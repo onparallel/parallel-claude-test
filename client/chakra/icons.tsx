@@ -2509,3 +2509,21 @@ export const ArrowDiagonalRightIcon = createIcon({
     </g>
   ),
 });
+
+export const ArchiveIcon = createIcon({
+  displayName: "ArchiveIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m20.1819 8.54545v11.81815h-16.36366v-11.81815" />
+      <path d="m22 4h-20v4.54545h20z" />
+      <path d="m10.1818 12.1818h3.6363" />
+    </g>
+  ),
+});

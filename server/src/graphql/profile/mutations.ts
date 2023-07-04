@@ -30,7 +30,7 @@ import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
-import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
+import { authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { dateArg } from "../helpers/scalars/DateTime";
@@ -56,6 +56,7 @@ import {
   profileHasProfileTypeFieldId,
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsOfType,
+  profileTypeIsArchived,
   userHasAccessToProfile,
   userHasAccessToProfileType,
 } from "./authorizers";
@@ -146,6 +147,7 @@ export const deleteProfileType = mutationField("deleteProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
+    profileTypeIsArchived("profileTypeIds"),
     contextUserHasRole("ADMIN")
   ),
   args: {
@@ -162,6 +164,36 @@ export const deleteProfileType = mutationField("deleteProfileType", {
       await ctx.profiles.deleteProfileTypes(profileTypeIds, `User:${ctx.user!.id}`, t);
     });
     return SUCCESS;
+  },
+});
+
+export const archiveProfileType = mutationField("archiveProfileType", {
+  type: list("ProfileType"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfileType("profileTypeIds"),
+    contextUserHasRole("ADMIN")
+  ),
+  args: {
+    profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
+  },
+  resolve: async (_, { profileTypeIds }, ctx) => {
+    return await ctx.profiles.archiveProfileTypes(profileTypeIds, ctx.user!.id);
+  },
+});
+
+export const unarchiveProfileType = mutationField("unarchiveProfileType", {
+  type: list("ProfileType"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfileType("profileTypeIds"),
+    contextUserHasRole("ADMIN")
+  ),
+  args: {
+    profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
+  },
+  resolve: async (_, { profileTypeIds }, ctx) => {
+    return await ctx.profiles.unarchiveProfileTypes(profileTypeIds);
   },
 });
 
@@ -430,7 +462,8 @@ export const createProfile = mutationField("createProfile", {
   type: "Profile",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToProfileType("profileTypeId")
+    userHasAccessToProfileType("profileTypeId"),
+    not(profileTypeIsArchived("profileTypeId"))
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),

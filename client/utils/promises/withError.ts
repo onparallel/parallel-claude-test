@@ -4,10 +4,13 @@ import { isPromiseLike } from "./isPromiseLike";
 export type AsyncResult<T = any, E = Error> = [E] | [null, T];
 
 export async function withError<E = Error, T = any>(
-  value: PromiseLike<T> | (() => MaybePromise<T>)
+  value: PromiseLike<T> | (() => MaybePromise<T>) | MaybePromise<T>
 ): Promise<AsyncResult<T, E>> {
   try {
-    return [null, isPromiseLike(value) ? await value : await value()];
+    return [
+      null,
+      isPromiseLike(value) ? await value : value instanceof Function ? await value() : await value,
+    ];
   } catch (e: any) {
     return [e];
   }

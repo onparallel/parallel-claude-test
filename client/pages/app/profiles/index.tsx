@@ -27,7 +27,11 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import {
+  RedirectError,
+  withApolloData,
+  WithApolloDataContext,
+} from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
@@ -36,6 +40,7 @@ import {
   Profiles_createProfileDocument,
   Profiles_ProfileFragment,
   Profiles_profilesDocument,
+  Profiles_profileTypeDocument,
   Profiles_profileTypesDocument,
   Profiles_updateProfileFieldValueDocument,
   Profiles_userDocument,
@@ -47,8 +52,10 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { withError } from "@parallel/utils/promises/withError";
 import {
   integer,
+  parseQuery,
   QueryStateFrom,
   QueryStateOf,
   SetQueryState,
@@ -74,7 +81,7 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "DESC",
   }),
-  profileType: string(),
+  type: string().list(),
 };
 type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
@@ -95,7 +102,7 @@ function Profiles() {
       search: queryState.search,
       sortBy: [`${queryState.sort.field}_${queryState.sort.direction}` as const],
       filter: {
-        profileTypeId: queryState.profileType ? [queryState.profileType] : undefined,
+        profileTypeId: queryState.type ? queryState.type : undefined,
       },
     },
     fetchPolicy: "cache-and-network",
@@ -108,6 +115,17 @@ function Profiles() {
       locale: intl.locale as UserLocale,
     },
     fetchPolicy: "cache-and-network",
+  });
+
+  const { data: _profileTypeData } = useQueryOrPreviousData(Profiles_profileTypeDocument, {
+    variables: {
+      profileTypeId: queryState.type?.[0] ?? "",
+    },
+    fetchPolicy: "cache-first",
+    skip:
+      !queryState.type ||
+      queryState.type.length > 1 ||
+      _profileTypesData?.profileTypes.items.some((pt) => pt.id === queryState.type![0]),
   });
 
   const profiles = data?.profiles;
@@ -157,9 +175,14 @@ function Profiles() {
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
-  const profileType = queryState.profileType
-    ? profileTypes?.items.find((pt) => pt.id === queryState.profileType) ?? null
-    : null;
+  const hasMultipleProfileTypes = isDefined(queryState.type) && queryState.type.length > 1;
+
+  const profileType =
+    queryState.type && queryState.type.length === 1
+      ? profileTypes?.items.find((pt) => pt.id === queryState.type![0]) ??
+        _profileTypeData?.profileType ??
+        null
+      : null;
 
   const showSubscribersDialog = useProfileSubscribersDialog();
   const handleSubscribeClick = useCallback(async () => {
@@ -211,23 +234,33 @@ function Profiles() {
                 data-testid="profile-type-menu-button"
                 rightIcon={<ChevronDownIcon boxSize={5} />}
               >
-                <OverflownText>
-                  {isDefined(profileType)
-                    ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
-                    : intl.formatMessage({
-                        id: "page.profiles.all-profiles",
-                        defaultMessage: "All profiles",
-                      })}
-                </OverflownText>
+                {hasMultipleProfileTypes
+                  ? intl.formatMessage({
+                      id: "page.profiles.multiple-profile-types",
+                      defaultMessage: "Multiple types",
+                    })
+                  : isDefined(profileType)
+                  ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
+                  : intl.formatMessage({
+                      id: "page.profiles.all-profiles",
+                      defaultMessage: "All profiles",
+                    })}
               </MenuButton>
               <Portal>
                 <MenuList minWidth="180px" maxWidth="320px">
-                  <MenuOptionGroup value={queryState.profileType ?? ""}>
-                    <MenuItemOption
-                      value=""
-                      onClick={() => setQueryState((s) => ({ ...s, profileType: null }))}
-                      data-testid="profile-type-all"
-                    >
+                  <MenuOptionGroup
+                    value={
+                      queryState.type
+                        ? hasMultipleProfileTypes
+                          ? "multiple"
+                          : queryState.type?.[0]
+                        : ""
+                    }
+                    onChange={(value) => {
+                      setQueryState((s) => ({ ...s, type: value ? [value as string] : null }));
+                    }}
+                  >
+                    <MenuItemOption value="" data-testid="profile-type-all">
                       <FormattedMessage
                         id="page.profiles.all-profiles"
                         defaultMessage="All profiles"
@@ -238,9 +271,6 @@ function Profiles() {
                         <MenuItemOption
                           key={profileType.id}
                           value={profileType.id}
-                          onClick={() =>
-                            setQueryState((s) => ({ ...s, profileType: profileType.id }))
-                          }
                           data-testid={`profile-type-${profileType.id}`}
                         >
                           <Text noOfLines={2}>
@@ -510,7 +540,6 @@ const _fragments = {
       fragment Profiles_ProfileType on ProfileType {
         id
         name
-        createdAt
       }
     `;
   },
@@ -535,17 +564,6 @@ const _fragments = {
       }
       ${UserAvatarList.fragments.User}
       ${useProfileSubscribersDialog.fragments.User}
-    `;
-  },
-  get ProfileTypePagination() {
-    return gql`
-      fragment Profiles_ProfileTypePagination on ProfileTypePagination {
-        items {
-          ...Profiles_ProfileType
-        }
-        totalCount
-      }
-      ${this.ProfileType}
     `;
   },
   get ProfilePagination() {
@@ -576,10 +594,21 @@ const _queries = [
   gql`
     query Profiles_profileTypes($offset: Int, $limit: Int, $locale: UserLocale) {
       profileTypes(offset: $offset, limit: $limit, locale: $locale) {
-        ...Profiles_ProfileTypePagination
+        items {
+          ...Profiles_ProfileType
+        }
+        totalCount
       }
     }
-    ${_fragments.ProfileTypePagination}
+    ${_fragments.ProfileType}
+  `,
+  gql`
+    query Profiles_profileType($profileTypeId: GID!) {
+      profileType(profileTypeId: $profileTypeId) {
+        ...Profiles_ProfileType
+      }
+    }
+    ${_fragments.ProfileType}
   `,
   gql`
     query Profiles_profiles(
@@ -620,7 +649,18 @@ const _mutations = [
 ];
 
 Profiles.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery(Profiles_userDocument);
+  const state = parseQuery(query, QUERY_STATE);
+  const [_, [error]] = await Promise.all([
+    fetchQuery(Profiles_userDocument),
+    withError(
+      state.type && state.type.length === 1
+        ? fetchQuery(Profiles_profileTypeDocument, { variables: { profileTypeId: state.type[0] } })
+        : null
+    ),
+  ]);
+  if (error) {
+    throw new RedirectError("/app/profiles");
+  }
   return {};
 };
 

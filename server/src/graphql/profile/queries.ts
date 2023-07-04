@@ -15,6 +15,12 @@ export const profileTypes = queryField((t) => {
     sortableBy: ["createdAt", "name" as never],
     extendArgs: {
       locale: arg({ type: "UserLocale" }),
+      filter: inputObjectType({
+        name: "ProfileTypeFilter",
+        definition(t) {
+          t.nullable.boolean("onlyArchived");
+        },
+      }),
     },
     validateArgs: (_, args, ctx, info) => {
       if (
@@ -29,7 +35,7 @@ export const profileTypes = queryField((t) => {
         );
       }
     },
-    resolve: async (_, { locale, limit, offset, search, sortBy }, ctx) => {
+    resolve: async (_, { filter, locale, limit, offset, search, sortBy }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name",
@@ -43,6 +49,7 @@ export const profileTypes = queryField((t) => {
           const [field, order] = parseSortBy(value);
           return { field: columnMap[field], order };
         }),
+        filter,
       });
     },
   });

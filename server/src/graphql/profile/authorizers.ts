@@ -1,11 +1,30 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, uniq } from "remeda";
-import { ProfileTypeFieldType } from "../../db/__types";
+import { ProfileType, ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
-import { Arg } from "../helpers/authorize";
+import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
+
+function createProfileTypeAuthorizer<TRest extends any[] = []>(
+  predicate: (profileType: ProfileType, ...rest: TRest) => boolean
+) {
+  return ((argName, ...rest: TRest) => {
+    return async (_, args, ctx) => {
+      const profileTypeIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      if (profileTypeIds.length === 0) {
+        return true;
+      }
+      const profileTypes = await ctx.profiles.loadProfileType(profileTypeIds);
+      return profileTypes.every(
+        (profileType) => isDefined(profileType) && predicate(profileType, ...rest)
+      );
+    };
+  }) as ArgAuthorizer<MaybeArray<number>, TRest>;
+}
+
+export const profileTypeIsArchived = createProfileTypeAuthorizer((p) => isDefined(p.archived_at));
 
 export function userHasAccessToProfileType<
   TypeName extends string,

@@ -1543,6 +1543,8 @@ export interface ProfileType {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  archived_by_user_id: Maybe<number>; // int4
+  archived_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateProfileType = PartialProps<
@@ -1555,6 +1557,8 @@ export type CreateProfileType = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "archived_by_user_id"
+  | "archived_at"
 >;
 
 export interface ProfileTypeField {

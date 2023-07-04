@@ -251,6 +251,10 @@ export interface NexusGenInputs {
     profileTypeFieldId?: NexusGenScalars["GID"][] | null; // [GID!]
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
   };
+  ProfileTypeFilter: {
+    // input type
+    onlyArchived?: boolean | null; // Boolean
+  };
   PublicPetitionSignerDataInput: {
     // input type
     email: string; // String!
@@ -1423,6 +1427,7 @@ export interface NexusGenFieldTypes {
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
+    archiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     associateProfileToPetition: NexusGenRootTypes["PetitionProfile"]; // PetitionProfile!
     bulkCreateContacts: NexusGenRootTypes["BulkCreateContactsReturnType"]; // BulkCreateContactsReturnType!
     bulkCreatePetitionReplies: NexusGenRootTypes["Petition"]; // Petition!
@@ -1565,6 +1570,7 @@ export interface NexusGenFieldTypes {
     tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     transferOrganizationOwnership: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferPetitionOwnership: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    unarchiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
@@ -2361,6 +2367,8 @@ export interface NexusGenFieldTypes {
   };
   ProfileType: {
     // field return type
+    archivedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    archivedBy: NexusGenRootTypes["User"] | null; // User
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     fields: NexusGenRootTypes["ProfileTypeField"][]; // [ProfileTypeField!]!
     id: NexusGenScalars["GID"]; // GID!
@@ -3470,6 +3478,7 @@ export interface NexusGenFieldTypeNames {
     addUsersToUserGroup: "UserGroup";
     anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
+    archiveProfileType: "ProfileType";
     associateProfileToPetition: "PetitionProfile";
     bulkCreateContacts: "BulkCreateContactsReturnType";
     bulkCreatePetitionReplies: "Petition";
@@ -3612,6 +3621,7 @@ export interface NexusGenFieldTypeNames {
     tagPetition: "PetitionBase";
     transferOrganizationOwnership: "SupportMethodResponse";
     transferPetitionOwnership: "PetitionBase";
+    unarchiveProfileType: "ProfileType";
     unsubscribeFromProfile: "Profile";
     untagPetition: "PetitionBase";
     updateContact: "Contact";
@@ -4408,6 +4418,8 @@ export interface NexusGenFieldTypeNames {
   };
   ProfileType: {
     // field return type name
+    archivedAt: "DateTime";
+    archivedBy: "User";
     createdAt: "DateTime";
     fields: "ProfileTypeField";
     id: "GID";
@@ -5198,6 +5210,10 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
+    };
+    archiveProfileType: {
+      // args
+      profileTypeIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     associateProfileToPetition: {
       // args
@@ -5992,6 +6008,10 @@ export interface NexusGenArgTypes {
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       userId: NexusGenScalars["GID"]; // GID!
     };
+    unarchiveProfileType: {
+      // args
+      profileTypeIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
     unsubscribeFromProfile: {
       // args
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -6485,6 +6505,7 @@ export interface NexusGenArgTypes {
     };
     profileTypes: {
       // args
+      filter?: NexusGenInputs["ProfileTypeFilter"] | null; // ProfileTypeFilter
       limit?: number | null; // Int
       locale?: NexusGenEnums["UserLocale"] | null; // UserLocale
       offset?: number | null; // Int

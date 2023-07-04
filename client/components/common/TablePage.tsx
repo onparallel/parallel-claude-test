@@ -6,11 +6,16 @@ import {
   Flex,
   HStack,
   IconButton,
-  Select,
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Portal,
   Spinner,
   Stack,
 } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -93,28 +98,45 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   const pagination = usePagination({ current: page, pageSize, totalCount: totalCount ?? 0 });
   const bottom = (
     <>
-      <Box paddingLeft={1}>
-        <Select
-          size="sm"
-          variant="unstyled"
-          value={pageSize}
-          onChange={(e) => onPageSizeChange?.(parseInt(e.target.value))}
-          display="flex"
-          alignItems="center"
+      <Menu placement="bottom-start">
+        <MenuButton
+          fontWeight={400}
+          size={"sm"}
+          as={Button}
+          variant="ghost"
+          rightIcon={<ChevronDownIcon boxSize={4} />}
         >
-          {pageSizeOptions.map((items) => (
-            <option key={items} value={items}>
-              {intl.formatMessage(
-                {
-                  id: "component.table.page-size",
-                  defaultMessage: "{items} items",
-                },
-                { items }
-              )}
-            </option>
-          ))}
-        </Select>
-      </Box>
+          <FormattedMessage
+            id="component.table.page-size"
+            defaultMessage="{items} items"
+            values={{
+              items: pageSize,
+            }}
+          />
+        </MenuButton>
+        <Portal>
+          <MenuList minWidth={0} width="auto" fontSize="sm">
+            <MenuOptionGroup value={pageSize.toString()}>
+              {pageSizeOptions.map((items) => (
+                <MenuItemOption
+                  key={items}
+                  value={items.toString()}
+                  onClick={() => onPageSizeChange?.(items)}
+                >
+                  <FormattedMessage
+                    id="component.table.page-size"
+                    defaultMessage="{items} items"
+                    values={{
+                      items,
+                    }}
+                  />
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Portal>
+      </Menu>
+
       <Box fontSize="sm">
         {totalCount ? (
           <FormattedMessage

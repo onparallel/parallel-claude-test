@@ -26,6 +26,15 @@ export const ProfileType = objectType({
           .join(""),
     });
     t.implements("Timestamps");
+    t.nullable.datetime("archivedAt", {
+      description: "Time when the response was created.",
+      resolve: (o) => o.archived_at,
+    });
+    t.nullable.field("archivedBy", {
+      type: "User",
+      resolve: async (o, _, ctx) =>
+        o.archived_by_user_id ? await ctx.users.loadUser(o.archived_by_user_id) : null,
+    });
   },
 });
 

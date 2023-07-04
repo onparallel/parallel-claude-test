@@ -1544,7 +1544,7 @@ export const sendPetition = mutationField("sendPetition", {
     if (currentAccesses.length > 0 && args.contactIdGroups.length !== 1) {
       // bulk sends only if the petition has not been sent to anyone
       // we don't support this case for now, throw error to avoid possible future bugs
-      throw new Error("UNSUPPORTED_USE_CASE");
+      throw new ApolloError("Unsupported use case", "UNSUPPORTED_USE_CASE");
     }
 
     try {

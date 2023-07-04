@@ -3310,7 +3310,7 @@ describe("GraphQL/Petitions", () => {
         }
       );
 
-      expect(errors).toContainGraphQLError("INTERNAL_SERVER_ERROR");
+      expect(errors).toContainGraphQLError("UNSUPPORTED_USE_CASE");
       expect(data).toBeNull();
     });
 

@@ -1,25 +1,23 @@
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Alert, AlertDescription, AlertIcon, Button, Stack, Text } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import {
   useDeleteProfileType_deleteProfileTypeDocument,
   useDeleteProfileType_profilesDocument,
   useDeleteProfileType_ProfileTypeFragment,
 } from "@parallel/graphql/__types";
+import Link from "next/link";
 import { useCallback } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 
 export function useDeleteProfileType() {
   const [deleteProfileType] = useMutation(useDeleteProfileType_deleteProfileTypeDocument);
-  const [getProfile] = useLazyQuery(useDeleteProfileType_profilesDocument, {
-    fetchPolicy: "network-only",
-  });
-
-  const showConfirmDelete = useDialog(ConfirmDeleteProfileTypeDialog);
-  const showConfirmDeleteWithProfiles = useConfirmDeleteProfileTypeDialog();
+  const client = useApolloClient();
+  const showConfirmDeleteWithProfiles = useDialog(ConfirmDeleteProfileTypeDialog);
+  const showConfirmDelete = useConfirmDeleteProfileTypeDialog();
 
   return async function ({
     profileTypes,
@@ -27,19 +25,19 @@ export function useDeleteProfileType() {
     profileTypes: useDeleteProfileType_ProfileTypeFragment[];
   }) {
     try {
-      const { data } = await getProfile({
+      const { data } = await client.query({
+        query: useDeleteProfileType_profilesDocument,
         variables: {
           filter: {
             profileTypeId: profileTypes.map((pt) => pt.id),
           },
         },
+        fetchPolicy: "network-only",
       });
 
-      const profilesCount = data?.profiles.totalCount;
-
-      if (profilesCount) {
+      if (data!.profiles.totalCount > 0) {
         await showConfirmDeleteWithProfiles({
-          profilesCount,
+          profileCount: data!.profiles.totalCount,
           profileTypes,
         });
       } else {
@@ -94,15 +92,8 @@ useDeleteProfileType.mutations = [
 
 function useConfirmDeleteProfileTypeDialog() {
   const showDialog = useConfirmDeleteDialog();
-  const intl = useIntl();
   return useCallback(
-    async ({
-      profilesCount,
-      profileTypes,
-    }: {
-      profilesCount: number;
-      profileTypes: useDeleteProfileType_ProfileTypeFragment[];
-    }) => {
+    async ({ profileTypes }: { profileTypes: useDeleteProfileType_ProfileTypeFragment[] }) => {
       return await showDialog({
         size: "lg",
         header: (
@@ -116,45 +107,25 @@ function useConfirmDeleteProfileTypeDialog() {
         ),
         description: (
           <Stack>
-            <Alert status="warning">
-              <AlertIcon color="yellow.500" />
-              <AlertDescription>
-                {profileTypes.length > 1 ? (
-                  <FormattedMessage
-                    id="component.use-delete-profile-type.found-profiles-in-use"
-                    defaultMessage="We have found profiles created from one of these profile types."
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="component.use-delete-profile-type.profiles-in-use"
-                    defaultMessage="There are <b>{count, plural, =1 {1 profile} other {# profiles}}</b> created using this profile type."
-                    values={{
-                      count: profilesCount,
-                    }}
-                  />
-                )}
-              </AlertDescription>
-            </Alert>
-            <Text>
-              <FormattedMessage
-                id="component.use-delete-profile-type.if-proceed-delete-profiles"
-                defaultMessage="If you proceed, the profiles will be deleted and the information they contain will be lost."
-              />
-            </Text>
             <Text>
               <FormattedMessage
                 id="component.use-delete-profile-type.want-delete-profile-types"
-                defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?"
+                defaultMessage="Are you sure you want to delete {count, plural, =1{{name}} other {these profile types}}? You won't be able to create profiles using {count, plural, =1{this type} other {any of these types}}."
                 values={{
                   count: profileTypes.length,
-                  name: localizableUserTextRender({
-                    value: profileTypes[0].name,
-                    intl,
-                    default: intl.formatMessage({
-                      id: "generic.unamed-profile-type",
-                      defaultMessage: "Unnamed profile type",
-                    }),
-                  }),
+                  name: (
+                    <Text as="strong">
+                      <LocalizableUserTextRender
+                        value={profileTypes[0].name}
+                        default={
+                          <FormattedMessage
+                            id="generic.unamed-profile-type"
+                            defaultMessage="Unnamed profile type"
+                          />
+                        }
+                      />
+                    </Text>
+                  ),
                 }}
               />
             </Text>
@@ -167,13 +138,13 @@ function useConfirmDeleteProfileTypeDialog() {
 }
 
 function ConfirmDeleteProfileTypeDialog({
+  profileCount: profilesCount,
   profileTypes,
   ...props
 }: DialogProps<{
+  profileCount: number;
   profileTypes: useDeleteProfileType_ProfileTypeFragment[];
 }>) {
-  const intl = useIntl();
-
   return (
     <ConfirmDialog
       {...props}
@@ -187,27 +158,45 @@ function ConfirmDeleteProfileTypeDialog({
         />
       }
       body={
-        <Text>
-          <FormattedMessage
-            id="component.confirm-delete-profile-type.want-delete-profile-types"
-            defaultMessage="Are you sure you want to delete <b>{count, plural, =1 {{name}} other {# selected profile types}}</b>?"
-            values={{
-              count: profileTypes.length,
-              name: localizableUserTextRender({
-                value: profileTypes[0].name,
-                intl,
-                default: intl.formatMessage({
-                  id: "generic.unamed-profile-type",
-                  defaultMessage: "Unnamed profile type",
-                }),
-              }),
-            }}
-          />
-        </Text>
+        <Stack>
+          <Alert status="warning">
+            <AlertIcon color="yellow.500" />
+            <AlertDescription>
+              <FormattedMessage
+                id="component.use-delete-profile-type.profiles-in-use"
+                defaultMessage="There {count, plural, =1 {is <a>1 profile</a>} other {are <a># profiles</a>}} using {profileTypeCount, plural, =1 {this profile type} other {these profile types}}."
+                values={{
+                  count: profilesCount,
+                  profileTypeCount: profileTypes.length,
+                  a: (chunks) => (
+                    <Link
+                      href={`/app/profiles?${new URLSearchParams({
+                        type: profileTypes.map((pt) => pt.id).join(","),
+                      })}`}
+                    >
+                      <Text as="span" fontWeight={600} color="purple.500">
+                        {chunks}
+                      </Text>
+                    </Link>
+                  ),
+                }}
+              />
+            </AlertDescription>
+          </Alert>
+          <Text>
+            <FormattedMessage
+              id="component.confirm-delete-profile-type.want-delete-profile-types"
+              defaultMessage="To be able to delete {count, plural, =1 {this profile type} other {these profile types}}, first delete all profiles using {count, plural, =1 {this type} other {these types}}."
+              values={{
+                count: profileTypes.length,
+              }}
+            />
+          </Text>
+        </Stack>
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
+        <Button colorScheme="primary" onClick={() => props.onReject("CANCEL")}>
+          <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }
     />

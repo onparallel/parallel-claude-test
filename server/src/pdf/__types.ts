@@ -588,6 +588,7 @@ export type Mutation = {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
+  archiveProfileType: Success;
   /** Associates a profile to a petition */
   associateProfileToPetition: PetitionProfile;
   /** Load contacts from an excel file, creating the ones not found on database */
@@ -862,6 +863,7 @@ export type Mutation = {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
+  unarchiveProfileType: Array<ProfileType>;
   unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
@@ -978,6 +980,10 @@ export type MutationanonymizePetitionArgs = {
 export type MutationapproveOrRejectPetitionFieldRepliesArgs = {
   petitionId: Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
+};
+
+export type MutationarchiveProfileTypeArgs = {
+  profileTypeIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationassociateProfileToPetitionArgs = {
@@ -1771,6 +1777,10 @@ export type MutationtransferOrganizationOwnershipArgs = {
 export type MutationtransferPetitionOwnershipArgs = {
   petitionIds: Array<Scalars["GID"]["input"]>;
   userId: Scalars["GID"]["input"];
+};
+
+export type MutationunarchiveProfileTypeArgs = {
+  profileTypeIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationunsubscribeFromProfileArgs = {
@@ -3545,6 +3555,9 @@ export type ProfileSubscription = {
 };
 
 export type ProfileType = Timestamps & {
+  /** Time when the response was created. */
+  archivedAt: Maybe<Scalars["DateTime"]["output"]>;
+  archivedBy: Maybe<User>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
@@ -3572,6 +3585,10 @@ export type ProfileTypeField = {
 export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType = "DATE" | "FILE" | "NUMBER" | "PHONE" | "SHORT_TEXT" | "TEXT";
+
+export type ProfileTypeFilter = {
+  onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
 
 export type ProfileTypePagination = {
   /** The requested slice of items. */
@@ -4071,6 +4088,7 @@ export type QueryprofileTypeArgs = {
 };
 
 export type QueryprofileTypesArgs = {
+  filter?: InputMaybe<ProfileTypeFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale?: InputMaybe<UserLocale>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;

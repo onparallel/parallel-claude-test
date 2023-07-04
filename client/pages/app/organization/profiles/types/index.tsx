@@ -1,6 +1,17 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Flex, Text } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
+import {
+  Box,
+  Button,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Portal,
+  Text,
+} from "@chakra-ui/react";
+import { ArchiveIcon, ChevronDownIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -24,14 +35,18 @@ import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQu
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
 import { useDeleteProfileType } from "@parallel/utils/mutations/useDeleteProfileType";
+import { useUnarchiveProfileType } from "@parallel/utils/mutations/useUnarchiveProfileType";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
+  boolean,
   integer,
   QueryStateFrom,
   sorting,
   string,
   useQueryState,
+  useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
 import { useSelection } from "@parallel/utils/useSelectionState";
@@ -48,6 +63,7 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "ASC",
   }),
+  showArchived: boolean(),
 };
 
 export type ProfileTypesQueryState = QueryStateFrom<typeof QUERY_STATE>;
@@ -59,6 +75,11 @@ function OrganizationProfileTypes() {
   } = useAssertQueryOrPreviousData(OrganizationProfileTypes_userDocument);
 
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
+  const [showArchived, setShowArchived] = useQueryStateSlice(
+    queryState,
+    setQueryState,
+    "showArchived"
+  );
 
   const { data, loading, refetch } = useQueryOrPreviousData(
     OrganizationProfileTypes_profileTypesDocument,
@@ -69,6 +90,9 @@ function OrganizationProfileTypes() {
         search: queryState.search,
         sortBy: [`${queryState.sort.field}_${queryState.sort.direction}` as const],
         locale: intl.locale as UserLocale,
+        filter: {
+          onlyArchived: queryState.showArchived,
+        },
       },
       fetchPolicy: "cache-and-network",
     }
@@ -127,11 +151,74 @@ function OrganizationProfileTypes() {
     } catch {}
   };
 
+  const archiveProfileType = useArchiveProfileType();
+  const handleArchiveClick = async () => {
+    try {
+      await archiveProfileType({ profileTypes: selectedRows });
+      await refetch();
+    } catch {}
+  };
+
+  const unarchiveProfileType = useUnarchiveProfileType();
+  const handleUnarchiveClick = async () => {
+    try {
+      await unarchiveProfileType({ profileTypes: selectedRows });
+      await refetch();
+    } catch {}
+  };
+
   const actions = useProfileTypesListActions({
+    showArchived,
     selectedCount: selectedRows.length,
     onDeleteClick: handleDeleteClick,
     onCloneClick: handleCloneClick,
+    onUnarchiveClick: handleUnarchiveClick,
+    onArchiveClick: handleArchiveClick,
   });
+
+  function CustomFooter({ children }: { children: React.ReactNode }) {
+    return (
+      <>
+        <Menu placement="bottom-start">
+          <MenuButton
+            fontWeight={400}
+            size={"sm"}
+            as={Button}
+            variant="ghost"
+            rightIcon={<ChevronDownIcon boxSize={4} />}
+          >
+            {showArchived ? (
+              <FormattedMessage
+                id="component.profile-types-table.archived"
+                defaultMessage="Archived"
+              />
+            ) : (
+              <FormattedMessage id="component.profile-types-table.active" defaultMessage="Active" />
+            )}
+          </MenuButton>
+          <Portal>
+            <MenuList fontSize="sm" minWidth={0} width="auto">
+              <MenuOptionGroup value={showArchived ? "ARCHIVED" : "ACTIVE"}>
+                <MenuItemOption value="ACTIVE" onClick={() => setShowArchived(null)}>
+                  <FormattedMessage
+                    id="component.profile-types-table.active"
+                    defaultMessage="Active"
+                  />
+                </MenuItemOption>
+                <MenuItemOption value="ARCHIVED" onClick={() => setShowArchived(true)}>
+                  <FormattedMessage
+                    id="component.profile-types-table.archived"
+                    defaultMessage="Archived"
+                  />
+                </MenuItemOption>
+              </MenuOptionGroup>
+            </MenuList>
+          </Portal>
+        </Menu>
+        {children}
+      </>
+    );
+  }
 
   return (
     <OrganizationProfilesLayout currentTabKey="types" me={me} realMe={realMe}>
@@ -178,6 +265,15 @@ function OrganizationProfileTypes() {
                     />
                   </Text>
                 </Flex>
+              ) : queryState.showArchived ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text fontSize="lg">
+                    <FormattedMessage
+                      id="component.profile-types-table.no-profiles-archived"
+                      defaultMessage="There are no archived profiles"
+                    />
+                  </Text>
+                </Flex>
               ) : (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text fontSize="lg">
@@ -190,6 +286,7 @@ function OrganizationProfileTypes() {
               )
             ) : null
           }
+          Footer={CustomFooter}
         />
       </Box>
     </OrganizationProfilesLayout>
@@ -244,31 +341,54 @@ function useProfileTypesTableColumns(): TableColumn<OrganizationProfileTypes_Pro
 }
 
 function useProfileTypesListActions({
+  showArchived,
   selectedCount,
   onCloneClick,
   onDeleteClick,
+  onArchiveClick,
+  onUnarchiveClick,
 }: {
+  showArchived: boolean | null;
   selectedCount: number;
   onCloneClick: () => void;
   onDeleteClick: () => void;
+  onArchiveClick: () => void;
+  onUnarchiveClick: () => void;
 }) {
-  return [
-    {
-      key: "clone",
-      onClick: onCloneClick,
-      leftIcon: <CopyIcon />,
-      children: <FormattedMessage id="generic.duplicate" defaultMessage="Duplicate" />,
-      isDisabled: selectedCount !== 1,
-    },
-
-    {
-      key: "delete",
-      onClick: onDeleteClick,
-      leftIcon: <DeleteIcon />,
-      children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
-      colorScheme: "red",
-    },
-  ];
+  return showArchived
+    ? [
+        {
+          key: "unarchive",
+          onClick: onUnarchiveClick,
+          leftIcon: <ArchiveIcon />,
+          children: <FormattedMessage id="generic.unarchive" defaultMessage="Unarchive" />,
+        },
+        {
+          key: "delete",
+          onClick: onDeleteClick,
+          leftIcon: <DeleteIcon />,
+          children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+          colorScheme: "red",
+        },
+      ]
+    : [
+        {
+          key: "clone",
+          onClick: onCloneClick,
+          leftIcon: <CopyIcon />,
+          children: <FormattedMessage id="generic.duplicate" defaultMessage="Duplicate" />,
+          isDisabled: selectedCount !== 1,
+        },
+        {
+          key: "archive",
+          onClick: onArchiveClick,
+          leftIcon: <ArchiveIcon />,
+          children: (
+            <FormattedMessage id="component.profile-types-table.archive" defaultMessage="Archive" />
+          ),
+          colorScheme: "red",
+        },
+      ];
 }
 
 OrganizationProfileTypes.fragments = {
@@ -278,9 +398,13 @@ OrganizationProfileTypes.fragments = {
         id
         name
         createdAt
+        archivedAt
         ...useDeleteProfileType_ProfileType
+        ...useArchiveProfileType_ProfileType
       }
       ${useDeleteProfileType.fragments.ProfileType}
+      ${useArchiveProfileType.fragments.ProfileType}
+      ${useUnarchiveProfileType.fragments.ProfileType}
     `;
   },
   get ProfileTypePagination() {
@@ -304,6 +428,7 @@ OrganizationProfileTypes.queries = [
       $search: String
       $sortBy: [QueryProfileTypes_OrderBy!]
       $locale: UserLocale
+      $filter: ProfileTypeFilter
     ) {
       profileTypes(
         offset: $offset
@@ -311,6 +436,7 @@ OrganizationProfileTypes.queries = [
         search: $search
         sortBy: $sortBy
         locale: $locale
+        filter: $filter
       ) {
         ...OrganizationProfileTypes_ProfileTypePagination
       }

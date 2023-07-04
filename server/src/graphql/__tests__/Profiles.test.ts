@@ -557,6 +557,86 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("queries organization profile types with filter", async () => {
+      await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            archiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeIds: [
+            toGlobalId("ProfileType", profileTypes[0].id),
+            toGlobalId("ProfileType", profileTypes[1].id),
+          ],
+        }
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query (
+            $limit: Int
+            $offset: Int
+            $sortBy: [QueryProfileTypes_OrderBy!]
+            $locale: UserLocale
+            $filter: ProfileTypeFilter
+          ) {
+            profileTypes(
+              limit: $limit
+              offset: $offset
+              sortBy: $sortBy
+              locale: $locale
+              filter: $filter
+            ) {
+              totalCount
+              items {
+                id
+                name
+                fields {
+                  position
+                  name
+                }
+              }
+            }
+          }
+        `,
+        {
+          limit: 10,
+          offset: 0,
+          sortBy: ["name_DESC"],
+          locale: "en",
+          filter: {
+            onlyArchived: true,
+          },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypes).toEqual({
+        totalCount: 2,
+        items: [
+          {
+            id: toGlobalId("ProfileType", profileTypes[1].id),
+            name: { en: "Legal entity", es: "Persona jurídica" },
+            fields: times(3, (i) => ({
+              position: i,
+              name: { es: expect.any(String), en: expect.any(String) },
+            })),
+          },
+          {
+            id: toGlobalId("ProfileType", profileTypes[0].id),
+            name: { en: "Individual", es: "Persona física" },
+            fields: profileType0Fields.map((f, i) => ({
+              position: i,
+              name: f.name,
+            })),
+          },
+        ],
+      });
+    });
   });
 
   describe("createProfile", () => {
@@ -597,6 +677,33 @@ describe("GraphQL/Profiles", () => {
           },
         ],
       });
+    });
+
+    it("sends error if trying to create a profile with an archived profile type", async () => {
+      const [archivedProfileType] = await mocks.createRandomProfileTypes(
+        organization.id,
+        1,
+        () => ({
+          archived_at: new Date(),
+          archived_by_user_id: sessionUser.id,
+        })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $subscribe: Boolean) {
+            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", archivedProfileType.id),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull()
     });
   });
 
@@ -965,8 +1072,122 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
+  describe("archiveProfileType", () => {
+    it("archives multiple profile types", async () => {
+      const { errors: archiveErrors, data: archiveData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            archiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeIds: [
+            toGlobalId("ProfileType", profileTypes[1].id),
+            toGlobalId("ProfileType", profileTypes[2].id),
+          ],
+        }
+      );
+
+      expect(archiveErrors).toBeUndefined();
+      expect(archiveData?.archiveProfileType).toEqual([
+        { id: toGlobalId("ProfileType", profileTypes[1].id) },
+        { id: toGlobalId("ProfileType", profileTypes[2].id) },
+      ]);
+    });
+  });
+
+  describe("unarchiveProfileType", () => {
+    it("unarchives multiple profile types", async () => {
+      const { errors: archiveErrors, data: archiveData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            archiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeIds: [
+            toGlobalId("ProfileType", profileTypes[1].id),
+            toGlobalId("ProfileType", profileTypes[2].id),
+          ],
+        }
+      );
+
+      expect(archiveErrors).toBeUndefined();
+      expect(archiveData?.archiveProfileType).toEqual([
+        { id: toGlobalId("ProfileType", profileTypes[1].id) },
+        { id: toGlobalId("ProfileType", profileTypes[2].id) },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            unarchiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeIds: [
+            toGlobalId("ProfileType", profileTypes[1].id),
+            toGlobalId("ProfileType", profileTypes[2].id),
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.unarchiveProfileType).toEqual([
+        { id: toGlobalId("ProfileType", profileTypes[1].id) },
+        { id: toGlobalId("ProfileType", profileTypes[2].id) },
+      ]);
+    });
+  });
+
   describe("deleteProfileType", () => {
+    it("fails try to delete a profile type before archive it", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds)
+          }
+        `,
+        {
+          profileTypeIds: [
+            toGlobalId("ProfileType", profileTypes[1].id),
+            toGlobalId("ProfileType", profileTypes[2].id),
+          ],
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("deletes multiple profile types and its corresponding fields", async () => {
+      const { errors: archiveErrors, data: archiveData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            archiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeIds: [
+            toGlobalId("ProfileType", profileTypes[1].id),
+            toGlobalId("ProfileType", profileTypes[2].id),
+          ],
+        }
+      );
+
+      expect(archiveErrors).toBeUndefined();
+      expect(archiveData?.archiveProfileType).toEqual([
+        { id: toGlobalId("ProfileType", profileTypes[1].id) },
+        { id: toGlobalId("ProfileType", profileTypes[2].id) },
+      ]);
+
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($profileTypeIds: [GID!]!) {

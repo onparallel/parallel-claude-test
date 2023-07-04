@@ -360,6 +360,26 @@
     "context": "Upgrade your plan to increase your user and parallel limits."
   },
   {
+    "term": "component.archive-profile-type-confirmation-dialog.archive",
+    "definition": "Archive",
+    "context": "Archive"
+  },
+  {
+    "term": "component.archive-profile-type-confirmation-dialog.body",
+    "definition": "If you continue, you won't be able to create new profiles of {count, plural, =1 {type {profileTypeName}} other {the selected types}}. Existing profiles won't be affected and this action can be reversed if necessary.",
+    "context": "If you continue, you won't be able to create new profiles of {count, plural, =1 {type {profileTypeName}} other {the selected types}}. Existing profiles won't be affected and this action can be reversed if necessary."
+  },
+  {
+    "term": "component.archive-profile-type-confirmation-dialog.body-question",
+    "definition": "Are you sure you want to archive {count, plural, =1 {{profileTypeName}} other {the selected profile types}}?",
+    "context": "Are you sure you want to archive {count, plural, =1 {{profileTypeName}} other {the selected profile types}}?"
+  },
+  {
+    "term": "component.archive-profile-type-confirmation-dialog.title",
+    "definition": "Archive profile type",
+    "context": "Archive profile type"
+  },
+  {
     "term": "component.ask-view-name-dialog.max-length-error",
     "definition": "Name cannot exceed {max} characters",
     "context": "Name cannot exceed {max} characters"
@@ -766,8 +786,8 @@
   },
   {
     "term": "component.confirm-delete-profile-type.want-delete-profile-types",
-    "definition": "Are you sure you want to delete <b>{count, plural, =1 {{name}} other {# selected profile types}}</b>?",
-    "context": "Are you sure you want to delete <b>{count, plural, =1 {{name}} other {# selected profile types}}</b>?"
+    "definition": "To be able to delete {count, plural, =1 {this profile type} other {these profile types}}, first delete all profiles using {count, plural, =1 {this type} other {these types}}.",
+    "context": "To be able to delete {count, plural, =1 {this profile type} other {these profile types}}, first delete all profiles using {count, plural, =1 {this type} other {these types}}."
   },
   {
     "term": "component.confirm-disable-ongoing-signature-petition-close.body",
@@ -3100,21 +3120,6 @@
     "context": "Overwrite documentation"
   },
   {
-    "term": "component.overwrite-name-pattern-dialog.body",
-    "definition": "There <b>{count, plural, =1 {is # profile} other {are # profiles}}</b> that use this type of profile. If you continue, {count, plural, =1 {its} other {their}} name will be updated according to the new rule. Would you like to continue?",
-    "context": "There <b>{count, plural, =1 {is # profile} other {are # profiles}}</b> that use this type of profile. If you continue, {count, plural, =1 {its} other {their}} name will be updated according to the new rule. Would you like to continue?"
-  },
-  {
-    "term": "component.overwrite-name-pattern-dialog.change-name",
-    "definition": "Change name",
-    "context": "Change name"
-  },
-  {
-    "term": "component.overwrite-name-pattern-dialog.title",
-    "definition": "Overwrite name",
-    "context": "Overwrite name"
-  },
-  {
     "term": "component.password-input.hide",
     "definition": "Hide",
     "context": "Hide"
@@ -4805,6 +4810,21 @@
     "context": "Settings"
   },
   {
+    "term": "component.profile-types-table.active",
+    "definition": "Active",
+    "context": "Active"
+  },
+  {
+    "term": "component.profile-types-table.archive",
+    "definition": "Archive",
+    "context": "Archive"
+  },
+  {
+    "term": "component.profile-types-table.archived",
+    "definition": "Archived",
+    "context": "Archived"
+  },
+  {
     "term": "component.profile-types-table.new-type",
     "definition": "New type",
     "context": "New type"
@@ -4813,6 +4833,11 @@
     "term": "component.profile-types-table.no-profiles",
     "definition": "You have no profile types yet. Start by creating one now!",
     "context": "You have no profile types yet. Start by creating one now!"
+  },
+  {
+    "term": "component.profile-types-table.no-profiles-archived",
+    "definition": "There are no archived profiles",
+    "context": "There are no archived profiles"
   },
   {
     "term": "component.profile-types-table.no-results",
@@ -6810,6 +6835,16 @@
     "context": "Other"
   },
   {
+    "term": "component.unarchive-profile-type-dialog.body",
+    "definition": "If you continue, the selected profile {count, plural, =1 {type} other {types}} will be unarchived and you will be able to create new profiles using {count, plural, =1 {it} other {them}}.",
+    "context": "If you continue, the selected profile {count, plural, =1 {type} other {types}} will be unarchived and you will be able to create new profiles using {count, plural, =1 {it} other {them}}."
+  },
+  {
+    "term": "component.unarchive-profile-type-dialog.title",
+    "definition": "Unarchive profile type",
+    "context": "Unarchive profile type"
+  },
+  {
     "term": "component.update-organization-current-usage-period-dialog.limit-label",
     "definition": "Limit",
     "context": "Limit"
@@ -7040,24 +7075,14 @@
     "context": "Delete {count, plural, =1 {profile type} other {# profile types}}"
   },
   {
-    "term": "component.use-delete-profile-type.found-profiles-in-use",
-    "definition": "We have found profiles created from one of these profile types.",
-    "context": "We have found profiles created from one of these profile types."
-  },
-  {
-    "term": "component.use-delete-profile-type.if-proceed-delete-profiles",
-    "definition": "If you proceed, the profiles will be deleted and the information they contain will be lost.",
-    "context": "If you proceed, the profiles will be deleted and the information they contain will be lost."
-  },
-  {
     "term": "component.use-delete-profile-type.profiles-in-use",
-    "definition": "There are <b>{count, plural, =1 {1 profile} other {# profiles}}</b> created using this profile type.",
-    "context": "There are <b>{count, plural, =1 {1 profile} other {# profiles}}</b> created using this profile type."
+    "definition": "There {count, plural, =1 {is <a>1 profile</a>} other {are <a># profiles</a>}} using {profileTypeCount, plural, =1 {this profile type} other {these profile types}}.",
+    "context": "There {count, plural, =1 {is <a>1 profile</a>} other {are <a># profiles</a>}} using {profileTypeCount, plural, =1 {this profile type} other {these profile types}}."
   },
   {
     "term": "component.use-delete-profile-type.want-delete-profile-types",
-    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?",
-    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?"
+    "definition": "Are you sure you want to delete {count, plural, =1{{name}} other {these profile types}}? You won't be able to create profiles using {count, plural, =1{this type} other {any of these types}}.",
+    "context": "Are you sure you want to delete {count, plural, =1{{name}} other {these profile types}}? You won't be able to create profiles using {count, plural, =1{this type} other {any of these types}}."
   },
   {
     "term": "component.use-delete-tag.confirm-tag-header",
@@ -8755,6 +8780,11 @@
     "context": "Unnamed profile type"
   },
   {
+    "term": "generic.unarchive",
+    "definition": "Unarchive",
+    "context": "Unarchive"
+  },
+  {
     "term": "generic.unavailable",
     "definition": "Unavailable",
     "context": "Unavailable"
@@ -9783,6 +9813,11 @@
     "term": "page.profiles.create-profile",
     "definition": "Create profile",
     "context": "Create profile"
+  },
+  {
+    "term": "page.profiles.multiple-profile-types",
+    "definition": "Multiple types",
+    "context": "Multiple types"
   },
   {
     "term": "page.profiles.no-profiles",

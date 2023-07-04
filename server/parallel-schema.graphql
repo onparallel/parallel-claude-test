@@ -723,6 +723,7 @@ type Mutation {
     petitionId: GID!
     status: PetitionFieldReplyStatus!
   ): Petition!
+  archiveProfileType(profileTypeIds: [GID!]!): [ProfileType!]!
 
   """
   Associates a profile to a petition
@@ -1824,6 +1825,7 @@ type Mutation {
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [PetitionBase!]!
+  unarchiveProfileType(profileTypeIds: [GID!]!): [ProfileType!]!
   unsubscribeFromProfile(profileIds: [GID!]!, userIds: [GID!]!): [Profile!]!
 
   """
@@ -4669,6 +4671,12 @@ type ProfileSubscription {
 
 type ProfileType implements Timestamps {
   """
+  Time when the response was created.
+  """
+  archivedAt: DateTime
+  archivedBy: User
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -4710,6 +4718,10 @@ enum ProfileTypeFieldType {
   PHONE
   SHORT_TEXT
   TEXT
+}
+
+input ProfileTypeFilter {
+  onlyArchived: Boolean
 }
 
 type ProfileTypePagination {
@@ -5456,6 +5468,8 @@ type Query {
   profile(profileId: GID!): Profile!
   profileType(profileTypeId: GID!): ProfileType!
   profileTypes(
+    filter: ProfileTypeFilter
+
     """
     Number of elements to take from the list.
     """

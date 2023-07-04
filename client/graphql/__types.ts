@@ -633,6 +633,7 @@ export interface Mutation {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
+  archiveProfileType: Array<ProfileType>;
   /** Associates a profile to a petition */
   associateProfileToPetition: PetitionProfile;
   /** Load contacts from an excel file, creating the ones not found on database */
@@ -907,6 +908,7 @@ export interface Mutation {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
+  unarchiveProfileType: Array<ProfileType>;
   unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
@@ -1023,6 +1025,10 @@ export interface MutationanonymizePetitionArgs {
 export interface MutationapproveOrRejectPetitionFieldRepliesArgs {
   petitionId: Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
+}
+
+export interface MutationarchiveProfileTypeArgs {
+  profileTypeIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationassociateProfileToPetitionArgs {
@@ -1816,6 +1822,10 @@ export interface MutationtransferOrganizationOwnershipArgs {
 export interface MutationtransferPetitionOwnershipArgs {
   petitionIds: Array<Scalars["GID"]["input"]>;
   userId: Scalars["GID"]["input"];
+}
+
+export interface MutationunarchiveProfileTypeArgs {
+  profileTypeIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationunsubscribeFromProfileArgs {
@@ -3669,6 +3679,9 @@ export interface ProfileSubscription {
 
 export interface ProfileType extends Timestamps {
   __typename?: "ProfileType";
+  /** Time when the response was created. */
+  archivedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  archivedBy?: Maybe<User>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
@@ -3697,6 +3710,10 @@ export interface ProfileTypeField {
 export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType = "DATE" | "FILE" | "NUMBER" | "PHONE" | "SHORT_TEXT" | "TEXT";
+
+export interface ProfileTypeFilter {
+  onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
+}
 
 export interface ProfileTypePagination {
   __typename?: "ProfileTypePagination";
@@ -4216,6 +4233,7 @@ export interface QueryprofileTypeArgs {
 }
 
 export interface QueryprofileTypesArgs {
+  filter?: InputMaybe<ProfileTypeFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale?: InputMaybe<UserLocale>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
@@ -19070,6 +19088,7 @@ export type OrganizationProfileTypes_ProfileTypeFragment = {
   id: string;
   name: { [locale in UserLocale]?: string };
   createdAt: string;
+  archivedAt?: string | null;
 };
 
 export type OrganizationProfileTypes_ProfileTypePaginationFragment = {
@@ -19080,6 +19099,7 @@ export type OrganizationProfileTypes_ProfileTypePaginationFragment = {
     id: string;
     name: { [locale in UserLocale]?: string };
     createdAt: string;
+    archivedAt?: string | null;
   }>;
 };
 
@@ -19089,6 +19109,7 @@ export type OrganizationProfileTypes_profileTypesQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryProfileTypes_OrderBy> | QueryProfileTypes_OrderBy>;
   locale?: InputMaybe<UserLocale>;
+  filter?: InputMaybe<ProfileTypeFilter>;
 }>;
 
 export type OrganizationProfileTypes_profileTypesQuery = {
@@ -19100,6 +19121,7 @@ export type OrganizationProfileTypes_profileTypesQuery = {
       id: string;
       name: { [locale in UserLocale]?: string };
       createdAt: string;
+      archivedAt?: string | null;
     }>;
   };
 };
@@ -19155,6 +19177,7 @@ export type OrganizationProfileTypes_createProfileTypeMutation = {
     id: string;
     name: { [locale in UserLocale]?: string };
     createdAt: string;
+    archivedAt?: string | null;
   };
 };
 
@@ -28720,7 +28743,6 @@ export type Profiles_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
-  createdAt: string;
 };
 
 export type Profiles_ProfileFragment = {
@@ -28744,17 +28766,6 @@ export type Profiles_ProfileFragment = {
       avatarUrl?: string | null;
       initials?: string | null;
     };
-  }>;
-};
-
-export type Profiles_ProfileTypePaginationFragment = {
-  __typename?: "ProfileTypePagination";
-  totalCount: number;
-  items: Array<{
-    __typename?: "ProfileType";
-    id: string;
-    name: { [locale in UserLocale]?: string };
-    createdAt: string;
   }>;
 };
 
@@ -28841,8 +28852,19 @@ export type Profiles_profileTypesQuery = {
       __typename?: "ProfileType";
       id: string;
       name: { [locale in UserLocale]?: string };
-      createdAt: string;
     }>;
+  };
+};
+
+export type Profiles_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type Profiles_profileTypeQuery = {
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
   };
 };
 
@@ -30918,6 +30940,20 @@ export type usePetitionCommentsMutations_deletePetitionFieldCommentMutation = {
   };
 };
 
+export type useArchiveProfileType_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+};
+
+export type useArchiveProfileType_archiveProfileTypeMutationVariables = Exact<{
+  profileTypeIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type useArchiveProfileType_archiveProfileTypeMutation = {
+  archiveProfileType: Array<{ __typename?: "ProfileType"; id: string }>;
+};
+
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
   keepTitle?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -31080,6 +31116,20 @@ export type useDeleteTag_deleteTagMutationVariables = Exact<{
 }>;
 
 export type useDeleteTag_deleteTagMutation = { deleteTag: Result };
+
+export type useUnarchiveProfileType_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+};
+
+export type useUnarchiveProfileType_unarchiveProfileTypeMutationVariables = Exact<{
+  profileTypeIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type useUnarchiveProfileType_unarchiveProfileTypeMutation = {
+  unarchiveProfileType: Array<{ __typename?: "ProfileType"; id: string }>;
+};
 
 export type useUpdateIsReadNotification_UserFragment = {
   __typename?: "User";
@@ -33820,14 +33870,23 @@ export const useDeleteProfileType_ProfileTypeFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<useDeleteProfileType_ProfileTypeFragment, unknown>;
+export const useArchiveProfileType_ProfileTypeFragmentDoc = gql`
+  fragment useArchiveProfileType_ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<useArchiveProfileType_ProfileTypeFragment, unknown>;
 export const OrganizationProfileTypes_ProfileTypeFragmentDoc = gql`
   fragment OrganizationProfileTypes_ProfileType on ProfileType {
     id
     name
     createdAt
+    archivedAt
     ...useDeleteProfileType_ProfileType
+    ...useArchiveProfileType_ProfileType
   }
   ${useDeleteProfileType_ProfileTypeFragmentDoc}
+  ${useArchiveProfileType_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileTypes_ProfileTypeFragment, unknown>;
 export const OrganizationProfileTypes_ProfileTypePaginationFragmentDoc = gql`
   fragment OrganizationProfileTypes_ProfileTypePagination on ProfileTypePagination {
@@ -37169,18 +37228,8 @@ export const Profiles_ProfileTypeFragmentDoc = gql`
   fragment Profiles_ProfileType on ProfileType {
     id
     name
-    createdAt
   }
 ` as unknown as DocumentNode<Profiles_ProfileTypeFragment, unknown>;
-export const Profiles_ProfileTypePaginationFragmentDoc = gql`
-  fragment Profiles_ProfileTypePagination on ProfileTypePagination {
-    items {
-      ...Profiles_ProfileType
-    }
-    totalCount
-  }
-  ${Profiles_ProfileTypeFragmentDoc}
-` as unknown as DocumentNode<Profiles_ProfileTypePaginationFragment, unknown>;
 export const Profiles_ProfileFragmentDoc = gql`
   fragment Profiles_Profile on Profile {
     id
@@ -37858,6 +37907,12 @@ export const usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc = gql`
   }
   ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<usePetitionCommentsMutations_PetitionFieldCommentFragment, unknown>;
+export const useUnarchiveProfileType_ProfileTypeFragmentDoc = gql`
+  fragment useUnarchiveProfileType_ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<useUnarchiveProfileType_ProfileTypeFragment, unknown>;
 export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
   fragment useUpdateIsReadNotification_PetitionFieldComment on PetitionFieldComment {
     id
@@ -41061,6 +41116,7 @@ export const OrganizationProfileTypes_profileTypesDocument = gql`
     $search: String
     $sortBy: [QueryProfileTypes_OrderBy!]
     $locale: UserLocale
+    $filter: ProfileTypeFilter
   ) {
     profileTypes(
       offset: $offset
@@ -41068,6 +41124,7 @@ export const OrganizationProfileTypes_profileTypesDocument = gql`
       search: $search
       sortBy: $sortBy
       locale: $locale
+      filter: $filter
     ) {
       ...OrganizationProfileTypes_ProfileTypePagination
     }
@@ -42112,11 +42169,22 @@ export const Profiles_userDocument = gql`
 export const Profiles_profileTypesDocument = gql`
   query Profiles_profileTypes($offset: Int, $limit: Int, $locale: UserLocale) {
     profileTypes(offset: $offset, limit: $limit, locale: $locale) {
-      ...Profiles_ProfileTypePagination
+      items {
+        ...Profiles_ProfileType
+      }
+      totalCount
     }
   }
-  ${Profiles_ProfileTypePaginationFragmentDoc}
+  ${Profiles_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<Profiles_profileTypesQuery, Profiles_profileTypesQueryVariables>;
+export const Profiles_profileTypeDocument = gql`
+  query Profiles_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      ...Profiles_ProfileType
+    }
+  }
+  ${Profiles_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<Profiles_profileTypeQuery, Profiles_profileTypeQueryVariables>;
 export const Profiles_profilesDocument = gql`
   query Profiles_profiles(
     $offset: Int
@@ -42730,6 +42798,16 @@ export const usePetitionCommentsMutations_deletePetitionFieldCommentDocument = g
   usePetitionCommentsMutations_deletePetitionFieldCommentMutation,
   usePetitionCommentsMutations_deletePetitionFieldCommentMutationVariables
 >;
+export const useArchiveProfileType_archiveProfileTypeDocument = gql`
+  mutation useArchiveProfileType_archiveProfileType($profileTypeIds: [GID!]!) {
+    archiveProfileType(profileTypeIds: $profileTypeIds) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  useArchiveProfileType_archiveProfileTypeMutation,
+  useArchiveProfileType_archiveProfileTypeMutationVariables
+>;
 export const useClonePetitions_clonePetitionsDocument = gql`
   mutation useClonePetitions_clonePetitions(
     $petitionIds: [GID!]!
@@ -42847,6 +42925,16 @@ export const useDeleteTag_deleteTagDocument = gql`
 ` as unknown as DocumentNode<
   useDeleteTag_deleteTagMutation,
   useDeleteTag_deleteTagMutationVariables
+>;
+export const useUnarchiveProfileType_unarchiveProfileTypeDocument = gql`
+  mutation useUnarchiveProfileType_unarchiveProfileType($profileTypeIds: [GID!]!) {
+    unarchiveProfileType(profileTypeIds: $profileTypeIds) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  useUnarchiveProfileType_unarchiveProfileTypeMutation,
+  useUnarchiveProfileType_unarchiveProfileTypeMutationVariables
 >;
 export const useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusDocument = gql`
   mutation useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus(

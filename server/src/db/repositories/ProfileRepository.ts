@@ -74,6 +74,9 @@ export class ProfileRepository extends BaseRepository {
       search?: string | null;
       locale?: UserLocale;
       sortBy?: SortBy<"created_at" | "name">[];
+      filter?: {
+        onlyArchived?: boolean | null;
+      } | null;
     } & PageOpts
   ) {
     return this.getPagination<ProfileType>(
@@ -81,7 +84,14 @@ export class ProfileRepository extends BaseRepository {
         .where("org_id", orgId)
         .whereNull("deleted_at")
         .mmodify((q) => {
-          const { search, sortBy, locale } = opts;
+          const { search, sortBy, locale, filter } = opts;
+
+          if (filter?.onlyArchived) {
+            q.whereNotNull("archived_at");
+          } else {
+            q.whereNull("archived_at");
+          }
+
           if (search) {
             q.whereExists((q) =>
               q
@@ -220,6 +230,42 @@ export class ProfileRepository extends BaseRepository {
       deleted_at: this.now(),
       deleted_by: deletedBy,
     });
+  }
+
+  async archiveProfileTypes(id: MaybeArray<number>, userId: number, t?: Knex.Transaction) {
+    const ids = unMaybeArray(id);
+    if (ids.length === 0) {
+      return [];
+    }
+    return await this.from("profile_type", t)
+      .whereIn("id", ids)
+      .whereNull("deleted_at")
+      .whereNull("archived_at")
+      .update(
+        {
+          archived_at: this.now(),
+          archived_by_user_id: userId,
+        },
+        "*"
+      );
+  }
+
+  async unarchiveProfileTypes(id: MaybeArray<number>, t?: Knex.Transaction) {
+    const ids = unMaybeArray(id);
+    if (ids.length === 0) {
+      return [];
+    }
+    return await this.from("profile_type", t)
+      .whereIn("id", ids)
+      .whereNull("deleted_at")
+      .whereNotNull("archived_at")
+      .update(
+        {
+          archived_at: null,
+          archived_by_user_id: null,
+        },
+        "*"
+      );
   }
 
   async createProfileTypeField(
