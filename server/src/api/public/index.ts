@@ -27,6 +27,7 @@ import {
 } from "../rest/responses";
 import {
   ActivatePetitionRecipient_reactivateAccessesDocument,
+  AssociatePetitionToProfile_associateProfileToPetitionDocument,
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetition_petitionDocument,
@@ -42,6 +43,7 @@ import {
   CreateProfileFieldValue_profileFieldFileUploadCompleteDocument,
   CreateProfileFieldValue_updateProfileFieldValueDocument,
   DeactivatePetitionRecipient_deactivateAccessesDocument,
+  DeassociateProfileFromPetition_deassociateProfileFromPetitionDocument,
   DeletePetition_deletePetitionsDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeleteProfileFieldValue_deleteProfileFieldFileDocument,
@@ -64,6 +66,7 @@ import {
   GetPermissions_permissionsDocument,
   GetPetition_petitionDocument,
   GetPetitionEvents_PetitionEventsDocument,
+  GetPetitionProfiles_petitionDocument,
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetitions_petitionsDocument,
   GetProfile_profileDocument,
@@ -157,6 +160,7 @@ import {
 import { anyFileUploadMiddleware, singleFileUploadMiddleware } from "./middleware";
 import {
   _PetitionEvent,
+  AssociatePetitionToProfileInput,
   Contact,
   CreateContact,
   CreateOrUpdatePetitionCustomProperty,
@@ -169,6 +173,7 @@ import {
   ListOfPetitionEvents,
   ListOfPetitionFieldsWithReplies,
   ListOfProfileProperties,
+  ListOfProfiles,
   ListOfProfileSubscriptions,
   ListOfSignatureRequests,
   ListOfSubscriptions,
@@ -203,6 +208,7 @@ import {
   UpdateProfileFieldValueFormDataBody,
   UserWithOrg,
 } from "./schemas";
+import { th } from "date-fns/locale";
 
 function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
@@ -2660,6 +2666,163 @@ api
         throw new BadRequestError("The document is not yet ready to be downloaded");
       } else {
         return Redirect(signedPetitionDownloadLink.url!);
+      }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/profiles", { params: { petitionId } })
+  .get(
+    {
+      operationId: "GetPetitionProfiles",
+      summary: "List parallel profiles",
+      description: outdent`
+    Returns a list of all profiles associated to the parallel.
+    `,
+      query: {
+        ...profileIncludeParam,
+        type: stringParam({
+          description: "List of profile type IDs to filter by",
+          example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
+          required: false,
+          array: true,
+        }),
+      },
+      tags: ["Parallels"],
+      responses: { 200: SuccessResponse(ListOfProfiles) },
+    },
+    async ({ client, params, query }) => {
+      const _query = gql`
+        query GetPetitionProfiles_petition(
+          $petitionId: GID!
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          petition(id: $petitionId) {
+            __typename
+            ... on Petition {
+              profiles {
+                ...Profile
+              }
+            }
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      const response = await client.request(GetPetitionProfiles_petitionDocument, {
+        petitionId: params.petitionId,
+        ...getProfileIncludesFromQuery(query),
+      });
+
+      if (response.petition?.__typename !== "Petition") {
+        return Ok([]);
+      }
+
+      return Ok(
+        response.petition.profiles
+          .filter((p) => !isDefined(query.type) || query.type.includes(p.profileType.id))
+          .map(mapProfile)
+      );
+    }
+  )
+  .post(
+    {
+      operationId: "AssociatePetitionToProfile",
+      summary: "Associate a profile",
+      description: "Associates the parallel with a profile.",
+      body: JsonBody(AssociatePetitionToProfileInput),
+      query: {
+        ...profileIncludeParam,
+      },
+      responses: {
+        200: SuccessResponse(Profile),
+        409: ErrorResponse({
+          description: "The profile is already associated to the parallel",
+        }),
+      },
+      tags: ["Parallels"],
+    },
+    async ({ client, params, body, query }) => {
+      const _mutation = gql`
+        mutation AssociatePetitionToProfile_associateProfileToPetition(
+          $profileId: GID!
+          $petitionId: GID!
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          associateProfileToPetition(profileId: $profileId, petitionId: $petitionId) {
+            profile {
+              ...Profile
+            }
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      try {
+        const response = await client.request(
+          AssociatePetitionToProfile_associateProfileToPetitionDocument,
+          {
+            profileId: body.profileId,
+            petitionId: params.petitionId,
+            ...getProfileIncludesFromQuery(query),
+          }
+        );
+
+        assert("id" in response.associateProfileToPetition.profile);
+
+        return Ok(mapProfile(response.associateProfileToPetition.profile));
+      } catch (error) {
+        if (containsGraphQLError(error, "PROFILE_ALREADY_ASSOCIATED_TO_PETITION")) {
+          throw new ConflictError("The profile is already associated to this parallel");
+        }
+        throw error;
+      }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/profiles/:profileId", { params: { petitionId, profileId } })
+  .delete(
+    {
+      operationId: "DeassociateProfileFromPetition",
+      summary: "Dissociate a profile",
+      description: "Dissociates the parallel from a profile.",
+      responses: {
+        200: SuccessResponse(),
+        409: ErrorResponse({
+          description: "The profile is not associated to this parallel",
+        }),
+      },
+      tags: ["Parallels"],
+    },
+    async ({ client, params }) => {
+      const _mutation = gql`
+        mutation DeassociateProfileFromPetition_deassociateProfileFromPetition(
+          $profileId: GID!
+          $petitionId: GID!
+        ) {
+          deassociateProfileFromPetition(profileId: $profileId, petitionId: $petitionId)
+        }
+      `;
+
+      try {
+        await client.request(
+          DeassociateProfileFromPetition_deassociateProfileFromPetitionDocument,
+          {
+            profileId: params.profileId,
+            petitionId: params.petitionId,
+          }
+        );
+        return NoContent();
+      } catch (error) {
+        if (containsGraphQLError(error, "PROFILE_NOT_ASSOCIATED_TO_PETITION")) {
+          throw new ConflictError("The profile is not associated to this parallel");
+        }
+        throw error;
       }
     }
   );

@@ -2598,6 +2598,7 @@ const _Profile = {
 
 export const PaginatedProfiles = schema(_PaginationOf(_Profile as JsonSchema));
 export const Profile = schema(_Profile as JsonSchema);
+export const ListOfProfiles = ListOf(_Profile as JsonSchema);
 export const CreateProfile = schema({
   title: "CreateProfile",
   type: "object",
@@ -2699,6 +2700,20 @@ export const UpdateProfileFieldValueFormDataBody = schema({
       type: ["string", "null"],
       description:
         "Pass a date in format YYYY-MM-DD to specify when the value should expire. The field must be previously configured to allow expiration.",
+    },
+  },
+} as const);
+
+export const AssociatePetitionToProfileInput = schema({
+  title: "AssociatePetitionToProfileInput",
+  type: "object",
+  additionalProperties: false,
+  required: ["profileId"],
+  properties: {
+    profileId: {
+      type: "string",
+      description: "The ID of the profile to associate the parallel to",
+      example: toGlobalId("Profile", 101),
     },
   },
 } as const);

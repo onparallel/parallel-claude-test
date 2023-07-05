@@ -588,7 +588,7 @@ export type Mutation = {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
-  archiveProfileType: Success;
+  archiveProfileType: Array<ProfileType>;
   /** Associates a profile to a petition */
   associateProfileToPetition: PetitionProfile;
   /** Load contacts from an excel file, creating the ones not found on database */
@@ -6453,6 +6453,158 @@ export type DownloadSignedDocument_downloadAuditTrailMutation = {
   signedPetitionDownloadLink: { result: Result; url: string | null };
 };
 
+export type GetPetitionProfiles_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type GetPetitionProfiles_petitionQuery = {
+  petition:
+    | {
+        __typename: "Petition";
+        profiles: Array<{
+          id: string;
+          name: string;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+          properties?: Array<{
+            field: {
+              id: string;
+              name: { [locale in UserLocale]?: string };
+              alias: string | null;
+              type: ProfileTypeFieldType;
+              isExpirable: boolean;
+            };
+            value: {
+              id: string;
+              content: { [key: string]: any } | null;
+              expiresAt: string | null;
+              createdAt: string;
+            } | null;
+            files: Array<{
+              id: string;
+              expiresAt: string | null;
+              createdAt: string;
+              file: { filename: string; size: number; contentType: string } | null;
+            }> | null;
+          }>;
+          propertiesByAlias: Array<{
+            field: {
+              id: string;
+              name: { [locale in UserLocale]?: string };
+              alias: string | null;
+              type: ProfileTypeFieldType;
+              isExpirable: boolean;
+            };
+            value: {
+              id: string;
+              content: { [key: string]: any } | null;
+              expiresAt: string | null;
+              createdAt: string;
+            } | null;
+            files: Array<{
+              id: string;
+              expiresAt: string | null;
+              createdAt: string;
+              file: { filename: string; size: number; contentType: string } | null;
+            }> | null;
+          }>;
+          subscribers?: Array<{
+            user: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            };
+          }>;
+        }>;
+      }
+    | { __typename: "PetitionTemplate" }
+    | null;
+};
+
+export type AssociatePetitionToProfile_associateProfileToPetitionMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
+  associateProfileToPetition: {
+    profile: {
+      id: string;
+      name: string;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      properties?: Array<{
+        field: {
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          alias: string | null;
+          type: ProfileTypeFieldType;
+          isExpirable: boolean;
+        };
+        value: {
+          id: string;
+          content: { [key: string]: any } | null;
+          expiresAt: string | null;
+          createdAt: string;
+        } | null;
+        files: Array<{
+          id: string;
+          expiresAt: string | null;
+          createdAt: string;
+          file: { filename: string; size: number; contentType: string } | null;
+        }> | null;
+      }>;
+      propertiesByAlias: Array<{
+        field: {
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          alias: string | null;
+          type: ProfileTypeFieldType;
+          isExpirable: boolean;
+        };
+        value: {
+          id: string;
+          content: { [key: string]: any } | null;
+          expiresAt: string | null;
+          createdAt: string;
+        } | null;
+        files: Array<{
+          id: string;
+          expiresAt: string | null;
+          createdAt: string;
+          file: { filename: string; size: number; contentType: string } | null;
+        }> | null;
+      }>;
+      subscribers?: Array<{
+        user: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
+      }>;
+    };
+  };
+};
+
+export type DeassociateProfileFromPetition_deassociateProfileFromPetitionMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type DeassociateProfileFromPetition_deassociateProfileFromPetitionMutation = {
+  deassociateProfileFromPetition: Success;
+};
+
 export type GetTemplates_templatesQueryVariables = Exact<{
   offset: Scalars["Int"]["input"];
   limit: Scalars["Int"]["input"];
@@ -8858,6 +9010,57 @@ export const DownloadSignedDocument_downloadAuditTrailDocument = gql`
 ` as unknown as DocumentNode<
   DownloadSignedDocument_downloadAuditTrailMutation,
   DownloadSignedDocument_downloadAuditTrailMutationVariables
+>;
+export const GetPetitionProfiles_petitionDocument = gql`
+  query GetPetitionProfiles_petition(
+    $petitionId: GID!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    petition(id: $petitionId) {
+      __typename
+      ... on Petition {
+        profiles {
+          ...Profile
+        }
+      }
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  GetPetitionProfiles_petitionQuery,
+  GetPetitionProfiles_petitionQueryVariables
+>;
+export const AssociatePetitionToProfile_associateProfileToPetitionDocument = gql`
+  mutation AssociatePetitionToProfile_associateProfileToPetition(
+    $profileId: GID!
+    $petitionId: GID!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    associateProfileToPetition(profileId: $profileId, petitionId: $petitionId) {
+      profile {
+        ...Profile
+      }
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  AssociatePetitionToProfile_associateProfileToPetitionMutation,
+  AssociatePetitionToProfile_associateProfileToPetitionMutationVariables
+>;
+export const DeassociateProfileFromPetition_deassociateProfileFromPetitionDocument = gql`
+  mutation DeassociateProfileFromPetition_deassociateProfileFromPetition(
+    $profileId: GID!
+    $petitionId: GID!
+  ) {
+    deassociateProfileFromPetition(profileId: $profileId, petitionId: $petitionId)
+  }
+` as unknown as DocumentNode<
+  DeassociateProfileFromPetition_deassociateProfileFromPetitionMutation,
+  DeassociateProfileFromPetition_deassociateProfileFromPetitionMutationVariables
 >;
 export const GetTemplates_templatesDocument = gql`
   query GetTemplates_templates(

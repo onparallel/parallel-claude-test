@@ -588,7 +588,7 @@ export type Mutation = {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
-  archiveProfileType: Success;
+  archiveProfileType: Array<ProfileType>;
   /** Associates a profile to a petition */
   associateProfileToPetition: PetitionProfile;
   /** Load contacts from an excel file, creating the ones not found on database */
