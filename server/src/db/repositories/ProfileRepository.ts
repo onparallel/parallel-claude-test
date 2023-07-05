@@ -1224,7 +1224,7 @@ export class ProfileRepository extends BaseRepository {
     return petitionProfile;
   }
 
-  async deassociateProfileFromPetition(petitionIds: number[], profileIds: number[]) {
+  async disassociateProfileFromPetition(petitionIds: number[], profileIds: number[]) {
     if (profileIds.length === 0) {
       throw new Error("expected profileIds to be non-empty");
     }

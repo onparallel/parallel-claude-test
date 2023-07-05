@@ -25,7 +25,7 @@ import {
   useConfirmReactivateAccessDialog,
 } from "@parallel/components/petition-activity/dialogs/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/dialogs/ConfirmSendReminderDialog";
-import { useConfirmDeassociateProfileDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDeassociateProfileDialog";
+import { useConfirmDisassociateProfileDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDisassociateProfileDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
 import { PetitionProfilesTable } from "@parallel/components/petition-activity/PetitionProfilesTable";
@@ -43,7 +43,7 @@ import {
   PetitionActivity_reactivateAccessesDocument,
   PetitionActivity_sendRemindersDocument,
   PetitionActivity_switchAutomaticRemindersDocument,
-  PetitionActivity_deassociateProfileFromPetitionDocument,
+  PetitionActivity_disassociateProfileFromPetitionDocument,
   PetitionActivity_updatePetitionDocument,
   PetitionActivity_userDocument,
   UpdatePetitionInput,
@@ -358,13 +358,13 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     } catch {}
   };
 
-  const showConfirmDeassociateProfileDialog = useConfirmDeassociateProfileDialog();
-  const [deassociateProfileFromPetition] = useMutation(
-    PetitionActivity_deassociateProfileFromPetitionDocument
+  const showConfirmDisassociateProfileDialog = useConfirmDisassociateProfileDialog();
+  const [disassociateProfileFromPetition] = useMutation(
+    PetitionActivity_disassociateProfileFromPetitionDocument
   );
-  const handledeassociateProfileFromPetition = async (profileIds: string[]) => {
+  const handleDisassociateProfileFromPetition = async (profileIds: string[]) => {
     try {
-      await showConfirmDeassociateProfileDialog({
+      await showConfirmDisassociateProfileDialog({
         petitionName: petition.name,
         profileName:
           profileIds.length === 1
@@ -372,7 +372,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             : "",
         selectedProfiles: profileIds.length,
       });
-      await deassociateProfileFromPetition({
+      await disassociateProfileFromPetition({
         variables: { petitionId, profileIds },
       });
       refetch();
@@ -415,7 +415,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           <PetitionProfilesTable
             petition={petition}
             onAddProfile={handleAddProfileToPetition}
-            onRemoveProfile={handledeassociateProfileFromPetition}
+            onRemoveProfile={handleDisassociateProfileFromPetition}
           />
         </Box>
       ) : null}
@@ -557,11 +557,11 @@ PetitionActivity.mutations = [
         }
       }
     }
-    mutation PetitionActivity_deassociateProfileFromPetition(
+    mutation PetitionActivity_disassociateProfileFromPetition(
       $petitionId: GID!
       $profileIds: [GID!]!
     ) {
-      deassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+      disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
     }
   `,
 ];

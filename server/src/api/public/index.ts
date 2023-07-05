@@ -43,7 +43,6 @@ import {
   CreateProfileFieldValue_profileFieldFileUploadCompleteDocument,
   CreateProfileFieldValue_updateProfileFieldValueDocument,
   DeactivatePetitionRecipient_deactivateAccessesDocument,
-  DeassociateProfileFromPetition_deassociateProfileFromPetitionDocument,
   DeletePetition_deletePetitionsDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeleteProfileFieldValue_deleteProfileFieldFileDocument,
@@ -51,6 +50,7 @@ import {
   DeleteProfileFieldValue_updateProfileFieldValueDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
+  DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
   DownloadSignedDocument_downloadAuditTrailDocument,
   DownloadSignedDocument_downloadSignedDocDocument,
@@ -2787,9 +2787,9 @@ api
   .path("/petitions/:petitionId/profiles/:profileId", { params: { petitionId, profileId } })
   .delete(
     {
-      operationId: "DeassociateProfileFromPetition",
-      summary: "Dissociate a profile",
-      description: "Dissociates the parallel from a profile.",
+      operationId: "DisassociateProfileFromPetition",
+      summary: "Disassociate a profile",
+      description: "Disassociates the parallel from a profile.",
       responses: {
         200: SuccessResponse(),
         409: ErrorResponse({
@@ -2800,19 +2800,19 @@ api
     },
     async ({ client, params }) => {
       const _mutation = gql`
-        mutation DeassociateProfileFromPetition_deassociateProfileFromPetition(
-          $profileId: GID!
+        mutation DisassociateProfileFromPetition_disassociateProfileFromPetition(
           $petitionId: GID!
+          $profileIds: [GID!]!
         ) {
-          deassociateProfileFromPetition(profileId: $profileId, petitionId: $petitionId)
+          disassociateProfileFromPetition(profileIds: $profileIds, petitionId: $petitionId)
         }
       `;
 
       try {
         await client.request(
-          DeassociateProfileFromPetition_deassociateProfileFromPetitionDocument,
+          DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument,
           {
-            profileId: params.profileId,
+            profileIds: [params.profileId],
             petitionId: params.petitionId,
           }
         );

@@ -179,7 +179,12 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
     profile_id: number;
   };
+  /** @deprecated */
   PROFILE_DEASSOCIATED: {
+    user_id: number;
+    profile_id: number;
+  };
+  PROFILE_DISASSOCIATED: {
     user_id: number;
     profile_id: number;
   };
@@ -366,8 +371,15 @@ export type ProfileAssociatedEvent<IsCreate extends boolean = false> = GenericPe
   "PROFILE_ASSOCIATED",
   IsCreate
 >;
+
+/** @deprecated */
 export type ProfileDeassociatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
   "PROFILE_DEASSOCIATED",
+  IsCreate
+>;
+
+export type ProfileDisassociatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PROFILE_DISASSOCIATED",
   IsCreate
 >;
 
@@ -413,6 +425,7 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionAnonymizedEvent<IsCreate>
   | ReplyStatusChangedEvent<IsCreate>
   | ProfileAssociatedEvent<IsCreate>
+  | ProfileDisassociatedEvent<IsCreate>
   | ProfileDeassociatedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;

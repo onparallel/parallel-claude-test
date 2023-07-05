@@ -688,10 +688,6 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
-  /** Deassociates a petition from a profile */
-  deassociatePetitionFromProfile: Success;
-  /** Deassociates a profile from a petition */
-  deassociateProfileFromPetition: Success;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
@@ -725,6 +721,10 @@ export type Mutation = {
   deleteTag: Result;
   /** Deletes a group */
   deleteUserGroup: Result;
+  /** Disassociates a petition from a profile */
+  disassociatePetitionFromProfile: Success;
+  /** Disassociates a profile from a petition */
+  disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given parallel and users */
@@ -1271,16 +1271,6 @@ export type MutationdeactivateUserArgs = {
   userIds: Array<Scalars["GID"]["input"]>;
 };
 
-export type MutationdeassociatePetitionFromProfileArgs = {
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  profileId: Scalars["GID"]["input"];
-};
-
-export type MutationdeassociateProfileFromPetitionArgs = {
-  petitionId: Scalars["GID"]["input"];
-  profileIds: Array<Scalars["GID"]["input"]>;
-};
-
 export type MutationdeleteContactsArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   ids: Array<Scalars["GID"]["input"]>;
@@ -1370,6 +1360,16 @@ export type MutationdeleteTagArgs = {
 
 export type MutationdeleteUserGroupArgs = {
   ids: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationdisassociatePetitionFromProfileArgs = {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+};
+
+export type MutationdisassociateProfileFromPetitionArgs = {
+  petitionId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
@@ -2621,6 +2621,14 @@ export type PetitionDeletedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type PetitionDisassociatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
+};
+
 export type PetitionEvent = {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -2675,6 +2683,7 @@ export type PetitionEventType =
   | "PETITION_REOPENED"
   | "PROFILE_ASSOCIATED"
   | "PROFILE_DEASSOCIATED"
+  | "PROFILE_DISASSOCIATED"
   | "RECIPIENT_SIGNED"
   | "REMINDERS_OPT_OUT"
   | "REMINDER_SENT"
@@ -3421,6 +3430,16 @@ export type ProfileDeassociatedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
+export type ProfileDisassociatedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<Petition>;
+  profile: Maybe<Profile>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
 export type ProfileEvent = {
   createdAt: Scalars["DateTime"]["output"];
   id: Scalars["GID"]["output"];
@@ -3438,6 +3457,7 @@ export type ProfileEventPagination = {
 export type ProfileEventType =
   | "PETITION_ASSOCIATED"
   | "PETITION_DEASSOCIATED"
+  | "PETITION_DISASSOCIATED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"
@@ -6596,13 +6616,14 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
   };
 };
 
-export type DeassociateProfileFromPetition_deassociateProfileFromPetitionMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-}>;
+export type DisassociateProfileFromPetition_disassociateProfileFromPetitionMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"]["input"];
+    profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  }>;
 
-export type DeassociateProfileFromPetition_deassociateProfileFromPetitionMutation = {
-  deassociateProfileFromPetition: Success;
+export type DisassociateProfileFromPetition_disassociateProfileFromPetitionMutation = {
+  disassociateProfileFromPetition: Success;
 };
 
 export type GetTemplates_templatesQueryVariables = Exact<{
@@ -6800,6 +6821,13 @@ export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
 
 export type GetPetitionEvents_PetitionEventsQuery = {
   petitionEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
     | {
         id: string;
         data: { [key: string]: any };
@@ -9051,16 +9079,16 @@ export const AssociatePetitionToProfile_associateProfileToPetitionDocument = gql
   AssociatePetitionToProfile_associateProfileToPetitionMutation,
   AssociatePetitionToProfile_associateProfileToPetitionMutationVariables
 >;
-export const DeassociateProfileFromPetition_deassociateProfileFromPetitionDocument = gql`
-  mutation DeassociateProfileFromPetition_deassociateProfileFromPetition(
-    $profileId: GID!
+export const DisassociateProfileFromPetition_disassociateProfileFromPetitionDocument = gql`
+  mutation DisassociateProfileFromPetition_disassociateProfileFromPetition(
     $petitionId: GID!
+    $profileIds: [GID!]!
   ) {
-    deassociateProfileFromPetition(profileId: $profileId, petitionId: $petitionId)
+    disassociateProfileFromPetition(profileIds: $profileIds, petitionId: $petitionId)
   }
 ` as unknown as DocumentNode<
-  DeassociateProfileFromPetition_deassociateProfileFromPetitionMutation,
-  DeassociateProfileFromPetition_deassociateProfileFromPetitionMutationVariables
+  DisassociateProfileFromPetition_disassociateProfileFromPetitionMutation,
+  DisassociateProfileFromPetition_disassociateProfileFromPetitionMutationVariables
 >;
 export const GetTemplates_templatesDocument = gql`
   query GetTemplates_templates(

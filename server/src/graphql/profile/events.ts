@@ -33,8 +33,11 @@ export const ProfileEvent = interfaceType({
         return "ProfileFieldExpiryUpdatedEvent";
       case "PETITION_ASSOCIATED":
         return "PetitionAssociatedEvent";
+      /** @deprecated */
       case "PETITION_DEASSOCIATED":
         return "PetitionDeassociatedEvent";
+      case "PETITION_DISASSOCIATED":
+        return "PetitionDisassociatedEvent";
     }
   },
   sourceType: "profileEvents.ProfileEvent",
@@ -111,7 +114,17 @@ export const PetitionAssociatedEvent = createProfileEvent("PetitionAssociatedEve
     },
   });
 });
+/** @deprecated */
 export const PetitionDeassociatedEvent = createProfileEvent("PetitionDeassociatedEvent", (t) => {
+  t.nullable.field("user", {
+    type: "User",
+    resolve: async (root, _, ctx) => {
+      return await ctx.users.loadUser(root.data.user_id);
+    },
+  });
+});
+
+export const PetitionDisassociatedEvent = createProfileEvent("PetitionDisassociatedEvent", (t) => {
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {

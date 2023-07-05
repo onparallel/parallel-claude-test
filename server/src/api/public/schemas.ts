@@ -1816,16 +1816,32 @@ const PetitionEventSchemas = {
       },
     },
   },
-  PROFILE_DEASSOCIATED: {
-    description: "A user deassociated a profile from a parallel",
+  PROFILE_DISASSOCIATED: {
+    description: "A user disassociated a profile from a parallel",
     properties: {
       userId: {
-        description: "The ID of the user that deassociated the profile",
+        description: "The ID of the user that disassociated the profile",
         type: "string",
         example: toGlobalId("User", 5),
       },
       profileId: {
-        description: "The ID of the profile that was deassociated",
+        description: "The ID of the profile that was disassociated",
+        type: "string",
+        example: toGlobalId("Profile", 5),
+      },
+    },
+  },
+  /** @deprecated */
+  PROFILE_DEASSOCIATED: {
+    description: "A user disassociated a profile from a parallel",
+    properties: {
+      userId: {
+        description: "The ID of the user that disassociated the profile",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      profileId: {
+        description: "The ID of the profile that was disassociated",
         type: "string",
         example: toGlobalId("Profile", 5),
       },

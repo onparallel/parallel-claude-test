@@ -150,7 +150,8 @@ export type PetitionEventType =
   | "PETITION_ANONYMIZED"
   | "REPLY_STATUS_CHANGED"
   | "PROFILE_ASSOCIATED"
-  | "PROFILE_DEASSOCIATED";
+  | "PROFILE_DEASSOCIATED"
+  | "PROFILE_DISASSOCIATED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -195,6 +196,7 @@ export const PetitionEventTypeValues = [
   "REPLY_STATUS_CHANGED",
   "PROFILE_ASSOCIATED",
   "PROFILE_DEASSOCIATED",
+  "PROFILE_DISASSOCIATED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
@@ -325,7 +327,8 @@ export type ProfileEventType =
   | "PROFILE_FIELD_FILE_REMOVED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PETITION_ASSOCIATED"
-  | "PETITION_DEASSOCIATED";
+  | "PETITION_DEASSOCIATED"
+  | "PETITION_DISASSOCIATED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
@@ -335,6 +338,7 @@ export const ProfileEventTypeValues = [
   "PROFILE_FIELD_EXPIRY_UPDATED",
   "PETITION_ASSOCIATED",
   "PETITION_DEASSOCIATED",
+  "PETITION_DISASSOCIATED",
 ] as ProfileEventType[];
 
 export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";

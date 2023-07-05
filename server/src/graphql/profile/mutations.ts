@@ -929,8 +929,8 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
   },
 });
 
-export const deassociateProfileFromPetition = mutationField("deassociateProfileFromPetition", {
-  description: "Deassociates a profile from a petition",
+export const disassociateProfileFromPetition = mutationField("disassociateProfileFromPetition", {
+  description: "Disassociates a profile from a petition",
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
@@ -944,11 +944,11 @@ export const deassociateProfileFromPetition = mutationField("deassociateProfileF
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
   },
   resolve: async (_, { petitionId, profileIds }, ctx) => {
-    await ctx.profiles.deassociateProfileFromPetition([petitionId], profileIds);
+    await ctx.profiles.disassociateProfileFromPetition([petitionId], profileIds);
 
     await ctx.petitions.createEvent(
       profileIds.map((profileId) => ({
-        type: "PROFILE_DEASSOCIATED",
+        type: "PROFILE_DISASSOCIATED",
         petition_id: petitionId,
         data: {
           user_id: ctx.user!.id,
@@ -959,7 +959,7 @@ export const deassociateProfileFromPetition = mutationField("deassociateProfileF
 
     await ctx.profiles.createEvent(
       profileIds.map((profileId) => ({
-        type: "PETITION_DEASSOCIATED",
+        type: "PETITION_DISASSOCIATED",
         org_id: ctx.user!.org_id,
         profile_id: profileId,
         data: {
@@ -973,8 +973,8 @@ export const deassociateProfileFromPetition = mutationField("deassociateProfileF
   },
 });
 
-export const deassociatePetitionFromProfile = mutationField("deassociatePetitionFromProfile", {
-  description: "Deassociates a petition from a profile",
+export const disassociatePetitionFromProfile = mutationField("disassociatePetitionFromProfile", {
+  description: "Disassociates a petition from a profile",
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
@@ -988,11 +988,11 @@ export const deassociatePetitionFromProfile = mutationField("deassociatePetition
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
   },
   resolve: async (_, { profileId, petitionIds }, ctx) => {
-    await ctx.profiles.deassociateProfileFromPetition(petitionIds, [profileId]);
+    await ctx.profiles.disassociateProfileFromPetition(petitionIds, [profileId]);
 
     await ctx.petitions.createEvent(
       petitionIds.map((petitionId) => ({
-        type: "PROFILE_DEASSOCIATED",
+        type: "PROFILE_DISASSOCIATED",
         petition_id: petitionId,
         data: {
           user_id: ctx.user!.id,
@@ -1003,7 +1003,7 @@ export const deassociatePetitionFromProfile = mutationField("deassociatePetition
 
     await ctx.profiles.createEvent(
       petitionIds.map((petitionId) => ({
-        type: "PETITION_DEASSOCIATED",
+        type: "PETITION_DISASSOCIATED",
         org_id: ctx.user!.org_id,
         profile_id: profileId,
         data: {

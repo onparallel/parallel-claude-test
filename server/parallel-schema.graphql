@@ -1100,16 +1100,6 @@ type Mutation {
   ): [User!]!
 
   """
-  Deassociates a petition from a profile
-  """
-  deassociatePetitionFromProfile(petitionIds: [GID!]!, profileId: GID!): Success!
-
-  """
-  Deassociates a profile from a petition
-  """
-  deassociateProfileFromPetition(petitionId: GID!, profileIds: [GID!]!): Success!
-
-  """
   Delete contacts.
   """
   deleteContacts(
@@ -1224,6 +1214,16 @@ type Mutation {
   Deletes a group
   """
   deleteUserGroup(ids: [GID!]!): Result!
+
+  """
+  Disassociates a petition from a profile
+  """
+  disassociatePetitionFromProfile(petitionIds: [GID!]!, profileId: GID!): Success!
+
+  """
+  Disassociates a profile from a petition
+  """
+  disassociateProfileFromPetition(petitionId: GID!, profileIds: [GID!]!): Success!
 
   """
   generates a signed download link for the xlsx file containing the listings of a dynamic select field
@@ -3133,6 +3133,14 @@ type PetitionDeletedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
+type PetitionDisassociatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
+}
+
 interface PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -3192,6 +3200,7 @@ enum PetitionEventType {
   PETITION_REOPENED
   PROFILE_ASSOCIATED
   PROFILE_DEASSOCIATED
+  PROFILE_DISASSOCIATED
   RECIPIENT_SIGNED
   REMINDERS_OPT_OUT
   REMINDER_SENT
@@ -4495,6 +4504,16 @@ type ProfileDeassociatedEvent implements PetitionEvent {
   user: User
 }
 
+type ProfileDisassociatedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  profile: Profile
+  type: PetitionEventType!
+  user: User
+}
+
 interface ProfileEvent {
   createdAt: DateTime!
   id: GID!
@@ -4517,6 +4536,7 @@ type ProfileEventPagination {
 enum ProfileEventType {
   PETITION_ASSOCIATED
   PETITION_DEASSOCIATED
+  PETITION_DISASSOCIATED
   PROFILE_CREATED
   PROFILE_FIELD_EXPIRY_UPDATED
   PROFILE_FIELD_FILE_ADDED

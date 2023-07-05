@@ -3,7 +3,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmDeassociateProfileDialog({
+export function ConfirmDisassociateProfileDialog({
   petitionName,
   profileName,
   selectedPetitions,
@@ -20,7 +20,7 @@ export function ConfirmDeassociateProfileDialog({
       closeOnNavigation
       header={
         <FormattedMessage
-          id="component.confirm-deassociate-profile-dialog.header"
+          id="component.confirm-disassociate-profile-dialog.header"
           defaultMessage="Remove {count, plural, =1{association} other {# associations}}"
           values={{
             count: selectedPetitions || selectedProfiles,
@@ -32,17 +32,17 @@ export function ConfirmDeassociateProfileDialog({
           <Text>
             {selectedPetitions && selectedPetitions > 1 ? (
               <FormattedMessage
-                id="component.confirm-deassociate-profile-dialog.body-parallels-multiple"
+                id="component.confirm-disassociate-profile-dialog.body-parallels-multiple"
                 defaultMessage="Are you sure you want to remove the association with the selected parallels?"
               />
             ) : selectedProfiles && selectedProfiles > 1 ? (
               <FormattedMessage
-                id="component.confirm-deassociate-profile-dialog.body-profiles-multiple"
+                id="component.confirm-disassociate-profile-dialog.body-profiles-multiple"
                 defaultMessage="Are you sure you want to remove the association with the selected profiles?"
               />
             ) : (
               <FormattedMessage
-                id="component.confirm-deassociate-profile-dialog.body"
+                id="component.confirm-disassociate-profile-dialog.body"
                 defaultMessage="Are you sure you want to remove the association between {profileName} and parallel {petitionName}?"
                 values={{
                   profileName: profileName ? (
@@ -71,7 +71,7 @@ export function ConfirmDeassociateProfileDialog({
           </Text>
           <Text>
             <FormattedMessage
-              id="component.confirm-deassociate-profile-dialog.body-2"
+              id="component.confirm-disassociate-profile-dialog.body-2"
               defaultMessage="If you continue, the data will remain intact and only the association will be removed."
             />
           </Text>
@@ -80,7 +80,7 @@ export function ConfirmDeassociateProfileDialog({
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="component.confirm-deassociate-profile-dialog.confirm"
+            id="component.confirm-disassociate-profile-dialog.confirm"
             defaultMessage="Yes, remove association"
           />
         </Button>
@@ -90,6 +90,6 @@ export function ConfirmDeassociateProfileDialog({
   );
 }
 
-export function useConfirmDeassociateProfileDialog() {
-  return useDialog(ConfirmDeassociateProfileDialog);
+export function useConfirmDisassociateProfileDialog() {
+  return useDialog(ConfirmDisassociateProfileDialog);
 }

@@ -3639,7 +3639,7 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
-  describe("deassociateProfileFromPetition and deassociatePetitionFromProfile", () => {
+  describe("disassociateProfileFromPetition, disassociatePetitionFromProfile", () => {
     let petitions: Petition[];
     let profiles: Profile[];
 
@@ -3672,11 +3672,11 @@ describe("GraphQL/Profiles", () => {
       ]);
     });
 
-    it("deassociate profile from petition", async () => {
+    it("disassociate profile from petition", async () => {
       const { errors: unlinkErrors, data: unlinkData } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $profileIds: [GID!]!) {
-            deassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+            disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
           }
         `,
         {
@@ -3686,7 +3686,7 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(unlinkErrors).toBeUndefined();
-      expect(unlinkData?.deassociateProfileFromPetition).toEqual("SUCCESS");
+      expect(unlinkData?.disassociateProfileFromPetition).toEqual("SUCCESS");
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -3733,7 +3733,7 @@ describe("GraphQL/Profiles", () => {
         events: {
           items: [
             {
-              type: "PROFILE_DEASSOCIATED",
+              type: "PROFILE_DISASSOCIATED",
               data: {
                 userId: toGlobalId("User", sessionUser.id),
                 profileId: toGlobalId("Profile", profiles[0].id),
@@ -3749,11 +3749,11 @@ describe("GraphQL/Profiles", () => {
       });
     });
 
-    it("deassociate petition from profile", async () => {
+    it("disassociate petition from profile", async () => {
       const { errors: unlinkErrors, data: unlinkData } = await testClient.execute(
         gql`
           mutation ($profileId: GID!, $petitionIds: [GID!]!) {
-            deassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+            disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
           }
         `,
         {
@@ -3763,7 +3763,7 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(unlinkErrors).toBeUndefined();
-      expect(unlinkData?.deassociatePetitionFromProfile).toEqual("SUCCESS");
+      expect(unlinkData?.disassociatePetitionFromProfile).toEqual("SUCCESS");
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
@@ -3810,7 +3810,7 @@ describe("GraphQL/Profiles", () => {
         events: {
           items: [
             {
-              type: "PROFILE_DEASSOCIATED",
+              type: "PROFILE_DISASSOCIATED",
               data: {
                 userId: toGlobalId("User", sessionUser.id),
                 profileId: toGlobalId("Profile", profiles[0].id),

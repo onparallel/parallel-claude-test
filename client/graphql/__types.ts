@@ -733,10 +733,6 @@ export interface Mutation {
   deactivateAccesses: Array<PetitionAccess>;
   /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
-  /** Deassociates a petition from a profile */
-  deassociatePetitionFromProfile: Success;
-  /** Deassociates a profile from a petition */
-  deassociateProfileFromPetition: Success;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
@@ -770,6 +766,10 @@ export interface Mutation {
   deleteTag: Result;
   /** Deletes a group */
   deleteUserGroup: Result;
+  /** Disassociates a petition from a profile */
+  disassociatePetitionFromProfile: Success;
+  /** Disassociates a profile from a petition */
+  disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given parallel and users */
@@ -1316,16 +1316,6 @@ export interface MutationdeactivateUserArgs {
   userIds: Array<Scalars["GID"]["input"]>;
 }
 
-export interface MutationdeassociatePetitionFromProfileArgs {
-  petitionIds: Array<Scalars["GID"]["input"]>;
-  profileId: Scalars["GID"]["input"];
-}
-
-export interface MutationdeassociateProfileFromPetitionArgs {
-  petitionId: Scalars["GID"]["input"];
-  profileIds: Array<Scalars["GID"]["input"]>;
-}
-
 export interface MutationdeleteContactsArgs {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   ids: Array<Scalars["GID"]["input"]>;
@@ -1415,6 +1405,16 @@ export interface MutationdeleteTagArgs {
 
 export interface MutationdeleteUserGroupArgs {
   ids: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationdisassociatePetitionFromProfileArgs {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+}
+
+export interface MutationdisassociateProfileFromPetitionArgs {
+  petitionId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationdynamicSelectFieldFileDownloadLinkArgs {
@@ -2694,6 +2694,15 @@ export interface PetitionDeletedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
+export interface PetitionDisassociatedEvent extends ProfileEvent {
+  __typename?: "PetitionDisassociatedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
+  user?: Maybe<User>;
+}
+
 export interface PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -2750,6 +2759,7 @@ export type PetitionEventType =
   | "PETITION_REOPENED"
   | "PROFILE_ASSOCIATED"
   | "PROFILE_DEASSOCIATED"
+  | "PROFILE_DISASSOCIATED"
   | "RECIPIENT_SIGNED"
   | "REMINDERS_OPT_OUT"
   | "REMINDER_SENT"
@@ -3532,6 +3542,17 @@ export interface ProfileDeassociatedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
+export interface ProfileDisassociatedEvent extends PetitionEvent {
+  __typename?: "ProfileDisassociatedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition?: Maybe<Petition>;
+  profile?: Maybe<Profile>;
+  type: PetitionEventType;
+  user?: Maybe<User>;
+}
+
 export interface ProfileEvent {
   createdAt: Scalars["DateTime"]["output"];
   id: Scalars["GID"]["output"];
@@ -3550,6 +3571,7 @@ export interface ProfileEventPagination {
 export type ProfileEventType =
   | "PETITION_ASSOCIATED"
   | "PETITION_DEASSOCIATED"
+  | "PETITION_DISASSOCIATED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"
@@ -8098,8 +8120,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           } | null;
           profile?: { __typename?: "Profile"; id: string; name: string } | null;
         }
+      | { __typename?: "ProfileDeassociatedEvent"; id: string }
       | {
-          __typename?: "ProfileDeassociatedEvent";
+          __typename?: "ProfileDisassociatedEvent";
           id: string;
           createdAt: string;
           user?: {
@@ -8708,6 +8731,11 @@ export type PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragme
 export type PetitionActivityTimeline_PetitionEvent_ProfileDeassociatedEvent_Fragment = {
   __typename?: "ProfileDeassociatedEvent";
   id: string;
+};
+
+export type PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fragment = {
+  __typename?: "ProfileDisassociatedEvent";
+  id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   profile?: { __typename?: "Profile"; id: string; name: string } | null;
@@ -8958,6 +8986,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ProfileDeassociatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
@@ -9658,8 +9687,8 @@ export type TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment = {
   profile?: { __typename?: "Profile"; id: string; name: string } | null;
 };
 
-export type TimelineProfileDeassociatedEvent_ProfileDeassociatedEventFragment = {
-  __typename?: "ProfileDeassociatedEvent";
+export type TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment = {
+  __typename?: "ProfileDisassociatedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   profile?: { __typename?: "Profile"; id: string; name: string } | null;
@@ -15506,13 +15535,13 @@ export type ProfilePetitionsTable_associateProfileToPetitionMutation = {
   };
 };
 
-export type ProfilePetitionsTable_deassociatePetitionFromProfileMutationVariables = Exact<{
+export type ProfilePetitionsTable_disassociatePetitionFromProfileMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
-export type ProfilePetitionsTable_deassociatePetitionFromProfileMutation = {
-  deassociatePetitionFromProfile: Success;
+export type ProfilePetitionsTable_disassociatePetitionFromProfileMutation = {
+  disassociatePetitionFromProfile: Success;
 };
 
 export type ProfilePetitionsTable_petitionsQueryVariables = Exact<{
@@ -20084,8 +20113,9 @@ export type PetitionActivity_PetitionFragment = {
           } | null;
           profile?: { __typename?: "Profile"; id: string; name: string } | null;
         }
+      | { __typename?: "ProfileDeassociatedEvent"; id: string }
       | {
-          __typename?: "ProfileDeassociatedEvent";
+          __typename?: "ProfileDisassociatedEvent";
           id: string;
           createdAt: string;
           user?: {
@@ -21032,8 +21062,9 @@ export type PetitionActivity_updatePetitionMutation = {
                 } | null;
                 profile?: { __typename?: "Profile"; id: string; name: string } | null;
               }
+            | { __typename?: "ProfileDeassociatedEvent"; id: string }
             | {
-                __typename?: "ProfileDeassociatedEvent";
+                __typename?: "ProfileDisassociatedEvent";
                 id: string;
                 createdAt: string;
                 user?: {
@@ -21497,13 +21528,13 @@ export type PetitionActivity_associateProfileToPetitionMutation = {
   };
 };
 
-export type PetitionActivity_deassociateProfileFromPetitionMutationVariables = Exact<{
+export type PetitionActivity_disassociateProfileFromPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
-export type PetitionActivity_deassociateProfileFromPetitionMutation = {
-  deassociateProfileFromPetition: Success;
+export type PetitionActivity_disassociateProfileFromPetitionMutation = {
+  disassociateProfileFromPetition: Success;
 };
 
 export type PetitionActivity_petitionQueryVariables = Exact<{
@@ -22051,8 +22082,9 @@ export type PetitionActivity_petitionQuery = {
                 } | null;
                 profile?: { __typename?: "Profile"; id: string; name: string } | null;
               }
+            | { __typename?: "ProfileDeassociatedEvent"; id: string }
             | {
-                __typename?: "ProfileDeassociatedEvent";
+                __typename?: "ProfileDisassociatedEvent";
                 id: string;
                 createdAt: string;
                 user?: {
@@ -34598,8 +34630,8 @@ export const TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc = 
   TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment,
   unknown
 >;
-export const TimelineProfileDeassociatedEvent_ProfileDeassociatedEventFragmentDoc = gql`
-  fragment TimelineProfileDeassociatedEvent_ProfileDeassociatedEvent on ProfileDeassociatedEvent {
+export const TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc = gql`
+  fragment TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent on ProfileDisassociatedEvent {
     user {
       ...UserReference_User
     }
@@ -34611,7 +34643,7 @@ export const TimelineProfileDeassociatedEvent_ProfileDeassociatedEventFragmentDo
   ${UserReference_UserFragmentDoc}
   ${ProfileLink_ProfileFragmentDoc}
 ` as unknown as DocumentNode<
-  TimelineProfileDeassociatedEvent_ProfileDeassociatedEventFragment,
+  TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment,
   unknown
 >;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
@@ -34737,8 +34769,8 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on ProfileAssociatedEvent {
       ...TimelineProfileAssociatedEvent_ProfileAssociatedEvent
     }
-    ... on ProfileDeassociatedEvent {
-      ...TimelineProfileDeassociatedEvent_ProfileDeassociatedEvent
+    ... on ProfileDisassociatedEvent {
+      ...TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent
     }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
@@ -34780,7 +34812,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc}
   ${TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc}
   ${TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc}
-  ${TimelineProfileDeassociatedEvent_ProfileDeassociatedEventFragmentDoc}
+  ${TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -39444,16 +39476,16 @@ export const ProfilePetitionsTable_associateProfileToPetitionDocument = gql`
   ProfilePetitionsTable_associateProfileToPetitionMutation,
   ProfilePetitionsTable_associateProfileToPetitionMutationVariables
 >;
-export const ProfilePetitionsTable_deassociatePetitionFromProfileDocument = gql`
-  mutation ProfilePetitionsTable_deassociatePetitionFromProfile(
+export const ProfilePetitionsTable_disassociatePetitionFromProfileDocument = gql`
+  mutation ProfilePetitionsTable_disassociatePetitionFromProfile(
     $profileId: GID!
     $petitionIds: [GID!]!
   ) {
-    deassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+    disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
   }
 ` as unknown as DocumentNode<
-  ProfilePetitionsTable_deassociatePetitionFromProfileMutation,
-  ProfilePetitionsTable_deassociatePetitionFromProfileMutationVariables
+  ProfilePetitionsTable_disassociatePetitionFromProfileMutation,
+  ProfilePetitionsTable_disassociatePetitionFromProfileMutationVariables
 >;
 export const ProfilePetitionsTable_petitionsDocument = gql`
   query ProfilePetitionsTable_petitions($profileId: GID!, $offset: Int!, $limit: Int!) {
@@ -41162,16 +41194,16 @@ export const PetitionActivity_associateProfileToPetitionDocument = gql`
   PetitionActivity_associateProfileToPetitionMutation,
   PetitionActivity_associateProfileToPetitionMutationVariables
 >;
-export const PetitionActivity_deassociateProfileFromPetitionDocument = gql`
-  mutation PetitionActivity_deassociateProfileFromPetition(
+export const PetitionActivity_disassociateProfileFromPetitionDocument = gql`
+  mutation PetitionActivity_disassociateProfileFromPetition(
     $petitionId: GID!
     $profileIds: [GID!]!
   ) {
-    deassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+    disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
   }
 ` as unknown as DocumentNode<
-  PetitionActivity_deassociateProfileFromPetitionMutation,
-  PetitionActivity_deassociateProfileFromPetitionMutationVariables
+  PetitionActivity_disassociateProfileFromPetitionMutation,
+  PetitionActivity_disassociateProfileFromPetitionMutationVariables
 >;
 export const PetitionActivity_petitionDocument = gql`
   query PetitionActivity_petition($id: GID!) {

@@ -740,36 +740,6 @@
     "context": "Transfer parallels"
   },
   {
-    "term": "component.confirm-deassociate-profile-dialog.body",
-    "definition": "Are you sure you want to remove the association between {profileName} and parallel {petitionName}?",
-    "context": "Are you sure you want to remove the association between {profileName} and parallel {petitionName}?"
-  },
-  {
-    "term": "component.confirm-deassociate-profile-dialog.body-2",
-    "definition": "If you continue, the data will remain intact and only the association will be removed.",
-    "context": "If you continue, the data will remain intact and only the association will be removed."
-  },
-  {
-    "term": "component.confirm-deassociate-profile-dialog.body-parallels-multiple",
-    "definition": "Are you sure you want to remove the association with the selected parallels?",
-    "context": "Are you sure you want to remove the association with the selected parallels?"
-  },
-  {
-    "term": "component.confirm-deassociate-profile-dialog.body-profiles-multiple",
-    "definition": "Are you sure you want to remove the association with the selected profiles?",
-    "context": "Are you sure you want to remove the association with the selected profiles?"
-  },
-  {
-    "term": "component.confirm-deassociate-profile-dialog.confirm",
-    "definition": "Yes, remove association",
-    "context": "Yes, remove association"
-  },
-  {
-    "term": "component.confirm-deassociate-profile-dialog.header",
-    "definition": "Remove {count, plural, =1{association} other {# associations}}",
-    "context": "Remove {count, plural, =1{association} other {# associations}}"
-  },
-  {
     "term": "component.confirm-delete-petitions-dialog.body",
     "definition": "Are you sure you want to delete {list}?",
     "context": "Are you sure you want to delete {list}?"
@@ -823,6 +793,36 @@
     "term": "component.confirm-disable-ongoing-signature.header",
     "definition": "Ongoing eSignature",
     "context": "Ongoing eSignature"
+  },
+  {
+    "term": "component.confirm-disassociate-profile-dialog.body",
+    "definition": "Are you sure you want to remove the association between {profileName} and parallel {petitionName}?",
+    "context": "Are you sure you want to remove the association between {profileName} and parallel {petitionName}?"
+  },
+  {
+    "term": "component.confirm-disassociate-profile-dialog.body-2",
+    "definition": "If you continue, the data will remain intact and only the association will be removed.",
+    "context": "If you continue, the data will remain intact and only the association will be removed."
+  },
+  {
+    "term": "component.confirm-disassociate-profile-dialog.body-parallels-multiple",
+    "definition": "Are you sure you want to remove the association with the selected parallels?",
+    "context": "Are you sure you want to remove the association with the selected parallels?"
+  },
+  {
+    "term": "component.confirm-disassociate-profile-dialog.body-profiles-multiple",
+    "definition": "Are you sure you want to remove the association with the selected profiles?",
+    "context": "Are you sure you want to remove the association with the selected profiles?"
+  },
+  {
+    "term": "component.confirm-disassociate-profile-dialog.confirm",
+    "definition": "Yes, remove association",
+    "context": "Yes, remove association"
+  },
+  {
+    "term": "component.confirm-disassociate-profile-dialog.header",
+    "definition": "Remove {count, plural, =1{association} other {# associations}}",
+    "context": "Remove {count, plural, =1{association} other {# associations}}"
   },
   {
     "term": "component.confirm-discard-changes-dialog.body",
@@ -12410,7 +12410,7 @@
     "context": "{userIsYou, select, true {You} other {{user}}} associated the parallel with {profileName} {timeAgo}"
   },
   {
-    "term": "timeline.profile-deassociated-description",
+    "term": "timeline.profile-disassociated-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} removed the association with {profileName} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} removed the association with {profileName} {timeAgo}"
   },

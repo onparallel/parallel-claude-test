@@ -324,7 +324,9 @@ export function mapEventPayload(event: PetitionEvent) {
         profileId: toGlobalId("Profile", event.data.profile_id),
       };
     }
-    case "PROFILE_DEASSOCIATED": {
+    /** @deprecated */
+    case "PROFILE_DEASSOCIATED":
+    case "PROFILE_DISASSOCIATED": {
       return {
         userId: toGlobalId("User", event.data.user_id),
         profileId: toGlobalId("Profile", event.data.profile_id),

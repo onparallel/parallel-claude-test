@@ -9,7 +9,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import {
   ProfilePetitionsTable_PetitionFragment,
   ProfilePetitionsTable_associateProfileToPetitionDocument,
-  ProfilePetitionsTable_deassociatePetitionFromProfileDocument,
+  ProfilePetitionsTable_disassociatePetitionFromProfileDocument,
   ProfilePetitionsTable_petitionsDocument,
 } from "@parallel/graphql/__types";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
@@ -26,8 +26,7 @@ import { PetitionSignatureCellContent } from "../common/PetitionSignatureCellCon
 import { PetitionStatusCellContent } from "../common/PetitionStatusCellContent";
 import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
-import { UserAvatarList } from "../common/UserAvatarList";
-import { useConfirmDeassociateProfileDialog } from "../petition-activity/dialogs/ConfirmDeassociateProfileDialog";
+import { useConfirmDisassociateProfileDialog } from "../petition-activity/dialogs/ConfirmDisassociateProfileDialog";
 import { useAssociatePetitionToProfileDialog } from "./dialogs/AssociatePetitionToProfileDialog";
 
 const QUERY_STATE = {
@@ -65,21 +64,21 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       await refetch();
     } catch {}
   };
-  const showConfirmDeassociateProfileDialog = useConfirmDeassociateProfileDialog();
-  const [deassociatePetitionFromProfile] = useMutation(
-    ProfilePetitionsTable_deassociatePetitionFromProfileDocument
+  const showConfirmDisassociateProfileDialog = useConfirmDisassociateProfileDialog();
+  const [disassociatePetitionFromProfile] = useMutation(
+    ProfilePetitionsTable_disassociatePetitionFromProfileDocument
   );
   const columns = useProfilePetitionsTableColumns();
 
   const handleRemovePetition = async () => {
     try {
-      await showConfirmDeassociateProfileDialog({
+      await showConfirmDisassociateProfileDialog({
         petitionName: selectedRows[0].name,
         profileName: profile?.name,
         selectedPetitions: selectedRows.length,
       });
 
-      await deassociatePetitionFromProfile({
+      await disassociatePetitionFromProfile({
         variables: { profileId, petitionIds: selectedRows.map((row) => row.id) },
       });
       await refetch();
@@ -353,11 +352,11 @@ const _mutations = [
     }
   `,
   gql`
-    mutation ProfilePetitionsTable_deassociatePetitionFromProfile(
+    mutation ProfilePetitionsTable_disassociatePetitionFromProfile(
       $profileId: GID!
       $petitionIds: [GID!]!
     ) {
-      deassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+      disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
     }
   `,
 ];
