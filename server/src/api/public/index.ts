@@ -208,7 +208,6 @@ import {
   UpdateProfileFieldValueFormDataBody,
   UserWithOrg,
 } from "./schemas";
-import { th } from "date-fns/locale";
 
 function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
