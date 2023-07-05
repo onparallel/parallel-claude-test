@@ -313,15 +313,29 @@ export const ProfileForm = Object.assign(
                 defaultMessage: "Unnamed profile",
               })}
           </OverflownText>
-          <Box fontSize="sm" color="gray.600" lineHeight="18px">
-            <LocalizableUserTextRender
-              value={profile.profileType.name}
-              default={intl.formatMessage({
-                id: "generic.unnamed-profile-type",
-                defaultMessage: "Unnamed profile type",
-              })}
-            />
-          </Box>
+          <HStack
+            divider={<Divider isVertical height={3.5} color="gray.500" />}
+            fontSize="sm"
+            color="gray.600"
+            lineHeight="18px"
+          >
+            <Box>
+              <LocalizableUserTextRender
+                value={profile.profileType.name}
+                default={intl.formatMessage({
+                  id: "generic.unnamed-profile-type",
+                  defaultMessage: "Unnamed profile type",
+                })}
+              />
+            </Box>
+            <Box>
+              <FormattedMessage
+                id="generic.petition-count"
+                defaultMessage="{count, plural, =1 {# parallel} other {# parallels}}"
+                values={{ count: profile.petitions.totalCount }}
+              />
+            </Box>
+          </HStack>
         </Stack>
         {editedFieldsCount ? (
           <EditedFieldsAlert
@@ -467,6 +481,9 @@ export const ProfileForm = Object.assign(
             }
             properties {
               ...ProfileForm_ProfileFieldProperty
+            }
+            petitions {
+              totalCount
             }
           }
           ${this.ProfileFieldProperty}

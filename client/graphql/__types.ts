@@ -15077,6 +15077,7 @@ export type ProfileDrawer_profileQuery = {
         expiryDate?: string | null;
       } | null;
     }>;
+    petitions: { __typename?: "PetitionPagination"; totalCount: number };
   };
 };
 
@@ -15284,6 +15285,7 @@ export type ProfileForm_ProfileFragment = {
       expiryDate?: string | null;
     } | null;
   }>;
+  petitions: { __typename?: "PetitionPagination"; totalCount: number };
 };
 
 export type ProfileForm_updateProfileFieldValueMutationVariables = Exact<{
@@ -15334,6 +15336,7 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         expiryDate?: string | null;
       } | null;
     }>;
+    petitions: { __typename?: "PetitionPagination"; totalCount: number };
   };
 };
 
@@ -28204,6 +28207,7 @@ export type ProfileDetail_ProfileFragment = {
       expiryDate?: string | null;
     } | null;
   }>;
+  petitions: { __typename?: "PetitionPagination"; totalCount: number };
 };
 
 export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -28312,6 +28316,7 @@ export type ProfileDetail_profileQuery = {
         expiryDate?: string | null;
       } | null;
     }>;
+    petitions: { __typename?: "PetitionPagination"; totalCount: number };
   };
 };
 
@@ -28376,6 +28381,7 @@ export type ProfileDetail_subscribeToProfileMutation = {
         expiryDate?: string | null;
       } | null;
     }>;
+    petitions: { __typename?: "PetitionPagination"; totalCount: number };
   }>;
 };
 
@@ -28440,6 +28446,7 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
         expiryDate?: string | null;
       } | null;
     }>;
+    petitions: { __typename?: "PetitionPagination"; totalCount: number };
   }>;
 };
 
@@ -36889,6 +36896,9 @@ export const ProfileForm_ProfileFragmentDoc = gql`
     }
     properties {
       ...ProfileForm_ProfileFieldProperty
+    }
+    petitions {
+      totalCount
     }
   }
   ${ProfileForm_ProfileFieldPropertyFragmentDoc}

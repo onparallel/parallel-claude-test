@@ -7115,16 +7115,6 @@
     "context": "Deleting the tag will remove it from the parallels and views that are using it."
   },
   {
-    "term": "component.use-delete-tag.parallel-count",
-    "definition": "{count, plural, =1 {# parallel} other {# parallels}}",
-    "context": "{count, plural, =1 {# parallel} other {# parallels}}"
-  },
-  {
-    "term": "component.use-delete-tag.template-count",
-    "definition": "{count, plural, =1 {# plantilla} other {# plantillas}}",
-    "context": "{count, plural, =1 {# template} other {# templates}}"
-  },
-  {
     "term": "component.use-delete-tag.users-with-tag",
     "definition": "Los siguientes usuarios están utilizando la etiqueta seleccionada:",
     "context": "The following users are using the selected tag:"
@@ -8550,6 +8540,11 @@
     "context": "Parallels"
   },
   {
+    "term": "generic.petition-count",
+    "definition": "{count, plural, =1 {# parallel} other {# parallels}}",
+    "context": "{count, plural, =1 {# parallel} other {# parallels}}"
+  },
+  {
     "term": "generic.plans.enterprise",
     "definition": "Enterprise",
     "context": "Enterprise"
@@ -8743,6 +8738,11 @@
     "term": "generic.template",
     "definition": "Plantilla",
     "context": "Template"
+  },
+  {
+    "term": "generic.template-count",
+    "definition": "{count, plural, =1 {# plantilla} other {# plantillas}}",
+    "context": "{count, plural, =1 {# template} other {# templates}}"
   },
   {
     "term": "generic.template-name",

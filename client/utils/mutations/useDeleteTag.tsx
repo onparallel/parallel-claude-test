@@ -102,7 +102,7 @@ function useConfirmDeleteTagDialog() {
                       petitionCount
                         ? intl.formatMessage(
                             {
-                              id: "component.use-delete-tag.parallel-count",
+                              id: "generic.petition-count",
                               defaultMessage:
                                 "{count, plural, =1 {# parallel} other {# parallels}}",
                             },
@@ -112,7 +112,7 @@ function useConfirmDeleteTagDialog() {
                       templateCount
                         ? intl.formatMessage(
                             {
-                              id: "component.use-delete-tag.template-count",
+                              id: "generic.template-count",
                               defaultMessage:
                                 "{count, plural, =1 {# template} other {# templates}}",
                             },
