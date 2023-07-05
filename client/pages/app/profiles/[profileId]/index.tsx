@@ -155,8 +155,12 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             ) : null}
           </HStack>
           <Stack spacing={6} padding={4} paddingBottom={24} flex={1} minHeight={0} overflow="auto">
-            <ProfileRelationshipsTable />
-            <ProfilePetitionsTable profileId={profile.id} />
+            <Flex flex={1} direction="column" minHeight="305px">
+              <ProfileRelationshipsTable />
+            </Flex>
+            <Flex flex={1} direction="column" minHeight="305px">
+              <ProfilePetitionsTable profileId={profile.id} />
+            </Flex>
           </Stack>
         </Flex>
       </Flex>

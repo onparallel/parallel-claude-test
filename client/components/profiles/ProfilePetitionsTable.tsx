@@ -112,8 +112,8 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
 
   return (
     <TablePage
-      flex="0 1 auto"
-      minHeight="305px"
+      flex="1 1 auto"
+      minHeight={0}
       rowKeyProp="id"
       isSelectable
       isHighlightable
