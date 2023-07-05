@@ -688,6 +688,8 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
+  /** Deassociates a petition from a profile */
+  deassociatePetitionFromProfile: Success;
   /** Deassociates a profile from a petition */
   deassociateProfileFromPetition: Success;
   /** Delete contacts. */
@@ -1269,9 +1271,14 @@ export type MutationdeactivateUserArgs = {
   userIds: Array<Scalars["GID"]["input"]>;
 };
 
+export type MutationdeassociatePetitionFromProfileArgs = {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+};
+
 export type MutationdeassociateProfileFromPetitionArgs = {
   petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeleteContactsArgs = {
@@ -3024,6 +3031,13 @@ export type PetitionMessageStatus =
   /** The message has been scheduled to be sent at a specific time. */
   | "SCHEDULED";
 
+export type PetitionPagination = {
+  /** The requested slice of items. */
+  items: Array<Petition>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"]["output"];
+};
+
 export type PetitionPermission = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
@@ -3360,7 +3374,7 @@ export type Profile = Timestamps & {
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
   name: Scalars["String"]["output"];
-  petitions: Array<Petition>;
+  petitions: PetitionPagination;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
   subscribers: Array<ProfileSubscription>;
@@ -3369,6 +3383,11 @@ export type Profile = Timestamps & {
 };
 
 export type ProfileeventsArgs = {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type ProfilepetitionsArgs = {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 };

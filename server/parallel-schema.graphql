@@ -1100,9 +1100,14 @@ type Mutation {
   ): [User!]!
 
   """
+  Deassociates a petition from a profile
+  """
+  deassociatePetitionFromProfile(petitionIds: [GID!]!, profileId: GID!): Success!
+
+  """
   Deassociates a profile from a petition
   """
-  deassociateProfileFromPetition(petitionId: GID!, profileId: GID!): Success!
+  deassociateProfileFromPetition(petitionId: GID!, profileIds: [GID!]!): Success!
 
   """
   Delete contacts.
@@ -3829,6 +3834,18 @@ enum PetitionMessageStatus {
   SCHEDULED
 }
 
+type PetitionPagination {
+  """
+  The requested slice of items.
+  """
+  items: [Petition!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
 interface PetitionPermission implements Timestamps {
   """
   Time when the resource was created.
@@ -4428,7 +4445,17 @@ type Profile implements Timestamps {
   ): ProfileEventPagination!
   id: GID!
   name: String!
-  petitions: [Petition!]!
+  petitions(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PetitionPagination!
   profileType: ProfileType!
   properties: [ProfileFieldProperty!]!
   subscribers: [ProfileSubscription!]!

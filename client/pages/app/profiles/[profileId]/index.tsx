@@ -6,19 +6,15 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { useConfirmDeassociateProfileDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDeassociateProfileDialog";
-import { FakeProfileTables } from "@parallel/components/profiles/FakeProfileTables";
 import { MoreOptionsMenuProfile } from "@parallel/components/profiles/MoreOptionsMenuProfile";
 import { ProfileForm } from "@parallel/components/profiles/ProfileForm";
 import { ProfilePetitionsTable } from "@parallel/components/profiles/ProfilePetitionsTable";
+import { ProfileRelationshipsTable } from "@parallel/components/profiles/ProfileRelationshipsTable";
 import { ProfileSubscribers } from "@parallel/components/profiles/ProfileSubscribers";
-import { useAssociatePetitionToProfileDialog } from "@parallel/components/profiles/dialogs/AssociatePetitionToProfileDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
-  ProfileDetail_associateProfileToPetitionDocument,
   ProfileDetail_profileDocument,
   ProfileDetail_subscribeToProfileDocument,
-  ProfileDetail_deassociateProfileFromPetitionDocument,
   ProfileDetail_unsubscribeFromProfileDocument,
   ProfileDetail_userDocument,
 } from "@parallel/graphql/__types";
@@ -96,44 +92,6 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
     } catch {}
   };
 
-  const [associateProfileToPetition] = useMutation(
-    ProfileDetail_associateProfileToPetitionDocument
-  );
-  const showAssociatePetitionToProfileDialog = useAssociatePetitionToProfileDialog();
-  const handleAddPetition = async () => {
-    try {
-      const petitionId = await showAssociatePetitionToProfileDialog({
-        excludePetitions: profile.petitions.map((p) => p.id),
-      });
-
-      await associateProfileToPetition({
-        variables: { petitionId, profileId },
-      });
-    } catch {}
-  };
-  const showConfirmDeassociateProfileDialog = useConfirmDeassociateProfileDialog();
-  const [deassociateProfileFromPetition] = useMutation(
-    ProfileDetail_deassociateProfileFromPetitionDocument
-  );
-  const handleRemovePetition = async ({
-    petitionId,
-    petitionName,
-  }: {
-    petitionId: string;
-    petitionName: string;
-  }) => {
-    try {
-      await deassociateProfileFromPetition({
-        variables: { petitionId, profileId },
-      });
-      await showConfirmDeassociateProfileDialog({
-        petitionName,
-        profileName: profile.name,
-      });
-      refetch();
-    } catch {}
-  };
-
   return (
     <AppLayout
       title={intl.formatMessage({
@@ -153,7 +111,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           maxWidth="container.xs"
           minWidth="container.3xs"
         />
-        <Stack spacing={0} backgroundColor="gray.50" flex={2} height="full" overflow="auto">
+        <Flex direction="column" backgroundColor="gray.50" flex={2} maxHeight="full" minHeight={0}>
           <HStack
             backgroundColor="white"
             paddingX={4}
@@ -189,17 +147,11 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               />
             ) : null}
           </HStack>
-          <Stack spacing={6} padding={4} paddingBottom={24}>
-            {process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ? (
-              <FakeProfileTables me={me} />
-            ) : null}
-            {/* <ProfilePetitionsTable
-              petitions={profile.petitions}
-              onAddPetition={handleAddPetition}
-              onRemovePetition={handleRemovePetition}
-            /> */}
+          <Stack spacing={6} padding={4} paddingBottom={24} flex={1} minHeight={0} overflow="auto">
+            <ProfileRelationshipsTable />
+            <ProfilePetitionsTable profileId={profile.id} />
           </Stack>
-        </Stack>
+        </Flex>
       </Flex>
     </AppLayout>
   );
@@ -230,13 +182,9 @@ const _fragments = {
         subscribers {
           ...ProfileDetail_ProfileSubscription
         }
-        petitions {
-          ...ProfilePetitionsTable_Petition
-        }
       }
       ${ProfileForm.fragments.Profile}
       ${this.ProfileSubscription}
-      ${ProfilePetitionsTable.fragments.Petition}
     `;
   },
 };
@@ -283,21 +231,6 @@ const _mutations = [
       }
     }
     ${_fragments.Profile}
-  `,
-  gql`
-    mutation ProfileDetail_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
-      associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
-        profile {
-          ...ProfileDetail_Profile
-        }
-      }
-    }
-    ${_fragments.Profile}
-  `,
-  gql`
-    mutation ProfileDetail_deassociateProfileFromPetition($petitionId: GID!, $profileId: GID!) {
-      deassociateProfileFromPetition(petitionId: $petitionId, profileId: $profileId)
-    }
   `,
 ];
 

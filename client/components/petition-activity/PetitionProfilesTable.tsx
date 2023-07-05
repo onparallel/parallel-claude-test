@@ -1,82 +1,110 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Button, Center, Flex, Stack, Text } from "@chakra-ui/react";
+import { Button, Center, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
 import {
   PetitionProfilesTable_PetitionFragment,
   PetitionProfilesTable_ProfileFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { useMemo } from "react";
+import { useHandleNavigation } from "@parallel/utils/navigation";
+import { integer, useQueryState, values } from "@parallel/utils/queryState";
+import { useSelection } from "@parallel/utils/useSelectionState";
+import { MouseEvent, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Card, CardHeader } from "../common/Card";
+import { noop } from "remeda";
 import { DateTime } from "../common/DateTime";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
-import { Table, TableColumn } from "../common/Table";
-import { UserAvatarList } from "../common/UserAvatarList";
 import { ProfileLink } from "../common/ProfileLink";
+import { Spacer } from "../common/Spacer";
+import { TableColumn } from "../common/Table";
+import { TablePage } from "../common/TablePage";
+import { UserAvatarList } from "../common/UserAvatarList";
 
-export interface PetitionProfilesTable extends BoxProps {
+const QUERY_STATE = {
+  page: integer({ min: 1 }).orDefault(1),
+  items: values([10, 25, 50]).orDefault(10),
+};
+
+type PetitionProfilesTableSelection = PetitionProfilesTable_ProfileFragment;
+export interface PetitionProfilesTable {
   petition: PetitionProfilesTable_PetitionFragment;
   onAddProfile: () => void;
-  onRemoveProfile: (profileId: string) => void;
+  onRemoveProfile: (profileIds: string[]) => void;
 }
 
 export function PetitionProfilesTable({
   petition,
   onAddProfile,
   onRemoveProfile,
-  ...props
 }: PetitionProfilesTable) {
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const columns = usePetitionProfilesColumns();
-  const context = useMemo(
-    () => ({
-      petition,
-      onRemoveProfile,
-    }),
-    [petition]
-  );
+
+  const [state, setQueryState] = useQueryState(QUERY_STATE, { prefix: "p_" });
 
   const profiles = petition.__typename === "Petition" ? petition.profiles : [];
 
+  const { selectedIds, onChangeSelectedIds } = useSelection(profiles, "id");
+  const actions = usePetitionProfilesActions({
+    canRemove: myEffectivePermission !== "READ",
+    onRemoveClick: () => onRemoveProfile(selectedIds),
+  });
+
+  const navigate = useHandleNavigation();
+  const handleRowClick = useCallback(function (
+    row: PetitionProfilesTableSelection,
+    event: MouseEvent
+  ) {
+    navigate(`/app/profiles/${row.id}`, event);
+  },
+  []);
+
   return (
-    <Card {...props} data-section="petition-profiles-table">
-      <CardHeader
-        omitDivider={profiles.length > 0}
-        rightAction={
-          <Stack direction="row">
-            <Button
-              leftIcon={<AddIcon fontSize="18px" />}
-              onClick={onAddProfile}
-              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-            >
-              <FormattedMessage
-                id="component.petition-profiles-table.add-profile"
-                defaultMessage="Add profile"
-              />
-            </Button>
-          </Stack>
-        }
-      >
-        <FormattedMessage
-          id="component.petition-profiles-table.profiles"
-          defaultMessage="Profiles"
-        />
-      </CardHeader>
-      <Box overflowX="auto">
-        {profiles.length ? (
-          <Table
-            columns={columns}
-            context={context}
-            rows={profiles}
-            rowKeyProp="id"
-            marginBottom={2}
-          />
-        ) : (
-          <Center minHeight="60px" textAlign="center" padding={4} color="gray.400">
+    <TablePage
+      id="petition-profiles"
+      flex="0 1 auto"
+      rowKeyProp="id"
+      isSelectable
+      isHighlightable
+      loading={false}
+      columns={columns}
+      rows={profiles.slice((state.page - 1) * state.items, state.page * state.items)}
+      onRowClick={handleRowClick}
+      page={state.page}
+      pageSize={state.items}
+      totalCount={profiles.length}
+      onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+      onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items: items as any, page: 1 }))}
+      onSortChange={noop}
+      actions={actions}
+      onSelectionChange={onChangeSelectedIds}
+      header={
+        <HStack paddingX={4} paddingY={2}>
+          <Heading size="md">
+            <FormattedMessage
+              id="component.petition-profiles-table.profiles"
+              defaultMessage="Profiles"
+            />
+          </Heading>
+          <Spacer />
+          <Button
+            leftIcon={<AddIcon />}
+            colorScheme="primary"
+            onClick={onAddProfile}
+            isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+          >
+            <FormattedMessage
+              id="component.petition-profiles-table.add-profile"
+              defaultMessage="Add profile"
+            />
+          </Button>
+        </HStack>
+      }
+      body={
+        profiles.length === 0 ? (
+          <Center minHeight="60px" height="full" textAlign="center" padding={4} color="gray.400">
             <Stack spacing={1}>
               <Text>
                 <FormattedMessage
@@ -97,19 +125,37 @@ export function PetitionProfilesTable({
               ) : null}
             </Stack>
           </Center>
-        )}
-      </Box>
-    </Card>
+        ) : null
+      }
+    />
   );
 }
 
-function usePetitionProfilesColumns(): TableColumn<
-  PetitionProfilesTable_ProfileFragment,
-  {
-    petition: PetitionProfilesTable_PetitionFragment;
-    onRemoveProfile: (profileId: string) => void;
-  }
->[] {
+function usePetitionProfilesActions({
+  canRemove,
+  onRemoveClick,
+}: {
+  canRemove: boolean;
+  onRemoveClick: () => void;
+}) {
+  return [
+    {
+      key: "remove",
+      onClick: onRemoveClick,
+      leftIcon: <CloseIconSmall />,
+      children: (
+        <FormattedMessage
+          id="component.petition-profiles-table.remove-profile-button"
+          defaultMessage="Remove association"
+        />
+      ),
+      colorScheme: "red",
+      isDisabled: !canRemove,
+    },
+  ];
+}
+
+function usePetitionProfilesColumns(): TableColumn<PetitionProfilesTableSelection>[] {
   const intl = useIntl();
 
   return useMemo(
@@ -120,7 +166,19 @@ function usePetitionProfilesColumns(): TableColumn<
           id: "component.petition-profiles-table.name-header",
           defaultMessage: "Name",
         }),
-        CellContent: ({ row }) => <ProfileLink profile={row} />,
+        cellProps: {
+          width: "35%",
+          minWidth: "220px",
+        },
+        CellContent: ({ row }) => (
+          <>
+            {row.name || (
+              <Text textStyle="hint" as="span">
+                <FormattedMessage id="generic.unnamed-profile" defaultMessage="Unnamed profile" />
+              </Text>
+            )}
+          </>
+        ),
       },
       {
         key: "type",
@@ -128,6 +186,10 @@ function usePetitionProfilesColumns(): TableColumn<
           id: "component.petition-profiles-table.profile-type-header",
           defaultMessage: "Type",
         }),
+        cellProps: {
+          width: "25%",
+          minWidth: "220px",
+        },
         CellContent: ({ row: { profileType } }) => {
           return (
             <LocalizableUserTextRender
@@ -146,6 +208,10 @@ function usePetitionProfilesColumns(): TableColumn<
           id: "component.petition-profiles-table.subscribers-header",
           defaultMessage: "Subscribers",
         }),
+        cellProps: {
+          width: "20%",
+          minWidth: "220px",
+        },
         CellContent: ({ row: { subscribers }, column }) => {
           if (!subscribers.length)
             return (
@@ -169,40 +235,13 @@ function usePetitionProfilesColumns(): TableColumn<
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),
+        cellProps: {
+          width: "20%",
+          minWidth: "220px",
+        },
         CellContent: ({ row: { createdAt } }) => (
           <DateTime value={createdAt} format={FORMATS.LLL} whiteSpace="nowrap" />
         ),
-      },
-      {
-        key: "actions",
-        header: "",
-        cellProps: {
-          paddingY: 1,
-          width: "1px",
-        },
-        CellContent: ({ row, context }) => {
-          const { petition, onRemoveProfile } = context!;
-          const { id } = row;
-          const intl = useIntl();
-
-          const myEffectivePermission = petition.myEffectivePermission!.permissionType;
-
-          return (
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <IconButtonWithTooltip
-                label={intl.formatMessage({
-                  id: "component.petition-profiles-table.remove-profile-button",
-                  defaultMessage: "Remove association",
-                })}
-                onClick={() => onRemoveProfile(id)}
-                placement="bottom"
-                icon={<CloseIconSmall fontSize="16px" />}
-                size="sm"
-                isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-              />
-            </Stack>
-          );
-        },
       },
     ],
     [intl.locale]

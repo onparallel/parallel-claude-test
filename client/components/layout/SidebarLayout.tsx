@@ -49,13 +49,15 @@ export function SidebarLayout({
   return (
     <AppLayout title={title} me={me} realMe={realMe}>
       <Flex flex="1" maxHeight="100vh">
-        <Box
+        <Flex
+          direction="column"
           backgroundColor="white"
           borderRight="1px solid"
           borderRightColor="gray.100"
           flex="1"
+          minHeight={0}
           maxWidth={{ base: "auto", md: 64 }}
-          display={{ base: isBase ? "block" : "none", md: "block" }}
+          display={{ base: isBase ? "flex" : "none", md: "flex" }}
         >
           <Flex
             alignItems="center"
@@ -68,12 +70,14 @@ export function SidebarLayout({
               {sectionsHeader}
             </Heading>
           </Flex>
-          {sections.map((section, index) => (
-            <SidebarLayoutMenuItem key={index} path={section.path}>
-              {section.title}
-            </SidebarLayoutMenuItem>
-          ))}
-        </Box>
+          <Flex direction="column" flex={1} overflow="auto" minHeight={0}>
+            {sections.map((section, index) => (
+              <SidebarLayoutMenuItem key={index} path={section.path}>
+                {section.title}
+              </SidebarLayoutMenuItem>
+            ))}
+          </Flex>
+        </Flex>
         {isBase ? null : (
           <Flex
             display={{
@@ -111,7 +115,8 @@ export function SidebarLayout({
               </NakedLink>
               {header}
             </Flex>
-            <Box
+            <Flex
+              direction="column"
               flex="1"
               minHeight={0}
               overflow="auto"
@@ -119,7 +124,7 @@ export function SidebarLayout({
               position="relative"
             >
               {children}
-            </Box>
+            </Flex>
           </Flex>
         )}
       </Flex>

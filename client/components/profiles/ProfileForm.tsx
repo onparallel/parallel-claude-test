@@ -49,11 +49,12 @@ export interface ProfileFormData {
 interface ProfileFormProps {
   profile: ProfileForm_ProfileFragment;
   refetch: () => void;
+  overlapsIntercomBadge?: boolean;
 }
 
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
-    { profile, refetch, ...props },
+    { profile, refetch, overlapsIntercomBadge, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -330,7 +331,13 @@ export const ProfileForm = Object.assign(
             onCancel={() => handleResetForm()}
           />
         ) : null}
-        <Stack divider={<Divider />} padding={4} paddingBottom={24} spacing={4} overflow="auto">
+        <Stack
+          divider={<Divider />}
+          padding={4}
+          paddingBottom={overlapsIntercomBadge ? 24 : 4}
+          spacing={4}
+          overflow="auto"
+        >
           <Stack as="ul" width="100%">
             {properties.map(({ field, value, files }, i) => {
               const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;

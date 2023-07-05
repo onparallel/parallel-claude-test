@@ -6,29 +6,68 @@ import { FormattedMessage } from "react-intl";
 export function ConfirmDeassociateProfileDialog({
   petitionName,
   profileName,
-  isPetition,
+  selectedPetitions,
+  selectedProfiles,
   ...props
-}: DialogProps<{ petitionName: string; profileName: string; isPetition?: boolean }>) {
+}: DialogProps<{
+  petitionName?: string | null;
+  profileName?: string | null;
+  selectedPetitions?: number;
+  selectedProfiles?: number;
+}>) {
   return (
     <ConfirmDialog
       closeOnNavigation
       header={
         <FormattedMessage
           id="component.confirm-deassociate-profile-dialog.header"
-          defaultMessage="Remove association"
+          defaultMessage="Remove {count, plural, =1{association} other {# associations}}"
+          values={{
+            count: selectedPetitions || selectedProfiles,
+          }}
         />
       }
       body={
         <Stack>
           <Text>
-            <FormattedMessage
-              id="component.confirm-deassociate-profile-dialog.body"
-              defaultMessage="Are you sure you want to deassoaciate <b>{profileName}</b> from parallel <b>{petitionName}</b>?"
-              values={{
-                profileName,
-                petitionName,
-              }}
-            />
+            {selectedPetitions && selectedPetitions > 1 ? (
+              <FormattedMessage
+                id="component.confirm-deassociate-profile-dialog.body-parallels-multiple"
+                defaultMessage="Are you sure you want to remove the association with the selected parallels?"
+              />
+            ) : selectedProfiles && selectedProfiles > 1 ? (
+              <FormattedMessage
+                id="component.confirm-deassociate-profile-dialog.bod-profiles-multiple"
+                defaultMessage="Are you sure you want to remove the association with the selected profiles?"
+              />
+            ) : (
+              <FormattedMessage
+                id="component.confirm-deassociate-profile-dialog.body"
+                defaultMessage="Are you sure you want to deassoaciate {profileName} from parallel {petitionName}?"
+                values={{
+                  profileName: profileName ? (
+                    <Text as="strong">{profileName}</Text>
+                  ) : (
+                    <Text as="span" textStyle="hint">
+                      <FormattedMessage
+                        id="generic.unnamed-profile"
+                        defaultMessage="Unnamed profile"
+                      />
+                    </Text>
+                  ),
+                  petitionName: petitionName ? (
+                    <Text as="strong">{petitionName}</Text>
+                  ) : (
+                    <Text as="span" textStyle="hint">
+                      <FormattedMessage
+                        id="generic.unnamed-parallel"
+                        defaultMessage="Unnamed parallel"
+                      />
+                    </Text>
+                  ),
+                }}
+              />
+            )}
           </Text>
           <Text>
             <FormattedMessage

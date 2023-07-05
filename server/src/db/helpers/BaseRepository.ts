@@ -83,6 +83,11 @@ export interface Loader<K, V, C = K> {
   };
 }
 
+export interface Pagination<T> {
+  items: Promise<T[]>;
+  totalCount: Promise<number>;
+}
+
 @injectable()
 export class BaseRepository {
   constructor(protected readonly knex: Knex) {}
@@ -233,10 +238,7 @@ export class BaseRepository {
   protected getPagination<T>(
     query: Knex.QueryBuilder<any, T[]>,
     { offset, limit }: PageOpts
-  ): {
-    totalCount: Promise<number>;
-    items: Promise<T[]>;
-  } {
+  ): Pagination<T> {
     const totalCount = LazyPromise.from(async () => {
       const [{ count }] = await query
         .clone()

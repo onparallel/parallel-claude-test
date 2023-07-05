@@ -252,10 +252,9 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       }
       showBackButton={true}
     >
-      <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
+      <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={24}>
         <TablePage
           flex="0 1 auto"
-          minHeight={0}
           isSelectable={canEdit}
           isHighlightable
           columns={columns}

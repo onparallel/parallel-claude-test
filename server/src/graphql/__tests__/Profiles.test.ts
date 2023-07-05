@@ -703,7 +703,7 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull()
+      expect(data).toBeNull();
     });
   });
 
@@ -3281,8 +3281,11 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions {
-                  id
+                petitions(limit: 10) {
+                  items {
+                    id
+                  }
+                  totalCount
                 }
               }
               petition {
@@ -3311,7 +3314,7 @@ describe("GraphQL/Profiles", () => {
       expect(data?.associateProfileToPetition).toEqual({
         profile: {
           id: toGlobalId("Profile", profile.id),
-          petitions: [{ id: toGlobalId("Petition", petition.id) }],
+          petitions: { items: [{ id: toGlobalId("Petition", petition.id) }], totalCount: 1 },
         },
         petition: {
           id: toGlobalId("Petition", petition.id),
@@ -3393,8 +3396,11 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions {
-                  id
+                petitions(limit: 10) {
+                  items {
+                    id
+                  }
+                  totalCount
                 }
               }
               petition {
@@ -3427,8 +3433,11 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions {
-                  id
+                petitions(limit: 10) {
+                  items {
+                    id
+                  }
+                  totalCount
                 }
               }
               petition {
@@ -3457,8 +3466,11 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions {
-                  id
+                petitions(limit: 10) {
+                  items {
+                    id
+                  }
+                  totalCount
                 }
               }
               petition {
@@ -3480,7 +3492,7 @@ describe("GraphQL/Profiles", () => {
       expect(linkData?.associateProfileToPetition).toEqual({
         profile: {
           id: toGlobalId("Profile", profile.id),
-          petitions: [{ id: toGlobalId("Petition", petition.id) }],
+          petitions: { items: [{ id: toGlobalId("Petition", petition.id) }], totalCount: 1 },
         },
         petition: {
           id: toGlobalId("Petition", petition.id),
@@ -3507,8 +3519,11 @@ describe("GraphQL/Profiles", () => {
           query ($profileId: GID!) {
             profile(profileId: $profileId) {
               id
-              petitions {
-                id
+              petitions(limit: 10) {
+                items {
+                  id
+                }
+                totalCount
               }
             }
           }
@@ -3521,7 +3536,7 @@ describe("GraphQL/Profiles", () => {
       expect(queryErrors).toBeUndefined();
       expect(queryData?.profile).toEqual({
         id: toGlobalId("Profile", profile.id),
-        petitions: [],
+        petitions: { items: [], totalCount: 0 },
       });
 
       const petitionProfile = await mocks.knex
@@ -3542,8 +3557,11 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
-                petitions {
-                  id
+                petitions(limit: 10) {
+                  items {
+                    id
+                  }
+                  totalCount
                 }
               }
               petition {
@@ -3565,7 +3583,7 @@ describe("GraphQL/Profiles", () => {
       expect(linkData?.associateProfileToPetition).toEqual({
         profile: {
           id: toGlobalId("Profile", profile.id),
-          petitions: [{ id: toGlobalId("Petition", petition.id) }],
+          petitions: { items: [{ id: toGlobalId("Petition", petition.id) }], totalCount: 1 },
         },
         petition: {
           id: toGlobalId("Petition", petition.id),
@@ -3621,7 +3639,7 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
-  describe("deassociateProfileFromPetition", () => {
+  describe("deassociateProfileFromPetition and deassociatePetitionFromProfile", () => {
     let petitions: Petition[];
     let profiles: Profile[];
 
@@ -3654,16 +3672,16 @@ describe("GraphQL/Profiles", () => {
       ]);
     });
 
-    it("unlinks profile from petition", async () => {
+    it("deassociate profile from petition", async () => {
       const { errors: unlinkErrors, data: unlinkData } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $profileId: GID!) {
-            deassociateProfileFromPetition(petitionId: $petitionId, profileId: $profileId)
+          mutation ($petitionId: GID!, $profileIds: [GID!]!) {
+            deassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
           }
         `,
         {
           petitionId: toGlobalId("Petition", petitions[1].id),
-          profileId: toGlobalId("Profile", profiles[0].id),
+          profileIds: [toGlobalId("Profile", profiles[0].id)],
         }
       );
 
@@ -3690,8 +3708,11 @@ describe("GraphQL/Profiles", () => {
             }
             profile(profileId: $profileId) {
               id
-              petitions {
-                id
+              petitions(limit: 10) {
+                items {
+                  id
+                }
+                totalCount
               }
             }
           }
@@ -3724,7 +3745,84 @@ describe("GraphQL/Profiles", () => {
       });
       expect(queryData?.profile).toEqual({
         id: toGlobalId("Profile", profiles[0].id),
-        petitions: [{ id: toGlobalId("Petition", petitions[0].id) }],
+        petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
+      });
+    });
+
+    it("deassociate petition from profile", async () => {
+      const { errors: unlinkErrors, data: unlinkData } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $petitionIds: [GID!]!) {
+            deassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profiles[0].id),
+          petitionIds: [toGlobalId("Petition", petitions[1].id)],
+        }
+      );
+
+      expect(unlinkErrors).toBeUndefined();
+      expect(unlinkData?.deassociatePetitionFromProfile).toEqual("SUCCESS");
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($petitionId: GID!, $profileId: GID!) {
+            petition(id: $petitionId) {
+              id
+              ... on Petition {
+                events(limit: 10, offset: 0) {
+                  items {
+                    type
+                    data
+                  }
+                  totalCount
+                }
+                profiles {
+                  id
+                }
+              }
+            }
+            profile(profileId: $profileId) {
+              id
+              petitions(limit: 10) {
+                items {
+                  id
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+          profileId: toGlobalId("Profile", profiles[0].id),
+        }
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.petition).toEqual({
+        id: toGlobalId("Petition", petitions[1].id),
+        profiles: [
+          { id: toGlobalId("Profile", profiles[1].id) },
+          { id: toGlobalId("Profile", profiles[2].id) },
+        ],
+        events: {
+          items: [
+            {
+              type: "PROFILE_DEASSOCIATED",
+              data: {
+                userId: toGlobalId("User", sessionUser.id),
+                profileId: toGlobalId("Profile", profiles[0].id),
+              },
+            },
+          ],
+          totalCount: 1,
+        },
+      });
+      expect(queryData?.profile).toEqual({
+        id: toGlobalId("Profile", profiles[0].id),
+        petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
       });
     });
   });

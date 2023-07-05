@@ -781,6 +781,11 @@ export interface NexusGenObjects {
   };
   PetitionMessage: db.PetitionMessage;
   PetitionMessageBouncedEvent: petitionEvents.PetitionMessageBouncedEvent;
+  PetitionPagination: {
+    // root type
+    items: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    totalCount: number; // Int!
+  };
   PetitionProfile: db.PetitionProfile;
   PetitionProgress: {
     // root type
@@ -1478,6 +1483,7 @@ export interface NexusGenFieldTypes {
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
+    deassociatePetitionFromProfile: NexusGenEnums["Success"]; // Success!
     deassociateProfileFromPetition: NexusGenEnums["Success"]; // Success!
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
@@ -2078,6 +2084,11 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
+  PetitionPagination: {
+    // field return type
+    items: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    totalCount: number; // Int!
+  };
   PetitionProfile: {
     // field return type
     petition: NexusGenRootTypes["Petition"]; // Petition!
@@ -2234,7 +2245,7 @@ export interface NexusGenFieldTypes {
     events: NexusGenRootTypes["ProfileEventPagination"]; // ProfileEventPagination!
     id: NexusGenScalars["GID"]; // GID!
     name: string; // String!
-    petitions: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    petitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     properties: NexusGenRootTypes["ProfileFieldProperty"][]; // [ProfileFieldProperty!]!
     subscribers: NexusGenRootTypes["ProfileSubscription"][]; // [ProfileSubscription!]!
@@ -3529,6 +3540,7 @@ export interface NexusGenFieldTypeNames {
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deactivateUser: "User";
+    deassociatePetitionFromProfile: "Success";
     deassociateProfileFromPetition: "Success";
     deleteContacts: "Result";
     deleteDowJonesKycIntegration: "Organization";
@@ -4129,6 +4141,11 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
   };
+  PetitionPagination: {
+    // field return type name
+    items: "Petition";
+    totalCount: "Int";
+  };
   PetitionProfile: {
     // field return type name
     petition: "Petition";
@@ -4285,7 +4302,7 @@ export interface NexusGenFieldTypeNames {
     events: "ProfileEventPagination";
     id: "GID";
     name: "String";
-    petitions: "Petition";
+    petitions: "PetitionPagination";
     profileType: "ProfileType";
     properties: "ProfileFieldProperty";
     subscribers: "ProfileSubscription";
@@ -5498,10 +5515,15 @@ export interface NexusGenArgTypes {
       transferToUserId: NexusGenScalars["GID"]; // GID!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
+    deassociatePetitionFromProfile: {
+      // args
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      profileId: NexusGenScalars["GID"]; // GID!
+    };
     deassociateProfileFromPetition: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
-      profileId: NexusGenScalars["GID"]; // GID!
+      profileIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     deleteContacts: {
       // args
@@ -6343,6 +6365,11 @@ export interface NexusGenArgTypes {
   };
   Profile: {
     events: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+    };
+    petitions: {
       // args
       limit?: number | null; // Int
       offset?: number | null; // Int

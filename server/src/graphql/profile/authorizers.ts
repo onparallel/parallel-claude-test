@@ -26,6 +26,29 @@ function createProfileTypeAuthorizer<TRest extends any[] = []>(
 
 export const profileTypeIsArchived = createProfileTypeAuthorizer((p) => isDefined(p.archived_at));
 
+export function profileIsAssociatedToPetition<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TPetitionId extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(
+  profileIdArg: TProfileId,
+  petitionIdArg: TPetitionId
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileIds = uniq(unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>));
+    const petitionIds = uniq(unMaybeArray(args[petitionIdArg] as unknown as MaybeArray<number>));
+
+    const count = await ctx.profiles.countProfilesAssociatedToPetitions(profileIds, petitionIds);
+
+    if (count !== profileIds.length * petitionIds.length) {
+      throw new ApolloError("Profile not associated to petition", "PROFILE_ASSOCIATION_ERROR");
+    }
+
+    return true;
+  };
+}
+
 export function userHasAccessToProfileType<
   TypeName extends string,
   FieldName extends string,

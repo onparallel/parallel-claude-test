@@ -93,7 +93,6 @@ function Alerts() {
         <Box flex="1" paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
-            minHeight={0}
             columns={columns}
             rows={items}
             rowKeyProp={(row) => [row.profile.id, row.field.id].join(":")}

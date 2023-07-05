@@ -38,8 +38,12 @@ export function SettingsTabsInnerLayout<T extends string>({
           router.push(tabs[index].href!);
         }
       }}
+      flex={1}
+      display="flex"
+      flexDirection="column"
+      minHeight={0}
     >
-      <TabList paddingLeft={6} background="white" paddingTop={2}>
+      <TabList paddingLeft={6} background="white" paddingTop={2} marginBottom={0}>
         {tabs.map(({ key, title, href, isDisabled }) =>
           isDisabled ? (
             <Tab key={key} fontWeight="500" color="gray.400" cursor="not-allowed" isDisabled>
@@ -64,9 +68,17 @@ export function SettingsTabsInnerLayout<T extends string>({
           )
         )}
       </TabList>
-      <TabPanels>
+      <TabPanels flex={1} display="flex" flexDirection="column" minHeight={0}>
         {tabs.map((t) => (
-          <TabPanel padding={0} key={t.key} tabIndex={-1}>
+          <TabPanel
+            padding={0}
+            key={t.key}
+            flex={1}
+            display="flex"
+            flexDirection="column"
+            minHeight={0}
+            overflow="auto"
+          >
             {t.key === currentTabKey ? children : null}
           </TabPanel>
         ))}

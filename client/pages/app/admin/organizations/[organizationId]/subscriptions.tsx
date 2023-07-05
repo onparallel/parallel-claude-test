@@ -245,7 +245,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
       organization={organization}
       realMe={realMe}
     >
-      <Stack padding={4} spacing={4}>
+      <Stack padding={4} spacing={4} paddingBottom={24}>
         <Grid gap={4} templateColumns={{ base: "auto", lg: "1fr 1fr 1fr" }}>
           <AdminOrganizationsSubscriptionCard
             headerLabel={intl.formatMessage({
@@ -509,76 +509,75 @@ export function OrganizationUsagePeriodsTable({
   );
 
   return (
-    <Flex flexDirection="column" flex="1" marginTop={2}>
-      <TablePage<TableRow>
-        rowKeyProp="id"
-        columns={columns}
-        rows={items?.items}
-        totalCount={items?.totalCount}
-        loading={isLoading}
-        page={tableState.page}
-        onPageChange={(page) => onTableStateChange({ ...tableState, page })}
-        pageSize={tableState.items}
-        onPageSizeChange={(items) => onTableStateChange({ ...tableState, items: items as any })}
-        pageSizeOptions={[5, 10, 25]}
-        header={
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            justifyContent="space-between"
-            padding={4}
-            wrap="wrap"
-            gap={2}
-          >
-            <HStack fontWeight="bold" minWidth="0">
+    <TablePage<TableRow>
+      rowKeyProp="id"
+      columns={columns}
+      rows={items?.items}
+      totalCount={items?.totalCount}
+      loading={isLoading}
+      page={tableState.page}
+      onPageChange={(page) => onTableStateChange({ ...tableState, page })}
+      pageSize={tableState.items}
+      onPageSizeChange={(items) => onTableStateChange({ ...tableState, items: items as any })}
+      pageSizeOptions={[5, 10, 25]}
+      header={
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          justifyContent="space-between"
+          paddingX={4}
+          paddingY={2}
+          wrap="wrap"
+          gap={2}
+        >
+          <HStack fontWeight="bold" minWidth="0">
+            <FormattedMessage
+              id="component.organization-usage-periods-table.selector-label"
+              defaultMessage="Periods of {selector}"
+              values={{
+                selector: (
+                  <Stack marginLeft={4}>
+                    <SimpleSelect<OrganizationUsageLimitName>
+                      isSearchable={false}
+                      options={[
+                        {
+                          label: intl.formatMessage({
+                            id: "component.organization-usage-periods-table.selector-parallels-label",
+                            defaultMessage: "parallels",
+                          }),
+                          value: "PETITION_SEND",
+                        },
+                        {
+                          label: intl.formatMessage({
+                            id: "component.organization-usage-periods-table.selector-signatures-label",
+                            defaultMessage: "signatures",
+                          }),
+                          value: "SIGNATURIT_SHARED_APIKEY",
+                        },
+                      ]}
+                      value={tableState.limitName}
+                      onChange={(limitName) =>
+                        onTableStateChange({ ...tableState, limitName: limitName! })
+                      }
+                    />
+                  </Stack>
+                ),
+              }}
+            />
+          </HStack>
+          {isDefined(items?.items?.[0]) ? (
+            <Button
+              onClick={onModifyCurrentPeriod}
+              isDisabled={isDefined(items?.items[0]?.periodEndDate)}
+            >
               <FormattedMessage
-                id="component.organization-usage-periods-table.selector-label"
-                defaultMessage="Periods of {selector}"
-                values={{
-                  selector: (
-                    <Stack marginLeft={4}>
-                      <SimpleSelect<OrganizationUsageLimitName>
-                        isSearchable={false}
-                        options={[
-                          {
-                            label: intl.formatMessage({
-                              id: "component.organization-usage-periods-table.selector-parallels-label",
-                              defaultMessage: "parallels",
-                            }),
-                            value: "PETITION_SEND",
-                          },
-                          {
-                            label: intl.formatMessage({
-                              id: "component.organization-usage-periods-table.selector-signatures-label",
-                              defaultMessage: "signatures",
-                            }),
-                            value: "SIGNATURIT_SHARED_APIKEY",
-                          },
-                        ]}
-                        value={tableState.limitName}
-                        onChange={(limitName) =>
-                          onTableStateChange({ ...tableState, limitName: limitName! })
-                        }
-                      />
-                    </Stack>
-                  ),
-                }}
+                id="component.organization-usage-periods-table.modify-ongoing-period-button"
+                defaultMessage="Modify ongoing period"
               />
-            </HStack>
-            {isDefined(items?.items?.[0]) ? (
-              <Button
-                onClick={onModifyCurrentPeriod}
-                isDisabled={isDefined(items?.items[0]?.periodEndDate)}
-              >
-                <FormattedMessage
-                  id="component.organization-usage-periods-table.modify-ongoing-period-button"
-                  defaultMessage="Modify ongoing period"
-                />
-              </Button>
-            ) : null}
-          </Flex>
-        }
-      />
-    </Flex>
+            </Button>
+          ) : null}
+        </Flex>
+      }
+    />
   );
 }
 

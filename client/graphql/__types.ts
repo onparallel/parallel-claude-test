@@ -733,6 +733,8 @@ export interface Mutation {
   deactivateAccesses: Array<PetitionAccess>;
   /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
+  /** Deassociates a petition from a profile */
+  deassociatePetitionFromProfile: Success;
   /** Deassociates a profile from a petition */
   deassociateProfileFromPetition: Success;
   /** Delete contacts. */
@@ -1314,9 +1316,14 @@ export interface MutationdeactivateUserArgs {
   userIds: Array<Scalars["GID"]["input"]>;
 }
 
+export interface MutationdeassociatePetitionFromProfileArgs {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+}
+
 export interface MutationdeassociateProfileFromPetitionArgs {
   petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationdeleteContactsArgs {
@@ -3120,6 +3127,14 @@ export type PetitionMessageStatus =
   /** The message has been scheduled to be sent at a specific time. */
   | "SCHEDULED";
 
+export interface PetitionPagination {
+  __typename?: "PetitionPagination";
+  /** The requested slice of items. */
+  items: Array<Petition>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"]["output"];
+}
+
 export interface PetitionPermission {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
@@ -3467,7 +3482,7 @@ export interface Profile extends Timestamps {
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
   name: Scalars["String"]["output"];
-  petitions: Array<Petition>;
+  petitions: PetitionPagination;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
   subscribers: Array<ProfileSubscription>;
@@ -3476,6 +3491,11 @@ export interface Profile extends Timestamps {
 }
 
 export interface ProfileeventsArgs {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+}
+
+export interface ProfilepetitionsArgs {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 }
@@ -15411,6 +15431,12 @@ export type ProfileForm_deleteProfileFieldFileMutationVariables = Exact<{
 
 export type ProfileForm_deleteProfileFieldFileMutation = { deleteProfileFieldFile: Result };
 
+export type ProfilePetitionsTable_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  name: string;
+};
+
 export type ProfilePetitionsTable_PetitionFragment = {
   __typename?: "Petition";
   id: string;
@@ -15476,6 +15502,117 @@ export type ProfilePetitionsTable_PetitionFragment = {
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
+};
+
+export type ProfilePetitionsTable_associateProfileToPetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type ProfilePetitionsTable_associateProfileToPetitionMutation = {
+  associateProfileToPetition: {
+    __typename?: "PetitionProfile";
+    profile: { __typename?: "Profile"; id: string };
+  };
+};
+
+export type ProfilePetitionsTable_deassociatePetitionFromProfileMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type ProfilePetitionsTable_deassociatePetitionFromProfileMutation = {
+  deassociatePetitionFromProfile: Success;
+};
+
+export type ProfilePetitionsTable_petitionsQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
+}>;
+
+export type ProfilePetitionsTable_petitionsQuery = {
+  profile: {
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    petitions: {
+      __typename?: "PetitionPagination";
+      totalCount: number;
+      items: Array<{
+        __typename?: "Petition";
+        id: string;
+        name?: string | null;
+        status: PetitionStatus;
+        createdAt: string;
+        sentAt?: string | null;
+        isAnonymized: boolean;
+        permissions: Array<
+          | {
+              __typename?: "PetitionUserGroupPermission";
+              permissionType: PetitionPermissionType;
+              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+            }
+          | {
+              __typename?: "PetitionUserPermission";
+              permissionType: PetitionPermissionType;
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
+            }
+        >;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+          nextReminderAt?: string | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+          reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
+        }>;
+        progress: {
+          __typename?: "PetitionProgress";
+          external: {
+            __typename?: "PetitionFieldProgress";
+            approved: number;
+            replied: number;
+            optional: number;
+            total: number;
+          };
+          internal: {
+            __typename?: "PetitionFieldProgress";
+            approved: number;
+            replied: number;
+            optional: number;
+            total: number;
+          };
+        };
+        currentSignatureRequest?: {
+          __typename?: "PetitionSignatureRequest";
+          status: PetitionSignatureRequestStatus;
+          cancelReason?: string | null;
+          environment: SignatureOrgIntegrationEnvironment;
+        } | null;
+        signatureConfig?: {
+          __typename?: "SignatureConfig";
+          review: boolean;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            environment: SignatureOrgIntegrationEnvironment;
+          } | null;
+        } | null;
+      }>;
+    };
+  };
+};
+
+export type ProfileRelationshipsTable_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  name: string;
 };
 
 export type ProfileSubscribers_UserFragment = {
@@ -21386,7 +21523,7 @@ export type PetitionActivity_associateProfileToPetitionMutation = {
 
 export type PetitionActivity_deassociateProfileFromPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
 export type PetitionActivity_deassociateProfileFromPetitionMutation = {
@@ -28056,72 +28193,6 @@ export type ProfileDetail_ProfileFragment = {
       initials?: string | null;
     };
   }>;
-  petitions: Array<{
-    __typename?: "Petition";
-    id: string;
-    name?: string | null;
-    status: PetitionStatus;
-    createdAt: string;
-    sentAt?: string | null;
-    isAnonymized: boolean;
-    permissions: Array<
-      | {
-          __typename?: "PetitionUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-        }
-      | {
-          __typename?: "PetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          user: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            avatarUrl?: string | null;
-            initials?: string | null;
-          };
-        }
-    >;
-    accesses: Array<{
-      __typename?: "PetitionAccess";
-      id: string;
-      status: PetitionAccessStatus;
-      nextReminderAt?: string | null;
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-    }>;
-    progress: {
-      __typename?: "PetitionProgress";
-      external: {
-        __typename?: "PetitionFieldProgress";
-        approved: number;
-        replied: number;
-        optional: number;
-        total: number;
-      };
-      internal: {
-        __typename?: "PetitionFieldProgress";
-        approved: number;
-        replied: number;
-        optional: number;
-        total: number;
-      };
-    };
-    currentSignatureRequest?: {
-      __typename?: "PetitionSignatureRequest";
-      status: PetitionSignatureRequestStatus;
-      cancelReason?: string | null;
-      environment: SignatureOrgIntegrationEnvironment;
-    } | null;
-    signatureConfig?: {
-      __typename?: "SignatureConfig";
-      review: boolean;
-      integration?: {
-        __typename?: "SignatureOrgIntegration";
-        environment: SignatureOrgIntegrationEnvironment;
-      } | null;
-    } | null;
-  }>;
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -28230,72 +28301,6 @@ export type ProfileDetail_profileQuery = {
         initials?: string | null;
       };
     }>;
-    petitions: Array<{
-      __typename?: "Petition";
-      id: string;
-      name?: string | null;
-      status: PetitionStatus;
-      createdAt: string;
-      sentAt?: string | null;
-      isAnonymized: boolean;
-      permissions: Array<
-        | {
-            __typename?: "PetitionUserGroupPermission";
-            permissionType: PetitionPermissionType;
-            group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-          }
-        | {
-            __typename?: "PetitionUserPermission";
-            permissionType: PetitionPermissionType;
-            user: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              avatarUrl?: string | null;
-              initials?: string | null;
-            };
-          }
-      >;
-      accesses: Array<{
-        __typename?: "PetitionAccess";
-        id: string;
-        status: PetitionAccessStatus;
-        nextReminderAt?: string | null;
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-      }>;
-      progress: {
-        __typename?: "PetitionProgress";
-        external: {
-          __typename?: "PetitionFieldProgress";
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-        internal: {
-          __typename?: "PetitionFieldProgress";
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-      };
-      currentSignatureRequest?: {
-        __typename?: "PetitionSignatureRequest";
-        status: PetitionSignatureRequestStatus;
-        cancelReason?: string | null;
-        environment: SignatureOrgIntegrationEnvironment;
-      } | null;
-      signatureConfig?: {
-        __typename?: "SignatureConfig";
-        review: boolean;
-        integration?: {
-          __typename?: "SignatureOrgIntegration";
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-      } | null;
-    }>;
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -28359,72 +28364,6 @@ export type ProfileDetail_subscribeToProfileMutation = {
         avatarUrl?: string | null;
         initials?: string | null;
       };
-    }>;
-    petitions: Array<{
-      __typename?: "Petition";
-      id: string;
-      name?: string | null;
-      status: PetitionStatus;
-      createdAt: string;
-      sentAt?: string | null;
-      isAnonymized: boolean;
-      permissions: Array<
-        | {
-            __typename?: "PetitionUserGroupPermission";
-            permissionType: PetitionPermissionType;
-            group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-          }
-        | {
-            __typename?: "PetitionUserPermission";
-            permissionType: PetitionPermissionType;
-            user: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              avatarUrl?: string | null;
-              initials?: string | null;
-            };
-          }
-      >;
-      accesses: Array<{
-        __typename?: "PetitionAccess";
-        id: string;
-        status: PetitionAccessStatus;
-        nextReminderAt?: string | null;
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-      }>;
-      progress: {
-        __typename?: "PetitionProgress";
-        external: {
-          __typename?: "PetitionFieldProgress";
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-        internal: {
-          __typename?: "PetitionFieldProgress";
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-      };
-      currentSignatureRequest?: {
-        __typename?: "PetitionSignatureRequest";
-        status: PetitionSignatureRequestStatus;
-        cancelReason?: string | null;
-        environment: SignatureOrgIntegrationEnvironment;
-      } | null;
-      signatureConfig?: {
-        __typename?: "SignatureConfig";
-        review: boolean;
-        integration?: {
-          __typename?: "SignatureOrgIntegration";
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-      } | null;
     }>;
     profileType: {
       __typename?: "ProfileType";
@@ -28490,72 +28429,6 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
         initials?: string | null;
       };
     }>;
-    petitions: Array<{
-      __typename?: "Petition";
-      id: string;
-      name?: string | null;
-      status: PetitionStatus;
-      createdAt: string;
-      sentAt?: string | null;
-      isAnonymized: boolean;
-      permissions: Array<
-        | {
-            __typename?: "PetitionUserGroupPermission";
-            permissionType: PetitionPermissionType;
-            group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-          }
-        | {
-            __typename?: "PetitionUserPermission";
-            permissionType: PetitionPermissionType;
-            user: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              avatarUrl?: string | null;
-              initials?: string | null;
-            };
-          }
-      >;
-      accesses: Array<{
-        __typename?: "PetitionAccess";
-        id: string;
-        status: PetitionAccessStatus;
-        nextReminderAt?: string | null;
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-      }>;
-      progress: {
-        __typename?: "PetitionProgress";
-        external: {
-          __typename?: "PetitionFieldProgress";
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-        internal: {
-          __typename?: "PetitionFieldProgress";
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-      };
-      currentSignatureRequest?: {
-        __typename?: "PetitionSignatureRequest";
-        status: PetitionSignatureRequestStatus;
-        cancelReason?: string | null;
-        environment: SignatureOrgIntegrationEnvironment;
-      } | null;
-      signatureConfig?: {
-        __typename?: "SignatureConfig";
-        review: boolean;
-        integration?: {
-          __typename?: "SignatureOrgIntegration";
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-      } | null;
-    }>;
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -28595,148 +28468,6 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
       } | null;
     }>;
   }>;
-};
-
-export type ProfileDetail_associateProfileToPetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
-}>;
-
-export type ProfileDetail_associateProfileToPetitionMutation = {
-  associateProfileToPetition: {
-    __typename?: "PetitionProfile";
-    profile: {
-      __typename?: "Profile";
-      id: string;
-      name: string;
-      subscribers: Array<{
-        __typename?: "ProfileSubscription";
-        id: string;
-        user: {
-          __typename?: "User";
-          id: string;
-          isMe: boolean;
-          email: string;
-          fullName?: string | null;
-          avatarUrl?: string | null;
-          initials?: string | null;
-        };
-      }>;
-      petitions: Array<{
-        __typename?: "Petition";
-        id: string;
-        name?: string | null;
-        status: PetitionStatus;
-        createdAt: string;
-        sentAt?: string | null;
-        isAnonymized: boolean;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-              };
-            }
-        >;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          status: PetitionAccessStatus;
-          nextReminderAt?: string | null;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-          reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-        }>;
-        progress: {
-          __typename?: "PetitionProgress";
-          external: {
-            __typename?: "PetitionFieldProgress";
-            approved: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-          internal: {
-            __typename?: "PetitionFieldProgress";
-            approved: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-        };
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
-          cancelReason?: string | null;
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-        signatureConfig?: {
-          __typename?: "SignatureConfig";
-          review: boolean;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            environment: SignatureOrgIntegrationEnvironment;
-          } | null;
-        } | null;
-      }>;
-      profileType: {
-        __typename?: "ProfileType";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-      };
-      properties: Array<{
-        __typename?: "ProfileFieldProperty";
-        field: {
-          __typename?: "ProfileTypeField";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          position: number;
-          type: ProfileTypeFieldType;
-          myPermission: ProfileTypeFieldPermission;
-          isExpirable: boolean;
-          expiryAlertAheadTime?: Duration | null;
-          options: { [key: string]: any };
-        };
-        files?: Array<{
-          __typename?: "ProfileFieldFile";
-          id: string;
-          expiryDate?: string | null;
-          file?: {
-            __typename?: "FileUpload";
-            contentType: string;
-            filename: string;
-            isComplete: boolean;
-            size: number;
-          } | null;
-        }> | null;
-        value?: {
-          __typename?: "ProfileFieldValue";
-          id: string;
-          content?: { [key: string]: any } | null;
-          createdAt: string;
-          expiryDate?: string | null;
-        } | null;
-      }>;
-    };
-  };
-};
-
-export type ProfileDetail_deassociateProfileFromPetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
-}>;
-
-export type ProfileDetail_deassociateProfileFromPetitionMutation = {
-  deassociateProfileFromPetition: Success;
 };
 
 export type Profiles_ProfileTypeFragment = {
@@ -33260,6 +32991,120 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ExportRepliesProgressDialog_PetitionFragment, unknown>;
+export const ProfilePetitionsTable_ProfileFragmentDoc = gql`
+  fragment ProfilePetitionsTable_Profile on Profile {
+    id
+    name
+  }
+` as unknown as DocumentNode<ProfilePetitionsTable_ProfileFragment, unknown>;
+export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
+  fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
+    approved
+    replied
+    optional
+    total
+  }
+` as unknown as DocumentNode<PetitionProgressBar_PetitionFieldProgressFragment, unknown>;
+export const PetitionProgressBar_PetitionFragmentDoc = gql`
+  fragment PetitionProgressBar_Petition on Petition {
+    status
+    progress {
+      external {
+        ...PetitionProgressBar_PetitionFieldProgress
+      }
+      internal {
+        ...PetitionProgressBar_PetitionFieldProgress
+      }
+    }
+  }
+  ${PetitionProgressBar_PetitionFieldProgressFragmentDoc}
+` as unknown as DocumentNode<PetitionProgressBar_PetitionFragment, unknown>;
+export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionStatusCellContent_Petition on Petition {
+    ...PetitionProgressBar_Petition
+    status
+  }
+  ${PetitionProgressBar_PetitionFragmentDoc}
+` as unknown as DocumentNode<PetitionStatusCellContent_PetitionFragment, unknown>;
+export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
+  fragment getPetitionSignatureStatus_Petition on Petition {
+    status
+    currentSignatureRequest {
+      status
+      cancelReason
+    }
+    signatureConfig {
+      review
+    }
+  }
+` as unknown as DocumentNode<getPetitionSignatureStatus_PetitionFragment, unknown>;
+export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
+  fragment getPetitionSignatureEnvironment_Petition on Petition {
+    currentSignatureRequest {
+      environment
+    }
+    signatureConfig {
+      integration {
+        environment
+      }
+    }
+  }
+` as unknown as DocumentNode<getPetitionSignatureEnvironment_PetitionFragment, unknown>;
+export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionSignatureCellContent_Petition on Petition {
+    ...getPetitionSignatureStatus_Petition
+    ...getPetitionSignatureEnvironment_Petition
+  }
+  ${getPetitionSignatureStatus_PetitionFragmentDoc}
+  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
+` as unknown as DocumentNode<PetitionSignatureCellContent_PetitionFragment, unknown>;
+export const ProfilePetitionsTable_PetitionFragmentDoc = gql`
+  fragment ProfilePetitionsTable_Petition on Petition {
+    id
+    name
+    status
+    createdAt
+    permissions {
+      permissionType
+      ... on PetitionUserPermission {
+        user {
+          ...UserAvatarList_User
+        }
+      }
+      ... on PetitionUserGroupPermission {
+        group {
+          ...UserAvatarList_UserGroup
+        }
+      }
+    }
+    accesses {
+      id
+      status
+      contact {
+        ...ContactReference_Contact
+      }
+      nextReminderAt
+      reminders {
+        createdAt
+      }
+    }
+    sentAt
+    ...PetitionStatusCellContent_Petition
+    ...PetitionSignatureCellContent_Petition
+    isAnonymized
+  }
+  ${UserAvatarList_UserFragmentDoc}
+  ${UserAvatarList_UserGroupFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+  ${PetitionStatusCellContent_PetitionFragmentDoc}
+  ${PetitionSignatureCellContent_PetitionFragmentDoc}
+` as unknown as DocumentNode<ProfilePetitionsTable_PetitionFragment, unknown>;
+export const ProfileRelationshipsTable_ProfileFragmentDoc = gql`
+  fragment ProfileRelationshipsTable_Profile on Profile {
+    id
+    name
+  }
+` as unknown as DocumentNode<ProfileRelationshipsTable_ProfileFragment, unknown>;
 export const useCreateProfileDialog_ProfileTypeFragmentDoc = gql`
   fragment useCreateProfileDialog_ProfileType on ProfileType {
     id
@@ -33613,67 +33458,6 @@ export const useDeleteContacts_ContactFragmentDoc = gql`
     email
   }
 ` as unknown as DocumentNode<useDeleteContacts_ContactFragment, unknown>;
-export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
-  fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
-    approved
-    replied
-    optional
-    total
-  }
-` as unknown as DocumentNode<PetitionProgressBar_PetitionFieldProgressFragment, unknown>;
-export const PetitionProgressBar_PetitionFragmentDoc = gql`
-  fragment PetitionProgressBar_Petition on Petition {
-    status
-    progress {
-      external {
-        ...PetitionProgressBar_PetitionFieldProgress
-      }
-      internal {
-        ...PetitionProgressBar_PetitionFieldProgress
-      }
-    }
-  }
-  ${PetitionProgressBar_PetitionFieldProgressFragmentDoc}
-` as unknown as DocumentNode<PetitionProgressBar_PetitionFragment, unknown>;
-export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
-  fragment PetitionStatusCellContent_Petition on Petition {
-    ...PetitionProgressBar_Petition
-    status
-  }
-  ${PetitionProgressBar_PetitionFragmentDoc}
-` as unknown as DocumentNode<PetitionStatusCellContent_PetitionFragment, unknown>;
-export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
-  fragment getPetitionSignatureStatus_Petition on Petition {
-    status
-    currentSignatureRequest {
-      status
-      cancelReason
-    }
-    signatureConfig {
-      review
-    }
-  }
-` as unknown as DocumentNode<getPetitionSignatureStatus_PetitionFragment, unknown>;
-export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
-  fragment getPetitionSignatureEnvironment_Petition on Petition {
-    currentSignatureRequest {
-      environment
-    }
-    signatureConfig {
-      integration {
-        environment
-      }
-    }
-  }
-` as unknown as DocumentNode<getPetitionSignatureEnvironment_PetitionFragment, unknown>;
-export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
-  fragment PetitionSignatureCellContent_Petition on Petition {
-    ...getPetitionSignatureStatus_Petition
-    ...getPetitionSignatureEnvironment_Petition
-  }
-  ${getPetitionSignatureStatus_PetitionFragmentDoc}
-  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
-` as unknown as DocumentNode<PetitionSignatureCellContent_PetitionFragment, unknown>;
 export const Contact_PetitionFragmentDoc = gql`
   fragment Contact_Petition on Petition {
     id
@@ -37168,47 +36952,6 @@ export const ProfileDetail_ProfileSubscriptionFragmentDoc = gql`
   ${ProfileSubscribers_UserFragmentDoc}
   ${useProfileSubscribersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileSubscriptionFragment, unknown>;
-export const ProfilePetitionsTable_PetitionFragmentDoc = gql`
-  fragment ProfilePetitionsTable_Petition on Petition {
-    id
-    name
-    status
-    createdAt
-    permissions {
-      permissionType
-      ... on PetitionUserPermission {
-        user {
-          ...UserAvatarList_User
-        }
-      }
-      ... on PetitionUserGroupPermission {
-        group {
-          ...UserAvatarList_UserGroup
-        }
-      }
-    }
-    accesses {
-      id
-      status
-      contact {
-        ...ContactReference_Contact
-      }
-      nextReminderAt
-      reminders {
-        createdAt
-      }
-    }
-    sentAt
-    ...PetitionStatusCellContent_Petition
-    ...PetitionSignatureCellContent_Petition
-    isAnonymized
-  }
-  ${UserAvatarList_UserFragmentDoc}
-  ${UserAvatarList_UserGroupFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-  ${PetitionStatusCellContent_PetitionFragmentDoc}
-  ${PetitionSignatureCellContent_PetitionFragmentDoc}
-` as unknown as DocumentNode<ProfilePetitionsTable_PetitionFragment, unknown>;
 export const ProfileDetail_ProfileFragmentDoc = gql`
   fragment ProfileDetail_Profile on Profile {
     id
@@ -37216,13 +36959,9 @@ export const ProfileDetail_ProfileFragmentDoc = gql`
     subscribers {
       ...ProfileDetail_ProfileSubscription
     }
-    petitions {
-      ...ProfilePetitionsTable_Petition
-    }
   }
   ${ProfileForm_ProfileFragmentDoc}
   ${ProfileDetail_ProfileSubscriptionFragmentDoc}
-  ${ProfilePetitionsTable_PetitionFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileFragment, unknown>;
 export const Profiles_ProfileTypeFragmentDoc = gql`
   fragment Profiles_ProfileType on ProfileType {
@@ -39722,6 +39461,47 @@ export const ProfileForm_deleteProfileFieldFileDocument = gql`
   ProfileForm_deleteProfileFieldFileMutation,
   ProfileForm_deleteProfileFieldFileMutationVariables
 >;
+export const ProfilePetitionsTable_associateProfileToPetitionDocument = gql`
+  mutation ProfilePetitionsTable_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
+    associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+      profile {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ProfilePetitionsTable_associateProfileToPetitionMutation,
+  ProfilePetitionsTable_associateProfileToPetitionMutationVariables
+>;
+export const ProfilePetitionsTable_deassociatePetitionFromProfileDocument = gql`
+  mutation ProfilePetitionsTable_deassociatePetitionFromProfile(
+    $profileId: GID!
+    $petitionIds: [GID!]!
+  ) {
+    deassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+  }
+` as unknown as DocumentNode<
+  ProfilePetitionsTable_deassociatePetitionFromProfileMutation,
+  ProfilePetitionsTable_deassociatePetitionFromProfileMutationVariables
+>;
+export const ProfilePetitionsTable_petitionsDocument = gql`
+  query ProfilePetitionsTable_petitions($profileId: GID!, $offset: Int!, $limit: Int!) {
+    profile(profileId: $profileId) {
+      id
+      name
+      petitions(offset: $offset, limit: $limit) {
+        items {
+          ...ProfilePetitionsTable_Petition
+        }
+        totalCount
+      }
+    }
+  }
+  ${ProfilePetitionsTable_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  ProfilePetitionsTable_petitionsQuery,
+  ProfilePetitionsTable_petitionsQueryVariables
+>;
 export const useCreateProfileDialog_profileTypeDocument = gql`
   query useCreateProfileDialog_profileType($profileTypeId: GID!) {
     profileType(profileTypeId: $profileTypeId) {
@@ -41412,8 +41192,11 @@ export const PetitionActivity_associateProfileToPetitionDocument = gql`
   PetitionActivity_associateProfileToPetitionMutationVariables
 >;
 export const PetitionActivity_deassociateProfileFromPetitionDocument = gql`
-  mutation PetitionActivity_deassociateProfileFromPetition($petitionId: GID!, $profileId: GID!) {
-    deassociateProfileFromPetition(petitionId: $petitionId, profileId: $profileId)
+  mutation PetitionActivity_deassociateProfileFromPetition(
+    $petitionId: GID!
+    $profileIds: [GID!]!
+  ) {
+    deassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
   }
 ` as unknown as DocumentNode<
   PetitionActivity_deassociateProfileFromPetitionMutation,
@@ -42133,27 +41916,6 @@ export const ProfileDetail_unsubscribeFromProfileDocument = gql`
 ` as unknown as DocumentNode<
   ProfileDetail_unsubscribeFromProfileMutation,
   ProfileDetail_unsubscribeFromProfileMutationVariables
->;
-export const ProfileDetail_associateProfileToPetitionDocument = gql`
-  mutation ProfileDetail_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
-    associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
-      profile {
-        ...ProfileDetail_Profile
-      }
-    }
-  }
-  ${ProfileDetail_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  ProfileDetail_associateProfileToPetitionMutation,
-  ProfileDetail_associateProfileToPetitionMutationVariables
->;
-export const ProfileDetail_deassociateProfileFromPetitionDocument = gql`
-  mutation ProfileDetail_deassociateProfileFromPetition($petitionId: GID!, $profileId: GID!) {
-    deassociateProfileFromPetition(petitionId: $petitionId, profileId: $profileId)
-  }
-` as unknown as DocumentNode<
-  ProfileDetail_deassociateProfileFromPetitionMutation,
-  ProfileDetail_deassociateProfileFromPetitionMutationVariables
 >;
 export const Profiles_userDocument = gql`
   query Profiles_user {

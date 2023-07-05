@@ -28,7 +28,7 @@ import {
   ProfileFieldFileAddedEvent,
   ProfileFieldValueUpdatedEvent,
 } from "../events/ProfileEvent";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
 import { SortBy, escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 
@@ -987,7 +987,15 @@ export class ProfileRepository extends BaseRepository {
         subscribedByUserId?: number;
       }>;
     } & PageOpts
-  ) {
+  ): Pagination<{
+    profile_id: number;
+    profile_name: string;
+    profile_type_field_id: number;
+    profile_type_field_name: LocalizableUserText;
+    in_alert: boolean;
+    expiry_date: string;
+    is_expired: boolean;
+  }> {
     const filter = (q: Knex.QueryBuilder) => {
       if (isDefined(opts.search)) {
         q.whereEscapedILike("p.name", `%${escapeLike(opts.search, "\\")}%`, "\\");
@@ -1050,15 +1058,7 @@ export class ProfileRepository extends BaseRepository {
         return counts[0].count + counts[1].count;
       }),
       items: LazyPromise.from(async () => {
-        const properties: {
-          profile_id: number;
-          profile_name: string;
-          profile_type_field_id: number;
-          profile_type_field_name: LocalizableUserText;
-          in_alert: boolean;
-          expiry_date: string;
-          is_expired: boolean;
-        }[] = await this.knex
+        return await this.knex
           .unionAll([
             valuesQuery
               .clone()
@@ -1100,8 +1100,6 @@ export class ProfileRepository extends BaseRepository {
           .orderBy("profile_type_field_id")
           .offset(opts.offset ?? 0)
           .limit(opts.limit ?? 0);
-
-        return properties;
       }),
     };
   }
@@ -1226,9 +1224,30 @@ export class ProfileRepository extends BaseRepository {
     return petitionProfile;
   }
 
-  async deassociateProfileFromPetition(profileId: number, petitionId: number) {
+  async deassociateProfileFromPetition(petitionIds: number[], profileIds: number[]) {
+    if (profileIds.length === 0) {
+      throw new Error("expected profileIds to be non-empty");
+    }
+    if (petitionIds.length === 0) {
+      throw new Error("expected petitionIds to be non-empty");
+    }
     return await this.from("petition_profile")
-      .where({ petition_id: petitionId, profile_id: profileId })
+      .whereIn("petition_id", petitionIds)
+      .whereIn("profile_id", profileIds)
       .delete();
+  }
+
+  async countProfilesAssociatedToPetitions(profileIds: number[], petitionIds: number[]) {
+    if (profileIds.length === 0 || petitionIds.length === 0) {
+      return 0;
+    }
+
+    const [{ count }] = await this.knex
+      .from("petition_profile")
+      .whereIn("profile_id", profileIds)
+      .whereIn("petition_id", petitionIds)
+      .select(this.count());
+
+    return count as number;
   }
 }

@@ -740,14 +740,24 @@
     "context": "Transfer parallels"
   },
   {
+    "term": "component.confirm-deassociate-profile-dialog.bod-profiles-multiple",
+    "definition": "Are you sure you want to remove the association with the selected profiles?",
+    "context": "Are you sure you want to remove the association with the selected profiles?"
+  },
+  {
     "term": "component.confirm-deassociate-profile-dialog.body",
-    "definition": "Are you sure you want to deassoaciate <b>{profileName}</b> from parallel <b>{petitionName}</b>?",
-    "context": "Are you sure you want to deassoaciate <b>{profileName}</b> from parallel <b>{petitionName}</b>?"
+    "definition": "Are you sure you want to deassoaciate {profileName} from parallel {petitionName}?",
+    "context": "Are you sure you want to deassoaciate {profileName} from parallel {petitionName}?"
   },
   {
     "term": "component.confirm-deassociate-profile-dialog.body-2",
     "definition": "If you continue, the data will remain intact and only the association will be removed.",
     "context": "If you continue, the data will remain intact and only the association will be removed."
+  },
+  {
+    "term": "component.confirm-deassociate-profile-dialog.body-parallels-multiple",
+    "definition": "Are you sure you want to remove the association with the selected parallels?",
+    "context": "Are you sure you want to remove the association with the selected parallels?"
   },
   {
     "term": "component.confirm-deassociate-profile-dialog.confirm",
@@ -756,8 +766,8 @@
   },
   {
     "term": "component.confirm-deassociate-profile-dialog.header",
-    "definition": "Remove association",
-    "context": "Remove association"
+    "definition": "Remove {count, plural, =1{association} other {# associations}}",
+    "context": "Remove {count, plural, =1{association} other {# associations}}"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.body",
@@ -4708,6 +4718,16 @@
     "term": "component.profile-petitions-table.remove-profile-button",
     "definition": "Remove association",
     "context": "Remove association"
+  },
+  {
+    "term": "component.profile-relationships-table.comming-soon",
+    "definition": "Relationships between profiles coming soon.",
+    "context": "Relationships between profiles coming soon."
+  },
+  {
+    "term": "component.profile-relationships-table.header",
+    "definition": "Profiles",
+    "context": "Profiles"
   },
   {
     "term": "component.profile-select.add-profile",

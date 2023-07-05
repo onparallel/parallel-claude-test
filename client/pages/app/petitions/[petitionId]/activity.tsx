@@ -354,7 +354,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           defaultMessage: "You can include the information you need",
         }),
       });
-      goToSection("replies", { query: { profileId } });
+      goToSection("replies", { query: { profile: profileId } });
     } catch {}
   };
 
@@ -362,19 +362,18 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const [deassociateProfileFromPetition] = useMutation(
     PetitionActivity_deassociateProfileFromPetitionDocument
   );
-  const handleDeassociateProfileFromPetition = async (profileId: string) => {
+  const handledeassociateProfileFromPetition = async (profileIds: string[]) => {
     try {
       await showConfirmDeassociateProfileDialog({
-        petitionName:
-          petition.name ??
-          intl.formatMessage({
-            id: "generic.unnamed-parallel",
-            defaultMessage: "Unnamed parallel",
-          }),
-        profileName: petition.profiles.find((p) => p.id === profileId)?.name ?? "",
+        petitionName: petition.name,
+        profileName:
+          profileIds.length === 1
+            ? petition.profiles.find((p) => p.id === profileIds[0])?.name
+            : "",
+        selectedProfiles: profileIds.length,
       });
       await deassociateProfileFromPetition({
-        variables: { petitionId, profileId },
+        variables: { petitionId, profileIds },
       });
       refetch();
     } catch {}
@@ -412,13 +411,13 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         onPetitionSend={handleNextClick({ redirect: true })}
       />
       {me.hasProfilesAccess ? (
-        <PetitionProfilesTable
-          id="petition-profiles"
-          margin={4}
-          petition={petition}
-          onAddProfile={handleAddProfileToPetition}
-          onRemoveProfile={handleDeassociateProfileFromPetition}
-        />
+        <Box margin={4}>
+          <PetitionProfilesTable
+            petition={petition}
+            onAddProfile={handleAddProfileToPetition}
+            onRemoveProfile={handledeassociateProfileFromPetition}
+          />
+        </Box>
       ) : null}
       <Box margin={4}>
         <PetitionActivityTimeline
@@ -558,8 +557,11 @@ PetitionActivity.mutations = [
         }
       }
     }
-    mutation PetitionActivity_deassociateProfileFromPetition($petitionId: GID!, $profileId: GID!) {
-      deassociateProfileFromPetition(petitionId: $petitionId, profileId: $profileId)
+    mutation PetitionActivity_deassociateProfileFromPetition(
+      $petitionId: GID!
+      $profileIds: [GID!]!
+    ) {
+      deassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
     }
   `,
 ];

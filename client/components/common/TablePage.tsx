@@ -255,15 +255,14 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     [context, selectedCount]
   );
   return (
-    <Card display="flex" flexDirection="column" {...props}>
+    <Card display="flex" flexDirection="column" minHeight="300px" {...props}>
       {header ? <Box flex="none">{header}</Box> : null}
       <Flex
         flexDirection="column"
-        flex="0 1 auto"
+        flex="1 1 auto"
         minWidth="0"
         position="relative"
         overflowX="auto"
-        minHeight={props.minHeight ? props.minHeight : "240px"}
       >
         {!isDefined(rows) && loading ? (
           <Flex

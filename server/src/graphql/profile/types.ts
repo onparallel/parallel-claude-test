@@ -111,10 +111,19 @@ export const Profile = objectType({
         return await ctx.profiles.loadProfileSubscribers(root.id);
       },
     });
-    t.nonNull.list.nonNull.field("petitions", {
+    t.paginationField("petitions", {
       type: "Petition",
-      resolve: async (o, _, ctx) => {
-        return await ctx.petitions.loadPetitionsByProfileId(o.id);
+      resolve: (o, { offset, limit }, ctx) => {
+        return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
+          offset,
+          limit,
+          filters: {
+            type: "PETITION",
+            path: null,
+            profileIds: [o.id],
+          },
+          sortBy: [{ field: "createdAt", order: "desc" }],
+        }) as any;
       },
     });
     t.implements("Timestamps");

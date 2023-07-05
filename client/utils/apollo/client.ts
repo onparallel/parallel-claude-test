@@ -282,6 +282,11 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             petitionListViews: { merge: false },
           },
         },
+        Profile: {
+          fields: {
+            petitions: { merge: false },
+          },
+        },
       },
     }).restore(initialState ?? {}),
     typeDefs,

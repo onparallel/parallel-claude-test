@@ -740,14 +740,24 @@
     "context": "Transfer parallels"
   },
   {
+    "term": "component.confirm-deassociate-profile-dialog.bod-profiles-multiple",
+    "definition": "¿Estás seguro de querer quitar la asociación con los perfiles seleccionados?",
+    "context": "Are you sure you want to remove the association with the selected profiles?"
+  },
+  {
     "term": "component.confirm-deassociate-profile-dialog.body",
-    "definition": "¿Estás seguro de querer desasociar el perfil <b>{profileName}</b> del parallel <b>{petitionName}</b>?",
-    "context": "Are you sure you want to deassoaciate <b>{profileName}</b> from parallel <b>{petitionName}</b>?"
+    "definition": "¿Estás seguro de querer desasociar el perfil {profileName} del parallel {petitionName}?",
+    "context": "Are you sure you want to deassoaciate {profileName} from parallel {petitionName}?"
   },
   {
     "term": "component.confirm-deassociate-profile-dialog.body-2",
     "definition": "Si continúas, se mantendrán los datos y únicamente se quitará la asociación.",
     "context": "If you continue, the data will remain intact and only the association will be removed."
+  },
+  {
+    "term": "component.confirm-deassociate-profile-dialog.body-parallels-multiple",
+    "definition": "¿Estás seguro de querer quitar la asociación con los parallels seleccionados?",
+    "context": "Are you sure you want to remove the association with the selected parallels?"
   },
   {
     "term": "component.confirm-deassociate-profile-dialog.confirm",
@@ -756,8 +766,8 @@
   },
   {
     "term": "component.confirm-deassociate-profile-dialog.header",
-    "definition": "Quitar asociación",
-    "context": "Remove association"
+    "definition": "Quitar {count, plural, =1{asociación} other {# asociaciones}}",
+    "context": "Remove {count, plural, =1{association} other {# associations}}"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.body",
@@ -4708,6 +4718,16 @@
     "term": "component.profile-petitions-table.remove-profile-button",
     "definition": "Quitar asociación",
     "context": "Remove association"
+  },
+  {
+    "term": "component.profile-relationships-table.comming-soon",
+    "definition": "Muy pronto podrás relacionar tus perfiles entre sí",
+    "context": "Relationships between profiles coming soon."
+  },
+  {
+    "term": "component.profile-relationships-table.header",
+    "definition": "Perfiles",
+    "context": "Profiles"
   },
   {
     "term": "component.profile-select.add-profile",

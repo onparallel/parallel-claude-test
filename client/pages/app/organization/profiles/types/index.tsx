@@ -1,6 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Box,
   Button,
   Flex,
   Menu,
@@ -13,20 +12,20 @@ import {
 } from "@chakra-ui/react";
 import { ArchiveIcon, ChevronDownIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
-import { useCreateOrUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
 import { OrganizationProfilesLayout } from "@parallel/components/organization/profiles/OrganizationProfilesLayout";
 import { ProfileTypesListHeader } from "@parallel/components/organization/profiles/ProfileTypesListHeader";
+import { useCreateOrUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
 import {
+  OrganizationProfileTypes_ProfileTypeFragment,
   OrganizationProfileTypes_cloneProfileTypeDocument,
   OrganizationProfileTypes_createProfileTypeDocument,
-  OrganizationProfileTypes_ProfileTypeFragment,
   OrganizationProfileTypes_profileTypesDocument,
   OrganizationProfileTypes_userDocument,
   UserLocale,
@@ -40,9 +39,9 @@ import { useDeleteProfileType } from "@parallel/utils/mutations/useDeleteProfile
 import { useUnarchiveProfileType } from "@parallel/utils/mutations/useUnarchiveProfileType";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
+  QueryStateFrom,
   boolean,
   integer,
-  QueryStateFrom,
   sorting,
   string,
   useQueryState,
@@ -222,10 +221,10 @@ function OrganizationProfileTypes() {
 
   return (
     <OrganizationProfilesLayout currentTabKey="types" me={me} realMe={realMe}>
-      <Box flex="1" padding={4} paddingBottom={16}>
+      <Flex direction="column" flex="1" padding={4} paddingBottom={24}>
         <TablePage
           flex="0 1 auto"
-          minHeight={0}
+          minHeight="305px"
           columns={profileTypesColumns}
           rows={profileTypes?.items}
           rowKeyProp="id"
@@ -288,7 +287,7 @@ function OrganizationProfileTypes() {
           }
           Footer={CustomFooter}
         />
-      </Box>
+      </Flex>
     </OrganizationProfilesLayout>
   );
 }

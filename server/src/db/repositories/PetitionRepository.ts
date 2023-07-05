@@ -89,7 +89,13 @@ import {
   ReplyStatusChangedEvent,
   ReplyUpdatedEvent,
 } from "../events/PetitionEvent";
-import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
+import {
+  BaseRepository,
+  PageOpts,
+  Pagination,
+  TableCreateTypes,
+  TableTypes,
+} from "../helpers/BaseRepository";
 import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
 import { SortBy, escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -138,6 +144,7 @@ interface PetitionFilter {
   /** @deprecated */
   tagIds?: number[] | null;
   tags?: PetitionTagFilter | null;
+  profileIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
   fromTemplateId?: number[] | null;
 }
@@ -431,7 +438,16 @@ export class PetitionRepository extends BaseRepository {
       sortBy?: SortBy<"name" | "lastUsedAt" | "sentAt" | "createdAt">[];
       filters?: PetitionFilter | null;
     } & PageOpts
-  ) {
+  ): Pagination<
+    | Petition
+    | {
+        name: string;
+        petition_count: number;
+        min_permission: PetitionPermissionType;
+        is_folder: true;
+        path: string;
+      }
+  > {
     const type = opts.filters?.type || "PETITION";
     const { search, filters } = opts;
 
@@ -567,6 +583,13 @@ export class PetitionRepository extends BaseRepository {
             }
           }
         });
+      });
+    }
+
+    if (filters?.profileIds && filters.profileIds.length > 0) {
+      builders.push((q) => {
+        q.joinRaw(/* sql */ `join petition_profile pp3 on pp3.petition_id = p.id`);
+        q.whereIn("pp3.profile_id", filters.profileIds!);
       });
     }
 
@@ -754,7 +777,7 @@ export class PetitionRepository extends BaseRepository {
           );
 
         const items: (Petition & {
-          is_folder: boolean;
+          is_folder: true;
           petition_count: number | null;
           min_permission: PetitionPermissionType | null;
           _name: string;
@@ -6255,27 +6278,4 @@ export class PetitionRepository extends BaseRepository {
 
     return await this.userHasAccessToPetitions(userId, [field.petition_id]);
   }
-
-  readonly loadPetitionsByProfileId = this.buildLoader<number, Petition[]>(
-    async (profileIds, t) => {
-      const results = await this.from("petition", t)
-        .join("petition_profile", "petition.id", "petition_profile.petition_id")
-        .whereIn("petition_profile.profile_id", profileIds)
-        .whereNull("petition.deleted_at")
-        .select<Array<Petition & { profile_id: number; pp_created_at: Date }>>(
-          "petition.*",
-          "petition_profile.profile_id",
-          "petition_profile.created_at as pp_created_at"
-        );
-
-      const byProfileId = groupBy(results, (r) => r.profile_id);
-      return profileIds.map((id) =>
-        byProfileId[id]
-          ? sortBy(byProfileId[id], (p) => p.pp_created_at).map((p) =>
-              omit(p, ["profile_id", "pp_created_at"])
-            )
-          : []
-      );
-    }
-  );
 }

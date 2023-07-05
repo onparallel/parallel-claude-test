@@ -300,7 +300,6 @@ function Profiles() {
         <Box flex="1" paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
-            minHeight={0}
             columns={columns}
             rows={profiles?.items}
             rowKeyProp="id"

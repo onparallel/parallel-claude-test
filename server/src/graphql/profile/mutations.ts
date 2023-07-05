@@ -54,6 +54,7 @@ import {
   fileUploadCanBeAttachedToProfileTypeField,
   profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
+  profileIsAssociatedToPetition,
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
@@ -934,39 +935,83 @@ export const deassociateProfileFromPetition = mutationField("deassociateProfileF
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId"),
-    userHasAccessToProfile("profileId"),
-    petitionIsNotAnonymized("petitionId")
+    userHasAccessToProfile("profileIds"),
+    petitionIsNotAnonymized("petitionId"),
+    profileIsAssociatedToPetition("profileIds", "petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
-    profileId: nonNull(globalIdArg("Profile")),
+    profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
   },
-  resolve: async (_, { petitionId, profileId }, ctx) => {
-    const count = await ctx.profiles.deassociateProfileFromPetition(profileId, petitionId);
-    if (count === 0) {
-      throw new ApolloError(
-        "Profile not associated to petition",
-        "PROFILE_NOT_ASSOCIATED_TO_PETITION"
-      );
-    }
+  resolve: async (_, { petitionId, profileIds }, ctx) => {
+    await ctx.profiles.deassociateProfileFromPetition([petitionId], profileIds);
 
-    await ctx.petitions.createEvent({
-      type: "PROFILE_DEASSOCIATED",
-      petition_id: petitionId,
-      data: {
-        user_id: ctx.user!.id,
-        profile_id: profileId,
-      },
-    });
-    await ctx.profiles.createEvent({
-      type: "PETITION_DEASSOCIATED",
-      org_id: ctx.user!.org_id,
-      profile_id: profileId,
-      data: {
-        user_id: ctx.user!.id,
+    await ctx.petitions.createEvent(
+      profileIds.map((profileId) => ({
+        type: "PROFILE_DEASSOCIATED",
         petition_id: petitionId,
-      },
-    });
+        data: {
+          user_id: ctx.user!.id,
+          profile_id: profileId,
+        },
+      }))
+    );
+
+    await ctx.profiles.createEvent(
+      profileIds.map((profileId) => ({
+        type: "PETITION_DEASSOCIATED",
+        org_id: ctx.user!.org_id,
+        profile_id: profileId,
+        data: {
+          user_id: ctx.user!.id,
+          petition_id: petitionId,
+        },
+      }))
+    );
+
+    return RESULT.SUCCESS;
+  },
+});
+
+export const deassociatePetitionFromProfile = mutationField("deassociatePetitionFromProfile", {
+  description: "Deassociates a petition from a profile",
+  type: "Success",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToPetitions("petitionIds"),
+    userHasAccessToProfile("profileId"),
+    petitionIsNotAnonymized("petitionIds"),
+    profileIsAssociatedToPetition("profileId", "petitionIds")
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+  },
+  resolve: async (_, { profileId, petitionIds }, ctx) => {
+    await ctx.profiles.deassociateProfileFromPetition(petitionIds, [profileId]);
+
+    await ctx.petitions.createEvent(
+      petitionIds.map((petitionId) => ({
+        type: "PROFILE_DEASSOCIATED",
+        petition_id: petitionId,
+        data: {
+          user_id: ctx.user!.id,
+          profile_id: profileId,
+        },
+      }))
+    );
+
+    await ctx.profiles.createEvent(
+      petitionIds.map((petitionId) => ({
+        type: "PETITION_DEASSOCIATED",
+        org_id: ctx.user!.org_id,
+        profile_id: profileId,
+        data: {
+          user_id: ctx.user!.id,
+          petition_id: petitionId,
+        },
+      }))
+    );
 
     return RESULT.SUCCESS;
   },
