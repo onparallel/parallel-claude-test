@@ -145,9 +145,9 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       }
       body={
         petitions?.totalCount === 0 && !loading ? (
-          <Center minHeight="150px" height="full" textAlign="center" padding={4} color="gray.400">
-            <Stack spacing={1}>
-              <Text>
+          <Center minHeight="150px" height="full">
+            <Stack spacing={1} align="center">
+              <Text color="gray.400">
                 <FormattedMessage
                   id="component.profile-petitions-table.no-parallels-associated"
                   defaultMessage="There are no parallels associated to this profile yet."
@@ -219,8 +219,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
           defaultMessage: "Recipient",
         }),
         cellProps: {
-          width: "25%",
-          minWidth: "220px",
+          minWidth: "200px",
           whiteSpace: "nowrap",
         },
         CellContent: ({ row }) => {
@@ -264,7 +263,6 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
           defaultMessage: "Status",
         }),
         cellProps: {
-          width: "10%",
           minWidth: "130px",
         },
         align: "center",
@@ -283,38 +281,13 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
         ),
       },
       {
-        key: "shared",
-        header: intl.formatMessage({
-          id: "petitions.header.shared",
-          defaultMessage: "Shared",
-        }),
-        align: "left",
-        cellProps: {
-          width: "20%",
-          minWidth: "140px",
-        },
-        CellContent: ({ row: { permissions }, column }) => (
-          <Flex justifyContent={column.align}>
-            <UserAvatarList
-              usersOrGroups={permissions.map((p) =>
-                p.__typename === "PetitionUserPermission"
-                  ? p.user
-                  : p.__typename === "PetitionUserGroupPermission"
-                  ? p.group
-                  : (null as never)
-              )}
-            />
-          </Flex>
-        ),
-      },
-      {
         key: "sentAt",
         header: intl.formatMessage({
           id: "generic.sent-at",
           defaultMessage: "Sent at",
         }),
         cellProps: {
-          width: "10%",
+          width: "1%",
           minWidth: "160px",
         },
         CellContent: ({ row: { sentAt } }) =>
@@ -347,19 +320,6 @@ const _fragments = {
       myEffectivePermission {
         permissionType
       }
-      permissions {
-        permissionType
-        ... on PetitionUserPermission {
-          user {
-            ...UserAvatarList_User
-          }
-        }
-        ... on PetitionUserGroupPermission {
-          group {
-            ...UserAvatarList_UserGroup
-          }
-        }
-      }
       accesses {
         id
         status
@@ -376,8 +336,6 @@ const _fragments = {
       ...PetitionSignatureCellContent_Petition
       isAnonymized
     }
-    ${UserAvatarList.fragments.User}
-    ${UserAvatarList.fragments.UserGroup}
     ${ContactReference.fragments.Contact}
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}

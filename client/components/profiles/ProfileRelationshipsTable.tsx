@@ -57,7 +57,7 @@ export function ProfileRelationshipsTable({}: {}) {
                 height="108px"
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/under-construction.svg`}
               />
-              <Text>
+              <Text color="gray.600">
                 <FormattedMessage
                   id="component.profile-relationships-table.comming-soon"
                   defaultMessage="Relationships between profiles coming soon."

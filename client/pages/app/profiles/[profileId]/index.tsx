@@ -111,7 +111,14 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           maxWidth="container.xs"
           minWidth="container.3xs"
         />
-        <Flex direction="column" backgroundColor="gray.50" flex={2} maxHeight="full" minHeight={0}>
+        <Flex
+          direction="column"
+          backgroundColor="gray.50"
+          flex={2}
+          maxHeight="full"
+          minHeight={0}
+          minWidth={0}
+        >
           <HStack
             backgroundColor="white"
             paddingX={4}

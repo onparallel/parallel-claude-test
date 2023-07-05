@@ -15450,24 +15450,6 @@ export type ProfilePetitionsTable_PetitionFragment = {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
   } | null;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          avatarUrl?: string | null;
-          initials?: string | null;
-        };
-      }
-  >;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -15556,24 +15538,6 @@ export type ProfilePetitionsTable_petitionsQuery = {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
         } | null;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-              };
-            }
-        >;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -33076,19 +33040,6 @@ export const ProfilePetitionsTable_PetitionFragmentDoc = gql`
     myEffectivePermission {
       permissionType
     }
-    permissions {
-      permissionType
-      ... on PetitionUserPermission {
-        user {
-          ...UserAvatarList_User
-        }
-      }
-      ... on PetitionUserGroupPermission {
-        group {
-          ...UserAvatarList_UserGroup
-        }
-      }
-    }
     accesses {
       id
       status
@@ -33105,8 +33056,6 @@ export const ProfilePetitionsTable_PetitionFragmentDoc = gql`
     ...PetitionSignatureCellContent_Petition
     isAnonymized
   }
-  ${UserAvatarList_UserFragmentDoc}
-  ${UserAvatarList_UserGroupFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
   ${PetitionStatusCellContent_PetitionFragmentDoc}
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
