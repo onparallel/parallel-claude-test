@@ -147,6 +147,7 @@ interface PetitionFilter {
   profileIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
   fromTemplateId?: number[] | null;
+  permissionTypes?: PetitionPermissionType[] | null;
 }
 
 type PetitionUserNotificationFilter =
@@ -660,6 +661,10 @@ export class PetitionRepository extends BaseRepository {
 
     if (filters?.fromTemplateId && filters.fromTemplateId.length > 0) {
       builders.push((q) => q.whereIn("p.from_template_id", filters.fromTemplateId!));
+    }
+
+    if (filters?.permissionTypes && filters.permissionTypes.length > 0) {
+      builders.push((q) => q.whereIn("pp.type", filters.permissionTypes!));
     }
 
     if (opts.excludeAnonymized) {

@@ -3612,6 +3612,7 @@ input PetitionFilter {
   fromTemplateId: [GID!]
   locale: PetitionLocale
   path: String
+  permissionTypes: [PetitionPermissionType!]
   sharedWith: PetitionSharedWithFilter
   signature: [PetitionSignatureStatusFilter!]
   status: [PetitionStatus!]

@@ -485,7 +485,11 @@ export const PetitionHeader = Object.assign(
                   paddingX={1.5}
                   fontSize="sm"
                   fontWeight="normal"
-                  onClick={() => handleProfilesClick(petition.profiles.length === 0)}
+                  onClick={() =>
+                    handleProfilesClick(
+                      petition.profiles.length === 0 && myEffectivePermission !== "READ"
+                    )
+                  }
                   isDisabled={isAnonymized}
                 >
                   <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">

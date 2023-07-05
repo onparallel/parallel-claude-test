@@ -21,11 +21,12 @@ interface ProfileDrawerProps {
   onChangeProfile: (profileId: string | null) => void;
   onAssociateProfile: () => void;
   isReadOnly?: boolean;
+  canAddProfiles?: boolean;
 }
 
 export const ProfileDrawer = Object.assign(
   forwardRef<ProfileSelectInstance<false>, ProfileDrawerProps>(function ProfileDrawer(
-    { profileId, profiles, onChangeProfile, onAssociateProfile, isReadOnly },
+    { profileId, profiles, onChangeProfile, onAssociateProfile, isReadOnly, canAddProfiles },
     ref
   ) {
     const intl = useIntl();
@@ -67,7 +68,7 @@ export const ProfileDrawer = Object.assign(
               options={profiles}
               isDisabled={isReadOnly}
               components={{ MenuList }}
-              {...({ onAssociateProfile } as any)}
+              {...({ onAssociateProfile, canAddProfiles } as any)}
             />
           </Box>
           <IconButton
@@ -110,25 +111,31 @@ export const ProfileDrawer = Object.assign(
 );
 
 function MenuList(props: MenuListProps<ProfileSelectSelection>) {
+  const canAddProfiles = (props.selectProps as any).canAddProfiles as boolean;
   return (
-    <components.MenuList {...props} innerProps={{ style: { paddingBottom: 0 } }}>
+    <components.MenuList
+      {...props}
+      innerProps={canAddProfiles ? { style: { paddingBottom: 0 } } : {}}
+    >
       {props.children}
 
-      <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
-        <Button
-          width="100%"
-          size="md"
-          variant="outline"
-          fontWeight="normal"
-          leftIcon={<AddIcon position="relative" top="-1px" />}
-          onClick={() => (props.selectProps as any).onAssociateProfile()}
-        >
-          <FormattedMessage
-            id="component.profile-select.add-profile"
-            defaultMessage="Add profile"
-          />
-        </Button>
-      </Box>
+      {canAddProfiles && (
+        <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
+          <Button
+            width="100%"
+            size="md"
+            variant="outline"
+            fontWeight="normal"
+            leftIcon={<AddIcon position="relative" top="-1px" />}
+            onClick={() => (props.selectProps as any).onAssociateProfile()}
+          >
+            <FormattedMessage
+              id="component.profile-select.add-profile"
+              defaultMessage="Add profile"
+            />
+          </Button>
+        </Box>
+      )}
     </components.MenuList>
   );
 }

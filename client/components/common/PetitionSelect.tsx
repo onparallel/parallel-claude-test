@@ -1,5 +1,6 @@
 import { gql, useApolloClient } from "@apollo/client";
 import {
+  PetitionPermissionType,
   PetitionSelect_PetitionBaseFragmentDoc,
   PetitionSelect_petitionDocument,
   PetitionSelect_petitionsDocument,
@@ -90,6 +91,7 @@ export interface PetitionSelectProps<
   excludePetitions?: string[];
   isSync?: IsSync;
   defaultOptions?: boolean;
+  permissionTypes?: PetitionPermissionType[];
 }
 
 export const PetitionSelect = Object.assign(
@@ -107,6 +109,7 @@ export const PetitionSelect = Object.assign(
       placeholder: _placeholder,
       type = "PETITION",
       excludePetitions,
+      permissionTypes,
       ...props
     }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
     ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>
@@ -125,6 +128,7 @@ export const PetitionSelect = Object.assign(
             limit: 100,
             filters: {
               type,
+              permissionTypes,
             },
             search,
             sortBy: "lastUsedAt_DESC",

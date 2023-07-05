@@ -630,6 +630,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             onChangeProfile={setProfileId}
             onAssociateProfile={handleAssociateProfile}
             isReadOnly={petition.isAnonymized}
+            canAddProfiles={petition.myEffectivePermission?.permissionType !== "READ"}
           />
         ) : null
       }

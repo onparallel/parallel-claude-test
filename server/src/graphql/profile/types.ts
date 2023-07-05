@@ -1,8 +1,8 @@
+import { zonedTimeToUtc } from "date-fns-tz";
 import { enumType, interfaceType, nonNull, objectType } from "nexus";
 import { sortBy } from "remeda";
 import { ProfileTypeFieldPermissionValues, ProfileTypeFieldTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { zonedTimeToUtc } from "date-fns-tz";
 
 export const ProfileType = objectType({
   name: "ProfileType",

@@ -2887,6 +2887,7 @@ export type PetitionFilter = {
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   locale?: InputMaybe<PetitionLocale>;
   path?: InputMaybe<Scalars["String"]["input"]>;
+  permissionTypes?: InputMaybe<Array<PetitionPermissionType>>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;

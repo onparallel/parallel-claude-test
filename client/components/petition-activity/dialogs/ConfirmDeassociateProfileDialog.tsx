@@ -37,13 +37,13 @@ export function ConfirmDeassociateProfileDialog({
               />
             ) : selectedProfiles && selectedProfiles > 1 ? (
               <FormattedMessage
-                id="component.confirm-deassociate-profile-dialog.bod-profiles-multiple"
+                id="component.confirm-deassociate-profile-dialog.body-profiles-multiple"
                 defaultMessage="Are you sure you want to remove the association with the selected profiles?"
               />
             ) : (
               <FormattedMessage
                 id="component.confirm-deassociate-profile-dialog.body"
-                defaultMessage="Are you sure you want to deassoaciate {profileName} from parallel {petitionName}?"
+                defaultMessage="Are you sure you want to remove the association between {profileName} and parallel {petitionName}?"
                 values={{
                   profileName: profileName ? (
                     <Text as="strong">{profileName}</Text>
@@ -81,7 +81,7 @@ export function ConfirmDeassociateProfileDialog({
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-deassociate-profile-dialog.confirm"
-            defaultMessage="Yes, deassociate"
+            defaultMessage="Yes, remove association"
           />
         </Button>
       }

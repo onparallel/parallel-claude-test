@@ -50,6 +50,7 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.field("sharedWith", { type: "PetitionSharedWithFilter" });
           t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
           t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
+          t.nullable.list.nonNull.field("permissionTypes", { type: "PetitionPermissionType" });
         },
       }).asArg(),
       searchByNameOnly: booleanArg({

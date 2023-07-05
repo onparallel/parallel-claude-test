@@ -145,7 +145,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       }
       body={
         petitions?.totalCount === 0 && !loading ? (
-          <Center minHeight="60px" height="full" textAlign="center" padding={4} color="gray.400">
+          <Center minHeight="150px" height="full" textAlign="center" padding={4} color="gray.400">
             <Stack spacing={1}>
               <Text>
                 <FormattedMessage
@@ -344,6 +344,9 @@ const _fragments = {
       name
       status
       createdAt
+      myEffectivePermission {
+        permissionType
+      }
       permissions {
         permissionType
         ... on PetitionUserPermission {

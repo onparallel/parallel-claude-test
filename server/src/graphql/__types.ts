@@ -196,6 +196,7 @@ export interface NexusGenInputs {
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     path?: string | null; // String
+    permissionTypes?: NexusGenEnums["PetitionPermissionType"][] | null; // [PetitionPermissionType!]
     sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
     signature?: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]

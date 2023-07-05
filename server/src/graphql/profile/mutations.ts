@@ -877,7 +877,7 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
   type: "PetitionProfile",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId")
@@ -934,7 +934,7 @@ export const deassociateProfileFromPetition = mutationField("deassociateProfileF
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileIds"),
     petitionIsNotAnonymized("petitionId"),
     profileIsAssociatedToPetition("profileIds", "petitionId")
@@ -978,7 +978,7 @@ export const deassociatePetitionFromProfile = mutationField("deassociatePetition
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToPetitions("petitionIds"),
+    userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileId"),
     petitionIsNotAnonymized("petitionIds"),
     profileIsAssociatedToPetition("profileId", "petitionIds")
