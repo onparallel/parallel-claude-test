@@ -1831,22 +1831,6 @@ const PetitionEventSchemas = {
       },
     },
   },
-  /** @deprecated */
-  PROFILE_DEASSOCIATED: {
-    description: "A user disassociated a profile from a parallel",
-    properties: {
-      userId: {
-        description: "The ID of the user that disassociated the profile",
-        type: "string",
-        example: toGlobalId("User", 5),
-      },
-      profileId: {
-        description: "The ID of the profile that was disassociated",
-        type: "string",
-        example: toGlobalId("Profile", 5),
-      },
-    },
-  },
 } as Record<PetitionEventType, JsonSchema>;
 
 export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];

@@ -2605,14 +2605,6 @@ export type PetitionCreatedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
-export type PetitionDeassociatedEvent = ProfileEvent & {
-  createdAt: Scalars["DateTime"]["output"];
-  id: Scalars["GID"]["output"];
-  profile: Maybe<Profile>;
-  type: ProfileEventType;
-  user: Maybe<User>;
-};
-
 export type PetitionDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -2682,7 +2674,6 @@ export type PetitionEventType =
   | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
   | "PROFILE_ASSOCIATED"
-  | "PROFILE_DEASSOCIATED"
   | "PROFILE_DISASSOCIATED"
   | "RECIPIENT_SIGNED"
   | "REMINDERS_OPT_OUT"
@@ -3420,16 +3411,6 @@ export type ProfileCreatedEvent = ProfileEvent & {
   user: Maybe<User>;
 };
 
-export type ProfileDeassociatedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"]["output"];
-  data: Scalars["JSONObject"]["output"];
-  id: Scalars["GID"]["output"];
-  petition: Maybe<Petition>;
-  profile: Maybe<Profile>;
-  type: PetitionEventType;
-  user: Maybe<User>;
-};
-
 export type ProfileDisassociatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -3456,7 +3437,6 @@ export type ProfileEventPagination = {
 
 export type ProfileEventType =
   | "PETITION_ASSOCIATED"
-  | "PETITION_DEASSOCIATED"
   | "PETITION_DISASSOCIATED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"

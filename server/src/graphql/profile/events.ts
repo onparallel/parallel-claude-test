@@ -33,9 +33,6 @@ export const ProfileEvent = interfaceType({
         return "ProfileFieldExpiryUpdatedEvent";
       case "PETITION_ASSOCIATED":
         return "PetitionAssociatedEvent";
-      /** @deprecated */
-      case "PETITION_DEASSOCIATED":
-        return "PetitionDeassociatedEvent";
       case "PETITION_DISASSOCIATED":
         return "PetitionDisassociatedEvent";
     }
@@ -107,15 +104,6 @@ export const ProfileFieldExpiryUpdatedEvent = createProfileEvent(
   }
 );
 export const PetitionAssociatedEvent = createProfileEvent("PetitionAssociatedEvent", (t) => {
-  t.nullable.field("user", {
-    type: "User",
-    resolve: async (root, _, ctx) => {
-      return await ctx.users.loadUser(root.data.user_id);
-    },
-  });
-});
-/** @deprecated */
-export const PetitionDeassociatedEvent = createProfileEvent("PetitionDeassociatedEvent", (t) => {
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {

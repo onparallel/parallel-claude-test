@@ -107,9 +107,6 @@ export const PetitionEvent = interfaceType({
         return "ReplyStatusChangedEvent";
       case "PROFILE_ASSOCIATED":
         return "ProfileAssociatedEvent";
-      /** @deprecated */
-      case "PROFILE_DEASSOCIATED":
-        return "ProfileDeassociatedEvent";
       case "PROFILE_DISASSOCIATED":
         return "ProfileDisassociatedEvent";
     }
@@ -711,22 +708,6 @@ export const ReplyStatusChangedEvent = createPetitionEvent("ReplyStatusChangedEv
 });
 
 export const ProfileAssociatedEvent = createPetitionEvent("ProfileAssociatedEvent", (t) => {
-  t.nullable.field("user", {
-    type: "User",
-    resolve: async (root, _, ctx) => {
-      return await ctx.users.loadUser(root.data.user_id);
-    },
-  });
-  t.nullable.field("profile", {
-    type: "Profile",
-    resolve: async (root, _, ctx) => {
-      return await ctx.profiles.loadProfile(root.data.profile_id);
-    },
-  });
-});
-
-/** @deprecated */
-export const ProfileDeassociatedEvent = createPetitionEvent("ProfileDeassociatedEvent", (t) => {
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {

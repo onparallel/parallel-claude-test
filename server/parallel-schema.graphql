@@ -3117,14 +3117,6 @@ type PetitionCreatedEvent implements PetitionEvent {
   user: User
 }
 
-type PetitionDeassociatedEvent implements ProfileEvent {
-  createdAt: DateTime!
-  id: GID!
-  profile: Profile
-  type: ProfileEventType!
-  user: User
-}
-
 type PetitionDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -3199,7 +3191,6 @@ enum PetitionEventType {
   PETITION_REMINDER_BOUNCED
   PETITION_REOPENED
   PROFILE_ASSOCIATED
-  PROFILE_DEASSOCIATED
   PROFILE_DISASSOCIATED
   RECIPIENT_SIGNED
   REMINDERS_OPT_OUT
@@ -4494,16 +4485,6 @@ type ProfileCreatedEvent implements ProfileEvent {
   user: User
 }
 
-type ProfileDeassociatedEvent implements PetitionEvent {
-  createdAt: DateTime!
-  data: JSONObject!
-  id: GID!
-  petition: Petition
-  profile: Profile
-  type: PetitionEventType!
-  user: User
-}
-
 type ProfileDisassociatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -4535,7 +4516,6 @@ type ProfileEventPagination {
 
 enum ProfileEventType {
   PETITION_ASSOCIATED
-  PETITION_DEASSOCIATED
   PETITION_DISASSOCIATED
   PROFILE_CREATED
   PROFILE_FIELD_EXPIRY_UPDATED

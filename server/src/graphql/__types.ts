@@ -707,7 +707,6 @@ export interface NexusGenObjects {
   PetitionCompletedEvent: petitionEvents.PetitionCompletedEvent;
   PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
   PetitionCreatedEvent: petitionEvents.PetitionCreatedEvent;
-  PetitionDeassociatedEvent: profileEvents.PetitionDeassociatedEvent;
   PetitionDeletedEvent: petitionEvents.PetitionDeletedEvent;
   PetitionDisassociatedEvent: profileEvents.PetitionDisassociatedEvent;
   PetitionEventPagination: {
@@ -825,7 +824,6 @@ export interface NexusGenObjects {
   Profile: db.Profile;
   ProfileAssociatedEvent: petitionEvents.ProfileAssociatedEvent;
   ProfileCreatedEvent: profileEvents.ProfileCreatedEvent;
-  ProfileDeassociatedEvent: petitionEvents.ProfileDeassociatedEvent;
   ProfileDisassociatedEvent: petitionEvents.ProfileDisassociatedEvent;
   ProfileEventPagination: {
     // root type
@@ -1882,14 +1880,6 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
-  PetitionDeassociatedEvent: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    id: NexusGenScalars["GID"]; // GID!
-    profile: NexusGenRootTypes["Profile"] | null; // Profile
-    type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
-    user: NexusGenRootTypes["User"] | null; // User
-  };
   PetitionDeletedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2278,16 +2268,6 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
-    user: NexusGenRootTypes["User"] | null; // User
-  };
-  ProfileDeassociatedEvent: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    data: NexusGenScalars["JSONObject"]; // JSONObject!
-    id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
-    profile: NexusGenRootTypes["Profile"] | null; // Profile
-    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
   ProfileDisassociatedEvent: {
@@ -3957,14 +3937,6 @@ export interface NexusGenFieldTypeNames {
     type: "PetitionEventType";
     user: "User";
   };
-  PetitionDeassociatedEvent: {
-    // field return type name
-    createdAt: "DateTime";
-    id: "GID";
-    profile: "Profile";
-    type: "ProfileEventType";
-    user: "User";
-  };
   PetitionDeletedEvent: {
     // field return type name
     createdAt: "DateTime";
@@ -4353,16 +4325,6 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
-    user: "User";
-  };
-  ProfileDeassociatedEvent: {
-    // field return type name
-    createdAt: "DateTime";
-    data: "JSONObject";
-    id: "GID";
-    petition: "Petition";
-    profile: "Profile";
-    type: "PetitionEventType";
     user: "User";
   };
   ProfileDisassociatedEvent: {
@@ -6726,7 +6688,6 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionReminderBouncedEvent"
     | "PetitionReopenedEvent"
     | "ProfileAssociatedEvent"
-    | "ProfileDeassociatedEvent"
     | "ProfileDisassociatedEvent"
     | "RecipientSignedEvent"
     | "ReminderSentEvent"
@@ -6757,7 +6718,6 @@ export interface NexusGenAbstractTypeMembers {
     | "SignatureCompletedUserNotification";
   ProfileEvent:
     | "PetitionAssociatedEvent"
-    | "PetitionDeassociatedEvent"
     | "PetitionDisassociatedEvent"
     | "ProfileCreatedEvent"
     | "ProfileFieldExpiryUpdatedEvent"
@@ -6819,7 +6779,6 @@ export interface NexusGenTypeInterfaces {
   PetitionCompletedEvent: "PetitionEvent";
   PetitionCompletedUserNotification: "PetitionUserNotification";
   PetitionCreatedEvent: "PetitionEvent";
-  PetitionDeassociatedEvent: "ProfileEvent";
   PetitionDeletedEvent: "PetitionEvent";
   PetitionDisassociatedEvent: "ProfileEvent";
   PetitionFieldAttachment: "CreatedAt";
@@ -6837,7 +6796,6 @@ export interface NexusGenTypeInterfaces {
   Profile: "Timestamps";
   ProfileAssociatedEvent: "PetitionEvent";
   ProfileCreatedEvent: "ProfileEvent";
-  ProfileDeassociatedEvent: "PetitionEvent";
   ProfileDisassociatedEvent: "PetitionEvent";
   ProfileFieldExpiryUpdatedEvent: "ProfileEvent";
   ProfileFieldFile: "ProfileFieldResponse";

@@ -2676,15 +2676,6 @@ export interface PetitionCreatedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
-export interface PetitionDeassociatedEvent extends ProfileEvent {
-  __typename?: "PetitionDeassociatedEvent";
-  createdAt: Scalars["DateTime"]["output"];
-  id: Scalars["GID"]["output"];
-  profile?: Maybe<Profile>;
-  type: ProfileEventType;
-  user?: Maybe<User>;
-}
-
 export interface PetitionDeletedEvent extends PetitionEvent {
   __typename?: "PetitionDeletedEvent";
   createdAt: Scalars["DateTime"]["output"];
@@ -2758,7 +2749,6 @@ export type PetitionEventType =
   | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
   | "PROFILE_ASSOCIATED"
-  | "PROFILE_DEASSOCIATED"
   | "PROFILE_DISASSOCIATED"
   | "RECIPIENT_SIGNED"
   | "REMINDERS_OPT_OUT"
@@ -3531,17 +3521,6 @@ export interface ProfileCreatedEvent extends ProfileEvent {
   user?: Maybe<User>;
 }
 
-export interface ProfileDeassociatedEvent extends PetitionEvent {
-  __typename?: "ProfileDeassociatedEvent";
-  createdAt: Scalars["DateTime"]["output"];
-  data: Scalars["JSONObject"]["output"];
-  id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
-  profile?: Maybe<Profile>;
-  type: PetitionEventType;
-  user?: Maybe<User>;
-}
-
 export interface ProfileDisassociatedEvent extends PetitionEvent {
   __typename?: "ProfileDisassociatedEvent";
   createdAt: Scalars["DateTime"]["output"];
@@ -3570,7 +3549,6 @@ export interface ProfileEventPagination {
 
 export type ProfileEventType =
   | "PETITION_ASSOCIATED"
-  | "PETITION_DEASSOCIATED"
   | "PETITION_DISASSOCIATED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
@@ -8120,7 +8098,6 @@ export type PetitionActivityTimeline_PetitionFragment = {
           } | null;
           profile?: { __typename?: "Profile"; id: string; name: string } | null;
         }
-      | { __typename?: "ProfileDeassociatedEvent"; id: string }
       | {
           __typename?: "ProfileDisassociatedEvent";
           id: string;
@@ -8728,11 +8705,6 @@ export type PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragme
   profile?: { __typename?: "Profile"; id: string; name: string } | null;
 };
 
-export type PetitionActivityTimeline_PetitionEvent_ProfileDeassociatedEvent_Fragment = {
-  __typename?: "ProfileDeassociatedEvent";
-  id: string;
-};
-
 export type PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fragment = {
   __typename?: "ProfileDisassociatedEvent";
   id: string;
@@ -8985,7 +8957,6 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_ProfileDeassociatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
@@ -20113,7 +20084,6 @@ export type PetitionActivity_PetitionFragment = {
           } | null;
           profile?: { __typename?: "Profile"; id: string; name: string } | null;
         }
-      | { __typename?: "ProfileDeassociatedEvent"; id: string }
       | {
           __typename?: "ProfileDisassociatedEvent";
           id: string;
@@ -21062,7 +21032,6 @@ export type PetitionActivity_updatePetitionMutation = {
                 } | null;
                 profile?: { __typename?: "Profile"; id: string; name: string } | null;
               }
-            | { __typename?: "ProfileDeassociatedEvent"; id: string }
             | {
                 __typename?: "ProfileDisassociatedEvent";
                 id: string;
@@ -22082,7 +22051,6 @@ export type PetitionActivity_petitionQuery = {
                 } | null;
                 profile?: { __typename?: "Profile"; id: string; name: string } | null;
               }
-            | { __typename?: "ProfileDeassociatedEvent"; id: string }
             | {
                 __typename?: "ProfileDisassociatedEvent";
                 id: string;

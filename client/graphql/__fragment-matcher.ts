@@ -48,7 +48,6 @@ const result: PossibleTypesResultData = {
       "PetitionReminderBouncedEvent",
       "PetitionReopenedEvent",
       "ProfileAssociatedEvent",
-      "ProfileDeassociatedEvent",
       "ProfileDisassociatedEvent",
       "RecipientSignedEvent",
       "ReminderSentEvent",
@@ -85,7 +84,6 @@ const result: PossibleTypesResultData = {
     ],
     ProfileEvent: [
       "PetitionAssociatedEvent",
-      "PetitionDeassociatedEvent",
       "PetitionDisassociatedEvent",
       "ProfileCreatedEvent",
       "ProfileFieldExpiryUpdatedEvent",
