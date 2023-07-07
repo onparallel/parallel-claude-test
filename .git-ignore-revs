@@ -1,8 +1,15 @@
+# [chore] run prettier v3
+
+b08e9fe52550a0932c0dbe39859fb8a7329df3fe
+
 # [chore] update printWidth in some ignored files
+
 d96d6f8bf197bc39a5fac21c1f171597fc769f40
 
 # [chore] increase prettier printWidth to 100
+
 733d3bf0239501d03d96d204f39240944dddbf52
 
 # [chore] update prettier to 2.3.0
+
 73ddf0f8a238b1f7fa0e5698ef313c5a35b2331a
