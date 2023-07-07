@@ -4,9 +4,10 @@ import { ApiContext } from "../../../context";
 import { PetitionPermissionType, UserStatus } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import { Maybe, MaybeArray } from "../../../util/types";
+import { userHasRole } from "../../../util/userHasRole";
 import { Arg } from "../../helpers/authorize";
-import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
 import { ApolloError } from "../../helpers/errors";
+import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
 
 async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
   try {
@@ -121,10 +122,24 @@ export function userCanSendAs<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const senderId = args[argName] as unknown as Maybe<number>;
-    if (!isDefined(senderId)) return true;
+    if (!isDefined(senderId) || senderId === ctx.user!.id) {
+      return true;
+    }
     try {
+      const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
+        ctx.user!.org_id,
+        "ON_BEHALF_OF"
+      );
+      if (!hasFeatureFlag) {
+        return false;
+      }
+      if (userHasRole(ctx.user!, "ADMIN")) {
+        return true;
+      }
       const delegates = await ctx.users.loadReverseUserDelegatesByUserId(ctx.user!.id);
-      if (delegates.find((d) => d.id === senderId)) return true;
+      if (delegates.some((d) => d.id === senderId)) {
+        return true;
+      }
     } catch {}
     throw new ApolloError("You are not allowed to send as this user", "SEND_AS_ERROR");
   };

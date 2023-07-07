@@ -9066,6 +9066,7 @@ export type AddPetitionAccessDialog_UserFragment = {
   id: string;
   fullName?: string | null;
   email: string;
+  role: OrganizationRole;
   firstName?: string | null;
   lastName?: string | null;
   hasOnBehalfOf: boolean;
@@ -11341,6 +11342,7 @@ export type useSendPetitionHandler_UserFragment = {
   id: string;
   fullName?: string | null;
   email: string;
+  role: OrganizationRole;
   firstName?: string | null;
   lastName?: string | null;
   hasOnBehalfOf: boolean;
@@ -35087,6 +35089,7 @@ export const AddPetitionAccessDialog_UserFragmentDoc = gql`
       fullName
       email
     }
+    role
     hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
     ...ConfirmPetitionSignersDialog_User
   }

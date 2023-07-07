@@ -167,7 +167,6 @@ function usePetitionProfilesColumns(): TableColumn<PetitionProfilesTableSelectio
           defaultMessage: "Name",
         }),
         cellProps: {
-          width: "35%",
           minWidth: "220px",
         },
         CellContent: ({ row }) => (

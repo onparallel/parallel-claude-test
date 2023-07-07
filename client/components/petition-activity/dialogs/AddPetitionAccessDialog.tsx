@@ -54,17 +54,19 @@ import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
 import { MessageEmailEditor } from "../../petition-common/MessageEmailEditor";
 import { SendButton } from "../../petition-common/SendButton";
 import { useContactlessLinkDialog } from "./ContactlessLinkDialog";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
+import { isAdmin } from "@parallel/utils/roles";
 
-export type AddPetitionAccessDialogProps = {
+export interface AddPetitionAccessDialogProps {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];
   onCreateContact?: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
   canAddRecipientGroups?: boolean;
   petition: AddPetitionAccessDialog_PetitionFragment;
   user: AddPetitionAccessDialog_UserFragment;
-};
+}
 
-export type AddPetitionAccessDialogResult = {
+export interface AddPetitionAccessDialogResult {
   recipientIdGroups: string[][];
   subject: string;
   body: RichTextEditorValue;
@@ -73,7 +75,7 @@ export type AddPetitionAccessDialogResult = {
   bulkSendSigningMode?: BulkSendSigningMode;
   subscribeSender: boolean;
   senderId: string | null;
-};
+}
 
 export function AddPetitionAccessDialog({
   user,
@@ -104,14 +106,18 @@ export function AddPetitionAccessDialog({
       : null
   );
 
-  const showSendAs =
-    user.hasOnBehalfOf &&
-    user.delegateOf.length &&
-    petition.myEffectivePermission?.permissionType === "OWNER";
+  const showSendAs = user.hasOnBehalfOf && (isAdmin(user.role) || user.delegateOf.length > 0);
 
   const senderHasPermission = petition.effectivePermissions.some((p) => p.user.id === sendAsId);
 
   const sendAsOptions = useMemo(() => [user, ...user.delegateOf], [user]);
+  const _handleSearchUsers = useSearchUsers();
+  const handleSearchUsers = useCallback(
+    async (search: string, excludeUsers: string[]) => {
+      return await _handleSearchUsers(search, { excludeUsers });
+    },
+    [_handleSearchUsers]
+  );
 
   const [sendAsId, setSendAsId] = useState(
     // make sure the "send as" is one of the available delegated users
@@ -346,14 +352,23 @@ export function AddPetitionAccessDialog({
                   defaultMessage="Send as..."
                 />
               </Text>
-              <UserSelect
-                isSync
-                onSearch={undefined}
-                isSearchable
-                value={sendAsId}
-                onChange={(user) => setSendAsId(user!.id)}
-                options={sendAsOptions}
-              />
+              {isAdmin(user.role) ? (
+                <UserSelect
+                  onSearch={handleSearchUsers}
+                  isSearchable
+                  value={sendAsId}
+                  onChange={(user) => setSendAsId(user!.id)}
+                />
+              ) : (
+                <UserSelect
+                  isSync
+                  onSearch={undefined}
+                  isSearchable
+                  value={sendAsId}
+                  onChange={(user) => setSendAsId(user!.id)}
+                  options={sendAsOptions}
+                />
+              )}
               {senderHasPermission ? null : (
                 <Checkbox
                   isChecked={subscribeSender}
@@ -454,6 +469,7 @@ AddPetitionAccessDialog.fragments = {
         fullName
         email
       }
+      role
       hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
       ...ConfirmPetitionSignersDialog_User
     }
