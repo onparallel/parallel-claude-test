@@ -1621,7 +1621,7 @@ export const sendPetition = mutationField("sendPetition", {
         return await pMap(currentChunk, async ({ petition, contactIds, index }) => {
           const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues({
             petitionId: petition.id,
-            userId: ctx.user!.id,
+            userId: args.senderId ?? ctx.user!.id,
             contactId: contactIds[0],
           });
 

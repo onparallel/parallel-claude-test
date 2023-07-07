@@ -6,6 +6,7 @@ import { unMaybeArray } from "../../../util/arrays";
 import { Maybe, MaybeArray } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
+import { ApolloError } from "../../helpers/errors";
 
 async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
   try {
@@ -125,7 +126,7 @@ export function userCanSendAs<
       const delegates = await ctx.users.loadReverseUserDelegatesByUserId(ctx.user!.id);
       if (delegates.find((d) => d.id === senderId)) return true;
     } catch {}
-    return false;
+    throw new ApolloError("You are not allowed to send as this user", "SEND_AS_ERROR");
   };
 }
 

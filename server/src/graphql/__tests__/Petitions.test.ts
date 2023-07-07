@@ -3474,7 +3474,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("SEND_AS_ERROR");
       expect(data).toBeNull();
     });
 

@@ -5,7 +5,7 @@ import { outdent } from "outdent";
 import pMap from "p-map";
 import { isDefined, omit, pick, uniq, zip } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
-import { toGlobalId } from "../../util/globalId";
+import { isGlobalId, toGlobalId } from "../../util/globalId";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi, RestParameter } from "../rest/core";
 import {
@@ -36,6 +36,7 @@ import {
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
+  CreatePetitionRecipients_userByEmailDocument,
   CreateProfile_createProfileDocument,
   CreateProfile_updateProfileFieldValueDocument,
   CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
@@ -1282,6 +1283,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeReplies: Boolean!
           $includeProgress: Boolean!
           $includeSigners: Boolean!
+          $senderId: GID
         ) {
           sendPetition(
             petitionId: $petitionId
@@ -1290,6 +1292,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
             body: $body
             scheduledAt: $scheduledAt
             remindersConfig: $remindersConfig
+            senderId: $senderId
           ) {
             result
             petition {
@@ -1318,11 +1321,43 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         }
       }
 
+      let senderId: string | null = null;
+      const EMAIL_REGEX =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (isDefined(body.sendAs)) {
+        if (isGlobalId(body.sendAs, "User")) {
+          senderId = body.sendAs;
+        } else if (EMAIL_REGEX.test(body.sendAs)) {
+          const _query = gql`
+            query CreatePetitionRecipients_userByEmail($email: String!) {
+              me {
+                organization {
+                  users(limit: 1, offset: 0, search: $email) {
+                    items {
+                      id
+                      email
+                    }
+                  }
+                }
+              }
+            }
+          `;
+
+          const queryResponse = await client.request(CreatePetitionRecipients_userByEmailDocument, {
+            email: body.sendAs,
+          });
+          senderId = queryResponse.me.organization.users.items[0]?.id ?? null;
+        } else {
+          throw new BadRequestError("The sendAs field must be a valid email or a user id");
+        }
+      }
+
       const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
         petitionId: params.petitionId,
         contactIds,
         body: message,
         subject,
+        senderId,
         scheduledAt: body.scheduledAt,
         remindersConfig: body.remindersConfig && {
           limit: 10,
@@ -1348,6 +1383,8 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         }
       } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
         throw new ForbiddenError("You don't have enough credits to send this parallel");
+      } else if (containsGraphQLError(error, "SEND_AS_ERROR")) {
+        throw new ForbiddenError("You don't have permission to send as this user");
       }
 
       throw error;

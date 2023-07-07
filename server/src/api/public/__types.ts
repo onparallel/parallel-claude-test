@@ -5891,6 +5891,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  senderId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
@@ -5968,6 +5969,14 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       };
     } | null;
   }>;
+};
+
+export type CreatePetitionRecipients_userByEmailQueryVariables = Exact<{
+  email: Scalars["String"]["input"];
+}>;
+
+export type CreatePetitionRecipients_userByEmailQuery = {
+  me: { organization: { users: { items: Array<{ id: string; email: string }> } } };
 };
 
 export type GetPetitionRecipients_petitionAccessesQueryVariables = Exact<{
@@ -8708,6 +8717,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $senderId: GID
   ) {
     sendPetition(
       petitionId: $petitionId
@@ -8716,6 +8726,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
       body: $body
       scheduledAt: $scheduledAt
       remindersConfig: $remindersConfig
+      senderId: $senderId
     ) {
       result
       petition {
@@ -8727,6 +8738,23 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
 ` as unknown as DocumentNode<
   CreatePetitionRecipients_sendPetitionMutation,
   CreatePetitionRecipients_sendPetitionMutationVariables
+>;
+export const CreatePetitionRecipients_userByEmailDocument = gql`
+  query CreatePetitionRecipients_userByEmail($email: String!) {
+    me {
+      organization {
+        users(limit: 1, offset: 0, search: $email) {
+          items {
+            id
+            email
+          }
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_userByEmailQuery,
+  CreatePetitionRecipients_userByEmailQueryVariables
 >;
 export const GetPetitionRecipients_petitionAccessesDocument = gql`
   query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {

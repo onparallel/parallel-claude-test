@@ -935,6 +935,12 @@ export const SendPetition = schema({
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
+    sendAs: {
+      description:
+        "Send the parallel as one of your delegates. You can pass either the ID or the email of the delegate",
+      type: "string",
+      example: toGlobalId("User", 1003),
+    },
   },
 } as const);
 
