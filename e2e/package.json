@@ -15,9 +15,9 @@
   "dependencies": {
     "@faker-js/faker": "^8.0.2",
     "dotenv": "^16.3.1",
-    "imapflow": "^1.0.130",
-    "mailparser": "^3.6.4",
-    "remeda": "^1.22.1"
+    "imapflow": "^1.0.131",
+    "mailparser": "^3.6.5",
+    "remeda": "^1.23.0"
   },
   "main": "index.js"
 }

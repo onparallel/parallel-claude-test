@@ -21,40 +21,40 @@ declare global {
      */
     datetime<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>,
     ): void; // "DateTime";
     /**
      * A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
      */
     date<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>,
     ): void; // "Date";
     duration<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>,
     ): void; // "Duration";
     /**
      * The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
      */
     jsonObject<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>,
     ): void; // "JSONObject";
     /**
      * The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
      */
     json<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>,
     ): void; // "JSON";
     localizableUserText<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>,
     ): void; // "LocalizableUserText";
     globalId<FieldName extends string>(
       fieldName: FieldName,
-      opts: GlobalIdInputFieldConfig<TypeName, FieldName>
+      opts: GlobalIdInputFieldConfig<TypeName, FieldName>,
     ): void;
   }
 }
@@ -103,10 +103,10 @@ declare global {
 
     paginationField<
       FieldName extends string,
-      PaginationType extends core.GetGen<"allOutputTypes", string> | core.AllNexusOutputTypeDefs
+      PaginationType extends core.GetGen<"allOutputTypes", string> | core.AllNexusOutputTypeDefs,
     >(
       fieldName: FieldName,
-      config: PaginationFieldConfig<TypeName, FieldName, PaginationType>
+      config: PaginationFieldConfig<TypeName, FieldName, PaginationType>,
     ): void;
   }
 }
