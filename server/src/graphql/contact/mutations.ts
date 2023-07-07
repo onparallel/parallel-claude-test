@@ -40,17 +40,17 @@ export const createContact = mutationField("createContact", {
           t.nonNull.string("firstName");
           t.string("lastName");
         },
-      }).asArg()
+      }).asArg(),
     ),
     force: nullable(
       booleanArg({
         description: "Pass true to force create contacts with failed resolveMx email.",
-      })
+      }),
     ),
   },
   validateArgs: validateIf(
     (args) => !isDefined(args.force),
-    validEmail((args) => args.data.email, "data.email")
+    validEmail((args) => args.data.email, "data.email"),
   ),
   resolve: async (_, args, ctx) => {
     const { email, firstName, lastName } = args.data;
@@ -62,7 +62,7 @@ export const createContact = mutationField("createContact", {
           first_name: firstName.trim(),
           last_name: lastName ? lastName.trim() : null,
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       return contact;
@@ -85,7 +85,7 @@ export const updateContact = mutationField("updateContact", {
           t.nullable.string("firstName");
           t.nullable.string("lastName");
         },
-      }).asArg()
+      }).asArg(),
     ),
   },
   validateArgs: validateAnd(
@@ -93,8 +93,8 @@ export const updateContact = mutationField("updateContact", {
     notEmptyString((arg) => arg.data.firstName, "firstName"),
     validateIfDefined(
       (arg) => arg.data.lastName,
-      notEmptyString((arg) => arg.data.lastName, "lastName")
-    )
+      notEmptyString((arg) => arg.data.lastName, "lastName"),
+    ),
   ),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
@@ -126,7 +126,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
     force: nullable(
       booleanArg({
         description: "Pass true to force create contacts with failed resolveMx email.",
-      })
+      }),
     ),
   },
   validateArgs: validateFile(
@@ -135,7 +135,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       maxSize: 1024 * 1024 * 10,
     },
-    "file"
+    "file",
   ),
   resolve: async (_, args, ctx) => {
     const file = await args.file;
@@ -158,7 +158,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       await pMap(
         chunk(
           uniqBy(parsedContacts, (c) => c.email),
-          50
+          50,
         ),
         (chunk) =>
           ctx.contacts.createOrUpdate(
@@ -168,9 +168,9 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
               last_name: parsed.lastName ? nameCase(parsed.lastName) : null,
               org_id: ctx.user!.org_id,
             })),
-            `User:${ctx.user!.id}`
+            `User:${ctx.user!.id}`,
           ),
-        { concurrency: 1 }
+        { concurrency: 1 },
       )
     ).flat();
 
@@ -191,7 +191,7 @@ export const deleteContacts = mutationField("deleteContacts", {
       booleanArg({
         description:
           "Pass true to force deleting contacts with active accesses. Their accesses will be set as INACTIVE",
-      })
+      }),
     ),
   },
   resolve: async (_, { ids, force }, ctx) => {
@@ -212,7 +212,7 @@ export const deleteContacts = mutationField("deleteContacts", {
       throw new ApolloError(
         "The contact has active accesses. Pass force=true to force deletion",
         "CONTACT_HAS_ACTIVE_ACCESSES_ERROR",
-        data
+        data,
       );
     }
 

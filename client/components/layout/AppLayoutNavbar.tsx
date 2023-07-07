@@ -45,7 +45,7 @@ export const AppLayoutNavbar = Object.assign(
   memo(
     chakraForwardRef<"nav", AppLayoutNavbarProps>(function AppLayoutNavbar(
       { me, realMe, onHelpCenterClick, ...props },
-      ref
+      ref,
     ) {
       const intl = useIntl();
       const router = useRouter();
@@ -100,7 +100,7 @@ export const AppLayoutNavbar = Object.assign(
                         {chunks}
                       </SupportLink>
                     ),
-                  }
+                  },
                 )
               : undefined,
           },
@@ -157,7 +157,7 @@ export const AppLayoutNavbar = Object.assign(
               ]
             : []),
         ],
-        [intl.locale, pathname, query]
+        [intl.locale, pathname, query],
       );
       const isMobile = useBreakpointValue({ base: true, sm: false });
 
@@ -313,7 +313,7 @@ export const AppLayoutNavbar = Object.assign(
           </Center>
         </Flex>
       );
-    })
+    }),
   ),
   {
     fragments: {
@@ -347,5 +347,5 @@ export const AppLayoutNavbar = Object.assign(
         `;
       },
     },
-  }
+  },
 );

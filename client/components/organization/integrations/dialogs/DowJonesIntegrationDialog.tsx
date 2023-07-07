@@ -55,7 +55,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
   });
 
   const [createDowJonesKycIntegration] = useMutation(
-    useDowJonesIntegrationDialog_createDowJonesKycIntegrationDocument
+    useDowJonesIntegrationDialog_createDowJonesKycIntegrationDocument,
   );
   return (
     <ConfirmDialog

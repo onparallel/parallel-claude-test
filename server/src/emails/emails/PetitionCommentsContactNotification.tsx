@@ -32,7 +32,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         id: "petition-comments-contact-notification.subject",
         defaultMessage: "New comments on {subject, select, null{your parallel} other{{subject}}}",
       },
-      { subject: emailSubject, tone: theme.preferredTone }
+      { subject: emailSubject, tone: theme.preferredTone },
     );
   },
   text(
@@ -45,7 +45,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
       emailSubject,
       theme,
     }: PetitionCommentsContactNotificationProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return outdent`
@@ -57,7 +57,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
           defaultMessage:
             "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your parallel} other{{subject}}}:",
         },
-        { count: commentCount, subject: emailSubject, tone: theme.preferredTone }
+        { count: commentCount, subject: emailSubject, tone: theme.preferredTone },
       )}
 
       ${intl.formatMessage({

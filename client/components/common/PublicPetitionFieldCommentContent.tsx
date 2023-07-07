@@ -13,7 +13,7 @@ interface PublicPetitionFieldCommentContentProps {
 export const PublicPetitionFieldCommentContent = Object.assign(
   chakraForwardRef<"div", PublicPetitionFieldCommentContentProps>(function CommentContent(
     { comment, ...props },
-    ref
+    ref,
   ) {
     const memoizedHtml = useMemo(() => {
       return comment.contentHtml ? parse(sanitizeHtml(comment.contentHtml)) : null;
@@ -33,5 +33,5 @@ export const PublicPetitionFieldCommentContent = Object.assign(
         }
       `,
     },
-  }
+  },
 );

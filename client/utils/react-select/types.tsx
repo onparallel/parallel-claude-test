@@ -13,7 +13,7 @@ type ValueType<T, IsMulti extends boolean> = If<IsMulti, T[], T | null>;
 export interface CustomSelectProps<
   OptionType extends OptionBase,
   IsMulti extends boolean = false,
-  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>
+  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>,
 > extends UseReactSelectProps<OptionType, IsMulti, GroupType>,
     Omit<SelectProps<OptionType, IsMulti, GroupType>, "value" | "onChange"> {
   value: ValueType<OptionType, IsMulti>;
@@ -23,7 +23,7 @@ export interface CustomSelectProps<
 export interface CustomAsyncSelectProps<
   OptionType extends OptionBase,
   IsMulti extends boolean = false,
-  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>
+  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>,
 > extends UseReactSelectProps<OptionType, IsMulti, GroupType>,
     Omit<AsyncProps<OptionType, IsMulti, GroupType>, "value" | "onChange"> {
   value: ValueType<OptionType, IsMulti>;
@@ -33,7 +33,7 @@ export interface CustomAsyncSelectProps<
 export interface CustomAsyncCreatableSelectProps<
   OptionType extends OptionBase,
   IsMulti extends boolean = false,
-  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>
+  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>,
 > extends UseReactSelectProps<OptionType, IsMulti, GroupType>,
     Omit<AsyncCreatableProps<OptionType, IsMulti, GroupType>, "value" | "onChange"> {
   value: ValueType<OptionType, IsMulti>;

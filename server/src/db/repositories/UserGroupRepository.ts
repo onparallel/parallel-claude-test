@@ -19,7 +19,7 @@ export class UserGroupRepository extends BaseRepository {
     opts: {
       search?: string | null;
       sortBy?: SortBy<keyof Pick<UserGroup, "name" | "created_at">>[];
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<UserGroup>(
       this.from("user_group")
@@ -34,7 +34,7 @@ export class UserGroupRepository extends BaseRepository {
         })
         .orderBy("id")
         .select("*"),
-      opts
+      opts,
     );
   }
 
@@ -43,11 +43,11 @@ export class UserGroupRepository extends BaseRepository {
   readonly loadUserGroupMembers = this.buildLoadMultipleBy(
     "user_group_member",
     "user_group_id",
-    (q) => q.whereNull("deleted_at").orderBy("created_at")
+    (q) => q.whereNull("deleted_at").orderBy("created_at"),
   );
 
   readonly loadUserGroupCount = this.buildLoadCountBy("user_group_member", "user_group_id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadUserGroupsByUserId = this.buildLoader<number, UserGroup[]>(async (userIds, t) => {
@@ -57,7 +57,7 @@ export class UserGroupRepository extends BaseRepository {
         where ug.deleted_at is null and ugm.deleted_at is null and ugm.user_id in ? 
       `,
       [this.sqlIn(userIds)],
-      t
+      t,
     );
 
     const byUserId = groupBy(userGroups, (ug) => ug.user_id);
@@ -86,14 +86,14 @@ export class UserGroupRepository extends BaseRepository {
         const group = members.get(k.userGroupId)!;
         return k.userIds.every((userId) => group.has(userId));
       });
-    }
+    },
   );
 
   async updateUserGroupById(
     id: MaybeArray<number>,
     data: Partial<CreateUserGroup>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(id);
     return await this.from("user_group", t)
@@ -114,7 +114,7 @@ export class UserGroupRepository extends BaseRepository {
         created_by: createdBy,
         updated_by: createdBy,
       },
-      t
+      t,
     );
     return row;
   }
@@ -127,7 +127,7 @@ export class UserGroupRepository extends BaseRepository {
           org_id: user.org_id,
         },
         `User:${user.id}`,
-        t
+        t,
       );
 
       await t.raw(
@@ -136,7 +136,7 @@ export class UserGroupRepository extends BaseRepository {
         insert into user_group_member(user_group_id, user_id, created_by)
         select ?::int, user_id, ? from group_member;
       `,
-        [userGroupId, newGroup.id, `User:${user.id}`]
+        [userGroupId, newGroup.id, `User:${user.id}`],
       );
 
       return newGroup;
@@ -157,7 +157,7 @@ export class UserGroupRepository extends BaseRepository {
         this.from("petition_permission", t)
           .whereNull("deleted_at")
           .andWhere((q) =>
-            q.whereIn("user_group_id", userGroupIds).orWhereIn("from_user_group_id", userGroupIds)
+            q.whereIn("user_group_id", userGroupIds).orWhereIn("from_user_group_id", userGroupIds),
           )
           .update({ deleted_at: this.now(), deleted_by: deletedBy }),
         // stop automatically sharing petitions with this group
@@ -184,7 +184,7 @@ export class UserGroupRepository extends BaseRepository {
     userIds: MaybeArray<number>,
     userGroupIds: MaybeArray<number>,
     deletedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     if (
       (Array.isArray(userGroupIds) && userGroupIds.length === 0) ||
@@ -212,7 +212,7 @@ export class UserGroupRepository extends BaseRepository {
   async removeUsersFromAllGroups(
     userIds: MaybeArray<number>,
     deletedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     if (Array.isArray(userIds) && userIds.length === 0) {
       return;
@@ -237,7 +237,7 @@ export class UserGroupRepository extends BaseRepository {
     userGroupId: number,
     userIds: MaybeArray<number>,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(userIds);
     if (ids.length > 0) {
@@ -252,9 +252,9 @@ export class UserGroupRepository extends BaseRepository {
                 user_group_id: userGroupId,
                 user_id: userId,
                 created_by: createdBy,
-              }))
+              })),
             ),
-          ]
+          ],
         );
 
         /** add group permissions on the new group members */
@@ -268,7 +268,7 @@ export class UserGroupRepository extends BaseRepository {
     search: string,
     opts: {
       excludeUserGroups: number[];
-    }
+    },
   ) {
     const userGroups = await this.from("user_group")
       .where({
@@ -289,7 +289,7 @@ export class UserGroupRepository extends BaseRepository {
     userGroupId: number,
     memberIds: number[],
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.withTransaction(
       (t) =>
@@ -307,13 +307,13 @@ export class UserGroupRepository extends BaseRepository {
             userGroupId,
             this.sqlValues(
               memberIds.map((id) => [id]),
-              ["int"]
+              ["int"],
             ),
             createdBy,
             createdBy,
-          ]
+          ],
         ),
-      t
+      t,
     );
   }
 }

@@ -11,7 +11,7 @@ export interface HighlightTextProps {
 
 export const HighlightText = chakraForwardRef<"p", HighlightTextProps>(function HighlightText(
   { children, search, ...props },
-  ref
+  ref,
 ) {
   if (search === "" || !isDefined(search) || !isDefined(children)) {
     return (

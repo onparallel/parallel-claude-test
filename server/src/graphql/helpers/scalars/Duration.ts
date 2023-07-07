@@ -23,19 +23,19 @@ function ensureDuration(value: any, strict: boolean): _Duration {
   if (
     !ajv.validate(
       { ...DURATION_SCHEMA, additionalProperties: strict === true ? false : true },
-      value
+      value,
     )
   ) {
     throw new Error(`Value is not a valid Duration: ${value} ${ajv.errorsText()}`);
   }
   return Object.fromEntries(
-    KEYS.map((key) => [key, value[key]]).filter(([, value]) => isDefined(value) && value !== 0)
+    KEYS.map((key) => [key, value[key]]).filter(([, value]) => isDefined(value) && value !== 0),
   );
 }
 
 const parseDuration: GraphQLScalarLiteralParser<_Duration> = function parseDuration(
   ast,
-  variables
+  variables,
 ) {
   const value = Object.create(null);
   if (ast.kind !== Kind.OBJECT) {

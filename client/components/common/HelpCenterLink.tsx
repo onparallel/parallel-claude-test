@@ -11,7 +11,7 @@ interface HelpCenterLinkProps {
 
 export const HelpCenterLink = chakraForwardRef<"a", HelpCenterLinkProps>(function HelpCenterLink(
   { children, ...props },
-  ref
+  ref,
 ) {
   return (
     <NormalLink as={NakedHelpCenterLink} ref={ref} {...props}>
@@ -45,5 +45,5 @@ export const NakedHelpCenterLink = chakraForwardRef<"a", NakedHelpCenterLinkProp
         }}
       />
     );
-  }
+  },
 );

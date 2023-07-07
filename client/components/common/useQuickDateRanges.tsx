@@ -89,6 +89,6 @@ export function useQuickDateRanges() {
         ] as DateRange,
       },
     ],
-    [intl.locale, startOfDay(new Date()).valueOf()]
+    [intl.locale, startOfDay(new Date()).valueOf()],
   );
 }

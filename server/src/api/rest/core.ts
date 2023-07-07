@@ -48,7 +48,7 @@ export interface RestPathOptions {
 
 export interface RestPathOptionsWithParams<
   TPath extends string,
-  TParams extends PathParameters<TPath>
+  TParams extends PathParameters<TPath>,
 > extends RestPathOptions {
   params: RestParameters<TParams>;
 }
@@ -82,9 +82,9 @@ export interface ResponseWrapper<T> {
 }
 
 export interface OperationHandler<TContext, TParams, TQuery, TReturn, TBody> {
-  (context: RestApiContext<TContext, TParams, TQuery, TBody>): MaybePromise<
-    ResponseWrapper<TReturn>
-  >;
+  (
+    context: RestApiContext<TContext, TParams, TQuery, TBody>,
+  ): MaybePromise<ResponseWrapper<TReturn>>;
 }
 
 export type PathResolver<TContext, TPath extends string, TParams extends PathParameters<TPath>> = {
@@ -98,7 +98,7 @@ export type PathResolver<TContext, TPath extends string, TParams extends PathPar
 export interface OperationResolver<
   TContext,
   TPath extends string,
-  TParams extends PathParameters<TPath>
+  TParams extends PathParameters<TPath>,
 > {
   <TQuery, TBody, TResponses extends RestResponses<any>>(
     options: RestOperationOptions<TQuery, TBody, TResponses>,
@@ -108,7 +108,7 @@ export interface OperationResolver<
       TQuery,
       RestResponseReturnType<TResponses>,
       TBody
-    >
+    >,
   ): PathResolver<TContext, TPath, TParams>;
 }
 
@@ -142,7 +142,7 @@ const _PathResolver: any = (function () {
           name,
           in: "path",
           ...parameter.spec,
-        })
+        }),
       );
     } else {
       this.spec = {};
@@ -155,7 +155,7 @@ const _PathResolver: any = (function () {
       TParams extends PathParameters<TPath>,
       TQuery,
       TBody,
-      TResponses extends RestResponses<any>
+      TResponses extends RestResponses<any>,
     >(
       this: PathResolver<TContext, TPath, TParams>,
       operationOptions: RestOperationOptions<TQuery, TBody, TResponses>,
@@ -165,7 +165,7 @@ const _PathResolver: any = (function () {
         TQuery,
         RestResponseReturnType<TResponses>,
         TBody
-      >
+      >,
     ) {
       const {
         body,
@@ -185,7 +185,7 @@ const _PathResolver: any = (function () {
             name,
             in: "query",
             ...parameter.spec,
-          })
+          }),
         );
       }
       this.router[method](this.path, ...unMaybeArray(middleware), async (req, res, next) => {
@@ -213,7 +213,7 @@ const _PathResolver: any = (function () {
                   }
                   throw e;
                 }
-              }
+              },
             );
             context.query = await pProps(
               operationOptions.query ?? ({} as RestParameters<any>),
@@ -237,10 +237,10 @@ const _PathResolver: any = (function () {
                     name as string,
                     value,
                     "query",
-                    "Object or nested array params are not supported"
+                    "Object or nested array params are not supported",
                   );
                 }
-              }
+              },
             );
             context.signal = controller.signal;
             body?.validate?.(req, context);
@@ -339,7 +339,7 @@ export class RestApi<TContext = {}> {
           }
         });
       };
-    })()
+    })(),
   );
   private paths: PathResolver<TContext, any, any>[] = [];
   private _spec: Omit<RestApiOptions, "middleware">;
@@ -377,7 +377,7 @@ export class RestApi<TContext = {}> {
             // open api uses {} for path parameters
             const _path = path.replace(/(?<=\/):([^\/]+)/g, "{$1}");
             return [_path, spec];
-          })
+          }),
       ),
     };
   }
@@ -385,14 +385,14 @@ export class RestApi<TContext = {}> {
 
 type PathArguments<
   TPath extends string,
-  TParams extends PathParameters<TPath>
+  TParams extends PathParameters<TPath>,
 > = {} extends PathParameters<TPath>
   ? [path: TPath] | [path: TPath, pathOptions: RestPathOptions]
   : [path: TPath, pathOptions: RestPathOptionsWithParams<TPath, TParams>];
 
 type _RestPathOptions<
   TPath extends string,
-  TParams extends PathParameters<TPath>
+  TParams extends PathParameters<TPath>,
 > = RestPathOptions & {
   params?: RestParameters<TParams>;
 };

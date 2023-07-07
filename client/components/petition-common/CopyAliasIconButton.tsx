@@ -18,7 +18,7 @@ export interface CopyAliasIconButtonProps
 export const CopyAliasIconButton = Object.assign(
   chakraForwardRef<"button", CopyAliasIconButtonProps>(function CopyReferenceIconButton(
     { field, onClick, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     function handleClick(event: MouseEvent<HTMLButtonElement>) {
@@ -76,11 +76,11 @@ export const CopyAliasIconButton = Object.assign(
         }
       `,
     },
-  }
+  },
 );
 
 export function useBuildAliasInterpolation(
-  field: Pick<PetitionField, "type" | "multiple" | "options">
+  field: Pick<PetitionField, "type" | "multiple" | "options">,
 ) {
   const intl = useIntl();
 
@@ -107,6 +107,6 @@ export function useBuildAliasInterpolation(
         ? `{{ ${alias}[0] }}`
         : `{{ ${alias}${defaultFilter} }}`;
     },
-    [type, multiple, options]
+    [type, multiple, options],
   );
 }

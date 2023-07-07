@@ -24,7 +24,7 @@ export function validateOr<TypeName extends string, FieldName extends string>(
         } catch (error) {
           return error instanceof Error ? error.message : "";
         }
-      })
+      }),
     );
 
     // if every validator throws an error, the OR condition fails
@@ -37,7 +37,7 @@ export function validateOr<TypeName extends string, FieldName extends string>(
 
 export function validateIf<TypeName extends string, FieldName extends string>(
   check: (args: ArgsValue<TypeName, FieldName>) => boolean,
-  validator: FieldValidateArgsResolver<TypeName, FieldName>
+  validator: FieldValidateArgsResolver<TypeName, FieldName>,
 ) {
   return (async (root, args, ctx, info) => {
     if (check(args)) {
@@ -48,7 +48,7 @@ export function validateIf<TypeName extends string, FieldName extends string>(
 
 export function validateIfDefined<TypeName extends string, FieldName extends string>(
   prop: (args: ArgsValue<TypeName, FieldName>) => any,
-  validator: FieldValidateArgsResolver<TypeName, FieldName>
+  validator: FieldValidateArgsResolver<TypeName, FieldName>,
 ) {
   return (async (root, args, ctx, info) => {
     if (isDefined(prop(args))) {

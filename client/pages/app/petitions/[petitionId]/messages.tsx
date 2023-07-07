@@ -48,7 +48,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
       });
     }),
     500,
-    [petitionId, _updatePetition]
+    [petitionId, _updatePetition],
   );
 
   const cardCommonProps = {

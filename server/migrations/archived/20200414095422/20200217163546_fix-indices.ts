@@ -9,7 +9,7 @@ export async function up(knex: Knex) {
       t.dropUnique(["email"]);
     })
     .raw(
-      `create unique index "organization_identifier_unique" on "organization" ("identifier") where "deleted_at" is null`
+      `create unique index "organization_identifier_unique" on "organization" ("identifier") where "deleted_at" is null`,
     )
     .raw(`create unique index "user_email_unique" on "user" ("email") where "deleted_at" is null`);
 }

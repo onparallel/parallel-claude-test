@@ -31,7 +31,7 @@ export function PetitionTemplateDescriptionEdit({
       setDescription(value);
       updatePetition({ description: isEmptyRTEValue(value) ? null : value });
     },
-    [updatePetition]
+    [updatePetition],
   );
 
   return (

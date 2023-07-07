@@ -18,7 +18,7 @@ export interface IntegrationSwitchCardProps {
 export const IntegrationSwitchCard = chakraForwardRef<"div", IntegrationSwitchCardProps>(
   function IntegrationSwitchCard(
     { logo, title, body, badge, isDisabled, isChecked, disabledMessage, onChange, ...props },
-    ref
+    ref,
   ) {
     return (
       <RestrictedFeaturePopover
@@ -51,5 +51,5 @@ export const IntegrationSwitchCard = chakraForwardRef<"div", IntegrationSwitchCa
         </Card>
       </RestrictedFeaturePopover>
     );
-  }
+  },
 );

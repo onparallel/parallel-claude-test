@@ -57,7 +57,7 @@ export function PetitionActivityTimeline({
 }: PetitionActivityTimelineProps) {
   const handleCancelScheduledMessage = useMemoFactory(
     (messageId: string) => () => onCancelScheduledMessage(messageId),
-    [onCancelScheduledMessage]
+    [onCancelScheduledMessage],
   );
   return (
     <Box {...props}>

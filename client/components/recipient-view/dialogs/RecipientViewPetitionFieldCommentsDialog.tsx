@@ -56,7 +56,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   const { data, loading } = useQuery(
     RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument,
-    { variables: { keycode, petitionFieldId: fieldId } }
+    { variables: { keycode, petitionFieldId: fieldId } },
   );
   const field = data?.publicPetitionField;
   const comments = data?.publicPetitionField.comments ?? [];
@@ -67,7 +67,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const [markPetitionFieldCommentsAsRead] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument
+    RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument,
   );
 
   useTimeoutEffect(
@@ -83,11 +83,11 @@ export function RecipientViewPetitionFieldCommentsDialog({
       }
     },
     1000,
-    [fieldId, comments.map((c) => c.id).join(",")]
+    [fieldId, comments.map((c) => c.id).join(",")],
   );
 
   const [createPetitionFieldComment] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
+    RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   );
   async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (isMetaReturn(event)) {
@@ -113,7 +113,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   }
 
   const [updatePetitionFieldComment] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
+    RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
   );
 
   async function handleEditCommentContent(commentId: string, content: any) {
@@ -130,7 +130,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   }
 
   const [deletePetitionFieldComment] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
+    RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
   );
   async function handleDeleteClick(commentId: string) {
     try {
@@ -244,7 +244,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
                       id: "recipient-view.field-comments.placeholder",
                       defaultMessage: "Ask here your questions and doubts",
                     },
-                    { tone }
+                    { tone },
                   )}
                   isDisabled={!field}
                 />

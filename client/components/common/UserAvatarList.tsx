@@ -19,7 +19,7 @@ interface UserAvatarListProps {
 export const UserAvatarList = Object.assign(
   chakraForwardRef<"div", UserAvatarListProps>(function UserAvatarList(
     { usersOrGroups, size = "xs", max = 3, boxSize = 7 },
-    ref
+    ref,
   ) {
     const styles = useMultiStyleConfig("Avatar", { size });
     const slice =
@@ -129,5 +129,5 @@ export const UserAvatarList = Object.assign(
         `;
       },
     },
-  }
+  },
 );

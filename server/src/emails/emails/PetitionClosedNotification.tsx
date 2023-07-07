@@ -22,7 +22,7 @@ const email: Email<PetitionClosedNotificationProps> = {
         id: "from.via-parallel",
         defaultMessage: "{senderName} via Parallel",
       },
-      { senderName }
+      { senderName },
     );
   },
   subject({ senderName }, intl) {
@@ -31,7 +31,7 @@ const email: Email<PetitionClosedNotificationProps> = {
         id: "petition-closed-notification.subject",
         defaultMessage: "{senderName} confirmed receipt of the information.",
       },
-      { senderName }
+      { senderName },
     );
   },
   text({ senderName, senderEmail, bodyPlainText }, intl) {
@@ -41,7 +41,7 @@ const email: Email<PetitionClosedNotificationProps> = {
           id: "petition-closed-notification.text",
           defaultMessage: "{senderName} ({senderEmail}) has received the information.",
         },
-        { senderName, senderEmail }
+        { senderName, senderEmail },
       )}
 
       ${bodyPlainText}

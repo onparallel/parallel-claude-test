@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useCallback } from "react";
 export function useStateSlice<T extends {}, K extends keyof T>(
   state: T,
   setState: Dispatch<SetStateAction<T>>,
-  slice: K
+  slice: K,
 ): [T[K], Dispatch<SetStateAction<T[K]>>] {
   return [
     state[slice],
@@ -14,7 +14,7 @@ export function useStateSlice<T extends {}, K extends keyof T>(
           [slice]: typeof value === "function" ? (value as any)(prevState[slice]) : value,
         }));
       },
-      [setState]
+      [setState],
     ),
   ];
 }

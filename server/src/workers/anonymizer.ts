@@ -9,7 +9,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
   ctx.logger.debug(`Anonymizing ${petitionIds.length} deleted petitions`);
   for (const petitionId of petitionIds) {
     ctx.logger.debug(
-      `Anonymizing deleted petition ${petitionId} (${++count}/${petitionIds.length})`
+      `Anonymizing deleted petition ${petitionId} (${++count}/${petitionIds.length})`,
     );
     await ctx.petitions.anonymizePetition(petitionId);
   }
@@ -39,7 +39,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
   await ctx.files.updateFileUpload(
     filesToDelete.map((f) => f.id),
     { file_deleted_at: new Date() },
-    "AnonymizerWorker"
+    "AnonymizerWorker",
   );
 
   // search for closed parallels that are configured to be anonymized after a certain time
@@ -51,7 +51,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
     ctx.logger.debug(`Anonymizing ${closedPetitions.length} closed parallels`);
     for (const petition of closedPetitions) {
       ctx.logger.debug(
-        `Anonymizing closed petition ${petition.id} (${++count}/${closedPetitions.length})`
+        `Anonymizing closed petition ${petition.id} (${++count}/${closedPetitions.length})`,
       );
       await ctx.petitions.anonymizePetition(petition.id);
     }

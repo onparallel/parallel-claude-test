@@ -78,7 +78,7 @@ function DelegateAccessDialog({
       firstName: "",
       lastName: "",
       messageBody: plainTextToRTEValue(
-        (messages[intl.locale as PetitionLocale] ?? messages["en"])(organizationName, contactName)
+        (messages[intl.locale as PetitionLocale] ?? messages["en"])(organizationName, contactName),
       ),
     },
     shouldFocusError: true,

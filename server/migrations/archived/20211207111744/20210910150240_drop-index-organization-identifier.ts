@@ -12,6 +12,6 @@ export async function down(knex: Knex) {
       t.string("identifier").notNullable().alter();
     })
     .raw(
-      `create unique index "organization__identifier" on "organization" ("identifier") where "deleted_at" is null`
+      `create unique index "organization__identifier" on "organization" ("identifier") where "deleted_at" is null`,
     );
 }

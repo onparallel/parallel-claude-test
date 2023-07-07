@@ -14,7 +14,7 @@ export async function petitionShared(
     petition_permission_ids: number[];
     message: Maybe<string>;
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [user, userData, permissions] = await Promise.all([
     context.users.loadUser(payload.user_id),
@@ -39,12 +39,12 @@ export async function petitionShared(
 
   const permissionsByUserId = groupBy(
     permissions.filter((p) => isDefined(p?.user_id)),
-    (p) => p!.user_id!
+    (p) => p!.user_id!,
   );
 
   for (const [userId, permissions] of Object.entries(permissionsByUserId)) {
     const _petitions = petitions.filter(
-      (p) => isDefined(p) && permissions.some((permission) => permission!.petition_id === p.id)
+      (p) => isDefined(p) && permissions.some((permission) => permission!.petition_id === p.id),
     );
     const permissionUser = usersById[userId!];
     const permissionUserData = usersData.find((ud) => ud!.id === permissionUser.user_data_id)!;
@@ -63,7 +63,7 @@ export async function petitionShared(
         isTemplate: _petitions[0]!.is_template,
         ...layoutProps,
       },
-      { locale: permissionUserData.preferred_locale }
+      { locale: permissionUserData.preferred_locale },
     );
     const email = await context.emailLogs.createEmail({
       from: buildFrom(from, emailFrom),

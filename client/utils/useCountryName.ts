@@ -35,7 +35,7 @@ export function useLoadCountryNames(locale: string) {
         })
         .catch();
     },
-    [locale]
+    [locale],
   );
 
   return data;

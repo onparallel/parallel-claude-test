@@ -19,7 +19,7 @@ export interface RemindersOptOutNotificationProps {
 export const RemindersOptOutNotification = Object.assign(
   forwardRef<HTMLElement, RemindersOptOutNotificationProps>(function RemindersOptOutNotification(
     { isFirst, notification },
-    ref
+    ref,
   ) {
     const answers = useReminderOptOutReasons();
     const { other, access } = notification;
@@ -75,5 +75,5 @@ export const RemindersOptOutNotification = Object.assign(
         ${ContactReference.fragments.Contact}
       `,
     },
-  }
+  },
 );

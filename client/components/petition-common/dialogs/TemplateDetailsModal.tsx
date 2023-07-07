@@ -65,11 +65,11 @@ export function TemplateDetailsModal({
 
   const hasAccess = Boolean(
     template.myEffectivePermission &&
-      ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType)
+      ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType),
   );
 
   const filteredFields = template.fields.filter((field) =>
-    field.type === "HEADING" && !field.title ? false : true
+    field.type === "HEADING" && !field.title ? false : true,
   );
 
   const indices = useFieldIndices(filteredFields);
@@ -182,7 +182,7 @@ export function TemplateDetailsModal({
                         ? p.user
                         : p.__typename === "PetitionUserGroupPermission"
                         ? p.group
-                        : (null as never)
+                        : (null as never),
                     )}
                   />
                 </HStack>

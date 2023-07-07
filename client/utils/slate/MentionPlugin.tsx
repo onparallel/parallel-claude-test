@@ -40,7 +40,7 @@ export interface MentionInputElement extends SlateElement<typeof ELEMENT_MENTION
 
 export function createMentionPlugin<
   TValue extends Value = Value,
-  TEditor extends PlateEditor<TValue> = PlateEditor<TValue>
+  TEditor extends PlateEditor<TValue> = PlateEditor<TValue>,
 >() {
   return _createMentionPlugin<MentionPlugin<Mentionable>, TValue, TEditor>({
     options: {
@@ -107,7 +107,7 @@ export function MentionCombobox({
       const mentionables = await onSearchMentionables(search);
       return mentionables.map(mapMentionable);
     },
-    [onSearchMentionables]
+    [onSearchMentionables],
   );
 
   const defaultItems = useMemo(() => {

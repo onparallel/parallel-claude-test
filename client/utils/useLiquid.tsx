@@ -65,7 +65,7 @@ function useCreateLiquid() {
           timeZone: "UTC",
           ...FORMATS[format as keyof typeof FORMATS],
         });
-      }
+      },
     );
 
     engine.registerFilter(
@@ -85,7 +85,7 @@ function useCreateLiquid() {
           timeZone: timezone,
           ...FORMATS[format as keyof typeof FORMATS],
         })} (${prettifyTimezone(timezone)})`;
-      }
+      },
     );
 
     for (const filter of ["escape", "escape_once", "url_decode", "newline_to_br", "strip_html"]) {

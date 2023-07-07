@@ -10,7 +10,7 @@ export class ApolloError extends GraphQLError {
       throw Error(
         "Pass extensions directly as the third argument of the ApolloError constructor: `new " +
           "ApolloError(message, code, {myExt: value})`, not `new ApolloError(message, code, " +
-          "{extensions: {myExt: value}})`"
+          "{extensions: {myExt: value}})`",
       );
     }
   }
@@ -43,7 +43,7 @@ export class ArgValidationError extends ApolloError {
     { parentType, fieldName }: GraphQLResolveInfo,
     argName: string,
     message: string,
-    extra?: any
+    extra?: any,
   ) {
     super(
       `Validation error on argument "${argName}" for "${parentType}.${fieldName}": ${message}`,
@@ -54,7 +54,7 @@ export class ArgValidationError extends ApolloError {
         argName,
         message,
         extra,
-      }
+      },
     );
   }
 }
@@ -67,7 +67,7 @@ export class ValidatorOrConditionError extends ApolloError {
       "VALIDATOR_CONDITION_ERROR",
       {
         extra,
-      }
+      },
     );
   }
 }
@@ -78,7 +78,7 @@ export class InvalidReplyError extends ApolloError {
     { parentType, fieldName }: GraphQLResolveInfo,
     argName: string,
     message: string,
-    extra?: any
+    extra?: any,
   ) {
     super(message, "INVALID_REPLY_ERROR", {
       parentType,
@@ -96,7 +96,7 @@ export class MaxFileSizeExceededError extends ApolloError {
     { parentType, fieldName }: GraphQLResolveInfo,
     argName: string,
     message: string,
-    extra?: any
+    extra?: any,
   ) {
     super(message, "MAX_FILE_SIZE_EXCEEDED_ERROR", {
       parentType,

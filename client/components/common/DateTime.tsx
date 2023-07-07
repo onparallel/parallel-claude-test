@@ -41,7 +41,7 @@ function selectUnit(from: Date | number, to: Date | number) {
 
 export const DateTime = chakraForwardRef<"time", DateTimeProps>(function DateTime(
   { value, format, useRelativeTime, ...props },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const date = new Date(value);

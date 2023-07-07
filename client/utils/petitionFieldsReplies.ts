@@ -108,7 +108,7 @@ mapReplyContents.fragments = {
 
 export const isReplyContentCompatible = (
   target: isReplyContentCompatible_PetitionFieldFragment,
-  origin: isReplyContentCompatible_PetitionFieldFragment
+  origin: isReplyContentCompatible_PetitionFieldFragment,
 ) => {
   let isCompatible = false;
   const replies = target.multiple ? origin.replies : [origin.replies[0]];
@@ -190,7 +190,7 @@ export const isReplyContentCompatible = (
       if (
         compatibleFields.includes(origin.type) &&
         replies.every((reply) =>
-          reply ? hasCompatibleNumberFormat(options, reply.content.value) : true
+          reply ? hasCompatibleNumberFormat(options, reply.content.value) : true,
         )
       ) {
         isCompatible = true;

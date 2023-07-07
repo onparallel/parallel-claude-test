@@ -28,7 +28,7 @@ export async function up(knex: Knex): Promise<void> {
           },
         });
     },
-    { concurrency: 10 }
+    { concurrency: 10 },
   );
 }
 
@@ -37,7 +37,7 @@ export async function down(knex: Knex): Promise<void> {}
 function findSignerExternalId(
   documents: { email: string; id: string }[],
   signer: PetitionSignatureConfigSigner,
-  signerIndex: number
+  signerIndex: number,
 ) {
   const signerByEmail = documents.filter((d) => d.email === signer.email);
 
@@ -50,8 +50,8 @@ function findSignerExternalId(
     if (!externalId) {
       throw new Error(
         `Index out of bounds on signature document. document:${JSON.stringify(
-          documents
-        )}, index: ${signerIndex} `
+          documents,
+        )}, index: ${signerIndex} `,
       );
     }
     return externalId;
@@ -59,8 +59,8 @@ function findSignerExternalId(
     // if no signers were found with that email, there's an error
     throw new Error(
       `Can't find signer by email on document. signer:${JSON.stringify(
-        signer
-      )}. documents: ${JSON.stringify(documents)}`
+        signer,
+      )}. documents: ${JSON.stringify(documents)}`,
     );
   }
 }

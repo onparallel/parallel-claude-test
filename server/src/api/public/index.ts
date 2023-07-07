@@ -371,7 +371,7 @@ function getPetitionIncludesFromQuery<
     include: ReturnType<typeof petitionIncludeParam>["include"] extends RestParameter<infer T>
       ? T
       : never;
-  }
+  },
 >(query: Q) {
   return {
     includeFields: query.include?.includes("fields") ?? false,
@@ -407,7 +407,7 @@ const profileIncludeParam = {
 function getProfileIncludesFromQuery<
   Q extends {
     include: (typeof profileIncludeParam)["include"] extends RestParameter<infer T> ? T : never;
-  }
+  },
 >(query: Q) {
   return {
     includeFields: query.include?.includes("fields") ?? false,
@@ -488,7 +488,7 @@ api.path("/me").get(
     `;
     const result = await client.request(GetMe_userDocument);
     return Ok(result.me);
-  }
+  },
 );
 
 api.path("/tags").get(
@@ -525,7 +525,7 @@ api.path("/tags").get(
     const result = await client.request(GetTags_tagsDocument, query);
     const { items, totalCount } = result.tags;
     return Ok({ items: items.map((t) => t.name), totalCount });
-  }
+  },
 );
 
 api
@@ -619,7 +619,7 @@ api
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
       return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
-    }
+    },
   )
   .post(
     {
@@ -658,7 +658,7 @@ api
       });
       assert("id" in result.createPetition);
       return Created(mapPetition(result.createPetition));
-    }
+    },
   );
 
 api
@@ -700,7 +700,7 @@ api
       });
       assert("id" in result.petition!);
       return Ok(mapPetition(result.petition!));
-    }
+    },
   )
   .put(
     {
@@ -766,7 +766,7 @@ api
 
         if (!isDefined(queryResult.petition!.signatureConfig)) {
           throw new ConflictError(
-            "Cannot update signers on a petition without a signature configuration"
+            "Cannot update signers on a petition without a signature configuration",
           );
         }
 
@@ -797,7 +797,7 @@ api
 
         throw error;
       }
-    }
+    },
   )
   .delete(
     {
@@ -841,12 +841,12 @@ api
       } catch (error) {
         if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
           throw new BadRequestError(
-            "The parallel is being shared with another user. Set force=true to delete."
+            "The parallel is being shared with another user. Set force=true to delete.",
           );
         }
         throw error;
       }
-    }
+    },
   );
 
 api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
@@ -898,7 +898,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
 
       throw error;
     }
-  }
+  },
 );
 
 api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
@@ -972,7 +972,7 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
     });
     assert("id" in tagResult.tagPetition!);
     return Created(mapPetition(tagResult.tagPetition!));
-  }
+  },
 );
 
 api
@@ -1023,7 +1023,7 @@ api
       });
 
       return NoContent();
-    }
+    },
   );
 
 api
@@ -1054,7 +1054,7 @@ api
       });
 
       return Ok(result.petition!.customProperties);
-    }
+    },
   )
   .post(
     {
@@ -1092,18 +1092,18 @@ api
         `;
         const result = await client.request(
           CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-          { petitionId: params.petitionId, key: body.key, value: body.value }
+          { petitionId: params.petitionId, key: body.key, value: body.value },
         );
         return Ok(result.modifyPetitionCustomProperty.customProperties);
       } catch (error) {
         if (containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")) {
           throw new ConflictError(
-            "You reached the maximum limit of custom properties on the parallel."
+            "You reached the maximum limit of custom properties on the parallel.",
           );
         }
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -1133,11 +1133,11 @@ api
       `;
       await client.request(
         DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-        params
+        params,
       );
 
       return NoContent();
-    }
+    },
   );
 
 api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
@@ -1255,7 +1255,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
             }
           }
         },
-        { concurrency: 3 }
+        { concurrency: 3 },
       );
       let message = bodyMessageToRTE(body.message);
 
@@ -1316,7 +1316,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         message = message ?? query.petition?.emailBody ?? null;
         if (!isDefined(subject) || !isDefined(message)) {
           throw new BadRequestError(
-            "The subject or the message are missing and not defined on the parallel"
+            "The subject or the message are missing and not defined on the parallel",
           );
         }
       }
@@ -1389,7 +1389,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
 
       throw error;
     }
-  }
+  },
 );
 
 api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
@@ -1421,7 +1421,7 @@ api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
     });
     assert("accesses" in result.petition!);
     return Ok(result.petition!.accesses);
-  }
+  },
 );
 
 api
@@ -1458,7 +1458,7 @@ api
       assert("id" in result.reactivateAccesses[0]);
 
       return Ok(result.reactivateAccesses[0]);
-    }
+    },
   );
 
 api
@@ -1498,7 +1498,7 @@ api
       assert("id" in result.deactivateAccesses[0]);
 
       return Ok(result.deactivateAccesses[0]);
-    }
+    },
   );
 
 api
@@ -1557,7 +1557,7 @@ api
 
         throw error;
       }
-    }
+    },
   );
 
 api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
@@ -1588,7 +1588,7 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
     });
 
     return Ok(mapPetitionFieldRepliesContent(result.petition!).fields);
-  }
+  },
 );
 
 api
@@ -1632,7 +1632,7 @@ api
       });
       assert("id" in result.updatePetitionField!);
       return Ok(mapPetitionField(result.updatePetitionField));
-    }
+    },
   );
 
 const replyBodyDescription = outdent`
@@ -1705,7 +1705,7 @@ api
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
                 reply: replyValue,
-              }
+              },
             ));
             break;
           case "DATE_TIME":
@@ -1718,7 +1718,7 @@ api
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
                 reply: replyValue,
-              }
+              },
             ));
             break;
           case "FILE_UPLOAD":
@@ -1742,7 +1742,7 @@ api
                 {
                   petitionId: params.petitionId,
                   replyId: reply.id,
-                }
+                },
               );
               newReply = createFileUploadReplyComplete;
             } else {
@@ -1762,7 +1762,7 @@ api
               fieldId: params.fieldId,
               replyIds: [replyId],
               status: body.status,
-            }
+            },
           );
           newReply = updatePetitionFieldRepliesStatus.replies.find((r) => r.id === replyId)!;
         }
@@ -1776,7 +1776,7 @@ api
           });
         } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
           throw new BadRequestError(
-            "The field is already replied and does not accept any more replies."
+            "The field is already replied and does not accept any more replies.",
           );
         } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
           throw new ForbiddenError("You don't have enough credits to submit a reply");
@@ -1784,7 +1784,7 @@ api
 
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -1835,7 +1835,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
-              }
+              },
             ));
             break;
           case "DATE_TIME":
@@ -1848,7 +1848,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
-              }
+              },
             ));
             break;
           case "NUMBER": {
@@ -1861,7 +1861,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
-              }
+              },
             ));
 
             break;
@@ -1869,7 +1869,7 @@ api
           case "CHECKBOX":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
-                `Reply for ${fieldType} field must be an array with the chosen options.`
+                `Reply for ${fieldType} field must be an array with the chosen options.`,
               );
             }
             ({ updatePetitionFieldReply: updatedReply } = await client.request(
@@ -1878,14 +1878,14 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
-              }
+              },
             ));
 
             break;
           case "DYNAMIC_SELECT":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
-                `Reply for ${fieldType} field must be an array with the chosen options.`
+                `Reply for ${fieldType} field must be an array with the chosen options.`,
               );
             }
             const labels = field?.options?.labels as string[];
@@ -1897,7 +1897,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: labels.map((label, i) => [label, replies[i]]),
-              }
+              },
             ));
 
             break;
@@ -1923,7 +1923,7 @@ api
                 {
                   petitionId: params.petitionId,
                   replyId: reply.id,
-                }
+                },
               );
 
               updatedReply = updateFileUploadReplyComplete;
@@ -1947,7 +1947,7 @@ api
 
         throw error;
       }
-    }
+    },
   )
   .delete(
     {
@@ -1979,7 +1979,7 @@ api
         }
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -2006,13 +2006,13 @@ api
           fieldId: params.fieldId,
           replyIds: [params.replyId],
           status: "APPROVED",
-        }
+        },
       );
       const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
-        (r) => r.id === params.replyId
+        (r) => r.id === params.replyId,
       )!;
       return Ok(mapReplyResponse(updatedReply));
-    }
+    },
   );
 
 api
@@ -2038,13 +2038,13 @@ api
           fieldId: params.fieldId,
           replyIds: [params.replyId],
           status: "REJECTED",
-        }
+        },
       );
       const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
-        (r) => r.id === params.replyId
+        (r) => r.id === params.replyId,
       )!;
       return Ok(mapReplyResponse(updatedReply));
-    }
+    },
   );
 
 api
@@ -2086,7 +2086,7 @@ api
         }
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -2136,7 +2136,7 @@ api
         `;
         const result = await client.request(
           DownloadFileReply_fileUploadReplyDownloadLinkDocument,
-          params
+          params,
         );
         return Redirect(result.fileUploadReplyDownloadLink.url!);
       } catch (error) {
@@ -2145,7 +2145,7 @@ api
         }
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -2204,7 +2204,7 @@ api
             ExportPetitionReplies_createExportRepliesTaskDocument,
             {
               petitionId: params.petitionId,
-            }
+            },
           );
           await waitForTask(client, result.createExportRepliesTask);
           const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
@@ -2230,7 +2230,7 @@ api
       } else {
         return null as never;
       }
-    }
+    },
   );
 
 api
@@ -2259,7 +2259,7 @@ api
       const result = await client.request(GetPermissions_permissionsDocument, params);
 
       return Ok(result.petition!.permissions);
-    }
+    },
   )
   .post(
     {
@@ -2331,7 +2331,7 @@ api
       });
 
       return Ok(result.addPetitionPermission[0].permissions);
-    }
+    },
   )
   .delete(
     {
@@ -2355,7 +2355,7 @@ api
         petitionId: params.petitionId,
       });
       return NoContent();
-    }
+    },
   );
 
 api
@@ -2385,7 +2385,7 @@ api
         userId: params.userId,
       });
       return NoContent();
-    }
+    },
   );
 
 api
@@ -2418,7 +2418,7 @@ api
         userGroupId: params.userGroupId,
       });
       return NoContent();
-    }
+    },
   );
 
 api
@@ -2504,7 +2504,7 @@ api
       });
 
       return Ok(result.transferPetitionOwnership[0].permissions);
-    }
+    },
   );
 
 api
@@ -2538,7 +2538,7 @@ api
       } else {
         return Ok(data.petition?.signatureRequests ?? []);
       }
-    }
+    },
   )
   .post(
     {
@@ -2588,7 +2588,7 @@ api
 
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -2637,14 +2637,14 @@ api
         DownloadSignedDocument_downloadSignedDocDocument,
         {
           signatureId: params.signatureId,
-        }
+        },
       );
       if (signedPetitionDownloadLink.result === "FAILURE") {
         throw new BadRequestError("The signed document is not yet ready to be downloaded");
       } else {
         return Redirect(signedPetitionDownloadLink.url!);
       }
-    }
+    },
   );
 
 api
@@ -2696,14 +2696,14 @@ api
         DownloadSignedDocument_downloadAuditTrailDocument,
         {
           signatureId: params.signatureId,
-        }
+        },
       );
       if (signedPetitionDownloadLink.result === "FAILURE") {
         throw new BadRequestError("The document is not yet ready to be downloaded");
       } else {
         return Redirect(signedPetitionDownloadLink.url!);
       }
-    }
+    },
   );
 
 api
@@ -2759,9 +2759,9 @@ api
       return Ok(
         response.petition.profiles
           .filter((p) => !isDefined(query.type) || query.type.includes(p.profileType.id))
-          .map(mapProfile)
+          .map(mapProfile),
       );
-    }
+    },
   )
   .post(
     {
@@ -2805,7 +2805,7 @@ api
             profileId: body.profileId,
             petitionId: params.petitionId,
             ...getProfileIncludesFromQuery(query),
-          }
+          },
         );
 
         assert("id" in response.associateProfileToPetition.profile);
@@ -2817,7 +2817,7 @@ api
         }
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -2851,7 +2851,7 @@ api
           {
             profileIds: [params.profileId],
             petitionId: params.petitionId,
-          }
+          },
         );
         return NoContent();
       } catch (error) {
@@ -2860,7 +2860,7 @@ api
         }
         throw error;
       }
-    }
+    },
   );
 
 api.path("/templates").get(
@@ -2928,7 +2928,7 @@ api.path("/templates").get(
     const { items, totalCount } = result.templates;
     assertType<TemplateFragmentType[]>(items);
     return Ok({ items: items.map((t) => mapTemplate(t)), totalCount });
-  }
+  },
 );
 
 api
@@ -2968,7 +2968,7 @@ api
       });
       assert("id" in result.template!);
       return Ok(mapTemplate(result.template!));
-    }
+    },
   )
   .delete(
     {
@@ -3004,12 +3004,12 @@ api
       } catch (error) {
         if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
           throw new BadRequestError(
-            "The template is being shared with another user. Set force=true to delete."
+            "The template is being shared with another user. Set force=true to delete.",
           );
         }
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -3042,7 +3042,7 @@ api
       `;
       const result = await client.request(GetContacts_contactsDocument, query);
       return Ok(result.contacts);
-    }
+    },
   )
   .post(
     {
@@ -3072,7 +3072,7 @@ api
       } catch (error) {
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -3107,7 +3107,7 @@ api
         contactId: params.contactId,
       });
       return Ok(result.contact!);
-    }
+    },
   );
 
 api.path("/users").get(
@@ -3146,7 +3146,7 @@ api.path("/users").get(
     `;
     const result = await client.request(GetOrganizationUsers_usersDocument, query);
     return Ok(result.me.organization.users);
-  }
+  },
 );
 
 api
@@ -3170,7 +3170,7 @@ api
       `;
       const result = await client.request(EventSubscriptions_getSubscriptionsDocument);
       return Ok(result.subscriptions.map(mapSubscription));
-    }
+    },
   )
   .post(
     {
@@ -3243,7 +3243,7 @@ api
 
         throw error;
       }
-    }
+    },
   );
 
 api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delete(
@@ -3264,7 +3264,7 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
       ids: [params.subscriptionId],
     });
     return NoContent();
-  }
+  },
 );
 
 api.path("/petition-events").get(
@@ -3317,9 +3317,9 @@ api.path("/petition-events").get(
           type: e.type,
           data: e.data,
           createdAt: e.createdAt,
-        }))
+        })),
     );
-  }
+  },
 );
 
 api
@@ -3383,7 +3383,7 @@ api
         totalCount: result.profiles.totalCount,
         items: result.profiles.items.map(mapProfile),
       });
-    }
+    },
   )
   .post(
     {
@@ -3449,7 +3449,7 @@ api
             profileId: result.createProfile.id,
             fields: body.fields,
             ...getProfileIncludesFromQuery(query),
-          }
+          },
         );
 
         return Created(mapProfile(updatedProfileResult.updateProfileFieldValue));
@@ -3459,7 +3459,7 @@ api
         }
         throw error;
       }
-    }
+    },
   );
 
 api.path("/profiles/:profileId", { params: { profileId } }).get(
@@ -3492,7 +3492,7 @@ api.path("/profiles/:profileId", { params: { profileId } }).get(
     });
     assert("id" in result.profile);
     return Ok(mapProfile(result.profile));
-  }
+  },
 );
 
 api
@@ -3526,7 +3526,7 @@ api
       });
 
       return Ok(mapProfile(result.profile).fields!);
-    }
+    },
   )
   .put(
     {
@@ -3634,7 +3634,7 @@ api
           if (field.type === "FILE") {
             if (typeof value !== "object") {
               throw new BadRequestError(
-                `Invalid value for field ${field.alias}. Expected an array of files.`
+                `Invalid value for field ${field.alias}. Expected an array of files.`,
               );
             }
             fileUpdateFields.push({
@@ -3644,7 +3644,7 @@ api
           } else {
             if (typeof value !== "string") {
               throw new BadRequestError(
-                `Invalid value for field ${field.alias}. Expected a string.`
+                `Invalid value for field ${field.alias}. Expected a string.`,
               );
             }
             simpleTextUpdateFields.push({ profileTypeFieldId: field.id, content: { value } });
@@ -3672,13 +3672,13 @@ api
                   contentType: file.mimetype,
                   size: file.size,
                 })),
-              }
+              },
             );
             for (const [file, presignedPostData] of zip(
               fileUpdate.files,
               fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
-                (u) => u.presignedPostData
-              )
+                (u) => u.presignedPostData,
+              ),
             )) {
               await uploadFile(file, presignedPostData);
             }
@@ -3687,7 +3687,7 @@ api
               profileId: params.profileId,
               profileTypeFieldId: fileUpdate.profileTypeFieldId,
               profileFieldFileIds: fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
-                (u) => u.file.id
+                (u) => u.file.id,
               ),
             });
           }
@@ -3703,12 +3703,12 @@ api
       } catch (error) {
         if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
           throw new BadRequestError(
-            error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE"
+            error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE",
           );
         }
         throw error;
       }
-    }
+    },
   );
 
 api
@@ -3766,7 +3766,7 @@ api
       });
 
       const field = queryResponse.profile.properties!.find(
-        (p) => p.field.id === params.profileTypeFieldId
+        (p) => p.field.id === params.profileTypeFieldId,
       )?.field;
 
       if (!field) {
@@ -3786,7 +3786,7 @@ api
       }
 
       return NoContent();
-    }
+    },
   )
   .put(
     {
@@ -3882,7 +3882,7 @@ api
       });
 
       const field = queryResponse.profile.properties!.find(
-        (p) => p.field.id === params.profileTypeFieldId
+        (p) => p.field.id === params.profileTypeFieldId,
       )?.field;
 
       if (!isDefined(field)) {
@@ -3904,12 +3904,12 @@ api
               size: file.size,
             })),
             expiryDate: body.expiryDate,
-          }
+          },
         );
 
         for (const [file, uploadData] of zip(
           body.value as Express.Multer.File[],
-          createUploadLinkResponse.createProfileFieldFileUploadLink.uploads
+          createUploadLinkResponse.createProfileFieldFileUploadLink.uploads,
         )) {
           await uploadFile(file, uploadData.presignedPostData);
         }
@@ -3919,7 +3919,7 @@ api
           profileTypeFieldId: params.profileTypeFieldId,
           profileFieldFileIds:
             createUploadLinkResponse.createProfileFieldFileUploadLink.uploads.map(
-              (upload) => upload.file.id
+              (upload) => upload.file.id,
             ),
         });
       } else {
@@ -3946,7 +3946,7 @@ api
 
       assert("id" in profileQuery.profile);
       return Ok(mapProfile(profileQuery.profile));
-    }
+    },
   );
 
 api
@@ -3978,7 +3978,7 @@ api
       });
 
       return Ok(result.profile.subscribers);
-    }
+    },
   )
   .post(
     {
@@ -4017,7 +4017,7 @@ api
       assert("id" in response.subscribeToProfile[0]);
 
       return Created(mapProfile(response.subscribeToProfile[0]));
-    }
+    },
   )
   .delete(
     {
@@ -4057,5 +4057,5 @@ api
       assert("id" in response.unsubscribeFromProfile[0]);
 
       return Ok(mapProfile(response.unsubscribeFromProfile[0]));
-    }
+    },
   );

@@ -47,12 +47,12 @@ createQueueWorker(
           context.petitions.markPetitionAccessEmailBounceStatus(
             message.petition_access_id,
             true,
-            context.config.instanceName
+            context.config.instanceName,
           ),
           context.petitions.deactivateAccesses(
             message.petition_id,
             [message.petition_access_id],
-            context.config.instanceName
+            context.config.instanceName,
           ),
           context.emails.sendPetitionMessageBouncedEmail(message.id),
           context.petitions.createEvent({
@@ -68,7 +68,7 @@ createQueueWorker(
           context.petitions.markPetitionAccessEmailBounceStatus(
             access.id,
             true,
-            context.config.instanceName
+            context.config.instanceName,
           ),
           context.petitions.updateRemindersForPetition(access.petition_id, null),
           context.petitions.cancelScheduledMessagesByAccessIds([access.id]),
@@ -84,7 +84,7 @@ createQueueWorker(
     } else if (event === "complaint") {
       if (message || reminder) {
         const access = await context.petitions.loadAccess(
-          message?.petition_access_id ?? reminder!.petition_access_id
+          message?.petition_access_id ?? reminder!.petition_access_id,
         );
         if (access && !access.reminders_opt_out) {
           await context.petitions.optOutReminders([access.id]);
@@ -119,7 +119,7 @@ createQueueWorker(
         await context.petitions.markPetitionAccessEmailBounceStatus(
           message?.petition_access_id ?? reminder!.petition_access_id,
           false,
-          context.config.instanceName
+          context.config.instanceName,
         );
       }
     }
@@ -129,5 +129,5 @@ createQueueWorker(
       const m = JSON.parse(message);
       return JSON.parse(m.Message);
     },
-  }
+  },
 );

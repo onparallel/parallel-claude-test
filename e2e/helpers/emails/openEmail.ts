@@ -4,7 +4,7 @@ import { Email } from "./types";
 export async function openEmail<T>(
   context: BrowserContext,
   email: Email,
-  body: (args: { page: Page; context: BrowserContext }) => Promise<T>
+  body: (args: { page: Page; context: BrowserContext }) => Promise<T>,
 ): Promise<T> {
   const page = await context.newPage();
   await page.route("http://email", (route) => {

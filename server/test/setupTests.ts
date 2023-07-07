@@ -15,7 +15,7 @@ expect.extend({
   toContainGraphQLError(
     errors: GraphQLFormattedError[] | undefined,
     expectedErrorCode?: string,
-    expectedExtra?: any
+    expectedExtra?: any,
   ) {
     const options = {
       isNot: this.isNot,
@@ -32,7 +32,7 @@ expect.extend({
             (expectedExtra
               ? equals(
                   { ...(errors[0].extensions ?? {}), ...expectedExtra },
-                  errors[0].extensions ?? {}
+                  errors[0].extensions ?? {},
                 )
               : true)
           : true,

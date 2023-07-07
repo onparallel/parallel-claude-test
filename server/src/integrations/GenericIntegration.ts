@@ -20,14 +20,14 @@ import { Replace } from "../util/types";
 export abstract class GenericIntegration<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-  TContext extends {} = {}
+  TContext extends {} = {},
 > {
   protected abstract type: TType;
   protected abstract provider: TProvider;
 
   constructor(
     protected encryption: EncryptionService,
-    protected integrations: IntegrationRepository
+    protected integrations: IntegrationRepository,
   ) {}
 
   private encryptCredentials(credentials: IntegrationCredentials<TType, TProvider>): string {
@@ -47,11 +47,11 @@ export abstract class GenericIntegration<
     orgIntegrationId: number,
     handler: (
       credentials: IntegrationCredentials<TType, TProvider>,
-      context: TContext
-    ) => Promise<TResult>
+      context: TContext,
+    ) => Promise<TResult>,
   ): Promise<TResult> {
     const integration = (await this.integrations.loadIntegration(
-      orgIntegrationId
+      orgIntegrationId,
     )) as EnhancedOrgIntegration<TType, TProvider>;
     if (!isDefined(integration)) {
       throw new Error(`Invalid org integration ID ${orgIntegrationId}`);
@@ -72,7 +72,7 @@ export abstract class GenericIntegration<
         await this.integrations.updateOrgIntegration(
           orgIntegrationId,
           { invalid_credentials: false },
-          `OrgIntegration:${orgIntegrationId}`
+          `OrgIntegration:${orgIntegrationId}`,
         );
       }
       return response;
@@ -81,7 +81,7 @@ export abstract class GenericIntegration<
         await this.integrations.updateOrgIntegration(
           orgIntegrationId,
           { invalid_credentials: true },
-          `OrgIntegration:${orgIntegrationId}`
+          `OrgIntegration:${orgIntegrationId}`,
         );
       }
       throw error;
@@ -94,7 +94,7 @@ export abstract class GenericIntegration<
       "type" | "provider" | "is_enabled"
     >,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<TType, TProvider>> {
     assert("CREDENTIALS" in data.settings);
     const integration = await this.integrations.createOrgIntegration<TType, TProvider>(
@@ -104,14 +104,14 @@ export abstract class GenericIntegration<
         provider: this.provider,
         settings: {
           CREDENTIALS: this.encryptCredentials(
-            data.settings.CREDENTIALS as IntegrationCredentials<TType, TProvider>
+            data.settings.CREDENTIALS as IntegrationCredentials<TType, TProvider>,
           ),
           ...omit(data!.settings, ["CREDENTIALS"]),
         } as EnhancedIntegrationSettings<TType, TProvider, true>,
         is_enabled: true,
       },
       createdBy,
-      t
+      t,
     );
     if (data.is_default) {
       await this.integrations.setDefaultOrgIntegration(
@@ -119,7 +119,7 @@ export abstract class GenericIntegration<
         this.type,
         data.org_id,
         createdBy,
-        t
+        t,
       );
     }
 
@@ -137,7 +137,7 @@ export abstract class GenericIntegration<
         { settings: Partial<EnhancedCreateOrgIntegration<TType, TProvider, false>["settings"]> }
       >
     >,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const integration = (await this.integrations.loadIntegration.raw(orgIntegrationId))!;
     await this.integrations.updateOrgIntegration(
@@ -150,7 +150,7 @@ export abstract class GenericIntegration<
                 settings: {
                   ...integration.settings,
                   CREDENTIALS: this.encryptCredentials(
-                    data.settings.CREDENTIALS as IntegrationCredentials<TType, TProvider>
+                    data.settings.CREDENTIALS as IntegrationCredentials<TType, TProvider>,
                   ),
                   ...omit(data!.settings, ["CREDENTIALS"]),
                 },
@@ -164,7 +164,7 @@ export abstract class GenericIntegration<
           : {}),
       },
       `OrgIntegration:${orgIntegrationId}`,
-      t
+      t,
     );
     if (data.is_default) {
       await this.integrations.setDefaultOrgIntegration(
@@ -172,7 +172,7 @@ export abstract class GenericIntegration<
         integration.type,
         integration.org_id,
         `OrgIntegration:${orgIntegrationId}`,
-        t
+        t,
       );
     }
   }
@@ -181,7 +181,10 @@ export abstract class GenericIntegration<
 export class InvalidCredentialsError extends Error {
   override name = "InvalidCredentialsError";
 
-  constructor(public code: string, message?: string) {
+  constructor(
+    public code: string,
+    message?: string,
+  ) {
     super(message);
   }
 }

@@ -25,7 +25,7 @@ export function useDeleteProfile() {
             }
             cache.gc();
           },
-        })
+        }),
       );
 
       if (isDefined(error)) {
@@ -98,6 +98,6 @@ function useConfirmDeleteProfileDialog() {
         ),
       });
     },
-    []
+    [],
   );
 }

@@ -56,7 +56,7 @@ export interface PetitionRepliesFieldProps extends BoxProps {
   isActive: boolean;
   onAction: (
     action: PetitionRepliesFieldAction,
-    reply: PetitionRepliesField_PetitionFieldReplyFragment
+    reply: PetitionRepliesField_PetitionFieldReplyFragment,
   ) => void;
   onToggleComments: () => void;
   onUpdateReplyStatus: (replyId: string, status: PetitionFieldReplyStatus) => void;
@@ -77,11 +77,11 @@ export const PetitionRepliesField = Object.assign(
       isDisabled,
       ...props
     },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const [petitionFieldAttachmentDownloadLink] = useMutation(
-      PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument
+      PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
     );
     const handleAttachmentClick = async function (attachmentId: string) {
       await withError(
@@ -91,7 +91,7 @@ export const PetitionRepliesField = Object.assign(
           });
           const { url } = data!.petitionFieldAttachmentDownloadLink;
           return url!;
-        })
+        }),
       );
     };
 
@@ -398,7 +398,7 @@ export const PetitionRepliesField = Object.assign(
         }
       `,
     ],
-  }
+  },
 );
 
 function PetitionRepliesFieldAttachments({
@@ -459,7 +459,7 @@ interface CommentsButtonProps extends ButtonOptions, ThemingProps<"Button"> {
 
 const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function CommentsButton(
   { commentCount, hasUnreadComments, isActive, ...props },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const common = {
@@ -488,7 +488,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
               defaultMessage:
                 "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
             },
-            { commentCount }
+            { commentCount },
           )}
         >
           {intl.formatNumber(commentCount)}
@@ -510,7 +510,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
           defaultMessage:
             "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
         },
-        { commentCount }
+        { commentCount },
       )}
       ref={ref}
     />

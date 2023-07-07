@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<void> {
     })
     .raw(
       /* sql */ `
-      create unique index "tag__organization_id__name__unique" on "tag" ("organization_id", "name") where "deleted_at" is null`
+      create unique index "tag__organization_id__name__unique" on "tag" ("organization_id", "name") where "deleted_at" is null`,
     )
     .createTable("petition_tag", (t) => {
       t.increments("id");

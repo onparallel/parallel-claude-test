@@ -19,7 +19,7 @@ export class ChildProcessNonSuccessError extends Error {
     public command: string,
     public args: readonly string[],
     public exitCode: number | null,
-    public signal: NodeJS.Signals | null
+    public signal: NodeJS.Signals | null,
   ) {
     super(`Process ${command} with args ${args.join(" ")} exited with code ${exitCode}`);
   }

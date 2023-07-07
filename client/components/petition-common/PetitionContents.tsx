@@ -67,7 +67,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
 }: PetitionContentsProps<T>) {
   const handleFieldClick = useMemoFactory(
     (fieldId: string) => () => onFieldClick(fieldId),
-    [onFieldClick]
+    [onFieldClick],
   );
   return (
     <Stack as="ol" spacing={1} padding={4}>
@@ -108,7 +108,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
               />
             </Flex>
           </PetitionContentsDivider>
-        )
+        ),
       )}
     </Stack>
   );
@@ -309,7 +309,7 @@ const PetitionContentsItem = memo(
   _PetitionContentsItem,
   compareWithFragments<PetitionContentsItemProps<PetitionContents_PetitionFieldFragment>>({
     field: PetitionContents.fragments.PetitionField,
-  })
+  }),
 ) as typeof _PetitionContentsItem;
 
 function PetitionContentsDivider({

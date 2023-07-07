@@ -6,7 +6,7 @@ import { ArgValidationError } from "../errors";
 
 export function validFontFamily<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string
+  argName: string,
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);

@@ -42,7 +42,7 @@ export function useSupportedUserLocales() {
         localizedLabel: localizedLabel(intl),
         flag,
       })),
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -86,6 +86,6 @@ export function useSupportedPetitionLocales() {
         label,
         localizedLabel: localizedLabel(intl),
       })),
-    [intl.locale]
+    [intl.locale],
   );
 }

@@ -39,7 +39,7 @@ const email: Email<SignatureCancelledDeclinedBySignerProps> = {
       petitionId,
       parallelUrl,
     }: SignatureCancelledDeclinedBySignerProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       ${greetingUser({ name: userName }, intl)}
@@ -60,7 +60,7 @@ const email: Email<SignatureCancelledDeclinedBySignerProps> = {
               defaultMessage: "Unnamed parallel",
             }),
           signatureProvider,
-        }
+        },
       )}
 
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies#signatures

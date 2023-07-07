@@ -23,7 +23,7 @@ export class EventProcessor {
         const event = await ctx.petitions.pickEventToProcess(
           payload.id,
           payload.table_name,
-          payload.created_at
+          payload.created_at,
         );
 
         if (isDefined(event)) {

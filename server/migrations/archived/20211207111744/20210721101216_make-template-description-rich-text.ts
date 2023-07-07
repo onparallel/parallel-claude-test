@@ -22,7 +22,7 @@ export async function up(knex: Knex): Promise<void> {
               : JSON.stringify(fromPlainText(template.template_description)),
         });
     },
-    { concurrency: 5 }
+    { concurrency: 5 },
   );
 }
 
@@ -47,6 +47,6 @@ export async function down(knex: Knex): Promise<void> {
         }
       } catch {}
     },
-    { concurrency: 5 }
+    { concurrency: 5 },
   );
 }

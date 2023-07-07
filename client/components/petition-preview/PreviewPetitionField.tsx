@@ -67,7 +67,7 @@ export function PreviewPetitionField({
   const fieldId = field.id;
   const tone = useTone();
   const [petitionFieldAttachmentDownloadLink] = useMutation(
-    PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument
+    PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   );
   const handleDownloadAttachment = async function (attachmentId: string) {
     await withError(
@@ -81,7 +81,7 @@ export function PreviewPetitionField({
         });
         const { url } = data!.petitionFieldAttachmentDownloadLink;
         return url!;
-      })
+      }),
     );
   };
 
@@ -115,7 +115,7 @@ export function PreviewPetitionField({
         });
       } catch {}
     },
-    [deletePetitionReply]
+    [deletePetitionReply],
   );
 
   const updatePetitionFieldReply = useUpdatePetitionFieldReply();
@@ -131,7 +131,7 @@ export function PreviewPetitionField({
         });
       } catch {}
     },
-    [updatePetitionFieldReply]
+    [updatePetitionFieldReply],
   );
 
   const createPetitionFieldReply = useCreatePetitionFieldReply();
@@ -149,7 +149,7 @@ export function PreviewPetitionField({
 
       return;
     },
-    [createPetitionFieldReply]
+    [createPetitionFieldReply],
   );
 
   const createFileUploadReply = useCreateFileUploadReply();
@@ -165,11 +165,11 @@ export function PreviewPetitionField({
         });
       } catch {}
     },
-    [createFileUploadReply]
+    [createFileUploadReply],
   );
 
   const [downloadFileUploadReply] = useMutation(
-    RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument
+    RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
   );
   const showFailure = useFailureGeneratingLinkDialog();
   const apollo = useApolloClient();
@@ -197,7 +197,7 @@ export function PreviewPetitionField({
         });
       } catch {}
     },
-    [downloadFileUploadReply]
+    [downloadFileUploadReply],
   );
 
   const startAsyncFieldCompletion = useStartAsyncFieldCompletion();

@@ -15,7 +15,7 @@ export function useSearchUsers() {
   return useDebouncedAsync(
     async <IncludeGroups extends boolean = false>(
       search: string,
-      options: UserSearchUsersOptions<IncludeGroups> = {}
+      options: UserSearchUsersOptions<IncludeGroups> = {},
     ): Promise<UserSelectSelection<IncludeGroups>[]> => {
       const { excludeUsers, excludeUserGroups, includeGroups, includeInactive } = options;
       const { data } = await client.query({
@@ -32,7 +32,7 @@ export function useSearchUsers() {
       return data!.searchUsers as UserSelectSelection<IncludeGroups>[];
     },
     150,
-    []
+    [],
   );
 }
 

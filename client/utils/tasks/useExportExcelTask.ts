@@ -18,7 +18,7 @@ export function useExportExcelBackgroundTask() {
   return useCallback(
     async (
       variables: useExportExcelTask_createExportExcelTaskMutationVariables,
-      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {}
+      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {},
     ) => {
       const { data: initialData } = await createExportExcelTask({ variables });
 
@@ -54,7 +54,7 @@ export function useExportExcelBackgroundTask() {
         filename: data!.getTaskResultFile.filename,
       };
     },
-    []
+    [],
   );
 }
 

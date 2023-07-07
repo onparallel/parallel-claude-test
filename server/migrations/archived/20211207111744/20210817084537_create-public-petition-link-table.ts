@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
       -- useful to search by slug
       create unique index "public_petition_link__slug__unique" on "public_petition_link" ("slug") where "is_active" = true;
       alter table "public_petition_link" add constraint "public_petition_link__slug" check (slug ~ '^[a-zA-Z0-9-]*$');
-  `
+  `,
     )
     .createTable("public_petition_link_user", (t) => {
       t.increments("id");
@@ -53,7 +53,7 @@ export async function up(knex: Knex): Promise<void> {
         ("type" = 'OWNER' and "user_group_id" is null and "from_user_group_id" is null and "user_id" is not null)
         or ("type" != 'OWNER')
       );
-    `
+    `,
     )
     .alterTable("petition", (t) => {
       t.integer("from_public_petition_link_id").nullable().references("public_petition_link.id");

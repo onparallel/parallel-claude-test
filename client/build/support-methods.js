@@ -26,7 +26,7 @@ module.exports = {
     ]
       .filter(
         ({ field }) =>
-          field.type.kind === "NON_NULL" && field.type.ofType.name === "SupportMethodResponse"
+          field.type.kind === "NON_NULL" && field.type.ofType.name === "SupportMethodResponse",
       )
       .sort((a, b) => a.field.name.localeCompare(b.field.name));
 
@@ -66,7 +66,7 @@ module.exports = {
       }[] = ${JSON.stringify(supportMethods)} as any;
 
       export const schemaTypes: IntrospectionType[] = ${JSON.stringify(
-        Array.from(usedTypes)
+        Array.from(usedTypes),
       )} as any;
     `;
   },

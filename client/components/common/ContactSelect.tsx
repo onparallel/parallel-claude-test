@@ -63,7 +63,7 @@ export const ContactSelect = Object.assign(
       onFocus,
       ...props
     }: ContactSelectProps<IsMulti>,
-    ref: ForwardedRef<ContactSelectInstance<IsMulti>>
+    ref: ForwardedRef<ContactSelectInstance<IsMulti>>,
   ) {
     const [isCreating, _setIsCreating] = useState(false);
     // we need this because the create handler is called twice when clicking on the create menu option,
@@ -129,7 +129,7 @@ export const ContactSelect = Object.assign(
               ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.id !== email),
               option,
             ] as any,
-            { action: "select-option", option }
+            { action: "select-option", option },
           );
         } else {
           onChange(option as any, { action: "select-option", option });
@@ -209,7 +209,7 @@ export const ContactSelect = Object.assign(
       />
     );
   }) as <IsMulti extends boolean = false>(
-    props: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>
+    props: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>,
   ) => ReactElement,
   {
     fragments: {
@@ -225,11 +225,11 @@ export const ContactSelect = Object.assign(
         }
       `,
     },
-  }
+  },
 );
 
 function useContactSelectReactSelectProps<IsMulti extends boolean>(
-  props: UseReactSelectProps<ContactSelectSelection, IsMulti, never>
+  props: UseReactSelectProps<ContactSelectSelection, IsMulti, never>,
 ): AsyncCreatableProps<ContactSelectSelection, IsMulti, never> {
   const rsProps = useReactSelectProps<ContactSelectSelection, IsMulti, never>(props);
 
@@ -397,7 +397,7 @@ function Input(
     selectProps: {
       onPasteEmails?: (emails: string[]) => void;
     };
-  }
+  },
 ) {
   return (
     <components.Input

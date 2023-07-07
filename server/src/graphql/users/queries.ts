@@ -36,7 +36,7 @@ export const userQueries = queryField((t) => {
     validateArgs: validateAnd(
       validEmail((args) => args.email, "email"),
       emailIsAvailable((args) => args.email),
-      emailDomainIsNotSSO((args) => args.email)
+      emailDomainIsNotSSO((args) => args.email),
     ),
     resolve: () => true,
   });
@@ -47,7 +47,7 @@ export const searchUsers = queryField("searchUsers", {
   description: "Search users and user groups",
   authorize: authenticateAnd(
     ifArgDefined("excludeUsers", userHasAccessToUsers("excludeUsers" as never)),
-    ifArgDefined("excludeUserGroups", userHasAccessToUserGroups("excludeUserGroups" as never))
+    ifArgDefined("excludeUserGroups", userHasAccessToUserGroups("excludeUserGroups" as never)),
   ),
   args: {
     search: nonNull(stringArg()),
@@ -59,7 +59,7 @@ export const searchUsers = queryField("searchUsers", {
   resolve: async (
     _,
     { search, includeGroups, includeInactive, excludeUsers, excludeUserGroups },
-    ctx
+    ctx,
   ) => {
     return await ctx.users.searchUsers(ctx.user!.org_id, search, {
       includeGroups: includeGroups ?? false,
@@ -86,8 +86,8 @@ export const getUsersOrGroups = queryField("getUsersOrGroups", {
           : {
               __type: "UserGroup" as const,
               ...(await ctx.userGroups.loadUserGroup(id))!,
-            }
-      )
+            },
+      ),
     );
     for (const item of result) {
       if (item.org_id !== ctx.user!.org_id) {

@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
       "last_name",
       "is_sso_user",
       "avatar_public_file_id",
-      "details"
+      "details",
     );
   });
 }

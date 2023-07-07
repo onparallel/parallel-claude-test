@@ -29,7 +29,7 @@ const email: Email<TransferParallelsEmailProps> = {
   },
   text(
     { name, userEmail, userFullName, parallelUrl }: TransferParallelsEmailProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     const params = new URLSearchParams({ search: userEmail, transfer: "" }).toString();
     return outdent`
@@ -50,7 +50,7 @@ const email: Email<TransferParallelsEmailProps> = {
         },
         {
           user: `${userFullName} (${userEmail})`,
-        }
+        },
       )}
 
       ${intl.formatMessage({

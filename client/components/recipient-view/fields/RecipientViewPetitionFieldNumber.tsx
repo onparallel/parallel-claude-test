@@ -90,7 +90,7 @@ export function RecipientViewPetitionFieldNumber({
     (replyId: string) => async (value: number) => {
       await onUpdateReply(replyId, value);
     },
-    [onUpdateReply]
+    [onUpdateReply],
   );
 
   const handleDelete = useMemoFactory(
@@ -119,7 +119,7 @@ export function RecipientViewPetitionFieldNumber({
         handleAddNewReply();
       }
     },
-    [field.replies, onDeleteReply]
+    [field.replies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -138,7 +138,7 @@ export function RecipientViewPetitionFieldNumber({
               newReplyElement.focus();
               newReplyElement.setSelectionRange(
                 newReplyElement.value.length,
-                newReplyElement.value.length
+                newReplyElement.value.length,
               );
             }
           }
@@ -147,7 +147,7 @@ export function RecipientViewPetitionFieldNumber({
       setIsSaving(false);
     },
     1000,
-    [onCreateReply]
+    [onCreateReply],
   );
 
   const handleInvalidReply = (replyId: string, isInvalid: boolean) => {
@@ -337,7 +337,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   RecipientViewPetitionFieldReplyNumberProps
 >(function RecipientViewPetitionFieldReplyNumber(
   { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply, onInvalid },
-  ref
+  ref,
 ) {
   const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
 
@@ -370,7 +370,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
       setIsSaving(false);
     },
     1000,
-    [onUpdate]
+    [onUpdate],
   );
 
   const props = {

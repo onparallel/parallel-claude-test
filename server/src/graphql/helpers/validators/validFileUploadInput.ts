@@ -11,7 +11,7 @@ export function validFileUploadInput<TypeName extends string, FieldName extends 
     size: number;
   }>,
   opts: { maxSizeBytes?: number; contentType?: string },
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const files = unMaybeArray(prop(args));
@@ -20,14 +20,14 @@ export function validFileUploadInput<TypeName extends string, FieldName extends 
         throw new MaxFileSizeExceededError(
           info,
           argName,
-          `File size exceeds the max file size allowed of ${opts.maxSizeBytes} bytes`
+          `File size exceeds the max file size allowed of ${opts.maxSizeBytes} bytes`,
         );
       }
       if (opts.contentType && file.contentType !== opts.contentType) {
         throw new ArgValidationError(
           info,
           "contentType",
-          `Expected ${opts.contentType}, got ${file.contentType}`
+          `Expected ${opts.contentType}, got ${file.contentType}`,
         );
       }
     }

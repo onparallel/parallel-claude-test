@@ -15,7 +15,7 @@ export async function up(knex: Knex): Promise<void> {
     from petition p
     where p.id = pf.petition_id;
     `,
-    []
+    [],
   );
 }
 

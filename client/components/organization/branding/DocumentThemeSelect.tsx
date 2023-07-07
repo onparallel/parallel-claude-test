@@ -33,7 +33,7 @@ export const DocumentThemeSelect = Object.assign(
       isCreateNewThemeDisabled,
       ...props
     }: DocumentThemeSelectProps<T>,
-    ref: ForwardedRef<DocumentThemeSelectInstance>
+    ref: ForwardedRef<DocumentThemeSelectInstance>,
   ) {
     const rsProps = useReactSelectProps({
       ...props,
@@ -61,7 +61,7 @@ export const DocumentThemeSelect = Object.assign(
       />
     );
   }) as <T extends Selection>(
-    props: DocumentThemeSelectProps<T> & RefAttributes<DocumentThemeSelectInstance>
+    props: DocumentThemeSelectProps<T> & RefAttributes<DocumentThemeSelectInstance>,
   ) => ReactElement,
   {
     fragments: {
@@ -73,7 +73,7 @@ export const DocumentThemeSelect = Object.assign(
         }
       `,
     },
-  }
+  },
 );
 
 interface ReactSelectExtraProps {

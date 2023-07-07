@@ -11,6 +11,6 @@ export function useMultipleRefs<T>(): MultipleRefObject<T> {
           return target[id as string] ?? (target[id as string] = createRef<T>());
         },
       }),
-    []
+    [],
   );
 }

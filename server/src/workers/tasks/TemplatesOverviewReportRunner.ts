@@ -11,7 +11,7 @@ export class TemplatesOverviewReportRunner extends TaskRunner<"TEMPLATES_OVERVIE
       user!.org_id,
       user!.id,
       startDate,
-      endDate
+      endDate,
     );
   }
 }

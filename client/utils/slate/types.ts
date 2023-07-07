@@ -4,7 +4,7 @@ export type CustomEditor<Value extends SlateElement[] = SlateElement[]> = PlateE
 
 export interface SlateElement<
   TType extends string = string,
-  TChild extends TDescendant = TDescendant
+  TChild extends TDescendant = TDescendant,
 > extends TElement {
   type: TType;
   children: TChild[];

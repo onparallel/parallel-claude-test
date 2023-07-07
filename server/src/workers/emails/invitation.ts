@@ -13,7 +13,7 @@ export async function invitation(
     locale: UserLocale;
     is_new_user: boolean;
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [user] = await context.users.loadUsersByCognitoId(payload.user_cognito_id);
   if (!user) {
@@ -34,7 +34,7 @@ export async function invitation(
       parallelUrl: context.config.misc.parallelUrl,
       theme: defaultBrandTheme,
     },
-    { locale: payload.locale }
+    { locale: payload.locale },
   );
   return await context.emailLogs.createEmail({
     from: buildFrom(from, context.config.misc.emailFrom),

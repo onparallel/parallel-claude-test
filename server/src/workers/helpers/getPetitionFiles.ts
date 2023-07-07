@@ -16,13 +16,13 @@ export async function* getPetitionFiles(
     xlsxOnly?: boolean;
     onProgress?: (value: number) => Promise<void>;
   },
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const fields = await ctx.petitions.loadFieldsForPetition(petitionId);
   const fieldIds = fields.map((f) => f.id);
   const fieldReplies = await ctx.petitions.loadRepliesForField(fieldIds);
   const repliesByFieldId = Object.fromEntries(
-    fieldIds.map((id, index) => [id, fieldReplies[index]])
+    fieldIds.map((id, index) => [id, fieldReplies[index]]),
   );
   const fieldsWithReplies = fields.map((f) => ({
     ...f,
@@ -38,15 +38,15 @@ export async function* getPetitionFiles(
     .filter((r) => isFileTypeField(r.type) && isDefined(r.content["file_upload_id"]));
 
   const files = await ctx.files.loadFileUpload(
-    fileReplies.map((reply) => reply.content["file_upload_id"])
+    fileReplies.map((reply) => reply.content["file_upload_id"]),
   );
   const filesById = indexBy(
     files.filter((f) => f !== null),
-    (f) => f!.id
+    (f) => f!.id,
   );
 
   const latestPetitionSignature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
-    petitionId
+    petitionId,
   );
 
   const totalFiles = options.xlsxOnly
@@ -54,12 +54,12 @@ export async function* getPetitionFiles(
     : Math.max(
         Math.min(
           visibleFields.filter((f) => f.type !== "HEADING" && !isFileTypeField(f.type)).length,
-          1
+          1,
         ) +
           fileReplies.length +
           Number(isDefined(latestPetitionSignature?.file_upload_id)) +
           Number(isDefined(latestPetitionSignature?.file_upload_audit_trail_id)),
-        1
+        1,
       );
   let processedFiles = 0;
 
@@ -90,7 +90,7 @@ export async function* getPetitionFiles(
                 default:
                   return "";
               }
-            }
+            },
           );
           let filename = sanitizeFilenameWithSuffix(name, extension.toLowerCase());
           let counter = 1;
@@ -129,7 +129,7 @@ export async function* getPetitionFiles(
     }
     if (isDefined(latestPetitionSignature.file_upload_audit_trail_id)) {
       const auditTrail = await ctx.files.loadFileUpload(
-        latestPetitionSignature.file_upload_audit_trail_id
+        latestPetitionSignature.file_upload_audit_trail_id,
       );
       if (auditTrail?.upload_complete) {
         yield {

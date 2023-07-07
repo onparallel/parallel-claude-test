@@ -36,7 +36,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
       orgContactName,
       signatureProvider,
     }: SignatureCancelledNoCreditsLeftEmailProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       **${intl
@@ -54,7 +54,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
           defaultMessage:
             "The following signing process sent through {signatureProvider} could not be started because you reached your plan's signatures limit.",
         },
-        { signatureProvider }
+        { signatureProvider },
       )}
 
       - ${
@@ -68,7 +68,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
           defaultMessage:
             "Please contact {orgContactName} (<a>{orgContactEmail}</a>) so you can start the signing process.",
         },
-        { a: () => orgContactEmail, orgContactEmail, orgContactName }
+        { a: () => orgContactEmail, orgContactEmail, orgContactName },
       )}
 
     `;

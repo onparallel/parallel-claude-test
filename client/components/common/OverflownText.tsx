@@ -10,7 +10,7 @@ export interface OverflownTextProps {
 
 export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(function OverflownText(
   { children, ...props },
-  ref
+  ref,
 ) {
   const innerRef = useRef<HTMLElement>(null);
   const _ref = useMergedRef(innerRef, ref);

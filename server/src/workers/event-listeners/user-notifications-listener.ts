@@ -17,7 +17,7 @@ import { EventListener } from "../event-processor";
 
 async function createPetitionCompletedUserNotifications(
   event: PetitionCompletedEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -35,19 +35,19 @@ async function createPetitionCompletedUserNotifications(
         : { user_id: event.data.user_id! },
       petition_id: event.petition_id,
       user_id: user.id,
-    }))
+    })),
   );
 }
 
 async function createCommentPublishedUserNotifications(
   event: CommentPublishedEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
   const comment = await ctx.petitions.loadPetitionFieldComment(
-    event.data.petition_field_comment_id
+    event.data.petition_field_comment_id,
   );
 
   if (!comment) {
@@ -75,7 +75,7 @@ async function createCommentPublishedUserNotifications(
       (a) =>
         a.status === "ACTIVE" && // active access
         a.id !== comment.petition_access_id && // don't notify comment author
-        isDefined(a.contact_id) // filter contactless
+        isDefined(a.contact_id), // filter contactless
     )
     .map((a) => a.id);
   const userIds = users.filter((u) => u.id !== comment.user_id).map((u) => u.id);
@@ -91,7 +91,7 @@ async function createCommentPublishedUserNotifications(
           petition_field_comment_id: comment.id,
           is_mentioned: mentionedUserIds.includes(userId),
         },
-      }))
+      })),
     ),
     ctx.petitions.createPetitionContactNotification(
       accessIds.map((id) => ({
@@ -102,14 +102,14 @@ async function createCommentPublishedUserNotifications(
           petition_field_id: comment.petition_field_id,
           petition_field_comment_id: comment.id,
         },
-      }))
+      })),
     ),
   ]);
 }
 
 async function createPetitionMessageBouncedUserNotifications(
   event: PetitionMessageBouncedEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -136,7 +136,7 @@ async function createPetitionMessageBouncedUserNotifications(
 
 async function createPetitionReminderBouncedUserNotifications(
   event: PetitionReminderBouncedEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -169,7 +169,7 @@ async function createPetitionReminderBouncedUserNotifications(
 
 async function createSignatureCompletedUserNotifications(
   event: SignatureCompletedEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -183,13 +183,13 @@ async function createSignatureCompletedUserNotifications(
       data: {
         petition_signature_request_id: event.data.petition_signature_request_id,
       },
-    }))
+    })),
   );
 }
 
 async function createSignatureCancelledUserNotifications(
   event: SignatureCancelledEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -210,13 +210,13 @@ async function createSignatureCancelledUserNotifications(
         cancel_data: event.data.cancel_data,
         petition_signature_request_id: event.data.petition_signature_request_id,
       },
-    }))
+    })),
   );
 }
 
 async function createPetitionSharedUserNotifications(
   event: UserPermissionAddedEvent | GroupPermissionAddedEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -248,7 +248,7 @@ async function createPetitionSharedUserNotifications(
           user_group_id: event.data.user_group_id,
           permission_type: event.data.permission_type as "READ" | "WRITE",
         },
-      }))
+      })),
     );
   }
 }
@@ -268,13 +268,13 @@ async function createRemindersOptOutNotifications(event: RemindersOptOutEvent, c
         reason: event.data.reason,
         other: event.data.other,
       },
-    }))
+    })),
   );
 }
 
 async function createAccessActivatedFromPublicPetitionLinkUserNotifications(
   event: AccessActivatedFromPublicPetitionLinkEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -288,7 +288,7 @@ async function createAccessActivatedFromPublicPetitionLinkUserNotifications(
       data: {
         petition_access_id: event.data.petition_access_id,
       },
-    }))
+    })),
   );
 }
 

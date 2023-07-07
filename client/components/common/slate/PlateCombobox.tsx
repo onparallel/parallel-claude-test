@@ -55,7 +55,7 @@ const ComboboxContent = <TData extends Data = NoData>(
     | "maxSuggestions"
     | "filter"
     | "sort"
-  >
+  >,
 ) => {
   const {
     defaultItems,
@@ -99,13 +99,13 @@ const ComboboxContent = <TData extends Data = NoData>(
         }
       } catch {}
     },
-    [defaultItems, text, isOpen, onSearchItems]
+    [defaultItems, text, isOpen, onSearchItems],
   );
 
   // Get target range rect
   const getBoundingClientRect = useCallback(
     () => getRangeBoundingClientRect(editor, targetRange),
-    [editor, targetRange]
+    [editor, targetRange],
   );
 
   // Update popper position
@@ -137,8 +137,8 @@ const ComboboxContent = <TData extends Data = NoData>(
           Object.entries(
             groupBy(
               filteredItems.map((item, index) => ({ item, index })),
-              ({ item }) => (item as any)?.data?.group ?? ""
-            )
+              ({ item }) => (item as any)?.data?.group ?? "",
+            ),
           ).map(([group, items]) => {
             const list = items.map(({ item, index }) => {
               const isHighlighted = index === highlightedIndex;
@@ -161,7 +161,7 @@ const ComboboxContent = <TData extends Data = NoData>(
                   onMouseDown={(e) => {
                     e.preventDefault();
                     const onSelectItem = getComboboxStoreById(
-                      comboboxSelectors.activeId()
+                      comboboxSelectors.activeId(),
                     )?.get.onSelectItem();
                     onSelectItem?.(editor, item);
                   }}

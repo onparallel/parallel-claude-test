@@ -20,5 +20,5 @@ export const ToolbarMarkButton = chakraForwardRef<"button", ToolbarMarkButtonPro
         {...props}
       />
     );
-  }
+  },
 );

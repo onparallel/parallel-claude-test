@@ -21,7 +21,7 @@ export const ProfileType = objectType({
           .map((p) =>
             typeof p === "string"
               ? p.replaceAll("{", "\\{")
-              : `{{${toGlobalId("ProfileTypeField", p)}}}`
+              : `{{${toGlobalId("ProfileTypeField", p)}}}`,
           )
           .join(""),
     });
@@ -87,7 +87,7 @@ export const Profile = objectType({
       type: "ProfileFieldProperty",
       resolve: async (root, _, ctx) => {
         const fields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
-          root.profile_type_id
+          root.profile_type_id,
         );
         return sortBy(fields, (f) => f.position).map((field) => ({
           profile_id: root.id,

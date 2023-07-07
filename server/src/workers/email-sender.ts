@@ -80,7 +80,7 @@ createQueueWorker("email-sender", async (payload, context, config) => {
         })
       ) {
         context.logger.warn(
-          `DEVELOPMENT: ${email.to} is not whitelisted in .development.env. Skipping...`
+          `DEVELOPMENT: ${email.to} is not whitelisted in .development.env. Skipping...`,
         );
         continue;
       }
@@ -104,7 +104,7 @@ createQueueWorker("email-sender", async (payload, context, config) => {
             contentType: attachment.content_type,
             content: await context.storage.temporaryFiles.downloadFile(attachment.path),
           }),
-          { concurrency: 1 }
+          { concurrency: 1 },
         ),
       });
       await context.emailLogs.updateWithResponse(
@@ -115,7 +115,7 @@ createQueueWorker("email-sender", async (payload, context, config) => {
             ? result.response.replace(/^250 Ok /, "")
             : null,
         },
-        context.config.instanceName
+        context.config.instanceName,
       );
     }
   }

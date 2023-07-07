@@ -19,12 +19,12 @@ export async function up(knex: Knex): Promise<any> {
       update petition_reminder as ps set
         status = 'PROCESSED',
         ${columns.map((column) => `${column} = ps._${column}`).join(", ")}
-    `
+    `,
     )
     .raw(
       /* sql */ `
       alter table "petition_reminder" alter column "status" set not null;
-    `
+    `,
     )
     .alterTable("petition_reminder", (t) => {
       t.dropColumns(...columns.map((column) => `_${column}`));

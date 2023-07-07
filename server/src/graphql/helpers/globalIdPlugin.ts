@@ -18,13 +18,13 @@ export type GlobalIdConfig = {
 
 export type GlobalIdInputFieldConfig<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
 > = core.CommonInputFieldConfig<TypeName, FieldName> & GlobalIdConfig;
 
 export type GlobalIdOutputFieldConfig<
   TypeName extends string,
   FieldName extends string,
-  NeedsResolver extends boolean
+  NeedsResolver extends boolean,
 > = If<
   NeedsResolver,
   GlobalIdResolverConfig<TypeName, FieldName>,
@@ -49,7 +49,7 @@ type GlobalIdFieldResolver<TypeName extends string, FieldName extends string> = 
   root: core.GetGen2<"rootTypes", TypeName>,
   args: core.ArgsValue<TypeName, FieldName>,
   context: core.GetGen<"context">,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => core.MaybePromise<GlobalIdFieldResolverReturnType<TypeName, FieldName>>;
 
 /*
@@ -62,7 +62,7 @@ type GlobalIdFieldResolver<TypeName extends string, FieldName extends string> = 
  */
 type GlobalIdFieldResolverReturnType<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
 > = _GlobalIdFieldResolverReturnType<core.GetGen3<"fieldTypes", TypeName, FieldName>>;
 
 type _GlobalIdFieldResolverReturnType<T> = _UnwrapIfNullList<T>;
@@ -80,12 +80,12 @@ type IsNullable<T> = null extends T ? true : false;
 
 export function globalIdArg(
   prefixName: string,
-  opts?: Omit<core.NexusArgConfig<"ID">, "type">
+  opts?: Omit<core.NexusArgConfig<"ID">, "type">,
 ): core.NexusArgDef<any>;
 export function globalIdArg(opts?: Omit<core.NexusArgConfig<"ID">, "type">): core.NexusArgDef<any>;
 export function globalIdArg(
   prefixNameOrOpts?: string | Omit<core.NexusArgConfig<"ID">, "type">,
-  opts?: Omit<core.NexusArgConfig<"ID">, "type">
+  opts?: Omit<core.NexusArgConfig<"ID">, "type">,
 ): core.NexusArgDef<any> {
   const { extensions, ...config } =
     typeof prefixNameOrOpts === "string" ? opts ?? {} : prefixNameOrOpts ?? {};
@@ -168,7 +168,7 @@ export function globalIdPlugin() {
         core.scalarType({
           name: "GID",
           sourceType: "number",
-        })
+        }),
       );
       b.addType(
         dynamicInputMethod({
@@ -181,7 +181,7 @@ export function globalIdPlugin() {
           factory({ typeDef: t, args: factoryArgs }) {
             const [fieldName, fieldConfig] = factoryArgs as [
               string,
-              GlobalIdInputFieldConfig<any, any>
+              GlobalIdInputFieldConfig<any, any>,
             ];
             const { prefixName, extensions, ...config } = fieldConfig;
             t.field(fieldName, {
@@ -193,7 +193,7 @@ export function globalIdPlugin() {
               },
             });
           },
-        })
+        }),
       );
       b.addType(
         dynamicOutputMethod({
@@ -206,7 +206,7 @@ export function globalIdPlugin() {
           factory({ typeName, typeDef: t, args: factoryArgs }) {
             const [fieldName, fieldConfig = {}] = factoryArgs as [
               string,
-              GlobalIdOutputFieldConfig<any, any, any>
+              GlobalIdOutputFieldConfig<any, any, any>,
             ];
             const { prefixName, extensions, ...config } = fieldConfig;
             t.field(fieldName, {
@@ -218,7 +218,7 @@ export function globalIdPlugin() {
               },
             });
           },
-        })
+        }),
       );
     },
   });

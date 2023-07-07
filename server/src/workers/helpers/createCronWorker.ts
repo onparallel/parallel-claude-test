@@ -12,7 +12,7 @@ import { stopwatch } from "../../util/stopwatch";
 
 export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
   name: Q,
-  handler: (context: WorkerContext, config: Config["cronWorkers"][Q]) => Promise<void>
+  handler: (context: WorkerContext, config: Config["cronWorkers"][Q]) => Promise<void>,
 ) {
   await loadEnv(`.${name}.env`);
 
@@ -31,7 +31,7 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
           process.exit(1);
         }
         process.exit(0);
-      }
+      },
     )
     .command(
       "start",
@@ -48,13 +48,13 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
             const duration = await stopwatch(async () => {
               await handler(
                 container.get<WorkerContext>(WorkerContext),
-                config["cronWorkers"][name]
+                config["cronWorkers"][name],
               );
             });
             const nextExecution = job.nextDate().toISO();
             logger.info(
               `Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
-              { duration }
+              { duration },
             );
           } catch (error: any) {
             logger.error(error.stack);
@@ -87,6 +87,6 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
         job.start();
         const nextExecution = job.nextDate().toISO();
         logger.info(`Cron worker running. Next execution on ${nextExecution}`);
-      }
+      },
     ).argv;
 }

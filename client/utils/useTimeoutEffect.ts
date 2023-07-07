@@ -3,7 +3,7 @@ import { DependencyList, useEffect } from "react";
 export function useTimeoutEffect(
   effect: (isMounted: () => boolean) => void,
   millis: number,
-  deps?: DependencyList
+  deps?: DependencyList,
 ) {
   useEffect(() => {
     let isMounted = true;

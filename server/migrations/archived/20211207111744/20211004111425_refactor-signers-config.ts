@@ -84,7 +84,7 @@ const PetitionSignatureRequestsMigration = {
           const [signer] = await loadContact(
             (signatureRequest.cancel_data.canceller_id as number) ??
               (signatureRequest.cancel_data.contact_id as number),
-            knex
+            knex,
           );
           newCancelData = {
             ...newCancelData,
@@ -108,7 +108,7 @@ const PetitionSignatureRequestsMigration = {
             signer_status: JSON.stringify(newSignerStatus),
           });
       },
-      { concurrency: 10 }
+      { concurrency: 10 },
     );
   },
   down: async (knex: Knex) => {
@@ -147,7 +147,7 @@ const PetitionSignatureRequestsMigration = {
             signer_status: JSON.stringify(newSignerStatus),
           });
       },
-      { concurrency: 10 }
+      { concurrency: 10 },
     );
   },
 };
@@ -177,10 +177,10 @@ const PetitionsMigration = {
               ...petition.signature_config,
               signersInfo: contacts.map(mapContact),
               additionalSignersInfo: additionalContacts.map(mapContact),
-            })
+            }),
           );
       },
-      { concurrency: 10 }
+      { concurrency: 10 },
     );
   },
   down: async (knex: Knex) => {
@@ -206,10 +206,10 @@ const PetitionsMigration = {
               )
                 .map((signer) => signer.contactId)
                 .filter(isDefined),
-            })
+            }),
           );
       },
-      { concurrency: 10 }
+      { concurrency: 10 },
     );
   },
 };
@@ -233,7 +233,7 @@ const PetitionEventsMigration = {
               JSON.stringify({
                 ...event.data,
                 signer: mapContact(contact),
-              })
+              }),
             );
         } else if (
           event.type === "SIGNATURE_CANCELLED" &&
@@ -252,11 +252,11 @@ const PetitionEventsMigration = {
                   ...event.data.cancel_data,
                   canceller: mapContact(signer),
                 },
-              })
+              }),
             );
         }
       },
-      { concurrency: 10 }
+      { concurrency: 10 },
     );
   },
   down: async (knex: Knex) => {
@@ -277,7 +277,7 @@ const PetitionEventsMigration = {
                 JSON.stringify({
                   ...omit(event.data, ["signer"]),
                   contact_id: (event.data as any).contact_id,
-                })
+                }),
               );
           } else {
             // if event.data.contact_id is not defined on the event, we need to delete it because there is no way to obtain it
@@ -299,14 +299,14 @@ const PetitionEventsMigration = {
                     ...omit(event.data.cancel_data, ["canceller"]),
                     canceller_id: event.data.cancel_data.canceller_id,
                   },
-                })
+                }),
               );
           } else {
             await knex.from("petition_event").where("id", event.id).delete();
           }
         }
       },
-      { concurrency: 10 }
+      { concurrency: 10 },
     );
   },
 };

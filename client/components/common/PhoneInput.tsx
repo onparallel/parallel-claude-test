@@ -24,17 +24,17 @@ export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptio
   value?: string;
   onChange?(
     value: string | undefined,
-    metadata: { isValid: boolean; country: string | undefined }
+    metadata: { isValid: boolean; country: string | undefined },
   ): void;
   onBlur?(
     value: string | undefined,
-    metadata: { isValid: boolean; country: string | undefined }
+    metadata: { isValid: boolean; country: string | undefined },
   ): void;
 }
 
 const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
   { value, placeholder, onLoad, onChange, onBlur, defaultCountry, inputRef, ...props },
-  ref
+  ref,
 ) {
   const _ref = useRef<HTMLInputElement>(null);
   const intl = useIntl();

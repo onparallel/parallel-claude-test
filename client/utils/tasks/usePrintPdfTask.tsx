@@ -58,7 +58,7 @@ export function usePrintPdfTask() {
             defaultMessage:
               "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
           }),
-        })
+        }),
       );
     } else if (!taskError) {
       const [error] = await withError(
@@ -67,7 +67,7 @@ export function usePrintPdfTask() {
             variables: { taskId: finishedTask!.id },
           });
           return data!.getTaskResultFile.url;
-        })
+        }),
       );
 
       if (error) {
@@ -78,7 +78,7 @@ export function usePrintPdfTask() {
               defaultMessage:
                 "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
             }),
-          })
+          }),
         );
       }
     }
@@ -93,7 +93,7 @@ export function usePrintPdfBackgroundTask() {
   return useCallback(
     async (
       variables: usePrintPdfTask_createPrintPdfTaskMutationVariables,
-      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {}
+      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {},
     ) => {
       const { data: initialData } = await createPrintPdfTask({ variables });
 
@@ -129,7 +129,7 @@ export function usePrintPdfBackgroundTask() {
         filename: data!.getTaskResultFile.filename,
       };
     },
-    []
+    [],
   );
 }
 

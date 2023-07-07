@@ -104,7 +104,7 @@ export const ProfileFieldExpiresAtIcon = chakraForwardRef<"div", ProfileFieldExp
         </SmallPopover>
       </Center>
     );
-  }
+  },
 );
 
 ProfileFieldInputGroup.fragments = {

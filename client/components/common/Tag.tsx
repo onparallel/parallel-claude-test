@@ -39,7 +39,7 @@ export const Tag = Object.assign(
                 id: "component.tag.remove-tag",
                 defaultMessage: 'Remove tag "{tag}"',
               },
-              { tag: tag.name }
+              { tag: tag.name },
             )}
             alignSelf="stretch"
             paddingRight={2}
@@ -63,5 +63,5 @@ export const Tag = Object.assign(
         }
       `,
     },
-  }
+  },
 );

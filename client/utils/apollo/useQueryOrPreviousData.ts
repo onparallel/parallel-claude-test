@@ -6,14 +6,14 @@ import { isDefined } from "remeda";
 
 export function useQueryOrPreviousData<
   TData = any,
-  TVariables extends OperationVariables = OperationVariables
+  TVariables extends OperationVariables = OperationVariables,
 >(
   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
   options?: QueryHookOptions<TData, TVariables>,
   usePrevious: (
     prev?: QueryHookOptions<TData, TVariables>,
-    current?: QueryHookOptions<TData, TVariables>
-  ) => boolean = () => true
+    current?: QueryHookOptions<TData, TVariables>,
+  ) => boolean = () => true,
 ): QueryResult<TData, TVariables> {
   const previousRef = useRef<{
     data: TData | undefined;

@@ -122,7 +122,7 @@ export const HeaderNameEditable = Object.assign(
                             id: "petition.header.last-saved-on",
                             defaultMessage: "Last saved on: {date}",
                           },
-                          { date: intl.formatDate(petition.updatedAt, FORMATS.FULL) }
+                          { date: intl.formatDate(petition.updatedAt, FORMATS.FULL) },
                         )}
                         isDisabled={state !== "SAVED"}
                         offset={[0, 4]}
@@ -165,7 +165,7 @@ export const HeaderNameEditable = Object.assign(
           )}
         </Editable>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -183,5 +183,5 @@ export const HeaderNameEditable = Object.assign(
         }
       `,
     },
-  }
+  },
 );

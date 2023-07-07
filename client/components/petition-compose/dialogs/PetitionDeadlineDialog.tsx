@@ -15,8 +15,8 @@ export function PetitionDeadlineDialog({ ...props }: DialogProps<{}, Date>) {
       startOfWeek(addWeeks(new Date(), 1), {
         weekStartsOn: 0,
       }),
-      5
-    )
+      5,
+    ),
   );
   const [date, setDate] = useState<Date>(defaultDeadline);
 
@@ -28,7 +28,7 @@ export function PetitionDeadlineDialog({ ...props }: DialogProps<{}, Date>) {
           ? alternativeSameDay
           : parse(hours, "HH:mm", addDays(date, 1));
       }),
-    [date]
+    [date],
   );
 
   return (

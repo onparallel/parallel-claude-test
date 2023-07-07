@@ -49,7 +49,7 @@ export class FetchService implements IFetchService {
             }
           }
         },
-        { maxRetries: maxRetries ?? 0, delay, signal: (init?.signal ?? undefined) as any }
+        { maxRetries: maxRetries ?? 0, delay, signal: (init?.signal ?? undefined) as any },
       );
     } catch (e) {
       if (e instanceof Response) {

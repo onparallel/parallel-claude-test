@@ -8,7 +8,7 @@ import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function petitionMessageBounced(
   payload: { petition_message_id: number },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const message = await context.petitions.loadMessage(payload.petition_message_id);
   if (!message) {
@@ -27,7 +27,7 @@ export async function petitionMessageBounced(
   }
   if (!access) {
     throw new Error(
-      `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`
+      `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`,
     );
   }
   const contact = access.contact_id ? await context.contacts.loadContact(access.contact_id) : null;
@@ -50,7 +50,7 @@ export async function petitionMessageBounced(
       contactEmail: contact.email,
       ...layoutProps,
     },
-    { locale: senderData.preferred_locale }
+    { locale: senderData.preferred_locale },
   );
 
   return await context.emailLogs.createEmail({

@@ -9,7 +9,10 @@ import { KNEX } from "../knex";
 
 @injectable()
 export class SystemRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(QUEUES_SERVICE) private queues: IQueuesService) {
+  constructor(
+    @inject(KNEX) knex: Knex,
+    @inject(QUEUES_SERVICE) private queues: IQueuesService,
+  ) {
     super(knex);
   }
 

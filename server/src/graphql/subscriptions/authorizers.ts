@@ -7,7 +7,7 @@ import { Arg } from "../helpers/authorize";
 export function userHasAccessToEventSubscription<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const subscriptionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
@@ -19,7 +19,7 @@ export function userHasAccessToEventSubscription<
 export function eventSubscriptionHasSignatureKeysLessThan<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(subscriptionIdArg: TArg, maxAmount: number): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const id = args[subscriptionIdArg] as unknown as number;
@@ -32,7 +32,7 @@ export function eventSubscriptionHasSignatureKeysLessThan<
 export function userHasAccessToEventSubscriptionSignatureKeys<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const ids = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
@@ -50,10 +50,10 @@ export function petitionFieldsBelongsToTemplate<
   TypeName extends string,
   FieldName extends string,
   TFieldIdsArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
-  TPetitionIdArg extends Arg<TypeName, FieldName, number>
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
 >(
   fieldIdsArg: TFieldIdsArg,
-  petitionIdArg: TPetitionIdArg
+  petitionIdArg: TPetitionIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const fieldIds = unMaybeArray(args[fieldIdsArg] as unknown as MaybeArray<number>);

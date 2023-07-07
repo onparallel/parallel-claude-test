@@ -58,7 +58,7 @@ export const SIZES = {
 export interface UseReactSelectProps<
   OptionType extends OptionBase = OptionBase,
   IsMulti extends boolean = any,
-  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>
+  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>,
 > extends Pick<
     SelectProps<OptionType, IsMulti, GroupType>,
     "id" | "isDisabled" | "styles" | "components"
@@ -76,7 +76,7 @@ export interface UseReactSelectProps<
 export function useReactSelectProps<
   OptionType extends OptionBase = OptionBase,
   IsMulti extends boolean = any,
-  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>
+  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>,
 >({
   size = "md",
   usePortal = true,
@@ -126,7 +126,7 @@ export function useReactSelectProps<
         fontSize: fontSizes[SIZES[size].fontSize] as string,
       } as Theme;
     },
-    [size, colors]
+    [size, colors],
   );
 
   const styles = useMemo(() => {
@@ -143,7 +143,7 @@ export function useReactSelectProps<
       }),
       control: (
         styles: CSSObjectWithLabel,
-        { isDisabled, isFocused, theme, selectProps }: ControlProps & ExtendComponentProps
+        { isDisabled, isFocused, theme, selectProps }: ControlProps & ExtendComponentProps,
       ) => {
         const { isInvalid } = selectProps;
         const {
@@ -180,7 +180,7 @@ export function useReactSelectProps<
       },
       valueContainer: (
         styles: CSSObjectWithLabel,
-        { theme }: ContainerProps & ExtendComponentProps
+        { theme }: ContainerProps & ExtendComponentProps,
       ) => {
         const {
           spacing: { padding },
@@ -193,7 +193,7 @@ export function useReactSelectProps<
       },
       option: (
         styles: CSSObjectWithLabel,
-        { theme, selectProps }: OptionProps & ExtendComponentProps
+        { theme, selectProps }: OptionProps & ExtendComponentProps,
       ) => {
         const {
           fontSize,
@@ -238,7 +238,7 @@ export function useReactSelectProps<
       },
       multiValue: (
         styles: CSSObjectWithLabel,
-        { data, theme }: MultiValueProps & ExtendComponentProps
+        { data, theme }: MultiValueProps & ExtendComponentProps,
       ) => {
         const {
           colors: { neutral20: backgroundColor, error20: backgroundColorError },
@@ -254,7 +254,7 @@ export function useReactSelectProps<
       },
       multiValueRemove: (
         styles: CSSObjectWithLabel,
-        { data, theme }: MultiValueProps & ExtendComponentProps
+        { data, theme }: MultiValueProps & ExtendComponentProps,
       ) => {
         const {
           colors: {
@@ -328,7 +328,7 @@ function SelectContainer({ innerProps, ...props }: ContainerProps) {
       innerProps={{
         ...(props.selectProps.isLoading ? { "data-loading": "" } : {}),
         ...Object.fromEntries(
-          Object.entries(props.selectProps).filter(([key]) => key.startsWith("data-"))
+          Object.entries(props.selectProps).filter(([key]) => key.startsWith("data-")),
         ),
         ...innerProps,
       }}

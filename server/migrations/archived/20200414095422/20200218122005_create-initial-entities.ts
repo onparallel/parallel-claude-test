@@ -17,7 +17,7 @@ export async function up(knex: Knex) {
       t.foreign("owner_id").references("user.id");
     })
     .raw(
-      `create unique index "contact_owner_id_email_unique" on "contact" ("owner_id", "email") where "deleted_at" is null`
+      `create unique index "contact_owner_id_email_unique" on "contact" ("owner_id", "email") where "deleted_at" is null`,
     )
 
     .createTable("petition", (t) => {
@@ -43,7 +43,7 @@ export async function up(knex: Knex) {
     .raw(
       `alter table "petition" add constraint "petition_is_template_status" check (
         (not "is_template" and "status" is not null) or ("is_template" and "status" is null)
-      )`
+      )`,
     )
 
     .createTable("petition_field", (t) => {
@@ -64,7 +64,7 @@ export async function up(knex: Knex) {
       t.foreign("petition_id").references("petition.id");
     })
     .raw(
-      `create unique index "petition_field_petition_id_position" on "petition_field" ("petition_id", "position") where "deleted_at" is null`
+      `create unique index "petition_field_petition_id_position" on "petition_field" ("petition_id", "position") where "deleted_at" is null`,
     )
 
     .createTable("petition_access", (t) => {

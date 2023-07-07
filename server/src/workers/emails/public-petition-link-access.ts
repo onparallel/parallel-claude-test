@@ -8,7 +8,7 @@ import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function publicPetitionLinkAccess(
   payload: { petition_message_id: number },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const message = await context.petitions.loadMessage(payload.petition_message_id);
   if (!message) {
@@ -24,7 +24,7 @@ export async function publicPetitionLinkAccess(
   }
   if (!petition.from_public_petition_link_id) {
     throw new Error(
-      `Petition:${message.petition_id} should have defined property 'from_public_petition_link_id'`
+      `Petition:${message.petition_id} should have defined property 'from_public_petition_link_id'`,
     );
   }
   if (!senderData) {
@@ -47,7 +47,7 @@ export async function publicPetitionLinkAccess(
   const orgId = petition.org_id;
   const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
     orgId,
-    "REMOVE_WHY_WE_USE_PARALLEL"
+    "REMOVE_WHY_WE_USE_PARALLEL",
   );
 
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
@@ -61,7 +61,7 @@ export async function publicPetitionLinkAccess(
       userId: message.sender_id,
       petitionAccessId: access.id,
     },
-    { publicContext: true }
+    { publicContext: true },
   );
   const { html, text, subject, from } = await buildEmail(
     PublicPetitionLinkAccess,
@@ -79,7 +79,7 @@ export async function publicPetitionLinkAccess(
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
-    { locale: petition.recipient_locale }
+    { locale: petition.recipient_locale },
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

@@ -101,7 +101,7 @@ function ConfirmCommentMentionAndShareDialog({
                         .toLowerCase()
                     : null,
                 ].filter(isDefined),
-                { type: "conjunction" }
+                { type: "conjunction" },
               ),
             }}
           />

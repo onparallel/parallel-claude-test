@@ -72,7 +72,7 @@ export function useSearchUserGroups() {
       search: string,
       options: {
         excludeUserGroups?: string[];
-      } = {}
+      } = {},
     ) => {
       const { excludeUserGroups } = options;
       const { data } = await client.query({
@@ -85,7 +85,7 @@ export function useSearchUserGroups() {
       });
       return data!.searchUserGroups as UserSelect_UserGroupFragment[];
     },
-    []
+    [],
   );
 }
 

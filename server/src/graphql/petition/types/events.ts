@@ -116,7 +116,7 @@ export const PetitionEvent = interfaceType({
 
 function createPetitionEvent<TypeName extends string>(
   name: TypeName,
-  definition: (t: core.ObjectDefinitionBlock<TypeName>) => void
+  definition: (t: core.ObjectDefinitionBlock<TypeName>) => void,
 ) {
   return objectType({
     name,
@@ -418,7 +418,7 @@ export const GroupPermissionRemovedEvent = createPetitionEvent(
         return await ctx.userGroups.loadUserGroup(root.data.user_group_id);
       },
     });
-  }
+  },
 );
 
 export const GroupPermissionEditedEvent = createPetitionEvent("GroupPermissionEditedEvent", (t) => {
@@ -491,7 +491,7 @@ export const PetitionClosedNotifiedEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(data.petition_access_id))!;
       },
     });
-  }
+  },
 );
 
 /**
@@ -591,7 +591,7 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
       return data.cancel_reason === "REQUEST_ERROR" &&
         isDefined(data.cancel_data.error_code) &&
         ["SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", "EMAIL_BOUNCED"].includes(
-          data.cancel_data.error_code
+          data.cancel_data.error_code,
         ) &&
         typeof data.cancel_data.error === "string"
         ? data.cancel_data.error ?? null
@@ -646,7 +646,7 @@ export const AccessActivatedFromPublicPetitionLinkEvent = createPetitionEvent(
       resolve: async (root, _, ctx) =>
         (await ctx.petitions.loadAccess(root.data.petition_access_id))!,
     });
-  }
+  },
 );
 
 export const RecipientSignedEvent = createPetitionEvent("RecipientSignedEvent", (t) => {
@@ -665,7 +665,7 @@ export const PetitionMessageBouncedEvent = createPetitionEvent(
         return (await ctx.petitions.loadMessage(root.data.petition_message_id))!;
       },
     });
-  }
+  },
 );
 
 export const PetitionReminderBouncedEvent = createPetitionEvent(
@@ -677,7 +677,7 @@ export const PetitionReminderBouncedEvent = createPetitionEvent(
         return (await ctx.petitions.loadReminder(root.data.petition_reminder_id))!;
       },
     });
-  }
+  },
 );
 
 export const PetitionAnonymizedEvent = createPetitionEvent("PetitionAnonymizedEvent", (t) => {});

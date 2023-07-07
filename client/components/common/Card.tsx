@@ -11,7 +11,7 @@ export interface CardProps {
 
 export const Card = chakraForwardRef<"section", CardProps>(function Card(
   { children, isInteractive, isDisabled, ...props },
-  ref
+  ref,
 ) {
   return (
     <Box
@@ -74,7 +74,7 @@ export const CloseableCardHeader = chakraForwardRef<"header", CloseableCardHeade
         }
       />
     );
-  }
+  },
 );
 
 export interface CardHeaderProps {
@@ -87,7 +87,7 @@ export interface CardHeaderProps {
 
 export const CardHeader = chakraForwardRef<"header", CardHeaderProps>(function CardHeader(
   { headingLevel, headingSize, rightAction, omitDivider, leftIcon, children, ...props },
-  ref
+  ref,
 ) {
   return (
     <>

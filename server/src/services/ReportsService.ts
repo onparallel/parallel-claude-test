@@ -31,7 +31,7 @@ export interface IReportsService {
     templateId: number,
     orgId: number,
     startDate?: Maybe<Date>,
-    endDate?: Maybe<Date>
+    endDate?: Maybe<Date>,
   ): Promise<TaskOutput<"TEMPLATE_STATS_REPORT">>;
 }
 
@@ -45,7 +45,7 @@ export class ReportsService implements IReportsService {
     templateId: number,
     orgId: number,
     startDate?: Maybe<Date> | undefined,
-    endDate?: Maybe<Date> | undefined
+    endDate?: Maybe<Date> | undefined,
   ): Promise<TaskOutput<"TEMPLATE_STATS_REPORT">> {
     const [template, orgPetitions] = await Promise.all([
       this.petitions.loadPetition(templateId),
@@ -69,14 +69,14 @@ export class ReportsService implements IReportsService {
         "REPLY_DELETED",
         "SIGNATURE_COMPLETED",
         "SIGNATURE_STARTED",
-      ]
+      ],
     )) as PetitionEvent[];
 
     const petitionsWithEvents = orgPetitions.map((p) => ({
       ...p,
       events: sortBy(
         petitionEvents.filter((e) => e.petition_id === p.id),
-        [(e) => e.created_at, "asc"]
+        [(e) => e.created_at, "asc"],
       ),
     }));
 
@@ -108,7 +108,7 @@ export class ReportsService implements IReportsService {
   }
 
   private getPetitionsStatusAndTimes(
-    petitions: TemplateStatsReportPetitionWithEvents[]
+    petitions: TemplateStatsReportPetitionWithEvents[],
   ): Pick<TaskOutput<"TEMPLATE_STATS_REPORT">, "status" | "times"> {
     const times = chunk(petitions, 200).flatMap((chunk) => this.getPetitionTimes(chunk));
 
@@ -137,25 +137,25 @@ export class ReportsService implements IReportsService {
           (e) =>
             e.type === "ACCESS_ACTIVATED" ||
             e.type === "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK" ||
-            e.type === "REPLY_CREATED"
+            e.type === "REPLY_CREATED",
         )
         ?.created_at.getTime();
 
       const completedAt = findLast(
         events,
-        (e) => e.type === "PETITION_COMPLETED"
+        (e) => e.type === "PETITION_COMPLETED",
       )?.created_at.getTime();
 
       const closedAt = findLast(events, (e) => e.type === "PETITION_CLOSED")?.created_at.getTime();
 
       const signatureStartedAt = findLast(
         events,
-        (e) => e.type === "SIGNATURE_STARTED"
+        (e) => e.type === "SIGNATURE_STARTED",
       )?.created_at.getTime();
 
       const signatureCompletedAt = findLast(
         events,
-        (e) => e.type === "SIGNATURE_COMPLETED"
+        (e) => e.type === "SIGNATURE_COMPLETED",
       )?.created_at.getTime();
 
       return {
@@ -199,14 +199,14 @@ export class ReportsService implements IReportsService {
    */
   private getPetitionsConversionFunnel(
     petitions: TemplateStatsReportPetitionWithEvents[],
-    templateHasSignature: boolean
+    templateHasSignature: boolean,
   ) {
     // STEP 1
     const sent = petitions.filter((p) => p.is_sent);
 
     // STEP 2
     const opened = sent.filter(
-      ({ events }) => countBy(events, (e) => e.type === "ACCESS_OPENED") > 0
+      ({ events }) => countBy(events, (e) => e.type === "ACCESS_OPENED") > 0,
     );
 
     // STEP 3
@@ -218,7 +218,7 @@ export class ReportsService implements IReportsService {
 
       // if the petition has no recipient replies, but its completed by a recipient, consider it "replied" (the petition may have all optional fields)
       const completedByRecipientEvent = events.find(
-        (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id)
+        (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
       );
 
       return isDefined(completedByRecipientEvent) && ["COMPLETED", "CLOSED"].includes(status);
@@ -227,7 +227,7 @@ export class ReportsService implements IReportsService {
     // STEP 4. use subset "opened" instead of "firstReply"
     const completed = opened.filter(({ status, events }) => {
       const completedByRecipientEvent = events.find(
-        (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id)
+        (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
       );
 
       return isDefined(completedByRecipientEvent) && ["COMPLETED", "CLOSED"].includes(status);
@@ -278,7 +278,7 @@ export class ReportsService implements IReportsService {
    */
   private getPetitionsTimeStatistics(
     funnel: ReturnType<typeof this.getPetitionsConversionFunnel>,
-    templateHasSignature: boolean
+    templateHasSignature: boolean,
   ): PetitionTimeStatistics {
     const openTimes = funnel.sent
       .map(({ events }) => {
@@ -286,7 +286,7 @@ export class ReportsService implements IReportsService {
           .find(
             (e) =>
               e.type === "ACCESS_ACTIVATED" ||
-              e.type === "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
+              e.type === "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
           )
           ?.created_at.getTime();
 
@@ -319,17 +319,17 @@ export class ReportsService implements IReportsService {
 
         const lastCompletedByRecipientAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id)
+          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
         )?.created_at.getTime();
 
         const lastCompletedByUserAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id)
+          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id),
         )?.created_at.getTime();
 
         return this.getTimeInterval(
           lastCompletedByRecipientAt ?? lastCompletedByUserAt,
-          firstRepliedByRecipientAt ?? firstOpenedAt
+          firstRepliedByRecipientAt ?? firstOpenedAt,
         );
       })
       .filter(isDefined);
@@ -342,22 +342,22 @@ export class ReportsService implements IReportsService {
 
         const lastCompletedByRecipientAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id)
+          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
         )?.created_at.getTime();
 
         const lastCompletedByUserAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id)
+          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id),
         )?.created_at.getTime();
 
         const lastSignatureCompletedAt = findLast(
           events,
-          (e) => e.type === "SIGNATURE_COMPLETED"
+          (e) => e.type === "SIGNATURE_COMPLETED",
         )?.created_at.getTime();
 
         return this.getTimeInterval(
           lastSignatureCompletedAt,
-          lastCompletedByRecipientAt ?? lastCompletedByUserAt
+          lastCompletedByRecipientAt ?? lastCompletedByUserAt,
         );
       })
       .filter(isDefined);
@@ -370,22 +370,22 @@ export class ReportsService implements IReportsService {
 
         const lastCompletedByRecipientAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id)
+          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.petition_access_id),
         )?.created_at.getTime();
 
         const lastCompletedByUserAt = findLast(
           events,
-          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id)
+          (e) => e.type === "PETITION_COMPLETED" && isDefined(e.data.user_id),
         )?.created_at.getTime();
 
         const lastClosedAt = findLast(
           events,
-          (e) => e.type === "PETITION_CLOSED"
+          (e) => e.type === "PETITION_CLOSED",
         )?.created_at.getTime();
 
         return this.getTimeInterval(
           lastClosedAt,
-          lastCompletedByRecipientAt ?? lastCompletedByUserAt
+          lastCompletedByRecipientAt ?? lastCompletedByUserAt,
         );
       })
       .filter(isDefined);
@@ -416,7 +416,7 @@ export class ReportsService implements IReportsService {
       .filter(
         (e) =>
           (e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED") &&
-          isDefined(e.data.petition_access_id)
+          isDefined(e.data.petition_access_id),
       )
       .map((e) => (e as ReplyCreatedEvent | ReplyUpdatedEvent).data.petition_field_reply_id);
 
@@ -430,7 +430,7 @@ export class ReportsService implements IReportsService {
       (e) =>
         (e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED") &&
         isDefined(e.data.petition_access_id) &&
-        currentReplyIds.includes(e.data.petition_field_reply_id)
+        currentReplyIds.includes(e.data.petition_field_reply_id),
     );
   }
 

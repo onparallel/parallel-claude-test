@@ -27,7 +27,7 @@ interface ProfileDrawerProps {
 export const ProfileDrawer = Object.assign(
   forwardRef<ProfileSelectInstance<false>, ProfileDrawerProps>(function ProfileDrawer(
     { profileId, profiles, onChangeProfile, onAssociateProfile, isReadOnly, canAddProfiles },
-    ref
+    ref,
   ) {
     const intl = useIntl();
 
@@ -107,7 +107,7 @@ export const ProfileDrawer = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 function MenuList(props: MenuListProps<ProfileSelectSelection>) {

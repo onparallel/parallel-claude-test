@@ -113,7 +113,7 @@ export const PetitionComposeFieldList = Object.assign(
         if (dropped) {
           // check that this order of fields is respecting that visibility only refers to previous fields
           const fieldPositions = Object.fromEntries(
-            Array.from(newFieldIds.entries()).map(([i, id]) => [id, i])
+            Array.from(newFieldIds.entries()).map(([i, id]) => [id, i]),
           );
           for (const [position, fieldId] of Array.from(fieldIds.entries())) {
             const visibility = fieldsById[fieldId].visibility as PetitionFieldVisibility;
@@ -141,7 +141,7 @@ export const PetitionComposeFieldList = Object.assign(
           setState({ fieldsById, fieldIds: newFieldIds });
         }
       },
-      [onUpdateFieldPositions]
+      [onUpdateFieldPositions],
     );
 
     const showReferencedFieldDialog = useReferencedFieldDialog();
@@ -150,7 +150,7 @@ export const PetitionComposeFieldList = Object.assign(
     const fieldsDataRef = useUpdatingRef({ fields, indices, active });
     const fieldProps = useMemoFactory(
       (
-        fieldId: string
+        fieldId: string,
       ): Pick<
         PetitionComposeFieldProps & BoxProps,
         | "petitionId"
@@ -172,8 +172,11 @@ export const PetitionComposeFieldList = Object.assign(
           const { fields } = fieldsDataRef.current!;
           // if this field is being referenced by any other field ask the user
           // if they want to remove the conflicting conditions
-          const referencing = zip(fields, indices).filter(([f]) =>
-            (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId)
+          const referencing = zip(fields, indices).filter(
+            ([f]) =>
+              (f.visibility as PetitionFieldVisibility)?.conditions.some(
+                (c) => c.fieldId === fieldId,
+              ),
           );
           if (referencing.length > 0) {
             try {
@@ -206,14 +209,15 @@ export const PetitionComposeFieldList = Object.assign(
             // ensure no field has a condition on a missing value
             const values = field.options.values as any[];
             const newValues = data.options.values as any[];
-            const referencing = fields.filter((f) =>
-              (f.visibility as PetitionFieldVisibility)?.conditions.some(
-                (c) =>
-                  c.fieldId === fieldId &&
-                  c.modifier !== "NUMBER_OF_REPLIES" &&
-                  c.value !== null &&
-                  !newValues.includes(c.value)
-              )
+            const referencing = fields.filter(
+              (f) =>
+                (f.visibility as PetitionFieldVisibility)?.conditions.some(
+                  (c) =>
+                    c.fieldId === fieldId &&
+                    c.modifier !== "NUMBER_OF_REPLIES" &&
+                    c.value !== null &&
+                    !newValues.includes(c.value),
+                ),
             );
             // update visibility for fields referencing old options
             await Promise.all(
@@ -246,7 +250,7 @@ export const PetitionComposeFieldList = Object.assign(
                     }),
                   },
                 });
-              })
+              }),
             );
           }
         },
@@ -272,7 +276,7 @@ export const PetitionComposeFieldList = Object.assign(
                 field.type === "DYNAMIC_SELECT" &&
                   (field.options as FieldOptions["DYNAMIC_SELECT"]).labels?.length
                   ? [field, 0]
-                  : field
+                  : field,
               );
               onFieldEdit(fieldId, {
                 visibility: {
@@ -310,14 +314,14 @@ export const PetitionComposeFieldList = Object.assign(
             setTimeout(() => {
               document
                 .querySelector<HTMLButtonElement>(
-                  `#field-${fieldId} + .add-field-button-wrapper  button`
+                  `#field-${fieldId} + .add-field-button-wrapper  button`,
                 )!
                 .click();
             });
           }
         },
       }),
-      [onCloneField, onFieldSettingsClick, onDeleteField, onFieldEdit]
+      [onCloneField, onFieldSettingsClick, onDeleteField, onFieldEdit],
     );
 
     const [hoveredFieldId, _setHoveredFieldId] = useState<string | null>(null);
@@ -328,7 +332,7 @@ export const PetitionComposeFieldList = Object.assign(
         _setHoveredFieldId(fieldId);
         assignRef(hoveredFieldIdRef, fieldId);
       },
-      [_setHoveredFieldId]
+      [_setHoveredFieldId],
     );
     const [focusedFieldId, _setFocusedFieldId] = useState<string | null>(null);
     const focusedFieldIdRef = useRef<string>(null);
@@ -337,7 +341,7 @@ export const PetitionComposeFieldList = Object.assign(
         _setFocusedFieldId(fieldId);
         assignRef(focusedFieldIdRef, fieldId);
       },
-      [_setFocusedFieldId]
+      [_setFocusedFieldId],
     );
     const isMenuOpenedRef = useRef(false);
     const timeoutRef = useRef<number>();
@@ -406,8 +410,8 @@ export const PetitionComposeFieldList = Object.assign(
               assignRef(hoveredFieldIdWhileMenuOpenedRef, null);
             }
           },
-        } as HTMLChakraProps<"div">),
-      [setHoveredFieldId, setFocusedFieldId, onFieldSettingsClick]
+        }) as HTMLChakraProps<"div">,
+      [setHoveredFieldId, setFocusedFieldId, onFieldSettingsClick],
     );
     const addButtonMouseHandlers = useMemoFactory(
       (fieldId) => ({
@@ -432,7 +436,7 @@ export const PetitionComposeFieldList = Object.assign(
         },
         user,
       }),
-      []
+      [],
     );
 
     return (
@@ -522,7 +526,7 @@ export const PetitionComposeFieldList = Object.assign(
         ${AddFieldPopover.fragments.User}
       `,
     },
-  }
+  },
 );
 
 interface AddFieldButtonProps extends ButtonOptions, ThemingProps<"Button">, AddFieldPopoverProps {}
@@ -556,7 +560,7 @@ const AddFieldButton = memo(
         {...props}
       />
     );
-  })
+  }),
 );
 
 interface BigAddFieldButtonProps
@@ -574,5 +578,5 @@ const BigAddFieldButton = memo(
         />
       </AddFieldPopover>
     );
-  })
+  }),
 );

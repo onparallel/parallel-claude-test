@@ -294,7 +294,7 @@ export const PetitionBase = interfaceType({
           PetitionAttachmentTypeValues.map((type) => [
             type,
             attachments.filter((a) => a.type === type),
-          ])
+          ]),
         ) as Record<PetitionAttachmentType, PetitionAttachment[]>;
       },
     });
@@ -394,7 +394,7 @@ export const Petition = objectType({
         const messages = await ctx.petitions.loadMessagesByPetitionId(root.id);
         const firstMessage = minBy(
           messages,
-          (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()
+          (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf(),
         );
 
         return firstMessage?.scheduled_at ?? firstMessage?.created_at ?? null;
@@ -869,12 +869,12 @@ export const PetitionAccess = objectType({
       resolve: async (root, _, ctx) => {
         const hasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(
           ctx.user!.id,
-          "PETITION_ACCESS_RECIPIENT_URL_FIELD"
+          "PETITION_ACCESS_RECIPIENT_URL_FIELD",
         );
 
         if (hasFeatureFlag || root.contact_id === null) {
           const { recipient_locale: locale } = (await ctx.petitions.loadPetition(
-            root.petition_id
+            root.petition_id,
           ))!;
           return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
         }
@@ -977,7 +977,7 @@ export const PetitionFieldReply = objectType({
       resolve: async (root, _, ctx) => {
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
-          (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED"
+          (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED",
         )!;
 
         if (isDefined(event.data.user_id)) {
@@ -994,7 +994,7 @@ export const PetitionFieldReply = objectType({
       resolve: async (root, _, ctx) => {
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
-          (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED"
+          (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED",
         )!;
         return event.created_at;
       },
@@ -1008,7 +1008,7 @@ export const PetitionFieldReply = objectType({
         }
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
-          (e) => e.type === "REPLY_STATUS_CHANGED"
+          (e) => e.type === "REPLY_STATUS_CHANGED",
         ) as ReplyStatusChangedEvent;
         if (!isDefined(event)) {
           return null;
@@ -1025,7 +1025,7 @@ export const PetitionFieldReply = objectType({
         }
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
-          (e) => e.type === "REPLY_STATUS_CHANGED"
+          (e) => e.type === "REPLY_STATUS_CHANGED",
         ) as ReplyStatusChangedEvent;
         if (!isDefined(event)) {
           return null;

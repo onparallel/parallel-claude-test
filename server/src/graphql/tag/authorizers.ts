@@ -7,7 +7,7 @@ import { Arg } from "../helpers/authorize";
 export function userHasAccessToTags<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, Maybe<MaybeArray<number>> | undefined>
+  TArg extends Arg<TypeName, FieldName, Maybe<MaybeArray<number>> | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {

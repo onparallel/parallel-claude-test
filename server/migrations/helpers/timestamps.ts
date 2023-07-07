@@ -2,7 +2,7 @@ import { Knex } from "knex";
 
 export function timestamps(
   t: Knex.CreateTableBuilder,
-  { created = true, updated = true, deleted = true } = {}
+  { created = true, updated = true, deleted = true } = {},
 ) {
   const client = (t as any).client as Knex.Client;
   const now = client.raw("CURRENT_TIMESTAMP");

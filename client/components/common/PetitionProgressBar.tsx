@@ -28,7 +28,7 @@ const STYLES = (() => {
 export const PetitionProgressBar = Object.assign(
   chakraForwardRef<"div", PetitionProgressBarProps>(function PetitionProgressBar(
     { petition: { progress, status }, ...props },
-    ref
+    ref,
   ) {
     const { external, internal } = progress;
     const sum = {
@@ -145,7 +145,7 @@ export const PetitionProgressBar = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 function EmptyProgressText({
@@ -251,7 +251,7 @@ function OptionalProgressText({
 
 const ProgressText = chakraForwardRef<"li", { type: keyof typeof STYLES }>(function ProgressText(
   { children, type, ...props },
-  ref
+  ref,
 ) {
   return (
     <HStack ref={ref as any} as="li" {...(props as any)}>

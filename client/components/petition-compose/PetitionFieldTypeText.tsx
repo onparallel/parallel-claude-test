@@ -15,5 +15,5 @@ export const PetitionFieldTypeText = chakraForwardRef<"p", PetitionFieldTypeText
         {label}
       </Text>
     );
-  }
+  },
 );

@@ -274,6 +274,6 @@ export function useModifyExpirationDialog({
         hasBeenShown.current = true;
       }
     },
-    [index, isDirty, expiryDate]
+    [index, isDirty, expiryDate],
   );
 }

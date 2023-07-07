@@ -9,7 +9,7 @@ export type FileSizeProps = {
 export function fileSize(
   intl: IntlShape,
   value: number,
-  opts: FormatNumberOptions = { maximumSignificantDigits: 3 }
+  opts: FormatNumberOptions = { maximumSignificantDigits: 3 },
 ) {
   let unit = 0;
   let _value = value;

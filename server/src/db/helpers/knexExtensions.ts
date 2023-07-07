@@ -10,7 +10,7 @@ function likeClause<TRecord extends {} = any, TResult = unknown>(operator: strin
     this: Knex.QueryBuilder<TRecord, TResult>,
     columnName: string,
     pattern: string,
-    escape?: string
+    escape?: string,
   ) {
     if (escape) {
       return this.whereRaw(`?? ${operator} ? escape ?`, [columnName, pattern, escape]);
@@ -22,7 +22,7 @@ function likeClause<TRecord extends {} = any, TResult = unknown>(operator: strin
 
 (knex as any).QueryBuilder.extend("mmodify", function mmodify<
   TRecord extends {},
-  TResult extends {}
+  TResult extends {},
 >(this: Knex.QueryBuilder<TRecord, TResult>, ...args: Parameters<Knex.QueryBuilder["modify"]>) {
   return this.modify<TRecord, TResult>(...args);
 });

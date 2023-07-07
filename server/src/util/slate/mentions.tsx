@@ -27,7 +27,7 @@ export function renderSlateWithMentionsToHtml(nodes: SlateNode[]) {
         createElement(
           "mention",
           { "data-mention-id": node.mention },
-          renderSlateToReactNodes(node.children!)
+          renderSlateToReactNodes(node.children!),
         ),
     },
   });

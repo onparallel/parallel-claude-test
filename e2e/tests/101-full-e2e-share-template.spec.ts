@@ -69,7 +69,7 @@ test.describe("Full e2e share template", () => {
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
-        }
+        },
       );
       return await openEmail(await browser.newContext(), email, async ({ page, context }) => {
         const text = page.getByTestId("shared-message");

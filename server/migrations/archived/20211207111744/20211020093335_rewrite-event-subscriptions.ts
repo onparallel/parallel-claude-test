@@ -20,7 +20,7 @@ export async function down(knex: Knex): Promise<void> {
       "updated_at",
       "updated_by",
       "deleted_at",
-      "deleted_by"
+      "deleted_by",
     );
     t.unique(["org_id", "type", "provider"], "org_integration__org_id__type__provider");
   });

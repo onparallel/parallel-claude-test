@@ -67,7 +67,7 @@ interface MentionBadgeProps {
 
 const MentionBadge = chakraForwardRef<"span", MentionBadgeProps>(function MentionBadge(
   { mentionId, isHighlighted, isFaded, ...props },
-  ref
+  ref,
 ) {
   return (
     <Box

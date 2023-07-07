@@ -16,5 +16,5 @@ export const PublicContainer = chakraForwardRef<"div", PublicContainerProps>(
         </Box>
       </Flex>
     );
-  }
+  },
 );

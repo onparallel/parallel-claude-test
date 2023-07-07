@@ -25,13 +25,13 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
     authorize: authenticateAnd(
       ifArgDefined(
         "petitionUserNotificationIds",
-        userHasAccessToNotifications("petitionUserNotificationIds" as never)
+        userHasAccessToNotifications("petitionUserNotificationIds" as never),
       ),
       ifArgDefined("petitionIds", userHasAccessToPetitions("petitionIds" as never)),
       ifArgDefined(
         "petitionFieldCommentIds",
-        userHasAccessToPetitionFieldComment("petitionFieldCommentIds" as never)
-      )
+        userHasAccessToPetitionFieldComment("petitionFieldCommentIds" as never),
+      ),
     ),
     args: {
       petitionUserNotificationIds: list(nonNull(globalIdArg("PetitionUserNotification"))),
@@ -51,13 +51,13 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
         throw new ArgValidationError(
           info,
           "args.petitionUserNotificationIds, args.petitionIds, args.petitionFieldCommentIds",
-          "Only one of `petitionUserNotificationIds`, `petitionIds` or `petitionFieldCommentIds` argument should be defined"
+          "Only one of `petitionUserNotificationIds`, `petitionIds` or `petitionFieldCommentIds` argument should be defined",
         );
       } else if (argCount === 0 && !args.filter) {
         throw new ArgValidationError(
           info,
           "args.petitionUserNotificationIds, args.petitionIds, args.petitionFieldCommentIds, args.filter",
-          "Some required argument is missing."
+          "Some required argument is missing.",
         );
       }
     },
@@ -65,7 +65,7 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
       _,
       { petitionUserNotificationIds, petitionIds, petitionFieldCommentIds, filter, isRead },
       ctx,
-      info
+      info,
     ) => {
       let notifications: PetitionUserNotification<false>[] = [];
       if (petitionUserNotificationIds) {
@@ -73,30 +73,30 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
           petitionUserNotificationIds,
           isRead,
           ctx.user!.id,
-          filter
+          filter,
         );
       } else if (petitionIds) {
         notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByPetitionId(
           petitionIds,
           isRead,
           ctx.user!.id,
-          filter
+          filter,
         );
       } else if (petitionFieldCommentIds) {
         notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByCommentIds(
           petitionFieldCommentIds,
           isRead,
           ctx.user!.id,
-          filter
+          filter,
         );
       } else if (filter) {
         notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByUserId(
           filter,
           isRead,
-          ctx.user!.id
+          ctx.user!.id,
         );
       }
       return sortBy(notifications, [(n) => n.created_at, "desc"]);
     },
-  }
+  },
 );

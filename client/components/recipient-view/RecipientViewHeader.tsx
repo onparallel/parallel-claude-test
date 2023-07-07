@@ -107,13 +107,13 @@ export const RecipientViewHeader = Object.assign(
       isClosed,
       ...props
     },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const toast = useToast();
     const showDelegateAccessDialog = useDelegateAccessDialog();
     const [publicDelegateAccessToContact] = useMutation(
-      RecipientViewHeader_publicDelegateAccessToContactDocument
+      RecipientViewHeader_publicDelegateAccessToContactDocument,
     );
 
     const dividerOrientation = useBreakpointValue<DividerProps["orientation"]>({
@@ -150,7 +150,7 @@ export const RecipientViewHeader = Object.assign(
               defaultMessage:
                 "We have sent an email to {email} with instructions to access this parallel.",
             },
-            { email: data.email }
+            { email: data.email },
           ),
           duration: 5000,
           isClosable: true,
@@ -558,7 +558,7 @@ export const RecipientViewHeader = Object.assign(
         }
       `,
     },
-  }
+  },
 );
 
 const _mutations = [

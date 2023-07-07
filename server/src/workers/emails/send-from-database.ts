@@ -5,7 +5,7 @@ export async function sendFromDatabase(
   payload: {
     email_log_id: number[];
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   return (await context.emailLogs.loadEmailLog(payload.email_log_id)).filter(isDefined);
 }

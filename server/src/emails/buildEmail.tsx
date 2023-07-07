@@ -18,7 +18,7 @@ export interface Email<T extends {}> {
 export async function buildEmail<T extends {}>(
   email: Email<T>,
   props: T,
-  { locale }: EmailOptions
+  { locale }: EmailOptions,
 ) {
   const messages = await loadMessages(locale);
   const intlProps: IntlConfig = {
@@ -35,7 +35,7 @@ export async function buildEmail<T extends {}>(
       keepComments: false,
       minify: true,
       validationLevel: "skip",
-    }
+    },
   );
   const intl = createIntl(intlProps);
   const text = email.text(props, intl);

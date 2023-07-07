@@ -8,10 +8,10 @@ import { toGlobalId } from "../../util/globalId";
 
 export async function signatureCancelledDeclinedBySigner(
   payload: { petition_signature_request_id: number },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const signatureRequest = await context.petitions.loadPetitionSignatureById(
-    payload.petition_signature_request_id
+    payload.petition_signature_request_id,
   );
 
   if (!signatureRequest) return;
@@ -56,7 +56,7 @@ export async function signatureCancelledDeclinedBySigner(
         signerName,
         ...layoutProps,
       },
-      { locale: userData.preferred_locale }
+      { locale: userData.preferred_locale },
     );
 
     emails.push(
@@ -67,7 +67,7 @@ export async function signatureCancelledDeclinedBySigner(
         text,
         html,
         created_from: `Petition:${petition.id}`,
-      })
+      }),
     );
   }
 

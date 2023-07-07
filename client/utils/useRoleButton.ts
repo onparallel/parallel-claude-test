@@ -18,7 +18,7 @@ export function useRoleButton(onPressed?: MouseEventHandler<any> | KeyboardEvent
           event.preventDefault();
         }
       },
-      [onPressed]
+      [onPressed],
     ),
   };
 }

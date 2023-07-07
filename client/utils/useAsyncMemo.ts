@@ -2,17 +2,17 @@ import { DependencyList, useEffect, useState } from "react";
 
 export function useAsyncMemo<T>(
   factory: () => Promise<T> | undefined | null,
-  deps: DependencyList
+  deps: DependencyList,
 ): T | undefined;
 export function useAsyncMemo<T>(
   factory: () => Promise<T> | undefined | null,
   deps: DependencyList,
-  initial: T
+  initial: T,
 ): T;
 export function useAsyncMemo<T>(
   factory: () => Promise<T> | undefined | null,
   deps: DependencyList,
-  initial?: T
+  initial?: T,
 ) {
   const [val, setVal] = useState<T | undefined>(initial);
   useEffect(() => {

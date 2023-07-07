@@ -32,7 +32,7 @@ export async function up(knex: Knex): Promise<any> {
       /* sql */ `
       update petition as p set
         ${columns.map((column) => `${column} = p._${column}`).join(", ")}
-    `
+    `,
     )
     .raw(
       /* sql */ `
@@ -40,9 +40,9 @@ export async function up(knex: Knex): Promise<any> {
         (reminders_active and ${settings
           .map((s) => `${s} is not null`)
           .join(" and ")}) or (not reminders_active and ${settings
-        .map((s) => `${s} is null`)
-        .join(" and ")})
-      )`
+          .map((s) => `${s} is null`)
+          .join(" and ")})
+      )`,
     )
     .alterTable("petition", (t) => {
       t.dropColumns(...columns.map((column) => `_${column}`));
@@ -64,7 +64,7 @@ export async function up(knex: Knex): Promise<any> {
       /* sql */ `
       update petition_sendout as ps set
         ${columns.map((column) => `${column} = ps._${column}`).join(", ")}
-    `
+    `,
     )
     .raw(
       /* sql */ `
@@ -72,9 +72,9 @@ export async function up(knex: Knex): Promise<any> {
         (reminders_active and ${settings
           .map((s) => `${s} is not null`)
           .join(" and ")}) or (not reminders_active and ${settings
-        .map((s) => `${s} is null`)
-        .join(" and ")})
-      )`
+          .map((s) => `${s} is null`)
+          .join(" and ")})
+      )`,
     )
     .alterTable("petition_sendout", (t) => {
       t.dropColumns(...columns.map((column) => `_${column}`));

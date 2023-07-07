@@ -25,22 +25,22 @@ export interface IEmailsService {
       accessId?: number;
       signer?: PetitionSignatureConfigSigner;
     },
-    completedBy: string
+    completedBy: string,
   ): Promise<void>;
   sendPetitionCommentsContactNotificationEmail(
     petitionId: number,
     accessIds: number,
-    commentIds: number[]
+    commentIds: number[],
   ): Promise<void>;
   sendPetitionCommentsUserNotificationEmail(
     petitionId: number,
     userId: number,
-    commentIds: number[]
+    commentIds: number[],
   ): Promise<void>;
   sendPetitionSharedEmail(
     userId: number,
     petitionPermissionIds: MaybeArray<number>,
-    message: Maybe<string>
+    message: Maybe<string>,
   ): Promise<void>;
   sendPetitionClosedEmail(
     petitionId: number,
@@ -48,38 +48,38 @@ export interface IEmailsService {
     petitionAccessIds: MaybeArray<number>,
     emailBody: any,
     attachPdfExport: boolean,
-    pdfExportTitle: Maybe<string>
+    pdfExportTitle: Maybe<string>,
   ): Promise<void>;
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(
     requestId: number,
-    isContactVerification: boolean
+    isContactVerification: boolean,
   ): Promise<void>;
   sendAccessDelegatedEmail(
     petitionId: number,
     originalAccessId: number,
     newAccessId: number,
-    messageBody: any
+    messageBody: any,
   ): Promise<void>;
   sendDeveloperWebhookFailedEmail(
     petitionEventSubscriptionId: number,
     petitionId: number,
     errorMessage: string,
-    postBody: any
+    postBody: any,
   ): Promise<void>;
   sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>): Promise<void>;
   sendOrganizationLimitsReachedEmail(
     orgId: number,
     limitName: OrganizationUsageLimitName,
     used: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<void>;
   validateEmail(email: string): Promise<boolean>;
   sendAppSumoActivateAccountEmail(redirectUrl: string, email: string): Promise<void>;
   sendInternalSignaturitAccountDepletedCreditsEmail(
     orgId: number,
     petitionId: number,
-    apiKeyHint: string
+    apiKeyHint: string,
   ): Promise<void>;
   sendSignatureCancelledNoCreditsLeftEmail(petitionSignatureRequestId: number): Promise<void>;
   sendSignatureCancelledRequestErrorEmail(petitionSignatureRequestId: number): Promise<void>;
@@ -87,7 +87,7 @@ export interface IEmailsService {
   sendTransferParallelsEmail(userExternalId: string, orgId: number): Promise<void>;
   sendProfilesExpiringPropertiesEmail(
     userId: number,
-    payload: Pick<ProfilesExpiringPropertiesEmailProps, "organizationName" | "properties">
+    payload: Pick<ProfilesExpiringPropertiesEmailProps, "organizationName" | "properties">,
   ): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
@@ -99,7 +99,7 @@ export class EmailsService implements IEmailsService {
   private async enqueueEmail<T extends keyof EmailPayload>(
     type: T,
     data: MaybeArray<EmailPayload[T] & { id: string }>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const payloads = unMaybeArray(data);
     await this.queues.enqueueMessages(
@@ -109,7 +109,7 @@ export class EmailsService implements IEmailsService {
         body: { type, payload: p } as any,
         groupId: p.id,
       })),
-      t
+      t,
     );
   }
 
@@ -123,7 +123,7 @@ export class EmailsService implements IEmailsService {
       unMaybeArray(messageIds).map((messageId) => ({
         id: this.buildQueueId("PetitionMessage", messageId),
         petition_message_id: messageId,
-      }))
+      })),
     );
   }
 
@@ -133,7 +133,7 @@ export class EmailsService implements IEmailsService {
       unMaybeArray(reminderIds).map((reminderId) => ({
         id: this.buildQueueId("PetitionReminder", reminderId),
         petition_reminder_id: reminderId,
-      }))
+      })),
     );
   }
 
@@ -146,7 +146,7 @@ export class EmailsService implements IEmailsService {
       accessId?: number;
       signer?: PetitionSignatureConfigSigner;
     },
-    completedBy: string
+    completedBy: string,
   ) {
     if (!accessId && !signer) {
       return;
@@ -170,7 +170,7 @@ export class EmailsService implements IEmailsService {
   async sendPetitionCommentsContactNotificationEmail(
     petitionId: number,
     accessId: number,
-    commentIds: number[]
+    commentIds: number[],
   ) {
     return await this.enqueueEmail("comments-contact-notification", {
       id: this.buildQueueId("PetitionFieldCommentContact", [petitionId, accessId, ...commentIds]),
@@ -183,7 +183,7 @@ export class EmailsService implements IEmailsService {
   async sendPetitionCommentsUserNotificationEmail(
     petitionId: number,
     userId: number,
-    commentIds: number[]
+    commentIds: number[],
   ) {
     return await this.enqueueEmail("comments-user-notification", {
       id: this.buildQueueId("PetitionFieldCommentUser", [petitionId, userId, ...commentIds]),
@@ -196,7 +196,7 @@ export class EmailsService implements IEmailsService {
   async sendPetitionSharedEmail(
     userId: number,
     petitionPermissionIds: MaybeArray<number>,
-    message: Maybe<string>
+    message: Maybe<string>,
   ) {
     return await this.enqueueEmail("petition-shared", {
       id: this.buildQueueId("PetitionAccess", petitionPermissionIds),
@@ -212,7 +212,7 @@ export class EmailsService implements IEmailsService {
     petitionAccessIds: MaybeArray<number>,
     emailBody: any,
     attachPdfExport: boolean,
-    pdfExportTitle: Maybe<string>
+    pdfExportTitle: Maybe<string>,
   ) {
     return await this.enqueueEmail("petition-closed-notification", {
       id: this.buildQueueId("PetitionClosedNotification", petitionAccessIds),
@@ -244,7 +244,7 @@ export class EmailsService implements IEmailsService {
     petitionId: number,
     originalAccessId: number,
     newAccessId: number,
-    messageBody: any
+    messageBody: any,
   ) {
     return await this.enqueueEmail("petition-access-delegated", {
       id: this.buildQueueId("PetitionAccessDelegated", [originalAccessId, newAccessId]),
@@ -259,7 +259,7 @@ export class EmailsService implements IEmailsService {
     petitionEventSubscriptionId: number,
     petitionId: number,
     errorMessage: string,
-    postBody: any
+    postBody: any,
   ) {
     return await this.enqueueEmail("developer-webhook-failed", {
       id: this.buildQueueId("DeveloperWebhookFailed", petitionEventSubscriptionId),
@@ -276,7 +276,7 @@ export class EmailsService implements IEmailsService {
       unMaybeArray(messageIds).map((messageId) => ({
         id: this.buildQueueId("PublicPetitionLinkAccess", messageId),
         petition_message_id: messageId,
-      }))
+      })),
     );
   }
 
@@ -284,7 +284,7 @@ export class EmailsService implements IEmailsService {
     orgId: number,
     limitName: OrganizationUsageLimitName,
     used: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.enqueueEmail(
       "organization-limits-reached",
@@ -293,7 +293,7 @@ export class EmailsService implements IEmailsService {
         org_id: orgId,
         limit_name: limitName,
       },
-      t
+      t,
     );
   }
 
@@ -308,7 +308,7 @@ export class EmailsService implements IEmailsService {
   async sendInternalSignaturitAccountDepletedCreditsEmail(
     orgId: number,
     petitionId: number,
-    apiKeyHint: string
+    apiKeyHint: string,
   ) {
     return await this.enqueueEmail("internal-signaturit-account-depleted-credits", {
       id: this.buildQueueId("InternalSignaturitAccountDepletedCredits", [orgId, apiKeyHint]),
@@ -352,7 +352,7 @@ export class EmailsService implements IEmailsService {
 
   async sendProfilesExpiringPropertiesEmail(
     userId: number,
-    payload: Pick<ProfilesExpiringPropertiesEmailProps, "organizationName" | "properties">
+    payload: Pick<ProfilesExpiringPropertiesEmailProps, "organizationName" | "properties">,
   ): Promise<void> {
     return await this.enqueueEmail("profiles-expiring-properties", {
       id: this.buildQueueId("ProfilesExpiringProperties", userId),
@@ -374,7 +374,7 @@ export class EmailsService implements IEmailsService {
           } catch {}
           return false;
         },
-        { concurrency: 20 }
+        { concurrency: 20 },
       );
     });
   })();

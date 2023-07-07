@@ -16,5 +16,5 @@ export const SubscribedNotificationsIcon = chakraForwardRef<"svg">(
         <BellOnIcon ref={ref} {...(props as any)} />
       </Tooltip>
     );
-  }
+  },
 );

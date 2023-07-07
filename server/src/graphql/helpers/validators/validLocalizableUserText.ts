@@ -7,7 +7,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 export function validLocalizableUserText<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => LocalizableUserText | null | undefined,
   argName: string,
-  { maxLength }: { maxLength: number }
+  { maxLength }: { maxLength: number },
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
@@ -17,7 +17,7 @@ export function validLocalizableUserText<TypeName extends string, FieldName exte
         throw new ArgValidationError(
           info,
           argName,
-          `Invalid LocalizableUserText, at least one translation must be provided.`
+          `Invalid LocalizableUserText, at least one translation must be provided.`,
         );
       }
       let allEmpty = true;
@@ -29,7 +29,7 @@ export function validLocalizableUserText<TypeName extends string, FieldName exte
           throw new ArgValidationError(
             info,
             argName,
-            `Invalid LocalizableUserText, value can't be longer than ${maxLength} characters.`
+            `Invalid LocalizableUserText, value can't be longer than ${maxLength} characters.`,
           );
         }
       }
@@ -37,7 +37,7 @@ export function validLocalizableUserText<TypeName extends string, FieldName exte
         throw new ArgValidationError(
           info,
           argName,
-          `Invalid LocalizableUserText, at least one translation must be provided.`
+          `Invalid LocalizableUserText, at least one translation must be provided.`,
         );
       }
     }

@@ -135,19 +135,19 @@ function OrganizationUsers() {
       }));
     },
     300,
-    [setQueryState]
+    [setQueryState],
   );
   const handleSearchChange = useCallback(
     (value: string | null) => {
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   const showGenericErrorToast = useGenericErrorToast();
   const [inviteUserToOrganization] = useMutation(
-    OrganizationUsers_inviteUserToOrganizationDocument
+    OrganizationUsers_inviteUserToOrganizationDocument,
   );
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
@@ -175,7 +175,7 @@ function OrganizationUsers() {
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
-          { email: user.email }
+          { email: user.email },
         ),
         status: "success",
         duration: 5000,
@@ -330,7 +330,7 @@ function OrganizationUsers() {
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
-          { email: selectedRows[0].email }
+          { email: selectedRows[0].email },
         ),
         status: "success",
         duration: 5000,
@@ -350,7 +350,7 @@ function OrganizationUsers() {
               id: "organization.user-invitation-sent-error.toast-description",
               defaultMessage: "An invitation has been sent to {email} recently, try again later.",
             },
-            { email: selectedRows[0].email }
+            { email: selectedRows[0].email },
           ),
           status: "error",
           duration: 5000,
@@ -420,7 +420,7 @@ function OrganizationUsers() {
             defaultMessage:
               "You can't deactivate the owner. Please, remove it from the selection and try again.",
           }),
-        })
+        }),
       );
     } else if (selectedRows.some((u) => u.id === me.id)) {
       await withError(
@@ -430,7 +430,7 @@ function OrganizationUsers() {
             defaultMessage:
               "You can't deactivate your own user. Please, remove it from the selection and try again.",
           }),
-        })
+        }),
       );
     } else if (selectedRows.some((u) => u.isSsoUser && u.status !== "ON_HOLD")) {
       await withError(
@@ -441,9 +441,9 @@ function OrganizationUsers() {
               defaultMessage:
                 "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider.",
             },
-            { count: selectedRows.length }
+            { count: selectedRows.length },
           ),
-        })
+        }),
       );
     } else {
       handleUpdateUserStatus(newStatus);
@@ -539,7 +539,7 @@ function OrganizationUsers() {
                     onClick: handleResendInvitation,
                     isDisabled:
                       selectedRows.some(
-                        (u) => u.lastActiveAt || u.status === "INACTIVE" || u.isSsoUser
+                        (u) => u.lastActiveAt || u.status === "INACTIVE" || u.isSsoUser,
                       ) || selectedRows.length !== 1,
                     leftIcon: <ArrowUpRightIcon />,
                     children: (
@@ -727,7 +727,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

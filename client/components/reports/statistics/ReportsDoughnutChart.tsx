@@ -37,21 +37,21 @@ export function ReportsDoughnutChart({
             id: "component.reports-doughnut-chart.pending",
             defaultMessage: "{count, number} Pending",
           },
-          { count: pendingPetitions }
+          { count: pendingPetitions },
         ),
         intl.formatMessage(
           {
             id: "component.reports-doughnut-chart.completed",
             defaultMessage: "{count, number} Completed",
           },
-          { count: completedPetitions }
+          { count: completedPetitions },
         ),
         intl.formatMessage(
           {
             id: "component.reports-doughnut-chart.closed",
             defaultMessage: "{count, number} Closed",
           },
-          { count: closedPetitions }
+          { count: closedPetitions },
         ),
       ],
       datasets: [

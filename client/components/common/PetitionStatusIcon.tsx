@@ -55,5 +55,5 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
         ) : null}
       </Tooltip>
     );
-  }
+  },
 );

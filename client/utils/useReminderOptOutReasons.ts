@@ -39,6 +39,6 @@ export function useReminderOptOutReasons(): Record<ReminderOptOutReason, string>
         defaultMessage: "Other",
       }),
     }),
-    [intl.locale]
+    [intl.locale],
   );
 }

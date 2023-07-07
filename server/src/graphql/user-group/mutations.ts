@@ -17,7 +17,7 @@ export const createUserGroup = mutationField("createUserGroup", {
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
   validateArgs: validateAnd(
     notEmptyString((args) => args.name, "name"),
-    maxLength((args) => args.name, "name", 100)
+    maxLength((args) => args.name, "name", 100),
   ),
   args: {
     name: nonNull(stringArg()),
@@ -31,7 +31,7 @@ export const createUserGroup = mutationField("createUserGroup", {
           name: args.name.trim(),
         },
         `User:${ctx.user!.id}`,
-        t
+        t,
       );
       await ctx.userGroups.addUsersToGroup(group.id, args.userIds, `User:${ctx.user!.id}`, t);
       return group;
@@ -45,7 +45,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasAccessToUserGroups("id")),
   validateArgs: validateAnd(
     notEmptyString((args) => args.data.name, "data.name"),
-    maxLength((args) => args.data.name, "data.name", 100)
+    maxLength((args) => args.data.name, "data.name", 100),
   ),
   args: {
     id: nonNull(globalIdArg("UserGroup")),
@@ -55,7 +55,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
         definition(t) {
           t.string("name");
         },
-      }).asArg()
+      }).asArg(),
     ),
   },
   resolve: async (_, args, ctx) => {
@@ -67,7 +67,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
     const [userGroup] = await ctx.userGroups.updateUserGroupById(
       args.id,
       data,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     return userGroup;
   },
@@ -100,7 +100,7 @@ export const addUsersToUserGroup = mutationField("addUsersToUserGroup", {
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToUserGroups("userGroupId"),
-    userHasAccessToUsers("userIds")
+    userHasAccessToUsers("userIds"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.userGroups.addUsersToGroup(args.userGroupId, args.userIds, `User:${ctx.user!.id}`);
@@ -118,13 +118,13 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToUserGroups("userGroupId"),
-    userHasAccessToUsers("userIds")
+    userHasAccessToUsers("userIds"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.userGroups.removeUsersFromGroups(
       args.userIds,
       [args.userGroupId],
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     return (await ctx.userGroups.loadUserGroup(args.userGroupId))!;
   },
@@ -139,7 +139,7 @@ export const cloneUserGroups = mutationField("cloneUserGroups", {
   },
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
-    userHasAccessToUserGroups("userGroupIds")
+    userHasAccessToUserGroups("userGroupIds"),
   ),
   resolve: async (_, args, ctx) => {
     const groups = (await ctx.userGroups.loadUserGroup(args.userGroupIds)) as UserGroup[];
@@ -151,10 +151,10 @@ export const cloneUserGroups = mutationField("cloneUserGroups", {
           ` (${intl.formatMessage({
             id: "generic.copy",
             defaultMessage: "copy",
-          })})`
+          })})`,
         ),
-        ctx.user!
-      )
+        ctx.user!,
+      ),
     );
   },
 });

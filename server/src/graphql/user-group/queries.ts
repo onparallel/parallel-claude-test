@@ -44,7 +44,7 @@ export const searchUserGroups = queryField("searchUserGroups", {
   type: list("UserGroup"),
   description: "Search user groups",
   authorize: authenticateAnd(
-    ifArgDefined("excludeUserGroups", userHasAccessToUserGroups("excludeUserGroups" as never))
+    ifArgDefined("excludeUserGroups", userHasAccessToUserGroups("excludeUserGroups" as never)),
   ),
   args: {
     search: nonNull(stringArg()),

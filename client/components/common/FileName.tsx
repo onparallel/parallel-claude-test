@@ -10,7 +10,7 @@ export interface FileNameProps extends ThemingProps<"Text"> {
 
 export const FileName = chakraForwardRef<"span", FileNameProps>(function FileName(
   { value, ...props },
-  ref
+  ref,
 ) {
   const [isTruncated, setIsTruncated] = useState(false);
   const innerRef = useRef<HTMLSpanElement>(null);

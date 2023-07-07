@@ -47,7 +47,7 @@ export function ConfirmDialog<TResult = void>({
         });
       },
     }),
-    []
+    [],
   );
   return (
     <BaseDialog initialFocusRef={focusRef} {...props}>

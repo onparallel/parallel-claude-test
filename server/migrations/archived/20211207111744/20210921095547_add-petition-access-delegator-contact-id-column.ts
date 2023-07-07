@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   const { rows: accesses } = await knex.raw<{ rows: PetitionAccess[] }>(
-    "select * from petition_access where created_by like 'Contact:%'"
+    "select * from petition_access where created_by like 'Contact:%'",
   );
 
   pMap(accesses, async (access) => {

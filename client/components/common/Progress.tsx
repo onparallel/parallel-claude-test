@@ -27,7 +27,7 @@ export interface ProgressTrackProps {
 
 export const ProgressTrack = chakraForwardRef<"div", ProgressTrackProps>(function ProgressTrack(
   { size, min, max, value, ...rest },
-  ref
+  ref,
 ) {
   return (
     <Flex

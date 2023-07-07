@@ -22,7 +22,7 @@ export function reverseSortDirection(direction: "asc" | "desc") {
 }
 
 export function parseSortBy<T extends string>(
-  key: T
+  key: T,
 ): T extends `${infer U}_${"ASC" | "DESC"}` ? [U, "asc" | "desc"] : never {
   if (key.endsWith("_ASC")) {
     return [key.slice(0, -4), "asc"] as any;
@@ -46,7 +46,7 @@ type SortableFieldTypes = string | number | Date | boolean | null | undefined;
 export type PaginationFieldConfig<
   TypeName extends string,
   FieldName extends string,
-  ItemType extends core.GetGen<"allOutputTypes"> | core.AllNexusOutputTypeDefs
+  ItemType extends core.GetGen<"allOutputTypes"> | core.AllNexusOutputTypeDefs,
 > = {
   type: ItemType;
 
@@ -88,7 +88,7 @@ export type PaginationFieldConfig<
     root: core.GetGen2<"rootTypes", TypeName>,
     args: core.ArgsValue<TypeName, FieldName>,
     ctx: core.GetGen<"context">,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) =>
     | core.MaybePromise<core.ResultValue<TypeName, FieldName>>
     | core.MaybePromiseDeep<core.ResultValue<TypeName, FieldName>>;
@@ -98,12 +98,12 @@ const PaginationArgs = {
   offset: nullable(
     intArg({
       description: "Number of elements to skip from the list.",
-    })
+    }),
   ),
   limit: nullable(
     intArg({
       description: "Number of elements to take from the list.",
-    })
+    }),
   ),
 };
 
@@ -141,14 +141,14 @@ export function paginationPlugin() {
           factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage }) {
             const [fieldName, fieldConfig] = factoryArgs as [
               string,
-              PaginationFieldConfig<any, any, any>
+              PaginationFieldConfig<any, any, any>,
             ];
             const targetType = fieldConfig.type;
 
             const { paginationName, sortByName } = getTypeNames(
               fieldName,
               parentTypeName,
-              fieldConfig
+              fieldConfig,
             );
 
             // Add the "Pagination" type to the schema if it doesn't exist already
@@ -170,7 +170,7 @@ export function paginationPlugin() {
                       fieldConfig.extendPagination(t2);
                     }
                   },
-                })
+                }),
               );
             }
 
@@ -183,7 +183,7 @@ export function paginationPlugin() {
                     `${value}_ASC`,
                     `${value}_DESC`,
                   ]),
-                })
+                }),
               );
             }
 
@@ -205,9 +205,9 @@ export function paginationPlugin() {
                           arg({
                             description: "Sorting to use on the collection",
                             type: sortByName as any,
-                          })
-                        )
-                      )
+                          }),
+                        ),
+                      ),
                     ),
                   }
                 : {}),
@@ -229,7 +229,7 @@ export function paginationPlugin() {
               },
             });
           },
-        })
+        }),
       );
     },
   });
@@ -250,7 +250,7 @@ function nonPaginationFieldProps(fieldConfig: PaginationFieldConfig<any, any, an
 const getTypeNames = (
   fieldName: string,
   parentTypeName: string,
-  fieldConfig: PaginationFieldConfig<any, any, any>
+  fieldConfig: PaginationFieldConfig<any, any, any>,
 ) => {
   const targetTypeName =
     typeof fieldConfig.type === "string" ? fieldConfig.type : (fieldConfig.type.name as string);
@@ -281,7 +281,7 @@ function validateArgs<TypeName extends string, FieldName extends string>(
   root: core.GetGen2<"rootTypes", TypeName>,
   args: core.ArgsValue<TypeName, FieldName>,
   context: core.GetGen<"context">,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) {
   if ((args as any).offset < 0) {
     throw new ArgValidationError(info, "offset", "Value can't be negative.");

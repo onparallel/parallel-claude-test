@@ -136,7 +136,7 @@ export function RecipientViewPetitionFieldShortText({
         }
       },
     }),
-    [onUpdateReply, field.replies, onDeleteReply]
+    [onUpdateReply, field.replies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -158,7 +158,7 @@ export function RecipientViewPetitionFieldShortText({
               Object.assign(newReplyElement, selection);
               newReplyElement?.setSelectionRange(
                 newReplyElement.value.length,
-                newReplyElement.value.length
+                newReplyElement.value.length,
               );
             }
             newReplyElement?.focus();
@@ -168,7 +168,7 @@ export function RecipientViewPetitionFieldShortText({
       setIsSaving(false);
     },
     1000,
-    [onCreateReply]
+    [onCreateReply],
   );
 
   const handleInvalidReply = (replyId: string, isInvalid: boolean) => {
@@ -240,7 +240,7 @@ export function RecipientViewPetitionFieldShortText({
               id: "generic.for-example",
               defaultMessage: "E.g. {example}",
             },
-            { example: format.example }
+            { example: format.example },
           )
         : intl.formatMessage({
             id: "component.recipient-view-petition-field-reply.text-placeholder",
@@ -319,7 +319,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
   RecipientViewPetitionFieldReplyShortTextProps
 >(function RecipientViewPetitionFieldReplyShortText(
   { field, reply, isDisabled, isInvalid, onInvalid, onUpdate, onDelete, onAddNewReply },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
@@ -336,7 +336,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
       setIsSaving(false);
     },
     1000,
-    [onUpdate]
+    [onUpdate],
   );
 
   const formats = useShortTextFormats();
@@ -390,7 +390,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
                 id: "generic.for-example",
                 defaultMessage: "E.g. {example}",
               },
-              { example: format.example }
+              { example: format.example },
             )
           : intl.formatMessage({
               id: "component.recipient-view-petition-field-reply.text-placeholder",
@@ -440,7 +440,7 @@ interface ShortTextInput {
 
 const ShortTextInput = chakraForwardRef<"input", ShortTextInput>(function ShortTextInput(
   { format, onValueChange, ...props },
-  ref
+  ref,
 ) {
   const inputRef = useRef<any>(null);
   useImperativeHandle(
@@ -452,7 +452,7 @@ const ShortTextInput = chakraForwardRef<"input", ShortTextInput>(function ShortT
         return inputRef.current;
       }
     },
-    [format?.type]
+    [format?.type],
   );
   return (
     <Input

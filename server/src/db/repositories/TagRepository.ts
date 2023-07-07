@@ -16,7 +16,7 @@ export class TagRepository extends BaseRepository {
   readonly loadTag = this.buildLoadBy("tag", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadTagsByOrganizationId = this.buildLoadMultipleBy("tag", "organization_id", (q) =>
-    q.whereNull("deleted_at").orderBy("name", "asc")
+    q.whereNull("deleted_at").orderBy("name", "asc"),
   );
 
   readonly loadTagsByPetitionId = this.buildLoader<number, Tag[]>(async (petitionIds, t) => {
@@ -27,15 +27,15 @@ export class TagRepository extends BaseRepository {
       .select<Array<Tag & { petition_id: number; pt_created_at: Date }>>(
         "tag.*",
         "petition_tag.petition_id",
-        "petition_tag.created_at as pt_created_at"
+        "petition_tag.created_at as pt_created_at",
       );
     const byPetitionId = groupBy(results, (r) => r.petition_id);
     return petitionIds.map((id) =>
       byPetitionId[id]
         ? sortBy(byPetitionId[id], (tags) => tags.pt_created_at).map((tag) =>
-            omit(tag, ["petition_id", "pt_created_at"])
+            omit(tag, ["petition_id", "pt_created_at"]),
           )
-        : []
+        : [],
     );
   });
 
@@ -59,7 +59,7 @@ export class TagRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `User:${user.id}`,
         },
-        "*"
+        "*",
       );
 
     return tag;
@@ -78,7 +78,7 @@ export class TagRepository extends BaseRepository {
     tagId: MaybeArray<number>,
     petitionId: MaybeArray<number>,
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const petitionIdArr = unMaybeArray(petitionId);
     const tagIdArr = unMaybeArray(tagId);
@@ -98,11 +98,11 @@ export class TagRepository extends BaseRepository {
               tag_id: tagId,
               petition_id: petitionId,
               created_by: `User:${user.id}`,
-            }))
-          )
+            })),
+          ),
         ),
       ],
-      t
+      t,
     );
   }
 

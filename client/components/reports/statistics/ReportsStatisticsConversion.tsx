@@ -82,7 +82,7 @@ export function ReportsStatisticsConversion({
       Title,
       Tooltip,
       Legend,
-      ChartjsPluginStacked100
+      ChartjsPluginStacked100,
     );
     if (isMounted()) {
       setIsLoading(false);
@@ -213,12 +213,12 @@ export function ReportsStatisticsConversion({
                   ? Math.round(
                       chartType === "RELATIVE"
                         ? calculatedData[dataIndex].relativeDropOffPercentage
-                        : calculatedData[dataIndex].dropOffPercentage
+                        : calculatedData[dataIndex].dropOffPercentage,
                     )
                   : Math.round(
                       chartType === "RELATIVE"
                         ? calculatedData[dataIndex].relativePercentage
-                        : calculatedData[dataIndex].percentage
+                        : calculatedData[dataIndex].percentage,
                     );
 
               // To avoid print the dropOff data in the first column
@@ -235,7 +235,7 @@ export function ReportsStatisticsConversion({
                         defaultMessage:
                           "{ratio, number, percent} drop off from previous step ({amount, number})",
                       },
-                      { ratio: percentage / 100, amount: calculatedData[dataIndex].dropOff ?? 0 }
+                      { ratio: percentage / 100, amount: calculatedData[dataIndex].dropOff ?? 0 },
                     )
                   : intl.formatMessage(
                       {
@@ -243,7 +243,7 @@ export function ReportsStatisticsConversion({
                         defaultMessage:
                           "{ratio, number, percent} drop off from total ({amount, number})",
                       },
-                      { ratio: percentage / 100, amount: calculatedData[dataIndex].dropOff ?? 0 }
+                      { ratio: percentage / 100, amount: calculatedData[dataIndex].dropOff ?? 0 },
                     );
               }
 
@@ -255,14 +255,14 @@ export function ReportsStatisticsConversion({
                       defaultMessage:
                         "{ratio, number, percent} from previous step ({amount, number})",
                     },
-                    { ratio: percentage / 100, amount: calculatedData[dataIndex].total }
+                    { ratio: percentage / 100, amount: calculatedData[dataIndex].total },
                   )
                 : intl.formatMessage(
                     {
                       id: "component.reports-statistics-conversion.passing-absolute",
                       defaultMessage: "{ratio, number, percent} from total ({amount, number})",
                     },
-                    { ratio: percentage / 100, amount: calculatedData[dataIndex].total }
+                    { ratio: percentage / 100, amount: calculatedData[dataIndex].total },
                   );
             },
           },
@@ -318,7 +318,7 @@ export function ReportsStatisticsConversion({
       datasets: [
         {
           data: calculatedData.map((data) =>
-            chartType === "ABSOLUTE" ? data.percentage : data.relativePercentage
+            chartType === "ABSOLUTE" ? data.percentage : data.relativePercentage,
           ),
           barPercentage: 0.95,
           categoryPercentage: 0.95,
@@ -564,14 +564,14 @@ function useDownloadConversionReportExcel() {
           range: isDefined(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
-        }
+        },
       ),
       async (workbook) => {
         const worksheet = workbook.addWorksheet(
           intl.formatMessage({
             id: "component.reports-statistics-conversion.conversion-report",
             defaultMessage: "Conversion report",
-          })
+          }),
         );
 
         worksheet.columns = [
@@ -647,9 +647,9 @@ function useDownloadConversionReportExcel() {
             percentageRelative: row.relativePercentage,
             dropOff: row.dropOff,
             dropOffPercentage: row.dropOffPercentage,
-          }))
+          })),
         );
-      }
+      },
     );
   };
 }

@@ -38,14 +38,14 @@ export class SignaturitIntegration extends GenericIntegration<
 
   constructor(
     @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
-    @inject(IntegrationRepository) integrations: IntegrationRepository
+    @inject(IntegrationRepository) integrations: IntegrationRepository,
   ) {
     super(encryption, integrations);
   }
 
   public async withApiKey<TResult>(
     orgIntegrationId: number,
-    handler: (apiKey: string, context: SignaturitIntegrationContext) => Promise<TResult>
+    handler: (apiKey: string, context: SignaturitIntegrationContext) => Promise<TResult>,
   ): Promise<TResult> {
     return await this.withCredentials(orgIntegrationId, async (credentials, context) => {
       return await handler(credentials.API_KEY, context);
@@ -53,7 +53,7 @@ export class SignaturitIntegration extends GenericIntegration<
   }
 
   protected override getContext(
-    integration: EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT", false>
+    integration: EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT", false>,
   ): SignaturitIntegrationContext {
     const settings = integration.settings;
     const brandings = ContactLocaleValues.flatMap((locale) =>
@@ -62,7 +62,7 @@ export class SignaturitIntegration extends GenericIntegration<
         if (key in settings) {
           return { locale, tone, brandingId: settings[key]! };
         }
-      })
+      }),
     ).filter(isDefined);
     const apiKey = settings.CREDENTIALS.API_KEY;
     return {

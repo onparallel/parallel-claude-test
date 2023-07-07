@@ -63,7 +63,7 @@ function OrganizationGeneral() {
             id: "organization.branding.logo-error",
             defaultMessage: "The logo must be an image file of size up to {size}.",
           },
-          { size: <FileSize value={MAX_FILE_SIZE} /> }
+          { size: <FileSize value={MAX_FILE_SIZE} /> },
         ),
       });
     } else {

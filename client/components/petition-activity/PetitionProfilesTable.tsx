@@ -57,11 +57,10 @@ export function PetitionProfilesTable({
   const navigate = useHandleNavigation();
   const handleRowClick = useCallback(function (
     row: PetitionProfilesTableSelection,
-    event: MouseEvent
+    event: MouseEvent,
   ) {
     navigate(`/app/profiles/${row.id}`, event);
-  },
-  []);
+  }, []);
 
   return (
     <Card {...props} data-section="petition-profiles-table">
@@ -209,7 +208,7 @@ function usePetitionProfilesColumns(): TableColumn<
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

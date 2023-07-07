@@ -15,7 +15,7 @@ interface EditorText extends SlateText {}
 type EditorBlockContent = EditorText | PlaceholderElement | PlaceholderInputElement;
 
 export function parseTextWithPlaceholders(
-  text: string
+  text: string,
 ): (
   | { type: "placeholder"; value: string; raw: string }
   | { type: "text"; text: string; raw: string }
@@ -34,7 +34,7 @@ export function parseTextWithPlaceholders(
 
 export function textWithPlaceholderToSlateNodes(
   value: string,
-  placeholders: PlaceholderOption[]
+  placeholders: PlaceholderOption[],
 ): EditorBlock[] {
   return value.split("\n").map((line) => {
     const parts = parseTextWithPlaceholders(line);
@@ -66,7 +66,7 @@ export function textWithPlaceholderToSlateNodes(
 
 export function slateNodesToTextWithPlaceholders(
   value: EditorBlock[],
-  placeholders: PlaceholderOption[]
+  placeholders: PlaceholderOption[],
 ) {
   return value
     .map((b) =>
@@ -76,9 +76,9 @@ export function slateNodesToTextWithPlaceholders(
             ? `{{ ${e.placeholder} }}`
             : "text" in e
             ? (e.text as string).replaceAll("{", "\\{")
-            : ""
+            : "",
         )
-        .join("")
+        .join(""),
     )
     .join("\n");
 }

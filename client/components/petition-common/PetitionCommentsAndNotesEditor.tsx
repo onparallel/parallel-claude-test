@@ -45,7 +45,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
     tabIsNotes,
     onTabChange,
   },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const [draft, setDraft] = useState(emptyCommentEditorValue());
@@ -59,7 +59,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
         editorRef.current?.focus();
       },
     }),
-    []
+    [],
   );
 
   async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {

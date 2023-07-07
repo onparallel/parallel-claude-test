@@ -6,7 +6,7 @@ import { Arg } from "../helpers/authorize";
 export function userHasAccessToNotifications<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const notificationIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);

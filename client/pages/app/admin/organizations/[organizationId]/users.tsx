@@ -77,7 +77,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
         sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
       },
       fetchPolicy: "cache-and-network",
-    }
+    },
   );
 
   const [search, setSearch] = useState(state.search);
@@ -89,7 +89,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   const toast = useToast();
   const showGenericErrorToast = useGenericErrorToast();
   const [inviteUserToOrganization] = useMutation(
-    AdminOrganizationsMembers_inviteUserToOrganizationDocument
+    AdminOrganizationsMembers_inviteUserToOrganizationDocument,
   );
   const showInviteUserDialog = useInviteUserDialog();
   async function handleInviteUser() {
@@ -122,7 +122,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           },
           {
             email: user.email,
-          }
+          },
         ),
       });
     } catch (error) {
@@ -166,7 +166,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
       }));
     },
     300,
-    [setQueryState]
+    [setQueryState],
   );
 
   const handleSearchChange = useCallback(
@@ -174,7 +174,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   const loginAs = useLoginAs();
@@ -411,7 +411,7 @@ function useOrganizationMembersTableColumns() {
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -515,5 +515,5 @@ AdminOrganizationsMembers.getInitialProps = async ({
 export default compose(
   withSuperAdminAccess,
   withDialogs,
-  withApolloData
+  withApolloData,
 )(AdminOrganizationsMembers);

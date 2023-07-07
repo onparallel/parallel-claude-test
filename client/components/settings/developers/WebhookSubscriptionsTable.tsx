@@ -55,21 +55,21 @@ export function WebhookSubscriptionsTable({
   const [selectedSubscriptions, setSelectedSubscriptions] = useState<string[]>([]);
 
   const [updateEventSubscription] = useMutation(
-    WebhookSubscriptionsTable_updateEventSubscriptionDocument
+    WebhookSubscriptionsTable_updateEventSubscriptionDocument,
   );
   const [deleteEventSubscriptions] = useMutation(
-    WebhookSubscriptionsTable_deleteEventSubscriptionsDocument
+    WebhookSubscriptionsTable_deleteEventSubscriptionsDocument,
   );
   const [createEventSubscription] = useMutation(
-    WebhookSubscriptionsTable_createEventSubscriptionDocument
+    WebhookSubscriptionsTable_createEventSubscriptionDocument,
   );
 
   const [createEventSubscriptionSignatureKey] = useMutation(
-    WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyDocument
+    WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyDocument,
   );
 
   const [deleteEventSubscriptionSignatureKeys] = useMutation(
-    WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysDocument
+    WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysDocument,
   );
 
   const createOrUpdateSubscriptionHandlers = {
@@ -81,7 +81,7 @@ export function WebhookSubscriptionsTable({
         name: string | null;
         fromTemplateId: string | null;
         fromTemplateFieldIds: string[] | null;
-      }
+      },
     ) => {
       let subscriptionId = id;
       if (isDefined(id)) {
@@ -178,7 +178,7 @@ export function WebhookSubscriptionsTable({
       updateEventSubscription,
       showConfirmDeactivateEventSubscriptionDialog,
       handleEditSubscriptionSignatureKeys,
-    ]
+    ],
   );
 
   const subscriptionsColumns = useSubscriptionsColumns();
@@ -445,7 +445,7 @@ function useSubscriptionsColumns(): TableColumn<
         },
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

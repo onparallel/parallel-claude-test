@@ -57,7 +57,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
       return data.emailIsAvailable;
     },
     300,
-    []
+    [],
   );
 
   const emailIsAvailable = async (value: string) => {

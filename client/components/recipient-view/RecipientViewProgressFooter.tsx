@@ -45,7 +45,7 @@ export interface RecipientViewProgressFooterProps {
 export const RecipientViewProgressFooter = Object.assign(
   chakraForwardRef<"div", RecipientViewProgressFooterProps>(function RecipientViewProgressFooter(
     { petition: { status, fields, signatureConfig }, onFinalize, isDisabled, ...props },
-    ref
+    ref,
   ) {
     const visibility = useFieldVisibility(fields);
     const [poppoverClosed, setPoppoverClosed] = useState(false);
@@ -235,5 +235,5 @@ export const RecipientViewProgressFooter = Object.assign(
         `;
       },
     },
-  }
+  },
 );

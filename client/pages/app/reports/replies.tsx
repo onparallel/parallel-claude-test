@@ -188,7 +188,7 @@ export function ReportsReplies() {
                 handleTemplateRepliesReportTask(
                   activeTemplateId!,
                   activeRange?.[0].toISOString() ?? null,
-                  activeRange?.[1].toISOString() ?? null
+                  activeRange?.[1].toISOString() ?? null,
                 )
               }
             >

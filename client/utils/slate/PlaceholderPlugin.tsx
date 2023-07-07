@@ -67,7 +67,7 @@ export interface PlaceholderInputElement
 
 export function createPlaceholderPlugin<
   TValue extends Value = Value,
-  TEditor extends PlateEditor<TValue> = PlateEditor<TValue>
+  TEditor extends PlateEditor<TValue> = PlateEditor<TValue>,
 >({ placeholdersRef }: { placeholdersRef: RefObject<PlaceholderOption[]> }) {
   const trigger = "{";
   return createMentionPlugin<MentionPlugin<PlaceholderOption>, TValue, TEditor>({
@@ -107,7 +107,7 @@ export function createPlaceholderPlugin<
               const placeholder = placeholdersRef.current?.find(
                 (p) =>
                   p.key === part.value ||
-                  ("data" in p && "field" in p.data && p.data.field.alias === part.value)
+                  ("data" in p && "field" in p.data && p.data.field.alias === part.value),
               );
               if (isDefined(placeholder)) {
                 editor.insertNode({
@@ -126,12 +126,12 @@ export function createPlaceholderPlugin<
         // Make sure a mention input is created at the beginning of line or after a whitespace
         const previousChar = getEditorString(
           editor,
-          getRange(editor, editor.selection, getPointBefore(editor, editor.selection))
+          getRange(editor, editor.selection, getPointBefore(editor, editor.selection)),
         );
 
         const nextChar = getEditorString(
           editor,
-          getRange(editor, editor.selection, getPointAfter(editor, editor.selection))
+          getRange(editor, editor.selection, getPointAfter(editor, editor.selection)),
         );
 
         const beginningOfLine = previousChar === "";
@@ -143,7 +143,7 @@ export function createPlaceholderPlugin<
         };
         return insertNodes(
           editor,
-          beginningOfLine && !endOfLine ? [{ text: "" }, data] : (data as any)
+          beginningOfLine && !endOfLine ? [{ text: "" }, data] : (data as any),
         );
       };
 
@@ -156,7 +156,7 @@ export function createPlaceholderPlugin<
         return nodes.filter((node) => {
           if ("type" in node && node.type === ELEMENT_PLACEHOLDER) {
             const placeholder = placeholdersRef.current?.find(
-              (n) => n.key === (node as PlaceholderElement).placeholder
+              (n) => n.key === (node as PlaceholderElement).placeholder,
             );
             return isDefined(placeholder);
           }
@@ -193,7 +193,7 @@ export function PlaceholderCombobox({
     async (search: string) => {
       return placeholders.filter((p) => p.text.toLowerCase().includes(search.toLowerCase()));
     },
-    [placeholders]
+    [placeholders],
   );
 
   return (
@@ -287,7 +287,7 @@ function PlaceholderElement({
   const color = usePetitionFieldTypeColor(
     isDefined(placeholder) && "data" in placeholder && "field" in placeholder.data
       ? placeholder.data.field.type
-      : (undefined as any)
+      : (undefined as any),
   );
   const isSelected = useSelected();
   const isFocused = useFocused();
@@ -453,7 +453,7 @@ export function removePlaceholderInputElements<T extends SlateElement<any, any>[
   return value
     .filter((e) => e.type !== ELEMENT_PLACEHOLDER_INPUT)
     .map((e) =>
-      "children" in e ? { ...e, children: removePlaceholderInputElements(e.children as any) } : e
+      "children" in e ? { ...e, children: removePlaceholderInputElements(e.children as any) } : e,
     ) as T;
 }
 

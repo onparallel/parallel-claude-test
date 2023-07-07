@@ -53,7 +53,7 @@ export function useExportRepliesTask() {
             defaultMessage:
               "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
           }),
-        })
+        }),
       );
     } else if (!taskError) {
       const [error] = await withError(
@@ -62,7 +62,7 @@ export function useExportRepliesTask() {
             variables: { taskId: finishedTask!.id },
           });
           return data!.getTaskResultFile.url;
-        })
+        }),
       );
       if (error) {
         await withError(
@@ -72,7 +72,7 @@ export function useExportRepliesTask() {
               defaultMessage:
                 "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
             }),
-          })
+          }),
         );
       }
     }

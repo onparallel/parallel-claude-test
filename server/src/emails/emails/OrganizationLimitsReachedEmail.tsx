@@ -46,7 +46,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             id: "organization-limits-reached.parallel-send.few-credits-remaining.subject",
             defaultMessage: "Alert: You have used {value, number, percent} of your parallels",
           },
-          { value }
+          { value },
         )
       : signatureFewCreditsRemaining
       ? intl.formatMessage(
@@ -54,13 +54,13 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.subject",
             defaultMessage: "Alert: You have used {value, number, percent} of your signatures",
           },
-          { value }
+          { value },
         )
       : (null as never);
   },
   text(
     { senderName, used, total, limitName }: OrganizationLimitsReachedEmailProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     const petitionSendTotalCreditsUsed = used === total && limitName === "PETITION_SEND";
     const signatureTotalCreditsUsed = used === total && limitName === "SIGNATURIT_SHARED_APIKEY";
@@ -77,7 +77,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             defaultMessage:
               "It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} parallels</b>.",
           },
-          { b: (chunks: any[]) => chunks, total }
+          { b: (chunks: any[]) => chunks, total },
         )}
         
         ${intl.formatMessage(
@@ -86,7 +86,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             defaultMessage:
               "To increase the parallels limit, you can contact us at <a>support@onparallel.com</a>.",
           },
-          { a: (chunks: any[]) => chunks }
+          { a: (chunks: any[]) => chunks },
         )}
             
         ${closing({}, intl)}
@@ -101,7 +101,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             defaultMessage:
               "It seems that Parallel is helping you sign many of your documents, and you have already <b>reached your limit of {total, number} signatures</b>.",
           },
-          { b: (chunks: any[]) => chunks, total }
+          { b: (chunks: any[]) => chunks, total },
         )}
       
         ${intl.formatMessage(
@@ -110,7 +110,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             defaultMessage:
               "To increase the signature limit, you can contact us at <a>support@onparallel.com</a>.",
           },
-          { a: (chunks: any[]) => chunks }
+          { a: (chunks: any[]) => chunks },
         )}
       
         ${closing({}, intl)}
@@ -135,7 +135,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             remaining: total - used,
             percent: (total - used) / total,
             b: (chunks: any[]) => chunks,
-          }
+          },
         )}
           
         ${intl.formatMessage(
@@ -144,7 +144,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             defaultMessage:
               "To increase the parallels limit, you can contact us at <a>support@onparallel.com</a>.",
           },
-          { a: (chunks: any[]) => chunks }
+          { a: (chunks: any[]) => chunks },
         )}
         
         ${closing({}, intl)}
@@ -169,7 +169,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             remaining: total - used,
             percent: (total - used) / total,
             b: (chunks: any[]) => chunks,
-          }
+          },
         )}
         
         ${intl.formatMessage(
@@ -178,7 +178,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             defaultMessage:
               "To increase the signature limit, you can contact us at <a>support@onparallel.com</a>.",
           },
-          { a: (chunks: any[]) => chunks }
+          { a: (chunks: any[]) => chunks },
         )}
 
       `

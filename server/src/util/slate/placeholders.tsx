@@ -3,7 +3,7 @@ import { SlateNode, renderSlateToHtml, renderSlateToText, renderWhiteSpace } fro
 import { walkSlateNodes } from "./utils";
 
 export function parseTextWithPlaceholders(
-  text: string
+  text: string,
 ): (
   | { type: "placeholder"; value: string; raw: string }
   | { type: "text"; text: string; raw: string }
@@ -22,7 +22,7 @@ export function parseTextWithPlaceholders(
 
 export function replacePlaceholdersInText(
   text: string,
-  replacer: (value: string) => string
+  replacer: (value: string) => string,
 ): string {
   return parseTextWithPlaceholders(text)
     .map((part) => {
@@ -37,7 +37,7 @@ export function replacePlaceholdersInText(
 
 export function replacePlaceholdersInSlate(
   nodes: SlateNode[],
-  replacer: (value: string) => string
+  replacer: (value: string) => string,
 ): SlateNode[] {
   return walkSlateNodes(nodes, (node) => {
     if (node.type === "placeholder" && isDefined(node.placeholder)) {
@@ -51,7 +51,7 @@ export function replacePlaceholdersInSlate(
 
 export function renderSlateWithPlaceholdersToText(
   nodes: SlateNode[],
-  getPlaceholder?: (value: string) => string
+  getPlaceholder?: (value: string) => string,
 ) {
   return renderSlateToText(nodes, {
     override: {
@@ -62,7 +62,7 @@ export function renderSlateWithPlaceholdersToText(
 
 export function renderTextWithPlaceholders(
   text: string,
-  getPlaceholder: (value: string) => string
+  getPlaceholder: (value: string) => string,
 ) {
   return parseTextWithPlaceholders(text)
     .map((p) => (p.type === "text" ? p.text : getPlaceholder(p.value)))
@@ -71,7 +71,7 @@ export function renderTextWithPlaceholders(
 
 export function renderSlateWithPlaceholdersToHtml(
   nodes: SlateNode[],
-  getPlaceholder?: (value: string) => string
+  getPlaceholder?: (value: string) => string,
 ) {
   return renderSlateToHtml(nodes, {
     override: {
@@ -84,7 +84,7 @@ export function renderSlateWithPlaceholdersToHtml(
 
 export function interpolatePlaceholdersInSlate(
   nodes: SlateNode[],
-  getPlaceholder?: (value: string) => string
+  getPlaceholder?: (value: string) => string,
 ) {
   return walkSlateNodes(nodes, (node) => {
     if (node.type === "placeholder") {

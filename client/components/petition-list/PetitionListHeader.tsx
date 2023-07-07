@@ -69,7 +69,7 @@ export function PetitionListHeader({
         page: 1,
       })),
     300,
-    [onStateChange]
+    [onStateChange],
   );
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +77,7 @@ export function PetitionListHeader({
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   const buildUrl = useBuildStateUrl(shape);
@@ -122,7 +122,7 @@ export function PetitionListHeader({
         "path",
         "searchIn",
         "sort",
-      ]) as Omit<PetitionListViewData, "__typename">
+      ]) as Omit<PetitionListViewData, "__typename">,
     );
   }, [state, views]);
 
@@ -321,7 +321,7 @@ const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
         </Button>
       </Tooltip>
     );
-  }
+  },
 );
 
 PetitionListHeader.fragments = {
@@ -402,7 +402,7 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
   return (
     equals(
       omit(view1, ["__typename", "sharedWith", "sort", "tagsFilters"]),
-      omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters"])
+      omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters"]),
     ) &&
     equals(
       isDefined(view1.sharedWith)
@@ -416,7 +416,7 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
             ...omit(view2.sharedWith, ["__typename"]),
             filters: view2.sharedWith.filters.map(omit(["__typename"])),
           }
-        : view2.sharedWith
+        : view2.sharedWith,
     ) &&
     equals(
       isDefined(view1.sort)
@@ -424,7 +424,7 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
         : { field: "sentAt", direction: "DESC" },
       isDefined(view2.sort)
         ? omit(view2.sort, ["__typename"])
-        : { field: "sentAt", direction: "DESC" }
+        : { field: "sentAt", direction: "DESC" },
     ) &&
     equals(
       isDefined(view1.tagsFilters)
@@ -438,7 +438,7 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
             ...omit(view2.tagsFilters, ["__typename"]),
             filters: view2.tagsFilters.filters.map(omit(["__typename"])),
           }
-        : view2.tagsFilters
+        : view2.tagsFilters,
     )
   );
 }

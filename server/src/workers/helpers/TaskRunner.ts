@@ -8,7 +8,10 @@ import { random } from "../../util/token";
 export abstract class TaskRunner<T extends TaskName> {
   private abort!: AbortController;
 
-  constructor(protected ctx: WorkerContext, protected task: Task<T>) {}
+  constructor(
+    protected ctx: WorkerContext,
+    protected task: Task<T>,
+  ) {}
 
   protected abstract run({ signal }: { signal: AbortSignal }): Promise<TaskOutput<T>>;
 
@@ -25,14 +28,14 @@ export abstract class TaskRunner<T extends TaskName> {
         await this.ctx.tasks.taskFailed(
           this.task.id,
           { message: error.message, stack: error.stack },
-          this.ctx.config.instanceName
+          this.ctx.config.instanceName,
         );
       } else {
         this.ctx.logger.error(`Unknnown Error ${fastSafeStringify(error)}`);
         await this.ctx.tasks.taskFailed(
           this.task.id,
           { message: `Unknnown Error ${fastSafeStringify(error)}` },
-          this.ctx.config.instanceName
+          this.ctx.config.instanceName,
         );
       }
     }
@@ -51,7 +54,7 @@ export abstract class TaskRunner<T extends TaskName> {
         status: "PROCESSING",
         progress: Math.round(value),
       },
-      this.ctx.config.instanceName
+      this.ctx.config.instanceName,
     );
   }
 
@@ -74,7 +77,7 @@ export abstract class TaskRunner<T extends TaskName> {
         filename,
         size: res["ContentLength"]!.toString(),
       },
-      this.ctx.config.instanceName
+      this.ctx.config.instanceName,
     );
   }
 }

@@ -48,7 +48,7 @@ export function RecipientViewPetitionFieldReplyStatusIndicator({
           id: "component.recipient-view-petition-field-reply.reply-saved-on",
           defaultMessage: "Reply saved on {date}",
         },
-        { date: intl.formatDate(reply.updatedAt, FORMATS.LLL) }
+        { date: intl.formatDate(reply.updatedAt, FORMATS.LLL) },
       )}
     >
       <CloudOkIcon fontSize="18px" color="green.600" role="presentation" />

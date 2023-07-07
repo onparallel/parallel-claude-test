@@ -2,7 +2,7 @@ import { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<any> {
   return await knex.raw(
-    /* sql */ `alter table petition_access drop constraint petition_access__reminders_check`
+    /* sql */ `alter table petition_access drop constraint petition_access__reminders_check`,
   );
 }
 

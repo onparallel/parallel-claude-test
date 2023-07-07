@@ -67,7 +67,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
         variables: {
           orgId: organization.id,
           featureFlags: formData.features.filter(
-            (_, i) => formState.dirtyFields.features?.[i]?.value
+            (_, i) => formState.dirtyFields.features?.[i]?.value,
           ),
         },
       });
@@ -99,7 +99,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
                 const _search = search.toLowerCase().trim();
                 return featureFlags.some(
                   ({ name, title }) =>
-                    name.toLowerCase().includes(_search) || title.toLowerCase().includes(_search)
+                    name.toLowerCase().includes(_search) || title.toLowerCase().includes(_search),
                 );
               })
               .map(({ category, featureFlags }) => {
@@ -223,5 +223,5 @@ AdminOrganizationsFeatures.getInitialProps = async ({
 export default compose(
   withSuperAdminAccess,
   withDialogs,
-  withApolloData
+  withApolloData,
 )(AdminOrganizationsFeatures);

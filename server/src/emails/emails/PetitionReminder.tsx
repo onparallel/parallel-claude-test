@@ -37,7 +37,7 @@ const email: Email<PetitionReminderProps> = {
         id: "from.via-parallel",
         defaultMessage: "{senderName} via Parallel",
       },
-      { senderName }
+      { senderName },
     );
   },
   subject({ emailSubject, senderName }, intl: IntlShape) {
@@ -53,7 +53,7 @@ const email: Email<PetitionReminderProps> = {
             id: "petition-reminder.subject",
             defaultMessage: "Remember that {senderName} sent you a parallel",
           },
-          { senderName }
+          { senderName },
         )
       }`
     );
@@ -73,7 +73,7 @@ const email: Email<PetitionReminderProps> = {
       showOptOutLink,
       theme,
     }: PetitionReminderProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       ${greetingReminder({ name, fullName, tone: theme.preferredTone }, intl)}
@@ -84,7 +84,7 @@ const email: Email<PetitionReminderProps> = {
           defaultMessage:
             "We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted.",
         },
-        { senderName, senderEmail, tone: theme.preferredTone }
+        { senderName, senderEmail, tone: theme.preferredTone },
       )}
       
       ${bodyPlainText}
@@ -95,7 +95,7 @@ const email: Email<PetitionReminderProps> = {
           defaultMessage:
             "{tone, select, INFORMAL{You have} other{There are currently}} {pending}/{total} fields pending.",
         },
-        { pending: missingFieldCount, total: totalFieldCount, tone: theme.preferredTone }
+        { pending: missingFieldCount, total: totalFieldCount, tone: theme.preferredTone },
       )}
       ${
         deadline
@@ -107,7 +107,7 @@ const email: Email<PetitionReminderProps> = {
               defaultMessage:
                 "This information has been requested to be submitted before {deadline}.",
             },
-            { deadline: intl.formatDate(deadline, FORMATS.LLL) }
+            { deadline: intl.formatDate(deadline, FORMATS.LLL) },
           )}
             `
           : ""

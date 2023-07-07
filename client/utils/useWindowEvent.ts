@@ -8,18 +8,18 @@ export function useWindowEvent<K extends keyof WindowEventMap>(
   type: K,
   callback: (ev: WindowEventMap[K]) => void,
   options: UseWindowEventOptions,
-  deps: DependencyList
+  deps: DependencyList,
 ): void;
 export function useWindowEvent<K extends keyof WindowEventMap>(
   type: K,
   callback: (ev: WindowEventMap[K]) => void,
-  deps: DependencyList
+  deps: DependencyList,
 ): void;
 export function useWindowEvent<K extends keyof WindowEventMap>(
   type: K,
   callback: (ev: WindowEventMap[K]) => void,
   optionsOrDeps: UseWindowEventOptions | DependencyList,
-  deps?: DependencyList
+  deps?: DependencyList,
 ) {
   const [_deps, { isListening = true }] = Array.isArray(optionsOrDeps)
     ? [optionsOrDeps, { isListening: true }]

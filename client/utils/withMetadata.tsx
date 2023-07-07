@@ -6,7 +6,7 @@ const MetadataContext = createContext<Partial<ConnectionMetadata> | null>(null);
 
 export function withMetadata<P>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Component: ComponentType<P>
+  Component: ComponentType<P>,
 ): ComponentType<P> {
   const WithMetadata: ComponentType<P> = function (props) {
     return (

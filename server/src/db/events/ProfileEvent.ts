@@ -38,7 +38,7 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
 
 export type GenericProfileEvent<
   TType extends ProfileEventType,
-  IsCreate extends boolean = false
+  IsCreate extends boolean = false,
 > = Omit<DbProfileEvent, "type" | "data" | If<IsCreate, "id" | "created_at" | "processed_at">> & {
   type: TType;
   data: ProfileEventPayload<TType>;

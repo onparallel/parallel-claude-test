@@ -77,7 +77,7 @@ function OrganizationProfileTypes() {
   const [showArchived, setShowArchived] = useQueryStateSlice(
     queryState,
     setQueryState,
-    "showArchived"
+    "showArchived",
   );
 
   const { data, loading, refetch } = useQueryOrPreviousData(
@@ -94,7 +94,7 @@ function OrganizationProfileTypes() {
         },
       },
       fetchPolicy: "cache-and-network",
-    }
+    },
   );
 
   const profileTypes = data?.profileTypes;
@@ -108,7 +108,7 @@ function OrganizationProfileTypes() {
     (row: OrganizationProfileTypes_ProfileTypeFragment, event: MouseEvent) => {
       navigate(`/app/organization/profiles/types/${row.id}`, event);
     },
-    []
+    [],
   );
 
   const [createProfileType] = useMutation(OrganizationProfileTypes_createProfileTypeDocument);
@@ -335,7 +335,7 @@ function useProfileTypesTableColumns(): TableColumn<OrganizationProfileTypes_Pro
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -480,5 +480,5 @@ export default compose(
   withDialogs,
   withOrgRole("ADMIN", "/app/organization"),
   withFeatureFlag("PROFILES", "/app/organization"),
-  withApolloData
+  withApolloData,
 )(OrganizationProfileTypes);

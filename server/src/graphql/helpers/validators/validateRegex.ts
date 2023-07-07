@@ -5,7 +5,7 @@ import { ArgValidationError } from "../errors";
 export function validateRegex<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
   argName: string,
-  regex: RegExp
+  regex: RegExp,
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);

@@ -40,9 +40,9 @@ export function useProfileTypeFieldTypes() {
   return useSimpleSelectOptions<ProfileTypeFieldType>(
     (intl) =>
       (["SHORT_TEXT", "TEXT", "NUMBER", "PHONE", "DATE", "FILE"] as ProfileTypeFieldType[]).map(
-        (type) => ({ value: type, label: TYPES[type](intl) })
+        (type) => ({ value: type, label: TYPES[type](intl) }),
       ),
-    []
+    [],
   );
 }
 

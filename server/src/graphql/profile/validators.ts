@@ -17,10 +17,10 @@ export function validProfileNamePattern<
   TypeName extends string,
   FieldName extends string,
   TProfileId extends Arg<TypeName, FieldName, number>,
-  TProfileNamePattern extends Arg<TypeName, FieldName, Maybe<string> | undefined>
+  TProfileNamePattern extends Arg<TypeName, FieldName, Maybe<string> | undefined>,
 >(
   profileTypeIdArg: TProfileId,
-  profileNamePatternArg: TProfileNamePattern
+  profileNamePatternArg: TProfileNamePattern,
 ): FieldValidateArgsResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const profileTypeId = args[profileTypeIdArg] as unknown as number;
@@ -33,7 +33,7 @@ export function validProfileNamePattern<
       if (
         fields.length === 0 ||
         fields.some(
-          (f) => !isDefined(f) || f.profile_type_id !== profileTypeId || f.type !== "SHORT_TEXT"
+          (f) => !isDefined(f) || f.profile_type_id !== profileTypeId || f.type !== "SHORT_TEXT",
         )
       ) {
         throw new ApolloError("Invalid profile name pattern", "INVALID_PROFILE_NAME_PATTERN");
@@ -45,7 +45,7 @@ export function validProfileNamePattern<
 export function validProfileTypeFieldOptions<
   TypeName extends string,
   FieldName extends string,
-  TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["CreateProfileTypeFieldInput"]>
+  TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["CreateProfileTypeFieldInput"]>,
 >(dataArg: TDataArg, argName: string) {
   return (async (_, args, ctx, info) => {
     const data = args[dataArg] as unknown as NexusGenInputs["CreateProfileTypeFieldInput"];
@@ -69,7 +69,7 @@ const stringValueSchema = (maxLength?: number) =>
       value: { type: "string", maxLength },
     },
     additionalProperties: false,
-  } as const);
+  }) as const;
 
 const MAX_SHORT_TEXT_SIZE = 1_000;
 const MAX_TEXT_SIZE = 10_000;

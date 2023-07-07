@@ -18,7 +18,7 @@ export function useTimeInput(time: string, options: { onChange?: (value: string)
         options?.onChange?.(time.match(/([01]\d|2[0-3]):[0-5]\d/) ? time : "");
         setValue(time);
       },
-      [options?.onChange]
+      [options?.onChange],
     ),
   };
 }

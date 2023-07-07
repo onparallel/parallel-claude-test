@@ -18,7 +18,7 @@ export interface IntegrationLinkCardProps {
 export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardProps>(
   function IntegrationLinkCard(
     { logo, title, body, badge, isDisabled, href, isExternal, ...props },
-    ref
+    ref,
   ) {
     return (
       <LinkBox
@@ -59,5 +59,5 @@ export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardPr
         </HStack>
       </LinkBox>
     );
-  }
+  },
 );

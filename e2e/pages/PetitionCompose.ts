@@ -27,7 +27,7 @@ export class PetitionCompose extends PetitionLayout {
       description,
       required,
       options,
-    }: { title?: string; description?: string; required?: boolean; options?: string[] }
+    }: { title?: string; description?: string; required?: boolean; options?: string[] },
   ) {
     const field = this.getField(index);
     if (isDefined(title)) {
@@ -53,7 +53,7 @@ export class PetitionCompose extends PetitionLayout {
         await Promise.all([
           waitForGraphQL(
             this.page,
-            (o) => o.operationName === "PetitionCompose_updatePetitionField"
+            (o) => o.operationName === "PetitionCompose_updatePetitionField",
           ),
           field.getByTestId("compose-field-required").click(),
         ]);
@@ -92,7 +92,7 @@ export class PetitionCompose extends PetitionLayout {
     const fieldBox = await field.boundingBox();
     await this.page.mouse.move(
       handleBox!.x + handleBox!.width / 2,
-      handleBox!.y + handleBox!.height / 2
+      handleBox!.y + handleBox!.height / 2,
     );
     await this.page.mouse.down();
     await this.page.waitForTimeout(1);
@@ -101,26 +101,26 @@ export class PetitionCompose extends PetitionLayout {
       await this.page.mouse.move(
         handleBox!.x + handleBox!.width / 2,
         targetBox!.y + targetBox!.height / 2 - 1,
-        { steps: 10 }
+        { steps: 10 },
       );
       await this.page.waitForTimeout(1);
       await this.page.mouse.move(
         handleBox!.x + handleBox!.width / 2,
         targetBox!.y + fieldBox!.height / 2,
-        { steps: 10 }
+        { steps: 10 },
       );
     } else {
       // move past the centerpoint of the next field
       await this.page.mouse.move(
         handleBox!.x + handleBox!.width / 2,
         targetBox!.y + targetBox!.height / 2 + 1,
-        { steps: 10 }
+        { steps: 10 },
       );
       await this.page.waitForTimeout(1);
       await this.page.mouse.move(
         handleBox!.x + handleBox!.width / 2,
         targetBox!.y + targetBox!.height - fieldBox!.height / 2,
-        { steps: 10 }
+        { steps: 10 },
       );
     }
     await this.page.waitForTimeout(1);

@@ -49,7 +49,7 @@ export function EnumerateList<TValue>({
             values={{ count: values.length - maxItems }}
           />
         ),
-      })
+      }),
     );
   }
   return <FormattedList value={value} {...options} />;

@@ -49,7 +49,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   const { selectedRows, onChangeSelectedIds } = useSelection(petitions?.items, "id");
 
   const [associateProfileToPetition] = useMutation(
-    ProfilePetitionsTable_associateProfileToPetitionDocument
+    ProfilePetitionsTable_associateProfileToPetitionDocument,
   );
   const showAssociatePetitionToProfileDialog = useAssociatePetitionToProfileDialog();
   const handleAddPetition = async () => {
@@ -66,7 +66,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   };
   const showConfirmDisassociateProfileDialog = useConfirmDisassociateProfileDialog();
   const [disassociatePetitionFromProfile] = useMutation(
-    ProfilePetitionsTable_disassociatePetitionFromProfileDocument
+    ProfilePetitionsTable_disassociatePetitionFromProfileDocument,
   );
   const columns = useProfilePetitionsTableColumns();
 
@@ -88,7 +88,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   const goToPetition = useGoToPetition();
   const handleRowClick = useCallback(function (
     row: ProfilePetitionsTable_PetitionFragment,
-    event: MouseEvent
+    event: MouseEvent,
   ) {
     goToPetition(
       row.id,
@@ -100,10 +100,9 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
           CLOSED: "replies",
         } as const
       )[row.status],
-      { event }
+      { event },
     );
-  },
-  []);
+  }, []);
 
   const actions = useProfilePetitionsActions({
     onRemoveClick: () => handleRemovePetition(),
@@ -299,7 +298,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
           ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

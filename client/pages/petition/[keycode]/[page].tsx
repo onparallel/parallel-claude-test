@@ -68,7 +68,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     {
       variables: { keycode },
       skip: !access.hasClientPortalAccess,
-    }
+    },
   );
 
   const pending = access.hasClientPortalAccess
@@ -113,7 +113,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             f.isInternal ||
             f.optional ||
             completedFieldReplies(f).length > 0 ||
-            f.isReadOnly
+            f.isReadOnly,
         );
         if (canFinalize) {
           let confirmSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
@@ -147,7 +147,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                 pendingPetitions: pending,
                 keycode,
                 tone,
-              })
+              }),
             );
           }
         } else {
@@ -169,7 +169,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           router.push(
             `/petition/${keycode}/${page}?${new URLSearchParams({
               field: field.id,
-            })}`
+            })}`,
           );
         }
       } catch (e) {
@@ -187,7 +187,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
         }
       }
     },
-    [petition.fields, visibility, granter, router.query, pending]
+    [petition.fields, visibility, granter, router.query, pending],
   );
 
   const [sidebarTop, setSidebarTop] = useState(0);
@@ -665,7 +665,7 @@ RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
     }
     const pageCount =
       data!.access.petition.fields.filter(
-        (f) => f.type === "HEADING" && f.options!.hasPageBreak && !f.isInternal
+        (f) => f.type === "HEADING" && f.options!.hasPageBreak && !f.isInternal,
       ).length + 1;
     if (page > pageCount) {
       throw new RedirectError(`/petition/${keycode}/1`);

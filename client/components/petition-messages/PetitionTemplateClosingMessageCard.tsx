@@ -49,7 +49,7 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
       const placeholders = usePetitionMessagePlaceholderOptions({ petition });
       const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
         petition.closingEmailBody ??
-          textWithPlaceholderToSlateNodes(messages[petition.locale], placeholders)
+          textWithPlaceholderToSlateNodes(messages[petition.locale], placeholders),
       );
 
       const handleclosingEmailBodyChange = (value: RichTextEditorValue) => {
@@ -87,7 +87,7 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
           </Box>
         </Card>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -106,5 +106,5 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
         ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
       `,
     },
-  }
+  },
 );

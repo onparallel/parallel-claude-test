@@ -9,7 +9,7 @@ createCronWorker("scheduled-trigger", async (context) => {
         type: "MESSAGE_SENT",
         data: { petition_message_id: message.id },
         petition_id: message.petition_id,
-      }))
+      })),
     ),
   ]);
 });

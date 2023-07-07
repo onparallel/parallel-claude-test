@@ -255,7 +255,7 @@ export function validateFieldOptions(type: PetitionFieldType, options: any) {
 
 export function defaultFieldProperties(
   type: PetitionFieldType,
-  field?: PetitionField
+  field?: PetitionField,
 ): Partial<CreatePetitionField> {
   // Always inherit optional
   const optional = field?.optional ?? false;

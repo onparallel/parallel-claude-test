@@ -26,10 +26,10 @@ type SignatureOrgIntegration = Replace<
 /** starts a signature request on the petition */
 async function startSignatureProcess(
   payload: { petitionSignatureRequestId: number },
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const enqueued = await ctx.petitions.loadPetitionSignatureById.raw(
-    payload.petitionSignatureRequestId
+    payload.petitionSignatureRequestId,
   );
   // the signature wasn't found or with status !== ENQUEUED, ignore and finish
   if (!enqueued || enqueued.status !== "ENQUEUED") {
@@ -81,7 +81,7 @@ async function startSignatureProcess(
     const signatureClient = ctx.signature.getClient(integration);
 
     const petitionTheme = await ctx.organizations.loadOrganizationTheme(
-      petition.document_organization_theme_id
+      petition.document_organization_theme_id,
     );
 
     if (petitionTheme?.type !== "PDF_DOCUMENT") {
@@ -106,12 +106,12 @@ async function startSignatureProcess(
       {
         locale: petition.recipient_locale,
         initialMessage: message,
-      }
+      },
     );
 
     // remove events array from data before saving to DB
     data.documents = data.documents.map((doc) =>
-      removeKeys(doc as any, ([key]) => key !== "events")
+      removeKeys(doc as any, ([key]) => key !== "events"),
     );
 
     // update signers on signature_config to include the externalId provided by provider so we can match it later on events webhook
@@ -119,7 +119,7 @@ async function startSignatureProcess(
       (signer, signerIndex) => ({
         ...signer,
         externalId: findSignerExternalId(data.documents, signer, signerIndex),
-      })
+      }),
     );
 
     await ctx.petitions.updatePetitionSignatures(signature.id, {
@@ -171,7 +171,7 @@ async function startSignatureProcess(
           signersInfo: signature.signature_config.signersInfo,
         },
       },
-      ctx.config.instanceName
+      ctx.config.instanceName,
     );
 
     if (errorCode === "UNKNOWN_ERROR") {
@@ -189,7 +189,7 @@ async function startSignatureProcess(
 /** cancels the signature request for all signers on the petition */
 async function cancelSignatureProcess(
   payload: { petitionSignatureRequestId: number },
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
@@ -202,12 +202,12 @@ async function cancelSignatureProcess(
     // here we need to lookup all signature integrations, also disabled and deleted ones
     // this is because the user could have deleted their signature integration, triggering a cancel of all pending signature requests
     const integration = (await ctx.integrations.loadAnySignatureIntegration(
-      orgIntegrationId
+      orgIntegrationId,
     )) as SignatureOrgIntegration | null;
 
     if (!integration) {
       throw new Error(
-        `Couldn't find a signature integration for OrgIntegration:${orgIntegrationId}`
+        `Couldn't find a signature integration for OrgIntegration:${orgIntegrationId}`,
       );
     }
     const signatureClient = ctx.signature.getClient(integration);
@@ -225,7 +225,7 @@ async function cancelSignatureProcess(
 /** sends a reminder email to every pending signer of the signature request */
 async function sendSignatureReminder(
   payload: { petitionSignatureRequestId: number; userId: number },
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
@@ -235,7 +235,7 @@ async function sendSignatureReminder(
 
     if (!signature.external_id) {
       throw new Error(
-        `Can't find external_id on PetitionSignatureRequest:${payload.petitionSignatureRequestId}`
+        `Can't find external_id on PetitionSignatureRequest:${payload.petitionSignatureRequestId}`,
       );
     }
     const { orgIntegrationId } = signature.signature_config;
@@ -265,7 +265,7 @@ async function storeSignedDocument(
     signedDocumentExternalId: string;
     signer: PetitionSignatureConfigSigner;
   },
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
@@ -289,10 +289,10 @@ async function storeSignedDocument(
         `_${intl.formatMessage({
           id: "signature-worker.signed",
           defaultMessage: "signed",
-        })}.pdf`
+        })}.pdf`,
       ),
       integration.id,
-      ctx
+      ctx,
     );
 
     await ctx.petitions.createEvent({
@@ -312,7 +312,7 @@ async function storeSignedDocument(
     await ctx.petitions.updatePetition(
       petition.id,
       { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
-      ctx.config.instanceName
+      ctx.config.instanceName,
     );
 
     const petitionSignatures = await ctx.petitions.loadPetitionSignaturesByPetitionId(petition.id);
@@ -323,7 +323,7 @@ async function storeSignedDocument(
       await ctx.emails.sendPetitionCompletedEmail(
         petition.id,
         { signer: payload.signer },
-        ctx.config.instanceName
+        ctx.config.instanceName,
       );
     }
   } catch (error) {
@@ -335,7 +335,7 @@ async function storeSignedDocument(
 
 async function storeAuditTrail(
   payload: { petitionSignatureRequestId: number; signedDocumentExternalId: string },
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
@@ -352,10 +352,10 @@ async function storeAuditTrail(
       await client.downloadAuditTrail(payload.signedDocumentExternalId),
       sanitizeFilenameWithSuffix(
         title || (await getDefaultFileName(petition.id, petition.recipient_locale, ctx)),
-        "_audit_trail.pdf"
+        "_audit_trail.pdf",
       ),
       integration.id,
-      ctx
+      ctx,
     );
 
     await ctx.petitions.updatePetitionSignatures(signature.id, {
@@ -373,11 +373,11 @@ async function updateOrganizationBranding(
     orgId: number;
     integrationId: Maybe<number>;
   },
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
     payload.orgId,
-    "SIGNATURE"
+    "SIGNATURE",
   );
 
   await pMap(
@@ -390,7 +390,7 @@ async function updateOrganizationBranding(
 
       await ctx.signature.getClient(integration).onOrganizationBrandChange?.(payload.orgId);
     },
-    { concurrency: 1 }
+    { concurrency: 1 },
   );
 }
 
@@ -433,22 +433,22 @@ createQueueWorker(
               error: "fork process timed out",
               error_code: "TIMEOUT",
             },
-          }
+          },
         );
       }
     },
-  }
+  },
 );
 
 async function fetchOrgSignatureIntegration(
   orgIntegrationId: number,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ): Promise<SignatureOrgIntegration> {
   const signatureIntegration = await ctx.integrations.loadIntegration(orgIntegrationId);
 
   if (!signatureIntegration || signatureIntegration.type !== "SIGNATURE") {
     throw new Error(
-      `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`
+      `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`,
     );
   }
 
@@ -475,7 +475,7 @@ async function fetchPetitionSignature(petitionSignatureRequestId: number, ctx: W
 function findSignerExternalId(
   documents: SignatureResponse["documents"],
   signer: PetitionSignatureConfigSigner,
-  signerIndex: number
+  signerIndex: number,
 ) {
   const signerByEmail = documents.filter((d) => d.email === signer.email);
 
@@ -488,8 +488,8 @@ function findSignerExternalId(
     if (!externalId) {
       throw new Error(
         `Index out of bounds on signature document. document:${JSON.stringify(
-          documents
-        )}, index: ${signerIndex} `
+          documents,
+        )}, index: ${signerIndex} `,
       );
     }
     return externalId;
@@ -497,8 +497,8 @@ function findSignerExternalId(
     // if no signers were found with that email, there's an error
     throw new Error(
       `Can't find signer by email on document. signer:${JSON.stringify(
-        signer
-      )}. documents: ${JSON.stringify(documents)}`
+        signer,
+      )}. documents: ${JSON.stringify(documents)}`,
     );
   }
 }
@@ -507,7 +507,7 @@ async function storeDocument(
   buffer: Buffer,
   filename: string,
   integrationId: number,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const path = random(16);
   const res = await ctx.storage.fileUploads.uploadFile(path, "application/pdf", buffer);
@@ -520,7 +520,7 @@ async function storeDocument(
       size: res["ContentLength"]!.toString(),
       upload_complete: true,
     },
-    ctx.config.instanceName
+    ctx.config.instanceName,
   );
   return file;
 }
@@ -537,7 +537,7 @@ async function storeTemporaryDocument(filePath: string, filename: string, ctx: W
       path,
       size: res["ContentLength"]!.toString(),
     },
-    ctx.config.instanceName
+    ctx.config.instanceName,
   );
 }
 

@@ -77,7 +77,7 @@ export function PreviewPetitionFieldKyc({
       await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
-    [onDeleteReply]
+    [onDeleteReply],
   );
 
   const browserTabRef = useRef<Window>();
@@ -91,7 +91,7 @@ export function PreviewPetitionFieldKyc({
       }
     },
     10000,
-    [onRefreshField, state, field.replies.length]
+    [onRefreshField, state, field.replies.length],
   );
 
   useWindowEvent(
@@ -102,7 +102,7 @@ export function PreviewPetitionFieldKyc({
         onRefreshField();
       }
     },
-    [onRefreshField]
+    [onRefreshField],
   );
 
   const showDowJonesRestrictedDialog = usePreviewDowJonesPermissionDeniedDialog();
@@ -110,7 +110,7 @@ export function PreviewPetitionFieldKyc({
     if (petition.organization.hasDowJones) {
       setState("FETCHING");
       browserTabRef.current = await openNewWindow(
-        `/${intl.locale}/app/petitions/${petition.id}/preview/dowjones/${field.id}`
+        `/${intl.locale}/app/petitions/${petition.id}/preview/dowjones/${field.id}`,
       );
       if (isCacheOnly) {
         setState("IDLE");

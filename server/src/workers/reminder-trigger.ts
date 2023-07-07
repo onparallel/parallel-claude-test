@@ -16,10 +16,10 @@ createCronWorker("reminder-trigger", async (context) => {
             access.id,
             petition?.status === "PENDING"
               ? calculateNextReminder(new Date(), access.reminders_config!)
-              : null
+              : null,
           );
         },
-        { concurrency: 5 }
+        { concurrency: 5 },
       )
     ).filter((access) => access.next_reminder_at !== null);
     const reminders = await context.petitions.createReminders(
@@ -28,7 +28,7 @@ createCronWorker("reminder-trigger", async (context) => {
         status: "PROCESSING",
         type: "AUTOMATIC",
         created_by: `PetitionAccess:${access.id}`,
-      }))
+      })),
     );
     await context.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
     await context.petitions.createEvent(
@@ -38,7 +38,7 @@ createCronWorker("reminder-trigger", async (context) => {
         data: {
           petition_reminder_id: reminder.id,
         },
-      }))
+      })),
     );
   }
 });

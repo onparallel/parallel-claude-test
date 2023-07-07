@@ -31,7 +31,7 @@ export function useDeletePetitions() {
   const handleDeletePetitions = async (
     petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[],
     type: PetitionBaseType,
-    { force, dryrun }: { force?: boolean; dryrun?: boolean }
+    { force, dryrun }: { force?: boolean; dryrun?: boolean },
   ) => {
     const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
     const petitionIds = petitions.map((p) => p.id);
@@ -51,12 +51,12 @@ export function useDeletePetitions() {
       petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[],
       type: PetitionBaseType,
       currentPath?: string,
-      skipConfirmDialogs?: boolean
+      skipConfirmDialogs?: boolean,
     ) => {
       try {
         // first do a dry-run to check if errors will happen when deleting the petition
         const [error] = await withError(
-          handleDeletePetitions(petitionsOrFolders, type, { dryrun: true })
+          handleDeletePetitions(petitionsOrFolders, type, { dryrun: true }),
         );
         if (error && isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
           if (!skipConfirmDialogs) {
@@ -172,7 +172,7 @@ export function useDeletePetitions() {
         throw error;
       }
     },
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -226,7 +226,7 @@ function ConfirmDeletePetitionsDialog({
                         name: <PathName path={folders[0].path} type={type} />,
                         petitionCount: folderPetitionCount,
                         type,
-                      }
+                      },
                     )
                   : null,
                 petitions.length > 0
@@ -240,10 +240,10 @@ function ConfirmDeletePetitionsDialog({
                         count: petitions.length,
                         name: <PetitionNameWithPath petition={petitions[0]} />,
                         type,
-                      }
+                      },
                     )
                   : null,
-              ].filter(isDefined)
+              ].filter(isDefined),
             ),
           }}
         />

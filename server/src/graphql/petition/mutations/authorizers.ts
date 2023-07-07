@@ -16,7 +16,7 @@ async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
     }
     // ids of users in my same organization
     return (await ctx.users.loadUser(userIds)).every(
-      (u) => isDefined(u) && u.org_id === ctx.user!.org_id
+      (u) => isDefined(u) && u.org_id === ctx.user!.org_id,
     );
   } catch {}
   return false;
@@ -25,7 +25,7 @@ async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
 export function userHasAccessToUsers<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
@@ -38,7 +38,7 @@ type UserOrUserGroupPermissionInput = NexusGen["inputTypes"]["UserOrUserGroupPer
 export function userHasAccessToUserOrUserGroupPermissions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, UserOrUserGroupPermissionInput[] | null | undefined>
+  TArg extends Arg<TypeName, FieldName, UserOrUserGroupPermissionInput[] | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -59,11 +59,11 @@ export function userHasAccessToUserOrUserGroupPermissions<
       const [hasAccessToUsers, hasAccessToUserGroups] = await Promise.all([
         contextUserHasAccessToUsers(
           uPermissions.map((p) => p.userId!),
-          ctx
+          ctx,
         ),
         contextUserHasAccessToUserGroups(
           ugPermissions.map((p) => p.userGroupId!),
-          ctx
+          ctx,
         ),
       ]);
       return hasAccessToUsers && hasAccessToUserGroups;
@@ -75,7 +75,7 @@ export function userHasAccessToUserOrUserGroupPermissions<
 export function argUserHasStatus<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameUserId: TArg, status: UserStatus): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -93,10 +93,10 @@ export function argUserHasStatus<
 export function userHasAccessToPublicPetitionLink<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argName: TArg,
-  permissionTypes?: PetitionPermissionType[]
+  permissionTypes?: PetitionPermissionType[],
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -108,7 +108,7 @@ export function userHasAccessToPublicPetitionLink<
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
         publicPetitionLinks.map((ppl) => ppl.template_id),
-        permissionTypes
+        permissionTypes,
       );
     } catch {}
     return false;
@@ -118,7 +118,7 @@ export function userHasAccessToPublicPetitionLink<
 export function userCanSendAs<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, Maybe<number>>
+  TArg extends Arg<TypeName, FieldName, Maybe<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const senderId = args[argName] as unknown as Maybe<number>;
@@ -128,7 +128,7 @@ export function userCanSendAs<
     try {
       const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
         ctx.user!.org_id,
-        "ON_BEHALF_OF"
+        "ON_BEHALF_OF",
       );
       if (!hasFeatureFlag) {
         return false;
@@ -149,11 +149,11 @@ export function petitionCanUploadAttachments<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
-  TArgFileUploadInput extends Arg<TypeName, FieldName, any[]>
+  TArgFileUploadInput extends Arg<TypeName, FieldName, any[]>,
 >(
   petitionIdArg: TArgPetitionId,
   dataArrArg: TArgFileUploadInput,
-  maxAllowed: number
+  maxAllowed: number,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const petitionId = args[petitionIdArg] as unknown as number;

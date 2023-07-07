@@ -26,7 +26,7 @@ export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonI
     placement,
     ...props
   }: ResponsiveButtonIconProps,
-  ref
+  ref,
 ) {
   const isOnlyIcon = useBreakpointValue({ base: true, [breakpoint]: false });
   return (

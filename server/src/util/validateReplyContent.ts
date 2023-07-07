@@ -198,7 +198,7 @@ export function validateReplyContent(field: PetitionField, content: any) {
           }
           values =
             (values as DynamicSelectOption[]).find(
-              ([value]) => value === content.value[level][1]
+              ([value]) => value === content.value[level][1],
             )?.[1] ?? [];
         }
       }

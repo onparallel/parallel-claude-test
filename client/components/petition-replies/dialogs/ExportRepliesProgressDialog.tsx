@@ -66,7 +66,7 @@ export function ExportRepliesProgressDialog({
       }
       const rename = placeholdersRename(petition.fields);
       const replies = petition.fields.flatMap((field) =>
-        field.replies.map((reply) => ({ reply, field }))
+        field.replies.map((reply) => ({ reply, field })),
       );
 
       const hasTextReplies = !!replies.find((r) => !isFileTypeField(r.field.type));
@@ -114,12 +114,12 @@ export function ExportRepliesProgressDialog({
                 onProgress: ({ loaded, total }) =>
                   setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
                 signal: abort.signal,
-              }
+              },
             );
           } catch (e) {
             if (e instanceof CuatrecasasExportError) {
               const [stop] = await withError(
-                showExportFailedDialog(pick(e, ["fileName", "fieldName"]))
+                showExportFailedDialog(pick(e, ["fileName", "fieldName"])),
               );
 
               if (stop) {
@@ -145,7 +145,7 @@ export function ExportRepliesProgressDialog({
               signal: abort.signal,
               onProgress: ({ loaded, total }) =>
                 setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
-            }
+            },
           );
           setProgress(++uploaded / totalFiles);
         }
@@ -160,7 +160,7 @@ export function ExportRepliesProgressDialog({
               signal: abort.signal,
               onProgress: ({ loaded, total }) =>
                 setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
-            }
+            },
           );
           setProgress(++uploaded / totalFiles);
         }

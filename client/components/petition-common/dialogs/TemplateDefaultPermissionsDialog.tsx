@@ -82,7 +82,7 @@ export function TemplateDefaultPermissionsDialog({
   const nonOwnerUserPermissions = userPermissions.filter((p) => p.permissionType !== "OWNER");
 
   const groupPermissions = defaultPermissions.filter(
-    isTypename("TemplateDefaultUserGroupPermission")
+    isTypename("TemplateDefaultUserGroupPermission"),
   );
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export function TemplateDefaultPermissionsDialog({
         includeGroups: true,
       });
     },
-    [_handleSearchUsers, defaultPermissions]
+    [_handleSearchUsers, defaultPermissions],
   );
 
   function mapPermission(p: TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment) {
@@ -126,7 +126,7 @@ export function TemplateDefaultPermissionsDialog({
 
   const handleRemovePermission = async (templateDefaultPermissionId: string) => {
     await onUpdatePermissions(
-      defaultPermissions.filter((p) => p.id !== templateDefaultPermissionId).map(mapPermission)
+      defaultPermissions.filter((p) => p.id !== templateDefaultPermissionId).map(mapPermission),
     );
   };
 
@@ -145,13 +145,13 @@ export function TemplateDefaultPermissionsDialog({
             return p;
           }
         })
-        .map(mapPermission)
+        .map(mapPermission),
     );
   };
 
   const handleChangePermission = async (
     templateDefaultPermissionId: string,
-    permissionType: PetitionPermissionTypeRW
+    permissionType: PetitionPermissionTypeRW,
   ) => {
     await onUpdatePermissions(
       defaultPermissions
@@ -162,7 +162,7 @@ export function TemplateDefaultPermissionsDialog({
             return p;
           }
         })
-        .map(mapPermission)
+        .map(mapPermission),
     );
   };
 
@@ -189,7 +189,7 @@ export function TemplateDefaultPermissionsDialog({
                       ? { userGroupId: x.id }
                       : (null as never)),
                   }))
-                  .concat(defaultPermissions.map(mapPermission))
+                  .concat(defaultPermissions.map(mapPermission)),
               );
               setValue("editors", []);
             } catch {}
@@ -297,7 +297,7 @@ export function TemplateDefaultPermissionsDialog({
                   onTransfer={() => handleTransferOwnership(permission.id)}
                   onChange={handleChangePermission}
                   isSubscribed={effectiveDefaultPermissions.some(
-                    (ep) => ep.user.id === permission.user.id && ep.isSubscribed
+                    (ep) => ep.user.id === permission.user.id && ep.isSubscribed,
                   )}
                 />
               ))}

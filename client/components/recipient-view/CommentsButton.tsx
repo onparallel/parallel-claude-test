@@ -22,7 +22,7 @@ export const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
           defaultMessage:
             "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
         },
-        { commentCount }
+        { commentCount },
       ),
       ...props,
     } as const;
@@ -45,5 +45,5 @@ export const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
         {...common}
       />
     );
-  }
+  },
 );

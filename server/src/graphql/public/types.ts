@@ -200,12 +200,12 @@ export const PublicPetition = objectType({
               userId: user?.id,
               petitionAccessId: ctx.access!.id,
             },
-            { publicContext: true }
+            { publicContext: true },
           );
 
           return renderSlateWithPlaceholdersToHtml(
             safeJsonParse(o.completing_message_body),
-            getValues
+            getValues,
           );
         }
         return null;
@@ -265,7 +265,7 @@ export const PublicPetitionMessage = objectType({
         const messages = await ctx.petitions.loadMessagesByPetitionId(root.id);
         const firstMessage = minBy(
           messages,
-          (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()
+          (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf(),
         );
 
         return firstMessage?.scheduled_at ?? firstMessage?.created_at ?? null;
@@ -669,7 +669,7 @@ export const PublicPublicPetitionLink = objectType({
         if (!owner) return false;
         const orgLimits = await ctx.organizations.loadCurrentOrganizationUsageLimit(
           owner.user.org_id,
-          "PETITION_SEND"
+          "PETITION_SEND",
         );
         if (!orgLimits || orgLimits.used >= orgLimits.limit) {
           return false;

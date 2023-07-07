@@ -23,7 +23,7 @@ export const NetDocumentsLink = chakraForwardRef<"a", NetDocumentsLinkProps>(
         />
       </NormalLink>
     );
-  }
+  },
 );
 
 export const NetDocumentsIconButton = chakraForwardRef<

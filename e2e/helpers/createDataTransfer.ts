@@ -4,7 +4,7 @@ import { join } from "path";
 
 export async function createDataTransfer(
   page: Page,
-  { filePath, fileName, fileType }: { filePath: string; fileName: string; fileType: string }
+  { filePath, fileName, fileType }: { filePath: string; fileName: string; fileType: string },
 ) {
   const buffer = await readFile(join(__dirname, filePath));
   return await page.evaluateHandle(
@@ -15,6 +15,6 @@ export async function createDataTransfer(
       dt.items.add(file);
       return dt;
     },
-    [buffer, fileName, fileType] as [Buffer, string, string]
+    [buffer, fileName, fileType] as [Buffer, string, string],
   );
 }

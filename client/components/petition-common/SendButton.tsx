@@ -12,7 +12,7 @@ export interface SendButtonProps extends ButtonOptions, ThemingProps<"Button"> {
 
 export const SendButton = chakraForwardRef<"button", SendButtonProps>(function SendButton(
   { onSendClick, onScheduleClick, ...props },
-  ref
+  ref,
 ) {
   return (
     <ButtonWithMoreOptions

@@ -66,7 +66,7 @@ export const PetitionLayout = Object.assign(
       onRefetch,
       ...props
     },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const title = useMemo(
@@ -100,7 +100,7 @@ export const PetitionLayout = Object.assign(
               id: "generic.template",
               defaultMessage: "Template",
             }),
-      [section, intl.locale]
+      [section, intl.locale],
     );
 
     const headerRef = useRef<PetitionHeaderInstance>(null);
@@ -214,7 +214,7 @@ export const PetitionLayout = Object.assign(
         ${PetitionHeader.fragments.Query}
       `,
     },
-  }
+  },
 );
 
 const MotionSection = chakra(motion.section);
@@ -229,13 +229,13 @@ interface PetitionLayoutContext {
 const PetitionLayoutContext = createContext<
   [
     value: PetitionLayoutContext | null,
-    setValue: Dispatch<SetStateAction<PetitionLayoutContext>> | null
+    setValue: Dispatch<SetStateAction<PetitionLayoutContext>> | null,
   ]
 >([null, null]);
 
 export function withPetitionLayoutContext<P>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Component: ComponentType<P>
+  Component: ComponentType<P>,
 ): ComponentType<P> {
   const WithPetitionLayoutContext: ComponentType<P> = function (props) {
     const [value, setValue] = useState<PetitionLayoutContext>({
@@ -271,7 +271,7 @@ export function createUseContextSlice<K extends keyof PetitionLayoutContext>(key
 export const usePetitionState = createUseContextSlice("state", "usePetitionState");
 export const usePetitionShouldConfirmNavigation = createUseContextSlice(
   "shouldConfirmNavigation",
-  "usePetitionShouldConfirmNavigation"
+  "usePetitionShouldConfirmNavigation",
 );
 
 const HANDLED_ERRORS = ["ALIAS_ALREADY_EXISTS"];
@@ -282,7 +282,7 @@ export function usePetitionStateWrapper() {
   const [, setState] = usePetitionState();
   if (!isDefined(setState)) {
     throw new Error(
-      "usePetitionStateWrapper is being used without using withPetitionLayoutContext"
+      "usePetitionStateWrapper is being used without using withPetitionLayoutContext",
     );
   }
   return useCallback(function <T extends (...args: any[]) => Promise<any>>(updater: T) {

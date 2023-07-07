@@ -14,7 +14,7 @@ export function OptimizedMenuList(props: MenuListProps) {
       width=""
       height={Math.min(
         (style as any).maxHeight,
-        (children as any[]).length * itemSize + 2 * padding
+        (children as any[]).length * itemSize + 2 * padding,
       )}
       itemCount={(children as any[]).length ?? 0}
       itemSize={itemSize}
@@ -32,7 +32,7 @@ export function OptimizedMenuList(props: MenuListProps) {
 
 const InnerElementType = forwardRef<HTMLDivElement, any>(function InnerElementType(
   { style, ...props },
-  ref
+  ref,
 ) {
   return (
     <div

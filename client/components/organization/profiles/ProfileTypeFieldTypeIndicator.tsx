@@ -20,7 +20,7 @@ export const ProfileTypeFieldTypeIndicator = chakraForwardRef<
   ProfileTypeFieldTypeIndicatorProps
 >(function ProfileTypeFieldTypeIndicator(
   { type, fieldIndex, isTooltipDisabled, hideIcon, ...props }: ProfileTypeFieldTypeIndicatorProps,
-  ref
+  ref,
 ) {
   const label = useProfileTypeFieldTypeLabel(type);
   const color = useProfileTypeFieldTypeColor(type);

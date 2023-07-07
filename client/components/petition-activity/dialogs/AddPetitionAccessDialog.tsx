@@ -95,7 +95,7 @@ export function AddPetitionAccessDialog({
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
   const [remindersConfig, setRemindersConfig] = useState<Maybe<RemindersConfig>>(
-    petition.remindersConfig ? omit(petition.remindersConfig, ["__typename"]) : null
+    petition.remindersConfig ? omit(petition.remindersConfig, ["__typename"]) : null,
   );
   const [signatureConfig, setSignatureConfig] = useState(() =>
     petition.signatureConfig
@@ -103,7 +103,7 @@ export function AddPetitionAccessDialog({
           ...pick(petition.signatureConfig, ["allowAdditionalSigners", "review"]),
           signers: petition.signatureConfig.signers as SignatureConfigInputSigner[],
         }
-      : null
+      : null,
   );
 
   const showSendAs = user.hasOnBehalfOf && (isAdmin(user.role) || user.delegateOf.length > 0);
@@ -116,7 +116,7 @@ export function AddPetitionAccessDialog({
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, { excludeUsers });
     },
-    [_handleSearchUsers]
+    [_handleSearchUsers],
   );
 
   const [sendAsId, setSendAsId] = useState(
@@ -125,7 +125,7 @@ export function AddPetitionAccessDialog({
     isDefined(petition.defaultOnBehalf) &&
       sendAsOptions.some((o) => o.id === petition.defaultOnBehalf!.id)
       ? petition.defaultOnBehalf.id
-      : user.id
+      : user.id,
   );
 
   const handleSearchContactsByEmail = useSearchContactsByEmail();
@@ -141,7 +141,7 @@ export function AddPetitionAccessDialog({
       setSubject(value);
       updateSubject({ emailSubject: value || null });
     },
-    [updateSubject]
+    [updateSubject],
   );
 
   const handleBodyChange = useCallback(
@@ -149,7 +149,7 @@ export function AddPetitionAccessDialog({
       setBody(value);
       updateBody({ emailBody: isEmptyRTEValue(value) ? null : value });
     },
-    [updateBody]
+    [updateBody],
   );
 
   const handleRemindersConfigChange = useCallback(
@@ -159,7 +159,7 @@ export function AddPetitionAccessDialog({
         remindersConfig: value ? omit(value, ["__typename"]) : null,
       });
     },
-    [updateRemindersConfig]
+    [updateRemindersConfig],
   );
 
   const recipientsRef = useRef<HTMLInputElement>(null);
@@ -167,7 +167,7 @@ export function AddPetitionAccessDialog({
   const isValid = Boolean(
     subject &&
       !isEmptyRTEValue(body) &&
-      recipientGroups.every((g) => g.length > 0 && g.every((r) => !r.isInvalid && !r.isDeleted))
+      recipientGroups.every((g) => g.length > 0 && g.every((r) => !r.isInvalid && !r.isDeleted)),
   );
 
   const showScheduleMessageDialog = useScheduleMessageDialog();

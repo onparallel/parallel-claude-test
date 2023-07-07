@@ -105,7 +105,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
     }),
-    [petitionId]
+    [petitionId],
   );
 
   useEffect(() => {
@@ -207,7 +207,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     me,
     isPetition ? petition : null,
     handleUpdatePetition,
-    _validatePetitionFields
+    _validatePetitionFields,
   );
 
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
@@ -220,7 +220,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         setFinalized(true);
         const canFinalize = petition.fields.every(
           (f, index) =>
-            !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
+            !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly,
         );
         if (canFinalize && isPetition) {
           const presetSigners = petition!.signatureConfig?.signers.filter(isDefined) ?? [];
@@ -239,7 +239,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
           await showTestSignatureDialog(
             petition.signatureConfig?.integration?.environment,
-            petition.signatureConfig?.integration?.name
+            petition.signatureConfig?.integration?.name,
           );
 
           if (completeSignerInfoData !== null) {
@@ -336,12 +336,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             `/app/petitions/${query.petitionId}/preview?${new URLSearchParams({
               page: page.toString(),
               field: field.id,
-            })}`
+            })}`,
           );
         }
       } catch {}
     },
-    [petition.fields, visibility, router, query]
+    [petition.fields, visibility, router, query],
   );
 
   const displayPetitionLimitReachedAlert =
@@ -356,7 +356,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     petition.__typename === "PetitionTemplate" &&
     petition.publicLink?.isActive &&
     petition.fields.some(
-      (f) => !isFileTypeField(f.type) && isDefined(f.alias) && f.previewReplies.length > 0
+      (f) => !isFileTypeField(f.type) && isDefined(f.alias) && f.previewReplies.length > 0,
     );
   const showGeneratePrefilledPublicLinkDialog = useGeneratePrefilledPublicLinkDialog();
   async function handleGeneratePrefilledPublicLinkClick() {
@@ -775,5 +775,5 @@ export default compose(
   withMetadata,
   withPetitionLayoutContext,
   withDialogs,
-  withApolloData
+  withApolloData,
 )(PetitionPreview);

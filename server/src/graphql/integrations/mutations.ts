@@ -15,7 +15,7 @@ export const markSignatureIntegrationAsDefault = mutationField(
     authorize: authenticateAnd(
       contextUserHasRole("ADMIN"),
       userHasFeatureFlag("PETITION_SIGNATURE"),
-      userHasAccessToIntegrations("id", ["SIGNATURE"])
+      userHasAccessToIntegrations("id", ["SIGNATURE"]),
     ),
     args: {
       id: nonNull(globalIdArg("OrgIntegration")),
@@ -25,10 +25,10 @@ export const markSignatureIntegrationAsDefault = mutationField(
         id,
         "SIGNATURE",
         ctx.user!.org_id,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     },
-  }
+  },
 );
 
 export const createSignaturitIntegration = mutationField("createSignaturitIntegration", {
@@ -50,7 +50,7 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
         },
         args.apiKey,
         false,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     } catch {
       throw new ApolloError(`Unable to validate credentials`, "INVALID_CREDENTIALS_ERROR");
@@ -65,7 +65,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasFeatureFlag("PETITION_SIGNATURE"),
-    userHasAccessToIntegrations("id", ["SIGNATURE"])
+    userHasAccessToIntegrations("id", ["SIGNATURE"]),
   ),
   args: {
     id: nonNull(globalIdArg("OrgIntegration")),
@@ -74,21 +74,21 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
   resolve: async (_, args, ctx) => {
     const currentSignatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
       ctx.user!.org_id,
-      "SIGNATURE"
+      "SIGNATURE",
     );
 
     if (currentSignatureIntegrations.length < 2) {
       throw new ApolloError(
         "There are not enough integrations to be able to delete the requested integration.",
-        "INSUFFICIENT_SIGNATURE_INTEGRATIONS_ERROR"
+        "INSUFFICIENT_SIGNATURE_INTEGRATIONS_ERROR",
       );
     }
 
     const pendingSignatures = await ctx.petitions.loadPendingSignatureRequestsByIntegrationId(
-      args.id
+      args.id,
     );
     const pendingPetitionsWithSignatures = await ctx.petitions.loadPetitionsByOrgIntegrationId(
-      args.id
+      args.id,
     );
 
     if (
@@ -100,7 +100,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
         "SIGNATURE_INTEGRATION_IN_USE_ERROR",
         {
           pendingSignaturesCount: pendingPetitionsWithSignatures.length || pendingSignatures.length,
-        }
+        },
       );
     }
 
@@ -111,7 +111,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
           {
             signature_config: null,
           },
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
       }
       if (pendingSignatures.length > 0) {
@@ -142,7 +142,7 @@ export const createDowJonesKycIntegration = mutationField("createDowJonesKycInte
     ) {
       throw new ApolloError(
         `You already have an active Dow Jones integration`,
-        "INTEGRATION_ALREADY_EXISTS_ERROR"
+        "INTEGRATION_ALREADY_EXISTS_ERROR",
       );
     }
 
@@ -153,7 +153,7 @@ export const createDowJonesKycIntegration = mutationField("createDowJonesKycInte
           name: "Dow Jones KYC",
         },
         { CLIENT_ID: args.clientId, USERNAME: args.username, PASSWORD: args.password },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     } catch {
       throw new ApolloError(`Unable to validate credentials`, "INVALID_CREDENTIALS_ERROR");
@@ -168,7 +168,7 @@ export const deleteDowJonesKycIntegration = mutationField("deleteDowJonesKycInte
   resolve: async (_, args, ctx) => {
     const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
       ctx.user!.org_id,
-      "DOW_JONES_KYC"
+      "DOW_JONES_KYC",
     );
     if (integration) {
       await ctx.integrations.deleteOrgIntegration(integration.id, `User:${ctx.user!.id}`);

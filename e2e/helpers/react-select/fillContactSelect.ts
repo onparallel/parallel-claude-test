@@ -6,7 +6,7 @@ import { waitForSelectLoading } from "./waitForSelectLoading";
 export async function fillContactSelect(
   page: Page,
   select: Locator,
-  recipients: { email: string; firstName?: string | undefined; lastName?: string | undefined }[]
+  recipients: { email: string; firstName?: string | undefined; lastName?: string | undefined }[],
 ) {
   await select.click();
   const input = select.locator("input");

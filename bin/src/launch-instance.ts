@@ -70,7 +70,7 @@ async function main() {
     .send(
       new DescribeImagesCommand({
         ImageIds: [IMAGE_ID],
-      })
+      }),
     )
     .then((res) => res.Images![0]);
 
@@ -135,7 +135,7 @@ async function main() {
                   HttpTokens: HttpTokensState.required,
                   InstanceMetadataTags: InstanceMetadataTagsState.enabled,
                 },
-              })
+              }),
             );
           } catch (e) {
             if (e instanceof EC2ServiceException && e.name === "InsufficientInstanceCapacity") {
@@ -155,12 +155,12 @@ async function main() {
       await waitFor(
         async () => {
           const result = await ec2.send(
-            new DescribeInstanceStatusCommand({ InstanceIds: [instanceId] })
+            new DescribeInstanceStatusCommand({ InstanceIds: [instanceId] }),
           );
           return result.InstanceStatuses?.[0]?.InstanceState?.Name === InstanceStateName.running;
         },
         chalk`Instance {bold ${instanceId}} {yellow pending}. Waiting 10 more seconds...`,
-        10000
+        10000,
       );
       console.log(chalk`Instance {bold ${instanceId}} {green ✓ running}`);
       await waitForInstance(ipAddress);
@@ -169,7 +169,7 @@ async function main() {
       await copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
       await executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
     },
-    { concurrency: 4 }
+    { concurrency: 4 },
   );
 }
 
@@ -186,6 +186,6 @@ async function waitForInstance(ipAddress: string) {
       }
     },
     chalk`SSH not available. Waiting 5 more seconds...`,
-    5000
+    5000,
   );
 }

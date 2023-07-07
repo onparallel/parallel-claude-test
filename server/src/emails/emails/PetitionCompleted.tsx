@@ -44,7 +44,7 @@ const email: Email<PetitionCompletedProps> = {
             id: "generic.unnamed-parallel",
             defaultMessage: "Unnamed parallel",
           }),
-      }
+      },
     );
   },
   text(
@@ -58,7 +58,7 @@ const email: Email<PetitionCompletedProps> = {
       contactEmail,
       parallelUrl,
     }: PetitionCompletedProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       ${greetingUser({ name: userName }, intl)}
@@ -78,7 +78,7 @@ const email: Email<PetitionCompletedProps> = {
                     id: "generic.unnamed-parallel",
                     defaultMessage: "Unnamed parallel",
                   }),
-              }
+              },
             )
           : intl.formatMessage(
               {
@@ -93,7 +93,7 @@ const email: Email<PetitionCompletedProps> = {
                     id: "generic.unnamed-parallel",
                     defaultMessage: "Unnamed parallel",
                   }),
-              }
+              },
             )
       }
 

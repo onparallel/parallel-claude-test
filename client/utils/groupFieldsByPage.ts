@@ -16,7 +16,7 @@ export interface GroupFieldsByPagesOptions {
 export function groupFieldsByPages<T extends PetitionFieldSelection>(
   fields: T[],
   visibility: boolean[],
-  { hideInternalFields, isPdf }: GroupFieldsByPagesOptions
+  { hideInternalFields, isPdf }: GroupFieldsByPagesOptions,
 ): T[][] {
   const pages: T[][] = [];
   let page: T[] = [];

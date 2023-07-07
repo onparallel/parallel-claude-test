@@ -206,7 +206,7 @@ export const Organization = objectType({
           arg({
             type: "IntegrationType",
             description: "Filter by integration type.",
-          })
+          }),
         ),
       },
       authorize: isOwnOrgOrSuperAdmin(),
@@ -227,7 +227,7 @@ export const Organization = objectType({
         const integrations = await ctx.integrations.loadIntegrationsByOrgId(
           root.id,
           integration,
-          provider
+          provider,
         );
         return integrations.some((int) => int.is_enabled);
       },
@@ -268,7 +268,7 @@ export const Organization = objectType({
       resolve: async (root, args, ctx) => {
         const currentUsageLimit = await ctx.organizations.loadCurrentOrganizationUsageLimit(
           root.id,
-          args.limitName
+          args.limitName,
         );
         if (!currentUsageLimit) {
           return null;
@@ -283,9 +283,9 @@ export const Organization = objectType({
             currentUsageLimit.period,
             multiplyDuration(
               usageDetails.duration,
-              usageDetails.renewal_cycles - currentUsageLimit.cycle_number
-            )
-          )
+              usageDetails.renewal_cycles - currentUsageLimit.cycle_number,
+            ),
+          ),
         );
       },
     });

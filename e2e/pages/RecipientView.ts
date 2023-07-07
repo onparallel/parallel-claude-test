@@ -87,7 +87,7 @@ export class RecipientView {
       waitForGraphQL(
         this.page,
         (o) =>
-          o.operationName === "RecipientViewPetitionFieldMutations_publicFileUploadReplyComplete"
+          o.operationName === "RecipientViewPetitionFieldMutations_publicFileUploadReplyComplete",
       ),
       (async () => {
         const dropzone = this.page

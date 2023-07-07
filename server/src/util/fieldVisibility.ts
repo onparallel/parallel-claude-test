@@ -45,7 +45,7 @@ type VisibilityField = {
 function evaluatePredicate(
   reply: string | number | string[],
   operator: PetitionFieldVisibilityCondition["operator"],
-  value: string | string[] | number | null
+  value: string | string[] | number | null,
 ) {
   try {
     if (reply === undefined || value === undefined || value === null) {
@@ -127,7 +127,7 @@ function evaluatePredicate(
 function conditionIsMet(
   condition: PetitionFieldVisibilityCondition,
   field: VisibilityField,
-  isVisible: boolean
+  isVisible: boolean,
 ) {
   const replies = isVisible ? field.replies : [];
   const { operator, value, modifier } = condition;
@@ -167,7 +167,7 @@ export function evaluateFieldVisibility(fields: VisibilityField[]): boolean[] {
     if (field.visibility) {
       const { conditions, operator, type } = field.visibility as PetitionFieldVisibility;
       const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
-        conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
+        conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId]),
       );
       visibilitiesById[field.id] = type === "SHOW" ? result : !result;
     } else {

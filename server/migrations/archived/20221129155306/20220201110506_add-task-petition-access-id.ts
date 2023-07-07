@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.raw(
-    /* sql */ `alter table "task" drop constraint "task__user_id__petition_access_id";`
+    /* sql */ `alter table "task" drop constraint "task__user_id__petition_access_id";`,
   );
 
   await knex.from("task").whereNull("user_id").delete();

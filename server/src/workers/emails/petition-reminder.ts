@@ -9,7 +9,7 @@ import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const reminderId = payload.petition_reminder_id;
   const reminder = await context.petitions.loadReminder(reminderId);
@@ -23,7 +23,7 @@ export async function petitionReminder(
     const access = await context.petitions.loadAccess(reminder.petition_access_id);
     if (!access) {
       throw new Error(
-        `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`
+        `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`,
       );
     }
     const [petition, granterData, contact, fields, originalMessage] = await Promise.all([
@@ -38,7 +38,7 @@ export async function petitionReminder(
     }
     if (!["PENDING", "COMPLETED"].includes(petition.status!)) {
       throw new Error(
-        `Can not sent reminder for petition ${access.petition_id} with status "${petition.status}"`
+        `Can not sent reminder for petition ${access.petition_id} with status "${petition.status}"`,
       );
     }
     if (!granterData) {
@@ -51,7 +51,7 @@ export async function petitionReminder(
     const fieldIds = fields.map((f) => f.id);
     const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
     const repliesByFieldId = Object.fromEntries(
-      fieldIds.map((id, index) => [id, fieldReplies[index]])
+      fieldIds.map((id, index) => [id, fieldReplies[index]]),
     );
     const fieldsWithReplies = fields.map((f) => ({
       ...f,
@@ -60,15 +60,15 @@ export async function petitionReminder(
 
     const repliableFields = zip(
       fieldsWithReplies,
-      evaluateFieldVisibility(fieldsWithReplies)
+      evaluateFieldVisibility(fieldsWithReplies),
     ).filter(
-      ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.is_internal === false
+      ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.is_internal === false,
     );
 
     const orgId = petition.org_id;
     const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
       orgId,
-      "REMOVE_WHY_WE_USE_PARALLEL"
+      "REMOVE_WHY_WE_USE_PARALLEL",
     );
     const missingFieldCount = countBy(repliableFields, ([field]) => field.replies.length === 0);
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
@@ -92,7 +92,7 @@ export async function petitionReminder(
         showOptOutLink: remindersSent > 1,
         ...layoutProps,
       },
-      { locale: petition.recipient_locale }
+      { locale: petition.recipient_locale },
     );
     const email = await context.emailLogs.createEmail({
       from: buildFrom(from, emailFrom),

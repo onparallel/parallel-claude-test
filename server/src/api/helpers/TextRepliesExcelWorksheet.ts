@@ -15,7 +15,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
   constructor(
     worksheetName: string,
     wb: Excel.Workbook,
-    private context: ApiContext | WorkerContext
+    private context: ApiContext | WorkerContext,
   ) {
     super(worksheetName, wb);
   }
@@ -48,7 +48,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
           answer: r.content.value,
-        }))
+        })),
       );
     } else {
       this.addEmptyReply(field);
@@ -61,7 +61,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
           answer: r.content.value,
-        }))
+        })),
       );
     } else {
       this.addEmptyReply(field);
@@ -74,7 +74,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
           answer: this.intl.formatDate(r.content.value, { ...FORMATS["L"], timeZone: "Etc/UTC" }),
-        }))
+        })),
       );
     } else {
       this.addEmptyReply(field);
@@ -90,7 +90,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
             ...FORMATS["L+LTS"],
             timeZone: "Etc/UTC",
           }),
-        }))
+        })),
       );
     } else {
       this.addEmptyReply(field);
@@ -109,8 +109,8 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
                 id: "text-replies-excel-worksheet.no-answer",
                 defaultMessage: "Not replied",
               })}]`,
-          }))
-        )
+          })),
+        ),
       );
     } else {
       this.addEmptyReply(field);
@@ -124,8 +124,8 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
           (r.content.value as [string]).map((value) => ({
             title: field.title || "",
             answer: value,
-          }))
-        )
+          })),
+        ),
       );
     } else {
       this.addEmptyReply(field);
@@ -145,7 +145,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       ],
       {
         color: { argb: "FFA6A6A6" },
-      }
+      },
     );
   }
 }

@@ -13,7 +13,7 @@ import {
  * Build an initial condition based on the given field
  */
 export function defaultCondition<T extends Pick<PetitionField, "id" | "type" | "options">>(
-  value: T | [T, number]
+  value: T | [T, number],
 ): PetitionFieldVisibilityCondition {
   const [field, column] = Array.isArray(value) ? value : [value];
   const isOnlyHasReplies =
@@ -37,7 +37,7 @@ export function defaultCondition<T extends Pick<PetitionField, "id" | "type" | "
 
 function defaultConditionFieldValue<T extends Pick<PetitionField, "id" | "type" | "options">>(
   field: T,
-  column?: number
+  column?: number,
 ): number | string | null {
   if (isFileTypeField(field.type) || (field.type === "DYNAMIC_SELECT" && column === undefined)) {
     return 0;
@@ -49,7 +49,7 @@ function defaultConditionFieldValue<T extends Pick<PetitionField, "id" | "type" 
     return (
       getFirstDynamicSelectValue(
         (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
-        column!
+        column!,
       ) ?? null
     );
   } else if (field.type === "NUMBER") {
@@ -64,11 +64,11 @@ function defaultConditionFieldValue<T extends Pick<PetitionField, "id" | "type" 
 }
 
 export function updateConditionOperator<
-  T extends Pick<PetitionField, "id" | "type" | "options" | "multiple">
+  T extends Pick<PetitionField, "id" | "type" | "options" | "multiple">,
 >(
   condition: PetitionFieldVisibilityCondition,
   field: T,
-  operator: PseudoPetitionFieldVisibilityConditionOperator
+  operator: PseudoPetitionFieldVisibilityConditionOperator,
 ): PetitionFieldVisibilityCondition {
   if (operator === "HAVE_REPLY") {
     return {
@@ -137,11 +137,11 @@ export function updateConditionOperator<
 }
 
 export function updateConditionModifier<
-  T extends Pick<PetitionField, "id" | "type" | "options" | "multiple">
+  T extends Pick<PetitionField, "id" | "type" | "options" | "multiple">,
 >(
   condition: PetitionFieldVisibilityCondition,
   field: T,
-  modifier: PetitionFieldVisibilityConditionModifier
+  modifier: PetitionFieldVisibilityConditionModifier,
 ): PetitionFieldVisibilityCondition {
   if (modifier === "NUMBER_OF_REPLIES" && condition.modifier !== "NUMBER_OF_REPLIES") {
     return {

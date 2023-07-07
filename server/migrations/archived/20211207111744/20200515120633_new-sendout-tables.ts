@@ -30,14 +30,14 @@ export async function up(knex: Knex): Promise<any> {
         (reminders_active and reminders_config is not null)
           or (not reminders_active and reminders_config is null)
       )
-      `
+      `,
     )
     .raw(
       /* sql */ `
       alter table petition_access add constraint petition_access__reminders_left_check check (
         reminders_left >= 0
       )
-      `
+      `,
     )
     .createTable("petition_message", (t) => {
       t.increments("id");

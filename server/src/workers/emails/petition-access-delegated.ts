@@ -12,7 +12,7 @@ export async function petitionAccessDelegated(
     original_access_id: number;
     message_body: any;
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [petition, newAccess, originalAccess] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
@@ -35,18 +35,18 @@ export async function petitionAccessDelegated(
     context.users.loadUserDataByUserId(originalAccess.granter_id),
     context.petitions.loadOriginalMessageByPetitionAccess(
       payload.original_access_id,
-      payload.petition_id
+      payload.petition_id,
     ),
   ]);
 
   if (!contact) {
     throw new Error(
-      `Contact ${newAccess.contact_id} not found for petition_access with id ${newAccess.id}`
+      `Contact ${newAccess.contact_id} not found for petition_access with id ${newAccess.id}`,
     );
   }
   if (!delegator) {
     throw new Error(
-      `Contact ${originalAccess.contact_id} not found for petition_access with id ${originalAccess.id}`
+      `Contact ${originalAccess.contact_id} not found for petition_access with id ${originalAccess.id}`,
     );
   }
   if (!petitionOwnerData) {
@@ -56,7 +56,7 @@ export async function petitionAccessDelegated(
   const orgId = petition.org_id;
   const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
     orgId,
-    "REMOVE_WHY_WE_USE_PARALLEL"
+    "REMOVE_WHY_WE_USE_PARALLEL",
   );
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
 
@@ -75,7 +75,7 @@ export async function petitionAccessDelegated(
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
-    { locale: petition.recipient_locale }
+    { locale: petition.recipient_locale },
   );
 
   return await context.emailLogs.createEmail({

@@ -42,8 +42,8 @@ export function SidebarLayout({
           router.replace(sections[0].path);
         }
       },
-      [sections]
-    )
+      [sections],
+    ),
   );
 
   return (

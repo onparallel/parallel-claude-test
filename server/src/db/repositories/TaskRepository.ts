@@ -138,7 +138,10 @@ export type Task<TName extends TaskName> = Replace<
 
 @injectable()
 export class TaskRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(QUEUES_SERVICE) private queues: IQueuesService) {
+  constructor(
+    @inject(KNEX) knex: Knex,
+    @inject(QUEUES_SERVICE) private queues: IQueuesService,
+  ) {
     super(knex);
   }
 
@@ -148,7 +151,7 @@ export class TaskRepository extends BaseRepository {
     return await this.updateTask(
       taskId,
       { status: "PROCESSING", progress: 0, started_at: this.now() },
-      updatedBy
+      updatedBy,
     );
   }
 
@@ -163,7 +166,7 @@ export class TaskRepository extends BaseRepository {
         processed_at: this.now(),
         processed_by: updatedBy,
       },
-      updatedBy
+      updatedBy,
     );
   }
 
@@ -177,7 +180,7 @@ export class TaskRepository extends BaseRepository {
         processed_at: this.now(),
         processed_by: updatedBy,
       },
-      updatedBy
+      updatedBy,
     );
   }
 
@@ -187,7 +190,7 @@ export class TaskRepository extends BaseRepository {
         ...data,
         created_by: createdBy,
       },
-      "*"
+      "*",
     );
     await this.queues.enqueueMessages("task-worker", {
       groupId: `Task:${task.id}`,
@@ -200,7 +203,7 @@ export class TaskRepository extends BaseRepository {
   async updateTask<TName extends TaskName>(
     taskId: number,
     data: Partial<Task<TName>>,
-    updatedBy: string
+    updatedBy: string,
   ) {
     const [task] = await this.from("task")
       .where("id", taskId)

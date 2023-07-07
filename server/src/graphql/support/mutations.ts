@@ -43,7 +43,7 @@ export const forceUpdateSignatureOrganizationBrandings = mutationField(
         return { result: RESULT.FAILURE, message: e.message };
       }
     },
-  }
+  },
 );
 
 export const resetUserPassword = mutationField("resetUserPassword", {
@@ -122,13 +122,13 @@ export const transferOrganizationOwnership = mutationField("transferOrganization
         currentOwner.id,
         { organization_role: "ADMIN" },
         `User:${ctx.user!.id}`,
-        t
+        t,
       );
       await ctx.users.updateUserById(
         userId,
         { organization_role: "OWNER" },
         `User:${ctx.user!.id}`,
-        t
+        t,
       );
     });
 
@@ -147,7 +147,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
     backgroundColor: nullable(
       stringArg({
         description: "for example: #A0FFCE",
-      })
+      }),
     ),
     categories: nullable(stringArg({ description: "comma-separated list of categories" })),
     description: nullable(stringArg({ description: "short description for the template" })),
@@ -163,9 +163,9 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       validateFile(
         (args) => args.image!,
         { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-        "image"
-      )
-    )
+        "image",
+      ),
+    ),
   ),
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx, info) => {
@@ -211,7 +211,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
             content_type: mimetype,
             size: res["ContentLength"]!.toString(),
           },
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
 
         newMetadata.image_public_file_id = file.id;
@@ -222,7 +222,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       await ctx.petitions.updatePetition(
         template.id,
         { public_metadata: newMetadata },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       return {
@@ -249,7 +249,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
   validateArgs: validateFile(
     (args) => args.image,
     { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-    "image"
+    "image",
   ),
   resolve: async (_, { userId, image }, ctx) => {
     try {
@@ -273,13 +273,13 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
           content_type: mimetype,
           size: res["ContentLength"]!.toString(),
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       await ctx.users.updateUserData(
         userData.id,
         { avatar_public_file_id: file.id },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       return {
         result: RESULT.SUCCESS,
@@ -312,7 +312,7 @@ export const updatePublicTemplateVisibility = mutationField("updatePublicTemplat
       await ctx.petitions.updatePetition(
         templateId,
         { template_public: isPublic },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       return {
@@ -394,10 +394,10 @@ export const importPetitionFromJson = mutationField("importPetitionFromJson", {
   authorize: supportMethodAccess(),
   args: {
     json: nonNull(
-      stringArg({ description: "Petition to import in json format @form:type=textarea" })
+      stringArg({ description: "Petition to import in json format @form:type=textarea" }),
     ),
     userId: nonNull(
-      globalIdArg("User", { description: "Global ID of the user to assign this petition" })
+      globalIdArg("User", { description: "Global ID of the user to assign this petition" }),
     ),
   },
   resolve: async (_, { json, userId }, ctx) => {
@@ -448,7 +448,7 @@ export const signaturitIntegrationShowSecurityStamp = mutationField(
         await ctx.integrations.updateOrgIntegration(
           integrationId,
           { settings: { ...integration.settings, SHOW_CSV: showCsv } },
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
 
         await ctx.signature.onOrganizationBrandChange(integration.org_id, {
@@ -461,7 +461,7 @@ export const signaturitIntegrationShowSecurityStamp = mutationField(
         message: `OrgIntegration:${integrationId} updated successfully.`,
       };
     },
-  }
+  },
 );
 
 export const removePetitionPassword = mutationField("removePetitionPassword", {
@@ -479,7 +479,7 @@ export const removePetitionPassword = mutationField("removePetitionPassword", {
           restricted_password_hash: null,
           restricted_password_salt: null,
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       return { result: RESULT.SUCCESS, message: "Password removed" };
     } catch (e) {

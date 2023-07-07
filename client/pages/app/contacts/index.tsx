@@ -107,7 +107,7 @@ function Contacts() {
             defaultMessage:
               "{count, plural, =1{# contact} other{# contacts}} imported successfully!",
           },
-          { count: data!.count }
+          { count: data!.count },
         ),
         status: "success",
       });
@@ -270,7 +270,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

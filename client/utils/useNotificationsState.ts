@@ -37,7 +37,7 @@ export function useNotificationsState() {
         onOpen: () => {
           const prevValue = localStorageGet<PetitionUserNotificationFilter>(
             "notifications-filter",
-            "ALL"
+            "ALL",
           );
           onFilterChange(prevValue);
           window.analytics?.track("Notifications Open");
@@ -47,7 +47,7 @@ export function useNotificationsState() {
           window.analytics?.track("Notifications Close");
         },
       }),
-      [onFilterChange]
+      [onFilterChange],
     ),
   };
 }

@@ -27,7 +27,7 @@ export const organizationQueries = queryField((t) => {
         arg({
           type: "OrganizationStatus",
           description: "Optional status to filter for.",
-        })
+        }),
       ),
     },
     resolve: (_, { offset, limit, search, status, sortBy }, ctx) => {

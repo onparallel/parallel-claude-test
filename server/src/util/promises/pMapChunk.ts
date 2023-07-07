@@ -10,11 +10,11 @@ export interface PMapChunkOptions extends PMapOptions {
 export async function pMapChunk<Element, NewElements extends any[] | void>(
   input: Iterable<Element>,
   mapper: pMap.Mapper<Element[], NewElements>,
-  options: PMapChunkOptions
+  options: PMapChunkOptions,
 ): Promise<NewElements extends any[] ? UnwrapArray<NewElements>[] : undefined[]> {
   return pFlatMap(
     chunk(Array.from(input), options.chunkSize),
     mapper,
-    omit(options, ["chunkSize"])
+    omit(options, ["chunkSize"]),
   );
 }

@@ -33,5 +33,5 @@ export const PetitionFieldTypeLabel = chakraForwardRef<"div", PetitionFieldTypeL
         />
       </Box>
     );
-  }
+  },
 );

@@ -47,7 +47,7 @@ export function EmailEventsIndicator({
                   },
                   {
                     date: intl.formatDate(deliveredAt, FORMATS.FULL),
-                  }
+                  },
                 )
               : intl.formatMessage({
                   id: "component.message-events-indicator.not-delivered-explanation",
@@ -73,7 +73,7 @@ export function EmailEventsIndicator({
                   },
                   {
                     date: intl.formatDate(openedAt, FORMATS.FULL),
-                  }
+                  },
                 )
               : intl.formatMessage({
                   id: "component.message-events-indicator.not-opened-explanation",

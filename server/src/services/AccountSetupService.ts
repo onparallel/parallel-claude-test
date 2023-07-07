@@ -13,7 +13,7 @@ export interface IAccountSetupService {
     tier: string,
     data: CreateOrganization,
     userData: CreateUserData,
-    createdBy: string
+    createdBy: string,
   ): Promise<{ organization: Organization; user: User }>;
 }
 
@@ -25,21 +25,21 @@ export class AccountSetupService implements IAccountSetupService {
     @inject(UserRepository) private users: UserRepository,
     @inject(INTEGRATIONS_SETUP_SERVICE) private integrationsSetup: IIntegrationsSetupService,
     @inject(PROFILES_SETUP_SERVICE) private profilesSetup: IProfilesSetupService,
-    @inject(TIERS_SERVICE) private tiers: ITiersService
+    @inject(TIERS_SERVICE) private tiers: ITiersService,
   ) {}
 
   async createOrganization(
     tier: string,
     data: CreateOrganization,
     userData: CreateUserData,
-    createdBy: string
+    createdBy: string,
   ) {
     const organization = await this.organizations.createOrganization(data, createdBy);
 
     await this.organizations.createDefaultOrganizationThemes(organization.id, createdBy);
     await this.profilesSetup.createDefaultOrganizationProfileTypesAndFields(
       organization.id,
-      createdBy
+      createdBy,
     );
     await this.integrationsSetup.createSignaturitIntegration(
       {
@@ -49,7 +49,7 @@ export class AccountSetupService implements IAccountSetupService {
       },
       this.config.signature.signaturitSandboxApiKey,
       false,
-      createdBy
+      createdBy,
     );
 
     await this.tiers.updateOrganizationTier(organization, tier, createdBy);
@@ -61,7 +61,7 @@ export class AccountSetupService implements IAccountSetupService {
         status: "ACTIVE",
       },
       userData,
-      createdBy
+      createdBy,
     );
 
     return {

@@ -39,7 +39,7 @@ const email: Email<PetitionMessageProps> = {
         id: "from.via-parallel",
         defaultMessage: "{senderName} via Parallel",
       },
-      { senderName }
+      { senderName },
     );
   },
   subject({ subject }) {
@@ -47,7 +47,7 @@ const email: Email<PetitionMessageProps> = {
   },
   text(
     { senderName, senderEmail, recipients, bodyPlainText, deadline, keycode, parallelUrl, theme },
-    intl
+    intl,
   ) {
     return outdent`
       ${
@@ -68,17 +68,17 @@ const email: Email<PetitionMessageProps> = {
                       id: "new-petition.text-multiple-recipients.with-you",
                       defaultMessage: "you",
                     },
-                    { tone: theme.preferredTone }
+                    { tone: theme.preferredTone },
                   ),
                 ]),
-              }
+              },
             )
           : intl.formatMessage(
               {
                 id: "new-petition.text",
                 defaultMessage: "{senderName} ({senderEmail}) has shared this link with you.",
               },
-              { senderName, senderEmail, tone: theme.preferredTone }
+              { senderName, senderEmail, tone: theme.preferredTone },
             )
       }
 
@@ -93,7 +93,7 @@ const email: Email<PetitionMessageProps> = {
              defaultMessage:
                "This information has been requested to be submitted before {deadline}.",
            },
-           { deadline: intl.formatDate(deadline, FORMATS.LLL) }
+           { deadline: intl.formatDate(deadline, FORMATS.LLL) },
          )}
            
            `
@@ -170,7 +170,7 @@ const email: Email<PetitionMessageProps> = {
                           id: "new-petition.text-multiple-recipients.with-you",
                           defaultMessage: "you",
                         },
-                        { tone: theme.preferredTone }
+                        { tone: theme.preferredTone },
                       ),
                     ]),
                   }}

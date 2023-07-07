@@ -23,7 +23,7 @@ export const remindersOptOut = queryField("remindersOptOut", {
         t.nullable.string("orgLogoUrl");
         t.string("orgName");
       },
-    })
+    }),
   ),
   args: {
     keycode: nonNull(idArg()),

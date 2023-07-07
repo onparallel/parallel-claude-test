@@ -60,7 +60,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
   forwardRef<PetitionFieldOptionsListEditorRef, PetitionFieldOptionsListEditorProps>(
     function PetitionFieldOptionsListEditor(
       { field, showError, onFieldEdit, onFocusNextField, onFocusDescription, isReadOnly, ...props },
-      ref
+      ref,
     ) {
       const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
       const editorRef = useUpdatingRef(editor);
@@ -75,11 +75,11 @@ export const PetitionFieldOptionsListEditor = Object.assign(
               if (position) {
                 Transforms.select(
                   editor,
-                  position === "START" ? Editor.start(editor, []) : Editor.end(editor, [])
+                  position === "START" ? Editor.start(editor, []) : Editor.end(editor, []),
                 );
               }
             },
-          } as PetitionFieldOptionsListEditorRef)
+          }) as PetitionFieldOptionsListEditorRef,
       );
 
       const handleKeyDown = useCallback(
@@ -107,7 +107,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
               break;
           }
         },
-        [editor, onFocusNextField, onFocusDescription]
+        [editor, onFocusNextField, onFocusDescription],
       );
 
       const handleBlur = useCallback(() => {
@@ -168,7 +168,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
           </Box>
         </Slate>
       );
-    }
+    },
   ),
 
   {
@@ -182,7 +182,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         }
       `,
     },
-  }
+  },
 );
 
 function renderElement({ attributes, children, element }: RenderElementProps) {

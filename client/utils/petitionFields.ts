@@ -168,7 +168,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
 
 export function getDynamicSelectValues(
   values: (string | DynamicSelectOption)[],
-  level: number
+  level: number,
 ): string[] {
   if (level === 0) {
     return Array.isArray(values[0])
@@ -179,14 +179,14 @@ export function getDynamicSelectValues(
       throw new Error("Invalid level");
     }
     return (values as DynamicSelectOption[]).flatMap(([, children]) =>
-      getDynamicSelectValues(children, level - 1)
+      getDynamicSelectValues(children, level - 1),
     );
   }
 }
 
 export function getFirstDynamicSelectValue(
   values: (string | DynamicSelectOption)[],
-  level: number
+  level: number,
 ): string {
   if (level === 0) {
     return Array.isArray(values[0])

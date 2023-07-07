@@ -146,7 +146,7 @@ export function Overview() {
       }));
     },
     300,
-    [setTableState]
+    [setTableState],
   );
 
   const handleSearchChange = (value: string) => {
@@ -170,9 +170,9 @@ export function Overview() {
               startDate: queryState.range?.[0].toISOString() ?? null,
               endDate: queryState.range?.[1].toISOString() ?? null,
             },
-            { signal: taskAbortController.current!.signal, timeout: 60_000 }
+            { signal: taskAbortController.current!.signal, timeout: 60_000 },
           ),
-        2_000 + 1_000 * Math.random()
+        2_000 + 1_000 * Math.random(),
       );
       setState((state) => ({
         ...state,
@@ -790,7 +790,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               },
             ] as TableColumn<TemplateStats>[])),
       ] as TableColumn<TemplateStats>[],
-    [intl.locale, tableType]
+    [intl.locale, tableType],
   );
 }
 
@@ -807,14 +807,14 @@ function useDownloadOverviewExcel() {
           range: isDefined(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
-        }
+        },
       ),
       async (workbook) => {
         const worksheet = workbook.addWorksheet(
           intl.formatMessage({
             id: "page.reports-overview.worksheet-name",
             defaultMessage: "Overview report",
-          })
+          }),
         );
 
         worksheet.columns = [
@@ -916,7 +916,7 @@ function useDownloadOverviewExcel() {
                       id: "page.reports-overview.parallels-no-access",
                       defaultMessage: "Other templates not shared with me ({count})",
                     },
-                    { count: row.template_count ?? 0 }
+                    { count: row.template_count ?? 0 },
                   )
                 : row.aggregation_type === "NO_TEMPLATE"
                 ? intl.formatMessage({
@@ -939,9 +939,9 @@ function useDownloadOverviewExcel() {
               ? (row.times.signature_completed ?? 0) / 3600
               : "",
             time_to_close: (row.times.complete_to_close ?? 0) / 3600,
-          }))
+          })),
         );
-      }
+      },
     );
   };
 }

@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
 
     t.unique(
       ["petition_field_id", "file_upload_id"],
-      "petition_field_attachment__petition_field_id__file_upload_id__unique"
+      "petition_field_attachment__petition_field_id__file_upload_id__unique",
     );
   });
 

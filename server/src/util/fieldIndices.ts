@@ -36,6 +36,6 @@ export function getFieldIndices(fields: Pick<PetitionField, "type">[]): Petition
   const letter = letters();
   const number = numbers();
   return fields.map((f) =>
-    f.type === "HEADING" ? (letter.next().value as string) : (number.next().value as number)
+    f.type === "HEADING" ? (letter.next().value as string) : (number.next().value as number),
   );
 }

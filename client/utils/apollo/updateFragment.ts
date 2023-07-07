@@ -10,7 +10,7 @@ interface UpdateFragmentOptions<TData, TVariables> extends DataProxy.Fragment<TV
 
 export function updateFragment<TData = any, TVariables = any>(
   cache: DataProxy,
-  { data, ...options }: UpdateFragmentOptions<TData, TVariables>
+  { data, ...options }: UpdateFragmentOptions<TData, TVariables>,
 ) {
   const cached = cache.readFragment<TData, TVariables>(omit(options, ["broadcast"]));
   if (cached !== null) {

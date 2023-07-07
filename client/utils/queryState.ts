@@ -18,7 +18,7 @@ export class QueryItem<T> {
   constructor(
     private _parseValue: (value: string | string[] | undefined) => T | null,
     private _serialize?: (value: NonNullable<T>) => string,
-    private _isDefault?: (value: NonNullable<T>) => boolean
+    private _isDefault?: (value: NonNullable<T>) => boolean,
   ) {}
 
   withValidation(validator: QueryItemValidator) {
@@ -72,7 +72,7 @@ export class QueryItem<T> {
         value
           .filter(isDefined)
           .map((v) => this.serialize(v))
-          .join(",")
+          .join(","),
     );
   }
 }
@@ -109,7 +109,7 @@ export function date() {
     },
     (value: Date) => {
       return value.valueOf().toString();
-    }
+    },
   );
 }
 
@@ -134,7 +134,7 @@ export function sorting<T extends string>(fields: readonly T[]) {
       }
       return null;
     },
-    ({ field, direction }) => `${field}_${direction}`
+    ({ field, direction }) => `${field}_${direction}`,
   );
 }
 
@@ -149,7 +149,7 @@ export function object<T>({
     (value) => {
       if (value && typeof value === "string") {
         const decoded = JSON.parse(
-          fromBase64(value.replaceAll("-", "+").replaceAll("_", "/").replaceAll(".", "="))
+          fromBase64(value.replaceAll("-", "+").replaceAll("_", "/").replaceAll(".", "=")),
         );
         return unflatten ? unflatten(decoded) : decoded;
       }
@@ -160,7 +160,7 @@ export function object<T>({
         .replaceAll("+", "-")
         .replaceAll("/", "_")
         .replaceAll("=", ".");
-    }
+    },
   );
 }
 
@@ -171,12 +171,12 @@ export interface ParseQueryOptions {
 export function parseQuery<T extends {}>(
   query: (typeof Router)["query"],
   shape: QueryStateOf<T>,
-  { prefix }: ParseQueryOptions = {}
+  { prefix }: ParseQueryOptions = {},
 ): T {
   return Object.fromEntries(
     Object.entries(shape).map(([key, component]) => {
       return [key, (component as QueryItem<any>).parseValue(query[prefix ? prefix + key : key])];
-    })
+    }),
   ) as any;
 }
 
@@ -201,7 +201,7 @@ export interface SetQueryStateOptions {
 
 export function useBuildStateUrl<T extends {}>(
   shape: QueryStateOf<T>,
-  options: QueryStateOptions = {}
+  options: QueryStateOptions = {},
 ): (state: NextQueryState<Partial<T>>) => string {
   const router = useRouter();
   const state = useMemo(() => {
@@ -213,7 +213,7 @@ export function useBuildStateUrl<T extends {}>(
 
 export function useQueryState<T extends {}>(
   shape: QueryStateOf<T>,
-  options: QueryStateOptions = {}
+  options: QueryStateOptions = {},
 ): [T, SetQueryState<Partial<T>>] {
   const router = useRouter();
   const state = useMemo(() => {
@@ -238,7 +238,7 @@ export function buildStateUrl<T extends {}>(
   state: Partial<T>,
   currentPathname: string,
   currentQuery: ParsedUrlQuery,
-  { prefix }: QueryStateOptions = {}
+  { prefix }: QueryStateOptions = {},
 ) {
   const invalid = Object.keys(state).find((k) => !shape.hasOwnProperty(k));
   if (invalid) {
@@ -250,7 +250,7 @@ export function buildStateUrl<T extends {}>(
     ...(Object.entries(state)
       .filter(
         ([key, value]) =>
-          value !== null && value !== undefined && !shape[key as keyof T].isDefault(value as any)
+          value !== null && value !== undefined && !shape[key as keyof T].isDefault(value as any),
       )
       .map(([key, value]) => [
         prefix ? prefix + key : key,
@@ -258,7 +258,7 @@ export function buildStateUrl<T extends {}>(
       ]) as [string, string][]),
     // keep other params
     ...(Object.entries(currentQuery).filter(
-      ([key]) => !fromState.includes(key) && !fromPath.includes(key)
+      ([key]) => !fromState.includes(key) && !fromPath.includes(key),
     ) as [string, string][]),
   ];
   const route = resolveUrl(currentPathname, currentQuery);
@@ -268,11 +268,11 @@ export function buildStateUrl<T extends {}>(
 function useBuildStateUrlInternal<T extends {}>(
   getCurrentState: () => T,
   shape: QueryStateOf<T>,
-  options: QueryStateOptions = {}
+  options: QueryStateOptions = {},
 ): (state: NextQueryState<Partial<T>>) => string {
   const router = useRouter();
   const ref = useUpdatingRef<Pick<NextRouter, "query" | "pathname">>(
-    pick(router, ["query", "pathname"])
+    pick(router, ["query", "pathname"]),
   );
   return useCallback(function (state) {
     const { query, pathname } = ref.current;
@@ -284,7 +284,7 @@ function useBuildStateUrlInternal<T extends {}>(
 export function useQueryStateSlice<T extends {}, K extends keyof T>(
   state: T,
   setState: SetQueryState<Partial<T>>,
-  slice: K
+  slice: K,
 ): [T[K], SetQueryState<T[K]>] {
   return [
     state[slice],
@@ -295,10 +295,10 @@ export function useQueryStateSlice<T extends {}, K extends keyof T>(
             ...prevState,
             [slice]: typeof value === "function" ? (value as any)(prevState[slice]) : value,
           }),
-          options
+          options,
         );
       },
-      [setState]
+      [setState],
     ),
   ];
 }

@@ -61,7 +61,7 @@ export const updateUser = mutationField("updateUser", {
   },
   validateArgs: validateAnd(
     maxLength((args) => args.firstName, "data.firstName", 255),
-    maxLength((args) => args.lastName, "data.lastName", 255)
+    maxLength((args) => args.lastName, "data.lastName", 255),
   ),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args;
@@ -71,7 +71,7 @@ export const updateUser = mutationField("updateUser", {
         first_name: firstName,
         last_name: lastName,
       }),
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     return ctx.user!;
   },
@@ -118,10 +118,10 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
         orgDoesNotHaveSsoProvider(),
         orgCanCreateNewUser(),
         contextUserHasRole("ADMIN"),
-        ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
-      )
+        ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
+      ),
     ),
-    emailIsNotRegisteredInTargetOrg("email", "orgId" as never)
+    emailIsNotRegisteredInTargetOrg("email", "orgId" as never),
   ),
   args: {
     email: nonNull(stringArg()),
@@ -138,7 +138,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
       if (role === "OWNER") {
         throw new ArgValidationError(info, "role", "Can't create a new user with OWNER role.");
       }
-    }
+    },
   ),
   resolve: async (_, args, ctx) => {
     // if orgId is provided the invitation email will be anonymous
@@ -162,7 +162,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
         organizationName: organization!.name,
         organizationUser: args.orgId ? "" : fullName(userData!.first_name, userData!.last_name),
       },
-      true
+      true,
     );
     const [user] = await Promise.all([
       ctx.users.createUser(
@@ -180,7 +180,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
           },
           preferred_locale: args.locale,
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       ),
       ctx.system.createEvent({
         type: "INVITE_SENT",
@@ -196,7 +196,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
 
     if (args.userGroupIds) {
       await pMap(args.userGroupIds, (userGroupId) =>
-        ctx.userGroups.addUsersToGroup(userGroupId, user.id, `User:${ctx.user!.id}`)
+        ctx.userGroups.addUsersToGroup(userGroupId, user.id, `User:${ctx.user!.id}`),
       );
 
       ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(user.id);
@@ -212,12 +212,12 @@ export const activateUser = mutationField("activateUser", {
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToUsers("userIds"),
-    userIsNotSSO("userIds")
+    userIsNotSSO("userIds"),
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
-    maxActiveUsers((args) => args.userIds)
+    maxActiveUsers((args) => args.userIds),
   ),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
@@ -238,7 +238,7 @@ export const deactivateUser = mutationField("deactivateUser", {
     userIsNotOrgOwner("userIds"),
     userHasAccessToUsers("transferToUserId"),
     argUserHasStatus("transferToUserId", "ACTIVE"),
-    userHasAccessToTags("tagIds")
+    userHasAccessToTags("tagIds"),
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
@@ -248,10 +248,10 @@ export const deactivateUser = mutationField("deactivateUser", {
         throw new ArgValidationError(
           info,
           "transferToUserId",
-          "Can't transfer to a user that will be disabled."
+          "Can't transfer to a user that will be disabled.",
         );
       }
-    }
+    },
   ),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
@@ -261,7 +261,7 @@ export const deactivateUser = mutationField("deactivateUser", {
   },
   resolve: async (_, { userIds, transferToUserId, tagIds, includeDrafts }, ctx) => {
     const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
-      userIds
+      userIds,
     );
 
     return await ctx.petitions.withTransaction(async (t) => {
@@ -272,13 +272,13 @@ export const deactivateUser = mutationField("deactivateUser", {
         async ([userId, userPermissions]) => {
           const [ownedPermissions, notOwnedPermissions] = partition(
             userPermissions,
-            (p) => p.type === "OWNER"
+            (p) => p.type === "OWNER",
           );
 
           const petitions = (
             await ctx.petitions.loadPetition.raw(
               ownedPermissions.map((p) => p.petition_id),
-              t
+              t,
             )
           ).filter(isDefined);
           const draftsIds = petitions.filter((p) => p.status === "DRAFT").map((p) => p.id);
@@ -290,7 +290,7 @@ export const deactivateUser = mutationField("deactivateUser", {
             userId,
             { status: "INACTIVE" },
             `User:${ctx.user!.id}`,
-            t
+            t,
           );
 
           if (notOwnedPermissions.length > 0) {
@@ -299,14 +299,14 @@ export const deactivateUser = mutationField("deactivateUser", {
               notOwnedPermissions.map((p) => p.petition_id),
               userId,
               ctx.user!,
-              t
+              t,
             );
           }
 
           await ctx.petitions.removeTemplateDefaultPermissionsForUser(
             userId,
             `User:${ctx.user!.id}`,
-            t
+            t,
           );
 
           if (ownedPermissions.length > 0) {
@@ -316,7 +316,7 @@ export const deactivateUser = mutationField("deactivateUser", {
               transferToUserId,
               false,
               ctx.user!,
-              t
+              t,
             );
           }
 
@@ -332,7 +332,7 @@ export const deactivateUser = mutationField("deactivateUser", {
 
           return user;
         },
-        { concurrency: 1 }
+        { concurrency: 1 },
       );
     });
   },
@@ -344,7 +344,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToUsers("userId"),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
   ),
   args: {
     userId: nonNull(globalIdArg("User")),
@@ -372,7 +372,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
         userId,
         { organization_role: role },
         `User:${ctx.user!.id}`,
-        t
+        t,
       );
 
       if (userGroupIds) {
@@ -386,14 +386,14 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
           userGroupsIdsToAdd,
           async (userGroupId) =>
             await ctx.userGroups.addUsersToGroup(userGroupId, userId, `User:${ctx.user!.id}`, t),
-          { concurrency: 5 }
+          { concurrency: 5 },
         );
 
         await ctx.userGroups.removeUsersFromGroups(
           [userId],
           userGroupsIdsToDelete,
           `User:${ctx.user!.id}`,
-          t
+          t,
         );
 
         ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(userId);
@@ -417,7 +417,7 @@ export const signUp = mutationField("signUp", {
       arg({
         type: "UserLocale",
         description: "Preferred locale for AWS Cognito CustomMessages.",
-      })
+      }),
     ),
     organizationLogo: uploadArg(),
     industry: stringArg(),
@@ -437,9 +437,9 @@ export const signUp = mutationField("signUp", {
       validateFile(
         (args) => args.organizationLogo!,
         { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-        "organizationLogo"
-      )
-    )
+        "organizationLogo",
+      ),
+    ),
   ),
   resolve: async (_, args, ctx) => {
     let licenseCode: LicenseCode | null = null;
@@ -448,14 +448,14 @@ export const signUp = mutationField("signUp", {
       if (licenseCode?.status !== "PENDING") {
         throw new ApolloError(
           `Provided license code is ${licenseCode?.status} and can't be used`,
-          "INVALID_LICENSE_CODE"
+          "INVALID_LICENSE_CODE",
         );
       }
 
       await ctx.licenseCodes.updateLicenseCode(
         licenseCode.id,
         { status: "REDEEMED" },
-        `UserSignUp:${args.email}`
+        `UserSignUp:${args.email}`,
       );
     }
 
@@ -466,7 +466,7 @@ export const signUp = mutationField("signUp", {
     const [error, cognitoId] = await withError(
       ctx.auth.signUpUser(email, args.password, args.firstName, args.lastName, {
         locale: args.locale,
-      })
+      }),
     );
     if (error) {
       await withError(ctx.auth.deleteUser(email));
@@ -486,7 +486,7 @@ export const signUp = mutationField("signUp", {
           content_type: mimetype,
           size: res["ContentLength"]!.toString(),
         },
-        `UserSignUp:${args.email}`
+        `UserSignUp:${args.email}`,
       );
     }
 
@@ -517,7 +517,7 @@ export const signUp = mutationField("signUp", {
         },
         preferred_locale: args.locale,
       },
-      `UserSignUp:${args.email}`
+      `UserSignUp:${args.email}`,
     );
 
     return user;
@@ -558,7 +558,7 @@ export const resendVerificationEmail = mutationField("resendVerificationEmail", 
               verificationCodeSentAt: new Date(),
             },
           },
-          `User:${user.id}`
+          `User:${user.id}`,
         );
         await ctx.auth.resendVerificationCode(email, { locale });
       }
@@ -621,7 +621,7 @@ export const updateUserPreferredLocale = mutationField("updateUserPreferredLocal
         },
         preferred_locale: locale,
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     return ctx.user!;
   },
@@ -635,7 +635,7 @@ export const setUserDelegates = mutationField("setUserDelegates", {
   },
   authorize: authenticateAnd(
     userHasFeatureFlag("ON_BEHALF_OF"),
-    userHasAccessToUsers("delegateIds")
+    userHasAccessToUsers("delegateIds"),
   ),
   resolve: async (_, { delegateIds }, ctx) => {
     await ctx.users.syncDelegates(ctx.user!.id, delegateIds, ctx.user!);
@@ -655,9 +655,9 @@ export const loginAs = mutationField("loginAs", {
       and(
         contextUserHasRole("ADMIN"),
         userHasAccessToUsers("userId"),
-        userHasFeatureFlag("GHOST_LOGIN")
-      )
-    )
+        userHasFeatureFlag("GHOST_LOGIN"),
+      ),
+    ),
   ),
   resolve: async (_, { userId }, ctx) => {
     try {

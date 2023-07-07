@@ -38,7 +38,7 @@ async function main() {
           { Name: "tag-key", Values: ["Release"] },
           { Name: "tag:Environment", Values: [env] },
         ],
-      })
+      }),
     )
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
   for (const instance of instances) {
@@ -63,7 +63,7 @@ async function main() {
           // terminate instance that were stopped more than 7 days ago, so we can keep the instance data for a while
           if (new Date().valueOf() - transitionDate.valueOf() > 7 * 24 * 60 * 60 * 1000) {
             console.log(
-              chalk`Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`
+              chalk`Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`,
             );
             if (!dryRun) {
               await ec2.send(new TerminateInstancesCommand({ InstanceIds: [instanceId] }));

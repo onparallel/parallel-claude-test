@@ -28,14 +28,14 @@ export async function down(knex: Knex): Promise<void> {
         .from("user_petition_event_log")
         .whereIn(
           "petition_event_id",
-          events.map((e) => e.id)
+          events.map((e) => e.id),
         )
         .delete();
       await knex
         .from("petition_event")
         .whereIn(
           "id",
-          events.map((e) => e.id)
+          events.map((e) => e.id),
         )
         .delete();
     }

@@ -5,10 +5,10 @@ import { useRef } from "react";
 
 export function useAssertQuery<
   TData = any,
-  TVariables extends OperationVariables = OperationVariables
+  TVariables extends OperationVariables = OperationVariables,
 >(
   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  options?: QueryHookOptions<TData, TVariables>
+  options?: QueryHookOptions<TData, TVariables>,
 ): QueryResult<TData, TVariables> & { data: TData } {
   const { data, ...rest } = useQuery(query, options);
   if (!data) {
@@ -26,10 +26,10 @@ export function useAssertQuery<
 
 export function useAssertQueryOrPreviousData<
   TData = any,
-  TVariables extends OperationVariables = OperationVariables
+  TVariables extends OperationVariables = OperationVariables,
 >(
   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  options?: QueryHookOptions<TData, TVariables>
+  options?: QueryHookOptions<TData, TVariables>,
 ): QueryResult<TData, TVariables> & { data: TData } {
   const previous = useRef<TData>();
   const { data, ...rest } = useQuery(query, options);

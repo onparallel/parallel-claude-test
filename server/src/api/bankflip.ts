@@ -39,5 +39,5 @@ export const bankflip = Router().post(
       req.context.logger.error(error.message, { stack: error.stack });
       next(error);
     }
-  }
+  },
 );

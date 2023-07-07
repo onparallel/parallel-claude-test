@@ -67,8 +67,8 @@ export function ClosePetitionDialog({
     petition.closingEmailBody ??
       (textWithPlaceholderToSlateNodes(
         messages[petition.locale],
-        placeholders
-      ) as RichTextEditorValue)
+        placeholders,
+      ) as RichTextEditorValue),
   );
   const [sendMessage, setSendMessage] = useState(requiredMessage);
   const messageRef = useRef<RichTextEditorInstance>(null);

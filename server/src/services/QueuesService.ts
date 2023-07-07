@@ -29,13 +29,13 @@ export interface IQueuesService {
           deduplicationId?: string;
           delaySeconds?: number;
         },
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<void>;
   enqueueEvents<TName extends "petition_event" | "system_event">(
     events: MaybeArray<TableTypes[TName]>,
     tableName: TName,
     delaySeconds?: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<void>;
 }
 
@@ -51,7 +51,10 @@ export class QueuesService implements IQueuesService {
     });
   }
 
-  constructor(@inject(CONFIG) private config: Config, @inject(LOGGER) private logger: ILogger) {}
+  constructor(
+    @inject(CONFIG) private config: Config,
+    @inject(LOGGER) private logger: ILogger,
+  ) {}
 
   private hash(value: string) {
     return createHash("md5").update(value).digest("hex");
@@ -62,7 +65,7 @@ export class QueuesService implements IQueuesService {
     messages:
       | { id: string; body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }[]
       | { body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number },
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     if (isDefined(t)) {
       if (!t.isCompleted()) {
@@ -96,7 +99,7 @@ export class QueuesService implements IQueuesService {
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;
-        }
+        },
   ) {
     const queueUrl = this.config.queueWorkers[queue].queueUrl;
     if (Array.isArray(messages)) {
@@ -111,7 +114,7 @@ export class QueuesService implements IQueuesService {
               MessageDeduplicationId: deduplicationId,
               DelaySeconds: delaySeconds,
             })),
-          })
+          }),
         );
       }
     } else {
@@ -122,7 +125,7 @@ export class QueuesService implements IQueuesService {
           MessageGroupId: messages.groupId,
           MessageDeduplicationId: messages.deduplicationId,
           DelaySeconds: messages.delaySeconds,
-        })
+        }),
       );
     }
   }
@@ -131,7 +134,7 @@ export class QueuesService implements IQueuesService {
     events: MaybeArray<TableTypes[TName]>,
     tableName: TName,
     delaySeconds?: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const _events = unMaybeArray(events).filter(isDefined);
     if (_events.length > 0) {
@@ -154,7 +157,7 @@ export class QueuesService implements IQueuesService {
               delaySeconds,
             };
           }),
-          t
+          t,
         );
       } else {
         await this.enqueueMessages(
@@ -169,7 +172,7 @@ export class QueuesService implements IQueuesService {
               table_name: tableName,
             },
           })),
-          t
+          t,
         );
       }
     }

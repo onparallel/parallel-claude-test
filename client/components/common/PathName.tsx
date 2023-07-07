@@ -13,7 +13,7 @@ interface PathNameProps {
 
 export const PathName = chakraForwardRef<"span", PathNameProps>(function PathName(
   { path, type, disableTooltip, render = ({ children }) => <>{children}</>, ...props },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const root =
@@ -33,7 +33,9 @@ export const PathName = chakraForwardRef<"span", PathNameProps>(function PathNam
         {createElement(
           render,
           {},
-          <>{path === "/" ? root : path.replace(/^\//, "").replace(/\/$/, "").split("/").at(-1)!}</>
+          <>
+            {path === "/" ? root : path.replace(/^\//, "").replace(/\/$/, "").split("/").at(-1)!}
+          </>,
         )}
       </Box>
     </Tooltip>

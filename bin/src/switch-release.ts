@@ -60,7 +60,7 @@ async function main() {
           { Name: "tag:Environment", Values: [env] },
           { Name: "instance-state-name", Values: [InstanceStateName.running] },
         ],
-      })
+      }),
     )
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
 
@@ -74,7 +74,7 @@ async function main() {
       .then((r) => r.Addresses!);
 
     const availableAddresses = addresses.filter(
-      (a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId)
+      (a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId),
     );
 
     if (availableAddresses.length < newInstances.length) {
@@ -88,7 +88,7 @@ async function main() {
         new AssociateAddressCommand({
           InstanceId: instance.InstanceId,
           AllocationId: address.AllocationId,
-        })
+        }),
       );
     });
   }
@@ -119,7 +119,7 @@ async function main() {
     new RegisterInstancesWithLoadBalancerCommand({
       LoadBalancerName: `parallel-${env}`,
       Instances: newInstances,
-    })
+    }),
   );
 
   console.log(chalk.yellow`Creating invalidation for static files`);
@@ -128,8 +128,8 @@ async function main() {
     .then(
       (result) =>
         result.DistributionList!.Items!.find((d) =>
-          d.Origins!.Items!.some((o) => o.Id === `S3-parallel-static-${env}`)
-        )!.Id
+          d.Origins!.Items!.some((o) => o.Id === `S3-parallel-static-${env}`),
+        )!.Id,
     );
   await waitFor(async (iteration) => {
     if (iteration >= 10) {
@@ -143,7 +143,7 @@ async function main() {
             CallerReference: buildId,
             Paths: { Quantity: 1, Items: ["/static/*"] },
           },
-        })
+        }),
       );
       return true;
     } catch (error) {
@@ -163,12 +163,12 @@ async function main() {
           new DescribeInstanceHealthCommand({
             LoadBalancerName: `parallel-${env}`,
             Instances: newInstances,
-          })
+          }),
         )
         .then((r) => r.InstanceStates!.every((i) => i.State === "InService"));
     },
     chalk.yellow.italic`...Waiting for new instances to become healthy`,
-    3000
+    3000,
   );
   console.log(chalk.green.bold`New instances are healthy`);
 
@@ -178,7 +178,7 @@ async function main() {
       new DeregisterInstancesFromLoadBalancerCommand({
         LoadBalancerName: `parallel-${env}`,
         Instances: oldInstances,
-      })
+      }),
     );
 
     await waitFor(
@@ -188,12 +188,12 @@ async function main() {
             new DescribeInstanceHealthCommand({
               LoadBalancerName: `parallel-${env}`,
               Instances: oldInstances,
-            })
+            }),
           )
           .then((r) => r.InstanceStates!.every((i) => i.State === "OutOfService"));
       },
       chalk.yellow.italic`...Waiting for old instances to become out of service`,
-      3_000
+      3_000,
     );
     console.log(chalk.green.bold`Old instances deregistered`);
   }

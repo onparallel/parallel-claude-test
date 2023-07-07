@@ -33,7 +33,7 @@ export function AddMemberGroupDialog({
         excludeUsers: [...excludeUsers, ...exclude],
       });
     },
-    [_handleSearchUsers]
+    [_handleSearchUsers],
   );
 
   return (

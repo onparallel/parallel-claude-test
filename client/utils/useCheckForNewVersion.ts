@@ -18,7 +18,7 @@ export function useCheckForNewVersion() {
       } catch {}
     },
     60 * 1000,
-    []
+    [],
   );
   return hasNewVersion;
 }

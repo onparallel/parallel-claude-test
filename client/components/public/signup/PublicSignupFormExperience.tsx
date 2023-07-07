@@ -144,7 +144,7 @@ export function PublicSignupFormExperience({
         value: "other",
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 
   const roleOptions = useMemo(
@@ -262,7 +262,7 @@ export function PublicSignupFormExperience({
         value: "other",
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 
   return (

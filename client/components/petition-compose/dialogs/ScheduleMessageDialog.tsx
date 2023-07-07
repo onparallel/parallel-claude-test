@@ -19,7 +19,7 @@ import { FormattedMessage } from "react-intl";
 
 export function ScheduleMessageDialog({ ...props }: DialogProps<{}, Date>) {
   const [date, setDate] = useState<Date>(
-    roundToNearestMinutes(addHours(new Date(), 1), { nearestTo: 5 })
+    roundToNearestMinutes(addHours(new Date(), 1), { nearestTo: 5 }),
   );
 
   const suggestions = useMemo(
@@ -34,7 +34,7 @@ export function ScheduleMessageDialog({ ...props }: DialogProps<{}, Date>) {
           ? parse(hours, "HH:mm", today)
           : parse(hours, "HH:mm", tomorrowOrNextMonday);
       }),
-    [date]
+    [date],
   );
 
   return (

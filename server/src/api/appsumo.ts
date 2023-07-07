@@ -56,7 +56,7 @@ export const appsumo = Router()
         await verify(match[1], req.context.config.security.jwtSecret);
 
         const orgs = await req.context.organizations.getOrganizationsByUserEmail(
-          (req.body.activation_email as string).toLowerCase()
+          (req.body.activation_email as string).toLowerCase(),
         );
 
         if (orgs.length > 1) {
@@ -104,12 +104,12 @@ export const appsumo = Router()
           await req.context.organizations.updateAppSumoLicense(
             org.id,
             payload,
-            `AppSumo:${payload.uuid}`
+            `AppSumo:${payload.uuid}`,
           );
           await req.context.tiers.updateOrganizationTier(
             org,
             payload.parallel_tier,
-            `AppSumo:${payload.uuid}`
+            `AppSumo:${payload.uuid}`,
           );
 
           return res.status(201).json({
@@ -124,14 +124,14 @@ export const appsumo = Router()
           const license = await req.context.licenseCodes.createLicenseCode(
             "AppSumo",
             payload,
-            `AppSumo:${payload.uuid}`
+            `AppSumo:${payload.uuid}`,
           );
           const redirectUrl = `${req.context.config.misc.parallelUrl}/signup?${new URLSearchParams({
             code: license.code,
           })}`;
           await req.context.emails.sendAppSumoActivateAccountEmail(
             redirectUrl,
-            payload.activation_email
+            payload.activation_email,
           );
           return res.status(201).json({
             message: "product activated",
@@ -144,7 +144,7 @@ export const appsumo = Router()
           await req.context.organizations.updateAppSumoLicense(
             org.id,
             payload,
-            `AppSumo:${payload.uuid}`
+            `AppSumo:${payload.uuid}`,
           );
 
           await req.context.tiers.updateOrganizationTier(org, "FREE", `AppSumo:${payload.uuid}`);
@@ -152,25 +152,25 @@ export const appsumo = Router()
         await req.context.licenseCodes.updateAppSumoLicenseCodeByUUID(
           payload.uuid,
           "EXPIRED",
-          `AppSumo:${payload.uuid}`
+          `AppSumo:${payload.uuid}`,
         );
         return res.status(200).json({ message: "license refunded" });
       } else {
         await req.context.organizations.updateAppSumoLicense(
           org!.id,
           payload,
-          `AppSumo:${payload.uuid}`
+          `AppSumo:${payload.uuid}`,
         );
 
         await req.context.tiers.updateOrganizationTier(
           org!,
           payload.parallel_tier,
-          `AppSumo:${payload.uuid}`
+          `AppSumo:${payload.uuid}`,
         );
 
         return res.status(200).json({ message: "license updated" });
       }
-    }
+    },
   );
 
 function mapTier(planId: string) {

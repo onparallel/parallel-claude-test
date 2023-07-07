@@ -209,14 +209,14 @@ function RecipientViewConfirmPetitionSignersDialog({
                       id: "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
                       defaultMessage: "Write here a message for the signers...",
                     },
-                    { tone }
+                    { tone },
                   )}
                   placeholder={intl.formatMessage(
                     {
                       id: "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
                       defaultMessage: "Write here a message for the signers...",
                     },
-                    { tone }
+                    { tone },
                   )}
                 />
               </PaddedCollapse>

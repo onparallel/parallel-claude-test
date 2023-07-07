@@ -9,7 +9,7 @@ interface UserIntervalOptions {
 export function useInterval(
   effect: (clearTimeout: () => void) => void,
   delayOrOptions?: number | UserIntervalOptions,
-  deps?: DependencyList
+  deps?: DependencyList,
 ) {
   const { delay, isRunning = true } =
     typeof delayOrOptions === "number"

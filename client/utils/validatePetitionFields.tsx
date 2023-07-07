@@ -40,7 +40,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
     };
   }
   const fieldsWithoutTitle = fieldsWithIndices.filter(
-    ({ field }) => field.type !== "HEADING" && !field.title
+    ({ field }) => field.type !== "HEADING" && !field.title,
   );
   if (fieldsWithoutTitle.length > 0) {
     return {

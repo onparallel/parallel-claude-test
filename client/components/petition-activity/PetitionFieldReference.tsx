@@ -12,7 +12,7 @@ interface PetitionFieldReferenceProps {
 export const PetitionFieldReference = Object.assign(
   chakraForwardRef<"span", PetitionFieldReferenceProps>(function PetitionFieldReference(
     { field, ...props },
-    ref
+    ref,
   ) {
     return field ? (
       field.title ? (
@@ -39,5 +39,5 @@ export const PetitionFieldReference = Object.assign(
         }
       `,
     },
-  }
+  },
 );

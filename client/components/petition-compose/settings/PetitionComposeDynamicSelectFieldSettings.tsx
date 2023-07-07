@@ -39,7 +39,7 @@ export function DynamicSelectSettings({
   }
 
   const [downloadLink] = useMutation(
-    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument,
   );
 
   async function handleDownloadListingsFile() {
@@ -53,7 +53,7 @@ export function DynamicSelectSettings({
           throw new Error();
         }
         return url!;
-      })
+      }),
     );
   }
 
@@ -257,7 +257,7 @@ function DynamicSelectOptionsDropzone({
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
   const [uploadFile, { loading }] = useMutation(
-    DynamicSelectSettings_uploadDynamicSelectFieldFileDocument
+    DynamicSelectSettings_uploadDynamicSelectFieldFileDocument,
   );
 
   const showErrorDialog = useErrorDialog();

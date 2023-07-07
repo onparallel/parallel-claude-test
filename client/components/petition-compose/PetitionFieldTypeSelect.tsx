@@ -17,7 +17,7 @@ interface PetitionFieldTypeSelectProps extends ThemingProps<"Select"> {
 export const PetitionFieldTypeSelect = Object.assign(
   chakraForwardRef<"button", PetitionFieldTypeSelectProps>(function PetitionFieldTypeSelect(
     { user, type, onChange, ...props },
-    ref
+    ref,
   ) {
     return (
       <Menu placement="bottom" gutter={2}>
@@ -43,5 +43,5 @@ export const PetitionFieldTypeSelect = Object.assign(
         ${PetitionFieldTypeSelectDropdown.fragments.User}
       `,
     },
-  }
+  },
 );

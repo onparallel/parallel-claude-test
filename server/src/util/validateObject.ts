@@ -7,7 +7,7 @@ export async function validateObject<T extends {}>(
   validateKeys: {
     [K in keyof T]: (value: Exclude<T[K], null | undefined>) => MaybePromise<boolean>;
   },
-  options?: pMap.Options
+  options?: pMap.Options,
 ) {
   await pMap(
     Object.entries(validateKeys),
@@ -23,6 +23,6 @@ export async function validateObject<T extends {}>(
         }
       }
     },
-    options
+    options,
   );
 }

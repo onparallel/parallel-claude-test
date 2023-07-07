@@ -10,12 +10,12 @@ interface NavigationOptions {
 export function useHandleNavigation() {
   const router = useRouter();
   const localeRef = useUpdatingRef(
-    router.locale === router.defaultLocale ? undefined : router.locale
+    router.locale === router.defaultLocale ? undefined : router.locale,
   );
   return useCallback(function (
     url: string,
     event?: MouseEvent | globalThis.MouseEvent,
-    { type = "push", shallow }: NavigationOptions = {}
+    { type = "push", shallow }: NavigationOptions = {},
   ) {
     const path = (localeRef.current ? `/${localeRef.current}` : "") + url;
     if (event?.metaKey || event?.ctrlKey) {
@@ -23,6 +23,5 @@ export function useHandleNavigation() {
     } else {
       void router[type](path, undefined, { shallow });
     }
-  },
-  []);
+  }, []);
 }

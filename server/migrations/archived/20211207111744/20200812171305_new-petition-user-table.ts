@@ -55,7 +55,7 @@ export async function down(knex: Knex): Promise<void> {
 
   // repopulate petition.owner_id field
   await knex.raw(
-    /* sql */ `UPDATE petition SET owner_id = REGEXP_REPLACE(created_by, 'User:(\\d+)$', '\\1')::int WHERE id > 0`
+    /* sql */ `UPDATE petition SET owner_id = REGEXP_REPLACE(created_by, 'User:(\\d+)$', '\\1')::int WHERE id > 0`,
   );
 
   await knex.raw(/* sql */ `ALTER TABLE petition ALTER COLUMN owner_id SET NOT NULL`);

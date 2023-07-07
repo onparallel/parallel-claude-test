@@ -13,7 +13,7 @@ interface PetitionNameWithPathProps {
 export const PetitionNameWithPath = Object.assign(
   chakraForwardRef<"div", PetitionNameWithPathProps>(function PetitionName(
     { children, petition, relativePath, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     return (
@@ -47,5 +47,5 @@ export const PetitionNameWithPath = Object.assign(
         }
       `,
     },
-  }
+  },
 );

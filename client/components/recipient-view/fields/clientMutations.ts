@@ -71,13 +71,13 @@ const _publicDeletePetitionFieldReply = gql`
 
 export function useCreateFileUploadReply() {
   const [deletePetitionFieldReply] = useMutation(
-    RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyDocument
+    RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyDocument,
   );
   const [createFileUploadReply] = useMutation(
-    RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument
+    RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument,
   );
   const [fileUploadReplyComplete] = useMutation(
-    RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument
+    RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument,
   );
   const apollo = useApolloClient();
 
@@ -119,7 +119,7 @@ export function useCreateFileUploadReply() {
             const { reply, presignedPostData } = data!.publicCreateFileUploadReply;
             return { file, reply, presignedPostData };
           },
-          { concurrency: 1 }
+          { concurrency: 1 },
         ),
         async ({ file, reply, presignedPostData }) => {
           const controller = new AbortController();
@@ -150,17 +150,17 @@ export function useCreateFileUploadReply() {
             variables: { keycode, replyId: reply.id },
           });
         },
-        { concurrency: 5 }
+        { concurrency: 5 },
       );
     },
-    [createFileUploadReply, fileUploadReplyComplete]
+    [createFileUploadReply, fileUploadReplyComplete],
   );
 }
 
 function updateReplyContent(
   proxy: DataProxy,
   replyId: string,
-  updateFn: (cached: Record<string, any>) => Record<string, any>
+  updateFn: (cached: Record<string, any>) => Record<string, any>,
 ) {
   updateFragment(proxy, {
     fragment:

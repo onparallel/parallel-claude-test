@@ -7,7 +7,7 @@ import { fullName } from "../../util/fullName";
 
 export async function signatureCancelledNoCreditsLeft(
   payload: { petition_signature_request_id: number },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [signatureRequest, parallelOrg] = await Promise.all([
     context.petitions.loadPetitionSignatureById(payload.petition_signature_request_id),
@@ -24,7 +24,7 @@ export async function signatureCancelledNoCreditsLeft(
   const signatureIntegration = await context.integrations.loadIntegration(config.orgIntegrationId);
 
   const orgOwner = (await context.organizations.loadOwnerAndAdmins(petition.org_id)).find(
-    (u) => u.organization_role === "OWNER"
+    (u) => u.organization_role === "OWNER",
   )!;
   const orgOwnerData = await context.users.loadUserData(orgOwner.user_data_id);
   if (!orgOwnerData) {
@@ -54,7 +54,7 @@ export async function signatureCancelledNoCreditsLeft(
         signatureProvider: signatureIntegration!.name,
         ...layoutProps,
       },
-      { locale: userData.preferred_locale }
+      { locale: userData.preferred_locale },
     );
 
     emails.push(
@@ -65,7 +65,7 @@ export async function signatureCancelledNoCreditsLeft(
         text,
         html,
         created_from: `Petition:${petition.id}`,
-      })
+      }),
     );
   }
 

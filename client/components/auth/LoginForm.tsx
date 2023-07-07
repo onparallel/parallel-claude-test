@@ -50,7 +50,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     async function guessLogin() {
       const result = await postJSON<{ type: "SSO" | "PASSWORD"; url?: string }>(
         "/api/auth/guess-login",
-        { email, locale, redirect: router.query.redirect }
+        { email, locale, redirect: router.query.redirect },
       );
       if (result?.url && document.activeElement === passwordRef.current) {
         buttonRef.current!.focus();

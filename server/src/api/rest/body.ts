@@ -67,7 +67,7 @@ export function FormDataBodyContent<T>(schema: JsonSchemaFor<T>): RestBodyConten
 
 export function Body<T extends RestBodyContent<any>>(
   contents: T[],
-  options?: BodyOptions
+  options?: BodyOptions,
 ): RestBody<T extends RestBodyContent<infer U> ? U : never> {
   const { description, required = true } = options ?? {};
   const _contents = unMaybeArray(contents);
@@ -76,7 +76,7 @@ export function Body<T extends RestBodyContent<any>>(
       description,
       required,
       content: Object.fromEntries(
-        _contents.map(({ contentType, schema }) => [contentType, { schema: schema as any }])
+        _contents.map(({ contentType, schema }) => [contentType, { schema: schema as any }]),
       ),
     },
     validate: (req: Request, context: RestApiContext) => {

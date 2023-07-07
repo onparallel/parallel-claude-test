@@ -44,8 +44,8 @@ export async function up(knex: Knex): Promise<void> {
   if (!isDefined(environment) || !validEnvironments.includes(environment)) {
     throw new Error(
       `run this migration as: MIGRATION_ENV=<env> yarn migrate. <env>: ${validEnvironments.join(
-        " | "
-      )}`
+        " | ",
+      )}`,
     );
   }
 
@@ -64,8 +64,8 @@ export async function up(knex: Knex): Promise<void> {
         throw new Error(
           `key (${key.slice(
             0,
-            6
-          )}...) is not defined on encryptedCredentialsMap. Update the migration and try again.`
+            6,
+          )}...) is not defined on encryptedCredentialsMap. Update the migration and try again.`,
         );
       }
     });
@@ -83,7 +83,7 @@ export async function up(knex: Knex): Promise<void> {
         from "encrypted_keys" ek
         where "provider" = 'SIGNATURIT' and starts_with("settings"->'CREDENTIALS'->>'API_KEY', ek.hint);
     `,
-    encryptedKeys.flat()
+    encryptedKeys.flat(),
   );
 }
 

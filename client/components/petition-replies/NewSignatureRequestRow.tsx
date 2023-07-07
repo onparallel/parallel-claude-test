@@ -43,7 +43,7 @@ export function NewSignatureRequestRow({
 
   const canFinalize = petition.fields.every(
     (f, index) =>
-      !fieldVisibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
+      !fieldVisibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly,
   );
 
   const handleStartSignature = async () => {

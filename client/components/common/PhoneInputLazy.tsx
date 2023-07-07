@@ -18,5 +18,5 @@ export const PhoneInputLazy = withDynamicLoadingProps((useLoadingProps) =>
         </InputGroup>
       );
     },
-  })
+  }),
 ) as PhoneInputType;

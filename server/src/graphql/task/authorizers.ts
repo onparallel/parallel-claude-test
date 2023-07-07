@@ -7,7 +7,7 @@ import { Arg } from "../helpers/authorize";
 export function userHasAccessToTasks<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -24,7 +24,7 @@ export function userHasAccessToTasks<
 export function tasksAreOfType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg, allowedTypes: MaybeArray<TaskName>): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {

@@ -58,6 +58,6 @@ export function generateOrganizationPalette(color: string) {
       [700, lightness - ((lightness - 15) / 4) * 2],
       [800, lightness - ((lightness - 15) / 4) * 3],
       [900, 15],
-    ].map(([color, lightness]) => [color, _color.lightness(lightness).hex().toString()])
+    ].map(([color, lightness]) => [color, _color.lightness(lightness).hex().toString()]),
   );
 }

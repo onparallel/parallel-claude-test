@@ -264,5 +264,5 @@ export default compose(
   withDialogs,
   withMetadata,
   withFeatureFlag("PROFILES", "/app/petitions"),
-  withApolloData
+  withApolloData,
 )(ProfileDetail);

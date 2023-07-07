@@ -27,13 +27,13 @@ export async function up(knex: Knex): Promise<any> {
         ${columns.map((column) => `${column} = pfr._${column}`).join(", ")}
       from petition_field as pf
         where pfr.petition_field_id = pf.id
-    `
+    `,
     )
     .raw(
       /* sql */ `
       alter table "petition_field_reply" alter column "content" set not null;
       alter table "petition_field_reply" alter column "type" set not null;
-    `
+    `,
     )
     .alterTable("petition_field_reply", (t) => {
       t.dropColumns(...columns.map((column) => `_${column}`));

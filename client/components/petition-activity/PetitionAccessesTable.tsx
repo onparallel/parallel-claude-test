@@ -67,7 +67,7 @@ export function PetitionAccessesTable({
   const [selection, setSelection] = useState<string[]>([]);
   const selected = useMemo(
     () => selection.map((id) => petition.accesses.find((a) => a.id === id)!),
-    [selection, petition.accesses]
+    [selection, petition.accesses],
   );
 
   const handleSendReminders = useCallback(async () => {
@@ -94,7 +94,7 @@ export function PetitionAccessesTable({
       onDeactivateAccess,
       onConfigureReminders,
     }),
-    [petition]
+    [petition],
   );
 
   const optedOut = selected.filter((selected) => selected.remindersOptOut);
@@ -356,7 +356,7 @@ function usePetitionAccessesColumns(): TableColumn<
 
           if (status === "INACTIVE") {
             const contactHasActiveAccess = petition.accesses.some(
-              (access) => access.contact?.id === contact?.id && access.status === "ACTIVE"
+              (access) => access.contact?.id === contact?.id && access.status === "ACTIVE",
             );
 
             return (
@@ -441,7 +441,7 @@ function usePetitionAccessesColumns(): TableColumn<
         },
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

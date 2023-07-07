@@ -63,7 +63,7 @@ function Alerts() {
         search: queryState.search,
       },
       fetchPolicy: "cache-and-network",
-    }
+    },
   );
 
   const items = data?.expiringProfileProperties.items;
@@ -165,7 +165,7 @@ function AlertsListHeader({ shape, state, onStateChange, onReload }: AlertsListH
         page: 1,
       })),
     300,
-    [onStateChange]
+    [onStateChange],
   );
 
   const handleSearchChange = useCallback(
@@ -174,7 +174,7 @@ function AlertsListHeader({ shape, state, onStateChange, onReload }: AlertsListH
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   return (
@@ -368,7 +368,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
         },
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -444,5 +444,5 @@ Alerts.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 export default compose(
   withDialogs,
   withFeatureFlag("PROFILES", "/app/petitions"),
-  withApolloData
+  withApolloData,
 )(Alerts);

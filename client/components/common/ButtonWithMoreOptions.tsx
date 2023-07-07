@@ -47,5 +47,5 @@ export const ButtonWithMoreOptions = chakraForwardRef<"button", ButtonWithMoreOp
         />
       </ButtonGroup>
     );
-  }
+  },
 );

@@ -25,7 +25,7 @@ export async function up(knex: Knex): Promise<void> {
         updated_by: i.updated_by,
         deleted_at: i.deleted_at,
         deleted_by: i.deleted_by,
-      }))
+      })),
     );
   }
 

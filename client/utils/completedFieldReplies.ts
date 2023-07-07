@@ -25,7 +25,7 @@ export function completedFieldReplies(field: PartialField) {
   switch (f.type) {
     case "DYNAMIC_SELECT":
       return f.replies.filter((reply) =>
-        reply.content.value.every(([, value]: [string, string | null]) => !!value)
+        reply.content.value.every(([, value]: [string, string | null]) => !!value),
       );
     case "CHECKBOX":
       return f.replies.filter((reply) => {

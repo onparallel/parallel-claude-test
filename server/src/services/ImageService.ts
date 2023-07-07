@@ -29,7 +29,7 @@ export class ImageService implements ImageService {
         bucket: this.config.s3.publicFilesBucketName,
         key,
         edits: options,
-      })
+      }),
     ).toString("base64");
     const signature = createHmac("sha256", this.config.imageProxy.secret)
       .update(`/${request}`)

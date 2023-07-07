@@ -53,7 +53,7 @@ export function decode(value: string) {
     const c = value[i];
     if (!(c in ALPHABET_MAP)) {
       throw new Error(
-        `decode received unacceptable input. Character '${c}' is not in the alphabet.`
+        `decode received unacceptable input. Character '${c}' is not in the alphabet.`,
       );
     }
     let j = 0;

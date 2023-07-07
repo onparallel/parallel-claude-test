@@ -21,13 +21,13 @@ export function api(container: Container) {
       morgan("short", {
         stream: { write: (message: string) => logger.error(message) },
         skip: (req, res) => res.statusCode < 500,
-      }) as any
+      }) as any,
     )
     .use(
       morgan("short", {
         stream: { write: (message: string) => logger.info(message) },
         skip: (req, res) => res.statusCode >= 500,
-      }) as any
+      }) as any,
     )
     .use("/auth", auth)
     .use("/webhooks", webhooks)

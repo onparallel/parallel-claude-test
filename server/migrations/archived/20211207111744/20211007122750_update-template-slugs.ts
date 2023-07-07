@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
     .where("template_public", true)
     .update({
       public_metadata: knex.raw(
-        `jsonb_set(public_metadata, '{slug}', replace((public_metadata->'slug')::text, '_', '-')::jsonb)`
+        `jsonb_set(public_metadata, '{slug}', replace((public_metadata->'slug')::text, '_', '-')::jsonb)`,
       ),
     });
 }

@@ -10,7 +10,7 @@ export interface PdfDocumentGetPropsContext {
 
 export type PdfDocumentGetProps<ID = unknown, P = ID> = (
   initial: ID,
-  context: PdfDocumentGetPropsContext
+  context: PdfDocumentGetPropsContext,
 ) => MaybePromise<P>;
 
 export type PdfDocument<ID = unknown, P = ID> = ComponentType<P> & {

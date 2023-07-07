@@ -35,5 +35,5 @@ export const MoreOptionsMenuButton = chakraForwardRef<"button", MoreOptionsMenuB
         <Portal>{options}</Portal>
       </Menu>
     );
-  }
+  },
 );

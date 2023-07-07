@@ -7,9 +7,9 @@ import { EMAIL_REGEX } from "./validEmail";
 
 export function validSignatureConfig<TypeName extends string, FieldName extends string>(
   prop: (
-    args: core.ArgsValue<TypeName, FieldName>
+    args: core.ArgsValue<TypeName, FieldName>,
   ) => core.GetGen2<"inputTypes", "SignatureConfigInput"> | null | undefined,
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
@@ -34,7 +34,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         throw new ArgValidationError(
           info,
           `${argName}.timezone`,
-          `Value must be a valid timezone.`
+          `Value must be a valid timezone.`,
         );
       }
 
@@ -42,7 +42,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         throw new ArgValidationError(
           info,
           `${argName}.allowAdditionalSigners`,
-          "Invalid value with empty list of signers"
+          "Invalid value with empty list of signers",
         );
       }
     }

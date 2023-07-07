@@ -30,7 +30,7 @@ export function useFocus<T = any>({
           onBlur?.(e);
         }) as FocusEventHandler<T>,
       }),
-      [onFocus, onBlur]
+      [onFocus, onBlur],
     ),
   ] as const;
 }

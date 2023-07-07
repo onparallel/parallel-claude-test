@@ -30,7 +30,7 @@ export const ToolbarPlaceholderButton = chakraForwardRef<"button", ToolbarPlaceh
           });
         }
       }),
-      []
+      [],
     );
     return (
       <ToolbarButton
@@ -45,5 +45,5 @@ export const ToolbarPlaceholderButton = chakraForwardRef<"button", ToolbarPlaceh
         {...props}
       />
     );
-  }
+  },
 );

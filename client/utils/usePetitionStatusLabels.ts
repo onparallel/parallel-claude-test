@@ -23,6 +23,6 @@ export function usePetitionStatusLabels(): Record<PetitionStatus, string> {
         defaultMessage: "Closed",
       }),
     }),
-    [intl.locale]
+    [intl.locale],
   );
 }

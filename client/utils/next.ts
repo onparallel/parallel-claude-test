@@ -17,6 +17,6 @@ export function resolveUrl(pathname: string, query: (typeof Router)["query"]) {
  */
 export function pathParams(pathname: string) {
   return (pathname.match(/\[(\.{3})?([^\]]*)]/g) ?? []).map((param) =>
-    param.replace(/^\[(\.{3})?/, "").replace(/\]$/, "")
+    param.replace(/^\[(\.{3})?/, "").replace(/\]$/, ""),
   );
 }

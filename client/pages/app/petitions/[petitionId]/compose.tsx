@@ -170,7 +170,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         },
       });
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const [updateFieldPositions] = useMutation(PetitionCompose_updateFieldPositionsDocument);
@@ -178,7 +178,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     wrapper(async function (fieldIds: string[]) {
       await updateFieldPositions({ variables: { petitionId, fieldIds } });
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const [clonePetitionField] = useMutation(PetitionCompose_clonePetitionFieldDocument);
@@ -191,7 +191,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       setActiveFieldId(field.id);
       focusFieldTitle(field.id);
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
@@ -212,28 +212,28 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
       } catch {}
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const handleFieldSettingsClick = useCallback(
     function (fieldId: string) {
       setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : fieldId));
     },
-    [petitionId]
+    [petitionId],
   );
 
   const handleFieldTypeIndicatorClick = useCallback(
     function (fieldId: string) {
       setActiveFieldId(fieldId);
     },
-    [petitionId]
+    [petitionId],
   );
 
   const handleSettingsClose = useCallback(
     function () {
       setActiveFieldId(null);
     },
-    [petitionId]
+    [petitionId],
   );
 
   const confirmChangeFormat = useConfirmChangeShortTextFormatDialog();
@@ -254,8 +254,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           }
           return true;
         };
-        const referencing = zip(fields, indices).filter(([f]) =>
-          (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => !validCondition(c))
+        const referencing = zip(fields, indices).filter(
+          ([f]) =>
+            (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => !validCondition(c)),
         );
         if (referencing.length) {
           try {
@@ -273,7 +274,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 await _handleFieldEdit(field.id, {
                   visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
                 });
-              })
+              }),
             );
           } catch {
             return;
@@ -299,7 +300,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         } catch {}
       }
     },
-    [petitionId]
+    [petitionId],
   );
   const handleFieldEdit = useCallback(wrapper(_handleFieldEdit), [petitionId, _handleFieldEdit]);
 
@@ -310,8 +311,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
       const { fields, indices } = petitionDataRef.current!;
       const field = fields.find((f) => f.id === fieldId)!;
-      const referencing = zip(fields, indices).filter(([f]) =>
-        (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId)
+      const referencing = zip(fields, indices).filter(
+        ([f]) =>
+          (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId),
       );
       if (referencing.length) {
         // valid field types changes
@@ -352,7 +354,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
       } catch {}
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const [createPetitionField] = useMutation(PetitionCompose_createPetitionFieldDocument);
@@ -365,7 +367,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       setActiveFieldId(data!.createPetitionField.id);
       focusFieldTitle(data!.createPetitionField.id);
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const showErrorDialog = useErrorDialog();
@@ -394,7 +396,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     me,
     petition?.__typename === "Petition" ? petition : null,
     handleUpdatePetition,
-    validPetitionFields
+    validPetitionFields,
   );
 
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {

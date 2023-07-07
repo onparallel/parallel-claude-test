@@ -27,7 +27,7 @@ export function OlderSignatureRequestRows({
   const requestErrorMessage = useSignatureCancelledRequestErrorMessage();
   const showSignatureCancelledRequestErrorDialog = useSignatureCancelledRequestErrorDialog();
   async function handleSeeRequestErrorMessageClick(
-    signature: OlderSignatureRequestRows_PetitionSignatureRequestFragment
+    signature: OlderSignatureRequestRows_PetitionSignatureRequestFragment,
   ) {
     try {
       await showSignatureCancelledRequestErrorDialog({

@@ -13,7 +13,7 @@ type VoidableAsyncFunction<T extends (...args: any[]) => void> = (
 export function useDebouncedCallback<T extends (...args: any[]) => void>(
   callback: T,
   ms: number,
-  deps: DependencyList | undefined
+  deps: DependencyList | undefined,
 ): T & {
   immediate: T;
   immediateIfPending: VoidableAsyncFunction<T>;
@@ -38,7 +38,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => void>(
           callback(...args);
         }, ms);
       } as T,
-      [...(deps ?? []), ms]
+      [...(deps ?? []), ms],
     ),
     {
       immediate: useCallback(
@@ -49,7 +49,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => void>(
           pending.current = false;
           return callback(...args);
         } as T,
-        [...(deps ?? []), ms]
+        [...(deps ?? []), ms],
       ),
       immediateIfPending: useCallback(
         function (...args: any[]) {
@@ -61,14 +61,14 @@ export function useDebouncedCallback<T extends (...args: any[]) => void>(
             return callback(...args);
           }
         } as any,
-        [...(deps ?? []), ms]
+        [...(deps ?? []), ms],
       ),
       clear: useCallback(
         function () {
           clearTimeout(timeout.current);
         },
-        [...(deps ?? []), ms]
+        [...(deps ?? []), ms],
       ),
-    }
+    },
   );
 }

@@ -22,7 +22,7 @@ export async function profilesExpiringProperties(
       totalCount: number;
     };
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const user = await context.users.loadUser(payload.userId);
   if (!user) {
@@ -43,7 +43,7 @@ export async function profilesExpiringProperties(
       properties: payload.properties,
       ...layoutProps,
     },
-    { locale: userData.preferred_locale }
+    { locale: userData.preferred_locale },
   );
 
   return await context.emailLogs.createEmail({

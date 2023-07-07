@@ -66,7 +66,7 @@ export function CreateReferenceDialog({
         throw error;
       }
     },
-    [field.id]
+    [field.id],
   );
 
   const aliasRef = useRef<HTMLInputElement>(null);

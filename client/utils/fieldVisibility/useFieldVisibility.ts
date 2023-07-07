@@ -26,7 +26,7 @@ type PetitionFieldSelection =
 function evaluatePredicate(
   reply: string | number | string[],
   operator: PetitionFieldVisibilityConditionOperator,
-  value: string | string[] | number | null
+  value: string | string[] | number | null,
 ) {
   try {
     if (reply === undefined || value === undefined || value === null) {
@@ -109,7 +109,7 @@ function conditionIsMet(
   condition: PetitionFieldVisibilityCondition,
   field: PetitionFieldSelection,
   isVisible: boolean,
-  isCacheOnly: boolean
+  isCacheOnly: boolean,
 ) {
   const replies = isVisible
     ? isCacheOnly && field.__typename === "PetitionField"
@@ -154,7 +154,7 @@ function conditionIsMet(
  */
 export function useFieldVisibility(
   fields: UnionToArrayUnion<PetitionFieldSelection>,
-  usePreviewReplies = false
+  usePreviewReplies = false,
 ) {
   return useMemo(() => {
     const fieldsById = indexBy<PetitionFieldSelection>(fields, (f) => f.id);
@@ -163,7 +163,7 @@ export function useFieldVisibility(
       if (field.visibility) {
         const { conditions, operator, type } = field.visibility as PetitionFieldVisibility;
         const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
-          conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId], usePreviewReplies)
+          conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId], usePreviewReplies),
         );
         visibilitiesById[field.id] = type === "SHOW" ? result : !result;
       } else {

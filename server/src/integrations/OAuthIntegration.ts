@@ -33,12 +33,12 @@ export abstract class OAuthIntegration<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
   TState extends OauthIntegrationState = OauthIntegrationState,
-  WithAccessTokenContext extends {} = {}
+  WithAccessTokenContext extends {} = {},
 > extends ExpirableCredentialsIntegration<TType, TProvider, WithAccessTokenContext> {
   constructor(
     protected override encryption: EncryptionService,
     protected override integrations: IntegrationRepository,
-    protected redis: IRedis
+    protected redis: IRedis,
   ) {
     super(encryption, integrations);
   }
@@ -69,7 +69,7 @@ export abstract class OAuthIntegration<
 
   protected abstract fetchIntegrationSettings(
     code: string,
-    state: TState
+    state: TState,
   ): Promise<IntegrationSettings<TType, TProvider>>;
 
   private async storeState(key: string, value: TState) {
@@ -131,7 +131,7 @@ export abstract class OAuthIntegration<
                   is_default: state.isDefault,
                   settings,
                 },
-                `Organization:${state.orgId}`
+                `Organization:${state.orgId}`,
               );
             }
 

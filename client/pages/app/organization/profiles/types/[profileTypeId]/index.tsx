@@ -124,7 +124,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
         showError();
       }
     },
-    [profileTypeId]
+    [profileTypeId],
   );
 
   const showCreateOrUpdateProfileTypeDialog = useCreateOrUpdateProfileTypeDialog();
@@ -184,7 +184,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   };
 
   const [deleteProfileTypeField] = useMutation(
-    OrganizationProfileType_deleteProfileTypeFieldDocument
+    OrganizationProfileType_deleteProfileTypeFieldDocument,
   );
   const showUsedInPattern = useProfileTypeFieldsInPatternDialog();
   const showConfirmDeleteProfileTypeFieldDialog = useConfirmDeleteProfileTypeFieldDialog();
@@ -230,10 +230,10 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   };
 
   const [updateProfileTypeField] = useMutation(
-    OrganizationProfileType_updateProfileTypeFieldDocument
+    OrganizationProfileType_updateProfileTypeFieldDocument,
   );
   const handleConfigureVisibility = async (
-    rows: OrganizationProfileType_ProfileTypeFieldFragment[]
+    rows: OrganizationProfileType_ProfileTypeFieldFragment[],
   ) => {
     try {
       const data = {};
@@ -279,7 +279,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   };
 
   const [updateProfileTypeFieldPositions] = useMutation(
-    OrganizationProfileType_updateProfileTypeFieldPositionsDocument
+    OrganizationProfileType_updateProfileTypeFieldPositionsDocument,
   );
   const handleReorderProperties = useCallback(
     async (profileTypeFieldIds: string[]) => {
@@ -292,7 +292,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
         });
       } catch {}
     },
-    [profileTypeId]
+    [profileTypeId],
   );
 
   const actions = useProfileTypeFieldsActions({
@@ -439,7 +439,7 @@ function DraggableList({
 
   const { selection, allSelected, anySelected, toggle, toggleAll } = useSelectionState(
     rows ?? [],
-    rowKeyProp
+    rowKeyProp,
   );
 
   useEffect(() => {
@@ -545,7 +545,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
     onToggle,
     ...props
   },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const dragControls = useDragControls();
@@ -727,7 +727,7 @@ function useConfirmDeleteProfileTypeFieldDialog() {
         ),
       });
     },
-    []
+    [],
   );
 }
 
@@ -872,5 +872,5 @@ export default compose(
   withDialogs,
   withOrgRole("ADMIN", "/app/organization"),
   withFeatureFlag("PROFILES", "/app/organization"),
-  withApolloData
+  withApolloData,
 )(OrganizationProfileType);

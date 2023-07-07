@@ -132,14 +132,14 @@ function _PetitionSettings({
   const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
 
   const [cancelSignatureRequest] = useMutation(
-    PetitionSettings_cancelPetitionSignatureRequestDocument
+    PetitionSettings_cancelPetitionSignatureRequestDocument,
   );
   const [startSignatureRequest] = useMutation(
-    PetitionSettings_startPetitionSignatureRequestDocument
+    PetitionSettings_startPetitionSignatureRequestDocument,
   );
 
   const [updatePetitionRestriction] = useMutation(
-    PetitionSettings_updatePetitionRestrictionDocument
+    PetitionSettings_updatePetitionRestrictionDocument,
   );
 
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
@@ -226,7 +226,7 @@ function _PetitionSettings({
   const [updatePublicPetitionLink] = useMutation(
     PetitionSettings_updatePublicPetitionLinkDocument,
     // refetch on updates of public link so the new link owner is correctly passed to the TemplateDefaultPermissionsDialog
-    { update: () => onRefetch() }
+    { update: () => onRefetch() },
   );
   const showPublicLinkSettingDialog = usePublicLinkSettingsDialog();
   const handleToggleShareByLink = async () => {
@@ -286,7 +286,7 @@ function _PetitionSettings({
   const showTemplateDefaultPermissionsDialog = useTemplateDefaultPermissionsDialog();
   const [updateTemplateDefaultPermissions] = useMutation(
     PetitionSettings_updateTemplateDefaultPermissionsDocument,
-    { update: () => onRefetch() }
+    { update: () => onRefetch() },
   );
   const handleUpdateTemplateDefaultPermissions = async (enable: boolean) => {
     assertTypename(petition, "PetitionTemplate");
@@ -444,7 +444,7 @@ function _PetitionSettings({
     myEffectivePermission === "READ";
 
   const [updateTemplateDocumentTheme] = useMutation(
-    PetitionSettings_updateTemplateDocumentThemeDocument
+    PetitionSettings_updateTemplateDocumentThemeDocument,
   );
 
   async function handleUpdateTemplateDocumentTheme(orgThemeId: string) {
@@ -454,7 +454,7 @@ function _PetitionSettings({
           templateId: petition.id,
           orgThemeId,
         },
-      })
+      }),
     );
   }
 
@@ -1039,9 +1039,9 @@ export const PetitionSettings = Object.assign(
     compareWithFragments<PetitionSettingsProps>({
       user: fragments.User,
       petition: fragments.PetitionBase,
-    })
+    }),
   ) as typeof _PetitionSettings,
-  { fragments, mutations }
+  { fragments, mutations },
 );
 
 function DeadlineInput({

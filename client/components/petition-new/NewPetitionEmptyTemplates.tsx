@@ -51,5 +51,5 @@ export const NewPetitionEmptyTemplates = chakraForwardRef<"div", NewPetitionEmpt
         </Stack>
       </Center>
     );
-  }
+  },
 );

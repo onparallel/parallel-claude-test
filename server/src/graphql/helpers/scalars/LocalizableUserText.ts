@@ -21,17 +21,17 @@ function ensureLocalizableUserText(value: any, strict: boolean): LocalizableUser
   if (
     !ajv.validate(
       { ...LOCALIZABLE_USER_TEXT_SCHEMA, additionalProperties: strict === true ? false : true },
-      value
+      value,
     )
   ) {
     throw new Error(
-      `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} ${ajv.errorsText()}`
+      `Value is not a valid LocalizableUserText: ${JSON.stringify(value)} ${ajv.errorsText()}`,
     );
   }
   return Object.fromEntries(
     UserLocaleValues.map((key) => [key, value[key]]).filter(
-      ([, value]) => isDefined(value) && value.length > 0
-    )
+      ([, value]) => isDefined(value) && value.length > 0,
+    ),
   );
 }
 

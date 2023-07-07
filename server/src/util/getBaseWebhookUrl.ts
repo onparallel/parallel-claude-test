@@ -18,14 +18,14 @@ async function tunnelUrl() {
     });
     if (status !== 200) {
       throw new Error(
-        `Tunnel at ${tunnelUrl} seems to be down with code ${status}. Run 'yarn localtunnel' on a separate terminal and try again.`
+        `Tunnel at ${tunnelUrl} seems to be down with code ${status}. Run 'yarn localtunnel' on a separate terminal and try again.`,
       );
     }
     return tunnelUrl;
   } catch (e: any) {
     if (e.code === "ENOENT") {
       throw new Error(
-        `localtunnel-dev.url file not found at path ${e.path}. Run 'yarn localtunnel' on a separate terminal and try again.`
+        `localtunnel-dev.url file not found at path ${e.path}. Run 'yarn localtunnel' on a separate terminal and try again.`,
       );
     } else {
       throw e;

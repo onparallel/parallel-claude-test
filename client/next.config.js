@@ -20,7 +20,7 @@ const config = {
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;
     config.plugins.push(
-      new options.webpack.DefinePlugin({ "process.env.BUILD_ID": JSON.stringify(options.buildId) })
+      new options.webpack.DefinePlugin({ "process.env.BUILD_ID": JSON.stringify(options.buildId) }),
     );
 
     // Add the why did you render script on development
@@ -96,7 +96,7 @@ module.exports = [
               widenClientFileUpload: true,
               transpileClientSDK: true,
               hideSourceMaps: true,
-            }
+            },
           ),
       ]
     : []),

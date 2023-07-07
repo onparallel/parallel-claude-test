@@ -6,7 +6,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 export function maxFileSize<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => Promise<FileUpload>,
   maxSizeBytes: number,
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const { createReadStream } = await prop(args);
@@ -35,7 +35,7 @@ export function maxFileSize<TypeName extends string, FieldName extends string>(
       throw new MaxFileSizeExceededError(
         info,
         argName,
-        `File exceeded max size of ${maxSizeBytes} bytes`
+        `File exceeded max size of ${maxSizeBytes} bytes`,
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

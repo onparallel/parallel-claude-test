@@ -30,7 +30,7 @@ function init() {
                 ...fonts.find(
                   (font) =>
                     (font.fontStyle !== "italic" && font.fontWeight === undefined) ||
-                    font.fontWeight === 400
+                    font.fontWeight === 400,
                 )!,
                 fontStyle: "italic",
               },
@@ -75,7 +75,7 @@ async function createHyphenationCallback(locale: ContactLocale) {
 export async function buildPdf<ID, P extends {}>(
   document: PdfDocument<ID, P>,
   initial: ID,
-  context: PdfDocumentGetPropsContext
+  context: PdfDocumentGetPropsContext,
 ) {
   if (!hasInit) {
     init();
@@ -91,6 +91,6 @@ export async function buildPdf<ID, P extends {}>(
     onWarn: () => {},
   };
   return await renderToStream(
-    <IntlProvider {...intlProps}>{createElement<P>(document, props as any)}</IntlProvider>
+    <IntlProvider {...intlProps}>{createElement<P>(document, props as any)}</IntlProvider>,
   );
 }

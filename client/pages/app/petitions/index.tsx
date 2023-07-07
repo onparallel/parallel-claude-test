@@ -158,14 +158,14 @@ function Petitions() {
       },
       fetchPolicy: "cache-and-network",
     },
-    (prev, curr) => prev?.variables?.filters?.type === curr?.variables?.filters?.type
+    (prev, curr) => prev?.variables?.filters?.type === curr?.variables?.filters?.type,
   );
 
   const petitions = data?.petitions;
 
   const { selectedIdsRef, selectedRows, selectedRowsRef, onChangeSelectedIds } = useSelection(
     petitions?.items,
-    rowKeyProp
+    rowKeyProp,
   );
 
   function handleTypeChange(type: PetitionBaseType) {
@@ -294,7 +294,7 @@ function Petitions() {
   };
   const handleRowClick = useCallback(function (
     row: Petitions_PetitionBaseOrFolderFragment,
-    event: MouseEvent
+    event: MouseEvent,
   ) {
     if (row.__typename === "PetitionFolder") {
       setQueryState(
@@ -303,7 +303,7 @@ function Petitions() {
           path: row.path,
           page: 1,
         }),
-        { type: "push", event }
+        { type: "push", event },
       );
     } else if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
       goToPetition(
@@ -318,11 +318,10 @@ function Petitions() {
               } as const
             )[row.status]
           : "compose",
-        { event }
+        { event },
       );
     }
-  },
-  []);
+  }, []);
 
   const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
   const [renameFolder] = useMutation(Petitions_renameFolderDocument);
@@ -403,9 +402,9 @@ function Petitions() {
           ? r.minimumPermissionType
           : r.__typename === "Petition" || r.__typename === "PetitionTemplate"
           ? r.myEffectivePermission!.permissionType
-          : (null as never)
+          : (null as never),
       ),
-      maxBy((p) => ["OWNER", "WRITE", "READ"].indexOf(p))
+      maxBy((p) => ["OWNER", "WRITE", "READ"].indexOf(p)),
     )!;
   }, [selectedRows]);
 
@@ -875,7 +874,7 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
     if (isDefined(query.tags)) {
       const tagsState = parseQuery(query, {
         tags: new QueryItem<string[] | null>((value) =>
-          typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null
+          typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null,
         ),
       });
       if (Array.isArray(tagsState.tags)) {
@@ -917,8 +916,8 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
               ...tagsFiltersOrNothing,
             },
             pathname,
-            omit(query, ["tags"])
-          )
+            omit(query, ["tags"]),
+          ),
         );
       } else {
         throw new RedirectError(
@@ -926,8 +925,8 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
             QUERY_STATE,
             { view: "ALL", ...tagsFiltersOrNothing },
             pathname,
-            omit(query, ["tags"])
-          )
+            omit(query, ["tags"]),
+          ),
         );
       }
     } else if (state.view !== "ALL") {
@@ -938,14 +937,19 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
             QUERY_STATE,
             { ...state, view: "ALL", ...tagsFiltersOrNothing },
             pathname,
-            omit(query, ["tags"])
-          )
+            omit(query, ["tags"]),
+          ),
         );
       }
     }
     if (tags) {
       throw new RedirectError(
-        buildStateUrl(QUERY_STATE, { ...state, tagsFilters: tags }, pathname, omit(query, ["tags"]))
+        buildStateUrl(
+          QUERY_STATE,
+          { ...state, tagsFilters: tags },
+          pathname,
+          omit(query, ["tags"]),
+        ),
       );
     }
   }

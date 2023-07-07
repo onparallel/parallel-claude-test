@@ -18,7 +18,7 @@ async function main() {
   const result = await resolveCname(domain);
   assert(
     result.length === 1 && result[0] === "lb.onparallel.com",
-    `${domain} is not pointing to lb.onparallel.com`
+    `${domain} is not pointing to lb.onparallel.com`,
   );
 
   execSync(`certbot certonly \

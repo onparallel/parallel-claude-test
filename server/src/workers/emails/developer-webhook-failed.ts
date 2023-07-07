@@ -11,7 +11,7 @@ export async function developerWebhookFailed(
     error_message: string;
     post_body: any;
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [petition, subscription] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
@@ -22,13 +22,13 @@ export async function developerWebhookFailed(
   }
   if (!subscription) {
     throw new Error(
-      `PetitionEventSubscription not found for payload.petition_event_subscription_id ${payload.petition_event_subscription_id}`
+      `PetitionEventSubscription not found for payload.petition_event_subscription_id ${payload.petition_event_subscription_id}`,
     );
   }
   const subscribedUserData = await context.users.loadUserDataByUserId(subscription.user_id);
   if (!subscribedUserData) {
     throw new Error(
-      `UserData not found for User:${subscription.user_id} on PetitionEventSubscription:${payload.petition_event_subscription_id}`
+      `UserData not found for User:${subscription.user_id} on PetitionEventSubscription:${payload.petition_event_subscription_id}`,
     );
   }
 
@@ -41,7 +41,7 @@ export async function developerWebhookFailed(
       postBody: payload.post_body,
       ...layoutProps,
     },
-    { locale: subscribedUserData.preferred_locale }
+    { locale: subscribedUserData.preferred_locale },
   );
   return await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

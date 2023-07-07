@@ -73,7 +73,7 @@ export const excludedFieldsOrigin = [
 export const MapFieldsTable = Object.assign(
   chakraForwardRef<"table", MapFieldsTableProps>(function MapFieldsTable(
     { fields, sourcePetitionFields, value, onChange, overwriteExisting, isDisabled, ...props },
-    ref
+    ref,
   ) {
     const fieldsWithIndices = useFieldWithIndices(fields);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -171,7 +171,7 @@ export const MapFieldsTable = Object.assign(
                     onChange(
                       isDefined(fieldId)
                         ? { ...value, [field.id]: fieldId }
-                        : omit(value, [field.id])
+                        : omit(value, [field.id]),
                     )
                   }
                   sourcePetitionFields={sourcePetitionFields}
@@ -245,7 +245,7 @@ export const MapFieldsTable = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 function TableRow({
@@ -275,10 +275,10 @@ function TableRow({
     () =>
       unzipFieldsWithIndices(
         fieldsWithIndex.filter(
-          ([f]) => !excludedFieldsOrigin.includes(f.type) && isReplyContentCompatible(field, f)
-        )
+          ([f]) => !excludedFieldsOrigin.includes(f.type) && isReplyContentCompatible(field, f),
+        ),
       ),
-    [fieldsWithIndex]
+    [fieldsWithIndex],
   );
 
   const selectedField = sourcePetitionFields.find((f) => f.id === selectedFieldId);
@@ -588,7 +588,7 @@ function FieldReplies({
 
 const checkMultipleRepliesConflict = (
   target: MapFieldsTable_PetitionFieldFragment,
-  origin: MapFieldsTable_PetitionFieldFragment
+  origin: MapFieldsTable_PetitionFieldFragment,
 ) => {
   if (target.type === "CHECKBOX" && origin.type === "CHECKBOX") return false;
 

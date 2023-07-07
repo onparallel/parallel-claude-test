@@ -87,7 +87,7 @@ export type TagSelectInstance<IsMulti extends boolean = false> = SelectInstance<
 export const TagSelect = Object.assign(
   forwardRef(function TagSelect<IsMulti extends boolean = false>(
     { value, canEditTags, canCreateTags, maxItems, ...props }: TagSelectProps<IsMulti>,
-    ref: ForwardedRef<TagSelectInstance<IsMulti>>
+    ref: ForwardedRef<TagSelectInstance<IsMulti>>,
   ) {
     const intl = useIntl();
     const [newTagColor, setNewTagColor] = useState(randomColor());
@@ -126,7 +126,7 @@ export const TagSelect = Object.assign(
         return data!.tags.items;
       },
       150,
-      []
+      [],
     );
     const rsProps = useReactSelectProps<TagSelection, IsMulti, never>({
       ...props,
@@ -157,7 +157,7 @@ export const TagSelect = Object.assign(
           }),
           menuList: (
             styles: CSSObjectWithLabel,
-            { selectProps }: MenuListProps<TagSelection> & ReactSelectExtraProps
+            { selectProps }: MenuListProps<TagSelection> & ReactSelectExtraProps,
           ) => {
             return {
               ...styles,
@@ -184,7 +184,7 @@ export const TagSelect = Object.assign(
           option: tag,
         });
       },
-      [props.isMulti, newTagColor]
+      [props.isMulti, newTagColor],
     );
 
     const Component = canCreateTags
@@ -235,7 +235,7 @@ export const TagSelect = Object.assign(
       />
     );
   }) as <IsMulti extends boolean = false>(
-    props: TagSelectProps<IsMulti> & RefAttributes<TagSelectInstance<IsMulti>>
+    props: TagSelectProps<IsMulti> & RefAttributes<TagSelectInstance<IsMulti>>,
   ) => ReactElement,
   {
     fragments: {
@@ -247,7 +247,7 @@ export const TagSelect = Object.assign(
         ${Tag.fragments.Tag}
       `,
     },
-  }
+  },
 );
 
 const _queries = [
@@ -418,7 +418,7 @@ function MenuList(props: MenuListProps<TagSelection> & { selectProps: ReactSelec
 function useGetTagValues<IsMulti extends boolean = false>(
   value: If<IsMulti, TagSelection[] | string[], TagSelection | string | null>,
   isMulti: IsMulti,
-  deps: DependencyList
+  deps: DependencyList,
 ) {
   assert(!isMulti || Array.isArray(value));
   const client = useApolloClient();
@@ -438,7 +438,7 @@ function useGetTagValues<IsMulti extends boolean = false>(
           return tag;
         }
         return null;
-      })
+      }),
     );
     const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
     if (missing.length) {
@@ -484,7 +484,7 @@ function useGetTagValues<IsMulti extends boolean = false>(
             .join(","),
       ...deps,
     ],
-    isMulti ? [] : null
+    isMulti ? [] : null,
   );
 }
 

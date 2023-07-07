@@ -49,7 +49,7 @@ function AssociateProfileToPetitionDialog({
 
   const [createProfile] = useMutation(AssociateProfileToPetitionDialog_createProfileDocument);
   const [updateProfileFieldValue] = useMutation(
-    AssociateProfileToPetitionDialog_updateProfileFieldValueDocument
+    AssociateProfileToPetitionDialog_updateProfileFieldValueDocument,
   );
   const showCreateProfileDialog = useCreateProfileDialog();
   const handleCreateProfile = async (search: string) => {

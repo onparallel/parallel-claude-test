@@ -23,7 +23,7 @@ export const ToolbarHeadingButton = chakraForwardRef<"button", ToolbarHeadingBut
     const editor = usePlateEditorRef();
     const type =
       ["heading", "subheading", "paragraph"].find((type) =>
-        someNode(editor as any, { match: { type } })
+        someNode(editor as any, { match: { type } }),
       ) ?? "paragraph";
     const selectionRef = useRef<Selection>();
     return (
@@ -91,5 +91,5 @@ export const ToolbarHeadingButton = chakraForwardRef<"button", ToolbarHeadingBut
         </Menu>
       </Box>
     );
-  }
+  },
 );

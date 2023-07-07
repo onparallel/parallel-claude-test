@@ -70,7 +70,7 @@ async function main() {
         HttpEndpoint: InstanceMetadataEndpointState.enabled,
         HttpTokens: HttpTokensState.required,
       },
-    })
+    }),
   );
   const instanceId = instanceResult.Instances![0].InstanceId!;
   console.log(chalk`Launched instance {bold ${instanceId}}`);
@@ -87,7 +87,7 @@ async function main() {
       return isRunning;
     },
     chalk.italic`Instance {yellow pending}. Waiting 10 more seconds...`,
-    10_000
+    10_000,
   );
   assert(isDefined(ipAddress));
   console.log(chalk`Instance {green ✓ running}`);
@@ -99,7 +99,7 @@ async function main() {
     -o "UserKnownHostsFile=/dev/null" \
     -o "StrictHostKeyChecking=no" \
     ${path.resolve(__dirname, "../../ops/prod/image/*")} ec2-user@${ipAddress}:~`,
-    { stdio: "inherit" }
+    { stdio: "inherit" },
   );
   console.log("Executing build script.");
   execSync(
@@ -108,7 +108,7 @@ async function main() {
     -o "UserKnownHostsFile=/dev/null" \
     -o StrictHostKeyChecking=no \
     ec2-user@${ipAddress} /home/ec2-user/build.sh`,
-    { stdio: "inherit" }
+    { stdio: "inherit" },
   );
 
   console.log("Creating Image.");
@@ -120,7 +120,7 @@ async function main() {
         { ResourceType: ResourceType.image, Tags: [{ Key: "Name", Value: name }] },
         { ResourceType: ResourceType.snapshot, Tags: [{ Key: "Name", Value: name }] },
       ],
-    })
+    }),
   );
   const imageId = createImageResult.ImageId!;
   console.log(chalk.green`Image created: ${imageId}`);
@@ -129,12 +129,12 @@ async function main() {
       const result = await ec2.send(
         new DescribeImagesCommand({
           ImageIds: [imageId],
-        })
+        }),
       );
       const imageState = result.Images?.[0].State;
       if (
         ([ImageState.available, ImageState.pending] as ImageState[]).includes(
-          imageState as ImageState
+          imageState as ImageState,
         )
       ) {
         return imageState === ImageState.available;
@@ -143,12 +143,12 @@ async function main() {
       }
     },
     chalk.italic`Waiting for image to become available...`,
-    30_000
+    30_000,
   );
   await ec2.send(
     new TerminateInstancesCommand({
       InstanceIds: [instanceId],
-    })
+    }),
   );
   console.log(chalk.green`Image ID: ${imageId}`);
 }
@@ -165,7 +165,7 @@ async function waitForInstance(ipAddress: string) {
             -o ConnectTimeout=1 \
             -o "UserKnownHostsFile=/dev/null" \
             -o StrictHostKeyChecking=no \
-            ec2-user@${ipAddress} true >/dev/null 2>&1`
+            ec2-user@${ipAddress} true >/dev/null 2>&1`,
         );
         return true;
       } catch {
@@ -173,6 +173,6 @@ async function waitForInstance(ipAddress: string) {
       }
     },
     chalk.italic`SSH not available. Waiting 5 more seconds...`,
-    5_000
+    5_000,
   );
 }

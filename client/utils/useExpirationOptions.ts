@@ -5,7 +5,7 @@ export function expirationToDuration(expiration: ExpirationOption): Duration {
   const [value, period, beforeAfter] = expiration.split("_") as [
     "1" | "2" | "3" | "7" | "15",
     "MONTHS" | "DAYS",
-    "BEFORE" | "AFTER"
+    "BEFORE" | "AFTER",
   ];
 
   return {
@@ -45,7 +45,7 @@ export function useExpirationOptions() {
             id: "generic.n-months-before",
             defaultMessage: "{count, plural, =1 {1 month} other {# months}} before",
           },
-          { count }
+          { count },
         ),
       })),
       ...([15, 7, 1] as const).map((count) => ({
@@ -55,7 +55,7 @@ export function useExpirationOptions() {
             id: "generic.n-days-before",
             defaultMessage: "{count, plural, =1 {1 day} other {# days}} before",
           },
-          { count }
+          { count },
         ),
       })),
       {
@@ -65,7 +65,7 @@ export function useExpirationOptions() {
             id: "generic.n-days-after",
             defaultMessage: "{count, plural, =1 {1 day} other {# days}} after",
           },
-          { count: 7 }
+          { count: 7 },
         ),
       },
       {
@@ -75,7 +75,7 @@ export function useExpirationOptions() {
             id: "generic.n-months-after",
             defaultMessage: "{count, plural, =1 {1 month} other {# months}} after",
           },
-          { count: 1 }
+          { count: 1 },
         ),
       },
       {
@@ -86,6 +86,6 @@ export function useExpirationOptions() {
         }),
       },
     ],
-    []
+    [],
   );
 }

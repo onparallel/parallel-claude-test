@@ -9,7 +9,7 @@ export interface IProfilesSetupService {
   createDefaultProfileType(
     orgId: number,
     name: LocalizableUserText,
-    createdBy: string
+    createdBy: string,
   ): Promise<ProfileType>;
   createDefaultOrganizationProfileTypesAndFields(orgId: number, createdBy: string): Promise<void>;
 }
@@ -18,7 +18,7 @@ export interface IProfilesSetupService {
 export class ProfilesSetupService implements IProfilesSetupService {
   constructor(
     @inject(I18N_SERVICE) private intl: II18nService,
-    private profiles: ProfileRepository
+    private profiles: ProfileRepository,
   ) {}
 
   async createDefaultProfileType(orgId: number, name: LocalizableUserText, createdBy: string) {
@@ -30,7 +30,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
       const [profileType] = await this.profiles.createProfileType(
         { name, org_id: orgId },
         createdBy,
-        t
+        t,
       );
       const [field] = await this.profiles.createProfileTypeField(
         profileType.id,
@@ -39,13 +39,13 @@ export class ProfilesSetupService implements IProfilesSetupService {
           name: fieldName,
         },
         createdBy,
-        t
+        t,
       );
       await this.profiles.updateProfileTypeProfileNamePattern(
         profileType.id,
         [field.id],
         createdBy,
-        t
+        t,
       );
       return profileType;
     });
@@ -70,7 +70,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
       const [individual, legalEntity, contract] = await this.profiles.createProfileType(
         names.map((name) => ({ name, org_id: orgId })),
         createdBy,
-        t
+        t,
       );
 
       const [firstName, lastName] = await this.profiles.createProfileTypeField(
@@ -129,14 +129,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
           }))(),
         ]),
         createdBy,
-        t
+        t,
       );
 
       await this.profiles.updateProfileTypeProfileNamePattern(
         individual.id,
         [firstName.id, " ", lastName.id],
         createdBy,
-        t
+        t,
       );
 
       const [corporateName] = await this.profiles.createProfileTypeField(
@@ -177,14 +177,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
           }))(),
         ]),
         createdBy,
-        t
+        t,
       );
 
       await this.profiles.updateProfileTypeProfileNamePattern(
         legalEntity.id,
         [corporateName.id],
         createdBy,
-        t
+        t,
       );
 
       const [contractType, counterParty] = await this.profiles.createProfileTypeField(
@@ -252,14 +252,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
           }))(),
         ]),
         createdBy,
-        t
+        t,
       );
 
       await this.profiles.updateProfileTypeProfileNamePattern(
         contract.id,
         [contractType.id, " - ", counterParty.id],
         createdBy,
-        t
+        t,
       );
     });
   }

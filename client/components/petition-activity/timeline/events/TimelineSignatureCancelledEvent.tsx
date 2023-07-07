@@ -37,7 +37,7 @@ export function TimelineSignatureCancelledEvent({
   const requestErrorMessage = useSignatureCancelledRequestErrorMessage();
   const showSignatureCancelledRequestErrorDialog = useSignatureCancelledRequestErrorDialog();
   async function handleSeeRequestErrorMessageClick(
-    event: TimelineSignatureCancelledEvent_SignatureCancelledEventFragment
+    event: TimelineSignatureCancelledEvent_SignatureCancelledEventFragment,
   ) {
     try {
       await showSignatureCancelledRequestErrorDialog({
@@ -123,7 +123,7 @@ export function TimelineSignatureCancelledEvent({
         {event.cancelType === "REQUEST_ERROR" &&
           event.errorCode &&
           ["CONSENT_REQUIRED", "INVALID_CREDENTIALS", "ACCOUNT_SUSPENDED"].includes(
-            event.errorCode
+            event.errorCode,
           ) && (
             <NakedLink href="/app/organization/integrations/signature">
               <Button as="a" variant="outline" size="sm" marginLeft={4}>

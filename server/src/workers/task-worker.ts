@@ -41,5 +41,5 @@ createQueueWorker(
     async onForkTimeout({ taskId }, ctx) {
       await ctx.tasks.taskFailed(taskId, { message: "Timeout" }, ctx.config.instanceName);
     },
-  }
+  },
 );

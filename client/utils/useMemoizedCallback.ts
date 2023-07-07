@@ -2,7 +2,7 @@ import { useCallback, DependencyList, useRef } from "react";
 
 export function useMemoizedCallback<T extends (...args: any[]) => any>(
   callback: T,
-  deps: DependencyList
+  deps: DependencyList,
 ): T {
   const depsRef = useRef<DependencyList>();
   const resultRef = useRef<any>();
@@ -14,7 +14,7 @@ export function useMemoizedCallback<T extends (...args: any[]) => any>(
       }
       return resultRef.current;
     }) as T,
-    deps
+    deps,
   );
 }
 

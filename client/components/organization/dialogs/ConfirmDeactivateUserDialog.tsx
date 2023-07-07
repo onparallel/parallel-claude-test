@@ -67,7 +67,7 @@ function ConfirmDeactivateUserDialog({
         excludeUsers: [...excludeUsers, ...users.map((user) => user.id)],
       });
     },
-    [_handleSearchUsers]
+    [_handleSearchUsers],
   );
 
   return (

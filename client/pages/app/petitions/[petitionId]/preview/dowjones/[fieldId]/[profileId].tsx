@@ -77,10 +77,10 @@ function DowJonesFieldProfileDetails({
   const [replyId, setReplyId] = useState<string | null>(fieldReplyId ?? null);
 
   const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
-    DowJonesFieldProfileDetails_createDowJonesKycReplyDocument
+    DowJonesFieldProfileDetails_createDowJonesKycReplyDocument,
   );
   const [deletePetitionFieldReply, { loading: isDeletingReply }] = useMutation(
-    DowJonesFieldProfileDetails_deletePetitionFieldReplyDocument
+    DowJonesFieldProfileDetails_deletePetitionFieldReplyDocument,
   );
 
   useEffect(() => {
@@ -99,7 +99,7 @@ function DowJonesFieldProfileDetails({
 
       const replyId =
         data?.createDowJonesKycReply.field?.replies.find(
-          (r) => r.content.entity.profileId === profileId
+          (r) => r.content.entity.profileId === profileId,
         )?.id ?? null;
 
       setReplyId(replyId);
@@ -133,23 +133,21 @@ function DowJonesFieldProfileDetails({
   };
 
   const handleSanctionsRowClick = useCallback(function (
-    row: DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment
+    row: DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment,
   ) {
     if (isDefined(row.sources[0])) {
       openNewWindow(row.sources[0]);
     }
-  },
-  []);
+  }, []);
 
   const handleRelationshipsRowClick = useCallback(function (
-    row: DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment
+    row: DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment,
   ) {
     if (isDefined(row.profileId)) {
       const { petitionId, fieldId } = query;
       router.push(`/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${row.profileId}`);
     }
-  },
-  []);
+  }, []);
 
   const handleGoBackClick = () => {
     window.history.back();
@@ -621,7 +619,7 @@ function useDowJonesKycSanctionsColumns() {
         },
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -636,9 +634,7 @@ function useDowJonesKycRelationshipsColumns() {
         CellContent: ({ row: { iconHints } }) => {
           return (
             <Flex gap={2} flexWrap="wrap">
-              {iconHints?.map((hint, i) => (
-                <DowJonesRiskLabel key={i} risk={hint} />
-              ))}
+              {iconHints?.map((hint, i) => <DowJonesRiskLabel key={i} risk={hint} />)}
             </Flex>
           );
         },
@@ -698,7 +694,7 @@ function useDowJonesKycRelationshipsColumns() {
         },
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -874,5 +870,5 @@ DowJonesFieldProfileDetails.getInitialProps = async ({
 export default compose(
   withDialogs,
   withFeatureFlag("DOW_JONES_KYC"),
-  withApolloData
+  withApolloData,
 )(DowJonesFieldProfileDetails);

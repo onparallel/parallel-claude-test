@@ -111,10 +111,10 @@ export function ConfirmPetitionSignersDialog({
             (s) =>
               s.email === suggestion.email &&
               s.firstName === suggestion.firstName &&
-              s.lastName === suggestion.lastName
-          )
+              s.lastName === suggestion.lastName,
+          ),
       ),
-    (s) => [s.email, s.firstName, s.lastName].join("|")
+    (s) => [s.email, s.firstName, s.lastName].join("|"),
   );
 
   const handleSearchContacts = useSearchContacts();

@@ -17,30 +17,30 @@ export class SubscriptionRepository extends BaseRepository {
   }
 
   readonly loadSubscription = this.buildLoadBy("petition_event_subscription", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadSubscriptionsByUserId = this.buildLoadMultipleBy(
     "petition_event_subscription",
     "user_id",
-    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc"),
   );
 
   readonly loadEventSubscriptionSignatureKey = this.buildLoadBy(
     "event_subscription_signature_key",
     "id",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at"),
   );
 
   readonly loadEventSubscriptionSignatureKeysBySubscriptionId = this.buildLoadMultipleBy(
     "event_subscription_signature_key",
     "event_subscription_id",
-    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc")
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc"),
   );
 
   async createSubscription(
     { event_types: eventTypes, ...data }: CreatePetitionEventSubscription,
-    createdBy: string
+    createdBy: string,
   ) {
     const [row] = await this.insert("petition_event_subscription", {
       ...data,
@@ -54,7 +54,7 @@ export class SubscriptionRepository extends BaseRepository {
   async updateSubscription(
     id: number,
     { event_types: eventTypes, ...data }: Partial<PetitionEventSubscription>,
-    updatedBy: string
+    updatedBy: string,
   ) {
     const [row] = await this.from("petition_event_subscription")
       .where({ id, deleted_at: null })
@@ -67,7 +67,7 @@ export class SubscriptionRepository extends BaseRepository {
           updated_by: updatedBy,
           updated_at: this.now(),
         },
-        "*"
+        "*",
       );
 
     return row;
@@ -80,7 +80,7 @@ export class SubscriptionRepository extends BaseRepository {
         is_failing: true,
         error_log: this.knex.raw(
           /* sql */ `jsonb_path_query_array(? || "error_log", '$[0 to 99]')`,
-          this.json({ ...errorLog, timestamp: Date.now() })
+          this.json({ ...errorLog, timestamp: Date.now() }),
         ),
         updated_at: this.now(),
         updated_by: updatedBy,
@@ -99,7 +99,7 @@ export class SubscriptionRepository extends BaseRepository {
 
   async createEventSubscriptionSignatureKey(
     data: CreateEventSubscriptionSignatureKey,
-    createdBy: string
+    createdBy: string,
   ) {
     const [signatureKey] = await this.insert("event_subscription_signature_key", {
       ...data,
@@ -126,7 +126,7 @@ export class SubscriptionRepository extends BaseRepository {
 
   async deleteEventSubscriptionSignatureKeysBySubscriptionIds(
     ids: MaybeArray<number>,
-    deletedBy: string
+    deletedBy: string,
   ) {
     const _ids = unMaybeArray(ids);
     if (_ids.length === 0) {

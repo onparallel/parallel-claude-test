@@ -17,7 +17,7 @@ interface UseGetPageFieldsOptions extends GroupFieldsByPagesOptions {
 
 export function useGetPageFields<T extends PetitionFieldSelection>(
   fields: T[],
-  { usePreviewReplies, ...options }: UseGetPageFieldsOptions
+  { usePreviewReplies, ...options }: UseGetPageFieldsOptions,
 ) {
   const visibility = useFieldVisibility(fields as any, usePreviewReplies);
   return useMemo(() => {

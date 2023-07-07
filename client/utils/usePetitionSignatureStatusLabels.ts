@@ -31,6 +31,6 @@ export function usePetitionSignatureStatusLabels(): Record<PetitionSignatureStat
         defaultMessage: "eSignature cancelled",
       }),
     }),
-    [intl.locale]
+    [intl.locale],
   );
 }

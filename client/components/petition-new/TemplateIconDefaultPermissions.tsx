@@ -29,7 +29,7 @@ export function TemplateIconDefaultPermissions({
             {template.defaultPermissions.map((p) => {
               if (p.__typename === "TemplateDefaultUserPermission") {
                 const effectiveDefaultPermissions = template.effectiveDefaultPermissions.find(
-                  (e) => e.user.id === p.user.id
+                  (e) => e.user.id === p.user.id,
                 );
 
                 const permissionType =

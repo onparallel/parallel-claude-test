@@ -68,11 +68,11 @@ export const FieldDescription = chakraForwardRef<"div", { description?: string }
             </chakra.p>
           ) : process.env.NODE_ENV === "production" ? null : (
             <pre>{JSON.stringify(t, null, "  ")}</pre>
-          )
+          ),
         )}
       </Box>
     );
-  }
+  },
 );
 
 function TrailingNewLines({ raw }: { raw: string }) {
@@ -142,7 +142,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
               <chakra.span key={i}>{t.raw}</chakra.span>
             ) : process.env.NODE_ENV === "production" ? null : (
               <pre>{JSON.stringify(t)}</pre>
-            )
+            ),
           )}
         </chakra.li>
       ))}

@@ -25,7 +25,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
             isDefined(this.task.user_id)
               ? `User:${this.task.user_id}`
               : `PetitionAccess:${this.task.petition_access_id}`
-          } has no access to petition ${petitionId}`
+          } has no access to petition ${petitionId}`,
         );
       }
       const [petition, owner] = await Promise.all([

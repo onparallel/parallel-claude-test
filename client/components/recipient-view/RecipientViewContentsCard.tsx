@@ -49,7 +49,7 @@ interface RecipientViewContentsCardProps {
 export const RecipientViewContentsCard = Object.assign(
   chakraForwardRef<"section", RecipientViewContentsCardProps>(function RecipientViewContentsCard(
     { currentPage, petition, usePreviewReplies, ...props },
-    ref
+    ref,
   ) {
     const router = useRouter();
     const { query } = router;
@@ -115,7 +115,7 @@ export const RecipientViewContentsCard = Object.assign(
         (field.__typename === "PublicPetitionField" && field.isInternal) ||
         (field.type === "HEADING" && !field.title)
           ? false
-          : true
+          : true,
       )
       // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
       .slice(fields[0].title ? 1 : 0) as typeof fields;
@@ -142,7 +142,7 @@ export const RecipientViewContentsCard = Object.assign(
                 currentFieldCommentCount,
                 currentFieldHasUnreadComments,
               },
-              index
+              index,
             ) => {
               const url = query.petitionId
                 ? `/app/petitions/${query.petitionId}/preview?page=${index + 1}`
@@ -275,7 +275,7 @@ export const RecipientViewContentsCard = Object.assign(
                   ) : null}
                 </ListItem>
               );
-            }
+            },
           )}
         </Stack>
       </Card>
@@ -361,7 +361,7 @@ export const RecipientViewContentsCard = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 function RecipientViewContentsIndicators({
@@ -401,7 +401,7 @@ function RecipientViewContentsIndicators({
 function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
   fields: T,
   page: number,
-  usePreviewReplies?: boolean
+  usePreviewReplies?: boolean,
 ) {
   const pages: {
     title: Maybe<string>;

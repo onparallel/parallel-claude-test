@@ -19,7 +19,7 @@ export interface IIntegrationsSetupService {
     apiKey: string,
     isParallelManaged: boolean,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT">>;
   createDowJonesIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
@@ -28,7 +28,7 @@ export interface IIntegrationsSetupService {
       "CLIENT_ID" | "USERNAME" | "PASSWORD"
     >,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"DOW_JONES_KYC", "DOW_JONES_KYC">>;
 }
 
@@ -37,7 +37,7 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
   constructor(
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
-    @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration
+    @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration,
   ) {}
 
   private async authenticateSignaturitApiKey(apiKey: string) {
@@ -57,8 +57,8 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
             } else {
               throw new Error();
             }
-          })
-      )
+          }),
+      ),
     );
   }
 
@@ -67,7 +67,7 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     apiKey: string,
     isParallelManaged: boolean,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const { environment } = await this.authenticateSignaturitApiKey(apiKey);
     return await this.signaturitIntegration.createOrgIntegration(
@@ -80,7 +80,7 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
         },
       },
       createdBy,
-      t
+      t,
     );
   }
 
@@ -91,13 +91,13 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
       "CLIENT_ID" | "USERNAME" | "PASSWORD"
     >,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"DOW_JONES_KYC", "DOW_JONES_KYC">> {
     return await this.dowJonesIntegration.createDowJonesIntegration(
       data,
       credentials,
       createdBy,
-      t
+      t,
     );
   }
 }

@@ -14,7 +14,7 @@ export async function up(knex: Knex) {
       timestamps(t);
     })
     .raw(
-      `create unique index "organization__identifier" on "organization" ("identifier") where "deleted_at" is null`
+      `create unique index "organization__identifier" on "organization" ("identifier") where "deleted_at" is null`,
     )
 
     .createTable("user", (t) => {
@@ -49,7 +49,7 @@ export async function up(knex: Knex) {
       t.foreign("owner_id").references("user.id");
     })
     .raw(
-      `create unique index "contact__owner_id__email" on "contact" ("owner_id", "email") where "deleted_at" is null`
+      `create unique index "contact__owner_id__email" on "contact" ("owner_id", "email") where "deleted_at" is null`,
     )
 
     .createTable("petition", (t) => {
@@ -80,7 +80,7 @@ export async function up(knex: Knex) {
     .raw(
       `alter table "petition" add constraint "petition__is_template__status" check (
         (not "is_template" and "status" is not null) or ("is_template" and "status" is null)
-      )`
+      )`,
     )
     .raw(
       /* sql */ `
@@ -97,7 +97,7 @@ export async function up(knex: Knex) {
           reminders_timezone is null and
           reminders_weekdays_only is null)
       )
-      `
+      `,
     )
 
     .createTable("petition_field", (t) => {
@@ -119,7 +119,7 @@ export async function up(knex: Knex) {
       t.foreign("petition_id").references("petition.id");
     })
     .raw(
-      `create unique index "petition_field__petition_id__position" on "petition_field" ("petition_id", "position") where "deleted_at" is null`
+      `create unique index "petition_field__petition_id__position" on "petition_field" ("petition_id", "position") where "deleted_at" is null`,
     )
 
     .createTable("email_log", (t) => {
@@ -184,7 +184,7 @@ export async function up(knex: Knex) {
           reminders_timezone is null and
           reminders_weekdays_only is null)
       )
-      `
+      `,
     )
 
     .createTable("petition_field_reply", (t) => {

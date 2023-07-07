@@ -14,7 +14,7 @@ export function emptyRTEValue(): SlateNode[] {
 
 export function walkSlateNodes(
   nodes: SlateNode[],
-  visit: (input: SlateNode) => SlateNode | void
+  visit: (input: SlateNode) => SlateNode | void,
 ): SlateNode[] {
   return nodes.map((node) => {
     const result = visit(node) ?? node;

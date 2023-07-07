@@ -18,7 +18,7 @@ const _queries = [
 export function withOrgRole<P = {}>(role: OrganizationRole, orPath = "/app") {
   return function (
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    Component: NextComponentType<WithApolloDataContext, P, P>
+    Component: NextComponentType<WithApolloDataContext, P, P>,
   ): NextComponentType<WithApolloDataContext, P, P> {
     const { getInitialProps, displayName, ...rest } = Component;
     return Object.assign(Component, rest, {
@@ -26,7 +26,7 @@ export function withOrgRole<P = {}>(role: OrganizationRole, orPath = "/app") {
       getInitialProps: async (context: WithApolloDataContext) => {
         if (!context.apollo) {
           throw new Error(
-            `Please, place "withOrgRole" before "withApolloData" in the "compose" argument list.`
+            `Please, place "withOrgRole" before "withApolloData" in the "compose" argument list.`,
           );
         }
         const { data } = await context.fetchQuery(WithOrgRoleDocument);

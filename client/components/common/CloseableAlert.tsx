@@ -12,7 +12,7 @@ export interface CloseableAlertProps extends AlertProps, Omit<UseDisclosureProps
 
 export const CloseableAlert = chakraForwardRef<"div", CloseableAlertProps>(function CloseableAlert(
   { isOpen, defaultIsOpen = true, onClose, onOpen, children, ...props },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const disclosure = useDisclosure({

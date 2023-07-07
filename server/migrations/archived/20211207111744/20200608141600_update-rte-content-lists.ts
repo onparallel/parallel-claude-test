@@ -40,7 +40,7 @@ interface PetitionMessage {
 
 export async function up(knex: Knex): Promise<any> {
   const { rows: petitions }: { rows: Petition[] } = await knex.raw(
-    /* sql */ `select * from petition where email_body like '%list-item%'`
+    /* sql */ `select * from petition where email_body like '%list-item%'`,
   );
   for (const petition of petitions) {
     if (petition.email_body) {
@@ -52,7 +52,7 @@ export async function up(knex: Knex): Promise<any> {
     }
   }
   const { rows: messages }: { rows: PetitionMessage[] } = await knex.raw(
-    /* sql */ `select * from petition_message where email_body like '%list-item%'`
+    /* sql */ `select * from petition_message where email_body like '%list-item%'`,
   );
   for (const message of messages) {
     if (message.email_body) {

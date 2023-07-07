@@ -18,7 +18,7 @@ export function useDocusignConsentPopup() {
         promiseArgsRef.current?.[1]("CLOSED");
       }
     },
-    { delay: 500, isRunning }
+    { delay: 500, isRunning },
   );
 
   useWindowEvent(
@@ -36,7 +36,7 @@ export function useDocusignConsentPopup() {
       }
     },
     { isListening: isRunning },
-    []
+    [],
   );
 
   return useCallback(
@@ -55,14 +55,14 @@ export function useDocusignConsentPopup() {
                   ...params,
                   isDefault: params.isDefault.toString(),
                 }
-              : {}
+              : {},
           )}`,
-        centeredPopup({ width: 500, height: 600 })
+        centeredPopup({ width: 500, height: 600 }),
       );
       return new Promise<void>((...params) => {
         promiseArgsRef.current = params;
       });
     },
-    []
+    [],
   );
 }

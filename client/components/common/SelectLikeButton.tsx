@@ -49,5 +49,5 @@ export const SelectLikeButton = chakraForwardRef<"button", SelectLikeButtonProps
         </Box>
       </Box>
     );
-  }
+  },
 );

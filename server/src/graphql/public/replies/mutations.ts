@@ -46,12 +46,12 @@ export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitio
         "DATE_TIME",
         "CHECKBOX",
       ]),
-      fieldCanBeReplied("fieldId")
-    )
+      fieldCanBeReplied("fieldId"),
+    ),
   ),
   validateArgs: validateFieldReplyValue(
     (args) => [{ id: args.fieldId, value: args.reply }],
-    "reply"
+    "reply",
   ),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
@@ -72,7 +72,7 @@ export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitio
         type: field.type,
         content,
       },
-      `Contact:${ctx.contact!.id}`
+      `Contact:${ctx.contact!.id}`,
     );
 
     return reply;
@@ -103,8 +103,8 @@ export const publicUpdatePetitionFieldReply = mutationField("publicUpdatePetitio
         "DATE_TIME",
         "CHECKBOX",
       ]),
-      replyCanBeUpdated("replyId")
-    )
+      replyCanBeUpdated("replyId"),
+    ),
   ),
   validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
@@ -125,7 +125,7 @@ export const publicUpdatePetitionFieldReply = mutationField("publicUpdatePetitio
         content,
         status: "PENDING",
       },
-      ctx.access!
+      ctx.access!,
     );
   },
 });
@@ -137,7 +137,7 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
     authenticatePublicAccess("keycode"),
     replyBelongsToAccess("replyId"),
     replyBelongsToExternalField("replyId"),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId"),
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -159,7 +159,7 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
     authenticatePublicAccess("keycode"),
     replyBelongsToAccess("replyId"),
     replyBelongsToExternalField("replyId"),
-    replyIsForFieldOfType("replyId", "FILE_UPLOAD")
+    replyIsForFieldOfType("replyId", "FILE_UPLOAD"),
   ),
   resolve: async (_, args, ctx) => {
     const reply = await ctx.petitions.loadFieldReply(args.replyId);
@@ -197,13 +197,13 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
       fieldBelongsToAccess("fieldId"),
       fieldIsExternal("fieldId"),
       fieldHasType("fieldId", "FILE_UPLOAD"),
-      fieldCanBeReplied("fieldId")
-    )
+      fieldCanBeReplied("fieldId"),
+    ),
   ),
   validateArgs: validFileUploadInput(
     (args) => args.data,
     { maxSizeBytes: 50 * 1024 * 1024 },
-    "data"
+    "data",
   ),
   resolve: async (_, args, ctx) => {
     const key = random(16);
@@ -215,7 +215,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
         size: size.toString(),
         content_type: contentType,
       },
-      `Contact:${ctx.contact!.id}`
+      `Contact:${ctx.contact!.id}`,
     );
     const [presignedPostData, [reply]] = await Promise.all([
       ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
@@ -227,7 +227,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
           type: "FILE_UPLOAD",
           content: { file_upload_id: file.id },
         },
-        `Contact:${ctx.contact!.id}`
+        `Contact:${ctx.contact!.id}`,
       ),
     ]);
     return { presignedPostData, reply };
@@ -241,7 +241,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     type: "FileUploadDownloadLinkResult",
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      and(replyBelongsToAccess("replyId"), replyBelongsToExternalField("replyId"))
+      and(replyBelongsToAccess("replyId"), replyBelongsToExternalField("replyId")),
     ),
     args: {
       keycode: nonNull(idArg()),
@@ -272,7 +272,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
           url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
-            args.preview ? "inline" : "attachment"
+            args.preview ? "inline" : "attachment",
           ),
         };
       } catch {
@@ -281,7 +281,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
         };
       }
     },
-  }
+  },
 );
 
 export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFieldCompletion", {
@@ -303,8 +303,8 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       fieldBelongsToAccess("fieldId"),
       fieldIsExternal("fieldId"),
       fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-      fieldCanBeReplied("fieldId")
-    )
+      fieldCanBeReplied("fieldId"),
+    ),
   ),
   resolve: async (_, { fieldId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);

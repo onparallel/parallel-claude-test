@@ -20,6 +20,6 @@ export function useAdminSections() {
         path: "/app/admin/support-methods",
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }

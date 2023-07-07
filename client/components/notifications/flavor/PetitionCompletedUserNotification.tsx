@@ -42,7 +42,7 @@ export const PetitionCompletedUserNotification = Object.assign(
           />
         </PetitionUserNotification>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -57,5 +57,5 @@ export const PetitionCompletedUserNotification = Object.assign(
         ${UserOrContactReference.fragments.UserOrPetitionAccess}
       `,
     },
-  }
+  },
 );

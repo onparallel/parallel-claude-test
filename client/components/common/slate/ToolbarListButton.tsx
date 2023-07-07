@@ -21,5 +21,5 @@ export const ToolbarListButton = chakraForwardRef<"button", ToolbarListButtonPro
         {...props}
       />
     );
-  }
+  },
 );

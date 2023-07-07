@@ -44,7 +44,7 @@ export class OrganizationRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: IEmailsService,
-    @inject(SystemRepository) private system: SystemRepository
+    @inject(SystemRepository) private system: SystemRepository,
   ) {
     super(knex);
   }
@@ -52,14 +52,14 @@ export class OrganizationRepository extends BaseRepository {
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadOrgOwner = this.buildLoadBy("user", "org_id", (q) =>
-    q.whereNull("deleted_at").where("organization_role", "OWNER").where("status", "ACTIVE")
+    q.whereNull("deleted_at").where("organization_role", "OWNER").where("status", "ACTIVE"),
   );
 
   readonly loadOwnerAndAdmins = this.buildLoadMultipleBy("user", "org_id", (q) =>
     q
       .whereNull("deleted_at")
       .whereIn("organization_role", ["OWNER", "ADMIN"])
-      .where("status", "ACTIVE")
+      .where("status", "ACTIVE"),
   );
 
   async getOrganizationsByUserEmail(email: string) {
@@ -69,7 +69,7 @@ export class OrganizationRepository extends BaseRepository {
 	      select u.org_id from "user" u left join "user_data" ud on ud.id = u.user_data_id 
 	      where u.deleted_at is null and u.status = 'ACTIVE' and ud.email = ?
       )`,
-      [email]
+      [email],
     );
   }
 
@@ -85,7 +85,7 @@ export class OrganizationRepository extends BaseRepository {
       excludeIds?: number[] | null;
       sortBy?: SortBy<keyof User | "full_name" | "email" | "first_name" | "last_name">[];
       includeInactive?: boolean | null;
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<User>(
       this.from("user")
@@ -100,7 +100,7 @@ export class OrganizationRepository extends BaseRepository {
               q2.whereEscapedILike(
                 this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
                 `%${escapeLike(search, "\\")}%`,
-                "\\"
+                "\\",
               ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
             });
           }
@@ -129,7 +129,7 @@ export class OrganizationRepository extends BaseRepository {
                     return `"${s.field}" ${s.order}`;
                   }
                 })
-                .join(", ")
+                .join(", "),
             );
           }
           if (!includeInactive) {
@@ -138,19 +138,19 @@ export class OrganizationRepository extends BaseRepository {
         })
         .orderBy("user.id")
         .select("user.*"),
-      opts
+      opts,
     );
   }
 
   readonly loadActiveUserCount = this.buildLoadCountBy("user", "org_id", (q) =>
-    q.whereNull("deleted_at").andWhere("status", "ACTIVE")
+    q.whereNull("deleted_at").andWhere("status", "ACTIVE"),
   );
 
   async updateOrganization(
     id: number,
     data: Partial<CreateOrganization>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [org] = await this.from("organization", t)
       .where("id", id)
@@ -174,7 +174,7 @@ export class OrganizationRepository extends BaseRepository {
     orgId: number,
     details: Partial<OrganizationUsageDetails>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [org] = await this.from("organization", t)
       .where("id", orgId)
@@ -186,7 +186,7 @@ export class OrganizationRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
 
     return org;
@@ -198,7 +198,7 @@ export class OrganizationRepository extends BaseRepository {
       .update({
         appsumo_license: this.knex.raw(
           /* sql */ `coalesce("appsumo_license", '{}'::jsonb) || ?::jsonb || jsonb_build_object('events', coalesce("appsumo_license"->'events','[]'::jsonb) || ?::jsonb)`,
-          [payload, payload]
+          [payload, payload],
         ),
         updated_at: this.now(),
         updated_by: updatedBy,
@@ -215,7 +215,7 @@ export class OrganizationRepository extends BaseRepository {
         created_by: createdBy,
         updated_by: createdBy,
       },
-      t
+      t,
     );
     return org;
   }
@@ -225,7 +225,7 @@ export class OrganizationRepository extends BaseRepository {
       search?: string | null;
       sortBy?: SortBy<keyof Organization>[];
       status?: OrganizationStatus | null;
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<Organization>(
       this.from("organization")
@@ -249,7 +249,7 @@ export class OrganizationRepository extends BaseRepository {
         })
         .orderBy("id")
         .select("*"),
-      opts
+      opts,
     );
   }
 
@@ -261,7 +261,7 @@ export class OrganizationRepository extends BaseRepository {
         where o.id in ?
       `,
       [this.sqlIn(orgIds)],
-      t
+      t,
     );
     const resultsById = indexBy(results, (x) => x.id);
     return orgIds.map((id) => resultsById[id]?.path ?? null);
@@ -275,7 +275,7 @@ export class OrganizationRepository extends BaseRepository {
         where o.id in ?
       `,
       [this.sqlIn(orgIds)],
-      t
+      t,
     );
     const resultsById = indexBy(results, (x) => x.id);
     return orgIds.map((id) => resultsById[id]?.path ?? null);
@@ -306,13 +306,13 @@ export class OrganizationRepository extends BaseRepository {
       const byKey = indexBy(rows, keyBuilder(["org_id", "limit_name"]));
       return keys.map(keyBuilder(["orgId", "limitName"])).map((k) => byKey[k] ?? null);
     },
-    { cacheKeyFn: keyBuilder(["orgId", "limitName"]) }
+    { cacheKeyFn: keyBuilder(["orgId", "limitName"]) },
   );
 
   async loadCurrentOrganizationUsageLimit(
     orgId: number,
     limitName: OrganizationUsageLimitName,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<OrganizationUsageLimit | null> {
     if (isDefined(t)) {
       return await this._loadCurrentOrganizationUsageLimit.raw({ orgId, limitName }, t);
@@ -335,13 +335,13 @@ export class OrganizationRepository extends BaseRepository {
   async createOrganizationUsageLimit(
     orgId: number,
     data: MaybeArray<Omit<CreateOrganizationUsageLimit, "org_id">>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data).map((d) => ({ org_id: orgId, ...d }));
     return await this.insert(
       "organization_usage_limit",
       dataArr.map((d) => ({ ...d, period: this.interval(d.period) })),
-      t
+      t,
     );
   }
 
@@ -350,7 +350,7 @@ export class OrganizationRepository extends BaseRepository {
     limitName: OrganizationUsageLimitName,
     limit: number,
     duration: Duration,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.raw(
       /* sql */ `
@@ -368,14 +368,14 @@ export class OrganizationRepository extends BaseRepository {
           limit,
         }),
       ],
-      t
+      t,
     );
   }
 
   async updateOrganizationCurrentUsageLimit(
     orgId: number,
     limitName: OrganizationUsageLimitName,
-    newLimit: number
+    newLimit: number,
   ) {
     await this.from("organization_usage_limit")
       .where({
@@ -392,7 +392,7 @@ export class OrganizationRepository extends BaseRepository {
   async updateUsageLimitAsExpired(
     orgUsageLimitId: number,
     opts?: { expireNow: boolean },
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [usageLimit] = await this.from("organization_usage_limit", t)
       .where("id", orgUsageLimitId)
@@ -402,7 +402,7 @@ export class OrganizationRepository extends BaseRepository {
             ? this.now()
             : this.knex.raw(/* sql */ `"period_start_date" + "period"`),
         },
-        "*"
+        "*",
       );
 
     return usageLimit;
@@ -412,7 +412,7 @@ export class OrganizationRepository extends BaseRepository {
     orgId: number,
     limitName: OrganizationUsageLimitName,
     credits: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     if (credits <= 0) {
       return 0;
@@ -436,7 +436,7 @@ export class OrganizationRepository extends BaseRepository {
         const [{ period_end_date: periodEndDate }] = await this.raw<{ period_end_date: Date }>(
           `select (?::timestamptz + ?::interval) as period_end_date;`,
           [usage.period_start_date, this.interval(usage.period)],
-          t
+          t,
         );
         await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used, t);
         await this.system.createEvent(
@@ -451,7 +451,7 @@ export class OrganizationRepository extends BaseRepository {
               period_end_date: periodEndDate,
             },
           },
-          t
+          t,
         );
         break;
       }
@@ -468,22 +468,22 @@ export class OrganizationRepository extends BaseRepository {
       left join feature_flag_override ffoo on ffoo.feature_flag_name = ff.name and ffoo.org_id = o.id
       where coalesce(ffoo.value, ff.default_value) = true
     `,
-      [name]
+      [name],
     );
   }
 
   readonly loadOrganizationTheme = this.buildLoadBy("organization_theme", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadOrgBrandTheme = this.buildLoadBy("organization_theme", "org_id", (q) =>
-    q.where("type", "BRAND").whereNull("deleted_at")
+    q.where("type", "BRAND").whereNull("deleted_at"),
   );
 
   readonly loadPdfDocumentThemesByOrgId = this.buildLoadMultipleBy(
     "organization_theme",
     "org_id",
-    (q) => q.where("type", "PDF_DOCUMENT").whereNull("deleted_at").orderBy("created_at", "desc")
+    (q) => q.where("type", "PDF_DOCUMENT").whereNull("deleted_at").orderBy("created_at", "desc"),
   );
 
   async createDefaultOrganizationThemes(orgId: number, createdBy: string, t?: Knex.Transaction) {
@@ -512,7 +512,7 @@ export class OrganizationRepository extends BaseRepository {
     name: string,
     type: OrganizationThemeType,
     data: any,
-    createdBy: string
+    createdBy: string,
   ) {
     const [theme] = await this.from("organization_theme").insert(
       {
@@ -526,7 +526,7 @@ export class OrganizationRepository extends BaseRepository {
         data,
         is_default: false,
       },
-      "*"
+      "*",
     );
 
     return theme;
@@ -536,7 +536,7 @@ export class OrganizationRepository extends BaseRepository {
     id: number,
     data: Partial<CreateOrganizationTheme>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [theme] = await this.from("organization_theme", t)
       .where("id", id)
@@ -547,7 +547,7 @@ export class OrganizationRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
     return theme;
   }
@@ -556,7 +556,7 @@ export class OrganizationRepository extends BaseRepository {
     orgId: number,
     data: Partial<BrandTheme>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [theme] = await this.from("organization_theme", t)
       .where({
@@ -571,7 +571,7 @@ export class OrganizationRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
     return theme;
   }
@@ -586,7 +586,7 @@ export class OrganizationRepository extends BaseRepository {
             deleted_at: this.now(),
             deleted_by: `User:${deletedBy.id}`,
           },
-          "*"
+          "*",
         );
 
       // update every petition using this deleted theme to go back to the default theme
@@ -598,7 +598,7 @@ export class OrganizationRepository extends BaseRepository {
         where p.org_id = ? and p.document_organization_theme_id = ? and p.deleted_at is null
       `,
         [deletedBy.org_id, deletedBy.org_id, deletedTheme.id],
-        t
+        t,
       );
     });
   }
@@ -629,7 +629,7 @@ export class OrganizationRepository extends BaseRepository {
       where ot.org_id = st.org_id and ot.type = st.type and ot.deleted_at is null
       returning ot.*;
   `,
-      [orgThemeId, updatedBy]
+      [orgThemeId, updatedBy],
     );
 
     await this.from("organization_theme").where({ id: orgThemeId, deleted_at: null }).update({
@@ -644,7 +644,7 @@ export class OrganizationRepository extends BaseRepository {
     limitName: OrganizationUsageLimitName,
     limit: number,
     duration: Duration,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const currentPeriod = await this.loadCurrentOrganizationUsageLimit(orgId, limitName, t);
     let newPeriodStartDate = new Date();
@@ -652,7 +652,7 @@ export class OrganizationRepository extends BaseRepository {
       const oldLimit = await this.updateUsageLimitAsExpired(
         currentPeriod.id,
         { expireNow: true },
-        t
+        t,
       );
       newPeriodStartDate = oldLimit.period_end_date!;
     }
@@ -664,7 +664,7 @@ export class OrganizationRepository extends BaseRepository {
         period: duration,
         period_start_date: newPeriodStartDate,
       },
-      t
+      t,
     );
   }
 
@@ -672,14 +672,14 @@ export class OrganizationRepository extends BaseRepository {
     orgId: number,
     opts: {
       limitName: OrganizationUsageLimitName;
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<OrganizationUsageLimit>(
       this.from("organization_usage_limit")
         .where({ org_id: orgId, limit_name: opts.limitName })
         .orderBy("period_end_date", "desc")
         .select("*"),
-      opts
+      opts,
     );
   }
 }

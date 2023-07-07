@@ -32,13 +32,13 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
   fields: T[],
   fieldIndices: PetitionFieldIndex[],
   fieldVisibility: boolean[],
-  filter: PetitionFieldFilter = defaultFieldsFilter
+  filter: PetitionFieldFilter = defaultFieldsFilter,
 ): FilterPetitionFieldResult<T>[] {
   const filtered = [] as FilterPetitionFieldResult<T>[];
   for (const [field, fieldIndex, isVisible = true] of zipX(
     fields,
     fieldIndices,
-    fieldVisibility ?? []
+    fieldVisibility ?? [],
   )) {
     const last = filtered[filtered.length - 1];
     if (!isVisible) {
@@ -59,13 +59,13 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
 
       if (filter.SHOW_REVIEWED && !filter.SHOW_NOT_REVIEWED) {
         conditions.push(
-          field.replies.length > 0 && field.replies.every((r) => r.status === "APPROVED")
+          field.replies.length > 0 && field.replies.every((r) => r.status === "APPROVED"),
         );
       }
       if (!filter.SHOW_REVIEWED && filter.SHOW_NOT_REVIEWED) {
         conditions.push(
           field.replies.length === 0 ||
-            field.replies.some((r) => r.status === "REJECTED" || r.status === "PENDING")
+            field.replies.some((r) => r.status === "REJECTED" || r.status === "PENDING"),
         );
       }
       if (filter.SHOW_WITH_COMMENTS) {

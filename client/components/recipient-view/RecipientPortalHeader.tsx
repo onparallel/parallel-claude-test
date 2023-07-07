@@ -35,7 +35,7 @@ interface RecipientPortalHeaderProps {
 export const RecipientPortalHeader = Object.assign(
   chakraForwardRef<"section", RecipientPortalHeaderProps>(function RecipientPortalHeader(
     { sender, contact, keycode, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const tone = useTone();
@@ -166,5 +166,5 @@ export const RecipientPortalHeader = Object.assign(
         }
       `,
     },
-  }
+  },
 );

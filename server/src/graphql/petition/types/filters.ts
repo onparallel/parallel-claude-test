@@ -35,9 +35,9 @@ export const PetitionSharedWithFilter = inputObjectType({
 
 export function validPetitionSharedWithFilter<TypeName extends string, FieldName extends string>(
   prop: (
-    args: ArgsValue<TypeName, FieldName>
+    args: ArgsValue<TypeName, FieldName>,
   ) => NexusGenInputs["PetitionSharedWithFilter"] | null | undefined,
-  name: string
+  name: string,
 ) {
   return (async (_, args, ctx, info) => {
     const sharedWith = prop(args);
@@ -49,7 +49,7 @@ export function validPetitionSharedWithFilter<TypeName extends string, FieldName
       const targets = sharedWith.filters.map((f) => fromGlobalId(f.value));
       assert(
         targets.every(({ type }) => type === "User" || type === "UserGroup"),
-        "All IDs must refer to either users or user groups"
+        "All IDs must refer to either users or user groups",
       );
       const [userIds, userGroupIds] = partition(targets, (t) => t.type === "User");
       const [users, userGroups] = await Promise.all([
@@ -58,11 +58,11 @@ export function validPetitionSharedWithFilter<TypeName extends string, FieldName
       ]);
       assert(
         users.every((u) => u?.org_id === ctx.user!.org_id),
-        "Users must belong to the same organization"
+        "Users must belong to the same organization",
       );
       assert(
         userGroups.every((g) => g?.org_id === ctx.user!.org_id),
-        "User groups must belong to the same organization"
+        "User groups must belong to the same organization",
       );
     } catch (e) {
       if (e instanceof AssertionError) {
@@ -136,9 +136,9 @@ export const PetitionTagFilter = inputObjectType({
 
 export function validPetitionTagFilter<TypeName extends string, FieldName extends string>(
   prop: (
-    args: ArgsValue<TypeName, FieldName>
+    args: ArgsValue<TypeName, FieldName>,
   ) => NexusGenInputs["PetitionTagFilter"] | null | undefined,
-  name: string
+  name: string,
 ) {
   return (async (_, args, ctx, info) => {
     const tags = prop(args);
@@ -149,16 +149,16 @@ export function validPetitionTagFilter<TypeName extends string, FieldName extend
       assert(tags.filters.length <= 5, "A maximum of 5 filter lines is allowed");
       assert(
         tags.filters.every(
-          (f) => f.operator === "IS_EMPTY" || (f.value.length > 0 && f.value.length <= 10)
+          (f) => f.operator === "IS_EMPTY" || (f.value.length > 0 && f.value.length <= 10),
         ),
-        "A maximum of 10 tags is allowed in each filter line"
+        "A maximum of 10 tags is allowed in each filter line",
       );
       const tagIds = tags.filters.flatMap((f) => f.value);
       assert(
         (await ctx.tags.loadTag(uniq(tagIds))).every(
-          (t) => t?.organization_id === ctx.user!.org_id
+          (t) => t?.organization_id === ctx.user!.org_id,
         ),
-        "Tags must belong to the same organization"
+        "Tags must belong to the same organization",
       );
     } catch (e) {
       if (e instanceof AssertionError) {

@@ -38,13 +38,13 @@ export async function up(knex: Knex): Promise<any> {
         ${columns.map((column) => `${column} = ps._${column}`).join(", ")}
       from petition as p
         where ps.petition_id = p.id
-    `
+    `,
     )
     .raw(
       /* sql */ `
       alter table "petition_sendout" alter column "locale" set not null;
       alter table "petition_sendout" alter column "active" set not null;
-    `
+    `,
     )
     .alterTable("petition_sendout", (t) => {
       t.dropColumns(...columns.map((column) => `_${column}`));

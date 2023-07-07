@@ -237,7 +237,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                         ? p.user
                         : p.__typename === "PetitionUserGroupPermission"
                         ? p.group
-                        : (null as never)
+                        : (null as never),
                     )}
                   />
                 </Flex>
@@ -289,12 +289,12 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   if (row.__typename === "Petition") {
                     const lastReminderDate = maxBy(
                       row.accesses.map((a) => a.reminders[0]?.createdAt),
-                      (date) => new Date(date).valueOf()
+                      (date) => new Date(date).valueOf(),
                     );
 
                     const nextReminderAt = minBy(
                       row.accesses.filter((a) => !!a.nextReminderAt),
-                      (a) => new Date(a.nextReminderAt!).valueOf()
+                      (a) => new Date(a.nextReminderAt!).valueOf(),
                     )?.nextReminderAt;
 
                     const redirect = useGoToPetition();
@@ -406,7 +406,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           },
         },
       ] as PetitionsTableColumns_PetitionBaseOrFolder[],
-    [intl.locale, type]
+    [intl.locale, type],
   );
 }
 
@@ -472,7 +472,7 @@ const PetitionListStatusFilter = withProps(CheckboxTableFilter<PetitionStatus>, 
     options: useMemo(
       () =>
         Object.entries(statuses).map(([value, text]) => ({ value: value as PetitionStatus, text })),
-      []
+      [],
     ),
   };
 });
@@ -488,8 +488,8 @@ const PetitionListSignatureStatusFilter = withProps(
             value: value as PetitionSignatureStatusFilter,
             text,
           })),
-        []
+        [],
       ),
     };
-  }
+  },
 );

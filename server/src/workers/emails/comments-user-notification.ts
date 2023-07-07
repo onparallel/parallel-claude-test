@@ -13,7 +13,7 @@ export async function commentsUserNotification(
     petition_id: number;
     petition_field_comment_ids: number[];
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [petition, _comments, userData] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
@@ -34,7 +34,7 @@ export async function commentsUserNotification(
   const commentsByField = groupBy(comments, (c) => c.petition_field_id);
   const fields = await pMap(
     sortBy(_fields, (f) => f.position!),
-    (f) => buildFieldWithComments(f, commentsByField, context, payload.user_id)
+    (f) => buildFieldWithComments(f, commentsByField, context, payload.user_id),
   );
 
   const { html, text, subject, from } = await buildEmail(
@@ -46,7 +46,7 @@ export async function commentsUserNotification(
       fields,
       ...layoutProps,
     },
-    { locale: userData.preferred_locale }
+    { locale: userData.preferred_locale },
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

@@ -126,7 +126,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         });
         await ctx.contacts.addContactAuthenticationLogAccessEntry(
           contactAuthentication.id,
-          logEntry
+          logEntry,
         );
         return { isAllowed: true };
       } else {
@@ -145,7 +145,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         },
       });
       const { cookieValue, contactAuthentication } = await ctx.contacts.createContactAuthentication(
-        contactId
+        contactId,
       );
       await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, logEntry);
       return {
@@ -182,7 +182,7 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
         if (!isDefined(firstName) || !isDefined(lastName) || !isDefined(email)) {
           throw new ApolloError(
             "The information to create a contact is not valid",
-            "INVALID_CONTACT_FORM"
+            "INVALID_CONTACT_FORM",
           );
         }
 
@@ -198,12 +198,12 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
             (access) =>
               access.contact_id !== null &&
               access.status === "ACTIVE" &&
-              access.contact_id === contact?.id
+              access.contact_id === contact?.id,
           )
         ) {
           throw new ApolloError(
             "The contact already has an access in this petition",
-            "ACCESS_ALREADY_EXISTS"
+            "ACCESS_ALREADY_EXISTS",
           );
         }
       }
@@ -246,7 +246,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
         const result = await ctx.contacts.verifyContactAuthenticationRequest(
           ctx.access!.id,
           args.token,
-          args.code
+          args.code,
         );
 
         // if is a contactless petition access
@@ -259,7 +259,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
 
             await ctx.orgCredits.ensurePetitionHasConsumedCredit(
               petition.id,
-              `PetitionAccess:${access!.id}`
+              `PetitionAccess:${access!.id}`,
             );
 
             ctx.contact = (
@@ -270,14 +270,14 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
                   first_name: result.data!.contact_first_name!,
                   last_name: result.data!.contact_last_name || null,
                 },
-                `PetitionAccess:${access!.id}`
+                `PetitionAccess:${access!.id}`,
               )
             )[0];
             try {
               await ctx.petitions.addContactToPetitionAccess(
                 access!.id,
                 ctx.contact!.id,
-                `PetitionAccess:${access!.id}`
+                `PetitionAccess:${access!.id}`,
               );
             } catch (e) {
               if (
@@ -286,7 +286,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
               ) {
                 throw new ApolloError(
                   "The contact already has an access in this petition",
-                  "ACCESS_ALREADY_EXISTS"
+                  "ACCESS_ALREADY_EXISTS",
                 );
               } else {
                 throw e;
@@ -296,7 +296,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
             await ctx.petitions.updatePetition(
               petition.id,
               { status: "PENDING", closed_at: null },
-              `PetitionAccess:${access!.id}`
+              `PetitionAccess:${access!.id}`,
             );
           }
         }
@@ -311,7 +311,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           ) {
             throw new ApolloError(
               "Access already has a contact assigned to it",
-              "ACCESS_ALREADY_WITH_CONTACT"
+              "ACCESS_ALREADY_WITH_CONTACT",
             );
           }
 
@@ -330,7 +330,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
               sameSite: "lax",
               secure: process.env.NODE_ENV === "production",
               maxAge: 60 * 60 * 24 * 365 * 10 * 1000,
-            }
+            },
           );
         }
         return {
@@ -341,7 +341,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
         if (error.message === "PETITION_SEND_LIMIT_REACHED") {
           throw new ApolloError(
             `Can't send the parallel due to lack of credits`,
-            "PETITION_SEND_LIMIT_REACHED"
+            "PETITION_SEND_LIMIT_REACHED",
           );
         } else if (error.message === "INVALID_TOKEN") {
           throw new ApolloError("The token is no longer valid", "INVALID_TOKEN");
@@ -383,7 +383,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
               additionalSignersInfo: args.additionalSigners ?? [],
               message: args.message ?? undefined,
             },
-            ctx.access!
+            ctx.access!,
           );
           petition = updatedPetition ?? petition;
         } else {
@@ -399,7 +399,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         await ctx.emails.sendPetitionCompletedEmail(
           petition.id,
           { accessId: ctx.access!.id },
-          `PetitionAccess:${ctx.access!.id}`
+          `PetitionAccess:${ctx.access!.id}`,
         );
       }
 
@@ -408,12 +408,12 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
         throw new ApolloError(
           "Can't complete the petition without signers information",
-          "REQUIRED_SIGNER_INFO_ERROR"
+          "REQUIRED_SIGNER_INFO_ERROR",
         );
       } else if (error.message === "CANT_COMPLETE_PETITION_ERROR") {
         throw new ApolloError(
           "Can't transition status to COMPLETED",
-          "CANT_COMPLETE_PETITION_ERROR"
+          "CANT_COMPLETE_PETITION_ERROR",
         );
       }
       throw error;
@@ -427,7 +427,7 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(fieldBelongsToAccess("petitionFieldId"), fieldsHaveCommentsEnabled("petitionFieldId")),
-    validPetitionFieldCommentContent("content", "petitionFieldId")
+    validPetitionFieldCommentContent("content", "petitionFieldId"),
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -446,7 +446,7 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
         petitionFieldId: args.petitionFieldId,
         contentJson: args.content,
       },
-      ctx.access!
+      ctx.access!,
     );
   },
 });
@@ -456,7 +456,7 @@ export const publicDeletePetitionFieldComment = mutationField("publicDeletePetit
   type: "PublicPetitionField",
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId"))
+    and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId")),
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -468,7 +468,7 @@ export const publicDeletePetitionFieldComment = mutationField("publicDeletePetit
       ctx.access!.petition_id,
       args.petitionFieldId,
       args.petitionFieldCommentId,
-      ctx.access!
+      ctx.access!,
     );
     ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
       petitionId: ctx.access!.petition_id,
@@ -484,7 +484,7 @@ export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetit
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId")),
-    validPetitionFieldCommentContent("content", "petitionFieldId")
+    validPetitionFieldCommentContent("content", "petitionFieldId"),
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -498,7 +498,7 @@ export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetit
       {
         contentJson: args.content,
       },
-      ctx.contact!
+      ctx.contact!,
     );
   },
 });
@@ -510,7 +510,7 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
     type: list(nonNull("PublicPetitionFieldComment")),
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      commentsBelongsToAccess("petitionFieldCommentIds")
+      commentsBelongsToAccess("petitionFieldCommentIds"),
     ),
     args: {
       keycode: nonNull(idArg()),
@@ -520,10 +520,10 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.markPetitionFieldCommentsAsReadForAccess(
         args.petitionFieldCommentIds,
-        ctx.access!.id
+        ctx.access!.id,
       );
     },
-  }
+  },
 );
 
 export const publicDelegateAccessToContact = mutationField("publicDelegateAccessToContact", {
@@ -551,7 +551,7 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
         first_name: args.firstName,
         last_name: args.lastName,
       },
-      `Contact:${recipient.id}`
+      `Contact:${recipient.id}`,
     );
 
     try {
@@ -559,7 +559,7 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
         petitionId,
         access.granter_id,
         contactToDelegate.id,
-        recipient
+        recipient,
       );
 
       await Promise.all([
@@ -586,7 +586,7 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
           petitionId,
           access.id,
           contactAccess.id,
-          args.messageBody
+          args.messageBody,
         );
 
         return contactAccess;
@@ -604,7 +604,10 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
     type: "FileUploadDownloadLinkResult",
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      and(fieldBelongsToAccess("fieldId"), fieldAttachmentBelongsToField("fieldId", "attachmentId"))
+      and(
+        fieldBelongsToAccess("fieldId"),
+        fieldAttachmentBelongsToField("fieldId", "attachmentId"),
+      ),
     ),
     args: {
       keycode: nonNull(idArg()),
@@ -638,7 +641,7 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
           url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
-            args.preview ? "inline" : "attachment"
+            args.preview ? "inline" : "attachment",
           ),
         };
       } catch {
@@ -647,7 +650,7 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
         };
       }
     },
-  }
+  },
 );
 
 export const publicRemindersOptOut = mutationField("publicRemindersOptOut", {
@@ -699,16 +702,16 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         booleanArg({
           description:
             "Set to true to force the creation + send of a new petition if the contact already has an active access on this public link",
-        })
+        }),
       ),
       prefill: nullable(
         stringArg({
           description:
             "JWT token containing information to prefill the petition after creating it.",
-        })
+        }),
       ),
       prefillDataKey: nullable(
-        idArg({ description: "key to fetch prefill information from the database." })
+        idArg({ description: "key to fetch prefill information from the database." }),
       ),
     },
     authorize: chain(
@@ -716,15 +719,15 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug")),
       ifArgDefined(
         "prefillDataKey",
-        validPublicPetitionLinkPrefillDataKeycode("prefillDataKey" as never)
-      )
+        validPublicPetitionLinkPrefillDataKeycode("prefillDataKey" as never),
+      ),
     ),
     validateArgs: validateAnd(
       validEmail((args) => args.contactEmail, "contactEmail"),
       validXor(
         (args) => [isDefined(args.prefill), isDefined(args.prefillDataKey)],
-        "prefill,prefillDataKey"
-      )
+        "prefill,prefillDataKey",
+      ),
     ),
     resolve: async (_, args, ctx) => {
       const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
@@ -734,7 +737,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       ) {
         throw new ApolloError(
           "Contact already has access on this link.",
-          "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
+          "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR",
         );
       }
 
@@ -755,7 +758,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             credits_used: 1,
           },
           { insertPermissions: !owner.isDefault },
-          `PublicPetitionLink:${link.id}`
+          `PublicPetitionLink:${link.id}`,
         );
 
         const [contact] = await ctx.contacts.loadOrCreate(
@@ -765,7 +768,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             last_name: args.contactLastName,
             org_id: owner.user.org_id,
           },
-          `PublicPetitionLink:${link.id}`
+          `PublicPetitionLink:${link.id}`,
         );
 
         // prefill before creating message subject and body so replies are available on PetitionMessageContext
@@ -776,13 +779,13 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           }
         } else if (isDefined(args.prefillDataKey)) {
           const prefillData = (await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(
-            args.prefillDataKey
+            args.prefillDataKey,
           ))!;
           await ctx.petitions.prefillPetition(petition.id, prefillData.data, owner.user);
           await ctx.petitions.updatePetition(
             petition.id,
             { path: prefillData.path },
-            `PublicPetitionLink:${link.id}`
+            `PublicPetitionLink:${link.id}`,
           );
         }
 
@@ -807,7 +810,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             status: "PENDING",
             closed_at: null,
           },
-          `PublicPetitionLink:${link.id}`
+          `PublicPetitionLink:${link.id}`,
         );
         const { messages } = await ctx.petitions.createAccessesAndMessages(
           petition,
@@ -819,14 +822,14 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           },
           owner.user,
           null,
-          true
+          true,
         );
 
         await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
           petition.id,
           link.template_id,
           "PublicPetitionLink",
-          link.id
+          link.id,
         );
 
         // trigger emails and events
@@ -839,7 +842,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
                 type: "MESSAGE_SENT",
                 data: { petition_message_id: message.id },
                 petition_id: message.petition_id,
-              }))
+              })),
             ),
           ]);
         }
@@ -849,13 +852,13 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         if (error.message === "PETITION_SEND_LIMIT_REACHED") {
           throw new ApolloError(
             `Can't send the parallel due to lack of credits`,
-            "PETITION_SEND_LIMIT_REACHED"
+            "PETITION_SEND_LIMIT_REACHED",
           );
         }
         return RESULT.FAILURE;
       }
     },
-  }
+  },
 );
 
 export const publicSendReminder = mutationField("publicSendReminder", {
@@ -869,7 +872,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
   },
   authorize: chain(
     ifArgDefined("slug", validPublicPetitionLinkSlug("slug" as never)),
-    ifArgDefined("keycode", fetchPetitionAccess("keycode" as never))
+    ifArgDefined("keycode", fetchPetitionAccess("keycode" as never)),
   ),
   validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
   resolve: async (_, args, ctx) => {
@@ -883,10 +886,10 @@ export const publicSendReminder = mutationField("publicSendReminder", {
         orgId: petition.org_id,
       });
       const allPetitionAccesses = await ctx.petitions.loadAccessesForPetition(
-        ctx.access!.petition_id
+        ctx.access!.petition_id,
       );
       access = allPetitionAccesses.find(
-        (a) => a.contact_id === contact?.id && a.status === "ACTIVE"
+        (a) => a.contact_id === contact?.id && a.status === "ACTIVE",
       )!;
       if (!access) {
         return RESULT.FAILURE;
@@ -896,7 +899,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
       const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug!))!;
       access = await ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(
         link.id,
-        args.contactEmail
+        args.contactEmail,
       );
       const defaultOwner = await ctx.petitions.loadTemplateDefaultOwner(link.template_id);
       owner = defaultOwner!.user;
@@ -914,7 +917,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     if (latestReminder && differenceInDays(latestReminder.created_at, new Date()) < 1) {
       throw new ApolloError(
         `You can only send one reminder each 24 hours`,
-        "REMINDER_ALREADY_SENT_ERROR"
+        "REMINDER_ALREADY_SENT_ERROR",
       );
     }
 
@@ -962,7 +965,7 @@ export const publicCreatePrintPdfTask = mutationField("publicCreatePrintPdfTask"
           petition_id: ctx.access!.petition_id,
         },
       },
-      `PetitionAccess:${ctx.access!.id}`
+      `PetitionAccess:${ctx.access!.id}`,
     ),
 });
 
@@ -972,7 +975,7 @@ export const publicGetTaskResultFileUrl = mutationField("publicGetTaskResultFile
   authorize: chain(
     authenticatePublicAccess("keycode"),
     taskBelongsToAccess("taskId"),
-    tasksAreOfType("taskId", ["PRINT_PDF"])
+    tasksAreOfType("taskId", ["PRINT_PDF"]),
   ),
   args: {
     taskId: nonNull(globalIdArg("Task")),
@@ -991,13 +994,13 @@ export const publicGetTaskResultFileUrl = mutationField("publicGetTaskResultFile
     ) {
       throw new ApolloError(
         `Temporary file not found for Task:${task.id} output`,
-        "FILE_NOT_FOUND_ERROR"
+        "FILE_NOT_FOUND_ERROR",
       );
     }
     return await ctx.storage.temporaryFiles.getSignedDownloadEndpoint(
       file.path,
       file.filename,
-      "inline"
+      "inline",
     );
   },
 });

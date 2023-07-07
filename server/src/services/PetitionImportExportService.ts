@@ -196,7 +196,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
         },
         user,
         true,
-        t
+        t,
       );
 
       /**
@@ -238,13 +238,13 @@ export class PetitionImportExportService implements IPetitionImportExportService
             },
             jsonField.position,
             user,
-            t
+            t,
           );
 
           newFieldIds[jsonField.id] = field.id;
           return field;
         },
-        { concurrency: 1 }
+        { concurrency: 1 },
       );
       return petition.id;
     });

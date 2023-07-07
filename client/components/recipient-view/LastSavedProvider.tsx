@@ -19,7 +19,7 @@ export function LastSavedProvider({ children }: LastSavedProviderProps) {
       lastSaved,
       updateLastSaved: () => setLastSaved(new Date()),
     }),
-    [lastSaved]
+    [lastSaved],
   );
 
   return <LastSavedContext.Provider value={value}>{children}</LastSavedContext.Provider>;

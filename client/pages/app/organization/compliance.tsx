@@ -91,7 +91,7 @@ function OrganizationCompliance() {
   const period = Number(watch("period"));
 
   const [updateOrganizationAutoAnonymizePeriod] = useMutation(
-    OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument
+    OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument,
   );
 
   const onPeriodChange = async ({ period, isActive }: ComplianceFormData) => {
@@ -399,5 +399,5 @@ OrganizationCompliance.getInitialProps = async ({ fetchQuery }: WithApolloDataCo
 export default compose(
   withDialogs,
   withOrgRole("ADMIN", "/app/organization"),
-  withApolloData
+  withApolloData,
 )(OrganizationCompliance);

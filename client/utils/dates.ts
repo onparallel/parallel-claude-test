@@ -122,7 +122,7 @@ export function dateToDatetimeLocal(date: string | number | Date) {
     }).formatToParts(new Date(date)),
     filter((p) => p.type !== "literal"),
     indexBy((p) => p.type),
-    mapValues((p) => p.value)
+    mapValues((p) => p.value),
   );
   return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
 }
@@ -136,7 +136,7 @@ export function dateToFilenameFormat(date: string | number | Date) {
     }).formatToParts(new Date(date)),
     filter((p) => p.type !== "literal"),
     indexBy((p) => p.type),
-    mapValues((p) => p.value)
+    mapValues((p) => p.value),
   );
   return `${year}${month}${day}`;
 }

@@ -53,7 +53,10 @@ interface SignaturitError {
 }
 
 export class SignaturitRequestError extends Error {
-  constructor(public code: string, message?: string) {
+  constructor(
+    public code: string,
+    message?: string,
+  ) {
     super(message);
   }
 }
@@ -70,7 +73,7 @@ export class SignaturitClient implements ISignatureClient {
     @inject(FETCH_SERVICE) private fetchService: IFetchService,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
-    @inject(SignaturitIntegration) private signaturitApiKey: SignaturitIntegration
+    @inject(SignaturitIntegration) private signaturitApiKey: SignaturitIntegration,
   ) {}
   private integrationId!: number;
 
@@ -79,14 +82,14 @@ export class SignaturitClient implements ISignatureClient {
   }
 
   private async withSignaturitSDK<TResult>(
-    handler: (sdk: SignaturitSDK, context: SignaturitIntegrationContext) => Promise<TResult>
+    handler: (sdk: SignaturitSDK, context: SignaturitIntegrationContext) => Promise<TResult>,
   ): Promise<TResult> {
     return this.signaturitApiKey.withApiKey(this.integrationId, async (apiKey, context) => {
       try {
         const sdk = new SignaturitSDK(
           apiKey,
           context.environment === "production",
-          this.fetchService
+          this.fetchService,
         );
         return await handler(sdk, context);
       } catch (e) {
@@ -106,7 +109,7 @@ export class SignaturitClient implements ISignatureClient {
     orgId: number,
     filePath: string,
     recipients: Recipient[],
-    opts: SignatureOptions
+    opts: SignatureOptions,
   ) {
     return await this.withSignaturitSDK(async (sdk, context) => {
       // signaturit has a 40 signers limit
@@ -116,7 +119,7 @@ export class SignaturitClient implements ISignatureClient {
 
       const petition = await this.petitions.loadPetition(petitionId);
       const petitionTheme = await this.organizations.loadOrganizationTheme(
-        petition!.document_organization_theme_id
+        petition!.document_organization_theme_id,
       );
       if (!petitionTheme) {
         throw new Error(`Expected Petition:${petitionId} to have defined PDF_DOCUMENT theme`);
@@ -152,12 +155,12 @@ export class SignaturitClient implements ISignatureClient {
               branding_id: brandingId,
               events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
                 "Petition",
-                petitionId
+                petitionId,
               )}/events`,
               callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams(
                 {
                   o: toGlobalId("Organization", orgId),
-                }
+                },
               )}`,
               recipients: recipients.map((r, recipientIndex) => ({
                 email: r.email,
@@ -182,12 +185,12 @@ export class SignaturitClient implements ISignatureClient {
               reminders: 0,
             });
           },
-          { maxRetries: 3, delay: 5_000 }
+          { maxRetries: 3, delay: 5_000 },
         );
 
         if (!isDefined(response.id) || !isDefined(response.documents)) {
           throw new Error(
-            `Invalid response: ${stringify({ petitionId, opts, recipients, response })}`
+            `Invalid response: ${stringify({ petitionId, opts, recipients, response })}`,
           );
         }
         return response;
@@ -199,7 +202,7 @@ export class SignaturitClient implements ISignatureClient {
           await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
             orgId,
             petitionId,
-            context.apiKeyHint
+            context.apiKeyHint,
           );
           throw new SignaturitRequestError("SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", error.message);
         }
@@ -236,7 +239,7 @@ export class SignaturitClient implements ISignatureClient {
 
       const result = await retry(
         async () => await sdk.downloadSignedDocument(signatureId, documentId),
-        { maxRetries: 3, delay: 5_000 }
+        { maxRetries: 3, delay: 5_000 },
       );
 
       return Buffer.from(result);
@@ -249,7 +252,7 @@ export class SignaturitClient implements ISignatureClient {
 
       const result = await retry(
         async () => await sdk.downloadAuditTrail(signatureId, documentId),
-        { maxRetries: 3, delay: 5_000 }
+        { maxRetries: 3, delay: 5_000 },
       );
 
       return Buffer.from(result);
@@ -284,7 +287,7 @@ export class SignaturitClient implements ISignatureClient {
             templates: await this.buildSignaturItBrandingTemplates(locale, templateData),
           });
         },
-        { concurrency: 1 }
+        { concurrency: 1 },
       );
     });
   }
@@ -315,7 +318,7 @@ export class SignaturitClient implements ISignatureClient {
 
   private async buildSignaturItBrandingTemplates(
     locale: ContactLocale,
-    templateData: OrganizationLayout
+    templateData: OrganizationLayout,
   ): Promise<SignaturitBrandingParams<true>["templates"]> {
     const [
       { html: signatureRequestedEmail },
@@ -332,7 +335,7 @@ export class SignaturitClient implements ISignatureClient {
           emailBody: "{{email_body}}",
           ...templateData,
         },
-        { locale }
+        { locale },
       ),
       buildEmail(
         SignatureCompletedEmail,
@@ -342,7 +345,7 @@ export class SignaturitClient implements ISignatureClient {
           documentName: "{{filename}}",
           ...templateData,
         },
-        { locale }
+        { locale },
       ),
       buildEmail(
         SignatureCancelledEmail,
@@ -351,7 +354,7 @@ export class SignaturitClient implements ISignatureClient {
           signerName: "{{signer_name}}",
           ...templateData,
         },
-        { locale }
+        { locale },
       ),
       buildEmail(
         SignatureReminderEmail,
@@ -361,7 +364,7 @@ export class SignaturitClient implements ISignatureClient {
           signButton: "{{sign_button}}",
           ...templateData,
         },
-        { locale }
+        { locale },
       ),
     ]);
 
@@ -426,7 +429,7 @@ export class SignaturitClient implements ISignatureClient {
       return;
     }
     const signatureRequest = await this.petitions.loadPetitionSignatureByExternalId(
-      `SIGNATURIT/${signature.id}`
+      `SIGNATURIT/${signature.id}`,
     );
     if (!signatureRequest) {
       throw new Error(`PetitionSignatureRequest with externalId ${signature.id} not found`);
@@ -443,7 +446,9 @@ export class SignaturitClient implements ISignatureClient {
         await this.signature.storeSignedDocument(
           signatureRequest,
           `${signature.id}/${lastSigner.id}`,
-          signatureRequest.signature_config.signersInfo.find((s) => s.externalId === lastSigner.id)!
+          signatureRequest.signature_config.signersInfo.find(
+            (s) => s.externalId === lastSigner.id,
+          )!,
         );
       }
     } else if (
@@ -452,7 +457,7 @@ export class SignaturitClient implements ISignatureClient {
     ) {
       const declinedDocument = signature.documents.find((d) => d.status === "declined")!;
       const cancellerIndex = signatureRequest.signature_config.signersInfo.findIndex(
-        (s) => s.externalId === declinedDocument.id
+        (s) => s.externalId === declinedDocument.id,
       )!;
       const canceller = signatureRequest.signature_config.signersInfo[cancellerIndex];
       await this.petitions.updatePetitionSignatureRequestAsCancelled(signatureRequest.id, {
@@ -647,7 +652,11 @@ export type SignaturitEvents =
 
 class SignaturitSDK {
   private baseUrl: string;
-  constructor(private apiKey: string, isProduction: boolean, private fetch: IFetchService) {
+  constructor(
+    private apiKey: string,
+    isProduction: boolean,
+    private fetch: IFetchService,
+  ) {
     this.baseUrl = isProduction
       ? "https://api.signaturit.com"
       : "https://api.sandbox.signaturit.com";
@@ -657,7 +666,7 @@ class SignaturitSDK {
     method: string,
     path: string,
     body?: BodyInit,
-    binary?: boolean
+    binary?: boolean,
   ): Promise<T> {
     try {
       const response = await this.fetch.fetch(`${this.baseUrl}${path}`, {
@@ -699,14 +708,14 @@ class SignaturitSDK {
   async getSignature(signatureId: string) {
     return await this.apiRequest<SignaturitSignatureResponse>(
       "GET",
-      `/v3/signatures/${signatureId}.json`
+      `/v3/signatures/${signatureId}.json`,
     );
   }
 
   async cancelSignature(signatureId: string) {
     return await this.apiRequest<SignaturitSignatureResponse>(
       "PATCH",
-      `/v3/signatures/${signatureId}/cancel.json`
+      `/v3/signatures/${signatureId}/cancel.json`,
     );
   }
 
@@ -727,7 +736,7 @@ class SignaturitSDK {
       "GET",
       `/v3/signatures/${signatureId}/documents/${documentId}/download/signed`,
       undefined,
-      true
+      true,
     );
   }
 
@@ -736,14 +745,14 @@ class SignaturitSDK {
       "GET",
       `/v3/signatures/${signatureId}/documents/${documentId}/download/audit_trail`,
       undefined,
-      true
+      true,
     );
   }
 
   async sendSignatureReminder(signatureId: string) {
     return await this.apiRequest<SignaturitSignatureResponse>(
       "POST",
-      `/v3/signatures/${signatureId}/reminder.json`
+      `/v3/signatures/${signatureId}/reminder.json`,
     );
   }
 
@@ -751,7 +760,7 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "POST",
       "/v3/brandings.json",
-      new URLSearchParams(flatten(params))
+      new URLSearchParams(flatten(params)),
     );
   }
 
@@ -759,7 +768,7 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "PATCH",
       `/v3/brandings/${brandingId}.json`,
-      new URLSearchParams(flatten(params))
+      new URLSearchParams(flatten(params)),
     );
   }
 }

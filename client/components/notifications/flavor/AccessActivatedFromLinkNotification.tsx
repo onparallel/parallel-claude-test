@@ -42,7 +42,7 @@ export const AccessActivatedFromLinkNotification = Object.assign(
           />
         </PetitionUserNotification>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -59,5 +59,5 @@ export const AccessActivatedFromLinkNotification = Object.assign(
         ${ContactReference.fragments.Contact}
       `,
     },
-  }
+  },
 );

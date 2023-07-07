@@ -112,15 +112,15 @@ export function RecipientViewContactlessForm({
   }, [state]);
 
   const [sendVerificationCode, { loading: isSendingCode }] = useMutation(
-    RecipientViewContactlessForm_publicSendVerificationCodeDocument
+    RecipientViewContactlessForm_publicSendVerificationCodeDocument,
   );
 
   const [publicCheckVerificationCode, { loading: isVerifyingCode }] = useMutation(
-    RecipientViewContactlessForm_publicCheckVerificationCodeDocument
+    RecipientViewContactlessForm_publicCheckVerificationCodeDocument,
   );
 
   const [publicSendReminder, { loading: reminderLoading }] = useMutation(
-    RecipientViewContactlessForm_publicSendReminderDocument
+    RecipientViewContactlessForm_publicSendReminderDocument,
   );
 
   const accessSentToast = () => {
@@ -135,7 +135,7 @@ export function RecipientViewContactlessForm({
           defaultMessage:
             "We have sent a access to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it.",
         },
-        { email }
+        { email },
       ),
       duration: 5000,
       status: "success",
@@ -155,7 +155,7 @@ export function RecipientViewContactlessForm({
           defaultMessage:
             "There is already an access sent to <b>{email}</b> recently. Please check your inbox or spam.",
         },
-        { email }
+        { email },
       ),
       duration: null,
       status: "warning",

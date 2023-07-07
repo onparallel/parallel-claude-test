@@ -21,7 +21,7 @@ export type FieldValidateArgsResolver<TypeName extends string, FieldName extends
   root: core.GetGen2<"rootTypes", TypeName>,
   args: core.ArgsValue<TypeName, FieldName>,
   context: core.GetGen<"context">,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => core.MaybePromise<void>;
 
 export type ValidateArgsPluginConfig = {};
@@ -46,7 +46,7 @@ export const validateArgsPlugin = () => {
         // If it does have this field, but it's not a function, it's wrong - let's provide a warning
         const { name, type } = config.fieldConfig;
         console.warn(
-          `The validateArgs property provided to ${name} with type ${type} should be a function, saw ${typeof validateArgs}`
+          `The validateArgs property provided to ${name} with type ${type} should be a function, saw ${typeof validateArgs}`,
         );
         return;
       }

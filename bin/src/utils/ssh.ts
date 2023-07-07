@@ -6,7 +6,7 @@ export async function executeRemoteCommand(ipAddress: string, command: string) {
     `ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
-      ${ipAddress} ${command}`
+      ${ipAddress} ${command}`,
   );
 }
 
@@ -16,7 +16,7 @@ export async function pingSsh(ipAddress: string) {
       -o ConnectTimeout=1 \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
-      ${ipAddress} true >/dev/null 2>&1`
+      ${ipAddress} true >/dev/null 2>&1`,
   );
 }
 
@@ -25,7 +25,7 @@ export async function copyToRemoteServer(ipAddress: string, from: string, to: st
     `scp \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
-      ${from} ${ipAddress}:${to}`
+      ${from} ${ipAddress}:${to}`,
   );
 }
 

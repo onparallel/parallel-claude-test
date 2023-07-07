@@ -58,5 +58,5 @@ export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionL
         </Portal>
       </Menu>
     );
-  }
+  },
 );

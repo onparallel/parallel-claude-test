@@ -8,7 +8,7 @@ interface GraphQLOperation {
 
 export async function waitForGraphQL(
   page: Page,
-  predicate: (operation: GraphQLOperation) => boolean
+  predicate: (operation: GraphQLOperation) => boolean,
 ) {
   await page.waitForResponse((response) => {
     const request = response.request();

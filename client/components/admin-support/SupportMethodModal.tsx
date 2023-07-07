@@ -37,7 +37,7 @@ function reset(field: IntrospectionField, schemaTypes: readonly IntrospectionTyp
           value: getDefaultInputTypeValue(arg.type, schemaTypes, arg.defaultValue),
           isInvalid: false,
         },
-      ])
+      ]),
     );
 }
 
@@ -83,7 +83,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
     const invalidFields = field.args.filter(
       (f) =>
         f.type.kind === "NON_NULL" &&
-        (values[f.name] === null || values[f.name].value === "" || values[f.name].value === null)
+        (values[f.name] === null || values[f.name].value === "" || values[f.name].value === null),
     );
     setValues({
       ...Object.fromEntries(
@@ -93,7 +93,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
             ...values[arg.name],
             isInvalid: invalidFields.some((a) => a.name === arg.name),
           },
-        ])
+        ]),
       ),
     });
     if (invalidFields.length > 0) {
@@ -102,7 +102,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
     setStatus({ loading: true, data: null });
     try {
       const variables = Object.fromEntries(
-        field.args.map((arg) => [arg.name, values[arg.name].value])
+        field.args.map((arg) => [arg.name, values[arg.name].value]),
       );
       const { data } =
         queryType === "query"

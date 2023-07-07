@@ -12,7 +12,7 @@ export const EMAIL_REGEX =
 export function validEmail<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<string> | null | undefined,
   argName: string,
-  onlyRegex = false
+  onlyRegex = false,
 ) {
   return (async (_, args, ctx, info) => {
     const emails = unMaybeArray(prop(args)).filter(isDefined);
@@ -33,7 +33,7 @@ export function validEmail<TypeName extends string, FieldName extends string>(
             });
           }
         },
-        { concurrency: 20 }
+        { concurrency: 20 },
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

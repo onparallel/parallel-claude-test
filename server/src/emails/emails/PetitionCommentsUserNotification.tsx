@@ -28,7 +28,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
   },
   subject({ petitionName, fields }, intl: IntlShape) {
     const commentsWithMentions = fields.flatMap((f) =>
-      f.comments.filter((c) => c.mentions.filter((m) => m.highlight).length > 0)
+      f.comments.filter((c) => c.mentions.filter((m) => m.highlight).length > 0),
     );
 
     return commentsWithMentions.length === 0
@@ -38,7 +38,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
             defaultMessage:
               "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}",
           },
-          { petitionName }
+          { petitionName },
         )
       : intl.formatMessage(
           {
@@ -50,7 +50,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
             author: commentsWithMentions[0].author.name,
             uniqueAuthorCount: uniqBy(commentsWithMentions, (m) => m.author.id).length,
             petitionName,
-          }
+          },
         );
   },
   text(
@@ -61,13 +61,13 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       petitionId,
       parallelUrl,
     }: PetitionCommentsUserNotificationProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     const commentsWithMentions = fields.flatMap((f) =>
-      f.comments.filter((c) => c.mentions.length > 0)
+      f.comments.filter((c) => c.mentions.length > 0),
     );
     const mentionCount = commentsWithMentions.flatMap((c) =>
-      c.mentions.filter((m) => m.highlight)
+      c.mentions.filter((m) => m.highlight),
     ).length;
 
     const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
@@ -84,7 +84,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
                defaultMessage:
                  "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
              },
-             { count: commentCount, petitionName }
+             { count: commentCount, petitionName },
            )
          : onlyMentions
          ? intl.formatMessage(
@@ -93,7 +93,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
                defaultMessage:
                  "You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
              },
-             { count: mentionCount, petitionName }
+             { count: mentionCount, petitionName },
            )
          : intl.formatMessage(
              {
@@ -101,7 +101,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
                defaultMessage:
                  "You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
              },
-             { commentCount, mentionCount, petitionName }
+             { commentCount, mentionCount, petitionName },
            )
      }
 
@@ -128,10 +128,10 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const { locale } = useIntl();
 
     const commentsWithMentions = fields.flatMap((f) =>
-      f.comments.filter((c) => c.mentions.length > 0)
+      f.comments.filter((c) => c.mentions.length > 0),
     );
     const mentionCount = commentsWithMentions.flatMap((c) =>
-      c.mentions.filter((m) => m.highlight)
+      c.mentions.filter((m) => m.highlight),
     ).length;
 
     const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;

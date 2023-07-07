@@ -12,7 +12,7 @@ export interface AddFieldPopoverProps extends Pick<MenuProps, "onOpen" | "onClos
 export const AddFieldPopover = Object.assign(
   chakraForwardRef<"button", AddFieldPopoverProps>(function AddFieldPopover(
     { id, user, onSelectFieldType, onOpen, onClose, ...props },
-    ref
+    ref,
   ) {
     return (
       <Menu id={id} placement="bottom" onOpen={onOpen} onClose={onClose}>
@@ -37,5 +37,5 @@ export const AddFieldPopover = Object.assign(
         ${PetitionFieldTypeSelectDropdown.fragments.User}
       `,
     },
-  }
+  },
 );

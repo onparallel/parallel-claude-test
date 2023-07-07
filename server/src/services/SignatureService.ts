@@ -33,31 +33,31 @@ export interface ISignatureService {
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
-    starter: User | PetitionAccess
+    starter: User | PetitionAccess,
   ): Promise<any>;
   cancelSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
     signatures: MaybeArray<PetitionSignatureRequest>,
     cancelReason: CancelReason,
     cancelData: PetitionSignatureRequestCancelData<CancelReason>,
     extraData?: Partial<PetitionSignatureRequest>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<PetitionSignatureRequest[]>;
   cancelPendingSignatureRequests(
     petitionId: number,
-    canceller: PetitionAccess | User
+    canceller: PetitionAccess | User,
   ): Promise<void>;
   sendSignatureReminders(
     signatures: MaybeArray<PetitionSignatureRequest>,
-    userId: number
+    userId: number,
   ): Promise<void>;
   storeSignedDocument(
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string,
-    signer: PetitionSignatureConfigSigner
+    signer: PetitionSignatureConfigSigner,
   ): Promise<void>;
   storeAuditTrail(
     signature: PetitionSignatureRequest,
-    signedDocumentExternalId: string
+    signedDocumentExternalId: string,
   ): Promise<void>;
   onOrganizationBrandChange(orgId: number, opts?: UpdateBrandingOpts): Promise<void>;
 }
@@ -71,7 +71,7 @@ export class SignatureService implements ISignatureService {
     private integrations: IntegrationRepository,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
-    @inject(Container) private container: Container
+    @inject(Container) private container: Container,
   ) {}
 
   public getClient<TClient extends ISignatureClient>(integration: {
@@ -86,7 +86,7 @@ export class SignatureService implements ISignatureService {
   async createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
-    starter: User | PetitionAccess
+    starter: User | PetitionAccess,
   ) {
     await this.verifySignatureConfig(petitionId, signatureConfig);
 
@@ -99,7 +99,7 @@ export class SignatureService implements ISignatureService {
       [updatedPetition] = await this.petitions.updatePetition(
         petitionId,
         { signature_config: signatureConfig },
-        updatedBy
+        updatedBy,
       );
     }
 
@@ -109,7 +109,7 @@ export class SignatureService implements ISignatureService {
       signature_config: {
         ...omit(signatureConfig, ["additionalSignersInfo"]),
         signersInfo: signatureConfig.signersInfo.concat(
-          signatureConfig.additionalSignersInfo ?? []
+          signatureConfig.additionalSignersInfo ?? [],
         ),
       },
     });
@@ -128,7 +128,7 @@ export class SignatureService implements ISignatureService {
   async storeSignedDocument(
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string,
-    signer: PetitionSignatureConfigSigner
+    signer: PetitionSignatureConfigSigner,
   ) {
     await this.queues.enqueueMessages("signature-worker", {
       groupId: `signature-${toGlobalId("Petition", signature.petition_id)}`,
@@ -161,7 +161,7 @@ export class SignatureService implements ISignatureService {
     cancelReason: CancelReason,
     cancelData: PetitionSignatureRequestCancelData<CancelReason>,
     extraData?: Partial<PetitionSignatureRequest>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
 
@@ -173,7 +173,7 @@ export class SignatureService implements ISignatureService {
         cancel_data: cancelData,
         ...extraData,
       },
-      t
+      t,
     );
 
     if (rows.length > 0) {
@@ -187,7 +187,7 @@ export class SignatureService implements ISignatureService {
             payload: { petitionSignatureRequestId: s.id },
           },
         })),
-        t
+        t,
       );
     }
 
@@ -206,7 +206,7 @@ export class SignatureService implements ISignatureService {
             type: "send-signature-reminder" as const,
             payload: { petitionSignatureRequestId: s.id, userId },
           },
-        }))
+        })),
       );
     }
   }
@@ -232,7 +232,7 @@ export class SignatureService implements ISignatureService {
       petitionId,
       {
         refresh: true,
-      }
+      },
     );
 
     // avoid recipients restarting the signature process too many times
@@ -241,7 +241,7 @@ export class SignatureService implements ISignatureService {
     }
 
     const enqueuedSignatureRequest = previousSignatureRequests.find(
-      (r) => r.status === "ENQUEUED" || r.status === "PROCESSING"
+      (r) => r.status === "ENQUEUED" || r.status === "PROCESSING",
     );
 
     const pendingSignatureRequest = previousSignatureRequests.find((r) => r.status === "PROCESSED");
@@ -259,7 +259,7 @@ export class SignatureService implements ISignatureService {
       await this.cancelSignatureRequest(
         pendingSignatureRequest,
         "REQUEST_RESTARTED",
-        isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id }
+        isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id },
       );
     }
 
@@ -273,7 +273,7 @@ export class SignatureService implements ISignatureService {
    */
   private async verifySignatureConfig(
     petitionId: number,
-    signatureConfig: PetitionSignatureConfig
+    signatureConfig: PetitionSignatureConfig,
   ) {
     if (signatureConfig.orgIntegrationId === undefined) {
       throw new Error(`undefined orgIntegrationId on signature_config. Petition:${petitionId}`);
@@ -286,7 +286,7 @@ export class SignatureService implements ISignatureService {
     const integration = await this.integrations.loadIntegration(signatureConfig.orgIntegrationId);
     if (!integration || integration.type !== "SIGNATURE") {
       throw new Error(
-        `Couldn't find an enabled signature integration for OrgIntegration:${signatureConfig.orgIntegrationId}`
+        `Couldn't find an enabled signature integration for OrgIntegration:${signatureConfig.orgIntegrationId}`,
       );
     }
 
@@ -310,11 +310,11 @@ export class SignatureService implements ISignatureService {
             const [l, d] = e.split("@");
             const [local, domain] = s.email.split("@");
             return d === domain && (l === local || local.startsWith(l + "+"));
-          })
+          }),
         )
       ) {
         throw new Error(
-          "DEVELOPMENT: Every recipient email must be whitelisted in .development.env"
+          "DEVELOPMENT: Every recipient email must be whitelisted in .development.env",
         );
       }
     }

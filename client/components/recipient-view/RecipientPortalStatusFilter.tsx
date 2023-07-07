@@ -44,7 +44,7 @@ export const RecipientPortalStatusFilter = chakraForwardRef<
         }),
       },
     ],
-    []
+    [],
   );
 
   return (

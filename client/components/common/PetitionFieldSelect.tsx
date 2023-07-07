@@ -26,7 +26,7 @@ type PetitionFieldSelectSelection = PetitionFieldSelect_PetitionFieldFragment;
 export interface PetitionFieldSelectProps<
   T extends PetitionFieldSelectSelection,
   ExpandFields extends boolean = false,
-  IsMulti extends boolean = false
+  IsMulti extends boolean = false,
 > extends CustomSelectProps<If<ExpandFields, T | [T, number], T>, IsMulti, never> {
   fields: T[];
   indices: PetitionFieldIndex[];
@@ -36,7 +36,7 @@ export interface PetitionFieldSelectProps<
 export function PetitionFieldSelect<
   OptionType extends PetitionFieldSelectSelection,
   ExpandFields extends boolean = false,
-  IsMulti extends boolean = false
+  IsMulti extends boolean = false,
 >({
   value,
   onChange,
@@ -84,7 +84,7 @@ export function PetitionFieldSelect<
         } else {
           return [{ type: "FIELD", field, fieldIndex }];
         }
-      }
+      },
     );
 
     const _value = isMulti
@@ -96,21 +96,21 @@ export function PetitionFieldSelect<
   const handleChange = useCallback(
     (
       value: OnChangeValue<PetitionFieldSelectOption<OptionType>, IsMulti>,
-      actionMeta: ActionMeta<PetitionFieldSelectOption<OptionType>>
+      actionMeta: ActionMeta<PetitionFieldSelectOption<OptionType>>,
     ) => {
       if (isMulti) {
         onChange(
           (value as PetitionFieldSelectOption<OptionType>[]).map(unMapValue) as any,
-          actionMeta as any
+          actionMeta as any,
         );
       } else {
         onChange(
           unMapValue(value as PetitionFieldSelectOption<OptionType> | null) as any,
-          actionMeta as any
+          actionMeta as any,
         );
       }
     },
-    [onChange, isMulti]
+    [onChange, isMulti],
   );
 
   return (
@@ -152,7 +152,7 @@ type PetitionFieldSelectOption<T extends PetitionFieldSelectSelection> =
     };
 
 const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
-  T extends PetitionFieldSelectSelection
+  T extends PetitionFieldSelectSelection,
 >({ option, highlight }: { option: PetitionFieldSelectOption<T>; highlight?: string }) {
   const color = usePetitionFieldTypeColor(option.field.type);
   if (option.type === "FIELD") {
@@ -241,7 +241,7 @@ const getOptionLabel = (option: PetitionFieldSelectOption<any>) => {
 
 function mapValue<T extends PetitionFieldSelectSelection>(
   value: [T, number] | T | null,
-  options: PetitionFieldSelectOption<T>[]
+  options: PetitionFieldSelectOption<T>[],
 ) {
   const [field, column]: [T | null | undefined] | [T, number | undefined] = (
     Array.isArray(value) ? value : [value]
@@ -250,14 +250,14 @@ function mapValue<T extends PetitionFieldSelectSelection>(
     ? null
     : column !== undefined
     ? options.find(
-        (o) => o.type === "DYNAMIC_SELECT_OPTION" && o.field.id === field.id && o.column === column
+        (o) => o.type === "DYNAMIC_SELECT_OPTION" && o.field.id === field.id && o.column === column,
       ) ?? null
     : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ?? null;
   return _value;
 }
 
 function unMapValue<T extends PetitionFieldSelectSelection>(
-  value: PetitionFieldSelectOption<T> | null
+  value: PetitionFieldSelectOption<T> | null,
 ) {
   return isDefined(value)
     ? value.type === "FIELD"

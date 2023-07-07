@@ -69,14 +69,14 @@ class MyDocument extends Document<MyDocumentProps> {
       [
         ...POLYFILLS,
         ...POLYFILLS_INTL.flatMap((polyfill) => [polyfill, `${polyfill}.~locale.${locale}`]),
-      ].join(",")
+      ].join(","),
     )}`;
     const polyfillsUrlIntl = `https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
       POLYFILLS_INTL.flatMap((polyfill) =>
         languages
           .filter((lang) => lang.locale !== locale)
-          .map((lang) => `${polyfill}.~locale.${lang.locale}`)
-      ).join(",")
+          .map((lang) => `${polyfill}.~locale.${lang.locale}`),
+      ).join(","),
     )}`;
     const localeDataUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.js?v=${process.env.BUILD_ID}`;
     return (
@@ -101,7 +101,7 @@ class MyDocument extends Document<MyDocumentProps> {
                 type="font/woff2"
                 crossOrigin="anonymous"
               />
-            ))
+            )),
           )}
         </Head>
         <body>

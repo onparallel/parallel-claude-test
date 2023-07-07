@@ -27,14 +27,14 @@ export interface SimpleOption<T extends string = string> extends OptionBase {
 export interface SimpleSelectProps<
   T extends string = string,
   IsMulti extends boolean = false,
-  OptionType extends SimpleOption<T> = SimpleOption<T>
+  OptionType extends SimpleOption<T> = SimpleOption<T>,
 > extends UseReactSelectProps<OptionType, IsMulti>,
     Omit<SelectProps<OptionType, IsMulti>, "value" | "onChange"> {
   value: If<IsMulti, T[], T | null>;
   onChange: (value: If<IsMulti, T[], T | null>) => void;
 }
 export function toSimpleSelectOption<T extends string = string>(
-  value: T | null
+  value: T | null,
 ): SimpleOption<T> | null {
   return value === null ? null : { value, label: value as string };
 }
@@ -42,10 +42,10 @@ export function toSimpleSelectOption<T extends string = string>(
 export const SimpleSelect = forwardRef(function SimpleSelect<
   T extends string = string,
   IsMulti extends boolean = false,
-  OptionType extends SimpleOption<T> = SimpleOption<T>
+  OptionType extends SimpleOption<T> = SimpleOption<T>,
 >(
   { value, onChange, ...props }: SimpleSelectProps<T, IsMulti, OptionType>,
-  ref: ForwardedRef<SelectInstance<OptionType, IsMulti>>
+  ref: ForwardedRef<SelectInstance<OptionType, IsMulti>>,
 ) {
   const rsProps = useReactSelectProps({
     ...props,
@@ -57,7 +57,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
   const _value = useMemo(() => {
     const _options = indexBy(
       props.options?.flatMap((o) => ("value" in o ? [o] : o.options)) ?? [],
-      (o) => o.value
+      (o) => o.value,
     );
     if (props.isMulti) {
       return Array.isArray(value) ? value.map((o) => _options[o]) : [];
@@ -75,7 +75,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
       value={_value}
       onChange={(option) => {
         onChange(
-          Array.isArray(option) ? option.map((o) => o.value) : (option as any)?.value ?? null
+          Array.isArray(option) ? option.map((o) => o.value) : (option as any)?.value ?? null,
         );
       }}
     />
@@ -83,15 +83,15 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
 }) as <
   T extends string = string,
   IsMulti extends boolean = false,
-  OptionType extends SimpleOption<T> = SimpleOption<T>
+  OptionType extends SimpleOption<T> = SimpleOption<T>,
 >(
   props: SimpleSelectProps<T, IsMulti, OptionType> &
-    RefAttributes<SelectInstance<OptionType, false>>
+    RefAttributes<SelectInstance<OptionType, false>>,
 ) => ReactElement;
 
 export function useSimpleSelectOptions<T extends string = string>(
   factory: (intl: IntlShape) => SimpleOption<T>[],
-  deps: DependencyList | undefined
+  deps: DependencyList | undefined,
 ): SimpleOption<T>[] {
   const intl = useIntl();
   return useMemo(() => factory(intl), [intl.locale, ...(deps ?? [])]);

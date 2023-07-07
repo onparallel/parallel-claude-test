@@ -61,7 +61,7 @@ function CreateProfileDialog({
           content: {
             value: i < fields.length - 1 ? suggestions[i] ?? "" : suggestions.slice(i).join(" "),
           },
-        })) ?? []
+        })) ?? [],
       );
       setTimeout(() => setFocus(`fieldValues.0.content.value`));
     }

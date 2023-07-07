@@ -76,7 +76,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
         offset: tableState.items * (tableState.page - 1),
       },
       fetchPolicy: "cache-and-network",
-    }
+    },
   );
 
   const organization = data.organization!;
@@ -85,7 +85,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
   const showUpdateOrganizationUsageDetailsDialog = useUpdateOrganizationUsageDetailsDialog();
 
   const [updateOrganizationUserLimit] = useMutation(
-    AdminOrganizationsSubscriptions_updateOrganizationUserLimitDocument
+    AdminOrganizationsSubscriptions_updateOrganizationUserLimitDocument,
   );
   async function handleUpdateOrganizationUsersSubscription() {
     try {
@@ -104,7 +104,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
   }
 
   const [updateOrganizationUsageDetails] = useMutation(
-    AdminOrganizationsSubscriptions_updateOrganizationUsageDetailsDocument
+    AdminOrganizationsSubscriptions_updateOrganizationUsageDetailsDocument,
   );
   async function handleUpdateOrganizationPetitionsSubscription() {
     try {
@@ -142,7 +142,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
     } catch {}
   }
   const [shareSignaturitApiKey] = useMutation(
-    AdminOrganizationsSubscriptions_shareSignaturitApiKeyDocument
+    AdminOrganizationsSubscriptions_shareSignaturitApiKeyDocument,
   );
   async function handleUpdateOrganizationSignaturesSubscription() {
     try {
@@ -188,7 +188,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
   const showUpdateOrganizationCurrentUsagePeriodDialog =
     useUpdateOrganizationCurrentUsagePeriodDialog();
   const [modifyCurrentUsagePeriod] = useMutation(
-    AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodDocument
+    AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodDocument,
   );
   async function handleModifyCurrentUsagePeriod() {
     try {
@@ -411,7 +411,7 @@ interface OrganizationUsagePeriodsTableProps<
     page: number;
     items: NonNullable<5 | 10 | 25 | null>;
     limitName: OrganizationUsageLimitName;
-  }
+  },
 > {
   items?: OrganizationUsagePeriodsTable_OrganizationUsageLimitPaginationFragment;
   isLoading: boolean;
@@ -505,7 +505,7 @@ export function OrganizationUsagePeriodsTable({
           ),
         },
       ] as TableColumn<TableRow>[],
-    [intl.locale]
+    [intl.locale],
   );
 
   return (
@@ -744,5 +744,5 @@ AdminOrganizationsSubscriptions.getInitialProps = async ({
 export default compose(
   withSuperAdminAccess,
   withDialogs,
-  withApolloData
+  withApolloData,
 )(AdminOrganizationsSubscriptions);

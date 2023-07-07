@@ -79,7 +79,7 @@ export function TaskProgressDialog({
       }
     },
     1_500,
-    []
+    [],
   );
   const confirmRef = useRef<HTMLButtonElement>(null);
 

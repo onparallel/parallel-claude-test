@@ -6,7 +6,7 @@ import { useUpdatingRef } from "./useUpdatingRef";
 
 export function useTempQueryParam(
   paramName: string,
-  effect: (value: string) => MaybePromise<boolean | undefined | void>
+  effect: (value: string) => MaybePromise<boolean | undefined | void>,
 ) {
   const routerRef = useUpdatingRef(useRouter());
   useAsyncEffect(async (isMounted) => {
@@ -20,7 +20,7 @@ export function useTempQueryParam(
             query: omit(routerRef.current.query, [paramName]),
           },
           undefined,
-          { shallow: true }
+          { shallow: true },
         );
       }
     }

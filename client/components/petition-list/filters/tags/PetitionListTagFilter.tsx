@@ -77,7 +77,7 @@ export function PetitionListTagFilter({
                       : {
                           ...value,
                           filters: value.filters.filter((_, i) => i !== index),
-                        }
+                        },
                   )
                 }
               />
@@ -155,7 +155,7 @@ export function tagFilterQueryItem() {
 }
 
 export function removeInvalidTagFilterLines(
-  value: PetitionTagFilter | null
+  value: PetitionTagFilter | null,
 ): PetitionTagFilter | null {
   const filters =
     value?.filters.filter((l) => l.operator === "IS_EMPTY" || l.value.length > 0) ?? [];

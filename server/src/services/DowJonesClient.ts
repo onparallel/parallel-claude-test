@@ -105,12 +105,12 @@ export interface IDowJonesClient {
       dateOfBirth?: Maybe<Date>;
       limit?: Maybe<number>;
       offset?: Maybe<number>;
-    }
+    },
   ): Promise<RiskEntitySearchResult>;
   riskEntityProfile(integrationId: number, profileId: string): Promise<RiskEntityProfileResult>;
   riskEntityProfilePdf(
     integrationId: number,
-    profileId: string
+    profileId: string,
   ): Promise<RiskEntityProfilePdfResult>;
   entityFullName(name: RiskEntityPersonName | RiskEntityEntityName): string;
 }
@@ -119,7 +119,7 @@ export interface IDowJonesClient {
 export class DowJonesClient implements IDowJonesClient {
   constructor(
     @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration
+    @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration,
   ) {}
 
   entityFullName(name: RiskEntityPersonName | RiskEntityEntityName) {
@@ -135,7 +135,7 @@ export class DowJonesClient implements IDowJonesClient {
   private async makeApiCall<TResult>(
     integrationId: number,
     url: string,
-    opts: { method: "GET" | "POST"; body?: any }
+    opts: { method: "GET" | "POST"; body?: any },
   ): Promise<TResult> {
     return await this.dowJonesIntegration.withCredentials(
       integrationId,
@@ -166,7 +166,7 @@ export class DowJonesClient implements IDowJonesClient {
         }
 
         return data;
-      }
+      },
     );
   }
 
@@ -177,7 +177,7 @@ export class DowJonesClient implements IDowJonesClient {
       dateOfBirth?: Maybe<Date>;
       limit?: Maybe<number>;
       offset?: Maybe<number>;
-    }
+    },
   ) {
     return await this.makeApiCall<RiskEntitySearchResult>(
       integrationId,
@@ -225,7 +225,7 @@ export class DowJonesClient implements IDowJonesClient {
             },
           },
         },
-      }
+      },
     );
   }
 
@@ -233,7 +233,7 @@ export class DowJonesClient implements IDowJonesClient {
     return await this.makeApiCall<RiskEntityProfileResult>(
       integrationId,
       "https://api.dowjones.com/riskentities/profiles/" + profileId,
-      { method: "GET" }
+      { method: "GET" },
     );
   }
 
@@ -251,7 +251,7 @@ export class DowJonesClient implements IDowJonesClient {
             },
           },
         },
-      }
+      },
     );
   }
 }

@@ -30,7 +30,7 @@ export interface AliasOptionsMenuProps extends ButtonOptions, ThemingProps<"Butt
 export const AliasOptionsMenu = Object.assign(
   chakraForwardRef<"button", AliasOptionsMenuProps>(function AliasOptionsMenu(
     { field, onCreateAlias, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const copyFormula = useClipboardWithToast({
@@ -116,7 +116,7 @@ export const AliasOptionsMenu = Object.assign(
         }
       `,
     },
-  }
+  },
 );
 
 type FormulasType = {
@@ -149,7 +149,7 @@ function useFormulasByTypeField({
                     id: "component.reference-options-menu.sentence-for-option",
                     defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
                   },
-                  { option: value }
+                  { option: value },
                 ),
               ]),
               "{% else %}",
@@ -168,14 +168,14 @@ function useFormulasByTypeField({
             [
               ...values.slice(0, 3).flatMap((value, index) => [
                 `{% ${index === 0 ? "if" : "elsif"} ${buildAlias(alias)} == ${JSON.stringify(
-                  value
+                  value,
                 )} %}`,
                 intl.formatMessage(
                   {
                     id: "component.reference-options-menu.if-option-with-sentence",
                     defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
                   },
-                  { option: value }
+                  { option: value },
                 ),
               ]),
               "{% else %}",
@@ -207,7 +207,7 @@ function useFormulasByTypeField({
                   id: "component.reference-options-menu.sentence-with-reply",
                   defaultMessage: `This sentence will be displayed when the reply is "{value}".`,
                 },
-                { value }
+                { value },
               ),
               "{% else %}",
               intl.formatMessage({

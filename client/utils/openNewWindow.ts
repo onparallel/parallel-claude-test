@@ -16,7 +16,7 @@ interface WindowFeatures {
  */
 export async function openNewWindow(
   value: MaybePromise<string> | (() => MaybePromise<string>),
-  features?: Partial<WindowFeatures>
+  features?: Partial<WindowFeatures>,
 ) {
   const windowFeatures =
     features &&

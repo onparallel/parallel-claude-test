@@ -16,7 +16,7 @@ interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
 
 export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
   { decimals, onlyPositive, value, prefix, suffix, onChange, ...props },
-  ref
+  ref,
 ) {
   function format(value: number | undefined) {
     if (!isDefined(value)) return "";

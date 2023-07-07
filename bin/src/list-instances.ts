@@ -16,14 +16,14 @@ async function main() {
     .send(
       new DescribeInstancesCommand({
         Filters: [{ Name: "tag-key", Values: ["Release"] }],
-      })
+      }),
     )
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
 
   const loadBalancers = await elb.send(
     new DescribeLoadBalancersCommand({
       LoadBalancerNames: ["parallel-staging", "parallel-production"],
-    })
+    }),
   );
 
   const instancesToLb: Record<string, string> = {};
@@ -32,7 +32,7 @@ async function main() {
     const descriptions = await elb.send(
       new DescribeInstanceHealthCommand({
         LoadBalancerName: lb.LoadBalancerName!,
-      })
+      }),
     );
     for (const state of descriptions.InstanceStates!) {
       if (state.State === "InService") {
@@ -106,7 +106,7 @@ async function main() {
           health,
           i.LaunchTime?.toLocaleString("en-GB"),
         ];
-      })
+      }),
   );
   console.log(table.toString());
 }

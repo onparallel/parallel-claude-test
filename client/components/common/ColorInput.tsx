@@ -59,5 +59,5 @@ export const ColorInput = chakraForwardRef<"input", ColorInputProps, HTMLInputEl
         </FormControl>
       </HStack>
     );
-  }
+  },
 );

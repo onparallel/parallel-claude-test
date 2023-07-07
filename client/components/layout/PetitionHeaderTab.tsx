@@ -17,7 +17,7 @@ export const PetitionHeaderTab = chakraForwardRef<
   }
 >(function (
   { isActive, isDisabled, children, popoverContent, rightIcon, ...props },
-  ref: Ref<any>
+  ref: Ref<any>,
 ) {
   const link = (
     <ListItem position="relative" display="flex" alignItems="stretch">

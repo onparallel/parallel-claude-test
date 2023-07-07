@@ -23,7 +23,7 @@ export const PetitionPermission = interfaceType({
       return "PetitionUserGroupPermission";
     }
     throw new Error(
-      `Either user_id or user_group_id must be defined on petition_permission with id ${o.id}`
+      `Either user_id or user_group_id must be defined on petition_permission with id ${o.id}`,
     );
   },
   definition(t) {
@@ -112,7 +112,7 @@ export const TemplateDefaultPermission = interfaceType({
       return "TemplateDefaultUserGroupPermission";
     }
     throw new Error(
-      `Either user_id or user_group_id must be defined on petition_permission with id ${o.id}`
+      `Either user_id or user_group_id must be defined on petition_permission with id ${o.id}`,
     );
   },
   definition(t) {

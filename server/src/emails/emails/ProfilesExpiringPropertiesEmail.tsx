@@ -30,7 +30,7 @@ const email: Email<ProfilesExpiringPropertiesEmailProps> = {
         id: "profiles-expiring-properties.subject",
         defaultMessage: "Expiration alerts in {orgName}",
       },
-      { orgName: organizationName }
+      { orgName: organizationName },
     );
   },
   text({ properties }: ProfilesExpiringPropertiesEmailProps, intl: IntlShape) {
@@ -49,9 +49,9 @@ const email: Email<ProfilesExpiringPropertiesEmailProps> = {
               } (${intl.formatDate(p.expiryDate, {
                 ...FORMATS.LL,
                 timeZone: "UTC",
-              })})`
+              })})`,
           ),
-        ].join("\n")
+        ].join("\n"),
       )
       .join("\n\n");
 

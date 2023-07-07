@@ -25,7 +25,7 @@ function filterCookies(cookies: string) {
     Object.entries,
     filter(([key]) => key.startsWith("parallel_")),
     map(([key, value]) => serializeCookie(key, value)),
-    (values) => values.join("; ")
+    (values) => values.join("; "),
   );
 }
 
@@ -69,7 +69,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
     },
     // Batch requests happening concurrently
     new BatchHttpLink({ uri, batchInterval: 0 }),
-    createUploadLink({ uri, headers: { "Apollo-Require-Preflight": "true" } })
+    createUploadLink({ uri, headers: { "Apollo-Require-Preflight": "true" } }),
   );
 
   const authLink = setContext((_, { headers }) => {
@@ -116,7 +116,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 } else {
                   return {
                     items: uniqBy([...existing.items, ...incoming.items], (obj) =>
-                      readField("id", obj)
+                      readField("id", obj),
                     ),
                     totalCount: incoming.totalCount,
                   };
@@ -133,7 +133,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                     ? {
                         items: uniqBy(
                           [...(existing.items ?? []), ...(incoming.items ?? [])],
-                          (obj) => readField("keycode", obj)
+                          (obj) => readField("keycode", obj),
                         ),
                         totalCount: incoming.totalCount,
                       }
@@ -186,7 +186,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                     return id as string;
                   } else {
                     throw new Error(
-                      `Please include either "user.id" or "group.id" when fetching permissions`
+                      `Please include either "user.id" or "group.id" when fetching permissions`,
                     );
                   }
                 };
@@ -272,7 +272,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                         sortBy(arr, [
                           (obj) => new Date(readField("createdAt", obj) as string),
                           "desc",
-                        ])
+                        ]),
                     ),
                     hasMore: incoming.hasMore,
                   };

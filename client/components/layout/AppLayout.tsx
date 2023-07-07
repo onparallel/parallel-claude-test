@@ -35,7 +35,7 @@ export interface AppLayoutProps extends AppLayout_QueryFragment {
 export const AppLayout = Object.assign(
   chakraForwardRef<"div", AppLayoutProps>(function AppLayout(
     { title, me, realMe, children, ...props },
-    ref
+    ref,
   ) {
     const rehydrated = useRehydrated();
     const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +54,7 @@ export const AppLayout = Object.assign(
           window.intercomSettings = { hide_default_launcher: false };
           window.Intercom?.("update");
         }
-      }, [])
+      }, []),
     );
 
     // Show spinner if a page takes more than 1s to load
@@ -312,5 +312,5 @@ export const AppLayout = Object.assign(
         ${AppLayoutNavbar.fragments.Query}
       `,
     },
-  }
+  },
 );

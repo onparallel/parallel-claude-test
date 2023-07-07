@@ -49,7 +49,7 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
 
 export type GenericPetitionUserNotification<
   TType extends PetitionUserNotificationType,
-  IsCreate extends boolean = false
+  IsCreate extends boolean = false,
 > = Omit<
   DbPetitionUserNotification,
   "type" | "data" | If<IsCreate, "id" | "created_at" | "read_at" | "processed_at">
@@ -75,7 +75,7 @@ export type SignatureCompletedUserNotification<IsCreate extends boolean = false>
 export type RemindersOptOutNotification<IsCreate extends boolean = false> =
   GenericPetitionUserNotification<"REMINDERS_OPT_OUT", IsCreate>;
 export type AccessActivatedFromPublicPetitionLinkUserNotification<
-  IsCreate extends boolean = false
+  IsCreate extends boolean = false,
 > = GenericPetitionUserNotification<"ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK", IsCreate>;
 
 export type PetitionUserNotification<IsCreate extends boolean = false> =

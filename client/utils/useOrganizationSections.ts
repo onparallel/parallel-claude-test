@@ -74,7 +74,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         path: "/app/organization/integrations",
       },
     ],
-    [intl.locale, userIsAdmin]
+    [intl.locale, userIsAdmin],
   );
 }
 

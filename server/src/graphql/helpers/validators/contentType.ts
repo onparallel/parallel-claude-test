@@ -10,7 +10,7 @@ import { unMaybeArray } from "../../../util/arrays";
 export function contentType<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => Promise<FileUpload>,
   contentType: MaybeArray<string>,
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const mimes = unMaybeArray(contentType);
@@ -25,14 +25,14 @@ export function contentType<TypeName extends string, FieldName extends string>(
         throw new ArgValidationError(
           info,
           argName,
-          `Expected ${mimes.join(",")}, got ${result?.mime ?? "Unknown"}`
+          `Expected ${mimes.join(",")}, got ${result?.mime ?? "Unknown"}`,
         );
       }
     } else {
       throw new ArgValidationError(
         info,
         argName,
-        `Expected ${mimes.join(",")}, got ${upload.mimetype}`
+        `Expected ${mimes.join(",")}, got ${upload.mimetype}`,
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

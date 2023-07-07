@@ -27,7 +27,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       fieldsBelongsToPetition("petitionId", "fieldId"),
-      petitionsAreNotPublicTemplates("petitionId")
+      petitionsAreNotPublicTemplates("petitionId"),
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -37,7 +37,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
     validateArgs: validFileUploadInput(
       (args) => args.data,
       { maxSizeBytes: toBytes(100, "MB") },
-      "data"
+      "data",
     ),
     resolve: async (_, args, ctx) => {
       const attachments = await ctx.petitions.loadFieldAttachmentsByFieldId(args.fieldId);
@@ -53,7 +53,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
           size: size.toString(),
           content_type: contentType,
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       ctx.petitions.loadFieldAttachmentsByFieldId.dataloader.clear(args.fieldId);
       const [presignedPostData, attachment] = await Promise.all([
@@ -63,13 +63,13 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
             file_upload_id: file.id,
             petition_field_id: args.fieldId,
           },
-          ctx.user!
+          ctx.user!,
         ),
       ]);
 
       return { presignedPostData, attachment };
     },
-  }
+  },
 );
 
 export const petitionFieldAttachmentUploadComplete = mutationField(
@@ -85,7 +85,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldAttachmentBelongsToField("fieldId", "attachmentId")
+      fieldAttachmentBelongsToField("fieldId", "attachmentId"),
     ),
     resolve: async (_, args, ctx) => {
       const attachment = (await ctx.petitions.loadFieldAttachment(args.attachmentId))!;
@@ -97,7 +97,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
 
       return attachment;
     },
-  }
+  },
 );
 
 export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldAttachment", {
@@ -112,7 +112,7 @@ export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldA
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldAttachmentBelongsToField("fieldId", "attachmentId"),
-    petitionsAreNotPublicTemplates("petitionId")
+    petitionsAreNotPublicTemplates("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionFieldAttachment(args.attachmentId, ctx.user!);
@@ -128,7 +128,7 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldAttachmentBelongsToField("fieldId", "attachmentId")
+      fieldAttachmentBelongsToField("fieldId", "attachmentId"),
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -155,7 +155,7 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
           url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
-            "attachment"
+            "attachment",
           ),
         };
       } catch {
@@ -164,7 +164,7 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
         };
       }
     },
-  }
+  },
 );
 
 export const createPetitionAttachmentUploadLink = mutationField(
@@ -177,7 +177,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       petitionsAreEditable("petitionId"),
-      petitionCanUploadAttachments("petitionId", "data", 10)
+      petitionCanUploadAttachments("petitionId", "data", 10),
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -187,7 +187,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
     validateArgs: validFileUploadInput(
       (args) => args.data,
       { maxSizeBytes: toBytes(50, "MB"), contentType: "application/pdf" },
-      "data"
+      "data",
     ),
     resolve: async (_, args, ctx) => {
       const files = await ctx.files.createFileUpload(
@@ -198,7 +198,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
           content_type: data.contentType,
           upload_complete: false,
         })),
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       const presignedPostDataArray = await Promise.all(
@@ -206,19 +206,19 @@ export const createPetitionAttachmentUploadLink = mutationField(
           ctx.storage.fileUploads.getSignedUploadEndpoint(
             file.path,
             file.content_type,
-            parseInt(file.size)
-          )
-        )
+            parseInt(file.size),
+          ),
+        ),
       );
 
       const petitionAttachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(
-        args.petitionId
+        args.petitionId,
       );
 
       const maxPosition =
         maxBy(
           petitionAttachments.filter((a) => a.type === args.type),
-          (a) => a.position
+          (a) => a.position,
         )?.position ?? -1;
 
       const attachments = await ctx.petitions.createPetitionAttachment(
@@ -228,7 +228,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
           type: args.type,
           position: maxPosition + 1 + i,
         })),
-        ctx.user!
+        ctx.user!,
       );
 
       ctx.petitions.loadPetitionAttachmentsByPetitionId.dataloader.clear(args.petitionId);
@@ -238,7 +238,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
         attachment,
       }));
     },
-  }
+  },
 );
 
 export const petitionAttachmentUploadComplete = mutationField("petitionAttachmentUploadComplete", {
@@ -253,7 +253,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     const attachment = (await ctx.petitions.loadPetitionAttachment(args.attachmentId))!;
@@ -279,7 +279,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionAttachment(args.attachmentId, ctx.user!);
@@ -292,7 +292,7 @@ export const petitionAttachmentDownloadLink = mutationField("petitionAttachmentD
   description: "Generates a download link for a petition attachment",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    petitionAttachmentBelongsToPetition("petitionId", "attachmentId")
+    petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -321,7 +321,7 @@ export const petitionAttachmentDownloadLink = mutationField("petitionAttachmentD
         url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file!.path,
           file!.filename,
-          args.preview ? "inline" : "attachment"
+          args.preview ? "inline" : "attachment",
         ),
       };
     } catch {
@@ -341,7 +341,7 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
     isValidPetitionAttachmentReorder("petitionId", "attachmentType", "attachmentIds"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -353,7 +353,7 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
       args.petitionId,
       args.attachmentType,
       args.attachmentIds,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     ctx.petitions.loadPetitionAttachmentsByPetitionId.dataloader.clear(args.petitionId);
     return petition;
@@ -368,7 +368,7 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -380,7 +380,7 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
       args.petitionId,
       args.attachmentId,
       args.type,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });

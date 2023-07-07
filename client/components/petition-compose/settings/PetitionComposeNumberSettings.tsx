@@ -38,11 +38,11 @@ export function NumberSettings({
 
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   const [hasPrefix, setHasPrefix] = useState(
-    isDefined(options.prefix) || isDefined(options.suffix) ? true : false
+    isDefined(options.prefix) || isDefined(options.suffix) ? true : false,
   );
   const [prefixOption, setPrefixOption] = useState(isDefined(options.prefix) ? "prefix" : "suffix");
   const [prefixValue, setPrefixValue] = useState(
-    isDefined(options.prefix) ? options.prefix : options.suffix ?? ""
+    isDefined(options.prefix) ? options.prefix : options.suffix ?? "",
   );
 
   const isRangeInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;

@@ -28,7 +28,7 @@ export function PetitionListSharedWithFilterLine({
         excludeUserGroups: [...excludeUserGroups],
       });
     },
-    [_handleSearchUsers, value.operator]
+    [_handleSearchUsers, value.operator],
   );
 
   const operators = useMemo<SimpleOption<FilterSharedWithOperator>[]>(() => {

@@ -42,7 +42,7 @@ export async function up(knex: Knex): Promise<void> {
     from "organization" order by id
     returning id, org_id;
   `,
-    [JSON.stringify(defaultPdfDocumentTheme)]
+    [JSON.stringify(defaultPdfDocumentTheme)],
   );
 
   await knex.schema.alterTable("petition", (t) => {

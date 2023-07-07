@@ -27,7 +27,7 @@ export interface PublicTemplateCardProps {
 export const PublicTemplateCard = Object.assign(
   chakraForwardRef<"div", PublicTemplateCardProps>(function TemplateCard(
     { template, onPress, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const buttonProps = useRoleButton(onPress);
@@ -128,5 +128,5 @@ export const PublicTemplateCard = Object.assign(
         ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
       `,
     },
-  }
+  },
 );

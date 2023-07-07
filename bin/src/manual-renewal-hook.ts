@@ -51,7 +51,7 @@ async function addRecord(domain: string, challenge: string) {
       HostedZoneId: hostedZoneId,
       StartRecordName: recordName,
       StartRecordType: "TXT",
-    })
+    }),
   );
   console.log(`Adding TXT with value ${challenge} record to ${recordName}`);
   const response2 = await route53.send(
@@ -74,7 +74,7 @@ async function addRecord(domain: string, challenge: string) {
           },
         ],
       },
-    })
+    }),
   );
   await waitForChange(response2.ChangeInfo!.Id!);
 }
@@ -87,7 +87,7 @@ async function removeRecord(domain: string, challenge: string) {
       HostedZoneId: hostedZoneId,
       StartRecordName: recordName,
       StartRecordType: "TXT",
-    })
+    }),
   );
   if (isDefined(response.ResourceRecordSets)) {
     if (
@@ -112,7 +112,7 @@ async function removeRecord(domain: string, challenge: string) {
               },
             ],
           },
-        })
+        }),
       );
       await waitForChange(response2.ChangeInfo!.Id!);
     } else {
@@ -131,14 +131,14 @@ async function removeRecord(domain: string, challenge: string) {
                   TTL: 300,
                   ResourceRecords: [
                     ...(response.ResourceRecordSets?.[0]?.ResourceRecords ?? []).filter(
-                      (r) => r.Value !== `"${challenge}"`
+                      (r) => r.Value !== `"${challenge}"`,
                     ),
                   ],
                 },
               },
             ],
           },
-        })
+        }),
       );
       await waitForChange(response2.ChangeInfo!.Id!);
     }

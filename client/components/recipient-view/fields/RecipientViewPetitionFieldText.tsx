@@ -83,7 +83,7 @@ export function RecipientViewPetitionFieldText({
     (replyId: string) => async (value: string) => {
       await onUpdateReply(replyId, value);
     },
-    [onUpdateReply]
+    [onUpdateReply],
   );
 
   const handleDelete = useMemoFactory(
@@ -114,7 +114,7 @@ export function RecipientViewPetitionFieldText({
         handleAddNewReply();
       }
     },
-    [field.replies, onDeleteReply]
+    [field.replies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -137,7 +137,7 @@ export function RecipientViewPetitionFieldText({
               newReplyElement.focus();
               newReplyElement.setSelectionRange(
                 newReplyElement.value.length,
-                newReplyElement.value.length
+                newReplyElement.value.length,
               );
             }
           }
@@ -146,7 +146,7 @@ export function RecipientViewPetitionFieldText({
       setIsSaving(false);
     },
     1000,
-    [onCreateReply]
+    [onCreateReply],
   );
 
   const inputProps = {
@@ -254,7 +254,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   RecipientViewPetitionFieldReplyTextProps
 >(function RecipientViewPetitionFieldReplyText(
   { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
@@ -270,7 +270,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
       setIsSaving(false);
     },
     1000,
-    [onUpdate]
+    [onUpdate],
   );
 
   const props = {

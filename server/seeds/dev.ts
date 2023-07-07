@@ -55,7 +55,7 @@ export async function seed(knex: Knex): Promise<any> {
         },
       },
     ],
-    "id"
+    "id",
   );
 
   const orgIds = orgs.map((o) => o.id);
@@ -134,7 +134,7 @@ export async function seed(knex: Knex): Promise<any> {
       last_name: u.last_name,
       preferred_locale: u.preferred_locale,
     })),
-    "*"
+    "*",
   );
 
   const users = await knex("user").insert(
@@ -146,7 +146,7 @@ export async function seed(knex: Knex): Promise<any> {
         organization_role: user.organization_role,
       };
     }),
-    ["id", "org_id", "organization_role"]
+    ["id", "org_id", "organization_role"],
   );
 
   const orgUsers = orgIds.map((id) => [id, users.filter((u) => u.org_id === id)] as const);
@@ -186,7 +186,7 @@ export async function seed(knex: Knex): Promise<any> {
           settings: {
             CREDENTIALS: encryption.encrypt(
               JSON.stringify({ API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY }),
-              "hex"
+              "hex",
             ),
             ENVIRONMENT: "sandbox",
             IS_PARALLEL_MANAGED: false,
@@ -212,7 +212,7 @@ export async function seed(knex: Knex): Promise<any> {
             updated_by: `User:${ownerId}`,
           },
         ],
-        "id"
+        "id",
       );
 
       await knex("user_group_member").insert(
@@ -220,7 +220,7 @@ export async function seed(knex: Knex): Promise<any> {
           user_group_id: groups[0].id,
           user_id: u.id,
           created_by: `User:${ownerId}`,
-        }))
+        })),
       );
 
       const orgThemes = await knex("organization_theme").insert(
@@ -244,7 +244,7 @@ export async function seed(knex: Knex): Promise<any> {
             updated_by: `User:${ownerId}`,
           },
         ],
-        "id"
+        "id",
       );
 
       const petitions = await knex("petition").insert(
@@ -307,7 +307,7 @@ export async function seed(knex: Knex): Promise<any> {
             document_organization_theme_id: orgThemes[0].id,
           },
         ],
-        "id"
+        "id",
       );
 
       await knex("petition_permission").insert(
@@ -319,8 +319,8 @@ export async function seed(knex: Knex): Promise<any> {
             updated_by: `User:${ownerId}`,
             type: u.organization_role === "OWNER" ? "OWNER" : "WRITE",
             is_subscribed: true,
-          }))
-        )
+          })),
+        ),
       );
 
       await knex("petition_field").insert([
@@ -539,7 +539,7 @@ export async function seed(knex: Knex): Promise<any> {
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
           })),
-          "*"
+          "*",
         );
 
         const [firstName, lastName] = await t.from("profile_type_field").insert(
@@ -584,7 +584,7 @@ export async function seed(knex: Knex): Promise<any> {
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
           })),
-          "*"
+          "*",
         );
 
         await t
@@ -622,7 +622,7 @@ export async function seed(knex: Knex): Promise<any> {
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
           })),
-          "*"
+          "*",
         );
 
         await t
@@ -678,7 +678,7 @@ export async function seed(knex: Knex): Promise<any> {
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
           })),
-          "*"
+          "*",
         );
 
         await t
@@ -687,7 +687,7 @@ export async function seed(knex: Knex): Promise<any> {
           .update({ profile_name_pattern: json([type.id, " - ", counterparty.id]) });
       });
     },
-    { concurrency: 1 }
+    { concurrency: 1 },
   );
 
   function json(value: any) {

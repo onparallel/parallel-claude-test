@@ -43,7 +43,7 @@ export const MessageEmailBouncedUserNotification = Object.assign(
           />
         </PetitionUserNotification>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -60,5 +60,5 @@ export const MessageEmailBouncedUserNotification = Object.assign(
         ${ContactReference.fragments.Contact}
       `,
     },
-  }
+  },
 );

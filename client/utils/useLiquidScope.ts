@@ -14,7 +14,7 @@ import { UnwrapArray } from "./types";
 
 export function useLiquidScope(
   petition: useLiquidScope_PetitionBaseFragment | useLiquidScope_PublicPetitionFragment,
-  usePreviewReplies?: boolean
+  usePreviewReplies?: boolean,
 ) {
   const intl = useIntl();
   return useMemo(() => {
@@ -63,7 +63,7 @@ export class DateTimeLiquidValue {
 
   constructor(
     private intl: IntlShape,
-    content: { datetime: string; timezone: string; value: string }
+    content: { datetime: string; timezone: string; value: string },
   ) {
     this.datetime = content.datetime;
     this.timezone = content.timezone;
@@ -80,7 +80,10 @@ export class DateTimeLiquidValue {
 export class DateLiquidValue {
   readonly value: string;
 
-  constructor(private intl: IntlShape, content: { value: string }) {
+  constructor(
+    private intl: IntlShape,
+    content: { value: string },
+  ) {
     this.value = content.value;
   }
   toString() {

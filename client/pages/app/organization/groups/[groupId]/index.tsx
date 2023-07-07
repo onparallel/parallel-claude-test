@@ -122,7 +122,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       }));
     },
     300,
-    [setQueryState]
+    [setQueryState],
   );
 
   const handleSearchChange = useCallback(
@@ -130,7 +130,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   const [updateUserGroup] = useMutation(OrganizationGroup_updateUserGroupDocument);
@@ -370,7 +370,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

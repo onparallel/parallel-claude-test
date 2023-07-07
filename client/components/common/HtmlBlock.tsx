@@ -6,7 +6,7 @@ import { useMemo } from "react";
 
 export const HtmlBlock = chakraForwardRef<"div", { dangerousInnerHtml: string }>(function HtmlBlock(
   { children, dangerousInnerHtml: html, ...props },
-  ref
+  ref,
 ) {
   const options: HTMLReactParserOptions = {
     replace: (domNode) => {

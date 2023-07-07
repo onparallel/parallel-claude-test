@@ -62,7 +62,7 @@ export function PetitionListTagFilterLine({
           value={value.operator}
           onChange={(operator) => {
             onChange(
-              operator === "IS_EMPTY" ? { operator, value: [] } : { ...value, operator: operator! }
+              operator === "IS_EMPTY" ? { operator, value: [] } : { ...value, operator: operator! },
             );
           }}
         />

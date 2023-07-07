@@ -87,10 +87,10 @@ function CreateFolderDialog({
       return result.data.petitions.items.filter(
         (i) =>
           i.__typename !== "PetitionFolder" &&
-          (i as any).myEffectivePermission!.permissionType !== "READ"
+          (i as any).myEffectivePermission!.permissionType !== "READ",
       ) as any;
     },
-    [currentPath]
+    [currentPath],
   );
 
   return (
@@ -271,7 +271,7 @@ interface ReactSelectExtraProps {
 function Option(
   props: OptionProps<CreateFolderDialog_PetitionBaseFragment> & {
     selectProps: ReactSelectExtraProps;
-  }
+  },
 ) {
   return (
     <components.Option {...props}>
@@ -298,7 +298,7 @@ function MultiValueLabel({
 function NoOptionsMessage(
   props: NoticeProps & {
     selectProps: ReactSelectExtraProps;
-  }
+  },
 ) {
   return (
     <Box textAlign="center" color="gray.400" padding={4}>

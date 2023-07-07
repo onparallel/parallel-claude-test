@@ -1,6 +1,6 @@
 export function keyBuilder<
   T,
-  K extends keyof T | ((item: T) => string | number | null | undefined)
+  K extends keyof T | ((item: T) => string | number | null | undefined),
 >(properties: K[]) {
   return (item: T) =>
     properties

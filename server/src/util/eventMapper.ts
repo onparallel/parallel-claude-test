@@ -35,7 +35,7 @@ export function mapEventPayload(event: PetitionEvent) {
           : null,
         petitionFieldCommentId: toGlobalId(
           "PetitionFieldComment",
-          event.data.petition_field_comment_id
+          event.data.petition_field_comment_id,
         ),
         petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
         userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
@@ -45,7 +45,7 @@ export function mapEventPayload(event: PetitionEvent) {
       return {
         petitionFieldCommentId: toGlobalId(
           "PetitionFieldComment",
-          event.data.petition_field_comment_id
+          event.data.petition_field_comment_id,
         ),
         petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
       };
@@ -165,7 +165,7 @@ export function mapEventPayload(event: PetitionEvent) {
             ? {
                 petitionAccessId: toGlobalId(
                   "PetitionAccess",
-                  event.data.cancel_data.petition_access_id
+                  event.data.cancel_data.petition_access_id,
                 ),
               }
             : { userId: toGlobalId("User", event.data.cancel_data.user_id!) };
@@ -178,7 +178,7 @@ export function mapEventPayload(event: PetitionEvent) {
         cancelReason,
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
-          event.data.petition_signature_request_id
+          event.data.petition_signature_request_id,
         ),
       };
     }
@@ -187,7 +187,7 @@ export function mapEventPayload(event: PetitionEvent) {
         fileUploadId: toGlobalId("FileUpload", event.data.file_upload_id),
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
-          event.data.petition_signature_request_id
+          event.data.petition_signature_request_id,
         ),
       };
     }
@@ -196,7 +196,7 @@ export function mapEventPayload(event: PetitionEvent) {
         signer: event.data.signer,
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
-          event.data.petition_signature_request_id
+          event.data.petition_signature_request_id,
         ),
       };
     }
@@ -204,7 +204,7 @@ export function mapEventPayload(event: PetitionEvent) {
       return {
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
-          event.data.petition_signature_request_id
+          event.data.petition_signature_request_id,
         ),
       };
     }
@@ -212,7 +212,7 @@ export function mapEventPayload(event: PetitionEvent) {
       return {
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
-          event.data.petition_signature_request_id
+          event.data.petition_signature_request_id,
         ),
         userId: toGlobalId("User", event.data.user_id),
       };
@@ -293,7 +293,7 @@ export function mapEventPayload(event: PetitionEvent) {
         signer: event.data.signer,
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
-          event.data.petition_signature_request_id
+          event.data.petition_signature_request_id,
         ),
       };
     }

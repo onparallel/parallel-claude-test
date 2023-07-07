@@ -53,7 +53,7 @@ function OrganizationIntegrations() {
   const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
 
   const [deleteDowJonesKycIntegration] = useMutation(
-    OrganizationIntegrations_deleteDowJonesKycIntegrationDocument
+    OrganizationIntegrations_deleteDowJonesKycIntegrationDocument,
   );
 
   const showDeactivateDowJonesIntegrationDialog = useDeactivateDowJonesIntegrationDialog();
@@ -83,7 +83,7 @@ function OrganizationIntegrations() {
         />
       ),
       badge: me.organization.signatureIntegrations.items.some(
-        (i) => i.__typename === "SignatureOrgIntegration" && i.environment === "PRODUCTION"
+        (i) => i.__typename === "SignatureOrgIntegration" && i.environment === "PRODUCTION",
       ) ? (
         <Badge colorScheme="green">
           <FormattedMessage id="generic.activated" defaultMessage="Activated" />

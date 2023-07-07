@@ -32,7 +32,7 @@ export type ProfileSelectSelection = ProfileSelect_ProfileFragment;
 
 export type ProfileSelectInstance<
   IsMulti extends boolean,
-  OptionType extends ProfileSelectSelection = ProfileSelectSelection
+  OptionType extends ProfileSelectSelection = ProfileSelectSelection,
 > = SelectInstance<OptionType, IsMulti, never>;
 
 const fragments = {
@@ -79,7 +79,7 @@ const _queries = [
 export interface ProfileSelectProps<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
-  OptionType extends ProfileSelectSelection = ProfileSelectSelection
+  OptionType extends ProfileSelectSelection = ProfileSelectSelection,
 > extends Omit<CustomAsyncCreatableSelectProps<OptionType, IsMulti, never>, "value"> {
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
   profileTypeId?: string[];
@@ -94,7 +94,7 @@ export const ProfileSelect = Object.assign(
   forwardRef(function ProfileSelect<
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends ProfileSelectSelection = ProfileSelectSelection
+    OptionType extends ProfileSelectSelection = ProfileSelectSelection,
   >(
     {
       value,
@@ -108,7 +108,7 @@ export const ProfileSelect = Object.assign(
       onCreateProfile,
       ...props
     }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
-    ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>
+    ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,
   ) {
     const intl = useIntl();
     const needsLoading =
@@ -137,7 +137,7 @@ export const ProfileSelect = Object.assign(
         return result.data.profiles.items.filter((p) => !exclude.includes(p.id)) as any[];
       },
       300,
-      [profileTypeId]
+      [profileTypeId],
     );
 
     const getProfiles = useGetProfiles();
@@ -175,7 +175,7 @@ export const ProfileSelect = Object.assign(
           },
           {
             isMulti,
-          }
+          },
         )
       );
     }, [_placeholder, isMulti]);
@@ -254,12 +254,12 @@ export const ProfileSelect = Object.assign(
   }) as <
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends ProfileSelectSelection = ProfileSelectSelection
+    OptionType extends ProfileSelectSelection = ProfileSelectSelection,
   >(
     props: ProfileSelectProps<IsMulti, IsSync, OptionType> &
-      RefAttributes<ProfileSelectInstance<IsMulti, OptionType>>
+      RefAttributes<ProfileSelectInstance<IsMulti, OptionType>>,
   ) => ReactElement,
-  { fragments }
+  { fragments },
 );
 
 function useGetProfiles() {
@@ -276,7 +276,7 @@ function useGetProfiles() {
         });
 
         return profile ?? null;
-      })
+      }),
     );
     const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
 
@@ -297,7 +297,7 @@ function useGetProfiles() {
         },
         {
           concurrency: 1,
-        }
+        },
       );
 
       const fromServerById = indexBy(profiles.filter(isDefined), (x) => x.id);
@@ -325,7 +325,7 @@ const getOptionLabel = (option: ProfileSelectSelection) => {
 const getOptionValue = (option: ProfileSelectSelection) => option.id;
 
 function SingleValue(
-  props: SingleValueProps<ProfileSelectSelection> & { selectProps: ReactSelectExtraProps }
+  props: SingleValueProps<ProfileSelectSelection> & { selectProps: ReactSelectExtraProps },
 ) {
   return (
     <components.SingleValue {...props}>

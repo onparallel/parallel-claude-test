@@ -75,18 +75,18 @@ function validateCondition<
   TField extends Pick<
     PetitionField,
     "id" | "type" | "position" | "options" | "visibility" | "petition_id"
-  >
+  >,
 >(field: TField, fields: TField[]) {
   return (c: PetitionFieldVisibilityCondition, index: number) => {
     assert(
       field.type !== "HEADING" || !field.options.hasPageBreak,
-      `Can't add visibility conditions on a heading with page break`
+      `Can't add visibility conditions on a heading with page break`,
     );
     const referencedField = fields.find((f) => f.id === c.fieldId);
 
     assert(
       referencedField !== undefined,
-      `Can't find PetitionField:${c.fieldId} referenced in PetitionField:${field.id}, condition ${index}`
+      `Can't find PetitionField:${c.fieldId} referenced in PetitionField:${field.id}, condition ${index}`,
     );
     if (!referencedField) {
       return;
@@ -98,7 +98,7 @@ function validateCondition<
     assert(referencedField.id !== field.id, `Can't add a reference to field itself`);
     assert(
       referencedField.petition_id === field.petition_id,
-      `Field with id ${referencedField.id} is not linked to petition with id ${field.petition_id}`
+      `Field with id ${referencedField.id} is not linked to petition with id ${field.petition_id}`,
     );
 
     // check operator/modifier compatibility
@@ -113,23 +113,23 @@ function validateCondition<
           "GREATER_THAN",
           "GREATER_THAN_OR_EQUAL",
         ],
-        `Invalid operator ${c.operator} for modifier ${c.modifier}`
+        `Invalid operator ${c.operator} for modifier ${c.modifier}`,
       );
       assert(
         c.value === null || typeof c.value === "number",
-        `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
+        `Invalid value type ${typeof c.value} for modifier ${c.modifier}`,
       );
     } else {
       if (referencedField.type === "TEXT" || referencedField.type === "SHORT_TEXT") {
         assertOneOf(
           c.operator,
           ["EQUAL", "NOT_EQUAL", "START_WITH", "END_WITH", "CONTAIN", "NOT_CONTAIN"],
-          `Invalid operator ${c.operator} for field of type ${referencedField.type}`
+          `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
         );
 
         assert(
           c.value === null || typeof c.value === "string",
-          `Invalid value type ${typeof c.value} for field of type ${referencedField.type}`
+          `Invalid value type ${typeof c.value} for field of type ${referencedField.type}`,
         );
       } else if (isFileTypeField(referencedField.type)) {
         throw new Error(`Invalid modifier ${c.modifier} for field of type ${referencedField.type}`);
@@ -144,7 +144,7 @@ function validateCondition<
         assertOneOf(
           c.operator,
           ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF"],
-          `Invalid operator ${c.operator} for field of type ${referencedField.type}`
+          `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
         );
         assert(
           c.value === null ||
@@ -156,7 +156,7 @@ function validateCondition<
               c.value.every((v) => options.includes(v))),
           `Invalid value ${c.value} for field of type ${
             referencedField.type
-          }. Should be one of: ${options.join(", ")}`
+          }. Should be one of: ${options.join(", ")}`,
         );
       }
     }
@@ -167,7 +167,7 @@ export function validateFieldVisibilityConditions<
   TField extends Pick<
     PetitionField,
     "id" | "type" | "position" | "options" | "visibility" | "petition_id"
-  >
+  >,
 >(field: TField, allFields: TField[]) {
   if (!field.visibility) {
     return;
@@ -188,7 +188,7 @@ export function validFieldVisibilityJson<TypeName extends string, FieldName exte
   petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
   fieldIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     try {
@@ -216,7 +216,7 @@ export function validFieldVisibilityJson<TypeName extends string, FieldName exte
 
 export function getDynamicSelectValues(
   values: (string | DynamicSelectOption)[],
-  level: number
+  level: number,
 ): string[] {
   if (level === 0) {
     return Array.isArray(values[0])
@@ -227,7 +227,7 @@ export function getDynamicSelectValues(
       throw new Error("Invalid level");
     }
     return (values as DynamicSelectOption[]).flatMap(([, children]) =>
-      getDynamicSelectValues(children, level - 1)
+      getDynamicSelectValues(children, level - 1),
     );
   }
 }

@@ -25,7 +25,7 @@ const validCategories = [
 
 export function validatePublicTemplateCategories<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  argName: string
+  argName: string,
 ) {
   return ((_, args, ctx, info) => {
     const categories = prop(args);
@@ -35,14 +35,14 @@ export function validatePublicTemplateCategories<TypeName extends string, FieldN
       categories
         .trim()
         .split(",")
-        .map((c) => c.trim())
+        .map((c) => c.trim()),
     );
     const invalid = categoriesArray.filter((c) => !validCategories.includes(c));
     if (invalid.length > 0) {
       throw new ArgValidationError(
         info,
         argName,
-        `Invalid categories: ${invalid.join(", ")}. Expected: ${validCategories.join(", ")}`
+        `Invalid categories: ${invalid.join(", ")}. Expected: ${validCategories.join(", ")}`,
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

@@ -80,7 +80,7 @@ export function PetitionListSharedWithFilter({
                       : {
                           ...value,
                           filters: value.filters.filter((_, i) => i !== index),
-                        }
+                        },
                   )
                 }
               />
@@ -148,7 +148,7 @@ export function sharedWithQueryItem() {
 }
 
 export function removeInvalidSharedWithFilterLines(
-  value: PetitionSharedWithFilter | null
+  value: PetitionSharedWithFilter | null,
 ): PetitionSharedWithFilter | null {
   const filters = value?.filters.filter((l) => l.value !== null) ?? [];
   return filters.length > 0 ? { ...value!, filters } : null;

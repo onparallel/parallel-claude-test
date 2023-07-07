@@ -154,7 +154,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     onSelectionChange?.(
       Object.entries(selection)
         .filter(([_, value]) => value)
-        .map(([key]) => key)
+        .map(([key]) => key),
     );
   }, [selection]);
 
@@ -169,10 +169,10 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           : {
               field: value,
               direction: "ASC" as const,
-            }
+            },
       );
     },
-    [sort, onSortChange]
+    [sort, onSortChange],
   );
 
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -210,7 +210,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                         return (
                           <Fragment key={key}>
                             {wrap(
-                              <Button variant="ghost" size="sm" fontWeight="normal" {...props} />
+                              <Button variant="ghost" size="sm" fontWeight="normal" {...props} />,
                             )}
                           </Fragment>
                         );
@@ -335,7 +335,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 
   const _context = useMemo(
     () => Object.assign({}, context, { selectedCount }),
-    [context, selectedCount]
+    [context, selectedCount],
   );
 
   return (
@@ -667,7 +667,7 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
                 id: "component.table.filter",
                 defaultMessage: 'Filter "{column}"',
               },
-              { column: column.header }
+              { column: column.header },
             )}
             {...getFilterButtonProps()}
             onClick={onToggleFilter}
@@ -701,14 +701,14 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
                       id: "component.table.change-sorting",
                       defaultMessage: 'Change sorting for "{column}"',
                     },
-                    { column: column.header }
+                    { column: column.header },
                   )
                 : intl.formatMessage(
                     {
                       id: "component.table.sort-by",
                       defaultMessage: 'Sort by "{column}"',
                     },
-                    { column: column.header }
+                    { column: column.header },
                   )
             }
           />

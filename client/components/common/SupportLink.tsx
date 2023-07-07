@@ -8,7 +8,7 @@ interface SupportLink {
 
 export const SupportLink = chakraForwardRef<"a", SupportLink>(function SupportLink(
   { message, onClick, ...props },
-  ref
+  ref,
 ) {
   return (
     <NormalLink

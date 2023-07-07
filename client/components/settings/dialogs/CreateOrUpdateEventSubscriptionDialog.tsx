@@ -62,10 +62,10 @@ interface CreateOrUpdateEventSubscriptionDialogProps {
       name: string | null;
       fromTemplateId: string | null;
       fromTemplateFieldIds: string[] | null;
-    }
+    },
   ) => Promise<string>;
   onAddSignatureKey: (
-    subscriptionId: string
+    subscriptionId: string,
   ) => Promise<CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment>;
   onDeleteSignatureKey: (signatureKeyId: string) => Promise<void>;
 }
@@ -152,7 +152,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
   } = useCounter({ min: 0, max: 1, defaultValue: initialStep ?? 0 });
 
   const [newSubscriptionId, setNewSubscriptionId] = useState<string | null>(
-    eventSubscription?.id ?? null
+    eventSubscription?.id ?? null,
   );
 
   const {
@@ -199,7 +199,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
       return result.data.petitions.items;
     },
     300,
-    []
+    [],
   );
 
   const eventsUrlInputRef = useRef<HTMLInputElement>(null);
@@ -221,7 +221,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
 
   const options = useSimpleSelectOptions(
     () => EVENT_TYPES.map((event) => ({ label: event, value: event })),
-    []
+    [],
   );
 
   function handlePrevStep() {
@@ -279,8 +279,8 @@ export function CreateOrUpdateEventSubscriptionDialog({
         !initialFieldsSetRef.current
       ) {
         resetField("fromTemplateFields", {
-          defaultValue: fields.filter((field) =>
-            eventSubscription.fromTemplateFields?.some((f) => field.id === f.id)
+          defaultValue: fields.filter(
+            (field) => eventSubscription.fromTemplateFields?.some((f) => field.id === f.id),
           ),
         });
         initialFieldsSetRef.current = true;
@@ -315,7 +315,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
                     isDefined(data.fromTemplate) && data.fromTemplateFields.length > 0
                       ? data.fromTemplateFields.map((f) => f.id)
                       : null,
-                })
+                }),
               );
 
               clearErrors("eventsUrl");
@@ -634,7 +634,7 @@ function Option(props: OptionProps<CreateOrUpdateEventSubscriptionDialog_Petitio
 }
 
 function SingleValue(
-  props: SingleValueProps<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment>
+  props: SingleValueProps<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment>,
 ) {
   return (
     <components.SingleValue {...props}>

@@ -96,7 +96,7 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
             <View key={i}>
               <Text>{JSON.stringify(t, null, "  ")}</Text>
             </View>
-          )
+          ),
         )
       ) : (
         <Text>{cleanupText(interpolated || " ")}</Text>
@@ -204,7 +204,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
   });
   const flatten = (
     list: marked.Tokens.List,
-    level: number
+    level: number,
   ): [token: marked.Token, level: number, index: number, ordered: boolean][] => {
     return list.items.flatMap((t, i) =>
       t.tokens.flatMap(
@@ -213,8 +213,8 @@ function MdList({ token }: { token: marked.Tokens.List }) {
             ? flatten(t, level + 1)
             : [
                 [t, level, typeof list.start === "number" ? list.start + i : i + 1, list.ordered],
-              ]) as [[token: marked.Token, level: number, index: number, ordered: boolean]]
-      )
+              ]) as [[token: marked.Token, level: number, index: number, ordered: boolean]],
+      ),
     );
   };
   return (

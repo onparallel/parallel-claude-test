@@ -17,7 +17,7 @@ const _queries = [
 export function withFeatureFlag(featureFlag: FeatureFlag, orPath = "/path") {
   return function <P = {}>(
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    Component: NextComponentType<WithApolloDataContext, P, P>
+    Component: NextComponentType<WithApolloDataContext, P, P>,
   ): NextComponentType<WithApolloDataContext, P, P> {
     const { getInitialProps, displayName, ...rest } = Component;
     return Object.assign(Component, rest, {
@@ -25,7 +25,7 @@ export function withFeatureFlag(featureFlag: FeatureFlag, orPath = "/path") {
       getInitialProps: async (context: WithApolloDataContext) => {
         if (!context.apollo) {
           throw new Error(
-            `Please, place "withFeatureFlag" before "withApolloData" in the "compose" argument list.`
+            `Please, place "withFeatureFlag" before "withApolloData" in the "compose" argument list.`,
           );
         }
         const { data } = await context.fetchQuery(HasFeatureFlagDocument, {

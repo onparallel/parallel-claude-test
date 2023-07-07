@@ -94,7 +94,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
       fonts.sort(function (a, b) {
         return a[0].localeCompare(b[0]);
       }),
-    [fonts]
+    [fonts],
   );
 
   const objectUrl = useMemo(() => {
@@ -106,10 +106,10 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   const showGenericErrorToast = useGenericErrorToast();
   const showErrorDialog = useErrorDialog();
   const [updateLogo, { loading: updateLogoLoading }] = useMutation(
-    BrandingGeneral_updateOrgLogoDocument
+    BrandingGeneral_updateOrgLogoDocument,
   );
   const [updateOrganizationBrandTheme, { loading: updateBrandLoading }] = useMutation(
-    BrandingGeneral_updateOrganizationBrandThemeDocument
+    BrandingGeneral_updateOrganizationBrandThemeDocument,
   );
 
   return (
@@ -183,7 +183,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                             id: "organization.branding.logo-error",
                             defaultMessage: "The logo must be an image file of size up to {size}.",
                           },
-                          { size: <FileSize value={MAX_FILE_SIZE} /> }
+                          { size: <FileSize value={MAX_FILE_SIZE} /> },
                         ),
                       });
                     } else {

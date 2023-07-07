@@ -42,7 +42,7 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
                 getUrl: () => pathUrl(p),
                 isCurrent: path === p,
               };
-            })
+            }),
         );
       }
       if (breadcrumbs.length > 4) {
@@ -85,9 +85,9 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
                 ...
               </BreadcrumbLink>
             </BreadcrumbItem>
-          )
+          ),
         )}
       </Breadcrumb>
     );
-  }
+  },
 );

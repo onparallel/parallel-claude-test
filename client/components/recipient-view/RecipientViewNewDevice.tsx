@@ -47,11 +47,11 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
   });
 
   const [sendVerificationCode, { loading: isSendingCode }] = useMutation(
-    RecipientViewNewDevice_publicSendVerificationCodeDocument
+    RecipientViewNewDevice_publicSendVerificationCodeDocument,
   );
 
   const [publicCheckVerificationCode, { loading: isVerifyingCode }] = useMutation(
-    RecipientViewNewDevice_publicCheckVerificationCodeDocument
+    RecipientViewNewDevice_publicCheckVerificationCodeDocument,
   );
 
   async function handleSendVerificationCode() {

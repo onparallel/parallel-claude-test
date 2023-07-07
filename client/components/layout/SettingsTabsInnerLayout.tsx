@@ -65,7 +65,7 @@ export function SettingsTabsInnerLayout<T extends string>({
                 {title}
               </Tab>
             </NakedLink>
-          )
+          ),
         )}
       </TabList>
       <TabPanels flex={1} display="flex" flexDirection="column" minHeight={0}>

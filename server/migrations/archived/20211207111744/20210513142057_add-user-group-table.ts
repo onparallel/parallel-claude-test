@@ -19,7 +19,7 @@ export async function up(knex: Knex): Promise<void> {
     timestamps(t, { updated: false });
   });
   await knex.raw(
-    /* sql */ `create index "user_group_member__user_group_id" on "user_group_member" ("user_group_id") where "deleted_at" is null`
+    /* sql */ `create index "user_group_member__user_group_id" on "user_group_member" ("user_group_id") where "deleted_at" is null`,
   );
 }
 

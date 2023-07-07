@@ -6,7 +6,7 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 
 export async function organizationLimitsReached(
   payload: { org_id: number; limit_name: OrganizationUsageLimitName },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [usageLimit, ownerAndAdmins, parallelOrg] = await Promise.all([
     context.organizations.loadCurrentOrganizationUsageLimit(payload.org_id, payload.limit_name),
@@ -16,7 +16,7 @@ export async function organizationLimitsReached(
 
   if (!usageLimit) {
     throw new Error(
-      `Could not find ${payload.limit_name} usage limit for Organization:${payload.org_id}`
+      `Could not find ${payload.limit_name} usage limit for Organization:${payload.org_id}`,
     );
   }
 
@@ -37,7 +37,7 @@ export async function organizationLimitsReached(
         used: usageLimit.used,
         ...layoutProps,
       },
-      { locale: userData.preferred_locale }
+      { locale: userData.preferred_locale },
     );
 
     emails.push(
@@ -48,7 +48,7 @@ export async function organizationLimitsReached(
         text,
         html,
         created_from: `Organization:${payload.org_id}`,
-      })
+      }),
     );
   }
 

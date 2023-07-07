@@ -73,7 +73,7 @@ function DowJonesFieldSearchResults({
         dateOfBirth: state.dateOfBirth ? new Date(state.dateOfBirth).toISOString() : null,
       },
       fetchPolicy: "cache-and-network",
-    }
+    },
   );
 
   const showGenericErrorToast = useGenericErrorToast();
@@ -90,7 +90,7 @@ function DowJonesFieldSearchResults({
 
       router.push(`/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${row.profileId}`);
     },
-    [router.query]
+    [router.query],
   );
 
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -101,10 +101,10 @@ function DowJonesFieldSearchResults({
   };
 
   const [createDowJonesKycReply] = useMutation(
-    DowJonesFieldSearchResults_createDowJonesKycReplyDocument
+    DowJonesFieldSearchResults_createDowJonesKycReplyDocument,
   );
   const [deletePetitionFieldReply] = useMutation(
-    DowJonesFieldSearchResults_deletePetitionFieldReplyDocument
+    DowJonesFieldSearchResults_deletePetitionFieldReplyDocument,
   );
 
   const context = useMemo(
@@ -142,7 +142,7 @@ function DowJonesFieldSearchResults({
         setIsCreatingReply(({ [profileId]: _, ...curr }) => curr);
       },
     }),
-    [replies, isDeletingReply, isCreatingReply]
+    [replies, isDeletingReply, isCreatingReply],
   );
 
   return (
@@ -256,9 +256,7 @@ function useDowJonesKycDataColumns() {
         CellContent: ({ row: { iconHints } }) => {
           return (
             <Flex gap={2} flexWrap="wrap">
-              {iconHints?.map((hint, i) => (
-                <DowJonesRiskLabel key={i} risk={hint} />
-              ))}
+              {iconHints?.map((hint, i) => <DowJonesRiskLabel key={i} risk={hint} />)}
             </Flex>
           );
         },
@@ -346,7 +344,7 @@ function useDowJonesKycDataColumns() {
         header: "",
         CellContent: ({ row, context }) => {
           const profileReply = context.replies.find(
-            (r) => r.content.entity.profileId === row.profileId
+            (r) => r.content.entity.profileId === row.profileId,
           );
           const handleSaveClick = async () => {
             context.onCreateReply(row.profileId);
@@ -396,7 +394,7 @@ function useDowJonesKycDataColumns() {
         },
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -517,5 +515,5 @@ DowJonesFieldSearchResults.getInitialProps = async ({
 export default compose(
   withDialogs,
   withFeatureFlag("DOW_JONES_KYC"),
-  withApolloData
+  withApolloData,
 )(DowJonesFieldSearchResults);

@@ -50,7 +50,7 @@ export function PublicLayout({
                 type="font/woff2"
                 crossOrigin="anonymous"
               />
-            ))
+            )),
         )}
         <title>{`${title} | Parallel`}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -80,7 +80,7 @@ export function PublicLayout({
           <Head key={locale}>
             <link rel="alternate" hrefLang={locale} href={buildUrl(pathname, query, locale)} />
           </Head>
-        )
+        ),
       )}
       <Head>
         <meta property="og:title" content={og?.title ?? title} />

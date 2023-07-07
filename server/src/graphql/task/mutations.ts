@@ -22,7 +22,7 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   type: "Task",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -40,7 +40,7 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
           include_netdocuments_links: args.includeNdLinks ?? false,
         },
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     ),
 });
 
@@ -50,7 +50,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
   type: "Task",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -66,7 +66,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
           pattern: args.pattern,
         },
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -88,7 +88,7 @@ export const createExportExcelTask = mutationField("createExportExcelTask", {
           petition_id: args.petitionId,
         },
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -100,7 +100,7 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToPetitions("petitionId"),
-    petitionsAreOfTypeTemplate("petitionId")
+    petitionsAreOfTypeTemplate("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -114,7 +114,7 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
         info,
         "timezone",
         `Invalid timezone ${timezone}`,
-        "INVALID_TIMEZONE_ERROR"
+        "INVALID_TIMEZONE_ERROR",
       );
     }
   },
@@ -130,7 +130,7 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
           end_date: args.endDate,
         },
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -141,7 +141,7 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToPetitions("templateId"),
-    petitionsAreOfTypeTemplate("templateId")
+    petitionsAreOfTypeTemplate("templateId"),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
@@ -159,7 +159,7 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
           end_date: args.endDate,
         },
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -173,7 +173,7 @@ export const createDowJonesProfileDownloadTask = mutationField(
     authorize: authenticateAnd(
       userHasFeatureFlag("DOW_JONES_KYC"),
       // avoid creating task if credentials are invalid, so TaskRunner doesn't throw error
-      userHasEnabledIntegration("DOW_JONES_KYC", true)
+      userHasEnabledIntegration("DOW_JONES_KYC", true),
     ),
     args: {
       profileId: nonNull(idArg()),
@@ -187,10 +187,10 @@ export const createDowJonesProfileDownloadTask = mutationField(
             profile_id: args.profileId,
           },
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     },
-  }
+  },
 );
 
 export const createTemplatesOverviewReportTask = mutationField(
@@ -213,10 +213,10 @@ export const createTemplatesOverviewReportTask = mutationField(
             end_date: args.endDate,
           },
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     },
-  }
+  },
 );
 
 export const getTaskResultFile = mutationField("getTaskResultFile", {
@@ -236,7 +236,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       "EXPORT_EXCEL",
       "TEMPLATE_REPLIES_REPORT",
       "DOW_JONES_PROFILE_DOWNLOAD",
-    ])
+    ]),
   ),
   args: {
     taskId: nonNull(globalIdArg("Task")),
@@ -261,7 +261,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
     ) {
       throw new ApolloError(
         `Temporary file not found for Task:${task.id} output`,
-        "FILE_NOT_FOUND_ERROR"
+        "FILE_NOT_FOUND_ERROR",
       );
     }
 
@@ -269,7 +269,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       url: await ctx.storage.temporaryFiles.getSignedDownloadEndpoint(
         file.path,
         file.filename,
-        args.preview ? "inline" : "attachment"
+        args.preview ? "inline" : "attachment",
       ),
       filename: file.filename,
     };

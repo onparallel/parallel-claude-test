@@ -7,7 +7,7 @@ export interface ToolbarButtonProps extends IconButtonWithTooltipProps {
 
 export const ToolbarButton = chakraForwardRef<"button", ToolbarButtonProps>(function ToolbarButton(
   { isToggleable, isActive, ...props },
-  ref
+  ref,
 ) {
   return (
     <IconButtonWithTooltip

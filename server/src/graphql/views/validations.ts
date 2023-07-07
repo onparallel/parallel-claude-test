@@ -7,9 +7,9 @@ import { NexusGenInputs } from "../__types";
 
 export function validPetitionListViewData<TypeName extends string, FieldName extends string>(
   prop: (
-    args: ArgsValue<TypeName, FieldName>
+    args: ArgsValue<TypeName, FieldName>,
   ) => NexusGenInputs["PetitionListViewDataInput"] | null | undefined,
-  name: string
+  name: string,
 ) {
   return validateAnd<TypeName, FieldName>(
     validPetitionSharedWithFilter((args) => prop(args)?.sharedWith, `${name}.sharedWith`),
@@ -19,12 +19,12 @@ export function validPetitionListViewData<TypeName extends string, FieldName ext
       if (isDefined(fromTemplateId)) {
         const hasAccess = await ctx.petitions.userHasAccessToPetitions(
           ctx.user!.id,
-          fromTemplateId
+          fromTemplateId,
         );
         if (!hasAccess) {
           throw new ArgValidationError(info, `${name}.fromTemplateId`, "Invalid template ID");
         }
       }
-    }
+    },
   );
 }

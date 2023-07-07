@@ -18,7 +18,7 @@ export type EventProcessorPayload = {
 };
 
 export type EventListener<
-  TPayload extends PetitionEvent | SystemEvent = PetitionEvent | SystemEvent
+  TPayload extends PetitionEvent | SystemEvent = PetitionEvent | SystemEvent,
 > = (payload: TPayload, ctx: WorkerContext) => Promise<void>;
 
 createQueueWorker(
@@ -37,7 +37,7 @@ createQueueWorker(
         "REMINDERS_OPT_OUT",
         "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
       ],
-      userNotificationsListener
+      userNotificationsListener,
     )
     .register("*", eventSubscriptionsListener)
     .register(
@@ -66,7 +66,7 @@ createQueueWorker(
         "SIGNATURE_REMINDER",
         "ORGANIZATION_LIMIT_REACHED",
       ],
-      analyticsEventListener
+      analyticsEventListener,
     )
-    .listen()
+    .listen(),
 );

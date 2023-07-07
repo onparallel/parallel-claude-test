@@ -39,7 +39,7 @@ export function OrganizationProfilesLayout({
         isDisabled: true,
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
   const currentTab = tabs.find((t) => t.key === currentTabKey)!;
 

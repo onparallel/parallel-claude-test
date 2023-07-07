@@ -75,7 +75,7 @@ export function CheckboxTableFilter<T extends string>({
         onChange(newValue.size === 0 ? null : Array.from(newValue.values()));
       },
     }),
-    []
+    [],
   );
 
   const handleKeyDown = useCallback(
@@ -102,7 +102,7 @@ export function CheckboxTableFilter<T extends string>({
         }
       }
     },
-    [options.length]
+    [options.length],
   );
 
   useEffect(() => {

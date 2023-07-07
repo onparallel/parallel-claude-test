@@ -42,7 +42,7 @@ export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSha
           }),
         },
       ],
-      []
+      [],
     );
 
     return (
@@ -74,5 +74,5 @@ export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSha
         </Portal>
       </Menu>
     );
-  }
+  },
 );

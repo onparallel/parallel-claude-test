@@ -20,12 +20,11 @@ import {
 } from "./OrganizationCreditsService";
 import { STORAGE_SERVICE, StorageService } from "./StorageService";
 
-type SessionMetadata =
-  | {
-      petitionId: string;
-      fieldId: string;
-      orgId: string;
-    } & ({ userId: string } | { accessId: string });
+type SessionMetadata = {
+  petitionId: string;
+  fieldId: string;
+  orgId: string;
+} & ({ userId: string } | { accessId: string });
 
 /** When the Session is completed. (every requested model has been extracted) */
 export interface SessionCompletedWebhookEvent {
@@ -109,7 +108,7 @@ export class BankflipService implements IBankflipService {
     @inject(STORAGE_SERVICE) private storage: StorageService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: OrganizationCreditsService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(CONFIG) private config: Config
+    @inject(CONFIG) private config: Config,
   ) {}
 
   public webhookSecret(orgId: string) {
@@ -149,7 +148,7 @@ export class BankflipService implements IBankflipService {
     orgId: string,
     url: string,
     init?: RequestInit,
-    type: "json" | "buffer" = "json"
+    type: "json" | "buffer" = "json",
   ): Promise<T> {
     const host = this.bankflipHost(orgId);
     const apiKey = this.bankflipApiKey(orgId);
@@ -175,7 +174,7 @@ export class BankflipService implements IBankflipService {
     const organization = await this.organizations.loadOrg(petition!.org_id);
     const hasRemoveParallelBranding = await this.featureFlags.orgHasFeatureFlag(
       organization!.id,
-      "REMOVE_PARALLEL_BRANDING"
+      "REMOVE_PARALLEL_BRANDING",
     );
 
     const customization: any = {};
@@ -203,20 +202,20 @@ export class BankflipService implements IBankflipService {
   async sessionCompleted(orgId: string, event: SessionCompletedWebhookEvent): Promise<void> {
     const session = await this.apiRequest<SessionResponse>(
       orgId,
-      `/session/${event.payload.sessionId}`
+      `/session/${event.payload.sessionId}`,
     );
     const { metadata } = session;
     await this.consumePetitionCredits(metadata);
 
     const summary = await this.apiRequest<SessionSummaryResponse>(
       orgId,
-      `/session/${event.payload.sessionId}/summary`
+      `/session/${event.payload.sessionId}/summary`,
     );
 
     const replyContents = await pFlatMap(
       summary.modelRequestOutcomes,
       async (model) => await this.extractAndUploadModelDocuments(metadata, model),
-      { concurrency: 2 }
+      { concurrency: 2 },
     );
 
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
@@ -237,7 +236,7 @@ export class BankflipService implements IBankflipService {
         content: { ...content, bankflip_session_id: event.payload.sessionId },
         ...data,
       })),
-      createdBy
+      createdBy,
     );
   }
 
@@ -255,7 +254,7 @@ export class BankflipService implements IBankflipService {
    */
   private async extractAndUploadModelDocuments(
     metadata: SessionMetadata,
-    modelRequestOutcome: ModelRequestOutcome
+    modelRequestOutcome: ModelRequestOutcome,
   ): Promise<any[]> {
     if (isDefined(modelRequestOutcome.noDocumentReasons)) {
       return [
@@ -273,7 +272,7 @@ export class BankflipService implements IBankflipService {
       Object.keys(d.model)
         .sort()
         .map((key) => d.model[key as keyof ModelRequest])
-        .join("_")
+        .join("_"),
     );
     return await pFlatMap(Object.values(groupedByRequestModel), async (docs) => {
       const documents: Record<string, ModelRequestDocument[]> = {};
@@ -296,7 +295,7 @@ export class BankflipService implements IBankflipService {
         documents.pdf,
         async ({ id }) =>
           await this.apiRequest<Buffer>(metadata.orgId, `/document/${id}/content`, {}, "buffer"),
-        { concurrency: 1 }
+        { concurrency: 1 },
       );
 
       const results: any[] = [];
@@ -313,7 +312,7 @@ export class BankflipService implements IBankflipService {
           },
           "userId" in metadata
             ? `User:${fromGlobalId(metadata.userId, "User").id}`
-            : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`
+            : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`,
         );
 
         results.push({
@@ -330,7 +329,7 @@ export class BankflipService implements IBankflipService {
               : documents.json.length === 1
               ? await this.apiRequest<any>(
                   metadata.orgId,
-                  `/document/${documents.json[0].id}/content`
+                  `/document/${documents.json[0].id}/content`,
                 )
               : null,
         });

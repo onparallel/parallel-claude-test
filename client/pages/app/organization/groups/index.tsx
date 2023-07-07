@@ -92,24 +92,23 @@ function OrganizationGroups() {
       }));
     },
     300,
-    [setQueryState]
+    [setQueryState],
   );
   const handleSearchChange = useCallback(
     (value: string | null) => {
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   const navigate = useHandleNavigation();
   const handleRowClick = useCallback(function (
     row: OrganizationGroups_UserGroupFragment,
-    event: MouseEvent
+    event: MouseEvent,
   ) {
     navigate(`/app/organization/groups/${row.id}`, event);
-  },
-  []);
+  }, []);
 
   const [cloneUserGroups] = useMutation(OrganizationGroups_cloneUserGroupsDocument);
   const handleCloneClick = useCallback(
@@ -127,7 +126,7 @@ function OrganizationGroups() {
             id: "view.groups.clone-success-title",
             defaultMessage: "{count, plural, =1{Team} other{Teams}} cloned successfully.",
           },
-          { count: selectedIds.length }
+          { count: selectedIds.length },
         ),
         description: intl.formatMessage(
           {
@@ -138,20 +137,20 @@ function OrganizationGroups() {
           {
             count: selectedIds.length,
             name: selectedRows[0].name,
-          }
+          },
         ),
         status: "success",
         duration: 5000,
         isClosable: true,
       });
     },
-    [userGroups, selectedIds]
+    [userGroups, selectedIds],
   );
 
   const [deleteUserGroup] = useMutation(OrganizationGroups_deleteUserGroupDocument);
   const handleDeleteClick = useCallback(async () => {
     const [error] = await withError(
-      confirmDelete({ name: selectedRows[0].name, groupIds: selectedIds })
+      confirmDelete({ name: selectedRows[0].name, groupIds: selectedIds }),
     );
     if (!error) {
       await deleteUserGroup({
@@ -166,7 +165,7 @@ function OrganizationGroups() {
             id: "view.groups.delete-success-title",
             defaultMessage: "{count, plural, =1{Team} other{Teams}} deleted successfully.",
           },
-          { count: selectedIds.length }
+          { count: selectedIds.length },
         ),
         description: intl.formatMessage(
           {
@@ -177,7 +176,7 @@ function OrganizationGroups() {
           {
             count: selectedIds.length,
             name: selectedRows[0].name,
-          }
+          },
         ),
         status: "success",
         duration: 5000,
@@ -208,7 +207,7 @@ function OrganizationGroups() {
             id: "view.groups.create-success-description",
             defaultMessage: "Team {name} successfully created.",
           },
-          { name: newGroup.name }
+          { name: newGroup.name },
         ),
         status: "success",
         duration: 5000,
@@ -383,7 +382,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

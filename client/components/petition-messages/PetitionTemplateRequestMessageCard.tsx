@@ -29,7 +29,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
   chakraForwardRef<"section", PetitionTemplateRequestMessageCardProps>(
     function PetitionTemplateRequestMessageCard(
       { petition, user, onUpdatePetition, ...props },
-      ref
+      ref,
     ) {
       const [messages, setMessages] = useState({
         emailSubject: petition.emailSubject ?? "",
@@ -37,7 +37,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
       });
 
       const [onBehalf, setOnBehalf] = useState<UserSelect_UserFragment | null>(
-        petition.defaultOnBehalf ?? null
+        petition.defaultOnBehalf ?? null,
       );
 
       const handleMessagesEmailSubjectChange = (emailSubject: string) => {
@@ -61,7 +61,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
             excludeUsers: [...excludeUsers],
           });
         },
-        [_handleSearchUsers]
+        [_handleSearchUsers],
       );
 
       const handleDefaultOnBehalf = (user: UserSelect_UserFragment | null) => {
@@ -130,7 +130,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
           </Stack>
         </Card>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -159,5 +159,5 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
         }
       `,
     },
-  }
+  },
 );

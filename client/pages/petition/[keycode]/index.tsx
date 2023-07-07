@@ -81,7 +81,7 @@ export async function getServerSideProps({
           sameSite: "lax",
           secure: process.env.NODE_ENV === "production",
           maxAge: 60 * 60 * 24 * 365 * 10,
-        })
+        }),
       );
     }
     if (isAllowed) {

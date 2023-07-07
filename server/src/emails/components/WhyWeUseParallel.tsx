@@ -25,7 +25,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
           id: "component.why-we-use-parallel.security-title",
           defaultMessage: "Private portal for your information",
         },
-        { tone }
+        { tone },
       ),
       body: intl.formatMessage(
         {
@@ -33,7 +33,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
           defaultMessage:
             "Parallel is a private space where you can <b>share information and documents</b> with third parties securely.",
         },
-        { tone }
+        { tone },
       ),
     },
     {
@@ -43,7 +43,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
           id: "component.why-we-use-parallel.autosave-title",
           defaultMessage: "Your replies auto-saved",
         },
-        { tone }
+        { tone },
       ),
       body: intl.formatMessage(
         {
@@ -51,7 +51,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
           defaultMessage:
             "Every <b>response is saved automatically and synchronized</b> with your sender, allowing you to exit at any time and resume later.",
         },
-        { tone }
+        { tone },
       ),
     },
     {
@@ -61,7 +61,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
           id: "component.why-we-use-parallel.invite-title",
           defaultMessage: "Invite collaborators",
         },
-        { tone }
+        { tone },
       ),
       body: intl.formatMessage(
         {
@@ -69,7 +69,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
           defaultMessage:
             "Only allowed users will be able to access the link. Once inside, they can <b>invite the collaborators</b> they need to help complete the information.",
         },
-        { tone }
+        { tone },
       ),
     },
   ];

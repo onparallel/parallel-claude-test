@@ -155,7 +155,7 @@ export async function up(knex: Knex): Promise<void> {
       {
         enumName: "profile_event_type",
         useNative: true,
-      }
+      },
     ).notNullable();
     t.jsonb("data").notNullable().defaultTo(knex.raw("'{}'::jsonb"));
     t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));

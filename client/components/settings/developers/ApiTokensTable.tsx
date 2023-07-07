@@ -194,7 +194,7 @@ function useApiTokensColumns(): TableColumn<ApiTokensTable_UserAuthenticationTok
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

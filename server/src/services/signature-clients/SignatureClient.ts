@@ -48,7 +48,7 @@ export interface ISignatureClient {
     orgId: number,
     filePath: string,
     recipients: Recipient[],
-    options: SignatureOptions
+    options: SignatureOptions,
   ) => Promise<SignatureResponse>;
   cancelSignatureRequest: (externalId: string) => Promise<void>;
   downloadSignedDocument: (externalId: string) => Promise<Buffer>;

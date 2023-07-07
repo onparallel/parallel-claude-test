@@ -4,7 +4,10 @@ import { RestParameter } from "./core";
 import { JsonSchema } from "./schemas";
 
 export class ParseError extends Error {
-  constructor(public readonly value: string | string[] | undefined, message: string) {
+  constructor(
+    public readonly value: string | string[] | undefined,
+    message: string,
+  ) {
     super(message);
   }
 }
@@ -15,7 +18,7 @@ export interface BaseParameterOptions<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 > {
   defaultValue?: TDefaultValue;
   description?: string;
@@ -35,7 +38,7 @@ export type ParameterOptions<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 > = BaseParameterOptions<T, TRequired, TArray, TDefaultValue> &
   If<TArray, ArrayParameterOptions, {}>;
 
@@ -43,7 +46,7 @@ export type GeneratedParameterType<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 > = If<
   TRequired,
   ArrayIfTrue<T, TArray>,
@@ -54,7 +57,7 @@ export interface ParameterParser<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 > {
   (value?: string): MaybePromise<GeneratedParameterType<T, TRequired, TArray, TDefaultValue>>;
 }
@@ -63,10 +66,10 @@ export function buildParse<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 >(
   options: ParameterOptions<T, TRequired, TArray, TDefaultValue>,
-  parser: (value: string) => MaybePromise<T>
+  parser: (value: string) => MaybePromise<T>,
 ): ParameterParser<T, TRequired, TArray, TDefaultValue> {
   return async function (value: string | string[] | undefined) {
     const { required = true, array = false, defaultValue } = options;
@@ -83,7 +86,7 @@ export function buildParse<
           return await Promise.all(
             (Array.isArray(value) ? value : value.split(/(?<!\\),/)).map(async (part) => {
               return await parser(part.replace(/\\,/g, ","));
-            })
+            }),
           );
         }
       } else {
@@ -100,10 +103,10 @@ export function buildDefinition<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 >(
   options: ParameterOptions<T, TRequired, TArray, TDefaultValue>,
-  schema: JsonSchema
+  schema: JsonSchema,
 ): OpenAPIV3.ParameterBaseObject {
   const { required = true, array = false, deprecated, description, example } = options;
   return {
@@ -126,7 +129,7 @@ export function buildDefinition<
 export type NumberParameterOptions<
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<number, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<number, TArray> | undefined = undefined,
 > = ParameterOptions<number, TRequired, TArray, TDefaultValue> & {
   minimum?: number;
   exclusiveMinimum?: number;
@@ -139,9 +142,9 @@ function _numberParam(integer: boolean) {
   return function numberParam<
     TRequired extends boolean = true,
     TArray extends boolean | undefined = undefined,
-    TDefaultValue extends ArrayIfTrue<number, TArray> | undefined = undefined
+    TDefaultValue extends ArrayIfTrue<number, TArray> | undefined = undefined,
   >(
-    options: NumberParameterOptions<TRequired, TArray, TDefaultValue>
+    options: NumberParameterOptions<TRequired, TArray, TDefaultValue>,
   ): RestParameter<GeneratedParameterType<number, TRequired, TArray, TDefaultValue>> {
     const { minimum, exclusiveMinimum, maximum, exclusiveMaximum, multipleOf } = options;
     return {
@@ -189,7 +192,7 @@ export const numberParam = _numberParam(false);
 export type StringParameterOptions<
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<string, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<string, TArray> | undefined = undefined,
 > = ParameterOptions<string, TRequired, TArray, TDefaultValue> & {
   pattern?: RegExp;
   maxLength?: number;
@@ -199,9 +202,9 @@ export type StringParameterOptions<
 export function stringParam<
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<string, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<string, TArray> | undefined = undefined,
 >(
-  options: StringParameterOptions<TRequired, TArray, TDefaultValue>
+  options: StringParameterOptions<TRequired, TArray, TDefaultValue>,
 ): RestParameter<GeneratedParameterType<string, TRequired, TArray, TDefaultValue>> {
   const { pattern, maxLength, minLength } = options;
   return {
@@ -209,7 +212,7 @@ export function stringParam<
       if (pattern !== undefined && !pattern.test(value)) {
         throw new ParseError(
           value,
-          `Value must match pattern ${JSON.stringify(pattern.toString())}`
+          `Value must match pattern ${JSON.stringify(pattern.toString())}`,
         );
       }
       if (maxLength !== undefined && value.length > maxLength) {
@@ -233,7 +236,7 @@ export type EnumParameterOptions<
   T extends string,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 > = ParameterOptions<T, TRequired, TArray, TDefaultValue> & {
   schemaTitle?: string;
   values: T[];
@@ -243,9 +246,9 @@ export function enumParam<
   T extends string,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined,
 >(
-  options: EnumParameterOptions<T, TRequired, TArray, TDefaultValue>
+  options: EnumParameterOptions<T, TRequired, TArray, TDefaultValue>,
 ): RestParameter<GeneratedParameterType<T, TRequired, TArray, TDefaultValue>> {
   const { values, schemaTitle } = options;
   return {
@@ -253,7 +256,7 @@ export function enumParam<
       if (!values.includes(value as T)) {
         throw new ParseError(
           value,
-          `Value must be one of ${values.map((v) => JSON.stringify(v)).join(", ")}`
+          `Value must be one of ${values.map((v) => JSON.stringify(v)).join(", ")}`,
         );
       }
       return value as T;
@@ -268,7 +271,7 @@ export function enumParam<
 
 export type IdParameterOptions<
   TRequired extends boolean = true,
-  TArray extends boolean | undefined = undefined
+  TArray extends boolean | undefined = undefined,
 > = ParameterOptions<string, TRequired, TArray, undefined> & {
   type: string;
 };
@@ -276,9 +279,9 @@ export type IdParameterOptions<
 export function booleanParam<
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
-  TDefaultValue extends ArrayIfTrue<boolean, TArray> | undefined = undefined
+  TDefaultValue extends ArrayIfTrue<boolean, TArray> | undefined = undefined,
 >(
-  options: ParameterOptions<boolean, TRequired, TArray, TDefaultValue>
+  options: ParameterOptions<boolean, TRequired, TArray, TDefaultValue>,
 ): RestParameter<GeneratedParameterType<boolean, TRequired, TArray, TDefaultValue>> {
   return {
     parse: buildParse(options, (value: string) => {

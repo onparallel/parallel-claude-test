@@ -42,7 +42,7 @@ export function ProfileFieldFileUpload({
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
   const intl = useIntl();
   const [profileFieldFileDownloadLink] = useMutation(
-    ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument
+    ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument,
   );
 
   const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {
@@ -53,7 +53,7 @@ export function ProfileFieldFileUpload({
         });
         const { url } = data!.profileFieldFileDownloadLink;
         return url!;
-      })
+      }),
     );
   };
 
@@ -113,7 +113,7 @@ export function ProfileFieldFileUpload({
                 {differenceWith(
                   files ?? [],
                   actions.filter(discriminator("type", "DELETE")),
-                  (file, action) => action.id === file.id
+                  (file, action) => action.id === file.id,
                 ).map(({ id, file }) => {
                   if (!isDefined(file)) {
                     return null;
@@ -171,7 +171,7 @@ export function ProfileFieldFileUpload({
                         id: "component.profile-field-file-upload.invalid-attachment-message.file-too-large",
                         defaultMessage: "Only attachments of up to {size} are allowed.",
                       },
-                      { size: <FileSize value={MAX_FILE_SIZE} /> }
+                      { size: <FileSize value={MAX_FILE_SIZE} /> },
                     ),
                   });
                 } else if (
@@ -183,7 +183,7 @@ export function ProfileFieldFileUpload({
                         id: "component.profile-field-file-upload.invalid-attachment-message.too-many-files",
                         defaultMessage: "You can upload up to {max} files.",
                       },
-                      { max: 10 }
+                      { max: 10 },
                     ),
                   });
                 } else {
@@ -254,7 +254,7 @@ function ProfileFile({ name, type, size, onRemove, onPreview }: ProfileFileProps
           defaultMessage:
             "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
         },
-        { filename: name }
+        { filename: name },
       )}
       onKeyDown={(e) => {
         switch (e.key) {

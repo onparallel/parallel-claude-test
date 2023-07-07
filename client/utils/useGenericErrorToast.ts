@@ -30,6 +30,6 @@ export function useGenericErrorToast(title?: string, description?: string) {
         isClosable: true,
       });
     },
-    [intl.locale]
+    [intl.locale],
   );
 }

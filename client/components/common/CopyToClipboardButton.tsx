@@ -28,7 +28,7 @@ export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardB
       onMouseEnter,
       ...props
     },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const labels = {
@@ -73,5 +73,5 @@ export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardB
         {...props}
       />
     );
-  }
+  },
 );

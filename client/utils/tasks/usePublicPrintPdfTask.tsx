@@ -20,7 +20,7 @@ export function usePublicPrintPdfTask() {
   const showTaskProgressDialog = useTaskProgressDialog();
 
   const [publicGetTaskResultFileUrl] = useMutation(
-    usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument
+    usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument,
   );
 
   return async (keycode: string) => {
@@ -56,7 +56,7 @@ export function usePublicPrintPdfTask() {
             defaultMessage:
               "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
           }),
-        })
+        }),
       );
     } else if (!taskError) {
       const [error] = await withError(
@@ -68,7 +68,7 @@ export function usePublicPrintPdfTask() {
             throw new Error();
           }
           return data.publicGetTaskResultFileUrl;
-        })
+        }),
       );
       if (error) {
         await withError(
@@ -78,7 +78,7 @@ export function usePublicPrintPdfTask() {
               defaultMessage:
                 "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
             }),
-          })
+          }),
         );
       }
     }

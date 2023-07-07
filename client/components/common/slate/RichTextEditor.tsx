@@ -109,7 +109,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       toolbarOpts,
       ...props
     },
-    ref
+    ref,
   ) {
     const hasPlaceholders = isDefined(placeholderOptions) && placeholderOptions.length > 0;
     const placeholdersRef = useUpdatingRef(placeholderOptions ?? []);
@@ -174,8 +174,8 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             [ELEMENT_LIC]: { type: "list-item-child" },
             [ELEMENT_LINK]: { type: "link" },
           },
-        }
-      )
+        },
+      ),
     );
     const formControl = useFormControl({
       id,
@@ -274,7 +274,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
         </Box>
       </PlateProvider>
     );
-  }
+  },
 );
 
 function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {

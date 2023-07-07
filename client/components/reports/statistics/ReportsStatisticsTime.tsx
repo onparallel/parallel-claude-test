@@ -74,7 +74,7 @@ export function ReportsStatisticsTime({
   const divideBy = meanDuration.hours > 120 ? 86_400 : meanDuration.minutes > 240 ? 3_600 : 60;
 
   const hasEnoughData = Object.values(timeStatistics).some(
-    (value) => value && Object.values(value).some((v) => (v ?? 0) > 0)
+    (value) => value && Object.values(value).some((v) => (v ?? 0) > 0),
   );
 
   const labels = useMemo<{ value: RadioValues; label: string }[]>(() => {
@@ -160,11 +160,11 @@ export function ReportsStatisticsTime({
                     min: Number(((timeStatistics[selectedValue]!.min ?? 0) / divideBy).toFixed(2)),
                     max: Number(((timeStatistics[selectedValue]!.max ?? 0) / divideBy).toFixed(2)),
                     mean: Number(
-                      ((timeStatistics[selectedValue]!.mean ?? 0) / divideBy).toFixed(2)
+                      ((timeStatistics[selectedValue]!.mean ?? 0) / divideBy).toFixed(2),
                     ),
                     q1: Number(((timeStatistics[selectedValue]!.q1 ?? 0) / divideBy).toFixed(2)),
                     median: Number(
-                      ((timeStatistics[selectedValue]!.median ?? 0) / divideBy).toFixed(2)
+                      ((timeStatistics[selectedValue]!.median ?? 0) / divideBy).toFixed(2),
                     ),
                     q3: Number(((timeStatistics[selectedValue]!.q3 ?? 0) / divideBy).toFixed(2)),
                   } as any,
@@ -206,7 +206,7 @@ export function ReportsStatisticsTime({
                   },
                   {
                     value: labelStringTimeSpans.mean,
-                  }
+                  },
                 ),
                 intl.formatMessage(
                   {
@@ -215,7 +215,7 @@ export function ReportsStatisticsTime({
                   },
                   {
                     value: labelStringTimeSpans.median,
-                  }
+                  },
                 ),
               ];
 
@@ -227,7 +227,7 @@ export function ReportsStatisticsTime({
                   },
                   {
                     value: labelStringTimeSpans.max,
-                  }
+                  },
                 ),
                 intl.formatMessage(
                   {
@@ -236,7 +236,7 @@ export function ReportsStatisticsTime({
                   },
                   {
                     value: labelStringTimeSpans.q3,
-                  }
+                  },
                 ),
                 ...(median > mean ? meanMedian.reverse() : meanMedian),
                 intl.formatMessage(
@@ -246,7 +246,7 @@ export function ReportsStatisticsTime({
                   },
                   {
                     value: labelStringTimeSpans.q1,
-                  }
+                  },
                 ),
                 intl.formatMessage(
                   {
@@ -255,7 +255,7 @@ export function ReportsStatisticsTime({
                   },
                   {
                     value: labelStringTimeSpans.min,
-                  }
+                  },
                 ),
               ];
             },
@@ -511,14 +511,14 @@ function useDownloadTimeReportExcel() {
           range: isDefined(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
-        }
+        },
       ),
       async (workbook) => {
         const worksheet = workbook.addWorksheet(
           intl.formatMessage({
             id: "component.reports-statistics-time.time-statistics",
             defaultMessage: "Time statistics",
-          })
+          }),
         );
 
         worksheet.columns = [
@@ -612,9 +612,9 @@ function useDownloadTimeReportExcel() {
             max: isDefined(timeStatistics[value]!.max)
               ? (timeStatistics[value]!.max ?? 0) / 3_600
               : "-",
-          }))
+          })),
         );
-      }
+      },
     );
   };
 }

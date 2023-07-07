@@ -81,7 +81,7 @@ export function RecipientViewPetitionFieldPhone({
     (replyId: string) => async (value: string) => {
       await onUpdateReply(replyId, value);
     },
-    [onUpdateReply]
+    [onUpdateReply],
   );
 
   const handleDelete = useMemoFactory(
@@ -110,7 +110,7 @@ export function RecipientViewPetitionFieldPhone({
         handleAddNewReply();
       }
     },
-    [field.replies, onDeleteReply]
+    [field.replies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -133,7 +133,7 @@ export function RecipientViewPetitionFieldPhone({
               newReplyElement.focus();
               newReplyElement.setSelectionRange(
                 newReplyElement.value.length,
-                newReplyElement.value.length
+                newReplyElement.value.length,
               );
             }
           }
@@ -142,7 +142,7 @@ export function RecipientViewPetitionFieldPhone({
       setIsSaving(false);
     },
     1000,
-    [onCreateReply]
+    [onCreateReply],
   );
 
   const props: ComponentProps<typeof PhoneInputLazy> = {
@@ -252,7 +252,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
   RecipientViewPetitionFieldReplyPhoneProps
 >(function RecipientViewPetitionFieldReplyPhone(
   { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
@@ -269,7 +269,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
       setIsSaving(false);
     },
     1000,
-    [onUpdate]
+    [onUpdate],
   );
 
   const props: ComponentProps<typeof PhoneInputLazy> = {

@@ -67,7 +67,7 @@ function AdminOrganizations() {
         status: state.status,
         sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryOrganizations_OrderBy],
       },
-    }
+    },
   );
   const organizations = data?.organizations;
   const toast = useToast();
@@ -81,7 +81,7 @@ function AdminOrganizations() {
   });
   const context = useMemo<AdminOrganizationsTableContext>(
     () => ({ onCopyToClipboard }),
-    [onCopyToClipboard]
+    [onCopyToClipboard],
   );
 
   const [search, setSearch] = useState(state.search);
@@ -95,7 +95,7 @@ function AdminOrganizations() {
       }));
     },
     300,
-    [setQueryState]
+    [setQueryState],
   );
 
   const handleSearchChange = useCallback(
@@ -103,7 +103,7 @@ function AdminOrganizations() {
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   const [createOrganization] = useMutation(AdminOrganizations_createOrganizationDocument);
@@ -136,7 +136,7 @@ function AdminOrganizations() {
           },
           {
             email: organization.email,
-          }
+          },
         ),
       });
     } catch (error) {
@@ -309,7 +309,7 @@ function useOrganizationColumns() {
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

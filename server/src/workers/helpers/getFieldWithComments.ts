@@ -33,7 +33,7 @@ export async function buildFieldWithComments(
   field: PetitionField,
   commentsByField: Record<string, PetitionFieldComment[]>,
   context: WorkerContext,
-  userId?: number
+  userId?: number,
 ) {
   return {
     ...pick(field, ["id", "title", "position"]),
@@ -56,11 +56,11 @@ export async function buildFieldWithComments(
                 };
               }
             },
-            { concurrency: 1 }
+            { concurrency: 1 },
           ),
           author: await fetchCommentAuthor(c, context),
         };
-      }
+      },
     ),
   };
 }

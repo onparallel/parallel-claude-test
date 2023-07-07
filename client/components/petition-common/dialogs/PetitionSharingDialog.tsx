@@ -117,11 +117,11 @@ export function PetitionSharingDialog({
   }, [loading]);
 
   const userPermissions = (petitions[0]?.permissions.filter(
-    (p) => p.__typename === "PetitionUserPermission"
+    (p) => p.__typename === "PetitionUserPermission",
   ) ?? []) as PetitionSharingModal_PetitionUserPermissionFragment[];
 
   const groupPermissions = (petitions[0]?.permissions.filter(
-    (p) => p.__typename === "PetitionUserGroupPermission"
+    (p) => p.__typename === "PetitionUserGroupPermission",
   ) ?? []) as PetitionSharingModal_PetitionUserGroupPermissionFragment[];
 
   const { handleSubmit, register, control, watch } = useForm<PetitionSharingDialogData>({
@@ -148,7 +148,7 @@ export function PetitionSharingDialog({
     petitions.filter(
       (petition) =>
         petition.myEffectivePermission?.permissionType === "OWNER" ||
-        petition.myEffectivePermission?.permissionType === "WRITE"
+        petition.myEffectivePermission?.permissionType === "WRITE",
     ) ?? [];
 
   const petitionsRead =
@@ -172,7 +172,7 @@ export function PetitionSharingDialog({
         excludeUserGroups: [...excludeUserGroups, ...groupsToExclude],
       });
     },
-    [_handleSearchUsers, usersToExclude.join(","), groupsToExclude.join(",")]
+    [_handleSearchUsers, usersToExclude.join(","), groupsToExclude.join(",")],
   );
 
   interface PetitionPermissionProps {
@@ -184,7 +184,7 @@ export function PetitionSharingDialog({
 
   const confirmRemovePetitionPermission = useDialog(ConfirmRemovePetitionPermissionDialog);
   const [removePetitionPermission] = useMutation(
-    PetitionSharingModal_removePetitionPermissionDocument
+    PetitionSharingModal_removePetitionPermissionDocument,
   );
 
   const handleRemovePetitionPermission = async ({
@@ -202,7 +202,7 @@ export function PetitionSharingDialog({
         variables: { petitionId, [prop]: [id] },
         refetchQueries: [
           getOperationName(
-            isTemplate ? NewPetition_templatesDocument : PetitionActivity_petitionDocument
+            isTemplate ? NewPetition_templatesDocument : PetitionActivity_petitionDocument,
           )!,
         ],
         update(client, { data }) {
@@ -262,7 +262,7 @@ export function PetitionSharingDialog({
           },
           refetchQueries: [
             getOperationName(
-              isTemplate ? NewPetition_templatesDocument : PetitionActivity_petitionDocument
+              isTemplate ? NewPetition_templatesDocument : PetitionActivity_petitionDocument,
             )!,
           ],
         });
@@ -274,7 +274,7 @@ export function PetitionSharingDialog({
         });
         props.onResolve();
       } catch {}
-    }
+    },
   );
 
   const getSuccessTitle = () => {
@@ -283,7 +283,7 @@ export function PetitionSharingDialog({
         id: "template-sharing.success-title",
         defaultMessage: "{count, plural, =1 {Template} other {Templates}} shared",
       },
-      { count: petitionsOwnedWrite.length }
+      { count: petitionsOwnedWrite.length },
     );
 
     const petition = intl.formatMessage(
@@ -291,7 +291,7 @@ export function PetitionSharingDialog({
         id: "petition-sharing.success-title",
         defaultMessage: "{count, plural, =1 {Parallel} other {Parallels}} shared",
       },
-      { count: petitionsOwnedWrite.length }
+      { count: petitionsOwnedWrite.length },
     );
 
     return isTemplate ? template : petition;
@@ -435,7 +435,7 @@ export function PetitionSharingDialog({
                           </Text>
                         ) : null}
                         {petitions[0].effectivePermissions.some(
-                          (ep) => ep.user.id === user.id && ep.isSubscribed
+                          (ep) => ep.user.id === user.id && ep.isSubscribed,
                         ) ? (
                           <SubscribedNotificationsIcon />
                         ) : null}
@@ -544,7 +544,7 @@ export function PetitionSharingDialog({
                             userDetails={(userId: string) => {
                               if (
                                 petitions[0].effectivePermissions.some(
-                                  (ep) => ep.user.id === userId && ep.isSubscribed
+                                  (ep) => ep.user.id === userId && ep.isSubscribed,
                                 )
                               ) {
                                 return <SubscribedNotificationsIcon />;
@@ -946,7 +946,7 @@ function ConfirmEditPetitionPermissionDialog({ ...props }: DialogProps) {
 function useTransferPetitionOwnership() {
   const confirmTransferPetitionOwnership = useDialog(ConfirmTransferPetitionOwnershipDialog);
   const [transferPetitionOwnership] = useMutation(
-    PetitionSharingModal_transferPetitionOwnershipDocument
+    PetitionSharingModal_transferPetitionOwnershipDocument,
   );
   return useCallback(
     async (petitionId: string, user: PetitionSharingModal_UserFragment) => {
@@ -958,7 +958,7 @@ function useTransferPetitionOwnership() {
         });
       } catch {}
     },
-    [confirmTransferPetitionOwnership, transferPetitionOwnership]
+    [confirmTransferPetitionOwnership, transferPetitionOwnership],
   );
 }
 

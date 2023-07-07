@@ -59,7 +59,7 @@ export const NotificationsFilterSelect = forwardRef<
         value: "OTHER",
       },
     ],
-    []
+    [],
   );
 
   const _ref = useRef<SelectInstance<SimpleOption<NotificationsFilter>, false>>(null);

@@ -187,7 +187,7 @@ function Profiles() {
   const showSubscribersDialog = useProfileSubscribersDialog();
   const handleSubscribeClick = useCallback(async () => {
     const isSubscribed = selectedRows.every((row) =>
-      row.subscribers.some((s) => s.user.id === me!.id)
+      row.subscribers.some((s) => s.user.id === me!.id),
     )
       ? true
       : selectedRows.every((row) => row.subscribers.every((s) => s.user.id !== me!.id))
@@ -403,7 +403,7 @@ function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesL
         page: 1,
       })),
     300,
-    [onStateChange]
+    [onStateChange],
   );
 
   const handleSearchChange = useCallback(
@@ -412,7 +412,7 @@ function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesL
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   return (
@@ -529,7 +529,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -654,7 +654,7 @@ Profiles.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) 
     withError(
       state.type && state.type.length === 1
         ? fetchQuery(Profiles_profileTypeDocument, { variables: { profileTypeId: state.type[0] } })
-        : null
+        : null,
     ),
   ]);
   if (error) {
@@ -666,5 +666,5 @@ Profiles.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) 
 export default compose(
   withDialogs,
   withFeatureFlag("PROFILES", "/app/petitions"),
-  withApolloData
+  withApolloData,
 )(Profiles);

@@ -11,13 +11,13 @@ import { BackgroundTaskOptions } from "./backgroundTaskOptions";
 export function useTemplatesOverviewReportBackgroundTask() {
   const apollo = useApolloClient();
   const [reateTemplatesOverviewReportTask] = useMutation(
-    useTemplatesOverviewReportTask_createTemplatesOverviewReportTaskDocument
+    useTemplatesOverviewReportTask_createTemplatesOverviewReportTaskDocument,
   );
 
   return useCallback(
     async (
       variables: useTemplatesOverviewReportTask_createTemplatesOverviewReportTaskMutationVariables,
-      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {}
+      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {},
     ) => {
       const { data: initialData } = await reateTemplatesOverviewReportTask({ variables });
 
@@ -49,7 +49,7 @@ export function useTemplatesOverviewReportBackgroundTask() {
 
       return { task };
     },
-    []
+    [],
   );
 }
 

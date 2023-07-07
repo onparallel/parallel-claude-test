@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.raw(
-    /* sql */ `update organization o set usage_details = o.usage_details - 'SIGNATURIT_SHARED_APIKEY';`
+    /* sql */ `update organization o set usage_details = o.usage_details - 'SIGNATURIT_SHARED_APIKEY';`,
   );
 
   await removeOrganizationUsageLimit(knex, "SIGNATURIT_SHARED_APIKEY");

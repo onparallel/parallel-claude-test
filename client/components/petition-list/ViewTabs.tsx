@@ -147,7 +147,7 @@ export const ViewTabs = Object.assign(
     };
 
     const [markPetitionListViewAsDefault] = useMutation(
-      ViewTabs_markPetitionListViewAsDefaultDocument
+      ViewTabs_markPetitionListViewAsDefaultDocument,
     );
     const createMarkViewAsDefaultClickHandler =
       (view: ViewTabs_PetitionListViewFragment) => async () => {
@@ -296,7 +296,7 @@ export const ViewTabs = Object.assign(
                       onDragStart={createDragStartHandler(view)}
                       onDragEnd={createDragEndHandler(view)}
                     />
-                  )
+                  ),
               )}
             </Flex>
           </RadioTabList>
@@ -361,7 +361,7 @@ export const ViewTabs = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 const _mutations = [

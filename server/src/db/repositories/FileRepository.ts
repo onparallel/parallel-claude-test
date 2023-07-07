@@ -17,13 +17,16 @@ import {
 
 @injectable()
 export class FileRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(LOGGER) public logger: ILogger) {
+  constructor(
+    @inject(KNEX) knex: Knex,
+    @inject(LOGGER) public logger: ILogger,
+  ) {
     super(knex);
   }
 
   readonly loadFileUpload = this.buildLoadBy("file_upload", "id", (q) => q.whereNull("deleted_at"));
   readonly loadFileUploadsByPath = this.buildLoadMultipleBy("file_upload", "path", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   async createFileUpload(data: MaybeArray<CreateFileUpload>, createdBy: string) {
@@ -33,14 +36,14 @@ export class FileRepository extends BaseRepository {
         ...data,
         created_by: createdBy,
         updated_by: createdBy,
-      }))
+      })),
     ).returning("*");
     // Tengo las sospecha de que los errores de 403 vengan de que el orden en que retornamos
     // esto no coincide con el orden de insercion
     if (
       !zip(fileUploads, unMaybeArray(data)).every(
         ([fu, d]) =>
-          fu.content_type === d.content_type && fu.size === d.size && fu.filename === d.filename
+          fu.content_type === d.content_type && fu.size === d.size && fu.filename === d.filename,
       )
     ) {
       this.logger.error(new Error("fileUpload order doesn't match insert data. should guarantee"));
@@ -66,11 +69,11 @@ export class FileRepository extends BaseRepository {
       [
         this.sqlValues(
           ids.map((id, index) => [index, id]),
-          ["int", "int"]
+          ["int", "int"],
         ),
         this.sqlIn(ids),
       ],
-      t
+      t,
     );
   }
 
@@ -82,7 +85,7 @@ export class FileRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       )
       .whereIn("id", unMaybeArray(id))
       .where("upload_complete", false);
@@ -128,11 +131,11 @@ export class FileRepository extends BaseRepository {
               deleted_at: this.now(),
               deleted_by: deletedBy,
             },
-            "*"
+            "*",
           )
           .whereIn("id", idsChunk);
       },
-      { chunkSize: 200, concurrency: 5 }
+      { chunkSize: 200, concurrency: 5 },
     );
   }
 
@@ -147,7 +150,7 @@ export class FileRepository extends BaseRepository {
   }
 
   readonly loadPublicFile = this.buildLoadBy("public_file_upload", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   async createPublicFile(data: CreatePublicFileUpload, createdBy: string, t?: Knex.Transaction) {
@@ -158,7 +161,7 @@ export class FileRepository extends BaseRepository {
         created_by: createdBy,
         updated_by: createdBy,
       },
-      t
+      t,
     ).returning("*");
 
     return rows[0];
@@ -168,7 +171,7 @@ export class FileRepository extends BaseRepository {
     publicFileId: number,
     data: Partial<PublicFileUpload>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [row] = await this.from("public_file_upload", t)
       .where("id", publicFileId)

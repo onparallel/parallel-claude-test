@@ -82,5 +82,5 @@ export const RecipientViewFooter = Object.assign(
         }
       `,
     },
-  }
+  },
 );

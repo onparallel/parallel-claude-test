@@ -29,7 +29,7 @@ async function challengeWebhookUrl(url: string, fetch: IFetchService) {
       } as any,
       body: JSON.stringify({}),
       timeout: 5_000,
-    })
+    }),
   );
   return response?.status === 200 ?? false;
 }
@@ -42,16 +42,16 @@ export const createEventSubscription = mutationField("createEventSubscription", 
       "fromTemplateId",
       and(
         petitionsAreOfTypeTemplate("fromTemplateId" as never),
-        userHasAccessToPetitions("fromTemplateId" as never)
-      )
+        userHasAccessToPetitions("fromTemplateId" as never),
+      ),
     ),
     ifArgDefined(
       "fromTemplateFieldIds",
       and(
         argIsDefined("fromTemplateId"),
-        petitionFieldsBelongsToTemplate("fromTemplateFieldIds" as never, "fromTemplateId" as never)
-      )
-    )
+        petitionFieldsBelongsToTemplate("fromTemplateFieldIds" as never, "fromTemplateId" as never),
+      ),
+    ),
   ),
   args: {
     eventsUrl: nonNull(stringArg()),
@@ -62,14 +62,14 @@ export const createEventSubscription = mutationField("createEventSubscription", 
   },
   validateArgs: validateAnd(
     validUrl((args) => args.eventsUrl, "eventsUrl"),
-    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds")
+    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds"),
   ),
   resolve: async (_, args, ctx) => {
     const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch);
     if (!challengePassed) {
       throw new ApolloError(
         "Your URL does not seem to accept POST requests.",
-        "WEBHOOK_CHALLENGE_FAILED"
+        "WEBHOOK_CHALLENGE_FAILED",
       );
     }
     return await ctx.subscriptions.createSubscription(
@@ -82,7 +82,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
         from_template_id: args.fromTemplateId,
         from_template_field_ids: args.fromTemplateFieldIds,
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -96,16 +96,16 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
       "fromTemplateId",
       and(
         petitionsAreOfTypeTemplate("fromTemplateId" as never),
-        userHasAccessToPetitions("fromTemplateId" as never)
-      )
+        userHasAccessToPetitions("fromTemplateId" as never),
+      ),
     ),
     ifArgDefined(
       "fromTemplateFieldIds",
       and(
         argIsDefined("fromTemplateId"),
-        petitionFieldsBelongsToTemplate("fromTemplateFieldIds" as never, "fromTemplateId" as never)
-      )
-    )
+        petitionFieldsBelongsToTemplate("fromTemplateFieldIds" as never, "fromTemplateId" as never),
+      ),
+    ),
   ),
   args: {
     id: nonNull(globalIdArg("PetitionEventSubscription")),
@@ -118,7 +118,7 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
   },
   validateArgs: validateAnd(
     validUrl((args) => args.eventsUrl, "eventsUrl"),
-    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds")
+    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds"),
   ),
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionEventSubscription> = {};
@@ -130,7 +130,7 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
       if (!challengePassed) {
         throw new ApolloError(
           "Your URL does not seem to accept POST requests.",
-          "WEBHOOK_CHALLENGE_FAILED"
+          "WEBHOOK_CHALLENGE_FAILED",
         );
       }
       data.endpoint = args.eventsUrl;
@@ -164,7 +164,7 @@ export const deleteEventSubscriptions = mutationField("deleteEventSubscriptions"
       await ctx.subscriptions.deleteSubscriptions(ids, `User:${ctx.user!.id}`);
       await ctx.subscriptions.deleteEventSubscriptionSignatureKeysBySubscriptionIds(
         ids,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       return RESULT.SUCCESS;
     } catch {}
@@ -179,7 +179,7 @@ export const createEventSubscriptionSignatureKey = mutationField(
     type: "EventSubscriptionSignatureKey",
     authorize: authenticateAnd(
       userHasAccessToEventSubscription("subscriptionId"),
-      eventSubscriptionHasSignatureKeysLessThan("subscriptionId", 5)
+      eventSubscriptionHasSignatureKeysLessThan("subscriptionId", 5),
     ),
     args: {
       subscriptionId: nonNull(globalIdArg("PetitionEventSubscription")),
@@ -192,10 +192,10 @@ export const createEventSubscriptionSignatureKey = mutationField(
           public_key: publicKey.toString("base64"),
           private_key: ctx.encryption.encrypt(privateKey.toString("base64"), "base64"),
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     },
-  }
+  },
 );
 
 export const deleteEventSubscriptionSignatureKeys = mutationField(
@@ -214,5 +214,5 @@ export const deleteEventSubscriptionSignatureKeys = mutationField(
       } catch {}
       return RESULT.FAILURE;
     },
-  }
+  },
 );

@@ -74,7 +74,7 @@ export interface PetitionComposeAttachmentsProps {
 export const PetitionComposeAttachments = Object.assign(
   chakraForwardRef<"div", PetitionComposeAttachmentsProps>(function PetitionComposeAttachments(
     { petition, isReadOnly, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
 
@@ -82,7 +82,7 @@ export const PetitionComposeAttachments = Object.assign(
     const attachmentsList = petition.attachmentsList;
     const isTemplate = petition?.__typename === "PetitionTemplate";
     const hasDocumentFieldsWithAttachments = petition.fields.some(
-      (field) => isFileTypeField(field.type) && field.options.attachToPdf
+      (field) => isFileTypeField(field.type) && field.options.attachToPdf,
     );
     const { FRONT, ANNEX, BACK } = attachmentsList;
 
@@ -95,7 +95,7 @@ export const PetitionComposeAttachments = Object.assign(
     const totalMaxFilesSizeExceeded =
       sumBy(
         allAttachments.filter((item) => item.file.isComplete),
-        (item) => item.file.size
+        (item) => item.file.size,
       ) > TOTAL_MAX_FILES_SIZE;
 
     const uploads = useRef<Record<string, AbortController>>({});
@@ -104,26 +104,26 @@ export const PetitionComposeAttachments = Object.assign(
     >({});
 
     const [createPetitionAttachmentUploadLink] = useMutation(
-      PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument
+      PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument,
     );
     const [petitionAttachmentUploadComplete] = useMutation(
-      PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument
+      PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument,
     );
 
     const [deletePetitionAttachment] = useMutation(
-      PetitionComposeAttachments_deletePetitionAttachmentDocument
+      PetitionComposeAttachments_deletePetitionAttachmentDocument,
     );
 
     const [petitionAttachmentDownloadLink] = useMutation(
-      PetitionComposeAttachments_petitionAttachmentDownloadLinkDocument
+      PetitionComposeAttachments_petitionAttachmentDownloadLinkDocument,
     );
 
     const [reorderPetitionAttachments] = useMutation(
-      PetitionComposeAttachments_reorderPetitionAttachmentsDocument
+      PetitionComposeAttachments_reorderPetitionAttachmentsDocument,
     );
 
     const [updatePetitionAttachmentType] = useMutation(
-      PetitionComposeAttachments_updatePetitionAttachmentTypeDocument
+      PetitionComposeAttachments_updatePetitionAttachmentTypeDocument,
     );
 
     useEffect(() => {
@@ -134,7 +134,7 @@ export const PetitionComposeAttachments = Object.assign(
 
     function updateAttachmentUploadingStatus(
       cache: DataProxy,
-      attachment: PetitionComposeAttachments_PetitionAttachmentFragment
+      attachment: PetitionComposeAttachments_PetitionAttachmentFragment,
     ) {
       updateFragment(cache, {
         fragment: PetitionComposeAttachments_PetitionBaseFragmentDoc,
@@ -166,13 +166,13 @@ export const PetitionComposeAttachments = Object.assign(
           });
           const { url } = data!.petitionAttachmentDownloadLink;
           return url!;
-        })
+        }),
       );
     };
 
     const handleReorderAttachments = async (
       attachmentType: PetitionAttachmentType,
-      attachmentIds: string[]
+      attachmentIds: string[],
     ) => {
       await reorderPetitionAttachments({
         variables: { petitionId, attachmentIds, attachmentType },
@@ -182,7 +182,7 @@ export const PetitionComposeAttachments = Object.assign(
     const handleChangeType = async (
       attachmentId: string,
       fromType: PetitionAttachmentType,
-      toType: PetitionAttachmentType
+      toType: PetitionAttachmentType,
     ) => {
       if (fromType !== toType) {
         await updatePetitionAttachmentType({
@@ -220,7 +220,7 @@ export const PetitionComposeAttachments = Object.assign(
                     values={{ count: 10 }}
                   />
                 ),
-              })
+              }),
             );
           }
 
@@ -241,7 +241,7 @@ export const PetitionComposeAttachments = Object.assign(
                 values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
               />
             ),
-          })
+          }),
         );
       },
       onDrop: async (files: File[], filesRejection: FileRejection[]) => {
@@ -307,7 +307,7 @@ export const PetitionComposeAttachments = Object.assign(
               },
             });
           },
-          { concurrency: 3 }
+          { concurrency: 3 },
         );
       },
       onDragEnter: async (e) => {
@@ -421,14 +421,14 @@ export const PetitionComposeAttachments = Object.assign(
                           onDragEnd={() =>
                             handleReorderAttachments(
                               position,
-                              list.map((item) => item.id)
+                              list.map((item) => item.id),
                             )
                           }
                         />
                       );
                     })}
                   </Stack>
-                ) : null
+                ) : null,
               )}
             </Stack>
           ) : (
@@ -524,7 +524,7 @@ export const PetitionComposeAttachments = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 const _mutations = [
@@ -636,7 +636,7 @@ interface AttachmentItemProps {
   onChangeType: (
     id: string,
     fromType: PetitionAttachmentType,
-    toType: PetitionAttachmentType
+    toType: PetitionAttachmentType,
   ) => void;
   onDragEnd: () => void;
 }
@@ -654,7 +654,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
     onDragEnd,
     ...props
   },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const dragControls = useDragControls();

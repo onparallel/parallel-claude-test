@@ -57,13 +57,13 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   useAutoConfirmDiscardChangesDialog(isDirty);
 
   const fontProperties = (["title1", "title2", "text"] as const).flatMap((k) =>
-    (["FontFamily", "FontSize", "Color"] as const).map((p) => `${k}${p}` as const)
+    (["FontFamily", "FontSize", "Color"] as const).map((p) => `${k}${p}` as const),
   );
   const data = watch();
   const defaultFontValues = [16, 14, 12].flatMap((s) => ["IBM Plex Sans", s, "#000000"]);
   const canRestoreFonts = zip(
     fontProperties.map((p) => data[p]),
-    defaultFontValues
+    defaultFontValues,
   ).some(([a, b]) => a !== b);
   async function handleRestoreFonts() {
     for (const [prop, value] of zip(fontProperties, defaultFontValues)) {
@@ -72,12 +72,12 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   }
 
   const [deleteOrganizationPdfDocumentTheme] = useMutation(
-    BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeDocument
+    BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeDocument,
   );
 
   const showCreateOrUpdateDocumentThemeDialog = useCreateOrUpdateDocumentThemeDialog();
   const [createOrganizationPdfDocumentTheme] = useMutation(
-    BrandingDocumentTheme_createOrganizationPdfDocumentThemeDocument
+    BrandingDocumentTheme_createOrganizationPdfDocumentThemeDocument,
   );
   async function handleCreateNewDocumentTheme() {
     try {
@@ -94,7 +94,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   }
 
   const [updateOrganizationPdfDocumentTheme] = useMutation(
-    BrandingDocumentTheme_updateOrganizationPdfDocumentThemeDocument
+    BrandingDocumentTheme_updateOrganizationPdfDocumentThemeDocument,
   );
   const showConfirmDeleteThemeDialog = useConfirmDeleteThemeDialog();
   async function handleEditDocumentTheme() {
@@ -107,7 +107,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       });
       if (isDefined(data)) {
         const theme = data.updateOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
-          (t) => t.id === selectedTheme.id
+          (t) => t.id === selectedTheme.id,
         )!;
         reset(theme.data);
         setSelectedTheme(theme);
@@ -121,7 +121,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           });
           if (isDefined(data)) {
             setSelectedTheme(
-              data.deleteOrganizationPdfDocumentTheme.pdfDocumentThemes.find((t) => t.isDefault)!
+              data.deleteOrganizationPdfDocumentTheme.pdfDocumentThemes.find((t) => t.isDefault)!,
             );
           }
         } catch {}
@@ -157,7 +157,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           });
           if (isDefined(data)) {
             const theme = data.updateOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
-              (t) => t.id === selectedTheme.id
+              (t) => t.id === selectedTheme.id,
             )!;
             reset(theme.data);
           }

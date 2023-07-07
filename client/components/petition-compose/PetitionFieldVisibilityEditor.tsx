@@ -78,7 +78,7 @@ export function PetitionFieldVisibilityEditor({
           [
             pick(field, ["id", "type", "title", "multiple", "isReadOnly", "options"]),
             index,
-          ] as const
+          ] as const,
       );
     const _fields: (typeof pairs)[0][0][] = [];
     const _indices: (typeof pairs)[0][1][] = [];
@@ -356,13 +356,13 @@ function ConditionMultipleFieldModifier({
         return options;
       }
     },
-    [field.type, condition.column]
+    [field.type, condition.column],
   );
   const handleChange = useCallback(
     (value: PetitionFieldVisibilityConditionModifier | null) => {
       onChange(updateConditionModifier(condition, field, value!));
     },
-    [onChange, condition, field]
+    [onChange, condition, field],
   );
 
   return (
@@ -412,7 +412,7 @@ function ConditionPredicate({
           { label: "<", value: "LESS_THAN" },
           { label: ">", value: "GREATER_THAN" },
           { label: "≤", value: "LESS_THAN_OR_EQUAL" },
-          { label: "≥", value: "GREATER_THAN_OR_EQUAL" }
+          { label: "≥", value: "GREATER_THAN_OR_EQUAL" },
         );
       } else if (field.type === "DATE" || field.type === "DATE_TIME") {
         options.push(
@@ -457,7 +457,7 @@ function ConditionPredicate({
               defaultMessage: "is after the (incl.)",
             }),
             value: "GREATER_THAN_OR_EQUAL",
-          }
+          },
         );
       } else if (field.type === "CHECKBOX") {
         options.push(
@@ -481,7 +481,7 @@ function ConditionPredicate({
               defaultMessage: "no. of selected",
             }),
             value: "NUMBER_OF_SUBREPLIES",
-          }
+          },
         );
       } else if (
         field.type === "SELECT" ||
@@ -494,7 +494,7 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.equal-select",
                 defaultMessage: "{modifier, select, ALL {are} other {is}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "EQUAL",
           },
@@ -504,7 +504,7 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.not-equal-select",
                 defaultMessage: "{modifier, select, ALL {are not} other {is not}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "NOT_EQUAL",
           },
@@ -514,7 +514,7 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.is-one-of-select",
                 defaultMessage: "{modifier, select, ALL {are one of} other {is one of}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "IS_ONE_OF",
           },
@@ -524,10 +524,10 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.not-is-one-of-select",
                 defaultMessage: "{modifier, select, ALL {are not one of} other {is not one of}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "NOT_IS_ONE_OF",
-          }
+          },
         );
       } else if (!isFileTypeField(field.type) && field.type !== "DYNAMIC_SELECT") {
         options.push(
@@ -537,7 +537,7 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.equal-default",
                 defaultMessage: "{modifier, select, ALL {are equal to} other {is equal to}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "EQUAL",
           },
@@ -548,7 +548,7 @@ function ConditionPredicate({
                 defaultMessage:
                   "{modifier, select, ALL {are not equal to} other {is not equal to}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "NOT_EQUAL",
           },
@@ -558,7 +558,7 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.start-with-default",
                 defaultMessage: "{modifier, select, ALL {start with} other {starts with}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "START_WITH",
           },
@@ -568,7 +568,7 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.end-with-default",
                 defaultMessage: "{modifier, select, ALL {end with} other {ends with}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "END_WITH",
           },
@@ -578,7 +578,7 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.contain-default",
                 defaultMessage: "{modifier, select, ALL {contain} other {contains}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "CONTAIN",
           },
@@ -588,10 +588,10 @@ function ConditionPredicate({
                 id: "component.petition-field-visibility-editor.not-contain-default",
                 defaultMessage: "{modifier, select, ALL {do not contain} other {does not contain}}",
               },
-              { modifier: condition.modifier }
+              { modifier: condition.modifier },
             ),
             value: "NOT_CONTAIN",
-          }
+          },
         );
       }
       if (!field.multiple) {
@@ -609,12 +609,12 @@ function ConditionPredicate({
               defaultMessage: "does not have replies",
             }),
             value: "NOT_HAVE_REPLY",
-          }
+          },
         );
       }
       return options;
     },
-    [field.type, field.multiple, condition.modifier]
+    [field.type, field.multiple, condition.modifier],
   );
   const operator =
     !field.multiple && condition.modifier === "NUMBER_OF_REPLIES"
@@ -626,7 +626,7 @@ function ConditionPredicate({
     function (operator: PseudoPetitionFieldVisibilityConditionOperator | null) {
       onChange(updateConditionOperator(condition, field, operator!));
     },
-    [onChange, condition, field]
+    [onChange, condition, field],
   );
 
   return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
@@ -766,7 +766,7 @@ function ConditionPredicateValueDatetime({
   const [value, setValue] = useState(
     condition.value && typeof condition.value === "string"
       ? dateToDatetimeLocal(condition.value)
-      : null
+      : null,
   );
 
   return (
@@ -874,7 +874,7 @@ function ConditionPredicateValueSelect({
         ? (field.options as FieldOptions["CHECKBOX"]).values
         : getDynamicSelectValues(
             (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
-            condition.column!
+            condition.column!,
           );
     return uniq(values)
       .sort((a, b) => a.localeCompare(b))
@@ -933,7 +933,7 @@ function ConditionPredicateValueString({
 }
 
 function VisibilityOperatorSelect(
-  props: Omit<SimpleSelectProps<PetitionFieldVisibilityOperator>, "options">
+  props: Omit<SimpleSelectProps<PetitionFieldVisibilityOperator>, "options">,
 ) {
   const options = useSimpleSelectOptions(
     (intl) => [
@@ -952,7 +952,7 @@ function VisibilityOperatorSelect(
         }),
       },
     ],
-    []
+    [],
   );
   return (
     <SimpleSelect
@@ -965,7 +965,7 @@ function VisibilityOperatorSelect(
 }
 
 function VisibilityTypeSelect(
-  props: Omit<SimpleSelectProps<PetitionFieldVisibilityType>, "options">
+  props: Omit<SimpleSelectProps<PetitionFieldVisibilityType>, "options">,
 ) {
   const intl = useIntl();
   const options = useSimpleSelectOptions(
@@ -985,7 +985,7 @@ function VisibilityTypeSelect(
         }),
       },
     ],
-    []
+    [],
   );
 
   return (

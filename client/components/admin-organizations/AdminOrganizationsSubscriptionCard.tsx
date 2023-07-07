@@ -14,7 +14,7 @@ export const AdminOrganizationsSubscriptionCard = chakraForwardRef<
   AdminOrganizationsSubscriptionCardProps
 >(function AdminOrganizationsSubscriptionCard(
   { headerLabel, buttonLabel, onAction, children, ...props },
-  ref
+  ref,
 ) {
   return (
     <Card display="flex" flexDirection="column" ref={ref} {...props}>

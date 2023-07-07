@@ -100,7 +100,7 @@ export const PetitionSignatureRequest = objectType({
         return o.cancel_reason === "REQUEST_ERROR" &&
           isDefined(o.cancel_data?.error_code) &&
           ["SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", "EMAIL_BOUNCED"].includes(
-            o.cancel_data.error_code
+            o.cancel_data.error_code,
           ) &&
           typeof o.cancel_data.error === "string"
           ? o.cancel_data.error ?? null
@@ -117,7 +117,7 @@ export const PetitionSignatureRequest = objectType({
       description: "The environment of the petition signature.",
       resolve: async (root, _, ctx) => {
         const integration = (await ctx.integrations.loadIntegration(
-          root.signature_config.orgIntegrationId
+          root.signature_config.orgIntegrationId,
         ))!;
         return integration?.settings.ENVIRONMENT === "production" ? "PRODUCTION" : "DEMO";
       },

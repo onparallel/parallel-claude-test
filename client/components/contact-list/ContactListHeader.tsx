@@ -33,7 +33,7 @@ export function ContactListHeader({
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
   return (
     <Stack direction="row" padding={2}>

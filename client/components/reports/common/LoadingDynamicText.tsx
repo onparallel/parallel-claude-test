@@ -31,7 +31,7 @@ export function LoadingDynamicText() {
         defaultMessage: "Calculating average times with a calculator...",
       }),
     ],
-    [intl.locale]
+    [intl.locale],
   );
   const [index, setIndex] = useState(0);
   useInterval(() => setIndex((curr) => (curr + 1) % loadingTexts.length), SHOW_TIME, [

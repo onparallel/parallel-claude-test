@@ -34,7 +34,7 @@ type SignatureCredentials<TProvider extends SignatureOrgIntegrationProvider> = {
 }[TProvider];
 
 interface AddSignatureCredentialsDialogData<
-  TProvider extends SignatureOrgIntegrationProvider = any
+  TProvider extends SignatureOrgIntegrationProvider = any,
 > {
   name: string;
   provider: TProvider;
@@ -82,7 +82,7 @@ function AddSignatureCredentialsDialog({
   }
 
   const [createSignaturitIntegration] = useMutation(
-    useAddSignatureCredentialsDialog_createSignaturitIntegrationDocument
+    useAddSignatureCredentialsDialog_createSignaturitIntegrationDocument,
   );
 
   return (
@@ -124,7 +124,7 @@ function AddSignatureCredentialsDialog({
                     id: "component.add-signature-credentials-dialog.toast-description",
                     defaultMessage: "{provider} integration created successfully.",
                   },
-                  { provider: "Docusign" }
+                  { provider: "Docusign" },
                 ),
               });
             } catch (e) {

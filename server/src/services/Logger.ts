@@ -31,7 +31,7 @@ export function createLogger({ container }: interfaces.Context): ILogger {
             ? winston.format.simple()
             : winston.format.combine(
                 winston.format.colorize({ level: true }),
-                winston.format.simple()
+                winston.format.simple(),
               ),
       }),
       ...(process.env.NODE_ENV === "production"

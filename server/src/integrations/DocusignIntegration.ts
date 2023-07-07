@@ -47,13 +47,16 @@ export class DocusignIntegration extends OAuthIntegration<
     @inject(IntegrationRepository) integrations: IntegrationRepository,
     @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(FETCH_SERVICE) private fetch: FetchService,
-    @inject(ENCRYPTION_SERVICE) protected override encryption: EncryptionService
+    @inject(ENCRYPTION_SERVICE) protected override encryption: EncryptionService,
   ) {
     super(encryption, integrations, redis);
   }
 
   protected override getContext(
-    integration: Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE", "DOCUSIGN"> }>
+    integration: Replace<
+      OrgIntegration,
+      { settings: IntegrationSettings<"SIGNATURE", "DOCUSIGN"> }
+    >,
   ): DocusignIntegrationContext {
     return {
       environment: integration.settings.ENVIRONMENT,
@@ -91,14 +94,14 @@ export class DocusignIntegration extends OAuthIntegration<
 
   private basicAuthorization(environment: DocusignEnvironment) {
     return `Basic ${Buffer.from(
-      this.integrationKey(environment) + ":" + this.secretKey(environment)
+      this.integrationKey(environment) + ":" + this.secretKey(environment),
     ).toString("base64")}`;
   }
 
   private async apiRequest<T>(
     environment: DocusignEnvironment,
     url: string,
-    init: RequestInit
+    init: RequestInit,
   ): Promise<T> {
     const response = await this.fetch.fetch(`${this.baseUri(environment)}${url}`, {
       ...omit(init, ["headers"]),
@@ -128,7 +131,7 @@ export class DocusignIntegration extends OAuthIntegration<
 
   protected async fetchIntegrationSettings(
     code: string,
-    { environment }: DocusignIntegrationState
+    { environment }: DocusignIntegrationState,
   ): Promise<IntegrationSettings<"SIGNATURE", "DOCUSIGN">> {
     const data = await this.apiRequest<TokenResponse>(environment, "/token", {
       method: "POST",
@@ -152,7 +155,7 @@ export class DocusignIntegration extends OAuthIntegration<
 
   protected async refreshCredentials(
     credentials: OauthCredentials,
-    { environment }: DocusignIntegrationContext
+    { environment }: DocusignIntegrationContext,
   ): Promise<OauthCredentials> {
     try {
       const data = await this.apiRequest<TokenResponse>(environment, "/token", {
@@ -183,7 +186,7 @@ export class DocusignIntegration extends OAuthIntegration<
 
   protected override async orgHasAccessToIntegration(
     orgId: number,
-    state: DocusignIntegrationState
+    state: DocusignIntegrationState,
   ) {
     const ffs: FeatureFlagName[] = ["PETITION_SIGNATURE"];
     if (state.environment === "sandbox") {

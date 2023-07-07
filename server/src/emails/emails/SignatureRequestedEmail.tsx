@@ -31,7 +31,7 @@ const email: Email<SignatureRequestedProps> = {
   },
   text(
     { signerName: fullName, documentName, signButton, emailBody, theme }: SignatureRequestedProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       ${greetingContact({ name: fullName, fullName, tone: theme.preferredTone }, intl)}
@@ -42,7 +42,7 @@ const email: Email<SignatureRequestedProps> = {
           defaultMessage:
             "You have received a signature request to sign a document titled {documentName}.",
         },
-        { documentName, tone: theme.preferredTone }
+        { documentName, tone: theme.preferredTone },
       )}
 
       ${emailBody}

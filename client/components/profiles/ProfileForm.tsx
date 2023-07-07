@@ -55,7 +55,7 @@ interface ProfileFormProps {
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
     { profile, refetch, overlapsIntercomBadge, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const showErrorDialog = useErrorDialog();
@@ -63,7 +63,7 @@ export const ProfileForm = Object.assign(
 
     const [properties, hiddenProperties] = partition(
       profile.properties,
-      (property) => property.field.myPermission !== "HIDDEN"
+      (property) => property.field.myPermission !== "HIDDEN",
     );
 
     const mapPropertiesToFields = (properties: ProfileForm_ProfileFieldPropertyFragment[]) => {
@@ -131,10 +131,10 @@ export const ProfileForm = Object.assign(
     const [updateProfileFieldValue] = useMutation(ProfileForm_updateProfileFieldValueDocument);
 
     const [createProfileFieldFileUploadLink] = useMutation(
-      ProfileForm_createProfileFieldFileUploadLinkDocument
+      ProfileForm_createProfileFieldFileUploadLinkDocument,
     );
     const [profileFieldFileUploadComplete] = useMutation(
-      ProfileForm_profileFieldFileUploadCompleteDocument
+      ProfileForm_profileFieldFileUploadCompleteDocument,
     );
 
     const [deleteProfileFieldFile] = useMutation(ProfileForm_deleteProfileFieldFileDocument);
@@ -152,7 +152,7 @@ export const ProfileForm = Object.assign(
         onSubmit={handleSubmit(async (formData) => {
           try {
             const editedFields = formData.fields.filter(
-              (_, i) => formState.dirtyFields.fields?.[i]
+              (_, i) => formState.dirtyFields.fields?.[i],
             );
 
             const [fileFields, fields] = partition(editedFields, (field) => field.type === "FILE");
@@ -163,7 +163,7 @@ export const ProfileForm = Object.assign(
                   profileId: profile.id,
                   fields: fields.map(({ content, profileTypeFieldId, expiryDate }) => {
                     const prop = profile.properties?.find(
-                      (prop) => prop.field.id === profileTypeFieldId
+                      (prop) => prop.field.id === profileTypeFieldId,
                     );
 
                     const useValueAsExpiryDate =
@@ -255,7 +255,7 @@ export const ProfileForm = Object.assign(
                     },
                     {
                       concurrency: 3,
-                    }
+                    },
                   );
 
                   await profileFieldFileUploadComplete({
@@ -271,7 +271,7 @@ export const ProfileForm = Object.assign(
               },
               {
                 concurrency: 1,
-              }
+              },
             );
 
             await refetch();
@@ -284,7 +284,7 @@ export const ProfileForm = Object.assign(
                     defaultMessage:
                       "You exceeded the maximum amount of files you can upload on the field.",
                   }),
-                })
+                }),
               );
             } else {
               throw e;
@@ -490,7 +490,7 @@ export const ProfileForm = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 function EditedFieldsAlert({

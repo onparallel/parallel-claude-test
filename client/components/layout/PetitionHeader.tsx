@@ -91,7 +91,7 @@ export interface PetitionHeaderInstance {
 export const PetitionHeader = Object.assign(
   chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(function PetitionHeader(
     { petition, me, onUpdatePetition, section: current, actions, onRefetch, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const router = useRouter();
@@ -152,7 +152,7 @@ export const PetitionHeader = Object.assign(
     };
 
     const [updatePetitionPermissionSubscription] = useMutation(
-      PetitionHeader_updatePetitionPermissionSubscriptionDocument
+      PetitionHeader_updatePetitionPermissionSubscriptionDocument,
     );
     const handleUpdatePetitionPermissionSubscription = async function (isSubscribed: boolean) {
       await updatePetitionPermissionSubscription({
@@ -305,7 +305,7 @@ export const PetitionHeader = Object.assign(
                 },
               },
             ],
-      [status, petition.isRestricted, intl.locale]
+      [status, petition.isRestricted, intl.locale],
     );
 
     const [reopenPetition] = useMutation(PetitionHeader_reopenPetitionDocument);
@@ -334,7 +334,7 @@ export const PetitionHeader = Object.assign(
       intl.formatMessage({
         id: "component.petition-header.import-replies-error",
         defaultMessage: "Failed to import data",
-      })
+      }),
     );
 
     const showImportRepliesDialog = useImportRepliesDialog();
@@ -360,7 +360,7 @@ export const PetitionHeader = Object.assign(
     };
 
     const [associateProfileToPetition] = useMutation(
-      PetitionsHeader_associateProfileToPetitionDocument
+      PetitionsHeader_associateProfileToPetitionDocument,
     );
     const showAssociateProfileToPetitionDialog = useAssociateProfileToPetitionDialog();
     const handleProfilesClick = async (forceAssociateNewProfile?: boolean) => {
@@ -487,7 +487,7 @@ export const PetitionHeader = Object.assign(
                   fontWeight="normal"
                   onClick={() =>
                     handleProfilesClick(
-                      petition.profiles.length === 0 && myEffectivePermission !== "READ"
+                      petition.profiles.length === 0 && myEffectivePermission !== "READ",
                     )
                   }
                   isDisabled={isAnonymized}
@@ -813,7 +813,7 @@ export const PetitionHeader = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 const _fragments = {

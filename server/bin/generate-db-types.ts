@@ -61,7 +61,7 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K
       ({ name, values }) => `
 export type ${name} = ${values.map((value) => `"${value}"`).join(" | ")};
         
-export const ${name}Values = [${values.map((value) => `"${value}"`).join(", ")}] as ${name}[];`
+export const ${name}Values = [${values.map((value) => `"${value}"`).join(", ")}] as ${name}[];`,
     )
     .join("\n")}
 
@@ -102,7 +102,7 @@ export interface ${table.name} {
             .concat(
               ...c.comment.split("\n").map((line) => ` * ${line.replaceAll("*/", "*\\/")}`),
               " */",
-              definition
+              definition,
             )
             .join("\n")
         : definition;
@@ -116,7 +116,7 @@ export type Create${table.name} = PartialProps<
     .filter((c) => c.name !== table.primaryKey && (c.hasDefault || c.isNullable))
     .map((c) => `"${c.name}"`)
     .join("|")}
->;`
+>;`,
     )
     .join("\n")}
   `;
@@ -124,7 +124,7 @@ export type Create${table.name} = PartialProps<
   const prettierOptions = await fs.readFile(path.join(__dirname, "../../.prettierrc"), "utf-8");
   await fs.writeFile(
     dist,
-    format(contents, { parser: "typescript", ...JSON.parse(prettierOptions) })
+    format(contents, { parser: "typescript", ...JSON.parse(prettierOptions) }),
   );
 }
 
@@ -190,9 +190,9 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
       from information_schema.columns
         where table_name in (${tables.map(() => "?").join(", ")})
     `,
-      [...tables]
+      [...tables],
     ),
-    (c) => c.table_name
+    (c) => c.table_name,
   );
   const primaryKeys = indexBy(
     await query<{ table_name: string; column_name: string }>(
@@ -205,9 +205,9 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
         where tc.constraint_type = 'PRIMARY KEY'
           and tc.table_name in (${tables.map(() => "?").join(", ")})
     `,
-      [...tables]
+      [...tables],
     ),
-    (pk) => pk.table_name
+    (pk) => pk.table_name,
   );
 
   const comments = await query<{
@@ -244,13 +244,13 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
           hasDefault: !!column.column_default,
           position: column.ordinal_position,
           comment: comments.find(
-            (c) => c.table_name === tableName && c.column_name === column.column_name
+            (c) => c.table_name === tableName && c.column_name === column.column_name,
           )?.description,
           _: column,
         })),
         primaryKey: primaryKeys[tableName].column_name,
       },
-    ])
+    ]),
   );
 }
 

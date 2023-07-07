@@ -87,7 +87,7 @@ export interface IAuth {
       organizationUser: string;
       locale: UserLocale;
     },
-    sendInviteEmail?: boolean
+    sendInviteEmail?: boolean,
   ): Promise<string>;
   signUpUser(
     email: string,
@@ -96,14 +96,14 @@ export interface IAuth {
     lastName: string,
     clientMetadata: {
       locale: UserLocale;
-    }
+    },
   ): Promise<string>;
   deleteUser(email: string): Promise<void>;
   resendVerificationCode(
     email: string,
     clientMetadata: {
       locale: UserLocale;
-    }
+    },
   ): Promise<void>;
 
   resetUserPassword(
@@ -112,7 +112,7 @@ export interface IAuth {
       organizationName: string;
       organizationUser: string;
       locale: UserLocale;
-    }
+    },
   ): Promise<void>;
 }
 
@@ -136,7 +136,7 @@ export class Auth implements IAuth {
     private integrations: IntegrationRepository,
     private users: UserRepository,
     private userAuthentication: UserAuthenticationRepository,
-    private system: SystemRepository
+    private system: SystemRepository,
   ) {}
 
   @Memoize() private get cognitoIdP() {
@@ -159,7 +159,7 @@ export class Auth implements IAuth {
       organizationUser: string;
       locale: UserLocale;
     },
-    sendInviteEmail?: boolean
+    sendInviteEmail?: boolean,
   ) {
     try {
       const user = await this.getUser(email);
@@ -187,7 +187,7 @@ export class Auth implements IAuth {
               { Name: "family_name", Value: lastName },
             ],
             ClientMetadata: clientMetadata,
-          })
+          }),
         );
         return res.User!.Username!;
       }
@@ -206,7 +206,7 @@ export class Auth implements IAuth {
     lastName: string,
     clientMetadata: {
       locale: UserLocale;
-    }
+    },
   ) {
     const res = await this.cognitoIdP.send(
       new SignUpCommand({
@@ -219,7 +219,7 @@ export class Auth implements IAuth {
           { Name: "given_name", Value: firstName },
           { Name: "family_name", Value: lastName },
         ],
-      })
+      }),
     );
 
     return res.UserSub!;
@@ -230,7 +230,7 @@ export class Auth implements IAuth {
       new AdminDeleteUserCommand({
         Username: email,
         UserPoolId: this.config.cognito.defaultPoolId,
-      })
+      }),
     );
   }
 
@@ -238,14 +238,14 @@ export class Auth implements IAuth {
     email: string,
     clientMetadata: {
       locale: UserLocale;
-    }
+    },
   ) {
     await this.cognitoIdP.send(
       new ResendConfirmationCodeCommand({
         ClientId: this.config.cognito.clientId,
         Username: email,
         ClientMetadata: clientMetadata,
-      })
+      }),
     );
   }
 
@@ -279,7 +279,7 @@ export class Auth implements IAuth {
               orgId: org.id.toString(),
               ...(locale ? { locale: locale.toString() } : {}),
               ...(redirect ? { redirect: redirect.toString() } : {}),
-            }).toString()
+            }).toString(),
           ).toString("base64"),
         })}`;
         res.json({ type: "SSO", url });
@@ -297,7 +297,7 @@ export class Auth implements IAuth {
         throw new Error("Invalid state");
       }
       const state = new URLSearchParams(
-        Buffer.from(req.query.state as string, "base64").toString("ascii")
+        Buffer.from(req.query.state as string, "base64").toString("ascii"),
       );
       const orgId = state.has("orgId") ? parseInt(state.get("orgId")!) : null;
       if (!isDefined(orgId) || Number.isNaN(orgId)) {
@@ -314,7 +314,7 @@ export class Auth implements IAuth {
           `${protocol}://${org.custom_host}/api/auth/callback?${new URLSearchParams({
             code: req.query.code as string,
             state: req.query.state as string,
-          })}`
+          })}`,
         );
       }
       const url = `https://${this.config.cognito.domain}/oauth2/token?${new URLSearchParams({
@@ -361,7 +361,7 @@ export class Auth implements IAuth {
             },
             preferred_locale: preferredLocale,
           },
-          `OrganizationSSO:${org.id}`
+          `OrganizationSSO:${org.id}`,
         );
       } else {
         if (userData) {
@@ -378,14 +378,14 @@ export class Auth implements IAuth {
                 cognito_id: cognitoId,
                 is_sso_user: true,
               },
-              `OrganizationSSO:${org.id}`
+              `OrganizationSSO:${org.id}`,
             );
           }
           if (user.external_id !== externalId) {
             await this.users.updateUserById(
               user.id,
               { external_id: externalId },
-              `OrganizationSSO:${org.id}`
+              `OrganizationSSO:${org.id}`,
             );
           }
         }
@@ -467,7 +467,7 @@ export class Auth implements IAuth {
         auth.Session!,
         email,
         newPassword,
-        this.getContextData(req)
+        this.getContextData(req),
       );
       if (challenge.AuthenticationResult) {
         const user = await this.getUserFromAuthenticationResult(challenge.AuthenticationResult);
@@ -480,7 +480,7 @@ export class Auth implements IAuth {
             Username: email,
             UserPoolId: this.config.cognito.defaultPoolId,
             UserAttributes: [{ Name: "email_verified", Value: "true" }],
-          })
+          }),
         );
         await this.trackSessionLogin(user);
         const token = await this.storeSessionInRedis(challenge.AuthenticationResult as any);
@@ -512,7 +512,7 @@ export class Auth implements IAuth {
             ClientId: this.config.cognito.clientId,
             Username: email,
             ClientMetadata: { locale },
-          })
+          }),
         );
         res.status(204).send();
       }
@@ -553,7 +553,7 @@ export class Auth implements IAuth {
           Username: email,
           Password: newPassword,
           ConfirmationCode: verificationCode,
-        })
+        }),
       );
       res.status(204).send();
     } catch (error: any) {
@@ -575,7 +575,7 @@ export class Auth implements IAuth {
 
   async logoutCallback(req: Request, res: Response, next: NextFunction) {
     const state = new URLSearchParams(
-      Buffer.from(req.cookies["parallel_logout"] ?? "", "base64").toString("ascii")
+      Buffer.from(req.cookies["parallel_logout"] ?? "", "base64").toString("ascii"),
     );
     const path = state.has("locale") ? `/${state.get("locale")!}/login` : "/login";
     const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
@@ -596,11 +596,11 @@ export class Auth implements IAuth {
         `${this.config.misc.parallelUrl}/api/auth/logout?${new URLSearchParams({
           ...(req.query.locale ? { locale: req.query.locale as string } : {}),
           hostname: req.hostname,
-        })}`
+        })}`,
       );
     }
     const state = Buffer.from(
-      new URLSearchParams(pick(req.query, ["locale", "hostname"]) as any).toString()
+      new URLSearchParams(pick(req.query, ["locale", "hostname"]) as any).toString(),
     ).toString("base64");
     res.cookie("parallel_logout", state, {
       maxAge: 30000,
@@ -612,7 +612,7 @@ export class Auth implements IAuth {
       `https://${this.config.cognito.domain}/logout?${new URLSearchParams({
         logout_uri: `${this.config.misc.parallelUrl}/api/auth/logout/callback`,
         client_id: this.config.cognito.clientId,
-      })}`
+      })}`,
     );
   }
 
@@ -649,7 +649,7 @@ export class Auth implements IAuth {
       `session:${token}:idToken`,
       `session:${token}:accessToken`,
       `session:${token}:refreshToken`,
-      `session:${token}:meta`
+      `session:${token}:meta`,
     );
   }
 
@@ -683,7 +683,7 @@ export class Auth implements IAuth {
             ? []
             : Array.isArray(value)
             ? value.map((v) => [name, v] as const)
-            : [[name, value] as const]
+            : [[name, value] as const],
         )
         .map(([name, value]) => ({ headerName: name, headerValue: value })),
       ServerName: this.config.misc.parallelUrl,
@@ -805,7 +805,7 @@ export class Auth implements IAuth {
       })();
       return payloads.map(() => result);
     },
-    { cacheKeyFn: (payload) => payload.token }
+    { cacheKeyFn: (payload) => payload.token },
   );
 
   /** users from auth token must have status ACTIVE to be valid */
@@ -851,7 +851,7 @@ export class Auth implements IAuth {
         AccessToken: accessToken!,
         PreviousPassword: password,
         ProposedPassword: newPassword,
-      })
+      }),
     );
   }
 
@@ -869,7 +869,7 @@ export class Auth implements IAuth {
             ClientId: this.config.cognito.clientId,
             ConfirmationCode: code,
             Username: email,
-          })
+          }),
         );
         await req.context.system.createEvent({
           type: "EMAIL_VERIFIED",
@@ -890,7 +890,7 @@ export class Auth implements IAuth {
     await this.redis.set(
       `session:${token}:meta`,
       JSON.stringify({ userId, asUserId }),
-      this.EXPIRY
+      this.EXPIRY,
     );
   }
 
@@ -930,7 +930,7 @@ export class Auth implements IAuth {
     ) {
       throw new ApolloError(
         `An invitation has been sent to this user in the last hour`,
-        "RESET_USER_PASSWORD_TIME_RESTRICTION"
+        "RESET_USER_PASSWORD_TIME_RESTRICTION",
       );
     }
 
@@ -962,7 +962,7 @@ export class Auth implements IAuth {
       organizationName: string;
       organizationUser: string;
       locale: UserLocale;
-    }
+    },
   ): Promise<void> {
     await this.cognitoIdP.send(
       new AdminCreateUserCommand({
@@ -970,7 +970,7 @@ export class Auth implements IAuth {
         Username: email,
         MessageAction: "RESEND",
         ClientMetadata: clientMetadata,
-      })
+      }),
     );
   }
 
@@ -985,7 +985,7 @@ export class Auth implements IAuth {
           PASSWORD: password,
         },
         ContextData: contextData,
-      })
+      }),
     );
   }
 
@@ -993,7 +993,7 @@ export class Auth implements IAuth {
     session: string,
     email: string,
     password: string,
-    contextData: ContextDataType
+    contextData: ContextDataType,
   ): Promise<AdminRespondToAuthChallengeCommandOutput> {
     return await this.cognitoIdP.send(
       new AdminRespondToAuthChallengeCommand({
@@ -1006,7 +1006,7 @@ export class Auth implements IAuth {
           NEW_PASSWORD: password,
         },
         ContextData: contextData,
-      })
+      }),
     );
   }
 
@@ -1015,7 +1015,7 @@ export class Auth implements IAuth {
       new AdminGetUserCommand({
         Username: email,
         UserPoolId: this.config.cognito.defaultPoolId,
-      })
+      }),
     );
   }
 
@@ -1029,7 +1029,7 @@ export class Auth implements IAuth {
           REFRESH_TOKEN: refreshToken,
         },
         ContextData: contextData,
-      })
+      }),
     );
   }
 

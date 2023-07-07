@@ -17,7 +17,7 @@ export interface TemplateCardProps {
 export const TemplateCard = Object.assign(
   chakraForwardRef<"div", TemplateCardProps>(function TemplateCard(
     { template, onPress, ...props },
-    ref
+    ref,
   ) {
     const buttonProps = useRoleButton(onPress);
 
@@ -52,7 +52,7 @@ export const TemplateCard = Object.assign(
                 ? p.user
                 : p.__typename === "PetitionUserGroupPermission"
                 ? p.group
-                : (null as never)
+                : (null as never),
             )}
           />
         </Flex>
@@ -84,5 +84,5 @@ export const TemplateCard = Object.assign(
         ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
       `,
     },
-  }
+  },
 );

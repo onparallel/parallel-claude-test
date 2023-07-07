@@ -16,7 +16,7 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
         t.nonNull.field("userAuthToken", { type: "UserAuthenticationToken" });
         t.nonNull.string("apiKey");
       },
-    })
+    }),
   ),
   authorize: authenticateAnd(userHasFeatureFlag("DEVELOPER_ACCESS")),
   args: {
@@ -43,7 +43,7 @@ export const revokeUserAuthToken = mutationField("revokeUserAuthToken", {
   type: "Result",
   authorize: authenticateAnd(
     userHasFeatureFlag("DEVELOPER_ACCESS"),
-    userHasAccessToAuthTokens("authTokenIds")
+    userHasAccessToAuthTokens("authTokenIds"),
   ),
   args: {
     authTokenIds: nonNull(list(nonNull(globalIdArg("UserAuthenticationToken")))),

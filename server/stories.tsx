@@ -43,7 +43,7 @@ app
   .get("/documents/:document", async (req, res, next) => {
     const query = new URLSearchParams(req.query as any);
     const url = encodeURIComponent(
-      `http://localhost:5000/documents/${req.params.document}/file.pdf?${query}`
+      `http://localhost:5000/documents/${req.params.document}/file.pdf?${query}`,
     );
     res.send(/* html */ `
       <html>
@@ -90,7 +90,7 @@ app
                   <Text>{error.stack}</Text>
                 </View>
               </Page>
-            </Document>
+            </Document>,
           )
         ).pipe(res);
       }
@@ -121,7 +121,7 @@ app.get("/emails/:email", async (req, res, next) => {
       res.send(
         result.html
           .replace(/(<body[^>]*>)/, /* html */ `$1${header(pick(result, ["subject", "from"]))}`)
-          .replace(/<\/body>/, LR_SCRIPT + "\n</body>")
+          .replace(/<\/body>/, LR_SCRIPT + "\n</body>"),
       );
     } else {
       res.send(/* html */ `
@@ -142,7 +142,7 @@ app.get("/emails/:email", async (req, res, next) => {
       <body>
         <pre style="background-color: #333; color: #fff; max-width: 100vw; white-space: pre-wrap;">${convert.toHtml(
           escapeHTML(error.toString()),
-          { bg: "#333", fg: "#fff" }
+          { bg: "#333", fg: "#fff" },
         )}</pre> 
         ${LR_SCRIPT}
       </body>

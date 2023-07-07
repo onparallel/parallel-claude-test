@@ -54,24 +54,24 @@ export async function showCursor(page: Page) {
             box.style.left = event.pageX + "px";
             box.style.top = event.pageY + "px";
           },
-          true
+          true,
         );
         document.addEventListener(
           "mousedown",
           (event) => {
             box.classList.add("button-" + event.which);
           },
-          true
+          true,
         );
         document.addEventListener(
           "mouseup",
           (event) => {
             box.classList.remove("button-" + event.which);
           },
-          true
+          true,
         );
       },
-      false
+      false,
     );
   });
 }

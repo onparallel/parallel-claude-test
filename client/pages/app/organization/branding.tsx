@@ -48,7 +48,7 @@ function OrganizationBranding() {
         href: buildStateUrl({ style: "document" as const }),
       },
     ],
-    [intl.locale, router.pathname, router.query]
+    [intl.locale, router.pathname, router.query],
   );
 
   return (

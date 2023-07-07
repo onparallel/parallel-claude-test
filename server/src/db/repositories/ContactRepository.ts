@@ -38,7 +38,7 @@ export class ContactRepository extends BaseRepository {
         keys,
         groupBy((k) => k.orgId),
         mapValues((keys) => keys.map((k) => k.email)),
-        toPairs
+        toPairs,
       );
       const rows = await this.from("contact", t)
         .whereNull("deleted_at")
@@ -50,7 +50,7 @@ export class ContactRepository extends BaseRepository {
       const results = indexBy(rows, keyBuilder(["org_id", "email"]));
       return keys.map(keyBuilder(["orgId", "email"])).map((key) => results[key] ?? null);
     },
-    { cacheKeyFn: keyBuilder(["orgId", "email"]) }
+    { cacheKeyFn: keyBuilder(["orgId", "email"]) },
   );
 
   readonly loadContactByAccessId = this.buildLoader<number, Contact | null>(
@@ -62,18 +62,18 @@ export class ContactRepository extends BaseRepository {
           where pa.id in ? 
         `,
         [this.sqlIn(accessIds)],
-        t
+        t,
       );
 
       const byAccessId = indexBy(contacts, (r) => r.access_id);
       return accessIds.map((id) => (byAccessId[id] ? omit(byAccessId[id], ["access_id"]) : null));
-    }
+    },
   );
 
   async loadOrCreate(
     contacts: MaybeArray<Pick<CreateContact, "first_name" | "last_name" | "email" | "org_id">>,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const contactsArr = unMaybeArray(contacts);
     if (contactsArr.length === 0) {
@@ -94,16 +94,16 @@ export class ContactRepository extends BaseRepository {
             email: contact.email.toLowerCase().trim(),
             created_by: createdBy,
             updated_by: createdBy,
-          }))
+          })),
         ),
       ],
-      t
+      t,
     );
   }
 
   async createOrUpdate(
     contacts: MaybeArray<Pick<CreateContact, "first_name" | "last_name" | "email" | "org_id">>,
-    updatedBy: string
+    updatedBy: string,
   ) {
     const contactsArr = unMaybeArray(contacts);
     if (contactsArr.length === 0) {
@@ -124,9 +124,9 @@ export class ContactRepository extends BaseRepository {
             email: contact.email.toLowerCase().trim(),
             created_by: updatedBy,
             updated_by: updatedBy,
-          }))
+          })),
         ),
-      ]
+      ],
     );
   }
 
@@ -147,7 +147,7 @@ export class ContactRepository extends BaseRepository {
       search?: string | null;
       sortBy?: SortBy<keyof Contact>[];
       excludeIds?: number[] | null;
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<Contact>(
       this.from("contact")
@@ -162,7 +162,7 @@ export class ContactRepository extends BaseRepository {
               q2.whereEscapedILike(
                 this.knex.raw(`concat("first_name", ' ', "last_name")`),
                 `%${escapeLike(search, "\\")}%`,
-                "\\"
+                "\\",
               ).or.whereEscapedILike("email", `%${escapeLike(search, "\\")}%`, "\\");
             });
           }
@@ -175,7 +175,7 @@ export class ContactRepository extends BaseRepository {
         })
         .orderBy("id")
         .select("*"),
-      opts
+      opts,
     );
   }
 
@@ -196,7 +196,7 @@ export class ContactRepository extends BaseRepository {
         .from("pas")
         .orderBy("pas.created_at", "desc")
         .select("pas.*"),
-      opts
+      opts,
     );
   }
 
@@ -205,7 +205,7 @@ export class ContactRepository extends BaseRepository {
     opts: PageOpts & {
       search?: string | null;
       status?: PetitionStatus[] | null;
-    }
+    },
   ) {
     return this.getPagination<PetitionAccess>(
       this.knex
@@ -216,7 +216,7 @@ export class ContactRepository extends BaseRepository {
               this.on("pm.petition_id", "=", "pa.petition_id").andOn(
                 "pm.petition_access_id",
                 "=",
-                "pa.id"
+                "pa.id",
               );
             })
             .mmodify((q) => {
@@ -235,7 +235,7 @@ export class ContactRepository extends BaseRepository {
         .from("pas")
         .orderBy("pas.created_at", "desc")
         .select("pas.*"),
-      opts
+      opts,
     );
   }
 
@@ -248,7 +248,7 @@ export class ContactRepository extends BaseRepository {
         created_by: createdBy,
         updated_by: createdBy,
       },
-      t
+      t,
     );
     return row;
   }
@@ -262,7 +262,7 @@ export class ContactRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `User:${user.id}`,
         },
-        "*"
+        "*",
       );
     return row;
   }
@@ -290,13 +290,13 @@ export class ContactRepository extends BaseRepository {
             reminders_active: false,
             next_reminder_at: null,
           },
-          "*"
+          "*",
         );
       if (accesses.length > 0) {
         await this.from("petition_message", t)
           .whereIn(
             "petition_access_id",
-            accesses.map((a) => a.id)
+            accesses.map((a) => a.id),
           )
           .where({ status: "SCHEDULED" })
           .update({
@@ -321,7 +321,7 @@ export class ContactRepository extends BaseRepository {
   >(
     async (keys, t) => {
       const hashes = await Promise.all(
-        keys.map(async (k) => await hash(k.cookieValue, k.contactId.toString()))
+        keys.map(async (k) => await hash(k.cookieValue, k.contactId.toString())),
       );
       const rows = await this.from("contact_authentication", t)
         .whereIn("contact_id", uniq(keys.map((k) => k.contactId)))
@@ -332,12 +332,12 @@ export class ContactRepository extends BaseRepository {
         .map(keyBuilder(["contactId", "cookieValueHash"]))
         .map((k) => byKey[k] ?? null);
     },
-    { cacheKeyFn: keyBuilder(["contactId", "cookieValue"]) }
+    { cacheKeyFn: keyBuilder(["contactId", "cookieValue"]) },
   );
 
   async addContactAuthenticationLogAccessEntry(
     contactAuthenticationId: number,
-    access: { ip: Maybe<string>; userAgent: Maybe<string> }
+    access: { ip: Maybe<string>; userAgent: Maybe<string> },
   ) {
     await this.from("contact_authentication")
       .where({
@@ -346,7 +346,7 @@ export class ContactRepository extends BaseRepository {
       .update({
         access_log: this.knex.raw(
           /* sql */ `jsonb_path_query_array(? || "access_log", '$[0 to 99]')`,
-          this.json({ ...access, timestamp: Date.now() })
+          this.json({ ...access, timestamp: Date.now() }),
         ),
       });
   }
@@ -369,7 +369,7 @@ export class ContactRepository extends BaseRepository {
       | "contact_first_name"
       | "contact_last_name"
       | "contact_email"
-    >
+    >,
   ) {
     const token = random(48);
     const [request] = await this.insert("contact_authentication_request", {
@@ -387,7 +387,7 @@ export class ContactRepository extends BaseRepository {
   async verifyContactAuthenticationRequest(
     accessId: number,
     token: string,
-    code: string
+    code: string,
   ): Promise<{
     success: boolean;
     remainingAttempts?: number;
@@ -413,7 +413,7 @@ export class ContactRepository extends BaseRepository {
 
   readonly loadContactAuthenticationRequest = this.buildLoadBy(
     "contact_authentication_request",
-    "id"
+    "id",
   );
 
   async processContactAuthenticationRequest(requestId: number, emailLogId: number) {

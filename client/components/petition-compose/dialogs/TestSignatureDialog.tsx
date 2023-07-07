@@ -76,7 +76,7 @@ export function useHandledTestSignatureDialog() {
   return useCallback(
     async (
       environment: SignatureOrgIntegrationEnvironment | undefined,
-      integrationName: string | undefined
+      integrationName: string | undefined,
     ) => {
       if (showTestSignatureDialogUserPreference && environment === "DEMO") {
         const { dontShow } = await showTestSignatureDialog({
@@ -87,6 +87,6 @@ export function useHandledTestSignatureDialog() {
         }
       }
     },
-    [showTestSignatureDialog, showTestSignatureDialogUserPreference]
+    [showTestSignatureDialog, showTestSignatureDialogUserPreference],
   );
 }

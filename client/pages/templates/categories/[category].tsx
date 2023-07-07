@@ -27,7 +27,7 @@ function LandingTemplatesCategory({
   const categories = usePublicTemplateCategories();
   const samplesByCategory = indexBy(samples, (s) => s.category);
   const filteredCategories = categories.filter(
-    (c) => samplesByCategory[c.slug]?.templates.totalCount > 0
+    (c) => samplesByCategory[c.slug]?.templates.totalCount > 0,
   );
 
   const currentCategory = categories.find((c) => c.slug === category)!;
@@ -39,7 +39,7 @@ function LandingTemplatesCategory({
           id: "public.template-category-preview.templates-for",
           defaultMessage: "Templates for {category}",
         },
-        { category: currentCategory.label }
+        { category: currentCategory.label },
       )}
       description={intl.formatMessage({
         id: "public.templates.meta-description",

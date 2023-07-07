@@ -44,7 +44,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       this.ctx.readonlyPetitions.getPetitionsForTemplateRepliesReport(
         templateId,
         startDate,
-        endDate
+        endDate,
       ),
     ]);
     const intl = await this.ctx.i18n.getIntl(template!.recipient_locale);
@@ -71,12 +71,12 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
       const petitionsAccessesContacts = await Promise.all(
         petitionsAccesses.map((accesses) =>
-          this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id))
-        )
+          this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id)),
+        ),
       );
 
       const petitionsOwnerUserData = await Promise.all(
-        petitionsOwner.map((user) => this.ctx.users.loadUserDataByUserId(user!.id))
+        petitionsOwner.map((user) => this.ctx.users.loadUserDataByUserId(user!.id)),
       );
 
       const petitionsFirstMessage = petitionsMessages.reduce(
@@ -85,13 +85,13 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             minBy(messages, (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()) ?? null;
           return result.concat(firstMessage);
         },
-        []
+        [],
       );
 
       const petitionsFirstMessageUserData = await Promise.all(
         petitionsFirstMessage.map((m) =>
-          m ? this.ctx.users.loadUserDataByUserId(m.sender_id) : null
-        )
+          m ? this.ctx.users.loadUserDataByUserId(m.sender_id) : null,
+        ),
       );
 
       rows = petitions.map((petition, petitionIndex) => {
@@ -129,7 +129,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             : null,
           "sent-by": fullName(
             petitionFirstMessageUserData?.first_name,
-            petitionFirstMessageUserData?.last_name
+            petitionFirstMessageUserData?.last_name,
           ),
           "parallel-owner": fullName(petitionOwner?.first_name, petitionOwner?.last_name),
           tags: petitionTags.map((t) => t.name).join(", "),
@@ -190,7 +190,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
                     id: "export-template-report.file-cell-content",
                     defaultMessage: "{count, plural, =1{1 file} other {# files}}",
                   },
-                  { count: field.replies.length }
+                  { count: field.replies.length },
                 )
               : "";
           });
@@ -208,7 +208,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           id: "export-template-report.file-name",
           defaultMessage: "template-report-{id}.xlsx",
         },
-        { id: toGlobalId("Petition", template!.id) }
+        { id: toGlobalId("Petition", template!.id) },
       ),
       contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
@@ -237,7 +237,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
   private async exportToExcel(
     headers: { id: string; title: string }[],
-    rows: Record<string, Maybe<string | Date>>[]
+    rows: Record<string, Maybe<string | Date>>[],
   ) {
     const wb = new Excel.Workbook();
     const page = wb.addWorksheet();

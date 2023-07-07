@@ -51,7 +51,7 @@ export function EsTaxDocumentsContentErrorMessage({
         defaultMessage: "An unknown error happened.",
       }),
     }),
-    [intl.locale]
+    [intl.locale],
   );
   return (
     <Text color="red.500" fontSize="xs">

@@ -10,7 +10,7 @@ export function useBuildUrlToPetition() {
   return useCallback(function (
     id: string,
     section: PetitionSection,
-    query?: Record<string, string>
+    query?: Record<string, string>,
   ) {
     let url = `/app/petitions/${id}/${section}`;
     const params = new URLSearchParams(query).toString();
@@ -18,8 +18,7 @@ export function useBuildUrlToPetition() {
       url += `?${params}`;
     }
     return url;
-  },
-  []);
+  }, []);
 }
 
 interface GoToPetitionOptions {
@@ -35,7 +34,7 @@ export function useGoToPetition() {
       const url = buildUrlToPetition(id, section, options?.query);
       navigate(url, options?.event);
     },
-    [buildUrlToPetition]
+    [buildUrlToPetition],
   );
 }
 
@@ -54,7 +53,7 @@ export function useBuildUrlToPetitionSection() {
         ...(query ?? {}),
       });
     },
-    [router.query]
+    [router.query],
   );
 }
 
@@ -66,6 +65,6 @@ export function useGoToPetitionSection() {
       const url = buildUrlToPetitionSection(section, options?.query);
       navigate(url, options?.event);
     },
-    [buildUrlToPetitionSection]
+    [buildUrlToPetitionSection],
   );
 }

@@ -75,7 +75,7 @@ function LandingTemplateDetails({
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
 
   const filteredFields = template.fields.filter((field) =>
-    field.type === "HEADING" && !field.title ? false : true
+    field.type === "HEADING" && !field.title ? false : true,
   );
 
   const indices = useFieldIndices(filteredFields);

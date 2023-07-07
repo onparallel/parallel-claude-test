@@ -25,7 +25,7 @@ async function updateDoneBy(
   tableName: string,
   newValue: string,
   valuesToReplace: string[],
-  t: Knex.Transaction<any, any>
+  t: Knex.Transaction<any, any>,
 ) {
   return await Promise.all([
     t
@@ -58,7 +58,7 @@ function replaceContactId(t: Knex.Transaction<any, any>) {
         FROM contact 
         WHERE id != ? AND email = ? AND org_id = ?
       `,
-      [contact.id, contact.email, contact.org_id]
+      [contact.id, contact.email, contact.org_id],
     );
 
     const idsToReplace = rows.map((r) => r.id);
@@ -75,13 +75,13 @@ function replaceContactId(t: Knex.Transaction<any, any>) {
         "petition_field_reply",
         `Contact:${contact.id}`,
         idsToReplace.flatMap((id) => [`Contact:${id}`, `Contact${id}`]), // some fields were being saved with bad format, so here it checks both and fixes it
-        t
+        t,
       ),
       updateDoneBy(
         "file_upload",
         `Contact:${contact.id}`,
         idsToReplace.map((id) => `Contact:${id}`),
-        t
+        t,
       ),
     ]);
 

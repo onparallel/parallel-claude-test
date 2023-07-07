@@ -42,7 +42,7 @@ const email: Email<MessageBouncedEmailProps> = {
       parallelUrl,
       bodyPlainText,
     }: MessageBouncedEmailProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       **${intl
@@ -67,7 +67,7 @@ const email: Email<MessageBouncedEmailProps> = {
               id: "generic.unnamed-parallel",
               defaultMessage: "Unnamed parallel",
             }),
-        }
+        },
       )}
 
       ${bodyPlainText}
@@ -77,7 +77,7 @@ const email: Email<MessageBouncedEmailProps> = {
           id: "petition-message-bounced.intro-text-2",
           defaultMessage: "Please, verify that the email {contactEmail} is correct and try again.",
         },
-        { contactEmail }
+        { contactEmail },
       )}
 
       ${intl.formatMessage({

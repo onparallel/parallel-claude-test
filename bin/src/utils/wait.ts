@@ -4,17 +4,17 @@ export async function wait(ms: number) {
 
 export async function waitFor(
   fn: (iteration: number) => Promise<boolean>,
-  ms: number
+  ms: number,
 ): Promise<void>;
 export async function waitFor(
   fn: (iteration: number) => Promise<boolean>,
   message: string,
-  ms: number
+  ms: number,
 ): Promise<void>;
 export async function waitFor(
   fn: (iteration: number) => Promise<boolean>,
   message: string | number,
-  ms?: number
+  ms?: number,
 ) {
   const _ms = typeof message === "number" ? message : ms!;
   const _message = typeof message === "number" ? undefined : message;

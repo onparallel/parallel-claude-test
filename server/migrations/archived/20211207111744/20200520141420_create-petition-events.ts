@@ -124,7 +124,7 @@ export async function up(knex: Knex): Promise<any> {
       {
         useNative: true,
         enumName: "petition_event_type",
-      }
+      },
     ).notNullable();
     t.jsonb("data");
     t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));

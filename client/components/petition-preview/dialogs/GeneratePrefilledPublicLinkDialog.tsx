@@ -61,11 +61,11 @@ export function GeneratePrefilledPublicLinkDialog({
       isDefined(field.alias) &&
       !isFileTypeField(field.type) &&
       !field.isReadOnly &&
-      field.previewReplies.length > 0
+      field.previewReplies.length > 0,
   );
 
   const [createPublicPetitionLinkPrefillData, { loading }] = useMutation(
-    GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataDocument
+    GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataDocument,
   );
 
   const handleGenerateClick = async function () {
@@ -79,7 +79,7 @@ export function GeneratePrefilledPublicLinkDialog({
             field.type === "DYNAMIC_SELECT"
               ? field.previewReplies.map((r) => (r.content.value as string[]).map((v) => v[1]))
               : field.previewReplies.map((r) => r.content.value),
-          ])
+          ]),
         ),
       },
     });

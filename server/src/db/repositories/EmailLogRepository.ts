@@ -28,7 +28,7 @@ export class EmailLogRepository extends BaseRepository {
       unMaybeArray(temporaryFileIds).map((temporaryFileId) => ({
         email_log_id: emailLogId,
         temporary_file_id: temporaryFileId,
-      }))
+      })),
     );
   }
 
@@ -39,7 +39,7 @@ export class EmailLogRepository extends BaseRepository {
         join email_attachment as ea on ea.temporary_file_id = tf.id
         where ea.email_log_id = ?
       `,
-      [emailLogId]
+      [emailLogId],
     );
     return rows;
   }
@@ -53,7 +53,7 @@ export class EmailLogRepository extends BaseRepository {
           processed_by: processedBy,
           processed_at: this.now(),
         },
-        "*"
+        "*",
       )
       .where("id", id);
   }
@@ -68,6 +68,6 @@ export class EmailLogRepository extends BaseRepository {
   }
 
   readonly loadEmailEvents = this.buildLoadMultipleBy("email_event", "email_log_id", (q) =>
-    q.orderBy("created_at")
+    q.orderBy("created_at"),
   );
 }

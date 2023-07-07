@@ -7,7 +7,7 @@ import { useEffectSkipFirst } from "./useEffectSkipFirst";
 export function useDebouncedAsync<TReturn, T extends (...args: any[]) => Promise<TReturn>>(
   callback: T,
   ms: number,
-  deps: DependencyList | undefined
+  deps: DependencyList | undefined,
 ): T {
   const timeout = useRef<any>(null);
   const promise = useRef<any>(null);
@@ -36,6 +36,6 @@ export function useDebouncedAsync<TReturn, T extends (...args: any[]) => Promise
         }, ms);
       });
     } as T,
-    [...(deps ?? []), ms]
+    [...(deps ?? []), ms],
   );
 }

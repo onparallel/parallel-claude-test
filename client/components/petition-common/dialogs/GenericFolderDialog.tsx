@@ -75,7 +75,7 @@ export function GenericFolderDialog({
       const pathToId: Record<string, number> = { "/": 1 };
       let counter = 2;
       const filteredPaths = data.petitionFolders.filter(
-        (p) => !(disabledPaths ?? []).some((dp) => p.startsWith(dp) && p.length > dp.length)
+        (p) => !(disabledPaths ?? []).some((dp) => p.startsWith(dp) && p.length > dp.length),
       );
       for (const path of filteredPaths) {
         const parts = path.replace(/^\//, "").replace(/\/$/, "").split("/");
@@ -115,7 +115,7 @@ export function GenericFolderDialog({
       setTimeout(() => {
         document.querySelector<HTMLElement>(`[data-folder-path="${path}"]`)?.click();
         resolve();
-      })
+      }),
     );
   }
 
@@ -127,10 +127,10 @@ export function GenericFolderDialog({
             view: window,
             bubbles: true,
             cancelable: true,
-          })
+          }),
         );
         resolve();
-      })
+      }),
     );
   }
 
@@ -149,12 +149,12 @@ export function GenericFolderDialog({
       if (
         // if new folder name already exists as children on the selectedPath, skip
         !parent.children.some(
-          (childrenId) => treeViewData!.find((n) => n.id === childrenId)!.path === path
+          (childrenId) => treeViewData!.find((n) => n.id === childrenId)!.path === path,
         )
       ) {
         setTreeViewData([
           ...treeViewData!.map((n) =>
-            n.id === parent.id ? { ...n, children: [...n.children, id] } : n
+            n.id === parent.id ? { ...n, children: [...n.children, id] } : n,
           ),
           {
             id: treeViewData!.length,

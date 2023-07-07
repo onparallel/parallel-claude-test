@@ -25,18 +25,18 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       and(
         userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
         fieldsHaveCommentsEnabled("petitionFieldId"),
-        fieldsAreNotInternal("petitionFieldId")
+        fieldsAreNotInternal("petitionFieldId"),
       ),
-      userHasAccessToPetitions("petitionId")
+      userHasAccessToPetitions("petitionId"),
     ),
     ifArgEquals(
       "sharePetitionPermission",
       "WRITE",
-      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     ),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     petitionIsNotAnonymized("petitionId"),
-    validPetitionFieldCommentContent("content", "petitionFieldId", true)
+    validPetitionFieldCommentContent("content", "petitionFieldId", true),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -70,7 +70,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
               isSubscribed: args.sharePetitionSubscribed ?? false,
               permissionType: args.sharePetitionPermission ?? "READ",
             }
-          : undefined
+          : undefined,
       );
 
       ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
@@ -85,14 +85,14 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
           contentJson: args.content,
           isInternal: args.isInternal ?? false,
         },
-        ctx.user!
+        ctx.user!,
       );
     } catch (e: any) {
       if (e.code === "NO_PERMISSIONS_MENTION_ERROR") {
         throw new ApolloError(
           `Mentioned users with no permissions`,
           "NO_PERMISSIONS_MENTION_ERROR",
-          { ids: e.ids }
+          { ids: e.ids },
         );
       } else {
         throw e;
@@ -109,7 +109,7 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -121,7 +121,7 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
       args.petitionId,
       args.petitionFieldId,
       args.petitionFieldCommentId,
-      ctx.user!
+      ctx.user!,
     );
     return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
@@ -135,13 +135,13 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
       "sharePetitionPermission",
       "WRITE",
       userHasAccessToPetitions("petitionId", ["OWNER"]),
-      userHasAccessToPetitions("petitionId")
+      userHasAccessToPetitions("petitionId"),
     ),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
-    validPetitionFieldCommentContent("content", "petitionFieldId", true)
+    validPetitionFieldCommentContent("content", "petitionFieldId", true),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -175,7 +175,7 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
               isSubscribed: args.sharePetitionSubscribed ?? false,
               permissionType: args.sharePetitionPermission ?? "READ",
             }
-          : undefined
+          : undefined,
       );
 
       return await ctx.petitions.updatePetitionFieldCommentFromUser(
@@ -183,14 +183,14 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
         {
           contentJson: args.content,
         },
-        ctx.user!
+        ctx.user!,
       );
     } catch (e: any) {
       if (e.code === "NO_PERMISSIONS_MENTION_ERROR") {
         throw new ApolloError(
           `Mentioned users with no permissions`,
           "NO_PERMISSIONS_MENTION_ERROR",
-          { ids: e.ids }
+          { ids: e.ids },
         );
       } else {
         throw e;

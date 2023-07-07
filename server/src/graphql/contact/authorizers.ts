@@ -6,12 +6,12 @@ import { Arg } from "../helpers/authorize";
 export function userHasAccessToContacts<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
       const contactIds = unMaybeArray(
-        (args[argName] as unknown as MaybeArray<number> | null) ?? []
+        (args[argName] as unknown as MaybeArray<number> | null) ?? [],
       );
       if (contactIds.length === 0) {
         return true;
@@ -25,7 +25,7 @@ export function userHasAccessToContacts<
 export function userHasAccessToContactGroups<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number[][]>
+  TArg extends Arg<TypeName, FieldName, number[][]>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {

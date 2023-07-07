@@ -31,7 +31,7 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
           },
         } as any,
       },
-      ref.current
+      ref.current,
     );
   }, []);
   return (

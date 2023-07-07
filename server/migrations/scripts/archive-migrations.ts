@@ -6,7 +6,7 @@ import { resolve } from "path";
 async function main() {
   console.log("generating dump of local database...");
   execSync(
-    `docker exec dev-db-1 pg_dump -h localhost -d parallel_dev -U parallel --schema-only --no-owner --exclude-table=migrations* > dump.sql`
+    `docker exec dev-db-1 pg_dump -h localhost -d parallel_dev -U parallel --schema-only --no-owner --exclude-table=migrations* > dump.sql`,
   );
 
   let dumpContents = await readFile("./dump.sql", "utf8");

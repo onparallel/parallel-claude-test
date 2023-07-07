@@ -13,7 +13,7 @@ export interface AlertPopoverProps {
 
 export const AlertPopover = chakraForwardRef<"svg", AlertPopoverProps>(function (
   { children, placement = "bottom", popoverWidth, fontSize = "sm", ...props },
-  ref
+  ref,
 ) {
   return (
     <SmallPopover

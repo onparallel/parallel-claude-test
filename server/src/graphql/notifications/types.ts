@@ -52,7 +52,7 @@ export const PetitionUserNotification = interfaceType({
 
 function createPetitionUserNotification<TypeName extends string>(
   name: TypeName,
-  definition: (t: core.ObjectDefinitionBlock<TypeName>) => void
+  definition: (t: core.ObjectDefinitionBlock<TypeName>) => void,
 ) {
   return objectType({
     name,
@@ -79,7 +79,7 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
     t.boolean("isMention", {
       resolve: (o) => o.data.is_mentioned ?? false,
     });
-  }
+  },
 );
 
 export const PetitionCompletedUserNotification = createPetitionUserNotification(
@@ -89,12 +89,12 @@ export const PetitionCompletedUserNotification = createPetitionUserNotification(
       type: "UserOrPetitionAccess",
       resolve: userOrPetitionAccessResolver,
     });
-  }
+  },
 );
 
 export const SignatureCompletedUserNotification = createPetitionUserNotification(
   "SignatureCompletedUserNotification",
-  () => {}
+  () => {},
 );
 
 export const SignatureCancelledUserNotification = createPetitionUserNotification(
@@ -111,7 +111,7 @@ export const SignatureCancelledUserNotification = createPetitionUserNotification
         return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.extra ?? null : null;
       },
     });
-  }
+  },
 );
 
 export const PetitionSharedUserNotification = createPetitionUserNotification(
@@ -137,7 +137,7 @@ export const PetitionSharedUserNotification = createPetitionUserNotification(
         } else return null;
       },
     });
-  }
+  },
 );
 
 export const MessageEmailBouncedUserNotification = createPetitionUserNotification(
@@ -149,7 +149,7 @@ export const MessageEmailBouncedUserNotification = createPetitionUserNotificatio
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-  }
+  },
 );
 
 export const ReminderEmailBouncedUserNotification = createPetitionUserNotification(
@@ -161,7 +161,7 @@ export const ReminderEmailBouncedUserNotification = createPetitionUserNotificati
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-  }
+  },
 );
 
 export const RemindersOptOutNotification = createPetitionUserNotification(
@@ -179,7 +179,7 @@ export const RemindersOptOutNotification = createPetitionUserNotification(
     t.nullable.string("other", {
       resolve: (o) => o.data.other ?? null,
     });
-  }
+  },
 );
 
 export const AccessActivatedFromPublicPetitionLinkUserNotification = createPetitionUserNotification(
@@ -191,5 +191,5 @@ export const AccessActivatedFromPublicPetitionLinkUserNotification = createPetit
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-  }
+  },
 );

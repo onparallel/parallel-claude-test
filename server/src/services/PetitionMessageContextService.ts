@@ -19,7 +19,7 @@ export interface IPetitionMessageContextService {
       userId?: Maybe<number>;
       petitionAccessId?: Maybe<number>;
     },
-    options?: { publicContext?: boolean }
+    options?: { publicContext?: boolean },
   ): Promise<(key: string) => string>;
 }
 
@@ -31,7 +31,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(ContactRepository) private contacts: ContactRepository,
     @inject(UserRepository) private users: UserRepository,
-    @inject(I18N_SERVICE) private i18n: II18nService
+    @inject(I18N_SERVICE) private i18n: II18nService,
   ) {}
 
   async fetchPlaceholderValues(
@@ -41,7 +41,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
       userId?: Maybe<number>;
       petitionAccessId?: Maybe<number>;
     },
-    options?: { publicContext?: boolean }
+    options?: { publicContext?: boolean },
   ) {
     const [petition, contact, user, fields] = await Promise.all([
       args.petitionId ? this.petitions.loadPetition(args.petitionId) : null,
@@ -54,14 +54,14 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
       await this.petitions.loadRepliesForField(fields?.map((f) => f.id) ?? []),
       flatten(),
       groupBy((r) => r.petition_field_id),
-      mapValues((replies) => replies?.[0])
+      mapValues((replies) => replies?.[0]),
     );
 
     const originalMessage =
       isDefined(args.petitionAccessId) && isDefined(args.petitionId) && options?.publicContext
         ? await this.petitions.loadOriginalMessageByPetitionAccess(
             args.petitionAccessId,
-            args.petitionId
+            args.petitionId,
           )
         : null;
 
@@ -94,7 +94,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
             case "DYNAMIC_SELECT":
               return intl.formatList(
                 (reply.content.value as [prop: string, value: string][]).map(([, value]) => value),
-                { type: "unit", style: "short" }
+                { type: "unit", style: "short" },
               );
             default:
               return reply.content.value;

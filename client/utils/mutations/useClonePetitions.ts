@@ -10,7 +10,7 @@ export function useClonePetitions() {
       // clear caches where new item would appear
       clearCache(
         cache,
-        /\$ROOT_QUERY\.petitions\(.*("type":"TEMPLATE"|"status":(null|"DRAFT"))[,}]/
+        /\$ROOT_QUERY\.petitions\(.*("type":"TEMPLATE"|"status":(null|"DRAFT"))[,}]/,
       );
     },
   });
@@ -30,7 +30,7 @@ export function useClonePetitions() {
       });
       return data!.clonePetitions!.map((p) => p.id);
     },
-    []
+    [],
   );
 }
 

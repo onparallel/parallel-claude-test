@@ -19,7 +19,10 @@ import { isDefined } from "remeda";
 import { useAlreadyExportedDialog } from "./dialogs/AlreadyExportedDialog";
 
 export class CuatrecasasExportError extends Error {
-  constructor(public fileName: string, public fieldName?: Maybe<string>) {
+  constructor(
+    public fileName: string,
+    public fieldName?: Maybe<string>,
+  ) {
     super("EXPORT_ERROR");
   }
 }
@@ -28,7 +31,7 @@ function cuatrecasasExport(
   fileName: string,
   externalClientId: string,
   signal: AbortSignal,
-  onProgress: (event: ProgressEvent) => void
+  onProgress: (event: ProgressEvent) => void,
 ) {
   return new Promise<string>((resolve, reject) => {
     const download = new XMLHttpRequest();
@@ -88,7 +91,7 @@ function useExportExcel(clientId: string) {
       result.filename,
       clientId,
       opts.signal,
-      opts.onProgress
+      opts.onProgress,
     );
   };
 }
@@ -96,20 +99,20 @@ function useExportExcel(clientId: string) {
 function useExportSignatureDocument(
   clientId: string,
   type: "signed-document" | "audit-trail",
-  refs: ExportRefs
+  refs: ExportRefs,
 ) {
   const [signedPetitionDownloadLink] = useMutation(
-    useCuatrecasasExport_signedPetitionDownloadLinkDocument
+    useCuatrecasasExport_signedPetitionDownloadLinkDocument,
   );
   const [updateSignatureRequestMetadata] = useMutation(
-    useCuatrecasasExport_updateSignatureRequestMetadataDocument
+    useCuatrecasasExport_updateSignatureRequestMetadataDocument,
   );
 
   const showAlreadyExported = useAlreadyExportedDialog();
 
   return async (
     signatureRequest: useCuatrecasasExport_PetitionSignatureRequestFragment,
-    opts: ExportOpts
+    opts: ExportOpts,
   ) => {
     const ndExternalId: string | undefined =
       signatureRequest.metadata[
@@ -151,7 +154,7 @@ function useExportSignatureDocument(
       filename,
       clientId,
       opts.signal,
-      opts.onProgress
+      opts.onProgress,
     );
 
     await updateSignatureRequestMetadata({
@@ -174,10 +177,10 @@ function useExportSignatureDocument(
 
 function useExportFieldReply(clientId: string, refs: ExportRefs) {
   const [fileUploadReplyDownloadLink] = useMutation(
-    useCuatrecasasExport_fileUploadReplyDownloadLinkDocument
+    useCuatrecasasExport_fileUploadReplyDownloadLinkDocument,
   );
   const [updatePetitionFieldReplyMetadata] = useMutation(
-    useCuatrecasasExport_updatePetitionFieldReplyMetadataDocument
+    useCuatrecasasExport_updatePetitionFieldReplyMetadataDocument,
   );
 
   const showAlreadyExported = useAlreadyExportedDialog();
@@ -194,7 +197,7 @@ function useExportFieldReply(clientId: string, refs: ExportRefs) {
       field: useCuatrecasasExport_PetitionFieldFragment;
       reply: useCuatrecasasExport_PetitionFieldReplyFragment;
     },
-    opts: Omit<ExportOpts, "filename"> & { filename: string }
+    opts: Omit<ExportOpts, "filename"> & { filename: string },
   ) => {
     if (isFileTypeField(field.type)) {
       if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
@@ -228,7 +231,7 @@ function useExportFieldReply(clientId: string, refs: ExportRefs) {
           opts.filename,
           clientId,
           opts.signal,
-          opts.onProgress
+          opts.onProgress,
         );
       } catch (e) {
         if (
@@ -306,7 +309,7 @@ function useExportPdfDocument(clientId: string, refs: ExportRefs) {
       exportedDocument.filename,
       clientId,
       opts.signal,
-      opts.onProgress
+      opts.onProgress,
     );
 
     await updatePetitionMetadata({

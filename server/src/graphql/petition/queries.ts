@@ -70,7 +70,7 @@ export const petitionsQuery = queryField((t) => {
         if (isDefined(fromTemplateId)) {
           const hasAccess = await ctx.petitions.userHasAccessToPetitions(
             ctx.user!.id,
-            fromTemplateId
+            fromTemplateId,
           );
           if (!hasAccess) {
             throw new ArgValidationError(info, "filters.fromTemplateId", "Invalid template ID");
@@ -88,12 +88,12 @@ export const petitionsQuery = queryField((t) => {
             throw new ArgValidationError(info, "filters.tagIds", "Invalid tag ids");
           }
         }
-      }
+      },
     ),
     resolve: async (
       _,
       { offset, limit, search, sortBy, filters, searchByNameOnly, excludeAnonymized },
-      ctx
+      ctx,
     ) => {
       return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
@@ -131,15 +131,15 @@ export const petitionsByIdQuery = queryField("petitionsById", {
   authorize: authenticateAnd(
     ifArgDefined(
       (args) => args.ids,
-      or(userHasAccessToPetitions("ids" as never), petitionsArePublicTemplates("ids" as never))
-    )
+      or(userHasAccessToPetitions("ids" as never), petitionsArePublicTemplates("ids" as never)),
+    ),
   ),
   validateArgs: validateAnd(
     validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
     notEmptyArray(
       (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
-      "ids or folders"
-    )
+      "ids or folders",
+    ),
   ),
   resolve: async (_, args, ctx) => {
     let petitionIds = args.ids ?? [];
@@ -148,7 +148,7 @@ export const petitionsByIdQuery = queryField("petitionsById", {
       const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
         folderIds,
         args.folders.type === "TEMPLATE",
-        ctx.user!
+        ctx.user!,
       );
       petitionIds.push(...folderPetitions.map((p) => p.id));
     }
@@ -269,7 +269,7 @@ export const petitionFieldQuery = queryField("petitionField", {
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    fieldsBelongsToPetition("petitionId", "petitionFieldId")
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -299,14 +299,14 @@ export const petitionFolders = queryField("petitionFolders", {
     const petitionPaths = await ctx.petitions.getUserPetitionFoldersList(
       ctx.user!.id,
       ctx.user!.org_id,
-      args.type === "TEMPLATE"
+      args.type === "TEMPLATE",
     );
 
     const fullPaths = uniq(
       [...petitionPaths, args.currentPath]
         .filter(isDefined)
         .flatMap((path) => pathAndParents(path))
-        .filter((p) => p !== "/")
+        .filter((p) => p !== "/"),
     );
     return sort(fullPaths, (a, b) => a.localeCompare(b));
   },

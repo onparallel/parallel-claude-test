@@ -16,7 +16,7 @@ async function generate(
   locales: string[],
   input: string,
   rawOutput: string | null,
-  compiledOutput: string | null
+  compiledOutput: string | null,
 ) {
   // store the values used in the default (first) locale to make sure they
   // are used in all the other locales
@@ -44,7 +44,7 @@ async function generate(
           warn(
             `Term "${term}" (${locale}) is missing the following values: ${missing
               .map((v) => `"${v}"`)
-              .join(", ")}`
+              .join(", ")}`,
           );
         }
         const extra = difference(termValues, [...reference, ...WHITELISTED_EXTRA_TERMS]);
@@ -52,7 +52,7 @@ async function generate(
           warn(
             `Term "${term}" (${locale}) has some extra values: ${extra
               .map((v) => `"${v}"`)
-              .join(", ")}`
+              .join(", ")}`,
           );
         }
       }
@@ -65,7 +65,7 @@ async function generate(
           window.__LOCALE__ = "${locale}";
           window.__LOCALE_DATA__ = ${JSON.stringify(raw)};
         `,
-        "utf-8"
+        "utf-8",
       );
     }
     if (compiledOutput) {
@@ -76,7 +76,7 @@ async function generate(
           window.__LOCALE__ = "${locale}";
           window.__LOCALE_DATA__ = ${JSON.stringify(compiled)};
         `,
-        "utf-8"
+        "utf-8",
       );
     }
     if (missing > 0) {
@@ -108,7 +108,7 @@ function getValues(elements: MessageFormatElement[]): string[] {
         case TYPE.tag:
           return [element.value, ...getValues(element.children)];
       }
-    })
+    }),
   );
 }
 

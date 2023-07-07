@@ -5,7 +5,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validIsDefined<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any | null | undefined,
-  argName: string
+  argName: string,
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
@@ -17,7 +17,7 @@ export function validIsDefined<TypeName extends string, FieldName extends string
 
 export function validIsNotUndefined<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any | null | undefined,
-  argName: string
+  argName: string,
 ) {
   return ((_, args, ctx, info) => {
     if (prop(args) === undefined) {

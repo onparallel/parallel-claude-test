@@ -11,7 +11,7 @@ export async function contextUserHasAccessToUserGroups(userGroupIds: number[], c
       return true;
     }
     return (await ctx.userGroups.loadUserGroup(userGroupIds)).every(
-      (ug) => isDefined(ug) && ug.org_id === ctx.user!.org_id
+      (ug) => isDefined(ug) && ug.org_id === ctx.user!.org_id,
     );
   } catch {}
   return false;
@@ -20,7 +20,7 @@ export async function contextUserHasAccessToUserGroups(userGroupIds: number[], c
 export function userHasAccessToUserGroups<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {

@@ -167,7 +167,7 @@ function EnumInput({
     arg.type.kind === "NON_NULL"
       ? (arg.type.ofType as IntrospectionNamedTypeRef<IntrospectionEnumType>)
       : (arg.type as IntrospectionNamedTypeRef<IntrospectionEnumType>),
-    schemaTypes
+    schemaTypes,
   );
 
   return (
@@ -192,7 +192,7 @@ function ObjectInput({
     arg.type.kind === "NON_NULL"
       ? (arg.type.ofType as IntrospectionNamedTypeRef<IntrospectionInputObjectType>)
       : (arg.type as IntrospectionNamedTypeRef<IntrospectionInputObjectType>),
-    schemaTypes
+    schemaTypes,
   );
   return (
     <Grid templateColumns="84px 1fr" gridColumn="1/3" rowGap={2} columnGap={2} marginLeft={4}>

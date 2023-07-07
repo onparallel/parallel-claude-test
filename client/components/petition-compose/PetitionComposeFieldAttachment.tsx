@@ -20,7 +20,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
   chakraForwardRef<"div", PetitionComposeFieldAttachmentProps>(
     function PetitionComposeFieldAttachment(
       { progress, attachment, onDownload, onRemove, isDisabled, ...props },
-      ref
+      ref,
     ) {
       const uploadHasFailed = !attachment.isUploading && !attachment.file.isComplete;
       const intl = useIntl();
@@ -54,7 +54,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
               defaultMessage:
                 "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
             },
-            { filename: attachment.file.filename }
+            { filename: attachment.file.filename },
           )}
           sx={{
             "&:hover button": {
@@ -129,7 +129,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
           ) : null}
         </Flex>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -146,5 +146,5 @@ export const PetitionComposeFieldAttachment = Object.assign(
         }
       `,
     },
-  }
+  },
 );

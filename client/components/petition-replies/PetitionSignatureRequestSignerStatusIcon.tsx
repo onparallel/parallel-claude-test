@@ -87,7 +87,7 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
     { signerStatus: PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment }
   >(function PetitionSignatureRequestSignerStatusIcon(
     { signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt }, ...props },
-    ref
+    ref,
   ) {
     switch (status) {
       case "SIGNED":
@@ -142,5 +142,5 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
         ${DatesList.fragments.SignerStatus}
       `,
     },
-  }
+  },
 );

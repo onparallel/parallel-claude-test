@@ -20,11 +20,11 @@ export interface ITiersService {
     org: Pick<Organization, "id" | "usage_details">,
     tierKey: string,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<Tier>;
   downgradeOrganizationPetitionSendLimit(
     org: Pick<Organization, "id" | "usage_details">,
-    updatedBy: string
+    updatedBy: string,
   ): Promise<void>;
 }
 
@@ -34,7 +34,7 @@ export class TiersService implements ITiersService {
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(FeatureFlagRepository)
     private featureFlags: FeatureFlagRepository,
-    @inject(SIGNATURE) private signatures: SignatureService
+    @inject(SIGNATURE) private signatures: SignatureService,
   ) {}
 
   private readonly defaultAppSumoFFs: FeatureFlagName[] = [
@@ -75,7 +75,7 @@ export class TiersService implements ITiersService {
     org: Pick<Organization, "id" | "usage_details">,
     tierKey: string,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const tiers = Object.keys(this.TIERS);
     if (!tiers.includes(tierKey)) {
@@ -95,7 +95,7 @@ export class TiersService implements ITiersService {
         org.id,
         { usage_details: newUsageDetails },
         updatedBy,
-        t
+        t,
       );
       await this.featureFlags.upsertFeatureFlagOverride(org.id, tier.FEATURE_FLAGS, t);
       await this.organizations.upsertOrganizationUsageLimit(
@@ -103,7 +103,7 @@ export class TiersService implements ITiersService {
         "PETITION_SEND",
         tier.PETITION_SEND.limit,
         tier.PETITION_SEND.duration,
-        t
+        t,
       );
     }, t);
 
@@ -114,7 +114,7 @@ export class TiersService implements ITiersService {
 
   async downgradeOrganizationPetitionSendLimit(
     org: Pick<Organization, "id" | "usage_details">,
-    updatedBy: string
+    updatedBy: string,
   ) {
     await Promise.all([
       this.organizations.updateOrganization(
@@ -125,13 +125,13 @@ export class TiersService implements ITiersService {
             PETITION_SEND: this.TIERS.FREE.PETITION_SEND,
           },
         },
-        updatedBy
+        updatedBy,
       ),
       this.organizations.upsertOrganizationUsageLimit(
         org.id,
         "PETITION_SEND",
         this.TIERS.FREE.PETITION_SEND.limit,
-        this.TIERS.FREE.PETITION_SEND.duration
+        this.TIERS.FREE.PETITION_SEND.duration,
       ),
     ]);
   }

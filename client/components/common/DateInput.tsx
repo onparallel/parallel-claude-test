@@ -4,7 +4,7 @@ import { useMetadata } from "@parallel/utils/withMetadata";
 
 export const DateInput = chakraForwardRef<"input", InputProps>(function DateInput(
   { sx, ...props },
-  ref
+  ref,
 ) {
   const { browserName } = useMetadata();
 

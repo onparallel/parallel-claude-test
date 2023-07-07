@@ -14,6 +14,6 @@ export async function writeJson(path: string, contents: any, opts?: WriteJsonOpt
   await fs.writeFile(
     path,
     (pretty ? JSON.stringify(contents, null, "  ") : JSON.stringify(contents)) + "\n",
-    "utf-8"
+    "utf-8",
   );
 }

@@ -11,7 +11,7 @@ export interface PaneWithFlyoutProps {
 
 export const TwoPaneLayout = chakraForwardRef<"div", PaneWithFlyoutProps>(function TwoPaneLayout(
   { isSidePaneActive, sidePane, top = 0, children, ...props },
-  ref
+  ref,
 ) {
   return (
     <Flex ref={ref} minHeight="100%" {...props}>

@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 const SENTRY_WHITELISTED_ERRORS = ["FORBIDDEN"];
 
 export default function CustomError(
-  props: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>
+  props: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>,
 ) {
   const { errorCode } = props;
   const intl = useIntl();

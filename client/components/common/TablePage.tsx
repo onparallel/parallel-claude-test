@@ -304,7 +304,7 @@ function usePagination({
     } else if (current === 3) {
       pages.push(
         { type: "PAGE", value: 2, isCurrent: false },
-        { type: "PAGE", value: 3, isCurrent: true }
+        { type: "PAGE", value: 3, isCurrent: true },
       );
     } else if (current > 3) {
       pages.push({ type: "START_ELLIPSIS" }, { type: "PAGE", value: current, isCurrent: true });

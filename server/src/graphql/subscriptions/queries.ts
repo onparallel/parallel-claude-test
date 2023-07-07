@@ -16,7 +16,7 @@ export const PetitionEventsQuery = queryField("petitionEvents", {
     before: nullable(
       globalIdArg("PetitionEvent", {
         description: "Filter events that happened before the specified event id",
-      })
+      }),
     ),
   },
   resolve: async (root, { before, eventTypes }, ctx) => {

@@ -116,7 +116,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
       onSearchMentionables,
       ...props
     },
-    ref
+    ref,
   ) {
     const plugins = useMemo(
       () =>
@@ -135,9 +135,9 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
             overrideByKey: {
               [ELEMENT_PARAGRAPH]: { type: "paragraph" },
             },
-          }
+          },
         ),
-      [isDefined(onSearchMentionables)]
+      [isDefined(onSearchMentionables)],
     );
     const formControl = useFormControl({
       id,
@@ -243,7 +243,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
         </Box>
       </PlateProvider>
     );
-  }
+  },
 );
 
 function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {

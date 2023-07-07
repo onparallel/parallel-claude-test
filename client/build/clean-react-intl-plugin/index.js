@@ -16,7 +16,7 @@ module.exports = function cleanReactIntl({ types: t }) {
         enter({ node }) {
           if (JSX_ELEMENTS.includes(node.openingElement.name.name)) {
             node.openingElement.attributes = node.openingElement.attributes.filter(
-              (attr) => !BLACKLISTED.includes(attr.name.name)
+              (attr) => !BLACKLISTED.includes(attr.name.name),
             );
           }
         },

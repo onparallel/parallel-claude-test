@@ -46,7 +46,7 @@ export const NewPetitionCategoryFilter = chakraForwardRef<"div", NewPetitionCate
         })}
       </Flex>
     );
-  }
+  },
 );
 
 function CategoryRadio(props: RadioProps) {

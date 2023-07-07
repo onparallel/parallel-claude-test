@@ -17,7 +17,7 @@ interface FileAttachmentButtonProps {
 export const FileAttachmentButton = Object.assign(
   chakraForwardRef<"button", FileAttachmentButtonProps>(function FileAttachmentButton(
     { file, showDownloadIcon, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     return (
@@ -33,7 +33,7 @@ export const FileAttachmentButton = Object.assign(
             id: "generic.attached-file",
             defaultMessage: "Attached file: {filename}",
           },
-          { filename: file.filename }
+          { filename: file.filename },
         )}
         {...props}
       >
@@ -65,5 +65,5 @@ export const FileAttachmentButton = Object.assign(
         }
       `,
     },
-  }
+  },
 );

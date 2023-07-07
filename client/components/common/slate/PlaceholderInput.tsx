@@ -87,7 +87,7 @@ export const PlaceholderInput = chakraForwardRef<
       onChange,
       ...props
     },
-    ref
+    ref,
   ) => {
     const placeholdersRef = useUpdatingRef(placeholders);
     const plugins = useConstant(() =>
@@ -106,8 +106,8 @@ export const PlaceholderInput = chakraForwardRef<
             [ELEMENT_PARAGRAPH]: { type: "paragraph" },
             [ELEMENT_MENTION_INPUT]: { type: ELEMENT_PLACEHOLDER_INPUT },
           },
-        }
-      )
+        },
+      ),
     );
     const formControl = useFormControl({
       id,
@@ -135,7 +135,7 @@ export const PlaceholderInput = chakraForwardRef<
 
     const initialValue = useMemo(
       () => textWithPlaceholderToSlateNodes(value, placeholders) as PlaceholderInputValue,
-      [placeholders]
+      [placeholders],
     );
 
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
@@ -212,5 +212,5 @@ export const PlaceholderInput = chakraForwardRef<
         </Box>
       </PlateProvider>
     );
-  }
+  },
 );

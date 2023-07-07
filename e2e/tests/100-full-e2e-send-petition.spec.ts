@@ -120,7 +120,7 @@ test.describe("Full e2e send petition", () => {
       await compose.openSendPetitionDialog();
       const address = process.env.USER1_EMAIL.replace(
         /(\+.*)?@.*$/,
-        `+${faker.random.alphaNumeric(16)}@gmail.com`
+        `+${faker.random.alphaNumeric(16)}@gmail.com`,
       );
       const subject = `Hello dummy ${faker.random.alphaNumeric(16)}`;
       await compose.fillSendPetitionDialog({
@@ -146,7 +146,7 @@ test.describe("Full e2e send petition", () => {
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
-        }
+        },
       );
       return await openEmail(await browser.newContext(), email, async ({ page, context }) => {
         return {
@@ -171,7 +171,7 @@ test.describe("Full e2e send petition", () => {
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
-        }
+        },
       );
       const code = await openEmail(await browser.newContext(), email, async ({ page }) => {
         return (await page.getByTestId("verification-code").textContent())!;
@@ -200,7 +200,7 @@ test.describe("Full e2e send petition", () => {
           filePath: "../fixtures/0001.jpeg",
           fileType: "image/jpeg",
           fileName: "0001.jpeg",
-        })
+        }),
       );
       await expect(page2.getByTestId("recipient-view-progress")).toHaveText("Progress 7/7");
       await recipientView.finalize();
@@ -214,7 +214,7 @@ test.describe("Full e2e send petition", () => {
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
-        }
+        },
       );
       return await openEmail(context, email, async ({ page }) => {
         return await openTargetBlankLink(context, page.getByTestId("access-information-button"));

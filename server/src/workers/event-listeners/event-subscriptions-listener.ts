@@ -14,7 +14,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
   }
 
   const userIds = (await ctx.petitions.loadEffectivePermissions(petition.id)).map(
-    (p) => p.user_id!
+    (p) => p.user_id!,
   );
   try {
     await ctx.petitions.attachPetitionEventsToUsers(event.id, userIds);
@@ -52,7 +52,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
       }
       return true;
     },
-    { concurrency: 5 }
+    { concurrency: 5 },
   );
 
   if (userSubscriptions.length === 0) {
@@ -61,7 +61,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
 
   const subscriptionKeys = (
     await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
-      userSubscriptions.map((s) => s.id)
+      userSubscriptions.map((s) => s.id),
     )
   ).flat();
 
@@ -97,14 +97,14 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
         });
         if (!response.ok) {
           throw new Error(
-            `Error ${response.status}: ${response.statusText} for POST ${subscription.endpoint}`
+            `Error ${response.status}: ${response.statusText} for POST ${subscription.endpoint}`,
           );
         }
         if (subscription.is_failing) {
           await ctx.subscriptions.updateSubscription(
             subscription.id,
             { is_failing: false },
-            ctx.config.instanceName
+            ctx.config.instanceName,
           );
         }
       } catch (e) {
@@ -114,16 +114,16 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
             subscription.id,
             petition.id,
             errorMessage,
-            mappedEvent
+            mappedEvent,
           );
         }
         await ctx.subscriptions.appendErrorLog(
           subscription.id,
           { error: errorMessage, event: mappedEvent },
-          ctx.config.instanceName
+          ctx.config.instanceName,
         );
       }
     },
-    { concurrency: 10 }
+    { concurrency: 10 },
   );
 };

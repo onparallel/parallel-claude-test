@@ -21,7 +21,7 @@ export async function petitionClosedNotification(
     attach_pdf_export: boolean;
     pdf_export_title: string | null;
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const [petition, sender, senderData] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
@@ -65,7 +65,7 @@ export async function petitionClosedNotification(
         userId: payload.user_id,
         petitionAccessId: accessId,
       },
-      { publicContext: true }
+      { publicContext: true },
     );
 
     const { html, text, subject, from } = await buildEmail(
@@ -78,7 +78,7 @@ export async function petitionClosedNotification(
         bodyPlainText: renderSlateWithPlaceholdersToText(payload.message, getValues),
         ...layoutProps,
       },
-      { locale: petition.recipient_locale }
+      { locale: petition.recipient_locale },
     );
     const email = await context.emailLogs.createEmail({
       from: buildFrom(from, emailFrom),
@@ -102,7 +102,7 @@ export async function petitionClosedNotification(
       const res = await context.storage.temporaryFiles.uploadFile(
         path,
         "application/pdf",
-        documentStream as Readable
+        documentStream as Readable,
       );
       const attachment = await context.files.createTemporaryFile(
         {
@@ -111,7 +111,7 @@ export async function petitionClosedNotification(
           filename: sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf"),
           size: res["ContentLength"]!.toString(),
         },
-        `User:${sender.id}`
+        `User:${sender.id}`,
       );
 
       await context.emailLogs.addEmailAttachments(email.id, attachment.id);

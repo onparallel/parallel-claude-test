@@ -96,7 +96,7 @@ export function SignatureConfigDialog({
     const [error] = await withError(
       handleSubmit(noop, () => {
         throw new Error();
-      })
+      }),
     );
 
     return !error;
@@ -146,7 +146,7 @@ export function SignatureConfigDialog({
         defaultMessage: "Who has to sign the document?",
       }),
     ],
-    [intl.locale]
+    [intl.locale],
   );
 
   return (
@@ -336,7 +336,7 @@ function SignatureConfigDialogBodyStep1({
         }),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 
   return (
@@ -533,10 +533,10 @@ export function SignatureConfigDialogBodyStep2({
             (s) =>
               s.email === suggestion.email &&
               s.firstName === suggestion.firstName &&
-              s.lastName === suggestion.lastName
-          )
+              s.lastName === suggestion.lastName,
+          ),
       ),
-    (s) => [s.email, s.firstName, s.lastName].join("|")
+    (s) => [s.email, s.firstName, s.lastName].join("|"),
   );
 
   const [selectedContact, setSelectedContact] = useState<ContactSelectSelection | null>(null);
@@ -571,7 +571,7 @@ export function SignatureConfigDialogBodyStep2({
     };
 
   const [radioSelection, setRadioSelection] = useState<"choose-after" | "choose-now">(
-    petitionIsCompleted || signers.length > 0 ? "choose-now" : "choose-after"
+    petitionIsCompleted || signers.length > 0 ? "choose-now" : "choose-after",
   );
 
   useEffect(() => {

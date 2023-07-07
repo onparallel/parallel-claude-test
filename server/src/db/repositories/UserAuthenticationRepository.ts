@@ -59,13 +59,13 @@ export class UserAuthenticationRepository extends BaseRepository {
   readonly loadUserAuthenticationByTokenHash = this.buildLoadBy(
     "user_authentication_token",
     "token_hash",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at"),
   );
 
   readonly loadUserAuthenticationTokens = this.buildLoadMultipleBy(
     "user_authentication_token",
     "user_id",
-    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc")
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc"),
   );
 
   async createUserAuthenticationToken(tokenName: string, user: User) {

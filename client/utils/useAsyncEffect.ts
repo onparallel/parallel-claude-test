@@ -3,7 +3,7 @@ import { MaybePromise } from "./types";
 
 export function useAsyncEffect(
   effect: (isMounted: () => boolean) => MaybePromise<void>,
-  deps?: DependencyList
+  deps?: DependencyList,
 ) {
   useEffect(() => {
     let isMounted = true;

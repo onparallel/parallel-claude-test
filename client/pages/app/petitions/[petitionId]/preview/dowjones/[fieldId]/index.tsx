@@ -106,8 +106,8 @@ function DowJonesFieldSearch() {
               const { petitionId, fieldId } = router.query;
               router.push(
                 `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/results?${new URLSearchParams(
-                  { name, dateOfBirth }
-                )}`
+                  { name, dateOfBirth },
+                )}`,
               );
             })}
             paddingX={8}

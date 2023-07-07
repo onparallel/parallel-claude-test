@@ -117,7 +117,7 @@ export class ApiContext {
     public readonly tasks: TaskRepository,
     public readonly licenseCodes: LicenseCodeRepository,
     public readonly views: PetitionViewRepository,
-    public readonly profiles: ProfileRepository
+    public readonly profiles: ProfileRepository,
   ) {}
 }
 
@@ -165,6 +165,6 @@ export class WorkerContext {
     @readOnly public readonly readonlyContacts: ContactRepository,
     @readOnly public readonly readonlyPetitions: PetitionRepository,
     @readOnly public readonly readonlyUsers: UserRepository,
-    @readOnly public readonly readonlyTags: TagRepository
+    @readOnly public readonly readonlyTags: TagRepository,
   ) {}
 }

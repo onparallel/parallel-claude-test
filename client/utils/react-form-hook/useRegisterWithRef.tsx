@@ -15,12 +15,12 @@ import {
 export function useRegisterWithRef<
   T,
   TFieldValues extends FieldValues,
-  TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   ref: Ref<T>,
   register: UseFormRegister<TFieldValues>,
   name: TFieldName,
-  options?: RegisterOptions<TFieldValues, TFieldName>
+  options?: RegisterOptions<TFieldValues, TFieldName>,
 ): UseFormRegisterReturn {
   const { ref: registerRef, ...props } = register(name, options);
   return { ref: useMergedRef(ref, registerRef), ...props };

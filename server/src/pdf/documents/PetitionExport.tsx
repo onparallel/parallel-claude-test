@@ -123,7 +123,7 @@ export default function PetitionExport({
       (field) =>
         field.type !== "HEADING" &&
         !isFileTypeField(field.type) &&
-        field.replies.some((r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS)
+        field.replies.some((r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS),
     )?.replies[0].metadata.EXTERNAL_ID_CUATRECASAS;
 
   function notEmptyHeading(field: PetitionExport_PetitionFieldFragment) {
@@ -254,7 +254,7 @@ function PetitionExportField({
   const approxNumberLines =
     (field.description ? approxTextHeight(liquidRender(field.description)) : 0) +
     sumBy(field.replies, (r) =>
-      field.type === "TEXT" ? approxTextHeight(r.content.value ?? "") : 1
+      field.type === "TEXT" ? approxTextHeight(r.content.value ?? "") : 1,
     ) +
     // more space for activity
     sumBy(field.replies, () => (field.showActivityInPdf ? 3 : 0)) +
@@ -412,7 +412,7 @@ function approxTextHeight(text: string) {
 
 function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
   fields: T[],
-  visibility: boolean[]
+  visibility: boolean[],
 ): T[][] {
   const pages: T[][] = [];
   let page: T[] = [];

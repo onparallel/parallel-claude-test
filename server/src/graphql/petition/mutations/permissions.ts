@@ -19,7 +19,7 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
   type: list(nonNull("PetitionBase")),
   authorize: chain(
     authenticate(),
-    and(userHasAccessToPetitions("petitionIds", ["OWNER"]), userHasAccessToUsers("userId"))
+    and(userHasAccessToPetitions("petitionIds", ["OWNER"]), userHasAccessToUsers("userId")),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -37,7 +37,7 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -64,10 +64,10 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
         throw new ArgValidationError(
           info,
           "userIds, userGroupIds",
-          "Either userIds or userGroupIds must be defined"
+          "Either userIds or userGroupIds must be defined",
         );
       }
-    }
+    },
   ),
   resolve: async (_, args, ctx) => {
     const currentPermissions = (
@@ -92,7 +92,7 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
       ],
       "User",
       ctx.user!.id,
-      true
+      true,
     );
 
     if (args.notify) {
@@ -104,15 +104,15 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
         // omit users who had access previously
         differenceWith(
           currentPermissions,
-          (p1, p2) => p1.petition_id === p2.petition_id && p1.user_id === p2.user_id
-        )
+          (p1, p2) => p1.petition_id === p2.petition_id && p1.user_id === p2.user_id,
+        ),
       );
 
       if (newUserPermissions.length > 0) {
         await ctx.emails.sendPetitionSharedEmail(
           ctx.user!.id,
           newUserPermissions.map((p) => p.id),
-          args.message ?? null
+          args.message ?? null,
         );
       }
     }
@@ -126,7 +126,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -143,7 +143,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
         throw new ArgValidationError(
           info,
           "userIds, userGroupIds",
-          "Either userIds or userGroupIds must be defined"
+          "Either userIds or userGroupIds must be defined",
         );
       }
     },
@@ -151,7 +151,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
       if (args.permissionType === "OWNER") {
         throw new ArgValidationError(info, "permissionType", "Invalid permissionType");
       }
-    }
+    },
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -160,13 +160,13 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
         args.userIds ?? [],
         args.userGroupIds ?? [],
         args.permissionType,
-        ctx.user!
+        ctx.user!,
       );
     } catch (e) {
       if (e instanceof DatabaseError && e.constraint === "petition_permission__owner") {
         throw new ApolloError(
           "A petition can't have more than one owner.",
-          "PETITION_OWNER_CONSTRAINT_ERROR"
+          "PETITION_OWNER_CONSTRAINT_ERROR",
         );
       } else {
         throw e;
@@ -181,7 +181,7 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -197,9 +197,9 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
     notEmptyArray((args) => args.userIds, "userIds"),
     validateIf(
       (args) => !isDefined(args.userIds) && !isDefined(args.userGroupIds),
-      validBooleanValue((args) => args.removeAll, "removeAll", true)
+      validBooleanValue((args) => args.removeAll, "removeAll", true),
     ),
-    notEmptyArray((args) => args.userGroupIds, "userGroupId")
+    notEmptyArray((args) => args.userGroupIds, "userGroupId"),
   ),
   resolve: async (_, args, ctx) => {
     const deletedPermissions = await ctx.petitions.removePetitionPermissions(
@@ -207,7 +207,7 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
       args.userIds ?? [],
       args.userGroupIds ?? [],
       args.removeAll ?? false,
-      ctx.user!
+      ctx.user!,
     );
     const deletedPermissionsByPetitionId = groupBy(deletedPermissions, (p) => p.petition_id);
 
@@ -219,7 +219,7 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
     await pMap(
       zip(
         petitionIds.map((id) => deletedPermissionsByPetitionId[id]),
-        effectivePermissions
+        effectivePermissions,
       ),
       async ([deletedPermissions, effectivePermissions]) => {
         const petitionId = deletedPermissions[0].petition_id;
@@ -231,23 +231,23 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
           deletedPermissions
             .filter((p) => p.user_id !== null)
             .map((p) => p.user_id!)
-            .filter((userId) => !hasPermissions.has(userId))
+            .filter((userId) => !hasPermissions.has(userId)),
         );
 
         await ctx.petitions.deletePetitionUserNotificationsByPetitionId([petitionId], userIds);
       },
-      { concurrency: 20 }
+      { concurrency: 20 },
     );
 
     const accesses = await ctx.petitions.userHasAccessToPetitionsRaw(
       ctx.user!.id,
-      args.petitionIds
+      args.petitionIds,
     );
 
     return Promise.all(
       zip(args.petitionIds, accesses).map(async ([petitionId, hasAccess]) =>
-        hasAccess ? await ctx.petitions.loadPetition(petitionId) : null
-      )
+        hasAccess ? await ctx.petitions.loadPetition(petitionId) : null,
+      ),
     );
   },
 });
@@ -267,5 +267,5 @@ export const updatePetitionPermissionSubscription = mutationField(
 
       return (await ctx.petitions.loadPetition(petitionId))!;
     },
-  }
+  },
 );

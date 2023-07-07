@@ -77,7 +77,7 @@ export const createProfileType = mutationField("createProfileType", {
     return await ctx.profilesSetup.createDefaultProfileType(
       ctx.user!.org_id,
       args.name,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -87,7 +87,7 @@ export const updateProfileType = mutationField("updateProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    contextUserHasRole("ADMIN")
+    contextUserHasRole("ADMIN"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -96,7 +96,7 @@ export const updateProfileType = mutationField("updateProfileType", {
   },
   validateArgs: validateAnd(
     validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 }),
-    validProfileNamePattern("profileTypeId", "profileNamePattern")
+    validProfileNamePattern("profileTypeId", "profileNamePattern"),
   ),
   resolve: async (_, { profileTypeId, name, profileNamePattern }, ctx) => {
     const updateData: Partial<CreateProfileType> = {};
@@ -107,12 +107,12 @@ export const updateProfileType = mutationField("updateProfileType", {
     await ctx.profiles.updateProfileType(profileTypeId, updateData, `User:${ctx.user!.id}`);
     if (isDefined(profileNamePattern)) {
       const pattern = parseTextWithPlaceholders(profileNamePattern).map((p) =>
-        p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text
+        p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text,
       );
       await ctx.profiles.updateProfileTypeProfileNamePattern(
         profileTypeId,
         pattern,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     }
     return (await ctx.profiles.loadProfileType(profileTypeId, { refresh: true }))!;
@@ -124,14 +124,14 @@ export const cloneProfileType = mutationField("cloneProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    contextUserHasRole("ADMIN")
+    contextUserHasRole("ADMIN"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     name: arg({ type: "LocalizableUserText" }),
   },
   validateArgs: validateAnd(
-    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 })
+    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 }),
   ),
   resolve: async (_, { profileTypeId, name }, ctx) => {
     const createData: Partial<CreateProfileType> = {};
@@ -149,7 +149,7 @@ export const deleteProfileType = mutationField("deleteProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
     profileTypeIsArchived("profileTypeIds"),
-    contextUserHasRole("ADMIN")
+    contextUserHasRole("ADMIN"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -160,7 +160,7 @@ export const deleteProfileType = mutationField("deleteProfileType", {
       await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(
         profileTypeIds,
         `User:${ctx.user!.id}`,
-        t
+        t,
       );
       await ctx.profiles.deleteProfileTypes(profileTypeIds, `User:${ctx.user!.id}`, t);
     });
@@ -173,7 +173,7 @@ export const archiveProfileType = mutationField("archiveProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
-    contextUserHasRole("ADMIN")
+    contextUserHasRole("ADMIN"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -188,7 +188,7 @@ export const unarchiveProfileType = mutationField("unarchiveProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
-    contextUserHasRole("ADMIN")
+    contextUserHasRole("ADMIN"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -203,14 +203,14 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    contextUserHasRole("ADMIN")
+    contextUserHasRole("ADMIN"),
   ),
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
     validLocalizableUserText((args) => args.data.name, "data.name", { maxLength: 200 }),
     maxLength((args) => args.data.alias, "data.alias", 100),
     validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/),
-    validProfileTypeFieldOptions("data", "data")
+    validProfileTypeFieldOptions("data", "data"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -227,7 +227,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
           t.nullable.boolean("isExpirable");
           t.nullable.duration("expiryAlertAheadTime");
         },
-      })
+      }),
     ),
   },
   resolve: async (_, args, ctx) => {
@@ -242,7 +242,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
           expiry_alert_ahead_time: args.data.isExpirable ? args.data.expiryAlertAheadTime : null,
           options: args.data.options ?? defaultProfileTypeFieldOptions(args.data.type),
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       return profileTypeField;
     } catch (e) {
@@ -252,7 +252,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
       ) {
         throw new ApolloError(
           "The alias for this field already exists in this profile type",
-          "ALIAS_ALREADY_EXISTS"
+          "ALIAS_ALREADY_EXISTS",
         );
       } else {
         throw e;
@@ -267,7 +267,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     userHasFeatureFlag("PROFILES"),
     contextUserHasRole("ADMIN"),
     userHasAccessToProfileType("profileTypeId"),
-    profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId")
+    profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -282,13 +282,13 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           t.nullable.duration("expiryAlertAheadTime");
           t.nullable.jsonObject("options");
         },
-      }).asArg()
+      }).asArg(),
     ),
     force: nullable(
       booleanArg({
         description:
           "Pass force=true to remove expirations from values and files when setting isExpirable to false",
-      })
+      }),
     ),
   },
   validateArgs: validateAnd(
@@ -296,7 +296,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     maxLength((args) => args.data.name?.en, "data.name.en", 500),
     maxLength((args) => args.data.name?.es, "data.name.es", 500),
     maxLength((args) => args.data.alias, "data.alias", 100),
-    validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/)
+    validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/),
   ),
   resolve: async (_, args, ctx, info) => {
     const updateData: Partial<CreateProfileTypeField> = {};
@@ -333,31 +333,31 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           const repliesHaveExpirySet = await ctx.profiles.profileFieldRepliesHaveExpiryDateSet(
             args.profileTypeFieldId,
             profileTypeField.type,
-            t
+            t,
           );
           if (repliesHaveExpirySet && !args.force) {
             throw new ApolloError(
               `Cannot remove expiry date from field because some profiles have expiry dates set for this field.`,
-              "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR"
+              "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR",
             );
           }
           // if removing caducity, remove expiry dates from all profile replies
           await ctx.profiles.updateProfileFieldValuesByProfileTypeFieldId(
             args.profileTypeFieldId,
             { expiry_date: null },
-            t
+            t,
           );
           await ctx.profiles.updateProfileFieldFilesByProfileTypeFieldId(
             args.profileTypeFieldId,
             { expiry_date: null },
-            t
+            t,
           );
         }
         return await ctx.profiles.updateProfileTypeField(
           args.profileTypeFieldId,
           updateData,
           `User:${ctx.user!.id}`,
-          t
+          t,
         );
       });
     } catch (e) {
@@ -367,7 +367,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
       ) {
         throw new ApolloError(
           "The alias for this field already exists in this profile type",
-          "ALIAS_ALREADY_EXISTS"
+          "ALIAS_ALREADY_EXISTS",
         );
       } else {
         throw e;
@@ -382,7 +382,7 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
     userHasFeatureFlag("PROFILES"),
     contextUserHasRole("ADMIN"),
     userHasAccessToProfileType("profileTypeId"),
-    profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId")
+    profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -391,23 +391,23 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
       booleanArg({
         description:
           "Pass force=true delete the field even if it has values or files associated with it.",
-      })
+      }),
     ),
   },
   resolve: async (_, { profileTypeId, profileTypeFieldIds, force }, ctx) => {
     const profileType = (await ctx.profiles.loadProfileType(profileTypeId))!;
     if (
       profileTypeFieldIds.some((id) =>
-        (profileType!.profile_name_pattern as (string | number)[]).includes(id)
+        (profileType!.profile_name_pattern as (string | number)[]).includes(id),
       )
     ) {
       throw new ApolloError(
         "At least one of the provided profile type field ids is being used in the profile name pattern.",
-        "FIELD_USED_IN_PATTERN"
+        "FIELD_USED_IN_PATTERN",
       );
     }
     const profileCount = await ctx.profiles.countProfilesWithValuesOrFilesByProfileTypeFieldId(
-      profileTypeFieldIds
+      profileTypeFieldIds,
     );
 
     if (Number(profileCount) > 0 && !force) {
@@ -416,14 +416,14 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
         "FIELD_HAS_VALUE_OR_FILES",
         {
           profileCount,
-        }
+        },
       );
     }
 
     await ctx.profiles.deleteProfileTypeFields(
       profileTypeId,
       profileTypeFieldIds,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     return profileType;
   },
@@ -435,7 +435,7 @@ export const updateProfileTypeFieldPositions = mutationField("updateProfileTypeF
     userHasFeatureFlag("PROFILES"),
     contextUserHasRole("ADMIN"),
     userHasAccessToProfileType("profileTypeId"),
-    profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId")
+    profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -446,7 +446,7 @@ export const updateProfileTypeFieldPositions = mutationField("updateProfileTypeF
       await ctx.profiles.updateProfileTypeFieldPositions(
         profileTypeId,
         profileTypeFieldIds,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       return (await ctx.profiles.loadProfileType(profileTypeId))!;
     } catch (e) {
@@ -464,7 +464,7 @@ export const createProfile = mutationField("createProfile", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    not(profileTypeIsArchived("profileTypeId"))
+    not(profileTypeIsArchived("profileTypeId")),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -473,14 +473,14 @@ export const createProfile = mutationField("createProfile", {
   resolve: async (_, args, ctx) => {
     const profile = await ctx.profiles.createProfile(
       { name: "", org_id: ctx.user!.org_id, profile_type_id: args.profileTypeId },
-      ctx.user!.id
+      ctx.user!.id,
     );
 
     if (args.subscribe) {
       await ctx.profiles.subscribeUsersToProfiles(
         [profile.id],
         [ctx.user!.id],
-        `User:${ctx.user!.id}}`
+        `User:${ctx.user!.id}}`,
       );
     }
 
@@ -493,7 +493,7 @@ export const deleteProfile = mutationField("deleteProfile", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     contextUserHasRole("ADMIN"),
-    userHasAccessToProfile("profileIds")
+    userHasAccessToProfile("profileIds"),
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
@@ -531,9 +531,9 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
                 t.nullable.date("expiryDate");
               },
             }),
-          })
-        )
-      )
+          }),
+        ),
+      ),
     ),
   },
   resolve: async (_, { profileId, fields }, ctx) => {
@@ -545,7 +545,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     if (
       !isDefined(profile) ||
       profileTypeFields.some(
-        (p) => !isDefined(p) || p.profile_type_id !== profile!.profile_type_id || p.type === "FILE"
+        (p) => !isDefined(p) || p.profile_type_id !== profile!.profile_type_id || p.type === "FILE",
       )
     ) {
       throw new ForbiddenError("Not authorized");
@@ -565,7 +565,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
           if (e instanceof Error) {
             throw new ApolloError(
               `Invalid profile field value: ${e.message}`,
-              "INVALID_PROFILE_FIELD_VALUE"
+              "INVALID_PROFILE_FIELD_VALUE",
             );
           }
         }
@@ -573,7 +573,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       if (field.expiryDate !== undefined && !profileTypeField.is_expirable) {
         throw new ApolloError(
           `Can't set expiry on a non expirable field`,
-          "EXPIRY_ON_NON_EXPIRABLE_FIELD"
+          "EXPIRY_ON_NON_EXPIRABLE_FIELD",
         );
       }
       if (field.expiryDate !== undefined && field.content === null) {
@@ -586,7 +586,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       ) {
         throw new ApolloError(
           `Can't set expiry on a field with no value`,
-          "EXPIRY_ON_NONEXISTING_VALUE"
+          "EXPIRY_ON_NONEXISTING_VALUE",
         );
       }
 
@@ -608,7 +608,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     return (await ctx.profiles.updateProfileFieldValue(
       profileId,
       fieldsWithZonedExpires,
-      ctx.user!.id
+      ctx.user!.id,
     ))!;
   },
 });
@@ -620,7 +620,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     userHasAccessToProfile("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
-    fileUploadCanBeAttachedToProfileTypeField("profileId", "profileTypeFieldId", "data")
+    fileUploadCanBeAttachedToProfileTypeField("profileId", "profileTypeFieldId", "data"),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -632,8 +632,8 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     validFileUploadInput((args) => args.data, { maxSizeBytes: toBytes(100, "MB") }, "data"),
     validateOr(
       notEmptyArray((args) => args.data, "data"),
-      validIsNotUndefined((args) => args.expiryDate, "expiryDate")
-    )
+      validIsNotUndefined((args) => args.expiryDate, "expiryDate"),
+    ),
   ),
   resolve: async (_, { profileId, profileTypeFieldId, data, expiryDate }, ctx) => {
     let fileUploads: FileUpload[] = [];
@@ -649,7 +649,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
           content_type: data.contentType,
           upload_complete: false,
         })),
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       presignedPostDatas = await Promise.all(
@@ -657,9 +657,9 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
           ctx.storage.fileUploads.getSignedUploadEndpoint(
             file.path,
             file.content_type,
-            parseInt(file.size)
-          )
-        )
+            parseInt(file.size),
+          ),
+        ),
       );
 
       files = await ctx.profiles.createProfileFieldFiles(
@@ -667,14 +667,14 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
         profileTypeFieldId,
         fileUploads.map((f) => f.id),
         expiryDate,
-        ctx.user!.id
+        ctx.user!.id,
       );
     } else {
       // no new files, update expiryDate on all uploaded files
       await ctx.profiles.updateProfileFieldFilesExpiryDate(
         profileId,
         profileTypeFieldId,
-        expiryDate ?? null
+        expiryDate ?? null,
       );
 
       await ctx.profiles.createEvent({
@@ -707,7 +707,7 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -722,13 +722,13 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
         (pff) =>
           !isDefined(pff) ||
           pff.profile_id !== profileId ||
-          pff.profile_type_field_id !== profileTypeFieldId
+          pff.profile_type_field_id !== profileTypeFieldId,
       )
     ) {
       throw new ForbiddenError("Not authorized");
     }
     const fileUploads = await ctx.files.loadFileUpload(
-      (profileFieldFiles as ProfileFieldFile[]).map((pff) => pff.file_upload_id)
+      (profileFieldFiles as ProfileFieldFile[]).map((pff) => pff.file_upload_id),
     );
 
     await pMap(fileUploads, async (fu) => {
@@ -736,7 +736,7 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
     });
     await ctx.files.markFileUploadComplete(
       fileUploads.map((fu) => fu!.id),
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     for (const fu of fileUploads) {
       ctx.files.loadFileUpload.dataloader.clear(fu!.id);
@@ -753,9 +753,9 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     ifArgDefined(
       "profileFieldFileIds",
-      profileFieldFileHasProfileTypeFieldId("profileFieldFileIds" as never, "profileTypeFieldId")
+      profileFieldFileHasProfileTypeFieldId("profileFieldFileIds" as never, "profileTypeFieldId"),
     ),
-    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -769,7 +769,7 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
       } else {
         await ctx.profiles.deleteProfileFieldFilesByProfileTypeFieldId(
           profileTypeFieldId,
-          ctx.user!.id
+          ctx.user!.id,
         );
       }
       return RESULT.SUCCESS;
@@ -787,7 +787,7 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
     userHasAccessToProfile("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     profileFieldFileHasProfileTypeFieldId("profileFieldFileId", "profileTypeFieldId"),
-    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -800,7 +800,7 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
   resolve: async (_, args, ctx) => {
     try {
       const profileFieldFile = (await ctx.profiles.loadProfileFieldFileById(
-        args.profileFieldFileId
+        args.profileFieldFileId,
       ))!;
 
       const file = await ctx.files.loadFileUpload(profileFieldFile.file_upload_id);
@@ -819,7 +819,7 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
         url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file!.path,
           file!.filename,
-          args.preview ? "inline" : "attachment"
+          args.preview ? "inline" : "attachment",
         ),
       };
     } catch {
@@ -835,7 +835,7 @@ export const subscribeToProfile = mutationField("subscribeToProfile", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileIds"),
-    contextUserCanSubscribeUsersToProfile("userIds")
+    contextUserCanSubscribeUsersToProfile("userIds"),
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
@@ -843,7 +843,7 @@ export const subscribeToProfile = mutationField("subscribeToProfile", {
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
-    notEmptyArray((args) => args.profileIds, "profileIds")
+    notEmptyArray((args) => args.profileIds, "profileIds"),
   ),
   resolve: async (_, { profileIds, userIds }, ctx) => {
     await ctx.profiles.subscribeUsersToProfiles(profileIds, userIds, `User:${ctx.user!.id}`);
@@ -856,7 +856,7 @@ export const unsubscribeFromProfile = mutationField("unsubscribeFromProfile", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileIds"),
-    contextUserCanSubscribeUsersToProfile("userIds")
+    contextUserCanSubscribeUsersToProfile("userIds"),
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
@@ -864,7 +864,7 @@ export const unsubscribeFromProfile = mutationField("unsubscribeFromProfile", {
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
-    notEmptyArray((args) => args.profileIds, "profileIds")
+    notEmptyArray((args) => args.profileIds, "profileIds"),
   ),
   resolve: async (_, { profileIds, userIds }, ctx) => {
     await ctx.profiles.unsubscribeUsersFromProfiles(profileIds, userIds, `User:${ctx.user!.id}`);
@@ -880,7 +880,7 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileId"),
     petitionsAreNotPublicTemplates("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -891,7 +891,7 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
       const petitionProfile = await ctx.profiles.associateProfileToPetition(
         profileId,
         petitionId,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       await ctx.petitions.createEvent({
@@ -920,7 +920,7 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
       ) {
         throw new ApolloError(
           "Profile already associated to petition",
-          "PROFILE_ALREADY_ASSOCIATED_TO_PETITION"
+          "PROFILE_ALREADY_ASSOCIATED_TO_PETITION",
         );
       }
 
@@ -937,7 +937,7 @@ export const disassociateProfileFromPetition = mutationField("disassociateProfil
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileIds"),
     petitionIsNotAnonymized("petitionId"),
-    profileIsAssociatedToPetition("profileIds", "petitionId")
+    profileIsAssociatedToPetition("profileIds", "petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -954,7 +954,7 @@ export const disassociateProfileFromPetition = mutationField("disassociateProfil
           user_id: ctx.user!.id,
           profile_id: profileId,
         },
-      }))
+      })),
     );
 
     await ctx.profiles.createEvent(
@@ -966,7 +966,7 @@ export const disassociateProfileFromPetition = mutationField("disassociateProfil
           user_id: ctx.user!.id,
           petition_id: petitionId,
         },
-      }))
+      })),
     );
 
     return RESULT.SUCCESS;
@@ -981,7 +981,7 @@ export const disassociatePetitionFromProfile = mutationField("disassociatePetiti
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileId"),
     petitionIsNotAnonymized("petitionIds"),
-    profileIsAssociatedToPetition("profileId", "petitionIds")
+    profileIsAssociatedToPetition("profileId", "petitionIds"),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -998,7 +998,7 @@ export const disassociatePetitionFromProfile = mutationField("disassociatePetiti
           user_id: ctx.user!.id,
           profile_id: profileId,
         },
-      }))
+      })),
     );
 
     await ctx.profiles.createEvent(
@@ -1010,7 +1010,7 @@ export const disassociatePetitionFromProfile = mutationField("disassociatePetiti
           user_id: ctx.user!.id,
           petition_id: petitionId,
         },
-      }))
+      })),
     );
 
     return RESULT.SUCCESS;

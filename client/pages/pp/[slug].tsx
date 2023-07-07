@@ -72,11 +72,11 @@ function PublicPetitionLink({
   const hasRemoveParallelBranding = organization.hasRemoveParallelBranding;
 
   const [createPublicPetition, { loading }] = useMutation(
-    PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument
+    PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument,
   );
 
   const [sendReminder, { loading: reminderLoading }] = useMutation(
-    PublicPetitionLink_publicSendReminderDocument
+    PublicPetitionLink_publicSendReminderDocument,
   );
 
   const onSubmit: SubmitHandler<PublicPetitionInitialFormData> = async (formData) => {

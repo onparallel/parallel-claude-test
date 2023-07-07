@@ -12,12 +12,12 @@ import { AUTH, IAuth } from "./AuthService";
 export interface IPrinter {
   petitionExport(
     userId: number,
-    data: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number }
+    data: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number },
   ): Promise<NodeJS.ReadableStream>;
   annexCoverPage(
     userId: number,
     props: AnnexCoverPageProps,
-    locale: ContactLocale
+    locale: ContactLocale,
   ): Promise<NodeJS.ReadableStream>;
   imageToPdf(userId: number, props: ImageToPdfProps): Promise<NodeJS.ReadableStream>;
 }
@@ -26,7 +26,10 @@ export const PRINTER = Symbol.for("PRINTER");
 
 @injectable()
 export class Printer implements IPrinter {
-  constructor(@inject(AUTH) protected auth: IAuth, private petitions: PetitionRepository) {}
+  constructor(
+    @inject(AUTH) protected auth: IAuth,
+    private petitions: PetitionRepository,
+  ) {}
 
   private async createClient(userId: number) {
     const token = await this.auth.generateTempAuthToken(userId);
@@ -37,7 +40,7 @@ export class Printer implements IPrinter {
 
   public async petitionExport(
     userId: number,
-    { petitionId, ...data }: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number }
+    { petitionId, ...data }: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number },
   ) {
     const petition = await this.petitions.loadPetition(petitionId, { refresh: true }); // refresh to get the correct petition.locale in case it has been recently updated
     if (!petition) {
@@ -47,7 +50,7 @@ export class Printer implements IPrinter {
     return await buildPdf(
       PetitionExport,
       { ...data, petitionId: toGlobalId("Petition", petitionId) },
-      { client, locale: petition.recipient_locale }
+      { client, locale: petition.recipient_locale },
     );
   }
 

@@ -78,7 +78,7 @@ export const contactQueries = queryField((t) => {
             email: email.toLowerCase(),
             orgId: ctx.user!.org_id,
           }),
-        { concurrency: 20 }
+        { concurrency: 20 },
       );
     },
   });

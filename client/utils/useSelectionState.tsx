@@ -21,7 +21,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
     selection: Object.fromEntries(
       items.map((r) => {
         return [getKey(r, keyProp), false];
-      })
+      }),
     ),
     lastSelected: null,
   });
@@ -35,7 +35,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
         items.map((r) => {
           const key = getKey(r, keyPropRef.current);
           return [key, selection[key] ?? false];
-        })
+        }),
       ),
     });
   }, [items.map((r) => getKey(r, keyProp)).join(",")]);
@@ -49,7 +49,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
         allSelected: items.every((r) => selection[getKey(r, keyPropRef.current)]),
         anySelected: items.some((r) => selection[getKey(r, keyPropRef.current)]),
       }),
-      [selection]
+      [selection],
     ),
 
     ...useMemo(() => {
@@ -60,7 +60,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
           if (previous.lastSelected && shiftKey) {
             // range selection
             const lastIndex = items.findIndex(
-              (r) => getKey(r, keyPropRef.current) === previous.lastSelected
+              (r) => getKey(r, keyPropRef.current) === previous.lastSelected,
             );
             const index = items.findIndex((r) => getKey(r, keyPropRef.current) === key);
             if (lastIndex >= 0 && index >= 0) {
@@ -88,7 +88,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
           return {
             lastSelected: null,
             selection: Object.fromEntries(
-              items.map((r) => [getKey(r, keyPropRef.current), !_allSelected])
+              items.map((r) => [getKey(r, keyPropRef.current), !_allSelected]),
             ),
           };
         });
@@ -104,7 +104,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
           setState({
             lastSelected: null,
             selection: Object.fromEntries(
-              items.map((r) => [getKey(r, keyPropRef.current), predicate(r)])
+              items.map((r) => [getKey(r, keyPropRef.current), predicate(r)]),
             ),
           });
         },
@@ -117,7 +117,7 @@ export function useSelection<T>(items: T[] | undefined, keyProp: KeyProp<T>) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedRows = useMemo(
     () => selectedIds.map((id) => items?.find((r) => getKey(r, keyProp) === id)).filter(isDefined),
-    [selectedIds, items, keyProp]
+    [selectedIds, items, keyProp],
   );
   return {
     selectedIds,

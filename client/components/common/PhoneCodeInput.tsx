@@ -25,7 +25,7 @@ export const PhoneCodeSelect = forwardRef<
     if (!isDefined(countries)) return undefined;
 
     const sortedCountries = Object.entries(countries).sort((a, b) =>
-      a[1].localeCompare(b[1], intl.locale)
+      a[1].localeCompare(b[1], intl.locale),
     );
 
     return sortedCountries.map(([key, value]) => {

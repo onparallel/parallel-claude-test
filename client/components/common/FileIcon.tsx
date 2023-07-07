@@ -23,7 +23,7 @@ export interface FileIconProps {
 
 export const FileIcon = chakraForwardRef<"svg", FileIconProps>(function FileIcon(
   { filename, contentType, hasFailed, ...props },
-  ref
+  ref,
 ) {
   const [Icon, label] = useGetIconAndLabelForFile({ filename, contentType, hasFailed });
   return (

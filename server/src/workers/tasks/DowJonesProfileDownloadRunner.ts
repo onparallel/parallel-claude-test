@@ -16,7 +16,7 @@ export class DowJonesProfileDownloadRunner extends TaskRunner<"DOW_JONES_PROFILE
 
     const [dowJonesIntegration] = await this.ctx.integrations.loadIntegrationsByOrgId(
       user.org_id,
-      "DOW_JONES_KYC"
+      "DOW_JONES_KYC",
     );
 
     if (!hasFeatureFlag) {
@@ -28,7 +28,7 @@ export class DowJonesProfileDownloadRunner extends TaskRunner<"DOW_JONES_PROFILE
 
     const response = await this.ctx.dowJonesKyc.riskEntityProfilePdf(
       dowJonesIntegration.id,
-      this.task.input.profile_id
+      this.task.input.profile_id,
     );
 
     const tmpFile = await this.uploadTemporaryFile({

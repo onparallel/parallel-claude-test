@@ -41,7 +41,7 @@ function AddNewSignerDialog({ tone, ...props }: DialogProps<{ tone: Tone }, NewS
             firstName: data.firstName.trim(),
             lastName: data.lastName.trim(),
             email: data.email.toLowerCase(),
-          })
+          }),
         ),
       }}
       header={

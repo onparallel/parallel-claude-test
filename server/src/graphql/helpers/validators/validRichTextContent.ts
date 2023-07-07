@@ -126,7 +126,7 @@ export function validRichTextContent<TypeName extends string, FieldName extends 
    * if not defined and the RTE contains globalId placeholders, an error will be thrown
    */
   petitionIdProp: ((args: core.ArgsValue<TypeName, FieldName>) => number) | undefined,
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     async function validateGlobalIdReferences(nodes: SlateNode[], petitionId: number) {
@@ -145,7 +145,7 @@ export function validRichTextContent<TypeName extends string, FieldName extends 
 
           if (isDefined(field) && field.petition_id !== petitionId) {
             throw new Error(
-              `Expected PetitionField:${field.id} to belong to Petition:${petitionId}`
+              `Expected PetitionField:${field.id} to belong to Petition:${petitionId}`,
             );
           }
         }

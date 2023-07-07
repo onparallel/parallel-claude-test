@@ -57,7 +57,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   const tone = useTone();
 
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
-    RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument
+    RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   );
   const handleDownloadAttachment = async function (attachmentId: string) {
     await withError(
@@ -71,7 +71,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         });
         const { url } = data!.publicPetitionFieldAttachmentDownloadLink;
         return url!;
-      })
+      }),
     );
   };
 
@@ -88,7 +88,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   }
 
   const [publicDeletePetitionFieldReply] = useMutation(
-    RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument
+    RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument,
   );
   const handleDeletePetitionFieldReply = useCallback(
     async (replyId: string) => {
@@ -106,11 +106,11 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         updateLastSaved();
       } catch {}
     },
-    [publicDeletePetitionFieldReply, updateLastSaved]
+    [publicDeletePetitionFieldReply, updateLastSaved],
   );
 
   const [publicUpdatePetitionFieldReply] = useMutation(
-    RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument
+    RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument,
   );
   const handleUpdatePetitionFieldReply = useCallback(
     async (replyId: string, reply: any) => {
@@ -125,11 +125,11 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         updateLastSaved();
       } catch {}
     },
-    [publicUpdatePetitionFieldReply, updateLastSaved]
+    [publicUpdatePetitionFieldReply, updateLastSaved],
   );
 
   const [publicCreatePetitionFieldReply] = useMutation(
-    RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument
+    RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument,
   );
   const handleCreatePetitionFieldReply = useCallback(
     async (reply: any) => {
@@ -147,7 +147,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
 
       return;
     },
-    [publicCreatePetitionFieldReply, updateLastSaved]
+    [publicCreatePetitionFieldReply, updateLastSaved],
   );
 
   const createFileUploadReply = useCreateFileUploadReply();
@@ -163,11 +163,11 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         updateLastSaved();
       } catch {}
     },
-    [createFileUploadReply, uploads, updateLastSaved]
+    [createFileUploadReply, uploads, updateLastSaved],
   );
 
   const [downloadFileUploadReply] = useMutation(
-    RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument
+    RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   );
   const showFailure = useFailureGeneratingLinkDialog();
   const apollo = useApolloClient();
@@ -191,14 +191,14 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
             throw new Error();
           }
           return url!;
-        })
+        }),
       );
     },
-    [downloadFileUploadReply]
+    [downloadFileUploadReply],
   );
 
   const [publicStartAsyncFieldCompletion] = useMutation(
-    RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument
+    RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument,
   );
 
   const handleStartAsyncFieldCompletion = async () => {
@@ -216,7 +216,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   });
   const handleRefreshAsyncField = useCallback(
     () => refetch({ fieldId: props.field.id, keycode: props.keycode }),
-    [refetch, props.field.id, props.keycode]
+    [refetch, props.field.id, props.keycode],
   );
 
   const commonProps = {

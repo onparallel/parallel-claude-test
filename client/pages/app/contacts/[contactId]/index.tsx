@@ -92,7 +92,7 @@ function Contact({ contactId }: ContactProps) {
           CLOSED: "replies",
         } as const
       )[row.petition!.status],
-      { event }
+      { event },
     );
   }
 
@@ -110,7 +110,7 @@ function Contact({ contactId }: ContactProps) {
       reset({ firstName, lastName });
       setIsEditing(false);
     }),
-    []
+    [],
   );
 
   const columns = useContactPetitionAccessesColumns();
@@ -333,7 +333,7 @@ function useContactPetitionAccessesColumns() {
                     ? p.user
                     : p.__typename === "PetitionUserGroupPermission"
                     ? p.group
-                    : (null as never)
+                    : (null as never),
                 )}
               />
             </Flex>
@@ -357,7 +357,7 @@ function useContactPetitionAccessesColumns() {
           ),
         },
       ] as TableColumn<PetitionAccessSelection>[],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -463,7 +463,7 @@ interface ToggleInputProps extends ThemingProps<"Input">, FormControlOptions {
 
 const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(function ToggleInput(
   { isEditing, children, ...props },
-  ref
+  ref,
 ) {
   return isEditing ? (
     <Input ref={ref} {...props} />

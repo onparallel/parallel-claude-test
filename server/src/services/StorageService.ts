@@ -25,12 +25,12 @@ export interface IStorageImpl {
   getSignedUploadEndpoint(
     key: string,
     contentType: string,
-    maxAllowedSize?: number
+    maxAllowedSize?: number,
   ): Promise<PresignedPost>;
   getSignedDownloadEndpoint(
     key: string,
     filename: string,
-    cdType: "attachment" | "inline"
+    cdType: "attachment" | "inline",
   ): Promise<string>;
   downloadFile(key: string): Promise<Readable>;
   getFileMetadata(key: string): Promise<HeadObjectOutput>;
@@ -41,7 +41,10 @@ export interface IStorageImpl {
 const _4GB = 1024 * 1024 * 1024 * 4;
 
 class StorageImpl implements IStorageImpl {
-  constructor(private s3: S3Client, private bucketName: string) {}
+  constructor(
+    private s3: S3Client,
+    private bucketName: string,
+  ) {}
 
   async getSignedUploadEndpoint(key: string, contentType: string, maxAllowedSize?: number) {
     return await createPresignedPost(this.s3, {
@@ -63,13 +66,13 @@ class StorageImpl implements IStorageImpl {
         Key: key,
         ResponseContentDisposition: contentDisposition(filename, { type: cdType }),
       }),
-      { expiresIn: 60 * 30 }
+      { expiresIn: 60 * 30 },
     );
   }
 
   async downloadFile(key: string) {
     const response = await this.s3.send(
-      new GetObjectCommand({ Bucket: this.bucketName, Key: key })
+      new GetObjectCommand({ Bucket: this.bucketName, Key: key }),
     );
     return Readable.from(await buffer(response.Body! as Readable));
   }
@@ -81,10 +84,10 @@ class StorageImpl implements IStorageImpl {
           new HeadObjectCommand({
             Bucket: this.bucketName,
             Key: key,
-          })
+          }),
         );
       },
-      { maxRetries: 3, delay: 1_000 }
+      { maxRetries: 3, delay: 1_000 },
     );
   }
 
@@ -97,7 +100,7 @@ class StorageImpl implements IStorageImpl {
           new DeleteObjectsCommand({
             Bucket: this.bucketName,
             Delete: { Objects: objectsChunk },
-          })
+          }),
         );
       }
     }
@@ -128,7 +131,10 @@ export interface IStorageService {
 
 @injectable()
 export class StorageService implements IStorageService {
-  constructor(@inject(CONFIG) private config: Config, @inject(LOGGER) private logger: ILogger) {}
+  constructor(
+    @inject(CONFIG) private config: Config,
+    @inject(LOGGER) private logger: ILogger,
+  ) {}
 
   @Memoize() private get s3() {
     return new S3Client({

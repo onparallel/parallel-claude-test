@@ -31,7 +31,7 @@ export function compareWithFragments<T>(fragments: Partial<{ [K in keyof T]: Doc
             prev[key],
             next[key],
             (doc.definitions[0] as FragmentDefinitionNode).selectionSet,
-            fragmentMap
+            fragmentMap,
           )
         ) {
           return false;
@@ -50,7 +50,7 @@ function checkSelectionSet(
   a: any,
   b: any,
   selectionSet: SelectionSetNode,
-  fragmentMap: FragmentMap
+  fragmentMap: FragmentMap,
 ) {
   if (a === b) {
     return true;

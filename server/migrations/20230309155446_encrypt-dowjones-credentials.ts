@@ -28,8 +28,8 @@ export async function up(knex: Knex): Promise<void> {
   if (!isDefined(environment) || !validEnvironments.includes(environment)) {
     throw new Error(
       `run this migration as: MIGRATION_ENV=<env> yarn migrate. <env>: ${validEnvironments.join(
-        " | "
-      )}`
+        " | ",
+      )}`,
     );
   }
   if (environment === "local") {
@@ -47,7 +47,7 @@ export async function up(knex: Knex): Promise<void> {
     const encrypted = encryptedKeys.find(([id]) => integration.id === parseInt(id));
     if (!encrypted) {
       throw new Error(
-        `OrgIntegration:${integration.id} is not defined on encryptedCredentialsMap. Update the migration and try again.`
+        `OrgIntegration:${integration.id} is not defined on encryptedCredentialsMap. Update the migration and try again.`,
       );
     }
   });
@@ -64,7 +64,7 @@ export async function up(knex: Knex): Promise<void> {
         from "encrypted_keys" ek
         where oi."provider" = 'DOW_JONES_KYC' and oi.id = ek.id;
     `,
-    encryptedKeys.flatMap(([id, encrypted]) => [parseInt(id), encrypted])
+    encryptedKeys.flatMap(([id, encrypted]) => [parseInt(id), encrypted]),
   );
 }
 

@@ -11,7 +11,7 @@ interface UploadFileOptions {
 export function uploadFile(
   file: File,
   presignedPostData: uploadFile_AWSPresignedPostDataFragment,
-  { signal, onProgress }: UploadFileOptions = {}
+  { signal, onProgress }: UploadFileOptions = {},
 ): Promise<void> {
   try {
     return retry(
@@ -48,7 +48,7 @@ export function uploadFile(
           setTimeout(() => request.send(formData));
         });
       },
-      { maxRetries: 3, signal, delay: 1_000 }
+      { maxRetries: 3, signal, delay: 1_000 },
     );
   } catch (e) {
     if (e instanceof UploadFileError && e.message === "Error when uploading to AWS") {
@@ -65,7 +65,10 @@ export function uploadFile(
 }
 
 export class UploadFileError extends Error {
-  constructor(message: string, public override cause: XMLHttpRequest) {
+  constructor(
+    message: string,
+    public override cause: XMLHttpRequest,
+  ) {
     super(message);
   }
 }

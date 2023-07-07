@@ -12,13 +12,13 @@ export class PetitionViewRepository extends BaseRepository {
   }
 
   readonly loadPetitionListView = this.buildLoadBy("petition_list_view", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadPetitionListViewsByUserId = this.buildLoadMultipleBy(
     "petition_list_view",
     "user_id",
-    (q) => q.whereNull("deleted_at").orderBy("position", "asc")
+    (q) => q.whereNull("deleted_at").orderBy("position", "asc"),
   );
 
   async getPetitionListViewUsingTags(tagId: number) {
@@ -31,7 +31,7 @@ export class PetitionViewRepository extends BaseRepository {
             jsonb_build_array(?::int)
           )
         )`,
-        [tagId]
+        [tagId],
       )
       .select("*");
   }
@@ -39,7 +39,7 @@ export class PetitionViewRepository extends BaseRepository {
   async createPetitionListView(data: CreatePetitionListView, createdBy: string) {
     const [view] = await this.from("petition_list_view").insert(
       { ...data, created_by: createdBy },
-      "*"
+      "*",
     );
     return view;
   }
@@ -48,7 +48,7 @@ export class PetitionViewRepository extends BaseRepository {
     id: number,
     data: Partial<PetitionListView>,
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [view] = await this.from("petition_list_view", t)
       .where({ id, deleted_at: null, user_id: user.id })
@@ -58,7 +58,7 @@ export class PetitionViewRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `User:${user.id}`,
         },
-        "*"
+        "*",
       );
 
     return view;
@@ -86,7 +86,7 @@ export class PetitionViewRepository extends BaseRepository {
         and plv.user_id = ?
     `,
         [this.sqlValues(input, ["int", "jsonb"]), `User:${user.id}`, user.id],
-        t
+        t,
       );
     }
   }
@@ -101,7 +101,7 @@ export class PetitionViewRepository extends BaseRepository {
           /* sql */ `
           case when (id != ?::int or ?::int is null) then false else true end
         `,
-          [id, id]
+          [id, id],
         ),
       });
   }
@@ -122,10 +122,10 @@ export class PetitionViewRepository extends BaseRepository {
         `User:${userId}`,
         this.sqlValues(
           orderedIds.map((id, i) => [id, i]),
-          ["int", "int"]
+          ["int", "int"],
         ),
         userId,
-      ]
+      ],
     );
   }
 

@@ -12,14 +12,14 @@ import { updateFragment } from "../apollo/updateFragment";
 
 export function useUpdateIsReadNotification() {
   const [updateIsReadNotification] = useMutation(
-    useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusDocument
+    useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusDocument,
   );
 
   return useCallback(
     async (
       variables: VariablesOf<
         typeof useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusDocument
-      >
+      >,
     ) => {
       await updateIsReadNotification({
         variables,
@@ -53,7 +53,7 @@ export function useUpdateIsReadNotification() {
         },
       });
     },
-    []
+    [],
   );
 }
 

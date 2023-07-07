@@ -35,7 +35,7 @@ export function ProfileTypesListHeader({
         page: 1,
       })),
     300,
-    [onStateChange]
+    [onStateChange],
   );
 
   const handleSearchChange = useCallback(
@@ -44,7 +44,7 @@ export function ProfileTypesListHeader({
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
-    [debouncedOnSearchChange]
+    [debouncedOnSearchChange],
   );
 
   return (

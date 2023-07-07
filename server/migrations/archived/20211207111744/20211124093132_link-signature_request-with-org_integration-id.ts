@@ -29,7 +29,7 @@ export async function up(knex: Knex): Promise<void> {
         throw new Error();
       }
       const orgIntegrationId = signatureIntegrations.find(
-        (i) => i.org_id === orgId && i.provider === s.signature_config.provider
+        (i) => i.org_id === orgId && i.provider === s.signature_config.provider,
       )?.id;
       if (!orgIntegrationId) {
         throw new Error();
@@ -41,10 +41,10 @@ export async function up(knex: Knex): Promise<void> {
         set signature_config = jsonb_set(signature_config - 'provider', '{orgIntegrationId}', ?::jsonb)
         where id = ?
       `,
-        [`${orgIntegrationId}`, s.id]
+        [`${orgIntegrationId}`, s.id],
       );
     },
-    { concurrency: 5 }
+    { concurrency: 5 },
   );
 
   const petitions = await knex
@@ -55,7 +55,7 @@ export async function up(knex: Knex): Promise<void> {
     petitions,
     async (p) => {
       const orgIntegrationId = signatureIntegrations.find(
-        (i) => i.org_id === p.org_id && i.provider === p.signature_config.provider
+        (i) => i.org_id === p.org_id && i.provider === p.signature_config.provider,
       )?.id;
       if (orgIntegrationId === undefined) {
         throw new Error();
@@ -67,10 +67,10 @@ export async function up(knex: Knex): Promise<void> {
         set signature_config = jsonb_set(signature_config - 'provider', '{orgIntegrationId}', ?::jsonb)
         where id = ?
       `,
-        [`${orgIntegrationId}`, p.id]
+        [`${orgIntegrationId}`, p.id],
       );
     },
-    { concurrency: 5 }
+    { concurrency: 5 },
   );
 }
 
@@ -85,11 +85,11 @@ export async function down(knex: Knex): Promise<void> {
     signatureRequests,
     async (s) => {
       const provider = signatureIntegrations.find(
-        (i) => i.id === s.signature_config.orgIntegrationId
+        (i) => i.id === s.signature_config.orgIntegrationId,
       )?.provider;
       if (!provider) {
         throw new Error(
-          `PetitionSignatureRequest:${s.id} missing OrgIntegration:${s.signature_config.orgIntegrationId}`
+          `PetitionSignatureRequest:${s.id} missing OrgIntegration:${s.signature_config.orgIntegrationId}`,
         );
       }
 
@@ -99,21 +99,21 @@ export async function down(knex: Knex): Promise<void> {
         set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', to_jsonb(?::text))
         where id = ?
       `,
-        [provider, s.id]
+        [provider, s.id],
       );
     },
-    { concurrency: 5 }
+    { concurrency: 5 },
   );
 
   await pMap(
     petitions,
     async (p) => {
       const provider = signatureIntegrations.find(
-        (i) => i.id === p.signature_config.orgIntegrationId
+        (i) => i.id === p.signature_config.orgIntegrationId,
       )?.provider;
       if (!provider) {
         throw new Error(
-          `Petition:${p.id} missing OrgIntegration:${p.signature_config.orgIntegrationId}`
+          `Petition:${p.id} missing OrgIntegration:${p.signature_config.orgIntegrationId}`,
         );
       }
       await knex.raw(
@@ -122,9 +122,9 @@ export async function down(knex: Knex): Promise<void> {
         set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', to_jsonb(?::text))
         where id = ?
       `,
-        [provider, p.id]
+        [provider, p.id],
       );
     },
-    { concurrency: 5 }
+    { concurrency: 5 },
   );
 }

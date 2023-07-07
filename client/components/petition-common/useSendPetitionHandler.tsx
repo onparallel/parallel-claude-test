@@ -30,7 +30,7 @@ export function useSendPetitionHandler(
   onUpdatePetition: (data: UpdatePetitionInput) => Promise<any>,
   validator: () => Promise<boolean>,
   onRefetch?: () => MaybePromise<any>,
-  options: { redirect: boolean } = { redirect: true }
+  options: { redirect: boolean } = { redirect: true },
 ) {
   const intl = useIntl();
   const router = useRouter();
@@ -55,7 +55,7 @@ export function useSendPetitionHandler(
 
       await showTestSignatureDialog(
         petition.signatureConfig?.integration?.environment,
-        petition.signatureConfig?.integration?.name
+        petition.signatureConfig?.integration?.name,
       );
 
       const {
@@ -108,7 +108,7 @@ export function useSendPetitionHandler(
                 <Progress isIndeterminate size="sm" borderRadius="full" />
               </Stack>
             ),
-          })
+          }),
         );
       }
       const { data } = await task;
@@ -150,7 +150,7 @@ export function useSendPetitionHandler(
               id: "petition.petition-scheduled-toast.title",
               defaultMessage: "{count, plural, =1{Parallel} other{Parallels}} scheduled",
             },
-            { count: recipientIdGroups.length }
+            { count: recipientIdGroups.length },
           ),
           description: intl.formatMessage(
             {
@@ -161,7 +161,7 @@ export function useSendPetitionHandler(
             {
               count: recipientIdGroups.length,
               date: intl.formatTime(scheduledAt!, FORMATS.LLL),
-            }
+            },
           ),
         });
       } else {
@@ -173,7 +173,7 @@ export function useSendPetitionHandler(
               id: "petition.petition-sent-toast.title",
               defaultMessage: "{count, plural, =1{Parallel} other{Parallels}} sent",
             },
-            { count: recipientIdGroups.length }
+            { count: recipientIdGroups.length },
           ),
           description: intl.formatMessage(
             {
@@ -181,7 +181,7 @@ export function useSendPetitionHandler(
               defaultMessage:
                 "Your {count, plural, =1{parallel is on its} other{parallels are on their}} way.",
             },
-            { count: recipientIdGroups.length }
+            { count: recipientIdGroups.length },
           ),
         });
       }

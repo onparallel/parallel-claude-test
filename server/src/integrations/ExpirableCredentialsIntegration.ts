@@ -13,26 +13,26 @@ import { GenericIntegration, InvalidCredentialsError } from "./GenericIntegratio
 export abstract class ExpirableCredentialsIntegration<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-  TContext extends {} = {}
+  TContext extends {} = {},
 > extends GenericIntegration<TType, TProvider, TContext> {
   constructor(
     protected override encryption: EncryptionService,
-    protected override integrations: IntegrationRepository
+    protected override integrations: IntegrationRepository,
   ) {
     super(encryption, integrations);
   }
 
   protected abstract refreshCredentials(
     credentials: IntegrationCredentials<TType, TProvider>,
-    context: TContext
+    context: TContext,
   ): Promise<IntegrationCredentials<TType, TProvider>>;
 
   public override async withCredentials<TResult>(
     orgIntegrationId: number,
     handler: (
       credentials: IntegrationCredentials<TType, TProvider>,
-      context: TContext
-    ) => Promise<TResult>
+      context: TContext,
+    ) => Promise<TResult>,
   ): Promise<TResult> {
     return await super.withCredentials(orgIntegrationId, async (credentials, context) => {
       try {

@@ -18,7 +18,7 @@ export function ShareButton({
       ? p.user.fullName
       : p.__typename === "PetitionUserGroupPermission"
       ? p.group.name
-      : (null as never)
+      : (null as never),
   );
 
   return (

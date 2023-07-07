@@ -13,5 +13,5 @@ export const IconButtonWithTooltip = chakraForwardRef<"button", IconButtonWithTo
         <IconButton aria-label={label} {...props} ref={ref} />
       </Tooltip>
     );
-  }
+  },
 );

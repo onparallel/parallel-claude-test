@@ -91,7 +91,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const showErrorDialog = useErrorDialog();
@@ -119,7 +119,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       handleUpdatePetition,
       _validatePetitionFields,
       refetch,
-      opts
+      opts,
     );
 
   const showNoRemindersLeftToast = (petitionAccessId?: string) => {
@@ -137,7 +137,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             },
             {
               nameOrEmail: access.contact!.fullName || access.contact!.email,
-            }
+            },
           )
         : intl.formatMessage({
             id: "petition.no-reminders-left-generic.toast-description",
@@ -184,7 +184,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       });
       await refetch();
     },
-    [petitionId, petition.accesses]
+    [petitionId, petition.accesses],
   );
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
   const [cancelScheduledMessage] = useMutation(PetitionActivity_cancelScheduledMessageDocument);
@@ -198,7 +198,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       await cancelScheduledMessage({ variables: { petitionId, messageId } });
       await refetch();
     },
-    [petitionId]
+    [petitionId],
   );
 
   const confirmReactivateAccess = useConfirmReactivateAccessDialog();
@@ -216,7 +216,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       });
       await refetch();
     },
-    [petitionId, petition.accesses]
+    [petitionId, petition.accesses],
   );
 
   const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
@@ -234,7 +234,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       });
       await refetch();
     },
-    [petitionId, petition.accesses]
+    [petitionId, petition.accesses],
   );
 
   const [switchReminders] = useMutation(PetitionActivity_switchAutomaticRemindersDocument);
@@ -252,7 +252,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             accesses,
             remindersActive: firstAccess.remindersActive,
             defaultRemindersConfig: firstAccess.remindersConfig || null,
-          })
+          }),
         );
         if (error) {
           return;
@@ -306,7 +306,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         }
       }
     },
-    [petitionId, petition.accesses]
+    [petitionId, petition.accesses],
   );
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
@@ -329,7 +329,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     petition.status === "DRAFT";
 
   const [associateProfileToPetition] = useMutation(
-    PetitionActivity_associateProfileToPetitionDocument
+    PetitionActivity_associateProfileToPetitionDocument,
   );
   const showAssociateProfileToPetitionDialog = useAssociateProfileToPetitionDialog();
   const handleAddProfileToPetition = async () => {
@@ -360,7 +360,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const showConfirmDisassociateProfileDialog = useConfirmDisassociateProfileDialog();
   const [disassociateProfileFromPetition] = useMutation(
-    PetitionActivity_disassociateProfileFromPetitionDocument
+    PetitionActivity_disassociateProfileFromPetitionDocument,
   );
   const handleDisassociateProfileFromPetition = async (profileIds: string[]) => {
     try {

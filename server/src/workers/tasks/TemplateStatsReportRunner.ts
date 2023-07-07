@@ -17,7 +17,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
       templateId,
       user!.org_id,
       startDate,
-      endDate
+      endDate,
     );
   }
 }

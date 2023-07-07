@@ -238,7 +238,7 @@ export class AnalyticsService implements IAnalyticsService {
 
   constructor(
     @inject(CONFIG) config: Config,
-    @inject(OrganizationRepository) private organizations: OrganizationRepository
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
   ) {
     if (config.analytics.writeKey) {
       this.analytics = new Analytics(config.analytics.writeKey, {

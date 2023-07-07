@@ -32,7 +32,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         id: "from.via-parallel",
         defaultMessage: "{senderName} via Parallel",
       },
-      { senderName }
+      { senderName },
     );
   },
   subject({ senderName, emailSubject, theme }, intl) {
@@ -46,7 +46,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         senderName,
         subject: emailSubject,
         tone: theme.preferredTone,
-      }
+      },
     );
   },
   text(
@@ -61,7 +61,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       parallelUrl,
       theme,
     },
-    intl
+    intl,
   ) {
     return outdent`
       ${intl.formatMessage(
@@ -76,7 +76,7 @@ const email: Email<AccessDelegatedEmailProps> = {
           petitionOwnerFullName,
           petitionOwnerEmail,
           tone: theme.preferredTone,
-        }
+        },
       )}
 
       ${bodyPlainText}
@@ -90,7 +90,7 @@ const email: Email<AccessDelegatedEmailProps> = {
                 defaultMessage:
                   "This information has been requested to be submitted before {deadline}.",
               },
-              { deadline: intl.formatDate(deadline, FORMATS.LLL) }
+              { deadline: intl.formatDate(deadline, FORMATS.LLL) },
             )}
 
           `

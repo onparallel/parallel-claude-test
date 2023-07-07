@@ -13,7 +13,7 @@ export interface HelpPopoverProps {
 
 export const HelpPopover = chakraForwardRef<"svg", HelpPopoverProps>(function (
   { children, placement = "bottom", popoverWidth, fontSize = "sm", ...props },
-  ref
+  ref,
 ) {
   return (
     <SmallPopover

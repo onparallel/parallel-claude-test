@@ -120,7 +120,7 @@ export function buildConfig() {
         rule: process.env.WORKERS_PETITION_NOTIFICATIONS_RULE!,
         minutesBeforeNotify: parseInt(
           process.env.WORKERS_PETITION_NOTIFICATIONS_MINUTES_BEFORE_NOTIFY!,
-          10
+          10,
         ),
       },
       "organization-limits": {

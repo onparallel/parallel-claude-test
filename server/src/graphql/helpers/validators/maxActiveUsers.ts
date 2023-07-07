@@ -3,7 +3,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { ArgValidationError } from "../errors";
 
 export function maxActiveUsers<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => any[]
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => any[],
 ) {
   return (async (_, args, ctx, info) => {
     const userIds = prop(args);
@@ -19,7 +19,7 @@ export function maxActiveUsers<TypeName extends string, FieldName extends string
         "USER_LIMIT_ERROR",
         {
           userLimit: org!.usage_details.USER_LIMIT,
-        }
+        },
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

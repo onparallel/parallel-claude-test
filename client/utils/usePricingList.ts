@@ -222,6 +222,6 @@ export function usePricingList(): PricingListCategory[] {
         ],
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }

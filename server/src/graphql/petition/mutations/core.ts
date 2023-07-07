@@ -121,10 +121,10 @@ export const createPetition = mutationField("createPetition", {
       "petitionId",
       or(
         userHasAccessToPetitions("petitionId" as never),
-        petitionsArePublicTemplates("petitionId" as never)
+        petitionsArePublicTemplates("petitionId" as never),
       ),
-      and(argIsDefined("locale"), contextUserHasRole("NORMAL"))
-    )
+      and(argIsDefined("locale"), contextUserHasRole("NORMAL")),
+    ),
   ),
   args: {
     name: stringArg(),
@@ -164,7 +164,7 @@ export const createPetition = mutationField("createPetition", {
           status: isTemplate ? null : "DRAFT",
           name: original.is_template && !isTemplate ? name : original.name,
         },
-        { insertPermissions: !hasCustomOwner }
+        { insertPermissions: !hasCustomOwner },
       );
 
       if (hasCustomOwner && !defaultPermissions.find((p) => p.user_id === ctx.user!.id)) {
@@ -182,7 +182,7 @@ export const createPetition = mutationField("createPetition", {
             },
           ],
           "User",
-          ctx.user!.id
+          ctx.user!.id,
         );
       }
 
@@ -191,7 +191,7 @@ export const createPetition = mutationField("createPetition", {
           petition.id,
           original.id,
           "User",
-          ctx.user!.id
+          ctx.user!.id,
         );
       }
 
@@ -243,19 +243,19 @@ export const createPetition = mutationField("createPetition", {
                           defaultMessage:
                             "We informed {name} that you have completed the information to continue with the process.",
                         },
-                        { name: "{{ user-first-name }}" }
-                      )
+                        { name: "{{ user-first-name }}" },
+                      ),
                     ).map((p) =>
                       p.type === "text"
                         ? { text: p.text }
-                        : { type: "placeholder", placeholder: p.value, children: [{ text: "" }] }
+                        : { type: "placeholder", placeholder: p.value, children: [{ text: "" }] },
                     ),
                   },
                 ]),
               }
             : {}),
         },
-        ctx.user!
+        ctx.user!,
       );
 
       await ctx.petitions.createEvent({
@@ -275,7 +275,7 @@ export const clonePetitions = mutationField("clonePetitions", {
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     contextUserHasRole("NORMAL"),
-    or(userHasAccessToPetitions("petitionIds"), petitionsArePublicTemplates("petitionIds"))
+    or(userHasAccessToPetitions("petitionIds"), petitionsArePublicTemplates("petitionIds")),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -284,7 +284,7 @@ export const clonePetitions = mutationField("clonePetitions", {
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.petitionIds, "petitionIds"),
-    validPath((args) => args.path, "path")
+    validPath((args) => args.path, "path"),
   ),
   resolve: async (_, args, ctx) => {
     return await pMap(
@@ -323,7 +323,7 @@ export const clonePetitions = mutationField("clonePetitions", {
 
         return cloned;
       },
-      { concurrency: 1 }
+      { concurrency: 1 },
     );
   },
 });
@@ -346,15 +346,15 @@ export const deletePetitions = mutationField("deletePetitions", {
     validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
     notEmptyArray(
       (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
-      "ids or folders"
-    )
+      "ids or folders",
+    ),
   ),
   resolve: async (_, args, ctx) => {
     function petitionIsSharedByOwner(p: PetitionPermission[]) {
       return (
         p?.length > 1 && // the petition is being shared to another user
         p.find(
-          (u) => u.type === "OWNER" && u.user_id === ctx.user!.id // logged user is the owner
+          (u) => u.type === "OWNER" && u.user_id === ctx.user!.id, // logged user is the owner
         )
       );
     }
@@ -363,10 +363,10 @@ export const deletePetitions = mutationField("deletePetitions", {
       return (
         p?.length > 1 &&
         !p.find(
-          (u) => u.user_id === ctx.user!.id && u.type === "OWNER" // user is not the owner
+          (u) => u.user_id === ctx.user!.id && u.type === "OWNER", // user is not the owner
         ) &&
         p.find(
-          (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null // has access via group
+          (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null, // has access via group
         )
       );
     }
@@ -377,7 +377,7 @@ export const deletePetitions = mutationField("deletePetitions", {
       const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
         folderIds,
         args.folders.type === "TEMPLATE",
-        ctx.user!
+        ctx.user!,
       );
       petitionIds.push(...folderPetitions.map((p) => p.id));
     }
@@ -399,7 +399,7 @@ export const deletePetitions = mutationField("deletePetitions", {
           petitionIds: zip(petitionIds, userPermissions)
             .filter(([, permissions]) => userHasAccessViaGroup(permissions))
             .map(([id]) => toGlobalId("Petition", id)),
-        }
+        },
       );
     }
 
@@ -411,7 +411,7 @@ export const deletePetitions = mutationField("deletePetitions", {
           petitionIds: zip(petitionIds, userPermissions)
             .filter(([, permissions]) => petitionIsSharedByOwner(permissions))
             .map(([id]) => toGlobalId("Petition", id)),
-        }
+        },
       );
     }
 
@@ -433,7 +433,7 @@ export const deletePetitions = mutationField("deletePetitions", {
         petitionIds,
         ctx.user!.id,
         ctx.user!,
-        t
+        t,
       );
 
       const ownerPermissions = deletedPermissions.filter((p) => p.type === "OWNER");
@@ -443,19 +443,19 @@ export const deletePetitions = mutationField("deletePetitions", {
         ctx.petitions.deleteAllPermissions(
           ownerPermissions.map((p) => p.petition_id),
           ctx.user!,
-          t
+          t,
         ),
         //finally, delete only petitions OWNED by me
         ctx.petitions.deletePetition(
           ownerPermissions.map((p) => p.petition_id),
           ctx.user!,
-          t
+          t,
         ),
         // delete every user notification on the deleted petitions
         ctx.petitions.deletePetitionUserNotificationsByPetitionId(
           deletedPermissions.map((p) => p.petition_id),
           undefined,
-          t
+          t,
         ),
       ]);
 
@@ -468,7 +468,7 @@ export const deletePetitions = mutationField("deletePetitions", {
             status: petition.status!,
           },
         })),
-        t
+        t,
       );
 
       // check if there are pending signature requests on this petitions and cancel those
@@ -482,7 +482,7 @@ export const deletePetitions = mutationField("deletePetitions", {
           "CANCELLED_BY_USER",
           { user_id: ctx.user!.id },
           {},
-          t
+          t,
         );
       }
     });
@@ -497,7 +497,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -583,7 +583,7 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreNotPublicTemplates("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -600,7 +600,7 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
     ) {
       throw new ApolloError(
         "The petition is restricted with a password.",
-        "INVALID_PETITION_RESTRICTION_PASSWORD"
+        "INVALID_PETITION_RESTRICTION_PASSWORD",
       );
     }
 
@@ -635,14 +635,14 @@ export const closePetition = mutationField("closePetition", {
     petitionIsNotAnonymized("petitionId"),
     async (_, args, ctx) => {
       const signature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
-        args.petitionId
+        args.petitionId,
       );
       // all signature requests must be finished before the petition is closed
       if (signature && ["ENQUEUED", "PROCESSED", "PROCESSING"].includes(signature.status)) {
         return false;
       }
       return true;
-    }
+    },
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -652,7 +652,7 @@ export const closePetition = mutationField("closePetition", {
       const [petition] = await ctx.petitions.closePetition(
         args.petitionId,
         `User:${ctx.user!.id}`,
-        t
+        t,
       );
 
       await ctx.petitions.updateRemindersForPetition(args.petitionId, null, t);
@@ -664,7 +664,7 @@ export const closePetition = mutationField("closePetition", {
             user_id: ctx.user!.id,
           },
         },
-        t
+        t,
       );
 
       return petition;
@@ -693,11 +693,11 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.defaultPath,
         args.data.defaultOnBehalfId,
       ],
-      petitionsAreEditable("petitionId")
+      petitionsAreEditable("petitionId"),
     ),
     ifSomeDefined(
       (args) => [args.data.emailBody, args.data.emailSubject],
-      or(petitionsAreEditable("petitionId"), petitionsAreOfTypePetition("petitionId"))
+      or(petitionsAreEditable("petitionId"), petitionsAreOfTypePetition("petitionId")),
     ),
     // only allow to update petition name if anonymized
     ifSomeDefined(
@@ -717,17 +717,17 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.defaultPath,
         args.data.defaultOnBehalfId,
       ],
-      petitionIsNotAnonymized("petitionId")
+      petitionIsNotAnonymized("petitionId"),
     ),
     // only petition owners can edit compliance props
     ifSomeDefined(
       (args) => [args.data.anonymizeAfterMonths, args.data.anonymizePurpose],
-      and(userHasFeatureFlag("AUTO_ANONYMIZE"), userHasAccessToPetitions("petitionId", ["OWNER"]))
+      and(userHasFeatureFlag("AUTO_ANONYMIZE"), userHasAccessToPetitions("petitionId", ["OWNER"])),
     ),
     ifSomeDefined(
       (args) => [args.data.defaultOnBehalfId],
-      defaultOnBehalfUserBelongsToContextOrganization("data")
-    )
+      defaultOnBehalfUserBelongsToContextOrganization("data"),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -756,7 +756,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.string("defaultPath");
           t.nullable.globalId("defaultOnBehalfId", { prefixName: "User" });
         },
-      }).asArg()
+      }).asArg(),
     ),
   },
   validateArgs: validateAnd(
@@ -768,32 +768,32 @@ export const updatePetition = mutationField("updatePetition", {
     validTextWithPlaceholders(
       (args) => args.data.emailSubject,
       (args) => args.petitionId,
-      "data.emailSubject"
+      "data.emailSubject",
     ),
     validRichTextContent(
       (args) => args.data.emailBody,
       (args) => args.petitionId,
-      "data.emailBody"
+      "data.emailBody",
     ),
     validRichTextContent(
       (args) => args.data.closingEmailBody,
       (args) => args.petitionId,
-      "data.closingEmailBody"
+      "data.closingEmailBody",
     ),
     validRichTextContent(
       (args) => args.data.description,
       undefined, // template description does not include PetitionField references
-      "data.description"
+      "data.description",
     ),
     validRichTextContent(
       (args) => args.data.completingMessageBody,
       (args) => args.petitionId,
-      "data.completingMessageBody"
+      "data.completingMessageBody",
     ),
     validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
     validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig"),
     inRange((args) => args.data.anonymizeAfterMonths, "data.anonymizeAfterMonths", 1),
-    validPath((args) => args.data.defaultPath, "data.defaultPath")
+    validPath((args) => args.data.defaultPath, "data.defaultPath"),
   ),
   resolve: async (_, args, ctx) => {
     const {
@@ -881,7 +881,7 @@ export const updatePetition = mutationField("updatePetition", {
     const [petition] = await ctx.petitions.updatePetition(
       args.petitionId,
       data,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     return petition;
   },
@@ -894,7 +894,7 @@ export const updateTemplateDocumentTheme = mutationField("updateTemplateDocument
     petitionsAreNotPublicTemplates("templateId"),
     petitionsAreEditable("templateId"),
     petitionIsNotAnonymized("templateId"),
-    userHasAccessToOrganizationTheme("orgThemeId")
+    userHasAccessToOrganizationTheme("orgThemeId"),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
@@ -904,7 +904,7 @@ export const updateTemplateDocumentTheme = mutationField("updateTemplateDocument
     const [template] = await ctx.petitions.updatePetition(
       args.templateId,
       { document_organization_theme_id: args.orgThemeId },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     return template;
   },
@@ -919,7 +919,7 @@ export const createPetitionField = mutationField("createPetitionField", {
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
     ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -936,7 +936,7 @@ export const createPetitionField = mutationField("createPetitionField", {
         ...defaultFieldProperties(args.type),
       },
       args.position ?? -1,
-      ctx.user!
+      ctx.user!,
     );
   },
 });
@@ -949,7 +949,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -969,7 +969,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     fieldIsNotFixed("fieldId"),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -984,13 +984,13 @@ export const deletePetitionField = mutationField("deletePetitionField", {
 
     const petitionFields = await ctx.petitions.loadFieldsForPetition.raw(args.petitionId);
     if (
-      petitionFields.some((f) =>
-        f.visibility?.conditions.some((c: any) => c.fieldId === args.fieldId)
+      petitionFields.some(
+        (f) => f.visibility?.conditions.some((c: any) => c.fieldId === args.fieldId),
       )
     ) {
       throw new ApolloError(
         "The petition field is being referenced in another field.",
-        "FIELD_IS_REFERENCED_ERROR"
+        "FIELD_IS_REFERENCED_ERROR",
       );
     }
 
@@ -1007,7 +1007,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    ifArgEquals((args) => args.data.requireApproval, true, not(fieldHasType("fieldId", "HEADING")))
+    ifArgEquals((args) => args.data.requireApproval, true, not(fieldHasType("fieldId", "HEADING"))),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1029,7 +1029,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.boolean("hasCommentsEnabled");
           t.nullable.boolean("requireApproval");
         },
-      }).asArg()
+      }).asArg(),
     ),
     force: booleanArg({ default: false }),
   },
@@ -1039,7 +1039,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     maxLength((args) => args.data.alias, "data.alias", 100),
     validateIf(
       (args) => isDefined(args.data.alias),
-      validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/)
+      validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/),
     ),
     validateIf(
       (args) => isDefined(args.data.visibility),
@@ -1047,9 +1047,9 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         (args) => args.petitionId,
         (args) => args.fieldId,
         (args) => args.data.visibility,
-        "data.visibility"
-      )
-    )
+        "data.visibility",
+      ),
+    ),
   ),
   resolve: async (_, args, ctx, info) => {
     const {
@@ -1156,14 +1156,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         await ctx.petitions.updatePetitionFieldReplyStatusesByPetitionFieldId(
           args.fieldId,
           "PENDING",
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
       }
       return await ctx.petitions.updatePetitionField(
         args.petitionId,
         args.fieldId,
         data,
-        ctx.user!
+        ctx.user!,
       );
     } catch (e) {
       if (
@@ -1172,7 +1172,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       ) {
         throw new ApolloError(
           "The alias for this field already exists in this petition",
-          "ALIAS_ALREADY_EXISTS"
+          "ALIAS_ALREADY_EXISTS",
         );
       } else {
         throw e;
@@ -1190,7 +1190,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
     petitionsAreNotPublicTemplates("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1203,7 +1203,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
       contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       maxSize: 1024 * 1024 * 10,
     },
-    "file"
+    "file",
   ),
   resolve: async (_, args, ctx) => {
     const file = await args.file;
@@ -1213,7 +1213,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
       throw new ApolloError("Invalid file", "INVALID_FORMAT_ERROR");
     }
     const [parseError, parseResult] = await withError(() =>
-      parseDynamicSelectValues(importResult!)
+      parseDynamicSelectValues(importResult!),
     );
     if (parseError) {
       throw new ApolloError(parseError.message, "INVALID_FORMAT_ERROR");
@@ -1224,7 +1224,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
     const res = await ctx.storage.fileUploads.uploadFile(
       key,
       file.mimetype,
-      file.createReadStream()
+      file.createReadStream(),
     );
 
     const [fileUpload] = await ctx.files.createFileUpload(
@@ -1235,7 +1235,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
         size: res["ContentLength"]!.toString(),
         upload_complete: true,
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
 
     const options = {
@@ -1253,7 +1253,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
       args.petitionId,
       args.fieldId,
       { options },
-      ctx.user!
+      ctx.user!,
     );
   },
 });
@@ -1267,7 +1267,7 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldHasType("fieldId", ["DYNAMIC_SELECT"])
+      fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -1286,14 +1286,14 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
           url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
-            "attachment"
+            "attachment",
           ),
         };
       } catch {
         return { result: RESULT.FAILURE };
       }
     },
-  }
+  },
 );
 
 export const approveOrRejectPetitionFieldReplies = mutationField(
@@ -1310,12 +1310,12 @@ export const approveOrRejectPetitionFieldReplies = mutationField(
       await ctx.petitions.updatePendingPetitionFieldRepliesStatusByPetitionId(
         args.petitionId,
         args.status,
-        ctx.user!
+        ctx.user!,
       );
 
       return (await ctx.petitions.loadPetition(args.petitionId))!;
     },
-  }
+  },
 );
 
 export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFieldRepliesStatus", {
@@ -1325,7 +1325,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds"),
-    replyStatusCanBeUpdated("petitionFieldId")
+    replyStatusCanBeUpdated("petitionFieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1338,7 +1338,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     await ctx.petitions.updatePetitionFieldRepliesStatus(
       args.petitionFieldReplyIds,
       args.status,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
 
     if (args.status === "REJECTED") {
@@ -1347,7 +1347,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
         await ctx.petitions.updatePetition(
           args.petitionId,
           { status: "PENDING" },
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
       }
     }
@@ -1362,7 +1362,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
           petition_field_reply_id: replyId,
           user_id: ctx.user!.id,
         },
-      }))
+      })),
     );
 
     return (await ctx.petitions.loadField(args.petitionFieldId))!;
@@ -1375,7 +1375,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1406,7 +1406,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
         url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file!.path,
           file!.filename,
-          args.preview ? "inline" : "attachment"
+          args.preview ? "inline" : "attachment",
         ),
       };
     } catch (error: any) {
@@ -1426,7 +1426,7 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionHasRepliableFields("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1458,7 +1458,7 @@ export const sendPetition = mutationField("sendPetition", {
     userHasAccessToContactGroups("contactIdGroups"),
     userCanSendAs("senderId" as never),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreOfTypePetition("petitionId")
+    petitionsAreOfTypePetition("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1495,12 +1495,12 @@ export const sendPetition = mutationField("sendPetition", {
     validTextWithPlaceholders(
       (args) => args.subject,
       (args) => args.petitionId,
-      "subject"
+      "subject",
     ),
     validRichTextContent(
       (args) => args.body,
       (args) => args.petitionId,
-      "body"
+      "body",
     ),
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig"),
     (_, { contactIdGroups }, ctx, info) => {
@@ -1511,11 +1511,11 @@ export const sendPetition = mutationField("sendPetition", {
           throw new ArgValidationError(
             info,
             "contactIdGroups",
-            "There are repeated contactIds inside a group"
+            "There are repeated contactIds inside a group",
           );
         }
       }
-    }
+    },
   ),
   resolve: async (_, args, ctx) => {
     const [petition, owner, currentAccesses] = await Promise.all([
@@ -1538,7 +1538,7 @@ export const sendPetition = mutationField("sendPetition", {
     ) {
       throw new ApolloError(
         "This petition was already sent to some of the contacts",
-        "PETITION_ALREADY_SENT_ERROR"
+        "PETITION_ALREADY_SENT_ERROR",
       );
     }
     if (currentAccesses.length > 0 && args.contactIdGroups.length !== 1) {
@@ -1551,7 +1551,7 @@ export const sendPetition = mutationField("sendPetition", {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
       await ctx.orgCredits.consumePetitionSendCredits(
         petition.org_id,
-        args.contactIdGroups.length - 1 // 1 more credit consumed for each contact group
+        args.contactIdGroups.length - 1, // 1 more credit consumed for each contact group
       );
 
       const clonedPetitions = await pMap(
@@ -1565,9 +1565,9 @@ export const sendPetition = mutationField("sendPetition", {
               email_subject: args.subject, // pass email subject so field placeholders are correctly replaced on the cloned petition
             },
             { cloneReplies: true }, // also clone the petition replies
-            `User:${ctx.user!.id}`
+            `User:${ctx.user!.id}`,
           ),
-        { concurrency: 5 }
+        { concurrency: 5 },
       );
 
       if (
@@ -1587,7 +1587,7 @@ export const sendPetition = mutationField("sendPetition", {
                   }
                 : null,
           },
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
       }
 
@@ -1596,7 +1596,7 @@ export const sendPetition = mutationField("sendPetition", {
         await ctx.petitions.clonePetitionPermissions(
           args.petitionId,
           clonedPetitions.map((p) => p.id),
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
       }
 
@@ -1607,13 +1607,13 @@ export const sendPetition = mutationField("sendPetition", {
         pipe(
           [petition, ...clonedPetitions],
           zipWith((petition, contactIds) => ({ petition, contactIds }), args.contactIdGroups),
-          zipWith((x, index) => ({ ...x, index }), range(0, args.contactIdGroups.length))
+          zipWith((x, index) => ({ ...x, index }), range(0, args.contactIdGroups.length)),
         ),
         (currentChunk, item) =>
           // current chunk is empty, or
           currentChunk.length === 0 ||
           // (number of contactIds in the accumulated chunk) + (number of contactIds in the current item) <= 20
-          sumBy(currentChunk, (x) => x.contactIds.length) + item.contactIds.length <= 20
+          sumBy(currentChunk, (x) => x.contactIds.length) + item.contactIds.length <= 20,
       );
 
       const baseDate = new Date();
@@ -1627,7 +1627,7 @@ export const sendPetition = mutationField("sendPetition", {
 
           const messageSubject = renderTextWithPlaceholders(
             index === 0 ? args.subject : petition.email_subject ?? args.subject,
-            getValues
+            getValues,
           );
 
           const [updatedPetition] = await ctx.petitions.updatePetition(
@@ -1639,7 +1639,7 @@ export const sendPetition = mutationField("sendPetition", {
               status: "PENDING",
               closed_at: null,
             },
-            `User:${ctx.user!.id}`
+            `User:${ctx.user!.id}`,
           );
           const accessAndMessages = await ctx.petitions.createAccessesAndMessages(
             petition,
@@ -1655,7 +1655,7 @@ export const sendPetition = mutationField("sendPetition", {
             },
             ctx.user!,
             sender,
-            false
+            false,
           );
 
           return { petition: updatedPetition, ...accessAndMessages };
@@ -1665,7 +1665,7 @@ export const sendPetition = mutationField("sendPetition", {
       const successfulSends = results.filter((r) => r.result === "SUCCESS");
 
       const messages = successfulSends.flatMap(
-        (s) => s.messages?.filter((m) => !isDefined(m.scheduled_at)) ?? []
+        (s) => s.messages?.filter((m) => !isDefined(m.scheduled_at)) ?? [],
       );
 
       if (messages.length > 0) {
@@ -1676,7 +1676,7 @@ export const sendPetition = mutationField("sendPetition", {
               type: "MESSAGE_SENT",
               data: { petition_message_id: message.id },
               petition_id: message.petition_id,
-            }))
+            })),
           ),
         ]);
       }
@@ -1687,7 +1687,7 @@ export const sendPetition = mutationField("sendPetition", {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           `Can't send the parallel due to lack of credits`,
-          "PETITION_SEND_LIMIT_REACHED"
+          "PETITION_SEND_LIMIT_REACHED",
         );
       }
       throw error;
@@ -1704,7 +1704,7 @@ export const sendReminders = mutationField("sendReminders", {
     accessesHaveStatus("accessIds", "ACTIVE"),
     accessesHaveRemindersLeft("accessIds"),
     petitionIsNotAnonymized("petitionId"),
-    petitionHasStatus("petitionId", ["PENDING", "COMPLETED"])
+    petitionHasStatus("petitionId", ["PENDING", "COMPLETED"]),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1714,7 +1714,7 @@ export const sendReminders = mutationField("sendReminders", {
   validateArgs: validRichTextContent(
     (args) => args.body,
     (args) => args.petitionId,
-    "body"
+    "body",
   ),
   resolve: async (_, args, ctx) => {
     const remindersData = await pMap(
@@ -1728,7 +1728,7 @@ export const sendReminders = mutationField("sendReminders", {
             contactId: contact?.id,
             petitionAccessId: accessId,
           },
-          { publicContext: true }
+          { publicContext: true },
         );
 
         const emailBody = args.body
@@ -1744,7 +1744,7 @@ export const sendReminders = mutationField("sendReminders", {
           created_by: `User:${ctx.user!.id}`,
         } as CreatePetitionReminder;
       },
-      { concurrency: 1 }
+      { concurrency: 1 },
     );
 
     const reminders = await ctx.petitions.createReminders(remindersData);
@@ -1756,7 +1756,7 @@ export const sendReminders = mutationField("sendReminders", {
         data: {
           petition_reminder_id: reminder.id,
         },
-      }))
+      })),
     );
 
     await ctx.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
@@ -1775,7 +1775,7 @@ export const switchAutomaticReminders = mutationField("switchAutomaticReminders"
     accessesIsNotOptedOut("accessIds"),
     petitionIsNotAnonymized("petitionId"),
     petitionHasStatus("petitionId", "PENDING"),
-    ifArgEquals("start", true, accessesHaveRemindersLeft("accessIds"))
+    ifArgEquals("start", true, accessesHaveRemindersLeft("accessIds")),
   ),
   args: {
     start: nonNull(booleanArg()),
@@ -1787,8 +1787,8 @@ export const switchAutomaticReminders = mutationField("switchAutomaticReminders"
     validBooleanValue((args) => args.start, "start", false),
     validateAnd(
       validIsDefined((args) => args.remindersConfig, "remindersConfig"),
-      validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
-    )
+      validRemindersConfig((args) => args.remindersConfig, "remindersConfig"),
+    ),
   ),
   resolve: async (_, args, ctx) => {
     if (args.start) {
@@ -1805,7 +1805,7 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1816,7 +1816,7 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
       args.petitionId,
       args.accessIds,
       `User:${ctx.user!.id}`,
-      ctx.user!.id
+      ctx.user!.id,
     );
     return (await ctx.petitions.loadAccess(args.accessIds)).filter(isDefined);
   },
@@ -1829,7 +1829,7 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
     accessesBelongToValidContacts("accessIds"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1847,7 +1847,7 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     messageBelongToPetition("petitionId", "messageId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1868,7 +1868,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
     ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1889,7 +1889,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
         args.petitionId,
         args.fieldId,
         args.type,
-        ctx.user!
+        ctx.user!,
       );
     } catch (e: any) {
       if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
@@ -1913,19 +1913,19 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validRichTextContent(
     (args) => args.emailBody,
     (args) => args.petitionId,
-    "emailBody"
+    "emailBody",
   ),
   resolve: async (_, args, ctx) => {
     const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(args.petitionId);
     if (!shouldSendNotification && !args.force) {
       throw new ApolloError(
         "You already notified the contacts",
-        "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
+        "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR",
       );
     }
 
@@ -1940,7 +1940,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
         activeAccesses.map((a) => a.id),
         args.emailBody,
         args.attachPdfExport,
-        args.pdfExportTitle ?? null
+        args.pdfExportTitle ?? null,
       ),
       ctx.petitions.createEvent(
         activeAccesses.map((access) => ({
@@ -1950,7 +1950,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
             user_id: ctx.user!.id,
             petition_access_id: access.id,
           },
-        }))
+        })),
       ),
     ]);
 
@@ -1964,7 +1964,7 @@ export const reopenPetition = mutationField("reopenPetition", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
-    petitionHasStatus("petitionId", ["COMPLETED", "CLOSED"])
+    petitionHasStatus("petitionId", ["COMPLETED", "CLOSED"]),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1979,7 +1979,7 @@ export const reopenPetition = mutationField("reopenPetition", {
             petition_id: args.petitionId,
             data: { user_id: ctx.user!.id },
           },
-          t
+          t,
         ),
       ]);
     });
@@ -2010,7 +2010,7 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2032,7 +2032,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
     petitionsAreOfTypeTemplate("templateId"),
-    userHasAccessToUserOrUserGroupPermissions("permissions")
+    userHasAccessToUserOrUserGroupPermissions("permissions"),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
@@ -2051,7 +2051,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     await ctx.petitions.resetTemplateDefaultPermissions(
       args.templateId,
       args.permissions as any,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     ctx.petitions.loadTemplateDefaultPermissions.dataloader.clear(args.templateId);
     ctx.petitions.loadTemplateDefaultOwner.dataloader.clear(args.templateId);
@@ -2065,7 +2065,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
     petitionsAreOfTypeTemplate("templateId"),
-    templateDoesNotHavePublicPetitionLink("templateId")
+    templateDoesNotHavePublicPetitionLink("templateId"),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
@@ -2076,7 +2076,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   },
   validateArgs: validateIfDefined(
     (args) => args.slug,
-    validatePublicPetitionLinkSlug((args) => args.slug!, "slug")
+    validatePublicPetitionLinkSlug((args) => args.slug!, "slug"),
   ),
   resolve: async (_, { templateId, title, description, slug, prefillSecret }, ctx) => {
     return await ctx.petitions.createPublicPetitionLink(
@@ -2088,7 +2088,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
         is_active: true,
         prefill_secret: prefillSecret || null,
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -2097,7 +2097,7 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
   description: "Updates the info and permissions of a public link",
   type: "PublicPetitionLink",
   authorize: authenticateAnd(
-    userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"])
+    userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"]),
   ),
   args: {
     publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
@@ -2112,8 +2112,8 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     validatePublicPetitionLinkSlug(
       (args) => args.slug!,
       "slug",
-      (args) => args.publicPetitionLinkId
-    )
+      (args) => args.publicPetitionLinkId,
+    ),
   ),
   resolve: async (_, args, ctx) => {
     const publicPetitionLinkData: Partial<CreatePublicPetitionLink> = {};
@@ -2137,7 +2137,7 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     return await ctx.petitions.updatePublicPetitionLink(
       args.publicPetitionLinkId,
       publicPetitionLinkData,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -2147,7 +2147,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2158,8 +2158,8 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
     maxLength((args) => args.key, "key", 100),
     validateIfDefined(
       (args) => args.value,
-      maxLength((args) => args.value!, "value", 1000)
-    )
+      maxLength((args) => args.value!, "value", 1000),
+    ),
   ),
   resolve: async (_, { petitionId, key, value }, ctx) => {
     const petition = (await ctx.petitions.loadPetition(petitionId))!;
@@ -2174,7 +2174,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
       petitionId,
       key,
       value ?? null,
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -2191,7 +2191,7 @@ export const completePetition = mutationField("completePetition", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -2214,7 +2214,7 @@ export const completePetition = mutationField("completePetition", {
               additionalSignersInfo: args.additionalSigners ?? [],
               message: args.message ?? undefined,
             },
-            ctx.user!
+            ctx.user!,
           );
           petition = updatedPetition ?? petition;
         } else {
@@ -2227,12 +2227,12 @@ export const completePetition = mutationField("completePetition", {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't complete the parallel due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED"
+          "PETITION_SEND_LIMIT_REACHED",
         );
       } else if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
         throw new ApolloError(
           "Can't complete the petition without signers information",
-          "REQUIRED_SIGNER_INFO_ERROR"
+          "REQUIRED_SIGNER_INFO_ERROR",
         );
       } else {
         throw error;
@@ -2249,16 +2249,16 @@ export const movePetitions = mutationField("movePetitions", {
       "ids",
       and(
         userHasAccessToPetitions("ids" as never, ["WRITE", "OWNER"]),
-        petitionsAreInPath("ids" as never, "source")
-      )
+        petitionsAreInPath("ids" as never, "source"),
+      ),
     ),
     ifArgDefined(
       "folderIds",
       and(
         userHasPermissionInFolders("folderIds" as never, "type", "WRITE"),
-        foldersAreInPath("folderIds" as never, "source")
-      )
-    )
+        foldersAreInPath("folderIds" as never, "source"),
+      ),
+    ),
   ),
   args: {
     ids: list(nonNull(globalIdArg("Petition", { description: "Petition to be moved." }))),
@@ -2278,10 +2278,10 @@ export const movePetitions = mutationField("movePetitions", {
         throw new ArgValidationError(
           info,
           "destination",
-          `Destination can't be within one of the target folders.`
+          `Destination can't be within one of the target folders.`,
         );
       }
-    }
+    },
   ),
   resolve: async (_, args, ctx) => {
     const paths = fromGlobalIds(args.folderIds ?? [], "PetitionFolder", true).ids;
@@ -2292,7 +2292,7 @@ export const movePetitions = mutationField("movePetitions", {
       args.source,
       args.destination,
       args.type === "TEMPLATE",
-      ctx.user!
+      ctx.user!,
     );
 
     return SUCCESS;
@@ -2310,7 +2310,7 @@ export const renameFolder = mutationField("renameFolder", {
   },
   validateArgs: validateAnd(
     validFolderId((args) => args.folderId, "folderId"),
-    validateRegex((args) => args.name, "name", /^[^/]+$/)
+    validateRegex((args) => args.name, "name", /^[^/]+$/),
   ),
   resolve: async (_, args, ctx, info) => {
     const path = fromGlobalId(args.folderId, "PetitionFolder", true).id;
@@ -2321,7 +2321,7 @@ export const renameFolder = mutationField("renameFolder", {
       path,
       destination,
       args.type === "TEMPLATE",
-      ctx.user!
+      ctx.user!,
     );
 
     return SUCCESS;
@@ -2336,7 +2336,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
     type: nonNull("String"),
     authorize: authenticateAnd(
       userHasFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA"),
-      userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"])
+      userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"]),
     ),
     args: {
       publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
@@ -2356,7 +2356,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
           data: args.data,
           path: args.path ?? "/",
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
@@ -2368,5 +2368,5 @@ export const createPublicPetitionLinkPrefillData = mutationField(
         pk: prefillData.keycode,
       })}`;
     },
-  }
+  },
 );

@@ -34,5 +34,5 @@ export const EmptyFolderIllustration = chakraForwardRef<"div", EmptyFolderIllust
         </Stack>
       </Center>
     );
-  }
+  },
 );

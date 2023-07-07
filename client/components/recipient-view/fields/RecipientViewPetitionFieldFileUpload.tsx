@@ -64,7 +64,7 @@ export function RecipientViewPetitionFieldFileUpload({
       await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
-    [onDeleteReply]
+    [onDeleteReply],
   );
 
   return (

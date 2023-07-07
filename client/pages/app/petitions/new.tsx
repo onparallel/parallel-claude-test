@@ -127,7 +127,7 @@ function NewPetition() {
       setQueryState((current) => ({ ...current, search: search || null }));
     },
     300,
-    [refetch]
+    [refetch],
   );
 
   useEffect(() => {
@@ -183,7 +183,7 @@ function NewPetition() {
     (template: string) => {
       setQueryState((current) => ({ ...current, template }));
     },
-    [setQueryState]
+    [setQueryState],
   );
 
   const handleCreateTemplate = useCallback(async () => {
@@ -232,7 +232,7 @@ function NewPetition() {
         ...current,
         path,
       }),
-      { type: "push" }
+      { type: "push" },
     );
   };
 

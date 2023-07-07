@@ -93,7 +93,7 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
           templateId: null,
         },
       ] as PreviewsType[],
-    [intl.locale]
+    [intl.locale],
   );
 
   const [activePreview, setActivePreview] = useState<PreviewsType>(previews[0]);
@@ -164,7 +164,7 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
                   id: "component.new-template-dialog.thumbnail-alt",
                   defaultMessage: 'Thumbnail for template example "{type}"',
                 },
-                { type: activePreview.title }
+                { type: activePreview.title },
               )}
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${activePreview.image}.png`}
             />

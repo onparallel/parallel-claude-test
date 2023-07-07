@@ -47,7 +47,7 @@ export const PetitionPermissionTypeSelect = forwardRef<
         value: "READ",
       },
     ],
-    [disableOwner]
+    [disableOwner],
   );
 
   return <SimpleSelect ref={ref as any} options={options} {...props} />;

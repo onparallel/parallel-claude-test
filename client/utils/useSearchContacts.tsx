@@ -15,7 +15,7 @@ export function useSearchContacts() {
       return data!.contacts.items;
     },
     300,
-    []
+    [],
   );
 }
 

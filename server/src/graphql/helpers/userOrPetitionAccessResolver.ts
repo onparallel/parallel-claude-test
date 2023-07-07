@@ -5,7 +5,7 @@ import { PetitionAccess, User } from "../../db/__types";
 export async function userOrPetitionAccessResolver(
   root: { data: { user_id?: number; petition_access_id?: number } },
   _: {},
-  ctx: ApiContext
+  ctx: ApiContext,
 ): Promise<(User & { __type: "User" }) | (PetitionAccess & { __type: "PetitionAccess" }) | null> {
   if (isDefined(root.data.user_id)) {
     const user = await ctx.users.loadUser(root.data.user_id);

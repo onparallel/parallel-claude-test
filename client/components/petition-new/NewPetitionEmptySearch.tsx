@@ -74,5 +74,5 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
         </Stack>
       </Center>
     );
-  }
+  },
 );

@@ -52,7 +52,7 @@ export const PetitionComposeFieldSettings = Object.assign(
         isReadOnly,
         ...props
       },
-      ref
+      ref,
     ) {
       const intl = useIntl();
 
@@ -372,7 +372,7 @@ export const PetitionComposeFieldSettings = Object.assign(
           </Stack>
         </Card>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -405,5 +405,5 @@ export const PetitionComposeFieldSettings = Object.assign(
         ${SettingsRowAlias.fragments.PetitionField}
       `,
     },
-  }
+  },
 );

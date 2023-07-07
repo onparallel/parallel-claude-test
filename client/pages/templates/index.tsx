@@ -21,7 +21,7 @@ function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSide
   const categories = usePublicTemplateCategories();
   const samplesByCategory = indexBy(samples, (s) => s.category);
   const filteredCategories = categories.filter(
-    (c) => samplesByCategory[c.slug]?.templates.totalCount > 0
+    (c) => samplesByCategory[c.slug]?.templates.totalCount > 0,
   );
 
   return (

@@ -2,7 +2,7 @@ import type { Workbook } from "exceljs";
 
 export async function downloadSpreadsheet(
   name: string,
-  builder: (workbook: Workbook) => Promise<void>
+  builder: (workbook: Workbook) => Promise<void>,
 ) {
   const exceljs = (await import("exceljs")).default;
   const workbook = new exceljs.Workbook();

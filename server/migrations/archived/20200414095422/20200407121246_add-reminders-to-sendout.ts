@@ -41,12 +41,12 @@ export async function up(knex: Knex): Promise<any> {
           .filter((column) => !["schedule_data", "active"].includes(column))
           .map((column) => `${column} = ps._${column}`)
           .join(", ")}
-    `
+    `,
     )
     .raw(
       /* sql */ `
       alter table "petition_sendout" alter column "status" set not null;
-    `
+    `,
     )
     .alterTable("petition_sendout", (t) => {
       t.dropColumns(...columns.map((column) => `_${column}`));

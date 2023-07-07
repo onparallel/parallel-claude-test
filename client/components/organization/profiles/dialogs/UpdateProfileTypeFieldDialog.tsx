@@ -39,8 +39,8 @@ function UpdateProfileTypeFieldDialog({
         ? "DO_NOT_REMEMBER"
         : f.expiryAlertAheadTime
         ? durationToExpiration(f.expiryAlertAheadTime)
-        : null
-    )
+        : null,
+    ),
   );
 
   const {

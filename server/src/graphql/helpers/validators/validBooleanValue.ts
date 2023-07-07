@@ -5,7 +5,7 @@ import { ArgValidationError } from "../errors";
 export function validBooleanValue<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => boolean | null | undefined,
   argName: string,
-  value: boolean
+  value: boolean,
 ) {
   return ((_, args, ctx, info) => {
     const curValue = prop(args);

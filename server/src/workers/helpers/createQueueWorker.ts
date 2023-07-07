@@ -35,7 +35,7 @@ export type QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> = {
   onForkTimeout?: (
     message: QueueWorkerPayload<Q>,
     context: WorkerContext,
-    config: Config["queueWorkers"][Q]
+    config: Config["queueWorkers"][Q],
   ) => MaybePromise<void>;
   parser?: (message: string) => QueueWorkerPayload<Q>;
   batchSize?: number;
@@ -46,9 +46,9 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
   handler: (
     payload: QueueWorkerPayload<Q>,
     context: WorkerContext,
-    config: Config["queueWorkers"][Q]
+    config: Config["queueWorkers"][Q],
   ) => Promise<void>,
-  options?: QueueWorkerOptions<Q>
+  options?: QueueWorkerOptions<Q>,
 ) {
   await loadEnv(`.${name}.env`);
 
@@ -88,7 +88,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           process.exit(1);
         }
         process.exit(0);
-      }
+      },
     )
     .command(
       "start",
@@ -119,7 +119,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                           message.Body!,
                           ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
                         ],
-                        { stdio: "inherit", timeout: forkTimeout, env: process.env }
+                        { stdio: "inherit", timeout: forkTimeout, env: process.env },
                       ).on("close", (code, signal) => {
                         if (code === 0) {
                           resolve();
@@ -136,7 +136,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                       await onForkTimeout?.(
                         parser(message.Body!),
                         container.get<WorkerContext>(WorkerContext),
-                        queueConfig
+                        queueConfig,
                       );
                     }
                     throw e;
@@ -193,7 +193,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           consumer.stop();
         }
         consumer.start();
-      }
+      },
     )
     .demandCommand()
     .recommendCommands().argv;

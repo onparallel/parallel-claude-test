@@ -79,7 +79,7 @@ export function RecipientSelectGroups({
     const unknownEmails = uniq(
       zip(contacts, emails)
         .map(([contact, email]) => (!contact ? email : null))
-        .filter(isDefined)
+        .filter(isDefined),
     );
 
     if (unknownEmails.length > 0) {
@@ -125,7 +125,7 @@ export function RecipientSelectGroups({
               </Text>
             </Stack>
           ),
-        })
+        }),
       );
       return;
     }
@@ -147,8 +147,8 @@ export function RecipientSelectGroups({
         recipientGroups.map((group, index) =>
           index === groupNumber
             ? uniqBy([...group, ...(contacts as ContactSelectSelection[])], (c) => c.id)
-            : group
-        )
+            : group,
+        ),
       );
     }
   }
@@ -189,7 +189,7 @@ export function RecipientSelectGroups({
   }
 
   const bouncedEmailRecipients = recipientGroups.flatMap((group) =>
-    group.filter((contact) => contact.hasBouncedEmail)
+    group.filter((contact) => contact.hasBouncedEmail),
   );
 
   return (

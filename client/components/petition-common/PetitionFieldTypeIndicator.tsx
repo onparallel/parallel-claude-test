@@ -28,7 +28,7 @@ export const PetitionFieldTypeIndicator = chakraForwardRef<
     isFixedWidth = true,
     ...props
   }: PetitionFieldTypeIndicatorProps,
-  ref
+  ref,
 ) {
   const label = usePetitionFieldTypeLabel(type);
   const color = usePetitionFieldTypeColor(type);

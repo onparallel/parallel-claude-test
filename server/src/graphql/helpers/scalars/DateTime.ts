@@ -55,7 +55,7 @@ export const Date = asNexusMethod(
     },
   } as GraphQLScalarTypeConfig<string, string>),
   "date",
-  "string"
+  "string",
 );
 
 export function dateArg(opts?: Omit<core.NexusArgConfig<"Date">, "type">) {

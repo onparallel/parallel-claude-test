@@ -18,7 +18,7 @@ export function PetitionRepliesFilterButton({ value, onChange }: PetitionReplies
     };
   };
   const isActive = (Object.keys(defaultFieldsFilter) as PetitionFieldFilterType[]).some(
-    (t) => value[t]
+    (t) => value[t],
   );
   return (
     <Menu closeOnSelect={false}>

@@ -13,7 +13,7 @@ export async function down(knex: Knex): Promise<void> {
     t.dropColumns(
       "is_completing_message_enabled",
       "completing_message_subject",
-      "completing_message_body"
+      "completing_message_body",
     );
   });
 }

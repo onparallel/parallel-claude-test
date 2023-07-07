@@ -38,7 +38,7 @@ function ChooseOrg({ organizations }: ChooseOrgProps) {
       const { data } = await apollo.query({ query: ChooseOrg_petitionsDocument });
       Router.push(data.petitions.totalCount ? "/app/petitions" : "/app/petitions/new");
     },
-    []
+    [],
   );
   return (
     <>

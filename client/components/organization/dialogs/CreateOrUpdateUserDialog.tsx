@@ -66,7 +66,7 @@ function CreateOrUpdateUserDialog({
         excludeUserGroups: [...excludeUserGroups, ...groupsToExclude],
       });
     },
-    [_handleSearchUserGroups, groupsToExclude.join(",")]
+    [_handleSearchUserGroups, groupsToExclude.join(",")],
   );
 
   const roles = useOrganizationRoles();
@@ -178,7 +178,7 @@ function CreateOrUpdateUserDialog({
                   <option key={r.role} value={r.role}>
                     {r.label}
                   </option>
-                )
+                ),
               )}
             </Select>
           </FormControl>

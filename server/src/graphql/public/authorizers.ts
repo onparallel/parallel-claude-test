@@ -14,7 +14,7 @@ import { ApolloError, ArgValidationError } from "../helpers/errors";
 export function authenticatePublicAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, string>,
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return chain(fetchPetitionAccess(argKeycode), async function (_, args, ctx) {
     const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
@@ -42,7 +42,7 @@ export function authenticatePublicAccess<
 
 export function getContactAuthCookieValue(
   req: IncomingMessage,
-  contactId: number
+  contactId: number,
 ): string | undefined {
   const cookies = parseCookie(req.headers["cookie"] ?? "");
   const cookieName = `parallel_contact_auth_${toGlobalId("Contact", contactId)}`;
@@ -52,7 +52,7 @@ export function getContactAuthCookieValue(
 export function fetchPetitionAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, string>,
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const keycode = args[argKeycode] as unknown as string;
@@ -60,12 +60,12 @@ export function fetchPetitionAccess<
     if (!access) {
       throw new ApolloError(
         `Petition access with keycode ${keycode} not found`,
-        "PUBLIC_PETITION_NOT_AVAILABLE"
+        "PUBLIC_PETITION_NOT_AVAILABLE",
       );
     } else if (access.status !== "ACTIVE") {
       throw new ApolloError(
         `Petition access with keycode ${keycode} not active`,
-        "PUBLIC_PETITION_NOT_AVAILABLE"
+        "PUBLIC_PETITION_NOT_AVAILABLE",
       );
     } else {
       ctx.access = access;
@@ -78,7 +78,7 @@ export function fetchPetitionAccess<
       if (!petition) {
         throw new ApolloError(
           `Petition for petition access with keycode ${keycode} not found`,
-          "PUBLIC_PETITION_NOT_AVAILABLE"
+          "PUBLIC_PETITION_NOT_AVAILABLE",
         );
       }
     }
@@ -89,7 +89,7 @@ export function fetchPetitionAccess<
 export function fieldBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, number>,
 >(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -104,7 +104,7 @@ export function fieldBelongsToAccess<
 export function fieldIsExternal<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, number>,
 >(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -119,7 +119,7 @@ export function fieldIsExternal<
 export function replyBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, number>,
 >(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -134,7 +134,7 @@ export function replyBelongsToAccess<
 export function replyBelongsToExternalField<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, number>,
 >(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -149,13 +149,13 @@ export function replyBelongsToExternalField<
 export function commentsBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argCommentId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.commentsBelongToPetition(
         ctx.access!.petition_id,
-        unMaybeArray(args[argCommentId] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argCommentId] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -165,7 +165,7 @@ export function commentsBelongsToAccess<
 export function validPublicPetitionLinkSlug<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, string>,
 >(argSlug: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const slug = args[argSlug] as unknown as string;
@@ -182,7 +182,7 @@ export function validPublicPetitionLinkPrefill<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>
+  TArg2 extends Arg<TypeName, FieldName, string>,
 >(argPrefill: TArg1, argSlug: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -201,13 +201,13 @@ export function validPublicPetitionLinkPrefill<
 export function validPublicPetitionLinkPrefillDataKeycode<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, string>,
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const keycode = args[argKeycode] as unknown as string;
       const publicPrefillData = await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(
-        keycode
+        keycode,
       );
       if (!publicPrefillData) {
         return false;
@@ -228,13 +228,13 @@ export function validPublicPetitionLinkPrefillDataKeycode<
 export function taskBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(taskIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.tasks.taskBelongsToAccess(
         args[taskIdArg] as unknown as number,
-        ctx.access!.id
+        ctx.access!.id,
       );
     } catch {}
     return false;
@@ -245,11 +245,11 @@ export function validPetitionFieldCommentContent<
   TypeName extends string,
   FieldName extends string,
   TArgContent extends Arg<TypeName, FieldName, any>,
-  TArgFieldId extends Arg<TypeName, FieldName, number>
+  TArgFieldId extends Arg<TypeName, FieldName, number>,
 >(
   argContent: TArgContent,
   argFieldId: TArgFieldId,
-  allowMentions?: boolean
+  allowMentions?: boolean,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx, info) => {
     const content = args[argContent] as any;
@@ -299,7 +299,7 @@ export function validPetitionFieldCommentContent<
         },
         $ref: "#/definitions/root",
       },
-      content
+      content,
     );
     if (!valid) {
       throw new ArgValidationError(info, argContent, ajv.errorsText());
@@ -312,7 +312,7 @@ export function validPetitionFieldCommentContent<
       return await ctx.petitions.canBeMentionedInPetitionFieldComment(
         petition.org_id,
         userMentions.map((m) => m.id),
-        userGroupMentions.map((m) => m.id)
+        userGroupMentions.map((m) => m.id),
       );
     }
     return true;

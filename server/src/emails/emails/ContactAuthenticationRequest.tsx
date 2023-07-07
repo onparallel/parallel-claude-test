@@ -36,7 +36,7 @@ const email: Email<ContactAuthenticationRequest> = {
         id: "verification-code-request.subject",
         defaultMessage: "{code} is your verification code on Parallel",
       },
-      { code, tone: theme.preferredTone }
+      { code, tone: theme.preferredTone },
     );
   },
   text({ name, fullName, code, browserName, osName, isContactVerification, theme }, intl) {
@@ -50,7 +50,7 @@ const email: Email<ContactAuthenticationRequest> = {
                 defaultMessage:
                   "Please use the following verification code to access the information:",
               },
-              { tone: theme.preferredTone }
+              { tone: theme.preferredTone },
             )
           : intl.formatMessage(
               {
@@ -58,7 +58,7 @@ const email: Email<ContactAuthenticationRequest> = {
                 defaultMessage:
                   "Please use the following verification code on the unrecognized device.",
               },
-              { tone: theme.preferredTone }
+              { tone: theme.preferredTone },
             )
       }
 
@@ -77,7 +77,7 @@ const email: Email<ContactAuthenticationRequest> = {
                 id: "verification-code-request.device",
                 defaultMessage: "{browserName} on {osName}",
               },
-              { browserName, osName }
+              { browserName, osName },
             )}`
       }
     
@@ -87,7 +87,7 @@ const email: Email<ContactAuthenticationRequest> = {
           defaultMessage:
             "This verification code will expire in 30 minutes, please make sure you use it as soon as possible.",
         },
-        { tone: theme.preferredTone }
+        { tone: theme.preferredTone },
       )}
       
       ${closing({}, intl)}

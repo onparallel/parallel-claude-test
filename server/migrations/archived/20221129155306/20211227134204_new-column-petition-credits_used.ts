@@ -16,7 +16,7 @@ export async function up(knex: Knex): Promise<void> {
     .from("petition")
     .whereIn(
       "id",
-      petitionSentEvents.map((e) => e.petition_id)
+      petitionSentEvents.map((e) => e.petition_id),
     )
     .update({ credits_used: 1 });
 }

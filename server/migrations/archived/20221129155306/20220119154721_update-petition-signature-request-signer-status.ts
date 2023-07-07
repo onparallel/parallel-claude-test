@@ -22,7 +22,7 @@ type SignatureRequestRow = {
 
 export async function up(knex: Knex): Promise<void> {
   const { rows } = await knex.raw<{ rows: SignatureRequestRow[] }>(
-    /* sql */ `SELECT id, (signature_config->>'signersInfo')::jsonb as signers, event_logs from petition_signature_request`
+    /* sql */ `SELECT id, (signature_config->>'signersInfo')::jsonb as signers, event_logs from petition_signature_request`,
   );
 
   await pMap(
@@ -66,13 +66,13 @@ export async function up(knex: Knex): Promise<void> {
         .where("id", row.id)
         .update("signer_status", newSignerStatus);
     },
-    { concurrency: 10 }
+    { concurrency: 10 },
   );
 }
 
 export async function down(knex: Knex): Promise<void> {
   const { rows } = await knex.raw<{ rows: { id: number; signer_status: any }[] }>(
-    /* sql */ `SELECT id, signer_status from petition_signature_request`
+    /* sql */ `SELECT id, signer_status from petition_signature_request`,
   );
 
   await pMap(
@@ -93,6 +93,6 @@ export async function down(knex: Knex): Promise<void> {
         .where("id", row.id)
         .update("signer_status", newStatus);
     },
-    { concurrency: 10 }
+    { concurrency: 10 },
   );
 }

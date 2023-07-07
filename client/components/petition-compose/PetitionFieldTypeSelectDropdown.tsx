@@ -33,7 +33,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
   chakraForwardRef<"div", PetitionFieldTypeSelectDropdownProps>(
     function PetitionFieldTypeSelectDropdown(
       { user, onSelectFieldType, showHeader, showDescription, role = "menu", ...props },
-      ref
+      ref,
     ) {
       const intl = useIntl();
       const innerRef = useRef<HTMLDivElement>(null);
@@ -107,7 +107,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
               ],
             },
           ] as { category: string; fields: PetitionFieldType[] }[],
-        [user.hasEsTaxDocumentsField, user.hasDowJonesField]
+        [user.hasEsTaxDocumentsField, user.hasDowJonesField],
       );
 
       const { locale } = useIntl();
@@ -192,7 +192,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                       id: "component.petition-field-type-select-dropdown.thumbnail-alt",
                       defaultMessage: 'Thumbnail for field type "{type}"',
                     },
-                    { type: activeTypeLabel }
+                    { type: activeTypeLabel },
                   )}
                   loading="eager"
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${activeType}_${locale}.png`}
@@ -294,7 +294,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
           </Box>
         </MenuList>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -305,5 +305,5 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
         }
       `,
     },
-  }
+  },
 );

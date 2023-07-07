@@ -17,7 +17,7 @@ export function toGlobalId<TId extends number | string = number>(type: string, i
 export function fromGlobalId<T extends string = string, IsStringId extends boolean = false>(
   globalId: string,
   type?: T,
-  isString?: IsStringId
+  isString?: IsStringId,
 ): { id: IsStringId extends true ? string : number; type: T } {
   let decoded: string;
   try {
@@ -41,17 +41,17 @@ export function fromGlobalId<T extends string = string, IsStringId extends boole
 export function fromGlobalIds<T extends string, IsStringId extends boolean = false>(
   globalIds: string[],
   type: T,
-  isString?: IsStringId
+  isString?: IsStringId,
 ): { type: T; ids: IsStringId extends true ? string[] : number[] };
 export function fromGlobalIds<T extends string, IsStringId extends boolean = false>(
   globalIds: Maybe<string>[],
   type: T,
-  isString?: IsStringId
+  isString?: IsStringId,
 ): { type: T; ids: IsStringId extends true ? Maybe<string>[] : Maybe<number>[] };
 export function fromGlobalIds<T extends string, IsStringId extends boolean = false>(
   globalIds: Maybe<string>[],
   type: T,
-  isString?: IsStringId
+  isString?: IsStringId,
 ) {
   return {
     type: type as T,

@@ -9,7 +9,7 @@ interface SupportButton extends ButtonOptions, ThemingProps<"Button"> {
 
 export const SupportButton = chakraForwardRef<"a", SupportButton>(function SupportButton(
   { message, onClick, children, isDisabled, ...props },
-  ref
+  ref,
 ) {
   if (isDisabled) {
     return (

@@ -28,7 +28,7 @@ export function CheckboxSettings({
 
   const values = field.options?.values ?? [];
   const [limitType, setLimitType] = useState<CheckboxLimitType>(
-    field.options?.limit?.type ?? "UNLIMITED"
+    field.options?.limit?.type ?? "UNLIMITED",
   );
   const [min, setMin] = useState<number>(1);
   const [max, setMax] = useState<number>(1);

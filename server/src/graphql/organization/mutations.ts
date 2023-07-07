@@ -49,7 +49,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   validateArgs: validateFile(
     (args) => args.file,
     { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-    "file"
+    "file",
   ),
   resolve: async (root, args, ctx) => {
     const { mimetype, createReadStream } = await args.file;
@@ -65,13 +65,13 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
         content_type: mimetype,
         size: res["ContentLength"]!.toString(),
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
 
     const org = await ctx.organizations.updateOrganization(
       ctx.user!.org_id,
       { [args.isIcon ? "icon_public_file_id" : "logo_public_file_id"]: logoFile.id },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
 
     if (!args.isIcon) {
@@ -97,10 +97,10 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
       return await ctx.organizations.updateOrganization(
         ctx.user!.org_id,
         { anonymize_petitions_after_months: months ?? null },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     },
-  }
+  },
 );
 
 export const updateOrganizationBrandTheme = mutationField("updateOrganizationBrandTheme", {
@@ -116,12 +116,12 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
           t.nullable.string("color");
           t.nullable.field("preferredTone", { type: "Tone" });
         },
-      }).asArg()
+      }).asArg(),
     ),
   },
   validateArgs: validateAnd(
     validWebSafeFontFamily((args) => args.data.fontFamily, "data.fontFamily"),
-    validateHexColor((args) => args.data.color, "data.color")
+    validateHexColor((args) => args.data.color, "data.color"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.organizations.updateOrganizationBrandThemeDataByOrgId(
@@ -132,9 +132,9 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
           fontFamily: args.data.fontFamily,
           preferredTone: args.data.preferredTone ?? undefined,
         },
-        ([_, value]) => value !== undefined
+        ([_, value]) => value !== undefined,
       ),
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
 
     await ctx.signature.onOrganizationBrandChange(ctx.user!.org_id);
@@ -144,11 +144,11 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
 
 export function validateTheme<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
-  argName: string
+  argName: string,
 ) {
   return validateAnd(
     ...["Top", "Right", "Bottom", "Left"].map((p) =>
-      inRange((args) => prop(args)?.[`margin${p}`], `${argName}.margin${p}`, 0)
+      inRange((args) => prop(args)?.[`margin${p}`], `${argName}.margin${p}`, 0),
     ),
     ...["text", "title1", "title2"].flatMap((p) => [
       validFontFamily((args) => prop(args)?.[`${p}FontFamily`], `${argName}.${p}FontFamily`),
@@ -159,9 +159,9 @@ export function validateTheme<TypeName extends string, FieldName extends string>
       validRichTextContent(
         (args) => prop(args)?.legalText?.[p],
         undefined, // this legal text cannot contain PetitionField references
-        `${argName}.legalText.${p}`
-      )
-    )
+        `${argName}.legalText.${p}`,
+      ),
+    ),
   ) as unknown as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
@@ -172,7 +172,7 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
     type: "Organization",
     authorize: authenticateAnd(
       contextUserHasRole("ADMIN"),
-      userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT")
+      userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT"),
     ),
     args: {
       orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
@@ -182,14 +182,14 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
     },
     validateArgs: validateAnd(
       maxLength((args) => args.name, "name", 50),
-      validateTheme((args) => args.data, "data")
+      validateTheme((args) => args.data, "data"),
     ),
     resolve: async (_, args, ctx) => {
       const theme = (await ctx.organizations.loadOrganizationTheme(args.orgThemeId))!;
       if (args.isDefault && !theme.is_default) {
         await ctx.organizations.setOrganizationThemeAsDefault(
           args.orgThemeId,
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
       }
       const updateData: Partial<OrganizationTheme> = {};
@@ -206,12 +206,12 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
         await ctx.organizations.updateOrganizationTheme(
           args.orgThemeId,
           updateData,
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         );
       }
       return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
     },
-  }
+  },
 );
 
 export const createOrganizationPdfDocumentTheme = mutationField(
@@ -231,7 +231,7 @@ export const createOrganizationPdfDocumentTheme = mutationField(
         name,
         "PDF_DOCUMENT",
         defaultPdfDocumentTheme,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       if (isDefault) {
         await ctx.organizations.setOrganizationThemeAsDefault(theme.id, `User:${ctx.user!.id}`);
@@ -239,7 +239,7 @@ export const createOrganizationPdfDocumentTheme = mutationField(
 
       return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
     },
-  }
+  },
 );
 
 export const deleteOrganizationPdfDocumentTheme = mutationField(
@@ -249,7 +249,7 @@ export const deleteOrganizationPdfDocumentTheme = mutationField(
     authorize: authenticateAnd(
       contextUserHasRole("ADMIN"),
       userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT"),
-      organizationThemeIsNotDefault("orgThemeId")
+      organizationThemeIsNotDefault("orgThemeId"),
     ),
     args: {
       orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
@@ -258,7 +258,7 @@ export const deleteOrganizationPdfDocumentTheme = mutationField(
       await ctx.organizations.deleteOrganizationTheme(orgThemeId, ctx.user!);
       return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
     },
-  }
+  },
 );
 
 export const updateFeatureFlags = mutationField("updateFeatureFlags", {
@@ -275,9 +275,9 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
               t.nonNull.field("name", { type: "FeatureFlag" });
               t.nonNull.boolean("value");
             },
-          })
-        )
-      )
+          }),
+        ),
+      ),
     ),
     orgId: nonNull(globalIdArg("Organization")),
   },
@@ -313,7 +313,7 @@ export const createOrganization = mutationField("createOrganization", {
       if (status === "ROOT") {
         throw new ArgValidationError(info, "status", "Can't create an org with ROOT status");
       }
-    }
+    },
   ),
   resolve: async (_, args, ctx) => {
     const email = args.email.trim().toLowerCase();
@@ -328,7 +328,7 @@ export const createOrganization = mutationField("createOrganization", {
         organizationName: args.name.trim(),
         organizationUser: fullName(userData.first_name, userData.last_name),
       },
-      true
+      true,
     );
 
     const { organization } = await ctx.accountSetup.createOrganization(
@@ -347,7 +347,7 @@ export const createOrganization = mutationField("createOrganization", {
         },
         preferred_locale: args.locale,
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
 
     return organization;
@@ -366,7 +366,7 @@ export const updateOrganizationUserLimit = mutationField("updateOrganizationUser
     return await ctx.organizations.updateOrganizationUsageDetails(
       orgId,
       { USER_LIMIT: limit },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
   },
 });
@@ -380,19 +380,19 @@ export const updateOrganizationUsageDetails = mutationField("updateOrganizationU
     orgId: nonNull(globalIdArg("Organization")),
     limitName: nonNull("OrganizationUsageLimitName"),
     limit: nonNull(
-      intArg({ description: "How many credits allow the org to use in the given period" })
+      intArg({ description: "How many credits allow the org to use in the given period" }),
     ),
     duration: nonNull("Duration"),
     renewalCycles: nonNull(
       intArg({
         description:
           "How many cycles this subscription will renew until it finishes. Zero means infinite",
-      })
+      }),
     ),
     startNewPeriod: nonNull(
       booleanArg({
         description: "End current period and start new with this arguments.",
-      })
+      }),
     ),
   },
   resolve: async (_, args, ctx) => {
@@ -405,14 +405,14 @@ export const updateOrganizationUsageDetails = mutationField("updateOrganizationU
           renewal_cycles: args.renewalCycles > 0 ? args.renewalCycles : null,
         },
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     if (args.startNewPeriod) {
       await ctx.organizations.startNewOrganizationUsageLimitPeriod(
         args.orgId,
         args.limitName,
         args.limit,
-        args.duration
+        args.duration,
       );
     }
 
@@ -425,7 +425,7 @@ export const modifyCurrentUsagePeriod = mutationField("modifyCurrentUsagePeriod"
   type: "Organization",
   authorize: authenticateAnd(
     userIsSuperAdmin(),
-    organizationHasOngoingUsagePeriod("orgId", "limitName")
+    organizationHasOngoingUsagePeriod("orgId", "limitName"),
   ),
   args: {
     orgId: nonNull(globalIdArg("Organization")),
@@ -437,7 +437,7 @@ export const modifyCurrentUsagePeriod = mutationField("modifyCurrentUsagePeriod"
     await ctx.organizations.updateOrganizationCurrentUsageLimit(
       args.orgId,
       args.limitName,
-      args.newLimit
+      args.newLimit,
     );
     return (await ctx.organizations.loadOrg(args.orgId))!;
   },
@@ -449,7 +449,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
   args: {
     orgId: nonNull(globalIdArg("Organization")),
     limit: nonNull(
-      intArg({ description: "How many credits allow the org to use in the given period" })
+      intArg({ description: "How many credits allow the org to use in the given period" }),
     ),
     duration: nonNull("Duration"),
   },
@@ -458,14 +458,14 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
     const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
       orgId,
       "SIGNATURE",
-      "SIGNATURIT"
+      "SIGNATURIT",
     );
 
     const hasSharedSignaturitApiKey =
       signatureIntegrations.length > 0 &&
       signatureIntegrations.some(
         (i) =>
-          i.settings.IS_PARALLEL_MANAGED && i.settings.ENVIRONMENT === "production" && i.is_enabled
+          i.settings.IS_PARALLEL_MANAGED && i.settings.ENVIRONMENT === "production" && i.is_enabled,
       );
 
     return await ctx.organizations.withTransaction(async (t) => {
@@ -479,7 +479,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
           },
         },
         `User:${ctx.user!.id}`,
-        t
+        t,
       );
 
       if (!hasSharedSignaturitApiKey) {
@@ -492,7 +492,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
           ctx.config.signature.signaturitSharedProductionApiKey,
           true,
           `User:${ctx.user!.id}`,
-          t
+          t,
         );
       }
 
@@ -501,13 +501,13 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
         "SIGNATURIT_SHARED_APIKEY",
         limit,
         duration,
-        t
+        t,
       );
 
       await ctx.featureFlags.upsertFeatureFlagOverride(
         orgId,
         { name: "PETITION_SIGNATURE", value: true },
-        t
+        t,
       );
 
       return organization;

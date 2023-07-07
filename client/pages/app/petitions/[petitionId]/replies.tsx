@@ -144,7 +144,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const [activeFieldId, setActiveFieldId] = useQueryStateSlice(
     queryState,
     setQueryState,
-    "comments"
+    "comments",
   );
   const [profileId, setProfileId] = useQueryStateSlice(queryState, setQueryState, "profile");
 
@@ -174,13 +174,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   async function handleUpdateRepliesStatus(
     petitionFieldId: string,
     petitionFieldReplyIds: string[],
-    status: PetitionFieldReplyStatus
+    status: PetitionFieldReplyStatus,
   ) {
     if (status === "REJECTED") {
       setActiveFieldId(petitionFieldId);
       setTimeout(() => {
         const input = document.querySelector<HTMLTextAreaElement>(
-          "#petition-replies-comments-input"
+          "#petition-replies-comments-input",
         );
         if (input) {
           scrollIntoView(input, { block: "center", behavior: "smooth" });
@@ -195,7 +195,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         petitionFieldReplyIds,
         status,
       },
-      petition.status
+      petition.status,
     );
   }
 
@@ -203,7 +203,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
     }),
-    [petitionId]
+    [petitionId],
   );
 
   const handleAction: PetitionRepliesFieldProps["onAction"] = async function (action, reply) {
@@ -241,7 +241,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, [petitionId, petition.fields]);
 
   const showDownloadAll = petition.fields.some(
-    (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
+    (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0,
   );
 
   const handlePrintPdfTask = usePrintPdfTask();
@@ -260,7 +260,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   async function handleUpdateComment(
     petitionFieldCommentId: string,
     content: string,
-    isNote: boolean
+    isNote: boolean,
   ) {
     await updatePetitionFieldComment({
       petitionId,
@@ -299,7 +299,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showClosePetitionDialog = useClosePetitionDialog();
   const [sendPetitionClosedNotification] = useMutation(
-    PetitionReplies_sendPetitionClosedNotificationDocument
+    PetitionReplies_sendPetitionClosedNotificationDocument,
   );
   const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleFinishPetition = useCallback(
@@ -361,19 +361,19 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         }
       }
     },
-    [petition, intl.locale]
+    [petition, intl.locale],
   );
 
   const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
   const [approveOrRejectReplies] = useMutation(
-    PetitionReplies_approveOrRejectPetitionFieldRepliesDocument
+    PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   );
   const [closePetition] = useMutation(PetitionReplies_closePetitionDocument);
 
   const showConfirmCancelOngoingSignature = useDialog(ConfirmCancelOngoingSignature);
 
   const [cancelSignatureRequest] = useMutation(
-    PetitionSettings_cancelPetitionSignatureRequestDocument
+    PetitionSettings_cancelPetitionSignatureRequestDocument,
   );
 
   const handleClosePetition = useCallback(async () => {
@@ -381,7 +381,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       const hasPendingSignature =
         (petition.currentSignatureRequest &&
           ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(
-            petition.currentSignatureRequest.status
+            petition.currentSignatureRequest.status,
           )) ??
         false;
       if (hasPendingSignature || petition.signatureConfig) {
@@ -403,7 +403,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       }
 
       const hasUnreviewedReplies = petition.fields.some((f) =>
-        f.replies.some((r) => r.status === "PENDING" && f.requireApproval)
+        f.replies.some((r) => r.status === "PENDING" && f.requireApproval),
       );
 
       const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog() : "APPROVE";
@@ -466,7 +466,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   } as const;
 
   const [associateProfileToPetition] = useMutation(
-    PetitionReplies_associateProfileToPetitionDocument
+    PetitionReplies_associateProfileToPetitionDocument,
   );
   const showAssociateProfileToPetitionDialog = useAssociateProfileToPetitionDialog();
   const handleAssociateProfile = async () => {
@@ -741,7 +741,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     />
                   ) : (
                     <PetitionRepliesFilteredFields key={index} count={x.count} />
-                  )
+                  ),
               )}
             </LiquidScopeProvider>
           </Stack>
@@ -949,7 +949,7 @@ function useDownloadReplyFile() {
     async function downloadReplyFile(
       petitionId: string,
       reply: Pick<PetitionFieldReply, "id" | "content">,
-      preview: boolean
+      preview: boolean,
     ) {
       await withError(
         openNewWindow(async () => {
@@ -962,23 +962,23 @@ function useDownloadReplyFile() {
             throw new Error();
           }
           return url!;
-        })
+        }),
       );
     },
-    [mutate]
+    [mutate],
   );
 }
 
 function useUpdatePetitionFieldRepliesStatus() {
   const [updatePetitionFieldRepliesStatus] = useMutation(
-    PetitionReplies_updatePetitionFieldRepliesStatusDocument
+    PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   );
   return useCallback(
     async (
       variables: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>,
-      petitionStatus: PetitionStatus
+      petitionStatus: PetitionStatus,
     ) => await updatePetitionFieldRepliesStatus({ variables }),
-    [updatePetitionFieldRepliesStatus]
+    [updatePetitionFieldRepliesStatus],
   );
 }
 
@@ -1035,7 +1035,7 @@ function PetitionContentsIndicators({ field }: { field: PetitionReplies_Petition
                   defaultMessage:
                     "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
                 },
-                { commentCount: field.comments.length }
+                { commentCount: field.comments.length },
               )}
             >
               {intl.formatNumber(field.comments.length)}
@@ -1090,5 +1090,5 @@ export default compose(
   withPetitionLayoutContext,
   withDialogs,
   withMetadata,
-  withApolloData
+  withApolloData,
 )(PetitionReplies);

@@ -29,7 +29,7 @@ export class DocuSignClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
-    @inject(DocusignIntegration) private docusignOauth: DocusignIntegration
+    @inject(DocusignIntegration) private docusignOauth: DocusignIntegration,
   ) {}
 
   private integrationId!: number;
@@ -49,8 +49,8 @@ export class DocuSignClient implements ISignatureClient {
   private async withDocusignSdk<TResult>(
     handler: (
       apis: { envelopes: EnvelopesApi; accounts: AccountsApi },
-      context: DocusignIntegrationContext & { userAccountId: string }
-    ) => Promise<TResult>
+      context: DocusignIntegrationContext & { userAccountId: string },
+    ) => Promise<TResult>,
   ): Promise<TResult> {
     return await this.docusignOauth.withCredentials(
       this.integrationId,
@@ -58,7 +58,7 @@ export class DocuSignClient implements ISignatureClient {
         try {
           const client = new ApiClient();
           client.setOAuthBasePath(
-            this.config.oauth.docusign[context.environment].oauthBaseUri.replace("https://", "")
+            this.config.oauth.docusign[context.environment].oauthBaseUri.replace("https://", ""),
           );
           const userInfo = (await client.getUserInfo(accessToken)) as UserInfoResponse;
           const defaultAccount = userInfo.accounts.find((a) => a.isDefault === "true")!;
@@ -71,7 +71,7 @@ export class DocuSignClient implements ISignatureClient {
               envelopes: new EnvelopesApi(client),
               accounts: new AccountsApi(client),
             },
-            { ...context, userAccountId: defaultAccount.accountId }
+            { ...context, userAccountId: defaultAccount.accountId },
           );
         } catch (error) {
           if (this.isAccessTokenExpiredError(error)) {
@@ -80,12 +80,12 @@ export class DocuSignClient implements ISignatureClient {
           if (this.isAccountSuspendedError(error)) {
             throw new InvalidCredentialsError(
               "ACCOUNT_SUSPENDED",
-              error instanceof Error ? error.message : stringify(error)
+              error instanceof Error ? error.message : stringify(error),
             );
           }
           throw error;
         }
-      }
+      },
     );
   }
 
@@ -94,7 +94,7 @@ export class DocuSignClient implements ISignatureClient {
     orgId: number,
     filePath: string,
     recipients: Recipient[],
-    options: SignatureOptions
+    options: SignatureOptions,
   ): Promise<SignatureResponse> {
     return await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
@@ -114,7 +114,7 @@ export class DocuSignClient implements ISignatureClient {
             includeHMAC: "true",
             url: `${baseEventsUrl}/api/webhooks/docusign/${toGlobalId(
               "Petition",
-              petitionId
+              petitionId,
             )}/events`,
             deliveryMode: "SIM",
             events: [
@@ -207,7 +207,7 @@ export class DocuSignClient implements ISignatureClient {
               defaultMessage:
                 "The signing process sent through {signatureProvider} has been cancelled by the sender.",
             },
-            { signatureProvider: "DocuSign", tone: "INFORMAL" }
+            { signatureProvider: "DocuSign", tone: "INFORMAL" },
           ),
         } as Envelope,
       });
@@ -218,7 +218,7 @@ export class DocuSignClient implements ISignatureClient {
     return await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       return Buffer.from(
         await envelopes.getDocument(userAccountId, externalId, "combined", {}),
-        "binary"
+        "binary",
       );
     });
   }
@@ -227,7 +227,7 @@ export class DocuSignClient implements ISignatureClient {
     return await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       return Buffer.from(
         await envelopes.getDocument(userAccountId, externalId, "certificate", {}),
-        "binary"
+        "binary",
       );
     });
   }

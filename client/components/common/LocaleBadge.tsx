@@ -23,5 +23,5 @@ export const LocaleBadge = chakraForwardRef<"abbr", { locale: PetitionLocale }>(
         </Badge>
       </SmallPopover>
     );
-  }
+  },
 );

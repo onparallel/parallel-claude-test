@@ -11,7 +11,7 @@ import { AuthenticationError } from "./errors";
 export type ArgAuthorizer<TArg, TRest extends any[] = []> = <
   TypeName extends string,
   FieldName extends string,
-  TArgName extends Arg<TypeName, FieldName, TArg>
+  TArgName extends Arg<TypeName, FieldName, TArg>,
 >(
   argName: TArgName,
   ...args: TRest
@@ -19,7 +19,7 @@ export type ArgAuthorizer<TArg, TRest extends any[] = []> = <
 
 export function authenticate<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
     try {
@@ -36,7 +36,7 @@ export function authenticate<
 export function checkClientServerToken<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, string>,
 >(tokenArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
     return (args[tokenArg] as unknown as string) === ctx.config.misc.clientServerToken;
@@ -54,7 +54,7 @@ export type Arg<TypeName extends string, FieldName extends string, Type = any> =
 
 function _all<TypeName extends string, FieldName extends string>(
   resolvers: FieldAuthorizeResolver<TypeName, FieldName>[],
-  concurrency: number
+  concurrency: number,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     try {
@@ -70,7 +70,7 @@ function _all<TypeName extends string, FieldName extends string>(
             throw passes;
           }
         }),
-        { concurrency }
+        { concurrency },
       );
     } catch (e: any) {
       // recapture "Not authorized" error, rethrow otherwise
@@ -111,11 +111,11 @@ export function or<TypeName extends string, FieldName extends string>(
 export function ifArgDefined<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName>
+  TArg extends Arg<TypeName, FieldName>,
 >(
   prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => any),
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
-  elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>
+  elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     const value = typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
@@ -130,7 +130,7 @@ export function ifArgDefined<
 
 export function ifSomeDefined<TypeName extends string, FieldName extends string>(
   props: (args: core.ArgsValue<TypeName, FieldName>) => any[],
-  thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>
+  thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     if (props(args).some((value) => value !== undefined)) {
@@ -143,12 +143,12 @@ export function ifSomeDefined<TypeName extends string, FieldName extends string>
 export function ifArgEquals<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName>
+  TArg extends Arg<TypeName, FieldName>,
 >(
   prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => any),
   expectedValue: core.ArgsValue<TypeName, FieldName>[TArg],
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
-  elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>
+  elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     const value = typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
@@ -164,7 +164,7 @@ export function ifArgEquals<
 export function argIsDefined<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName>
+  TArg extends Arg<TypeName, FieldName>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     return isDefined(args[argName]);
@@ -173,7 +173,7 @@ export function argIsDefined<
 
 export function userIsSuperAdmin<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -188,12 +188,12 @@ export function userIsSuperAdmin<
 export function verifyCaptcha<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, string>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
     return await ctx.auth.verifyCaptcha(
       args[argName] as unknown as string,
-      getClientIp(ctx.req) ?? ""
+      getClientIp(ctx.req) ?? "",
     );
   };
 }
@@ -202,7 +202,7 @@ export function verifyCaptcha<
  * negates the result of the given resolver
  */
 export function not<TypeName extends string, FieldName extends string>(
-  resolver: FieldAuthorizeResolver<TypeName, FieldName>
+  resolver: FieldAuthorizeResolver<TypeName, FieldName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     try {

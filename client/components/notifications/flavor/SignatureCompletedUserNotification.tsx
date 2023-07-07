@@ -31,7 +31,7 @@ export const SignatureCompletedUserNotification = Object.assign(
           />
         </PetitionUserNotification>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -42,5 +42,5 @@ export const SignatureCompletedUserNotification = Object.assign(
         ${PetitionUserNotification.fragments.PetitionUserNotification}
       `,
     },
-  }
+  },
 );

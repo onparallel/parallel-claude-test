@@ -16,7 +16,7 @@ export async function petitionCompleted(
     signer?: PetitionSignatureConfigSigner;
     completed_by: string;
   },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   let access: Maybe<PetitionAccess> = null;
   let contact: Maybe<Partial<Contact>> = null;
@@ -63,7 +63,7 @@ export async function petitionCompleted(
 
   const subscribedUserIds = permissions.filter((p) => p.is_subscribed).map((p) => p.user_id!);
   const subscribedUsersData = (await context.users.loadUserDataByUserId(subscribedUserIds)).filter(
-    isDefined
+    isDefined,
   );
 
   const isSigned = isDefined(payload.signer);
@@ -82,7 +82,7 @@ export async function petitionCompleted(
         contactEmail: contact.email!,
         ...layoutProps,
       },
-      { locale: userData.preferred_locale }
+      { locale: userData.preferred_locale },
     );
     emails.push(
       await context.emailLogs.createEmail({
@@ -92,7 +92,7 @@ export async function petitionCompleted(
         text,
         html,
         created_from: payload.completed_by,
-      })
+      }),
     );
   }
   return emails;

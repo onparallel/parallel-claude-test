@@ -372,14 +372,14 @@ function useDownloadAverageReportExcel() {
           range: isDefined(range)
             ? range.map((d) => dateToFilenameFormat(d)).join("-")
             : dateToFilenameFormat(new Date()),
-        }
+        },
       ),
       async (workbook) => {
         const worksheet = workbook.addWorksheet(
           intl.formatMessage({
             id: "page.reports-statistics.worksheet-name",
             defaultMessage: "Statistics report",
-          })
+          }),
         );
 
         worksheet.columns = [
@@ -503,7 +503,7 @@ function useDownloadAverageReportExcel() {
             : "-",
           time_to_close: isDefined(times.complete_to_close) ? times.complete_to_close / 3600 : "-",
         });
-      }
+      },
     );
   };
 }

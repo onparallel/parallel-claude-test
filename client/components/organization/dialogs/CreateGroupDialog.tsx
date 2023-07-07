@@ -44,7 +44,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
         excludeUsers: [...excludeUsers],
       });
     },
-    [_handleSearchUsers]
+    [_handleSearchUsers],
   );
 
   return (

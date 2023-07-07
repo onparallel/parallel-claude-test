@@ -61,7 +61,7 @@ export const PetitionSharedUserNotification = Object.assign(
           ) : null}
         </PetitionUserNotification>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -89,5 +89,5 @@ export const PetitionSharedUserNotification = Object.assign(
         ${UserReference.fragments.User}
       `,
     },
-  }
+  },
 );

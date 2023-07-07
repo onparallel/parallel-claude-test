@@ -32,14 +32,14 @@ const email: Email<InvitationProps> = {
             defaultMessage:
               "{organizationUser} invited you to join {organizationName} on Parallel 🎊",
           },
-          { organizationUser, organizationName }
+          { organizationUser, organizationName },
         )
       : intl.formatMessage(
           {
             id: "invitation.subject-anonymous",
             defaultMessage: "You have been invited to join {organizationName} on Parallel 🎊",
           },
-          { organizationName }
+          { organizationName },
         );
   },
   text(
@@ -52,7 +52,7 @@ const email: Email<InvitationProps> = {
       password,
       isNewUser,
     }: InvitationProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
     ${greetingUser({ name: userName }, intl)}
@@ -65,14 +65,14 @@ const email: Email<InvitationProps> = {
               defaultMessage:
                 "{organizationUser} has invited you to join {organizationName} on Parallel.",
             },
-            { organizationName, organizationUser }
+            { organizationName, organizationUser },
           )
         : intl.formatMessage(
             {
               id: "invitation.text-anonymous",
               defaultMessage: "You have been invited to join {organizationName} on Parallel.",
             },
-            { organizationName }
+            { organizationName },
           )
     }
     ${
@@ -87,14 +87,14 @@ const email: Email<InvitationProps> = {
       id: "invitation.email",
       defaultMessage: "Email: {email}",
     },
-    { email }
+    { email },
   )}
   ${intl.formatMessage(
     {
       id: "invitation.password",
       defaultMessage: "Password: {password}",
     },
-    { password }
+    { password },
   )}`
         : `${intl.formatMessage({
             id: "invitation.details.registered-user",

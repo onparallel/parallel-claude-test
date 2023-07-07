@@ -22,7 +22,7 @@ export async function up(knex: Knex): Promise<any> {
       /* sql */ `
       update petition_sendout as ps set
         ${columns.map((column) => `${column} = ps._${column}`).join(", ")}
-    `
+    `,
     )
     .alterTable("petition_sendout", (t) => {
       t.dropColumns(...columns.map((column) => `_${column}`));

@@ -25,7 +25,7 @@ export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeatur
       fontSize = "sm",
       ...props
     },
-    ref
+    ref,
   ) {
     return (
       <SmallPopover
@@ -75,5 +75,5 @@ export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeatur
         )}
       </SmallPopover>
     );
-  }
+  },
 );

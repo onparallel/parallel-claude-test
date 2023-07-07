@@ -70,7 +70,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 const QUERY_STATE = {
   search: string(),
   status: values<RecipientPortalStatusFilterValue>(["ALL", "PENDING", "COMPLETED"]).orDefault(
-    "ALL"
+    "ALL",
   ),
 };
 const PAGE_SIZE = 20;
@@ -155,7 +155,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
       setQueryState((current) => ({ ...current, search: search || null }));
     },
     300,
-    []
+    [],
   );
 
   const handleSearchChange = (search: string) => {

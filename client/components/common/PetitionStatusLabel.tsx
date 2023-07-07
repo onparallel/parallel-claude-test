@@ -23,5 +23,5 @@ export const PetitionStatusLabel = chakraForwardRef<"div", PetitionStatusLabelPr
         </Text>
       </HStack>
     );
-  }
+  },
 );

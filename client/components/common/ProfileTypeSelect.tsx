@@ -32,7 +32,7 @@ export type ProfileTypeSelectSelection = ProfileTypeSelect_ProfileTypeFragment;
 
 export type ProfileTypeSelectInstance<
   IsMulti extends boolean,
-  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
+  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
 > = SelectInstance<OptionType, IsMulti, never>;
 
 const fragments = {
@@ -81,7 +81,7 @@ const _queries = [
 export interface ProfileTypeSelectProps<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
-  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
+  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
 > extends Omit<CustomSelectProps<OptionType, IsMulti, never>, "value"> {
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
   isSync?: IsSync;
@@ -92,7 +92,7 @@ export const ProfileTypeSelect = Object.assign(
   forwardRef(function ProfileTypeSelect<
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
+    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
   >(
     {
       value,
@@ -103,7 +103,7 @@ export const ProfileTypeSelect = Object.assign(
       placeholder: _placeholder,
       ...props
     }: ProfileTypeSelectProps<IsMulti, IsSync, OptionType>,
-    ref: ForwardedRef<ProfileTypeSelectInstance<IsMulti, OptionType>>
+    ref: ForwardedRef<ProfileTypeSelectInstance<IsMulti, OptionType>>,
   ) {
     const intl = useIntl();
     const needsLoading =
@@ -128,7 +128,7 @@ export const ProfileTypeSelect = Object.assign(
         return result.data.profileTypes.items as any[];
       },
       300,
-      [intl.locale]
+      [intl.locale],
     );
 
     const getProfileTypes = useGetProfileTypes();
@@ -166,7 +166,7 @@ export const ProfileTypeSelect = Object.assign(
           },
           {
             isMulti,
-          }
+          },
         )
       );
     }, [_placeholder, isMulti]);
@@ -224,12 +224,12 @@ export const ProfileTypeSelect = Object.assign(
   }) as <
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
+    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
   >(
     props: ProfileTypeSelectProps<IsMulti, IsSync, OptionType> &
-      RefAttributes<ProfileTypeSelectInstance<IsMulti, OptionType>>
+      RefAttributes<ProfileTypeSelectInstance<IsMulti, OptionType>>,
   ) => ReactElement,
-  { fragments }
+  { fragments },
 );
 
 function useGetProfileTypes() {
@@ -246,7 +246,7 @@ function useGetProfileTypes() {
         });
 
         return profile ?? null;
-      })
+      }),
     );
     const missing = fromCache.filter(([id, value]) => value === null && id).map(([id]) => id);
 
@@ -267,7 +267,7 @@ function useGetProfileTypes() {
         },
         {
           concurrency: 1,
-        }
+        },
       );
 
       const fromServerById = indexBy(profiles.filter(isDefined), (x) => x.id);

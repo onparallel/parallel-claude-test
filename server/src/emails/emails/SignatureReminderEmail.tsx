@@ -29,7 +29,7 @@ const email: Email<SignatureReminderProps> = {
   },
   text(
     { signerName: fullName, documentName, signButton, theme }: SignatureReminderProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       ${greetingReminder({ fullName, name: fullName, tone: theme.preferredTone }, intl)}
@@ -40,7 +40,7 @@ const email: Email<SignatureReminderProps> = {
           defaultMessage:
             "You have a pending signature request to sign a document titled {documentName}.",
         },
-        { documentName, tone: theme.preferredTone }
+        { documentName, tone: theme.preferredTone },
       )}
 
       ${intl.formatMessage({

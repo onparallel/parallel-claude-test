@@ -20,7 +20,7 @@ import { ApolloError } from "../helpers/errors";
 import { NexusGenInputs } from "../__types";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
-  predicate: (petition: Petition, ...rest: TRest) => boolean
+  predicate: (petition: Petition, ...rest: TRest) => boolean,
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
@@ -35,7 +35,7 @@ function createPetitionAuthorizer<TRest extends any[] = []>(
 }
 
 function createPetitionAccessAuthorizer<TRest extends any[] = []>(
-  predicate: (access: PetitionAccess, ...rest: TRest) => boolean
+  predicate: (access: PetitionAccess, ...rest: TRest) => boolean,
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
@@ -55,10 +55,10 @@ function createPetitionAccessAuthorizer<TRest extends any[] = []>(
 export function userHasAccessToPetitions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argName: TArg,
-  permissionTypes?: PetitionPermissionType[]
+  permissionTypes?: PetitionPermissionType[],
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -69,7 +69,7 @@ export function userHasAccessToPetitions<
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
         petitionIds,
-        permissionTypes
+        permissionTypes,
       );
     } catch {}
     return false;
@@ -79,10 +79,10 @@ export function userHasAccessToPetitions<
 export function userHasAccessToSignatureRequest<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argName: TArg,
-  permissionTypes?: PetitionPermissionType[]
+  permissionTypes?: PetitionPermissionType[],
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -98,7 +98,7 @@ export function userHasAccessToSignatureRequest<
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
         uniq(signatureRequests.map((s) => s!.petition_id)),
-        permissionTypes
+        permissionTypes,
       );
     } catch {}
     return false;
@@ -106,7 +106,7 @@ export function userHasAccessToSignatureRequest<
 }
 
 export const petitionsArePublicTemplates = createPetitionAuthorizer(
-  (p) => p.is_template && p.template_public
+  (p) => p.is_template && p.template_public,
 );
 
 export const petitionsAreNotPublicTemplates = createPetitionAuthorizer((p) => !p.template_public);
@@ -117,7 +117,7 @@ export const petitionsAreOfTypeTemplate = createPetitionAuthorizer((p) => p.is_t
 export function fieldIsNotFixed<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, number>,
 >(argNameFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -132,10 +132,10 @@ export function fieldsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argNamePetitionId: TArg1,
-  argNameFieldIds: TArg2 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>)
+  argNameFieldIds: TArg2 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -143,13 +143,13 @@ export function fieldsBelongsToPetition<
         unMaybeArray(
           (typeof argNameFieldIds === "function"
             ? (argNameFieldIds as any)(args)
-            : (args as any)[argNameFieldIds]) as MaybeArray<number>
-        )
+            : (args as any)[argNameFieldIds]) as MaybeArray<number>,
+        ),
       );
 
       return await ctx.petitions.fieldsBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        fieldIds
+        fieldIds,
       );
     } catch {}
     return false;
@@ -159,7 +159,7 @@ export function fieldsBelongsToPetition<
 export function fieldsHaveCommentsEnabled<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameFieldIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -173,7 +173,7 @@ export function fieldsHaveCommentsEnabled<
 export function fieldsAreNotInternal<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameFieldIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -188,18 +188,18 @@ export function fieldCanBeReplied<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
-  TOverwrite extends Arg<TypeName, FieldName, boolean | null | undefined>
+  TOverwrite extends Arg<TypeName, FieldName, boolean | null | undefined>,
 >(
   fieldIdArg: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
-  overWriteArg?: TOverwrite
+  overWriteArg?: TOverwrite,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const fieldIds = uniq(
       unMaybeArray(
         (typeof fieldIdArg === "function"
           ? (fieldIdArg as any)(args)
-          : (args as any)[fieldIdArg]) as MaybeArray<number>
-      )
+          : (args as any)[fieldIdArg]) as MaybeArray<number>,
+      ),
     );
 
     const overwriteExisting = isDefined(overWriteArg)
@@ -215,7 +215,7 @@ export function fieldCanBeReplied<
       if (!field || (!field.multiple && replies.length > 0 && !overwriteExisting)) {
         throw new ApolloError(
           "The field is already replied and does not accept multiple replies",
-          "FIELD_ALREADY_REPLIED_ERROR"
+          "FIELD_ALREADY_REPLIED_ERROR",
         );
       }
     }
@@ -227,10 +227,10 @@ export function fieldCanBeReplied<
 export function fieldHasType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(
   argFieldId: TArg,
-  fieldType: MaybeArray<PetitionFieldType>
+  fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const fieldId = args[argFieldId] as unknown as number;
@@ -240,7 +240,7 @@ export function fieldHasType<
     if (!validFieldTypes.includes(field.type)) {
       throw new ApolloError(
         `Expected ${validFieldTypes.join(" or ")}, got ${field.type}`,
-        "INVALID_FIELD_TYPE_ERROR"
+        "INVALID_FIELD_TYPE_ERROR",
       );
     }
 
@@ -251,10 +251,10 @@ export function fieldHasType<
 export function replyIsForFieldOfType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(
   argReplyId: TArg,
-  fieldType: MaybeArray<PetitionFieldType>
+  fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const field = (await ctx.petitions.loadFieldForReply(args[argReplyId] as unknown as number))!;
@@ -263,7 +263,7 @@ export function replyIsForFieldOfType<
     if (!validFieldTypes.includes(field.type)) {
       throw new ApolloError(
         `Expected ${validFieldTypes.join(" or ")}, got ${field.type}`,
-        "INVALID_FIELD_TYPE_ERROR"
+        "INVALID_FIELD_TYPE_ERROR",
       );
     }
 
@@ -276,11 +276,11 @@ export function isValidPetitionAttachmentReorder<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, PetitionAttachmentType>,
-  TArg3 extends Arg<TypeName, FieldName, number[]>
+  TArg3 extends Arg<TypeName, FieldName, number[]>,
 >(
   petitionIdArg: TArg1,
   attachmentTypeArg: TArg2,
-  attachmentIdsArg: TArg3
+  attachmentIdsArg: TArg3,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -306,13 +306,13 @@ export function fieldAttachmentBelongsToField<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameFieldId: TArg1, argNameAttachmentId: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.fieldAttachmentBelongsToField(
         args[argNameFieldId] as unknown as number,
-        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -323,16 +323,16 @@ export function petitionAttachmentBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argNamePetitionId: TArg1,
-  argNameAttachmentId: TArg2
+  argNameAttachmentId: TArg2,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.petitionAttachmentBelongsToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -343,13 +343,13 @@ export function repliesBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNamePetitionId: TArg1, argNameReplyIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -360,13 +360,13 @@ export function repliesBelongsToField<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameFieldId: TArg1, argNameReplyIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToField(
         args[argNameFieldId] as unknown as number,
-        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -376,7 +376,7 @@ export function repliesBelongsToField<
 export function replyStatusCanBeUpdated<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argNameFieldId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -392,13 +392,13 @@ export function accessesBelongToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNamePetitionId: TArg1, argNameAccessIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -406,13 +406,13 @@ export function accessesBelongToPetition<
 }
 
 export const accessesHaveStatus = createPetitionAccessAuthorizer(
-  (access, status: PetitionAccessStatus) => access.status === status
+  (access, status: PetitionAccessStatus) => access.status === status,
 );
 
 export function accessesHaveRemindersLeft<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameAccessIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const ids = unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>);
@@ -431,20 +431,20 @@ export function accessesHaveRemindersLeft<
 }
 
 export const accessesIsNotOptedOut = createPetitionAccessAuthorizer(
-  (access) => !access.reminders_opt_out
+  (access) => !access.reminders_opt_out,
 );
 
 export function messageBelongToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, number>
+  TArg2 extends Arg<TypeName, FieldName, number>,
 >(argNamePetitionId: TArg1, argNameMessageId: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.messagesBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        [args[argNameMessageId] as unknown as number]
+        [args[argNameMessageId] as unknown as number],
       );
     } catch {}
     return false;
@@ -455,13 +455,13 @@ export function commentsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNamePetitionId: TArg1, argNameCommentIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.commentsBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameCommentIds] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argNameCommentIds] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -471,12 +471,12 @@ export function commentsBelongsToPetition<
 export function accessesBelongToValidContacts<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argNameAccessIds: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToValidContacts(
-        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>)
+        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>),
       );
     } catch {}
     return false;
@@ -484,7 +484,7 @@ export function accessesBelongToValidContacts<
 }
 
 export function userHasFeatureFlag<TypeName extends string, FieldName extends string>(
-  feature: FeatureFlagName
+  feature: FeatureFlagName,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -497,7 +497,7 @@ export function userHasFeatureFlag<TypeName extends string, FieldName extends st
 export function petitionHasRepliableFields<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argNamePetitionId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -515,18 +515,18 @@ export function petitionHasRepliableFields<
 }
 
 export const petitionsAreEditable = createPetitionAuthorizer(
-  (petition) => !isDefined(petition.restricted_at)
+  (petition) => !isDefined(petition.restricted_at),
 );
 
 export function templateDoesNotHavePublicPetitionLink<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const publicLinks = await ctx.petitions.loadPublicPetitionLinksByTemplateId(
-        args[argName] as unknown as number
+        args[argName] as unknown as number,
       );
       return publicLinks.length === 0;
     } catch {}
@@ -536,7 +536,7 @@ export function templateDoesNotHavePublicPetitionLink<
 
 export function userHasEnabledIntegration<TypeName extends string, FieldName extends string>(
   type: IntegrationType,
-  onlyValidCredentials?: boolean
+  onlyValidCredentials?: boolean,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -544,7 +544,7 @@ export function userHasEnabledIntegration<TypeName extends string, FieldName ext
 
       return (
         integrations.filter(
-          (i) => (onlyValidCredentials && !i.invalid_credentials) || !onlyValidCredentials
+          (i) => (onlyValidCredentials && !i.invalid_credentials) || !onlyValidCredentials,
         ).length > 0
       );
     } catch {}
@@ -555,7 +555,7 @@ export function userHasEnabledIntegration<TypeName extends string, FieldName ext
 export function replyCanBeUpdated<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, number>,
 >(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const replyId = args[argReplyId] as unknown as number;
@@ -569,7 +569,7 @@ export function replyCanBeUpdated<
     if (reply.status === "APPROVED" || reply.anonymized_at !== null) {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
-        "REPLY_ALREADY_APPROVED_ERROR"
+        "REPLY_ALREADY_APPROVED_ERROR",
       );
     }
 
@@ -578,17 +578,17 @@ export function replyCanBeUpdated<
 }
 
 export const petitionIsNotAnonymized = createPetitionAuthorizer(
-  (petition) => petition.anonymized_at === null
+  (petition) => petition.anonymized_at === null,
 );
 
 export function signatureRequestIsNotAnonymized<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, number>,
 >(argSignatureRequestId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(
-      args[argSignatureRequestId] as unknown as number
+      args[argSignatureRequestId] as unknown as number,
     );
     return signature?.anonymized_at === null;
   };
@@ -603,30 +603,30 @@ export const petitionHasStatus = createPetitionAuthorizer(
     if (!statuses.includes(petition.status!)) {
       throw new ApolloError(
         `Expected petition to have status ${statuses.join(" or ")} but got ${petition.status}`,
-        "PETITION_STATUS_ERROR"
+        "PETITION_STATUS_ERROR",
       );
     }
 
     return true;
-  }
+  },
 );
 
 export function userHasPermissionInFolders<
   TypeName extends string,
   FieldName extends string,
   TArgIds extends Arg<TypeName, FieldName, MaybeArray<string>>,
-  TArgType extends Arg<TypeName, FieldName, core.GetGen2<"allTypes", "PetitionBaseType">>
+  TArgType extends Arg<TypeName, FieldName, core.GetGen2<"allTypes", "PetitionBaseType">>,
 >(
   folderIdsArg: TArgIds,
   typeArg: TArgType,
-  permissionTypes: PetitionPermissionType
+  permissionTypes: PetitionPermissionType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const paths = fromGlobalIds(
         unMaybeArray(args[folderIdsArg] as unknown as MaybeArray<string>),
         "PetitionFolder",
-        true
+        true,
       ).ids;
       if (paths.length === 0) {
         return true;
@@ -637,7 +637,7 @@ export function userHasPermissionInFolders<
         ctx.user!.org_id,
         (args[typeArg] as unknown) === "TEMPLATE",
         paths,
-        permissionTypes
+        permissionTypes,
       );
     } catch {}
     return false;
@@ -648,7 +648,7 @@ export function petitionsAreInPath<
   TypeName extends string,
   FieldName extends string,
   TArgIds extends Arg<TypeName, FieldName, MaybeArray<number>>,
-  TArgPath extends Arg<TypeName, FieldName, string>
+  TArgPath extends Arg<TypeName, FieldName, string>,
 >(argIds: TArgIds, argPath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -668,7 +668,7 @@ export function foldersAreInPath<
   TypeName extends string,
   FieldName extends string,
   TArgFolderIds extends Arg<TypeName, FieldName, MaybeArray<string>>,
-  TArgPath extends Arg<TypeName, FieldName, string>
+  TArgPath extends Arg<TypeName, FieldName, string>,
 >(argFolderIds: TArgFolderIds, argPath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -687,7 +687,7 @@ export function foldersAreInPath<
 export function userHasAccessToPetitionFieldComment<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -704,7 +704,7 @@ export function userHasAccessToPetitionFieldComment<
 export function userIsOwnerOfPetitionFieldComment<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(commentIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const commentIds = unMaybeArray(args[commentIdArg] as unknown as MaybeArray<number>);
@@ -720,7 +720,7 @@ export function userIsOwnerOfPetitionFieldComment<
 export function defaultOnBehalfUserBelongsToContextOrganization<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdatePetitionInput"]>
+  TArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdatePetitionInput"]>,
 >(dataArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const data = args[dataArg] as unknown as NexusGenInputs["UpdatePetitionInput"];

@@ -50,7 +50,7 @@ export const PetitionRepliesFieldComments = Object.assign(
         onlyReadPermission,
         ...props
       },
-      ref
+      ref,
     ) {
       const intl = useIntl();
 
@@ -86,7 +86,7 @@ export const PetitionRepliesFieldComments = Object.assign(
           }
         },
         1000,
-        [comments, markedAsUnreadIds]
+        [comments, markedAsUnreadIds],
       );
 
       useEffect(() => {
@@ -112,7 +112,7 @@ export const PetitionRepliesFieldComments = Object.assign(
         async (search: string) => {
           return await searchUsers(search, { includeGroups: true, excludeUsers: [myId] });
         },
-        [searchUsers]
+        [searchUsers],
       );
 
       return (
@@ -218,7 +218,7 @@ export const PetitionRepliesFieldComments = Object.assign(
           </Box>
         </Card>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -250,7 +250,7 @@ export const PetitionRepliesFieldComments = Object.assign(
         `;
       },
     },
-  }
+  },
 );
 
 const _queries = [

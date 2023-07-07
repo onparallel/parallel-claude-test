@@ -21,7 +21,7 @@ export function useCreatePetition() {
         cache,
         isTemplate
           ? /\$ROOT_QUERY\.petitions\(.*"type":"TEMPLATE"[,}]/
-          : /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
+          : /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/,
       );
     },
   });
@@ -36,8 +36,7 @@ export function useCreatePetition() {
       variables: { name, locale: localeRef.current, petitionId, type, path },
     });
     return data!.createPetition.id;
-  },
-  []);
+  }, []);
 }
 
 useCreatePetition.mutations = [

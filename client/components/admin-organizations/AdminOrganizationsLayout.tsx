@@ -52,7 +52,7 @@ export function AdminOrganizationsLayout({
         href: `/app/admin/organizations/${organization.id}/features`,
       },
     ],
-    [intl.locale, organization.id]
+    [intl.locale, organization.id],
   );
   const currentTab = tabs.find((t) => t.key === currentTabKey)!;
 

@@ -25,7 +25,7 @@ async function post(url, data) {
         res.on("end", () => {
           resolve(JSON.parse(Buffer.concat(body).toString()));
         });
-      }
+      },
     );
 
     req.on("error", (err) => {
@@ -46,7 +46,7 @@ exports.handler = async (event, context, callback) => {
   try {
     event.response = await post(
       `${process.env.PARALLEL_BASE_URL}/api/lambda/${event.triggerSource}`,
-      event.request
+      event.request,
     );
   } catch (e) {
     console.error(e);

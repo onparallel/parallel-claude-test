@@ -156,7 +156,7 @@ async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: Worke
 
 async function trackAccessActivatedFromPublicLinkEvent(
   event: AccessActivatedFromPublicPetitionLinkEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -438,7 +438,7 @@ async function trackSignatureStartedEvent(event: SignatureStartedEvent, ctx: Wor
 
   const user = await loadPetitionOwner(event.petition_id, ctx);
   const orgIntegration = await ctx.integrations.loadIntegration(
-    petitionSignatureRequest.signature_config.orgIntegrationId
+    petitionSignatureRequest.signature_config.orgIntegrationId,
   );
 
   await ctx.analytics.trackEvent({
@@ -461,7 +461,7 @@ async function trackSignatureCompletedEvent(event: SignatureCompletedEvent, ctx:
 
   const user = await loadPetitionOwner(event.petition_id, ctx);
   const orgIntegration = await ctx.integrations.loadIntegration(
-    petitionSignatureRequest.signature_config.orgIntegrationId
+    petitionSignatureRequest.signature_config.orgIntegrationId,
   );
 
   await ctx.analytics.trackEvent({
@@ -483,7 +483,7 @@ async function trackSignatureReminderEvent(event: SignatureReminderEvent, ctx: W
   if (!petition || !petitionSignatureRequest) return;
 
   const orgIntegration = await ctx.integrations.loadIntegration(
-    petitionSignatureRequest.signature_config.orgIntegrationId
+    petitionSignatureRequest.signature_config.orgIntegrationId,
   );
 
   await ctx.analytics.trackEvent({
@@ -508,7 +508,7 @@ async function trackSignatureCancelledEvent(event: SignatureCancelledEvent, ctx:
 
   const orgIntegration = petitionSignatureRequest
     ? await ctx.integrations.loadIntegration(
-        petitionSignatureRequest.signature_config.orgIntegrationId
+        petitionSignatureRequest.signature_config.orgIntegrationId,
       )
     : null;
 
@@ -526,7 +526,7 @@ async function trackSignatureCancelledEvent(event: SignatureCancelledEvent, ctx:
 
 async function trackOrganizationLimitReachedEvent(
   event: OrganizationLimitReachedSystemEvent,
-  ctx: WorkerContext
+  ctx: WorkerContext,
 ) {
   const owner = await ctx.organizations.loadOrgOwner(event.data.org_id);
   if (owner) {

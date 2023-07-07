@@ -110,7 +110,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
   useEffect(() => {
     setValue(
       "options.useReplyAsExpiryDate",
-      selectedType !== "DATE" ? undefined : options?.useReplyAsExpiryDate ?? true
+      selectedType !== "DATE" ? undefined : options?.useReplyAsExpiryDate ?? true,
     );
   }, [selectedType, options]);
 
@@ -119,13 +119,13 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const expirationOptions = useExpirationOptions();
 
   const [createProfileTypeField] = useMutation(
-    useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument
+    useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
   );
 
   function useUpdateProfileTypeFieldWithForce() {
     const intl = useIntl();
     const [updateProfileTypeField] = useMutation(
-      useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument
+      useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
     );
     const showRemoveProfileTypeFieldIsExpirableErrorDialog = useConfirmDeleteDialog();
 

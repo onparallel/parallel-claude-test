@@ -9,7 +9,7 @@ export function useUpdatingRef<T>(value: T) {
 
 export function useUpdatingMemoRef<T>(
   factory: () => T,
-  deps: DependencyList | undefined
+  deps: DependencyList | undefined,
 ): RefObject<T> {
   const instance = useMemo(factory, deps);
   return useUpdatingRef(instance);

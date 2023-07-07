@@ -66,7 +66,7 @@ export interface PageOpts {
 type TableNames = keyof TableTypes;
 
 type QueryBuilderFunction<TRecord extends {}, TResult = TRecord[]> = (
-  q: Knex.QueryBuilder<TRecord, TResult>
+  q: Knex.QueryBuilder<TRecord, TResult>,
 ) => void;
 
 interface LoaderOptions {
@@ -107,13 +107,13 @@ export class BaseRepository {
   protected interval(value: Duration) {
     return this.knex.raw(
       "?::interval",
-      Object.assign(PostgresInterval(), value).toPostgres()
+      Object.assign(PostgresInterval(), value).toPostgres(),
     ) as any;
   }
 
   protected from<TName extends TableNames, TResult extends {} = TableTypes[TName]>(
     tableName: TName,
-    transaction?: Knex.Transaction
+    transaction?: Knex.Transaction,
   ) {
     return transaction ? transaction<TResult>(tableName) : this.knex<TResult>(tableName);
   }
@@ -121,7 +121,7 @@ export class BaseRepository {
   protected async raw<TResult>(
     sql: string,
     bindings?: readonly Knex.RawBinding[],
-    transaction?: Knex.Transaction
+    transaction?: Knex.Transaction,
   ): Promise<TResult[]> {
     let raw = this.knex.raw<{ rows: TResult[] }>(sql, bindings ?? []);
     if (transaction) {
@@ -134,12 +134,12 @@ export class BaseRepository {
   protected async exists(
     sql: string,
     bindings?: readonly Knex.RawBinding[],
-    transaction?: Knex.Transaction
+    transaction?: Knex.Transaction,
   ): Promise<boolean> {
     const [{ exists }] = await this.raw<{ exists: boolean }>(
       /* sql */ `select exists(?)`,
       [this.knex.raw(sql, bindings ?? [])],
-      transaction
+      transaction,
     );
     return exists;
   }
@@ -147,7 +147,7 @@ export class BaseRepository {
   protected insert<TName extends TableNames>(
     tableName: TName,
     data: MaybeArray<TableCreateTypes[TName]>,
-    transaction?: Knex.Transaction
+    transaction?: Knex.Transaction,
   ) {
     return (
       transaction
@@ -158,12 +158,12 @@ export class BaseRepository {
 
   protected buildLoader<K, V, C = K>(
     loadFn: (keys: ReadonlyArray<K>, t?: Knex.Transaction) => Promise<V[]>,
-    options?: DataLoader.Options<K, V, C>
+    options?: DataLoader.Options<K, V, C>,
   ): Loader<K, V, C> {
     const dataloader = new DataLoader<K, V, C>(
       async (keys) =>
         pMapChunk(keys, (chunk) => loadFn(chunk), { concurrency: 1, chunkSize: 10_000 }),
-      options
+      options,
     );
     return Object.assign(
       async function (keys: MaybeArray<K>, options?: LoaderOptions) {
@@ -183,14 +183,14 @@ export class BaseRepository {
           const result = await loadFn(unMaybeArray(keys), t);
           return Array.isArray(keys) ? result : result[0];
         },
-      }
+      },
     ) as any;
   }
 
   protected buildLoadBy<
     TName extends TableNames,
     TColumn extends KeysOfType<TableTypes[TName], number | string | null>,
-    TResult extends {} = TableTypes[TName]
+    TResult extends {} = TableTypes[TName],
   >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
     return this.buildLoader<TableTypes[TName][TColumn], TResult | null>(async (values, t) => {
       const rows: TResult[] = await this.from(tableName, t)
@@ -205,7 +205,7 @@ export class BaseRepository {
   protected buildLoadMultipleBy<
     TName extends TableNames,
     TColumn extends KeysOfType<TableTypes[TName], number | string | null>,
-    TResult extends {} = TableTypes[TName]
+    TResult extends {} = TableTypes[TName],
   >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
     return this.buildLoader<TableTypes[TName][TColumn], TResult[]>(async (values, t) => {
       const rows: TResult[] = await this.from(tableName, t)
@@ -219,7 +219,7 @@ export class BaseRepository {
 
   protected buildLoadCountBy<
     TName extends TableNames,
-    TColumn extends KeysOfType<TableTypes[TName], number | string | null>
+    TColumn extends KeysOfType<TableTypes[TName], number | string | null>,
   >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
     return this.buildLoader<TableTypes[TName][TColumn], number>(async (values, t) => {
       const rows: {
@@ -237,7 +237,7 @@ export class BaseRepository {
 
   protected getPagination<T>(
     query: Knex.QueryBuilder<any, T[]>,
-    { offset, limit }: PageOpts
+    { offset, limit }: PageOpts,
   ): Pagination<T> {
     const totalCount = LazyPromise.from(async () => {
       const [{ count }] = await query
@@ -263,7 +263,7 @@ export class BaseRepository {
 
   public async withTransaction<T>(
     transactionScope: (t: Knex.Transaction) => Promise<T>,
-    transaction?: Knex.Transaction
+    transaction?: Knex.Transaction,
   ) {
     return transaction
       ? await transactionScope(transaction)

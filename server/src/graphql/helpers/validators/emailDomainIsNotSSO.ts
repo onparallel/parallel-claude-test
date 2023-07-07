@@ -3,7 +3,7 @@ import { ApolloError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function emailDomainIsNotSSO<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => string
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => string,
 ) {
   return (async (_, args, ctx) => {
     const email = prop(args);

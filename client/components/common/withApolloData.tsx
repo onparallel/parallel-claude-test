@@ -18,7 +18,7 @@ export type WithApolloDataContext = NextPageContext & {
     options?: {
       variables?: TVariables;
       ignoreCache?: boolean;
-    }
+    },
   ): Promise<ApolloQueryResult<TData>>;
 };
 
@@ -45,7 +45,7 @@ export function redirect(context: NextPageContext, location: string, reload = fa
 
 export function withApolloData<P = {}>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Component: NextComponentType<WithApolloDataContext, P, P>
+  Component: NextComponentType<WithApolloDataContext, P, P>,
 ): NextComponentType<NextPageContext, WithServerState<P>, WithServerState<P>> {
   const WithApolloData: NextComponentType<
     NextPageContext,
@@ -73,13 +73,13 @@ export function withApolloData<P = {}>(
                 apollo,
                 async fetchQuery<
                   TData = any,
-                  TVariables extends OperationVariables = OperationVariables
+                  TVariables extends OperationVariables = OperationVariables,
                 >(
                   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
                   options?: {
                     variables?: TVariables;
                     ignoreCache?: boolean;
-                  }
+                  },
                 ) {
                   return await new Promise<ApolloQueryResult<TData>>((resolve, reject) => {
                     let resolved = false;

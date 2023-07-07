@@ -23,7 +23,7 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
   constructor(
     @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
     @inject(FETCH_SERVICE) private fetch: FetchService,
-    @inject(IntegrationRepository) integrations: IntegrationRepository
+    @inject(IntegrationRepository) integrations: IntegrationRepository,
   ) {
     super(encryption, integrations);
   }
@@ -65,17 +65,17 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
       "CLIENT_ID" | "USERNAME" | "PASSWORD"
     >,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"DOW_JONES_KYC", "DOW_JONES_KYC">> {
     const _credentials = await this.fetchCredentials(
       credentials.CLIENT_ID,
       credentials.USERNAME,
-      credentials.PASSWORD
+      credentials.PASSWORD,
     );
     return await this.createOrgIntegration(
       { ...data, settings: { CREDENTIALS: _credentials } },
       createdBy,
-      t
+      t,
     );
   }
 
@@ -83,7 +83,7 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
     const { idToken, refreshToken } = await this.getAuthenticationIdToken(
       clientId,
       username,
-      password
+      password,
     );
     const accessToken = await this.getAccessToken(idToken, clientId);
     return {
@@ -98,7 +98,7 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
   private async getAuthenticationIdToken(
     clientId: string,
     username: string,
-    password: string
+    password: string,
   ): Promise<{ idToken: string; refreshToken: string }> {
     const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
       method: "POST",

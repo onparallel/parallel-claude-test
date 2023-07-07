@@ -17,7 +17,7 @@ export function calculateNextReminder(fromDate: Date, config: PetitionAccessRemi
       timeZone: config.timezone,
     }),
     "yyyy-MM-dd",
-    startOfToday()
+    startOfToday(),
   );
   let reminderDate = addDays(date, config.offset);
   while (config.weekdaysOnly && isWeekend(reminderDate)) {

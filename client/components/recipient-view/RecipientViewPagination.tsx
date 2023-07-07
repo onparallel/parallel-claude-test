@@ -50,7 +50,7 @@ export function RecipientViewPagination({
                     id: "generic.go-to-page",
                     defaultMessage: "Go to page {page}",
                   },
-                  { page }
+                  { page },
                 )}
               />
             </ListItem>
@@ -66,7 +66,7 @@ export function RecipientViewPagination({
             >
               <MoreIcon />
             </ListItem>
-          )
+          ),
         )}
         <Spacer />
         <ListItem paddingLeft={1} display={{ base: pageCount > 5 ? "none" : "block", sm: "block" }}>
@@ -126,7 +126,7 @@ function usePagination({
     const startPages = range(1, Math.min(boundaryCount, pageCount) + 1);
     const endPages = range(
       Math.max(pageCount - boundaryCount + 1, boundaryCount + 1),
-      pageCount + 1
+      pageCount + 1,
     );
 
     const siblingsStart = Math.max(
@@ -134,10 +134,10 @@ function usePagination({
         // Natural start
         currentPage - siblingCount,
         // Lower boundary when page is high
-        pageCount - boundaryCount - siblingCount * 2 - 1
+        pageCount - boundaryCount - siblingCount * 2 - 1,
       ),
       // Greater than startPages
-      boundaryCount + 2
+      boundaryCount + 2,
     );
 
     const siblingsEnd = Math.min(
@@ -145,10 +145,10 @@ function usePagination({
         // Natural end
         currentPage + siblingCount,
         // Upper boundary when page is low
-        boundaryCount + siblingCount * 2 + 2
+        boundaryCount + siblingCount * 2 + 2,
       ),
       // Less than endPages
-      endPages.length > 0 ? endPages[0] - 2 : pageCount - 1
+      endPages.length > 0 ? endPages[0] - 2 : pageCount - 1,
     );
 
     // Basic list of items to render

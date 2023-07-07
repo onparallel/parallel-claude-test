@@ -65,11 +65,11 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
       "CHECKBOX",
     ]),
     fieldCanBeReplied("fieldId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validateFieldReplyValue(
     (args) => [{ id: args.fieldId, value: args.reply }],
-    "reply"
+    "reply",
   ),
   resolve: async (_, args, ctx) => {
     const { type } = (await ctx.petitions.loadField(args.fieldId))!;
@@ -93,14 +93,14 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
           status: "PENDING",
           content,
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
       return reply;
     } catch (error: any) {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED"
+          "PETITION_SEND_LIMIT_REACHED",
         );
       }
       throw error;
@@ -131,7 +131,7 @@ export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply"
       "CHECKBOX",
     ]),
     replyCanBeUpdated("replyId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
@@ -152,7 +152,7 @@ export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply"
         content,
         status: "PENDING",
       },
-      ctx.user!
+      ctx.user!,
     );
   },
 });
@@ -180,12 +180,12 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
     fieldCanBeReplied("fieldId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validFileUploadInput(
     (args) => args.file,
     { maxSizeBytes: 50 * 1024 * 1024 },
-    "file"
+    "file",
   ),
   resolve: async (_, args, ctx) => {
     const key = random(16);
@@ -201,7 +201,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
           content_type: contentType,
           upload_complete: false,
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       const [presignedPostData, [reply]] = await Promise.all([
@@ -215,7 +215,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
             content: { file_upload_id: file.id },
             status: "PENDING",
           },
-          `User:${ctx.user!.id}`
+          `User:${ctx.user!.id}`,
         ),
       ]);
       return { presignedPostData, reply };
@@ -223,7 +223,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED"
+          "PETITION_SEND_LIMIT_REACHED",
         );
       }
       throw error;
@@ -242,7 +242,7 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -269,12 +269,12 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     replyCanBeUpdated("replyId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validFileUploadInput(
     (args) => args.file,
     { maxSizeBytes: 50 * 1024 * 1024 },
-    "file"
+    "file",
   ),
   resolve: async (_, args, ctx) => {
     const oldReply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -290,7 +290,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
         content_type: contentType,
         upload_complete: false,
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
 
     const [presignedPostData, reply] = await Promise.all([
@@ -306,7 +306,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
           },
           status: "PENDING",
         },
-        ctx.user!
+        ctx.user!,
       ),
     ]);
 
@@ -326,7 +326,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -338,7 +338,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
       reply.content["old_file_upload_id"]
         ? ctx.files.deleteFileUpload(
             reply.content["old_file_upload_id"] as number,
-            `User:${ctx.user!.id}`
+            `User:${ctx.user!.id}`,
           )
         : null,
     ]);
@@ -351,7 +351,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
         user_id: ctx.user!.id,
         content: { file_upload_id: reply.content["file_upload_id"] }, // rewrite content to remove old_file_upload_id reference
       },
-      ctx.user!
+      ctx.user!,
     );
   },
 });
@@ -367,7 +367,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyCanBeUpdated("replyId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
@@ -385,7 +385,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-    fieldCanBeReplied("fieldId")
+    fieldCanBeReplied("fieldId"),
   ),
   resolve: async (_, { petitionId, fieldId }, ctx) => {
     const session = await ctx.bankflip.createSession({
@@ -412,7 +412,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -422,7 +422,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED"
+          "PETITION_SEND_LIMIT_REACHED",
         );
       }
       throw error;
@@ -445,7 +445,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DOW_JONES_KYC"]),
     fieldCanBeReplied("fieldId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -453,7 +453,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
 
       const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
         ctx.user!.org_id,
-        "DOW_JONES_KYC"
+        "DOW_JONES_KYC",
       );
       const [dowJonesFile, dowJonesProfile] = await Promise.all([
         ctx.dowJonesKyc.riskEntityProfilePdf(integration.id, args.profileId),
@@ -464,7 +464,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
       const response = await ctx.storage.fileUploads.uploadFile(
         path,
         dowJonesFile.mime_type,
-        Buffer.from(dowJonesFile.binary_stream, "base64")
+        Buffer.from(dowJonesFile.binary_stream, "base64"),
       );
 
       const [fileUpload] = await ctx.files.createFileUpload(
@@ -475,7 +475,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
           content_type: dowJonesFile.mime_type,
           upload_complete: true,
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       const [reply] = await ctx.petitions.createPetitionFieldReply(
@@ -490,7 +490,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
               profileId: args.profileId,
               type: dowJonesProfile.data.attributes.basic.type,
               name: ctx.dowJonesKyc.entityFullName(
-                dowJonesProfile.data.attributes.basic.name_details.primary_name
+                dowJonesProfile.data.attributes.basic.name_details.primary_name,
               ),
               iconHints:
                 dowJonesProfile.data.attributes.person?.icon_hints ??
@@ -500,7 +500,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
           },
           status: "PENDING",
         },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       return reply;
@@ -508,7 +508,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
       if (error instanceof Error && error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED"
+          "PETITION_SEND_LIMIT_REACHED",
         );
       } else if (error instanceof InvalidCredentialsError && error.code === "FORBIDDEN") {
         throw new ApolloError("Forbidden", "INVALID_CREDENTIALS");
@@ -525,11 +525,11 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", (args) => args.fields.map((field) => field.id)),
     fieldCanBeReplied((args) => args.fields.map((field) => field.id), "overwriteExisting"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.fields, "fields"),
-    validateFieldReplyContent((args) => args.fields, "fields")
+    validateFieldReplyContent((args) => args.fields, "fields"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -542,9 +542,9 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
               t.nonNull.globalId("id", { prefixName: "PetitionField" });
               t.nullable.json("content");
             },
-          })
-        )
-      )
+          }),
+        ),
+      ),
     ),
     overwriteExisting: booleanArg({
       description: "pass true to remove existing replies for the given fields",
@@ -568,7 +568,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
       if (args.overwriteExisting) {
         await ctx.petitions.deletePetitionFieldReplies(
           args.fields.map((field) => field.id),
-          ctx.user!
+          ctx.user!,
         );
       }
 
@@ -581,7 +581,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
             const reply = fileReplies.find(
               (r) =>
                 r.id ===
-                fromGlobalId(fieldReply.content.petitionFieldReplyId, "PetitionFieldReply").id
+                fromGlobalId(fieldReply.content.petitionFieldReplyId, "PetitionFieldReply").id,
             )!;
             const [fileUpload] = await ctx.files.cloneFileUpload(reply.content.file_upload_id);
             return {
@@ -599,7 +599,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
                       ...fieldReply.content,
                       value: zonedTimeToUtc(
                         fieldReply.content.datetime,
-                        fieldReply.content.timezone
+                        fieldReply.content.timezone,
                       ).toISOString(),
                     }
                   : fieldReply.content,
@@ -612,19 +612,19 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
         },
         {
           concurrency: 10,
-        }
+        },
       );
 
       return await ctx.petitions.createPetitionFieldReply(
         args.petitionId,
         data,
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
     } catch (error: any) {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED"
+          "PETITION_SEND_LIMIT_REACHED",
         );
       }
       throw error;

@@ -75,7 +75,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
   bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
   bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(
-    PetitionImportExportService
+    PetitionImportExportService,
   );
   bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE).to(OrganizationLayoutService);
   bind<IReportsService>(REPORTS_SERVICE).to(ReportsService);
@@ -83,6 +83,6 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IIntegrationsSetupService>(INTEGRATIONS_SETUP_SERVICE).to(IntegrationsSetupService);
   bind<IProfilesSetupService>(PROFILES_SETUP_SERVICE).to(ProfilesSetupService);
   bind<IPetitionMessageContextService>(PETITION_MESSAGE_CONTEXT_SERVICE).to(
-    PetitionMessageContextService
+    PetitionMessageContextService,
   );
 });

@@ -55,7 +55,7 @@ async function main() {
     `https://webfonts.googleapis.com/v1/webfonts?${new URLSearchParams({
       fields: ["items.files", "items.family"].join(","),
       key: "AIzaSyBpQsEEScqktyrQeEGfm5R0UIMivXAlhw8",
-    })}`
+    })}`,
   );
   const { items: fonts } = (await res.json()) as { items: Font[] };
   const dir = join(tmpdir(), `download-fonts-${token(16)}`);
@@ -100,7 +100,7 @@ async function main() {
         const name = token(16);
         const path = join(dir, `${name}.ttf`);
         await new Promise((resolve, reject) =>
-          res.body.pipe(createWriteStream(path)).on("error", reject).on("close", resolve)
+          res.body.pipe(createWriteStream(path)).on("error", reject).on("close", resolve),
         );
         const dest = join(familyDir, `${descriptor}.ttf`);
         execSync(`fontforge -lang=ff -c 'Open($1); Generate($2); Close();' '${path}' '${dest}'`);
@@ -108,7 +108,7 @@ async function main() {
     },
     {
       concurrency: 1,
-    }
+    },
   );
   await writeJson(join(output, "fonts.json"), results);
   await rm(dir, { recursive: true });

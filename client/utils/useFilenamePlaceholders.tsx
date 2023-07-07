@@ -36,7 +36,7 @@ export function useFilenamePlaceholders(): PlaceholderOption[] {
         }),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -50,7 +50,7 @@ export function useFilenamePlaceholdersRename() {
         field: useFilenamePlaceholdersRename_PetitionFieldFragment,
         reply: useFilenamePlaceholdersRename_PetitionFieldReplyFragment,
         pattern: string,
-        reset?: boolean
+        reset?: boolean,
       ) => {
         if (reset) {
           seen.clear();
@@ -86,7 +86,7 @@ export function useFilenamePlaceholdersRename() {
         return filename;
       };
     },
-    [placeholders]
+    [placeholders],
   );
 }
 

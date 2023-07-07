@@ -106,7 +106,7 @@ function useConfirmDeleteTagDialog() {
                               defaultMessage:
                                 "{count, plural, =1 {# parallel} other {# parallels}}",
                             },
-                            { count: petitionCount }
+                            { count: petitionCount },
                           )
                         : null,
                       templateCount
@@ -116,7 +116,7 @@ function useConfirmDeleteTagDialog() {
                               defaultMessage:
                                 "{count, plural, =1 {# template} other {# templates}}",
                             },
-                            { count: templateCount }
+                            { count: templateCount },
                           )
                         : null,
                       petitionListViewCount
@@ -125,10 +125,10 @@ function useConfirmDeleteTagDialog() {
                               id: "component.use-delete-tag.views-count",
                               defaultMessage: "{count, plural, =1 {# view} other {# views}}",
                             },
-                            { count: petitionListViewCount }
+                            { count: petitionListViewCount },
                           )
                         : null,
-                    ].filter(isDefined)
+                    ].filter(isDefined),
                   )})`}</Text>
                 );
               })}
@@ -143,6 +143,6 @@ function useConfirmDeleteTagDialog() {
         ),
       });
     },
-    []
+    [],
   );
 }

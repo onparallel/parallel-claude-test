@@ -28,7 +28,7 @@ const email: Email<SignatureCancelledProps> = {
   },
   text(
     { signerName: fullName, signatureProvider, theme }: SignatureCancelledProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       ${greetingContact({ name: fullName, fullName, tone: theme.preferredTone }, intl)}
@@ -39,7 +39,7 @@ const email: Email<SignatureCancelledProps> = {
           defaultMessage:
             "The signing process sent through {signatureProvider} has been cancelled by the sender.",
         },
-        { signatureProvider, tone: theme.preferredTone }
+        { signatureProvider, tone: theme.preferredTone },
       )}
 
 

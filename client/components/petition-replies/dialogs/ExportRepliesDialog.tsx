@@ -94,8 +94,8 @@ export function ExportRepliesDialog({
           await fetch("https://localhost:50500/api/v1/echo");
           setOptions((options) =>
             options.map((option) =>
-              option.type === "EXPORT_CUATRECASAS" ? { ...option, isEnabled: true } : option
-            )
+              option.type === "EXPORT_CUATRECASAS" ? { ...option, isEnabled: true } : option,
+            ),
           );
         } catch {}
       }
@@ -115,7 +115,7 @@ export function ExportRepliesDialog({
       (f) =>
         isFileTypeField(f.type) &&
         f.replies.length > 0 &&
-        f.replies.some((r) => !r.content.error && r.content.uploadComplete)
+        f.replies.some((r) => !r.content.error && r.content.uploadComplete),
     );
     if (!field) return [null];
     const reply = field.replies.find((r) => !r.content.error && r.content.uploadComplete)!;

@@ -42,7 +42,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
         const selection = editorRef.current.selection;
         const endOfEditor = Editor.range(
           editorRef.current as any,
-          Editor.end(editorRef.current as any, [])
+          Editor.end(editorRef.current as any, []),
         );
         const linkNode = editorRef.current.selection
           ? getAboveNode<LinkNode>(editorRef.current as any, { match: { type: "link" } })
@@ -54,7 +54,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
               text: linkNode[0].children.map((c) => c.text).join(""),
             },
             showTextInput: !linkNode && (!selection || isCollapsed(selection)),
-          })
+          }),
         );
         focusEditor(editorRef.current);
         select(editorRef.current, selection ?? endOfEditor);
@@ -76,12 +76,12 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
               url: link.url,
               children: [{ text }],
             },
-            { at: selection ?? endOfEditor }
+            { at: selection ?? endOfEditor },
           );
           moveSelection(editorRef.current, { distance: text.length });
         }
       }),
-      []
+      [],
     );
     return (
       <ToolbarButton
@@ -95,7 +95,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
         {...props}
       />
     );
-  }
+  },
 );
 
 type RTELink = {

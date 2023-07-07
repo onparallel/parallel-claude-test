@@ -9,7 +9,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 export function validTextWithPlaceholders<TypeName extends string, FieldName extends string>(
   props: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
   petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number | undefined,
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const value = props(args);
@@ -21,7 +21,7 @@ export function validTextWithPlaceholders<TypeName extends string, FieldName ext
       parseTextWithPlaceholders(value)
         .filter(discriminator("type", "placeholder" as const))
         .filter((p) => isGlobalId(p.value))
-        .map((p) => p.value)
+        .map((p) => p.value),
     );
 
     const petitionId = petitionIdProp?.(args);
@@ -30,7 +30,7 @@ export function validTextWithPlaceholders<TypeName extends string, FieldName ext
       throw new ArgValidationError(
         info,
         argName,
-        `Missing petitionId prop for globalId validation`
+        `Missing petitionId prop for globalId validation`,
       );
     }
 
@@ -38,12 +38,12 @@ export function validTextWithPlaceholders<TypeName extends string, FieldName ext
       throw new ArgValidationError(
         info,
         argName,
-        `Expected all ${globalIds} to be a PetitionField`
+        `Expected all ${globalIds} to be a PetitionField`,
       );
     }
 
     const fields = await ctx.petitions.loadField(
-      globalIds.map((globalId) => fromGlobalId(globalId).id)
+      globalIds.map((globalId) => fromGlobalId(globalId).id),
     );
 
     for (const field of fields) {
@@ -52,7 +52,7 @@ export function validTextWithPlaceholders<TypeName extends string, FieldName ext
         throw new ArgValidationError(
           info,
           argName,
-          `Expected PetitionField:${field.id} to belong to Petition:${petitionId}`
+          `Expected PetitionField:${field.id} to belong to Petition:${petitionId}`,
         );
       }
     }

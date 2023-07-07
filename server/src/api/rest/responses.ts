@@ -7,7 +7,7 @@ export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   constructor(
     public readonly status: number,
     public readonly body: any,
-    public readonly headers: Record<string, string> = {}
+    public readonly headers: Record<string, string> = {},
   ) {}
   apply(res: Response) {
     res.status(this.status);
@@ -28,7 +28,7 @@ export class PlainTextResponseWrapper implements ResponseWrapper<string> {
   constructor(
     public readonly status: number,
     public readonly body: string,
-    public readonly headers: Record<string, string> = {}
+    public readonly headers: Record<string, string> = {},
   ) {}
   apply(res: Response) {
     res.status(this.status);
@@ -47,7 +47,7 @@ export class PlainTextResponseWrapper implements ResponseWrapper<string> {
 
 export function Text(
   value: string,
-  { status = 200 }: { status?: number } = {}
+  { status = 200 }: { status?: number } = {},
 ): ResponseWrapper<string> {
   return new PlainTextResponseWrapper(status, value);
 }
@@ -73,7 +73,10 @@ interface Redirect {
   __type?: "REDIRECT";
 }
 export class RedirectResponseWrapper implements ResponseWrapper<Redirect> {
-  constructor(public readonly status: number, public readonly location: string) {}
+  constructor(
+    public readonly status: number,
+    public readonly location: string,
+  ) {}
   apply(res: Response) {
     res.redirect(this.status, this.location);
   }

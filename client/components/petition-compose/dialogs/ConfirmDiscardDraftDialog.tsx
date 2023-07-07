@@ -61,7 +61,7 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, "KEEP" |
 }
 
 export function useConfirmDiscardDraftDialog(
-  petition: useConfirmDiscardDraftDialog_PetitionBaseFragment
+  petition: useConfirmDiscardDraftDialog_PetitionBaseFragment,
 ) {
   const isDraft = petition.__typename === "Petition" && petition.status === "DRAFT";
   const showConfirmDiscardDraftDialog = useDialog(ConfirmDiscardDraftDialog);

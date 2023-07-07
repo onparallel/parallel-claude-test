@@ -24,7 +24,7 @@ export class I18nService implements II18nService {
   private intlLoader = new DataLoader<Locale, IntlShape>(async (keys) => {
     const messages = await pMap(keys, async (locale) => await loadMessages(locale));
     return zip(keys, messages).map(([locale, messages]) =>
-      createIntl({ locale, messages, onWarn: () => {} }, createIntlCache())
+      createIntl({ locale, messages, onWarn: () => {} }, createIntlCache()),
     );
   });
 

@@ -35,7 +35,7 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(func
     ...other
   } = props;
   const inputProps = useFormControl(
-    pick(props, ["id", "onFocus", "onBlur", "disabled", "readOnly", "required"])
+    pick(props, ["id", "onFocus", "onBlur", "disabled", "readOnly", "required"]),
   );
   const dropZoneOptions = {
     accept,

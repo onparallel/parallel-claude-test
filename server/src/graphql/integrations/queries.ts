@@ -11,7 +11,7 @@ export const queries = queryField((t) => {
     type: "DowJonesKycEntitySearchResult",
     authorize: authenticateAnd(
       userHasEnabledIntegration("DOW_JONES_KYC"),
-      userHasFeatureFlag("DOW_JONES_KYC")
+      userHasFeatureFlag("DOW_JONES_KYC"),
     ),
     extendArgs: {
       name: nonNull(stringArg()),
@@ -20,7 +20,7 @@ export const queries = queryField((t) => {
     resolve: async (_, args, ctx) => {
       const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
         ctx.user!.org_id,
-        "DOW_JONES_KYC"
+        "DOW_JONES_KYC",
       );
       try {
         const result = await ctx.dowJonesKyc.riskEntitySearch(integration.id, args);
@@ -62,7 +62,7 @@ export const queries = queryField((t) => {
     type: "DowJonesKycEntityProfileResult",
     authorize: authenticateAnd(
       userHasEnabledIntegration("DOW_JONES_KYC"),
-      userHasFeatureFlag("DOW_JONES_KYC")
+      userHasFeatureFlag("DOW_JONES_KYC"),
     ),
     args: {
       profileId: nonNull(idArg()),
@@ -77,7 +77,7 @@ export const queries = queryField((t) => {
 
         const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
           ctx.user!.org_id,
-          "DOW_JONES_KYC"
+          "DOW_JONES_KYC",
         );
 
         const profile = await ctx.dowJonesKyc.riskEntityProfile(integration.id, args.profileId);
@@ -97,7 +97,7 @@ export const queries = queryField((t) => {
           profileId: profile.data.id,
           type: profile.data.attributes.basic.type,
           name: ctx.dowJonesKyc.entityFullName(
-            profile.data.attributes.basic.name_details.primary_name
+            profile.data.attributes.basic.name_details.primary_name,
           ),
           iconHints:
             profile.data.attributes.person?.icon_hints ??
@@ -109,7 +109,7 @@ export const queries = queryField((t) => {
               name: s.name,
               sources: s.sources,
               fromDate: s.from_date ?? null,
-            })
+            }),
           ),
           relationships: (profile.data.attributes.relationship?.connection_details ?? []).map(
             (r) => ({
@@ -118,7 +118,7 @@ export const queries = queryField((t) => {
               connectionType: r.connection_type,
               iconHints: r.icon_hints,
               name: ctx.dowJonesKyc.entityFullName(r.name_detail),
-            })
+            }),
           ),
           placeOfBirth: profile.data.attributes.person?.places_of_birth
             ? {
@@ -158,7 +158,7 @@ export const queries = queryField((t) => {
         if (error instanceof Error && error.message === "PROFILE_NOT_FOUND") {
           throw new ApolloError(
             `Couldn't find profile with id ${args.profileId}`,
-            "PROFILE_NOT_FOUND"
+            "PROFILE_NOT_FOUND",
           );
         } else if (error instanceof InvalidCredentialsError && error.code === "FORBIDDEN") {
           throw new ApolloError("Forbidden", "INVALID_CREDENTIALS");

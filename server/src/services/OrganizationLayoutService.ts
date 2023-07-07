@@ -28,7 +28,7 @@ export class OrganizationLayoutService implements IOrganizationLayoutService {
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(IMAGE_SERVICE) private images: IImageService,
-    @inject(CONFIG) private config: Config
+    @inject(CONFIG) private config: Config,
   ) {}
 
   async getLayoutProps(orgId: number) {
@@ -46,7 +46,7 @@ export class OrganizationLayoutService implements IOrganizationLayoutService {
 
     const hasRemoveParallelBranding = await this.featureFlags.orgHasFeatureFlag(
       org.id,
-      "REMOVE_PARALLEL_BRANDING"
+      "REMOVE_PARALLEL_BRANDING",
     );
 
     const { assetsUrl, parallelUrl, emailFrom } = this.config.misc;

@@ -16,7 +16,7 @@ export abstract class HttpError extends Error implements ResponseWrapper<ErrorBo
     public status: number,
     public code: string,
     public override message: string,
-    public extra = {}
+    public extra = {},
   ) {
     super(message);
   }
@@ -31,7 +31,10 @@ export abstract class HttpError extends Error implements ResponseWrapper<ErrorBo
 
 export class BadRequestError extends HttpError {
   static readonly code = "BadRequestError";
-  constructor(public override message: string, extra = {}) {
+  constructor(
+    public override message: string,
+    extra = {},
+  ) {
     super(400, BadRequestError.code, message, extra);
   }
 }
@@ -45,7 +48,10 @@ export class ResourceNotFoundError extends HttpError {
 
 export class ForbiddenError extends HttpError {
   static readonly code = "ForbiddenError";
-  constructor(public override message: string, extra = {}) {
+  constructor(
+    public override message: string,
+    extra = {},
+  ) {
     super(403, ForbiddenError.code, message, extra);
   }
 }
@@ -76,7 +82,7 @@ export class UnknownError extends HttpError {
     super(
       500,
       UnknownError.code,
-      process.env.NODE_ENV === "development" ? originalError.message : "An unknown error happened"
+      process.env.NODE_ENV === "development" ? originalError.message : "An unknown error happened",
     );
   }
   override apply(res: Response<ErrorBody>) {
@@ -101,14 +107,14 @@ export class InvalidParameterError extends HttpError {
     public override name: string,
     public value: any,
     public location: "query" | "path",
-    message: string
+    message: string,
   ) {
     super(
       InvalidParameterError.status,
       InvalidParameterError.code,
       `Invalid ${location} parameter ${JSON.stringify(name)} with value ${
         isDefined(value) ? JSON.stringify(value) : "<missing parameter>"
-      }: ${message}`
+      }: ${message}`,
     );
   }
 }
@@ -120,7 +126,7 @@ export class InvalidRequestBodyError extends HttpError {
     super(
       InvalidRequestBodyError.status,
       InvalidRequestBodyError.code,
-      `Invalid request body: ${message}`
+      `Invalid request body: ${message}`,
     );
   }
 }

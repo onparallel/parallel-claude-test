@@ -34,13 +34,13 @@ export async function down(knex: Knex): Promise<void> {
     const byContactId = pipe(
       accesses,
       groupBy((pa) => pa.contact_id!),
-      mapValues((pas) => sortBy(pas, [(pa) => new Date(pa.created_at), "desc"]))
+      mapValues((pas) => sortBy(pas, [(pa) => new Date(pa.created_at), "desc"])),
     );
     for (const accesses of Object.values(byContactId)) {
       const remainingAccess = accesses.find((pa) => pa.status === "ACTIVE") ?? accesses[0];
       const accessIdsToRemove = difference(
         accesses.map((pa) => pa.id),
-        [remainingAccess.id]
+        [remainingAccess.id],
       );
 
       await knex

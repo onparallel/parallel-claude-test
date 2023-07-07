@@ -10,7 +10,7 @@
 export function negotiate(
   accepts: string | readonly string[],
   available: string[],
-  defaults: string
+  defaults: string,
 ) {
   try {
     let preferred: string[];

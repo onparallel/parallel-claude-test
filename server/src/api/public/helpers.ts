@@ -74,9 +74,9 @@ export function sortByParam<T extends string>(fields: T[]) {
 
 export function idParam<
   TRequired extends boolean = true,
-  TArray extends boolean | undefined = undefined
+  TArray extends boolean | undefined = undefined,
 >(
-  options: IdParameterOptions<TRequired, TArray>
+  options: IdParameterOptions<TRequired, TArray>,
 ): RestParameter<GeneratedParameterType<string, TRequired, TArray>> {
   // ignore defaultValue
   delete options.defaultValue;
@@ -135,7 +135,7 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
 }
 
 export function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, "fields">>(
-  petition: T
+  petition: T,
 ) {
   return {
     ...petition,
@@ -178,7 +178,7 @@ function mapPetitionTags<T extends Pick<PetitionFragment, "tags">>(petition: T) 
 function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petition: T) {
   function mapReplyContentsForAlias(
     replies: { content: any; metadata: any; id: string }[],
-    type: PetitionFieldType
+    type: PetitionFieldType,
   ) {
     switch (type) {
       case "TEXT":
@@ -234,7 +234,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
 }
 
 function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "signatureConfig">>(
-  petition: T
+  petition: T,
 ) {
   return {
     ...omit(petition, ["fromTemplate", "signatureConfig"]),
@@ -250,14 +250,14 @@ export function mapPetition<
   T extends Pick<
     PetitionFragment,
     "fromTemplate" | "tags" | "fields" | "replies" | "signatureConfig"
-  >
+  >,
 >(petition: T) {
   return pipe(
     petition,
     mapPetitionBase,
     mapPetitionFieldRepliesContent,
     mapPetitionTags,
-    mapPetitionReplies
+    mapPetitionReplies,
   );
 }
 
@@ -320,7 +320,7 @@ export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType
   `;
   const { getTaskResultFile } = await client.request(
     getTaskResultFileUrl_getTaskResultFileDocument,
-    { taskId: task.id }
+    { taskId: task.id },
   );
   return getTaskResultFile.url;
 }
@@ -343,7 +343,7 @@ export async function uploadFile(file: File, presignedPostData: AWSPresignedPost
 }
 
 export function mapReplyResponse(
-  reply: PetitionFieldReplyFragment & { field?: Maybe<{ id: string }> }
+  reply: PetitionFieldReplyFragment & { field?: Maybe<{ id: string }> },
 ) {
   return {
     ...omit(reply, ["field"]),
@@ -361,7 +361,7 @@ export function mapSubscription(subscription: SubscriptionFragment) {
 
 export function buildTagsFilter(
   allTags: { id: string; name: string }[],
-  tags: string[]
+  tags: string[],
 ): PetitionTagFilter {
   if (tags.length > 0) {
     const _tags = tags.map((tagName) => allTags.find((t) => t.name === tagName));
@@ -400,12 +400,12 @@ export function bodyMessageToRTE(message?: Maybe<{ format: "PLAIN_TEXT"; content
 }
 
 function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "propertiesByAlias">>(
-  profile: T
+  profile: T,
 ) {
   return {
     ...omit(profile, ["properties", "propertiesByAlias"]),
     fields: profile.properties?.map((prop) =>
-      pick(prop, ["field", prop.field.type === "FILE" ? "files" : "value"])
+      pick(prop, ["field", prop.field.type === "FILE" ? "files" : "value"]),
     ),
     fieldsByAlias: isDefined(profile.propertiesByAlias)
       ? fillPropertiesByAlias(profile.propertiesByAlias)
@@ -414,21 +414,24 @@ function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "pr
 }
 
 function fillPropertiesByAlias(props: ProfileFragment["propertiesByAlias"]) {
-  return props.reduce((acc, prop) => {
-    if (isDefined(prop.field.alias)) {
-      if (prop.field.type === "FILE") {
-        acc[prop.field.alias] = prop.files?.map((f) => f.file) ?? null;
-      } else {
-        acc[prop.field.alias] = prop.value?.content?.value ?? null;
+  return props.reduce(
+    (acc, prop) => {
+      if (isDefined(prop.field.alias)) {
+        if (prop.field.type === "FILE") {
+          acc[prop.field.alias] = prop.files?.map((f) => f.file) ?? null;
+        } else {
+          acc[prop.field.alias] = prop.value?.content?.value ?? null;
+        }
       }
-    }
 
-    return acc;
-  }, {} as Record<string, any>);
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
 }
 
 export function mapProfile<T extends Pick<ProfileFragment, "properties" | "propertiesByAlias">>(
-  profile: T
+  profile: T,
 ) {
   return pipe(profile, mapProfileProperties);
 }

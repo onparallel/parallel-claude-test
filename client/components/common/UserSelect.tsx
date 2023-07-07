@@ -39,7 +39,7 @@ export type UserSelectSelection<IncludeGroups extends boolean = false> =
 export type UserSelectInstance<
   IsMulti extends boolean,
   IncludeGroups extends boolean = false,
-  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
 > = SelectInstance<OptionType, IsMulti, never>;
 
 const fragments = {
@@ -92,7 +92,7 @@ export interface UserSelectProps<
   IsMulti extends boolean = false,
   IncludeGroups extends boolean = false,
   IsSync extends boolean = false,
-  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
 > extends Omit<CustomSelectProps<OptionType, IsMulti, never>, "value"> {
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
   isSync?: IsSync;
@@ -102,7 +102,7 @@ export interface UserSelectProps<
     : (
         search: string,
         excludeUsers: string[],
-        excludeUserGroups: string[]
+        excludeUserGroups: string[],
       ) => Promise<OptionType[]>;
 }
 
@@ -111,7 +111,7 @@ export const UserSelect = Object.assign(
     IsMulti extends boolean = false,
     IncludeGroups extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
   >(
     {
       value,
@@ -124,7 +124,7 @@ export const UserSelect = Object.assign(
       placeholder: _placeholder,
       ...props
     }: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType>,
-    ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>
+    ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
   ) {
     const needsLoading =
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
@@ -187,10 +187,10 @@ export const UserSelect = Object.assign(
           return await onSearch(
             search,
             items.filter(isTypename("User")).map((item) => item.id),
-            items.filter(isTypename("UserGroup")).map((item) => item.id)
+            items.filter(isTypename("UserGroup")).map((item) => item.id),
           );
         }),
-      [onSearch, _value]
+      [onSearch, _value],
     );
 
     const { data } = useQuery(UserSelect_canCreateUsersDocument);
@@ -246,12 +246,12 @@ export const UserSelect = Object.assign(
     IsMulti extends boolean = false,
     IncludeGroups extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
   >(
     props: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType> &
-      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>
+      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
   ) => ReactElement,
-  { fragments }
+  { fragments },
 );
 
 function useGetUsersOrGroups() {
@@ -278,7 +278,7 @@ function useGetUsersOrGroups() {
           return userGroup;
         }
         return null;
-      })
+      }),
     );
     const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
     if (missing.length) {

@@ -49,7 +49,7 @@ export function CurrentSignatureRequestRow({
         pendingSigners: signerStatus
           .filter(({ status }) => status === "PENDING")
           .map(({ signer }) => signer),
-      })
+      }),
     );
 
     if (sendReminder) {
@@ -60,7 +60,7 @@ export function CurrentSignatureRequestRow({
   const requestErrorMessage = useSignatureCancelledRequestErrorMessage();
   const showSignatureCancelledRequestErrorDialog = useSignatureCancelledRequestErrorDialog();
   async function handleSeeRequestErrorMessageClick(
-    signature: CurrentSignatureRequestRow_PetitionSignatureRequestFragment
+    signature: CurrentSignatureRequestRow_PetitionSignatureRequestFragment,
   ) {
     try {
       await showSignatureCancelledRequestErrorDialog({

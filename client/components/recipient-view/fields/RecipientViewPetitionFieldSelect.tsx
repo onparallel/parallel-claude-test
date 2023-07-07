@@ -58,7 +58,7 @@ export function RecipientViewPetitionFieldSelect({
   const options = field.options as FieldOptions["SELECT"];
   const values = useMemo(
     () => options.values.map((option) => toSimpleSelectOption(option)!),
-    [field.options]
+    [field.options],
   );
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function RecipientViewPetitionFieldSelect({
     (replyId: string) => async (value: string) => {
       await onUpdateReply(replyId, value);
     },
-    [onUpdateReply]
+    [onUpdateReply],
   );
 
   const handleDelete = useMemoFactory(
@@ -83,7 +83,7 @@ export function RecipientViewPetitionFieldSelect({
         setShowNewReply(true);
       }
     },
-    [field.replies, onDeleteReply]
+    [field.replies, onDeleteReply],
   );
 
   function handleAddNewReply() {
@@ -183,7 +183,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
   RecipientViewPetitionFieldReplySelectProps
 >(function RecipientViewPetitionFieldReplySelect(
   { field, reply, isDisabled, onUpdate, onDelete },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value);
@@ -193,7 +193,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
 
   const values = useMemo(
     () => options.values.map((option) => toSimpleSelectOption(option)!),
-    [options.values]
+    [options.values],
   );
 
   const id = `reply-${field.id}-${reply.id}`;

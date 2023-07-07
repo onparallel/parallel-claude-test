@@ -25,7 +25,7 @@ export const createPetitionListView = mutationField("createPetitionListView", {
         user_id: ctx.user!.id,
         position: maxPosition + 1,
       },
-      `User:${ctx.user!.id}`
+      `User:${ctx.user!.id}`,
     );
     ctx.views.loadPetitionListViewsByUserId.dataloader.clear(ctx.user!.id);
     return view;

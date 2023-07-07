@@ -32,7 +32,7 @@ const email: Email<PetitionSharedEmailProps> = {
         id: "from.via-parallel",
         defaultMessage: "{senderName} via Parallel",
       },
-      { senderName: ownerName }
+      { senderName: ownerName },
     );
   },
   subject({ petitions, ownerName, isTemplate }: PetitionSharedEmailProps, intl: IntlShape) {
@@ -43,7 +43,7 @@ const email: Email<PetitionSharedEmailProps> = {
           defaultMessage:
             "{userName} has shared {amount} {isTemplate, select, true{templates} other{parallels}} with you",
         },
-        { amount: petitions.length, userName: ownerName, isTemplate }
+        { amount: petitions.length, userName: ownerName, isTemplate },
       );
     } else {
       return intl.formatMessage(
@@ -51,7 +51,7 @@ const email: Email<PetitionSharedEmailProps> = {
           id: "petition-shared-email.subject",
           defaultMessage: "{userName} has shared {petitionName} with you",
         },
-        { petitionName: petitions[0].name, userName: ownerName }
+        { petitionName: petitions[0].name, userName: ownerName },
       );
     }
   },
@@ -65,7 +65,7 @@ const email: Email<PetitionSharedEmailProps> = {
       parallelUrl,
       isTemplate,
     }: PetitionSharedEmailProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     let body = "";
     if (petitions.length > 1) {
@@ -76,7 +76,7 @@ const email: Email<PetitionSharedEmailProps> = {
             defaultMessage:
               "{owner} has shared the following {isTemplate, select, true{templates} other{parallels}} with you:",
           },
-          { owner: `${ownerName} (${ownerEmail})`, isTemplate }
+          { owner: `${ownerName} (${ownerEmail})`, isTemplate },
         )}
 
         ${petitions
@@ -86,7 +86,7 @@ const email: Email<PetitionSharedEmailProps> = {
               intl.formatMessage({
                 id: "generic.unnamed-parallel",
                 defaultMessage: "Unnamed parallel",
-              })
+              }),
           )
           .join("\n")}
 
@@ -109,7 +109,7 @@ const email: Email<PetitionSharedEmailProps> = {
             defaultMessage:
               "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you.",
           },
-          { owner: `${ownerName} (${ownerEmail})`, isTemplate }
+          { owner: `${ownerName} (${ownerEmail})`, isTemplate },
         )}
 
         ${
@@ -203,7 +203,7 @@ const email: Email<PetitionSharedEmailProps> = {
                           defaultMessage="Unnamed parallel"
                         />
                       </li>
-                    )
+                    ),
                   )}
                 </MjmlText>
               </>

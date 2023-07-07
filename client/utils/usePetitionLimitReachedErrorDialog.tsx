@@ -31,9 +31,9 @@ export function usePetitionLimitReachedErrorDialog() {
                 {chunks}
               </SupportLink>
             ),
-          }
+          },
         ),
       }),
-    [intl.locale]
+    [intl.locale],
   );
 }

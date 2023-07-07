@@ -31,8 +31,8 @@ export function DateTimePicker({
               parse(
                 `${format(date, "yyyy-MM-dd")} ${format(value, "HH:mm")}`,
                 "yyyy-MM-dd HH:mm",
-                new Date()
-              )
+                new Date(),
+              ),
             );
           }}
           isPastAllowed={isPastAllowed}
@@ -50,8 +50,8 @@ export function DateTimePicker({
                   parse(
                     `${event.target.value} ${format(value, "HH:mm")}`,
                     "yyyy-MM-dd HH:mm",
-                    new Date()
-                  )
+                    new Date(),
+                  ),
                 );
               }
             }}

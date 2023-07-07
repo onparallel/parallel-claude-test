@@ -54,7 +54,7 @@ interface SignatureTokensTableContext {
   onDeleteIntegration: (id: string) => void;
   onMarkIntegrationAsDefault: (id: string) => void;
   onDocusignReauthorize: (
-    integration: IntegrationsSignature_SignatureOrgIntegrationFragment
+    integration: IntegrationsSignature_SignatureOrgIntegrationFragment,
   ) => Promise<void>;
   refetch: () => Promise<any>;
 }
@@ -95,7 +95,7 @@ function IntegrationsSignature() {
             id: "page.signature.provider-added-successfully.toast-description",
             defaultMessage: "{provider} integration created successfully.",
           },
-          { provider: "Signaturit" }
+          { provider: "Signaturit" },
         ),
       });
       refetch();
@@ -124,10 +124,10 @@ function IntegrationsSignature() {
   const removeSignatureToken = useDeleteSignatureTokenDialog();
   const confirmRemoveSignatureToken = useDeleteSignatureErrorConfirmationDialog();
   const [deleteSignatureIntegration] = useMutation(
-    IntegrationsSignature_deleteSignatureIntegrationDocument
+    IntegrationsSignature_deleteSignatureIntegrationDocument,
   );
   const [markIntegrationAsDefault] = useMutation(
-    IntegrationsSignature_markSignatureIntegrationAsDefaultDocument
+    IntegrationsSignature_markSignatureIntegrationAsDefaultDocument,
   );
   const showDocusignConsentPopup = useDocusignConsentPopup();
 
@@ -165,7 +165,7 @@ function IntegrationsSignature() {
           showDocusignConsentPopup({
             ...integration,
             environment: integration.environment === "DEMO" ? "sandbox" : "production",
-          })
+          }),
         );
         if (!error) {
           refetch();
@@ -180,13 +180,13 @@ function IntegrationsSignature() {
                 id: "page.signature.provider-updated-successfully.toast-description",
                 defaultMessage: "{provider} integration updated successfully.",
               },
-              { provider: "Docusign" }
+              { provider: "Docusign" },
             ),
           });
         }
       },
     }),
-    [me.hasPetitionSignature, numberOfIntegrations, refetch]
+    [me.hasPetitionSignature, numberOfIntegrations, refetch],
   );
 
   return (
@@ -456,7 +456,7 @@ function useSignatureTokensTableColumns() {
         IntegrationsSignature_SignatureOrgIntegrationFragment,
         SignatureTokensTableContext
       >[],
-    [intl.locale]
+    [intl.locale],
   );
 }
 
@@ -529,5 +529,5 @@ IntegrationsSignature.getInitialProps = async ({
 export default compose(
   withDialogs,
   withOrgRole("ADMIN", "/app/organization"),
-  withApolloData
+  withApolloData,
 )(IntegrationsSignature);

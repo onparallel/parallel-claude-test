@@ -68,7 +68,7 @@ export function PreviewPetitionFieldCommentsDialog({
       variables: { petitionId, petitionFieldId: field.id },
       pollInterval: 10_000,
       fetchPolicy: "cache-and-network",
-    }
+    },
   );
 
   const defaultMentionables = useGetDefaultMentionables(petitionId);
@@ -109,7 +109,7 @@ export function PreviewPetitionFieldCommentsDialog({
       }
     },
     1000,
-    [comments, markedAsUnreadIds]
+    [comments, markedAsUnreadIds],
   );
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
@@ -159,7 +159,7 @@ export function PreviewPetitionFieldCommentsDialog({
     async (search: string) => {
       return await searchUsers(search, { includeGroups: true, excludeUsers: [myId] });
     },
-    [searchUsers]
+    [searchUsers],
   );
 
   return (

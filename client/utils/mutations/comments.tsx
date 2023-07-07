@@ -17,13 +17,13 @@ import { Maybe } from "../types";
 
 export function useCreatePetitionFieldComment() {
   const [createPetitionFieldComment] = useMutation(
-    usePetitionCommentsMutations_createPetitionFieldCommentDocument
+    usePetitionCommentsMutations_createPetitionFieldCommentDocument,
   );
 
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
   const { refetch: fetchUsersOrGroups } = useQuery(
     usePetitionCommentsMutations_getUsersOrGroupsDocument,
-    { skip: true }
+    { skip: true },
   );
 
   return useCallback(
@@ -60,18 +60,18 @@ export function useCreatePetitionFieldComment() {
         }
       }
     },
-    [createPetitionFieldComment]
+    [createPetitionFieldComment],
   );
 }
 
 export function useUpdatePetitionFieldComment() {
   const [updatePetitionFieldComment] = useMutation(
-    usePetitionCommentsMutations_updatePetitionFieldCommentDocument
+    usePetitionCommentsMutations_updatePetitionFieldCommentDocument,
   );
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
   const { refetch: fetchUsersOrGroups } = useQuery(
     usePetitionCommentsMutations_getUsersOrGroupsDocument,
-    { skip: true }
+    { skip: true },
   );
 
   return useCallback(
@@ -108,21 +108,23 @@ export function useUpdatePetitionFieldComment() {
         }
       }
     },
-    [updatePetitionFieldComment]
+    [updatePetitionFieldComment],
   );
 }
 
 export function useDeletePetitionFieldComment() {
   const [deletePetitionFieldComment] = useMutation(
-    usePetitionCommentsMutations_deletePetitionFieldCommentDocument
+    usePetitionCommentsMutations_deletePetitionFieldCommentDocument,
   );
   return useCallback(
     async (
-      variables: VariablesOf<typeof usePetitionCommentsMutations_deletePetitionFieldCommentDocument>
+      variables: VariablesOf<
+        typeof usePetitionCommentsMutations_deletePetitionFieldCommentDocument
+      >,
     ) => {
       await deletePetitionFieldComment({ variables });
     },
-    [deletePetitionFieldComment]
+    [deletePetitionFieldComment],
   );
 }
 

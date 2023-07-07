@@ -38,12 +38,12 @@ export function getFieldIndices(fields: Pick<PetitionField, "type">[]): Petition
   const letter = letters();
   const number = numbers();
   return fields.map((f) =>
-    f.type === "HEADING" ? (letter.next().value as string) : (number.next().value as number)
+    f.type === "HEADING" ? (letter.next().value as string) : (number.next().value as number),
   );
 }
 
 export function unzipFieldsWithIndices<T extends Pick<PetitionField, "type">>(
-  fieldsWithIndices: [T, PetitionFieldIndex][]
+  fieldsWithIndices: [T, PetitionFieldIndex][],
 ): { fields: T[]; indices: PetitionFieldIndex[] } {
   return {
     fields: fieldsWithIndices.map(([field]) => field),
@@ -64,7 +64,7 @@ export function useFieldIndices(fields: Pick<PetitionField, "type">[]): Petition
  * @param fields fields to iterate.
  */
 export function useFieldWithIndices<T extends Pick<PetitionField, "type">>(
-  fields: T[]
+  fields: T[],
 ): [T, PetitionFieldIndex][] {
   return useMemo(() => zip(fields, getFieldIndices(fields)), [fields.map((f) => f.type).join(",")]);
 }

@@ -314,6 +314,6 @@ export function useFeatureFlags() {
         ],
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }

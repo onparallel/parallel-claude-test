@@ -23,7 +23,7 @@ export function isOwnOrgOrSuperAdmin<FieldName extends string>(): FieldAuthorize
 export function contextUserBelongsToOrg<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -35,14 +35,14 @@ export function contextUserBelongsToOrg<
 
 export function orgDoesNotHaveSsoProvider<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
     const ssoIntegrations = await ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, "SSO");
     if (ssoIntegrations.length > 0) {
       throw new ApolloError(
         "Can't create users on organizations with a SSO provider",
-        "SSO_PROVIDER_ENABLED"
+        "SSO_PROVIDER_ENABLED",
       );
     }
     return true;
@@ -51,7 +51,7 @@ export function orgDoesNotHaveSsoProvider<
 
 export function orgCanCreateNewUser<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
     const [org, activeUserCount] = await Promise.all([
@@ -71,12 +71,12 @@ export function orgCanCreateNewUser<
 export function userHasAccessToOrganizationTheme<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argName: TArg, themeType?: OrganizationThemeType): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const theme = await ctx.organizations.loadOrganizationTheme(
-        args[argName] as unknown as number
+        args[argName] as unknown as number,
       );
       return (
         theme?.org_id === ctx.user!.org_id &&
@@ -90,12 +90,12 @@ export function userHasAccessToOrganizationTheme<
 export function organizationThemeIsNotDefault<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const theme = await ctx.organizations.loadOrganizationTheme(
-        args[argName] as unknown as number
+        args[argName] as unknown as number,
       );
       return theme?.is_default === false;
     } catch {}
@@ -107,7 +107,7 @@ export function organizationHasOngoingUsagePeriod<
   TypeName extends string,
   FieldName extends string,
   TOrgIdArg extends Arg<TypeName, FieldName, number>,
-  TLimitNameArg extends Arg<TypeName, FieldName, OrganizationUsageLimitName>
+  TLimitNameArg extends Arg<TypeName, FieldName, OrganizationUsageLimitName>,
 >(orgIdArg: TOrgIdArg, limitNameArg: TLimitNameArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {

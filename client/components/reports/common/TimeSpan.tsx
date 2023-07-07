@@ -29,7 +29,7 @@ function getParts(intl: IntlShape, duration: Duration) {
             id: "component.timespan.years-part",
             defaultMessage: "{n, plural, =1{# year} other{# years}}",
           },
-          { n: duration.years }
+          { n: duration.years },
         )
       : null,
     duration.months
@@ -38,7 +38,7 @@ function getParts(intl: IntlShape, duration: Duration) {
             id: "component.timespan.months-part",
             defaultMessage: "{n, plural, =1{# month} other{# months}}",
           },
-          { n: duration.months }
+          { n: duration.months },
         )
       : null,
     duration.weeks
@@ -47,7 +47,7 @@ function getParts(intl: IntlShape, duration: Duration) {
             id: "component.timespan.weeks-part",
             defaultMessage: "{n, plural, =1{# week} other{# weeks}}",
           },
-          { n: duration.weeks }
+          { n: duration.weeks },
         )
       : null,
     duration.days
@@ -56,7 +56,7 @@ function getParts(intl: IntlShape, duration: Duration) {
             id: "component.timespan.days-part",
             defaultMessage: "{n, plural, =1{# day} other{# days}}",
           },
-          { n: duration.days }
+          { n: duration.days },
         )
       : null,
     duration.hours
@@ -65,7 +65,7 @@ function getParts(intl: IntlShape, duration: Duration) {
             id: "component.timespan.hours-part",
             defaultMessage: "{n}h",
           },
-          { n: duration.hours }
+          { n: duration.hours },
         )
       : null,
     isDefined(duration.minutes)
@@ -74,7 +74,7 @@ function getParts(intl: IntlShape, duration: Duration) {
             id: "component.timespan.minutes-part",
             defaultMessage: "{n}'",
           },
-          { n: duration.minutes }
+          { n: duration.minutes },
         )
       : null,
     isDefined(duration.seconds)
@@ -83,7 +83,7 @@ function getParts(intl: IntlShape, duration: Duration) {
             id: "component.timespan.seconds-part",
             defaultMessage: "{n}''",
           },
-          { n: duration.seconds }
+          { n: duration.seconds },
         )
       : null,
   ].filter(isDefined);

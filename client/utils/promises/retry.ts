@@ -14,7 +14,7 @@ export interface RetryOptions extends WaitForOptions {
  */
 export async function retry<TResult>(
   operation: (iteration: number) => MaybePromise<TResult>,
-  { maxRetries, delay, signal }: RetryOptions
+  { maxRetries, delay, signal }: RetryOptions,
 ): Promise<TResult> {
   if (maxRetries < 0) {
     throw new Error("maxRetries option must be greater than or equal to 0");

@@ -48,7 +48,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
       await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
-    [onDeleteReply]
+    [onDeleteReply],
   );
   const tone = useTone();
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
@@ -76,7 +76,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
       }
     },
     5000,
-    [onRefreshField, state, field.replies.length, bankflipSessionReady]
+    [onRefreshField, state, field.replies.length, bankflipSessionReady],
   );
 
   useWindowEvent(
@@ -97,7 +97,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
         }
       }
     },
-    [onRefreshField]
+    [onRefreshField],
   );
 
   const handleStart = async () => {
@@ -108,14 +108,17 @@ export function RecipientViewPetitionFieldTaxDocuments({
       }
       setBankflipSessionReady(false);
       setState("FETCHING");
-      popupRef.current = await openNewWindow(async () => {
-        const data = await onStartAsyncFieldCompletion();
-        if (data.type === "CACHE") {
-          throw new Error("CLOSE");
-        } else {
-          return data!.url;
-        }
-      }, centeredPopup({ height: 800, width: 700 }));
+      popupRef.current = await openNewWindow(
+        async () => {
+          const data = await onStartAsyncFieldCompletion();
+          if (data.type === "CACHE") {
+            throw new Error("CLOSE");
+          } else {
+            return data!.url;
+          }
+        },
+        centeredPopup({ height: 800, width: 700 }),
+      );
       if (isCacheOnly) {
         setState("IDLE");
       }

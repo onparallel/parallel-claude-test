@@ -21,7 +21,7 @@ export function TimezoneSelect({ value, onChange, ...props }: TimezoneSelectProp
         options: pipe(
           timezones,
           sort((a, b) => a.localeCompare(b)),
-          map((t) => ({ label: prettifyTimezone(t), value: t }))
+          map((t) => ({ label: prettifyTimezone(t), value: t })),
         ),
       })),
       sort((a, b) => a.label.localeCompare(b.label)),
@@ -35,10 +35,10 @@ export function TimezoneSelect({ value, onChange, ...props }: TimezoneSelectProp
             timezones,
             filter((t) => !t.includes("/") || t.startsWith("Etc/")),
             sort((a, b) => a.localeCompare(b)),
-            map((t) => ({ label: prettifyTimezone(t), value: t }))
+            map((t) => ({ label: prettifyTimezone(t), value: t })),
           ),
         },
-      ])
+      ]),
     );
   }, []);
 

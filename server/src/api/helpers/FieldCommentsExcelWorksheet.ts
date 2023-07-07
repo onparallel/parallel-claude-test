@@ -28,7 +28,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
   constructor(
     worksheetName: string,
     wb: Excel.Workbook,
-    private context: ApiContext | WorkerContext
+    private context: ApiContext | WorkerContext,
   ) {
     super(worksheetName, wb);
   }
@@ -123,14 +123,14 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
 
       if (!author) {
         throw new Error(
-          `Contact not found for PetitionAccess with id ${comment.petition_access_id}`
+          `Contact not found for PetitionAccess with id ${comment.petition_access_id}`,
         );
       }
       return author;
     }
 
     throw new Error(
-      `expected user_id or petition_access_id to be defined in PetitionFieldComment with id ${comment.id}`
+      `expected user_id or petition_access_id to be defined in PetitionFieldComment with id ${comment.id}`,
     );
   }
 }

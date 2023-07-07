@@ -69,7 +69,7 @@ export function Reports() {
         href: "/app/reports/replies",
       },
     ],
-    [navigate, intl.locale]
+    [navigate, intl.locale],
   );
 
   return (
@@ -141,7 +141,7 @@ interface ReportsCardProps {
 
 const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCard(
   { imgSrc, title, description, href, isPending, ...props },
-  ref
+  ref,
 ) {
   return (
     <LinkBox

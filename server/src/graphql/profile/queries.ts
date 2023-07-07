@@ -31,7 +31,7 @@ export const profileTypes = queryField((t) => {
         throw new ArgValidationError(
           info,
           "locale",
-          `"locale" must be provided when sorting by "name"`
+          `"locale" must be provided when sorting by "name"`,
         );
       }
     },
@@ -63,7 +63,7 @@ export const profileType = queryField((t) => {
     },
     authorize: authenticateAnd(
       userHasFeatureFlag("PROFILES"),
-      userHasAccessToProfileType("profileTypeId")
+      userHasAccessToProfileType("profileTypeId"),
     ),
     resolve: async (_, { profileTypeId }, ctx) => {
       return (await ctx.profiles.loadProfileType(profileTypeId))!;
@@ -144,7 +144,7 @@ export const expiringProfileProperties = queryField((t) => {
           filter,
           limit,
           offset,
-        }
+        },
       );
     },
   });

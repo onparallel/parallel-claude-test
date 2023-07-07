@@ -50,7 +50,7 @@ export function UpdateOrganizationCurrentUsagePeriodDialog({
 
   const periodEndDate = add(
     usagePeriod?.periodStartDate ? new Date(usagePeriod.periodStartDate) : new Date(),
-    usagePeriod?.period ?? { months: 1 }
+    usagePeriod?.period ?? { months: 1 },
   );
 
   return (

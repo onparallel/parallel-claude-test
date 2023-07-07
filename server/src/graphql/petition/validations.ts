@@ -12,7 +12,7 @@ import { validateReplyContent } from "../../util/validateReplyContent";
 export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(
   slugArg: (args: ArgsValue<TypeName, FieldName>) => string,
   argName: string,
-  publicPetitionLinkIdArg?: (args: ArgsValue<TypeName, FieldName>) => number
+  publicPetitionLinkIdArg?: (args: ArgsValue<TypeName, FieldName>) => number,
 ) {
   const MIN_SLUG_LENGTH = 8;
   const MAX_SLUG_LENGTH = 30;
@@ -26,7 +26,7 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
         info,
         argName,
         `Value can't have less than ${MIN_SLUG_LENGTH} characters.`,
-        { code: "MIN_SLUG_LENGTH_VALIDATION_ERROR" }
+        { code: "MIN_SLUG_LENGTH_VALIDATION_ERROR" },
       );
     }
     if (slug.length > MAX_SLUG_LENGTH) {
@@ -34,7 +34,7 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
         info,
         argName,
         `Value can't have more than ${MAX_SLUG_LENGTH} characters.`,
-        { code: "MAX_SLUG_LENGTH_VALIDATION_ERROR" }
+        { code: "MAX_SLUG_LENGTH_VALIDATION_ERROR" },
       );
     }
     if (!slug.match(/^[a-zA-Z0-9-]*$/)) {
@@ -49,7 +49,7 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
         info,
         argName,
         "Slug is already being used on another public link",
-        { code: "SLUG_ALREADY_TAKEN_VALIDATION_ERROR" }
+        { code: "SLUG_ALREADY_TAKEN_VALIDATION_ERROR" },
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
@@ -58,7 +58,7 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
 /** @deprecated */
 export function validateFieldReplyValue<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => { id: number; value?: any }[],
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const fieldReplies = prop(args);
@@ -80,7 +80,7 @@ export function validateFieldReplyValue<TypeName extends string, FieldName exten
           if (isFileTypeField(field.type)) {
             const { id: replyId } = fromGlobalId(
               reply.value.petitionFieldReplyId as string,
-              "PetitionFieldReply"
+              "PetitionFieldReply",
             );
             const petitionFieldReply = await ctx.petitions.loadFieldReply(replyId);
             if (!petitionFieldReply || petitionFieldReply.type !== field.type) {
@@ -89,12 +89,12 @@ export function validateFieldReplyValue<TypeName extends string, FieldName exten
 
             const hasAccess = await ctx.petitions.userhasAccessToPetitionFieldReply(
               petitionFieldReply.id,
-              ctx.user!.id
+              ctx.user!.id,
             );
 
             if (!hasAccess) {
               throw new Error(
-                `User doesn't have access to PetitionFieldReply id ${reply.value.petitionFieldReplyId}`
+                `User doesn't have access to PetitionFieldReply id ${reply.value.petitionFieldReplyId}`,
               );
             }
           }
@@ -110,7 +110,7 @@ export function validateFieldReplyValue<TypeName extends string, FieldName exten
 
 export function validateFieldReplyContent<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => { id: number; content?: any }[],
-  argName: string
+  argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const fieldReplies = prop(args);
@@ -132,23 +132,23 @@ export function validateFieldReplyContent<TypeName extends string, FieldName ext
           if (isFileTypeField(field.type)) {
             const { id: replyId } = fromGlobalId(
               reply.content.petitionFieldReplyId as string,
-              "PetitionFieldReply"
+              "PetitionFieldReply",
             );
             const petitionFieldReply = await ctx.petitions.loadFieldReply(replyId);
             if (!petitionFieldReply || petitionFieldReply.type !== field.type) {
               throw new Error(
-                `Invalid PetitionFieldReply id ${reply.content.petitionFieldReplyId}`
+                `Invalid PetitionFieldReply id ${reply.content.petitionFieldReplyId}`,
               );
             }
 
             const hasAccess = await ctx.petitions.userhasAccessToPetitionFieldReply(
               petitionFieldReply.id,
-              ctx.user!.id
+              ctx.user!.id,
             );
 
             if (!hasAccess) {
               throw new Error(
-                `User doesn't have access to PetitionFieldReply id ${reply.content.petitionFieldReplyId}`
+                `User doesn't have access to PetitionFieldReply id ${reply.content.petitionFieldReplyId}`,
               );
             }
           }
@@ -166,7 +166,7 @@ export function validateReplyUpdate<
   TypeName extends string,
   FieldName extends string,
   TReplyIdArg extends Arg<TypeName, FieldName, number>,
-  TValuedArg extends Arg<TypeName, FieldName>
+  TValuedArg extends Arg<TypeName, FieldName>,
 >(replyIdArg: TReplyIdArg, valueArg: TValuedArg, argName: string) {
   return (async (_, args, ctx, info) => {
     const replyId = args[replyIdArg] as unknown as number;

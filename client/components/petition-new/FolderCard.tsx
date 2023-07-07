@@ -63,5 +63,5 @@ export const FolderCard = Object.assign(
         }
       `,
     },
-  }
+  },
 );

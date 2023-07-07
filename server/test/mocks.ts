@@ -20,7 +20,7 @@ export const USER_COGNITO_ID = "test-cognito-id";
 export class MockAuth implements IAuth {
   constructor(
     private users: UserRepository,
-    private userAuthentication: UserAuthenticationRepository
+    private userAuthentication: UserAuthenticationRepository,
   ) {}
   async getOrCreateCognitoUser(): Promise<string> {
     return "";

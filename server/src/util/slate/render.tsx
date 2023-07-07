@@ -53,7 +53,7 @@ export function renderWhiteSpace(text: string) {
 
 export function renderSlateToReactNodes(
   node: SlateNode | SlateNode[],
-  options?: Partial<RenderSlateToHtmlOptions>
+  options?: Partial<RenderSlateToHtmlOptions>,
 ): ReactNode {
   const opts: RenderSlateToHtmlOptions = {
     startingHeadingLevel: 1,
@@ -86,14 +86,14 @@ export function renderSlateToReactNodes(
         return createElement(
           type,
           { style: { margin: 0, fontSize, fontWeight: "bold" } },
-          paragraphIsEmpty(node) ? <br /> : renderSlateToReactNodes(node.children, opts)
+          paragraphIsEmpty(node) ? <br /> : renderSlateToReactNodes(node.children, opts),
         );
       case "bulleted-list":
       case "numbered-list":
         return createElement(
           node.type === "bulleted-list" ? "ul" : "ol",
           { style: { margin: 0, marginLeft: "24px", paddingLeft: 0 } },
-          renderSlateToReactNodes(node.children, opts)
+          renderSlateToReactNodes(node.children, opts),
         );
       case "list-item": {
         return <li style={{ marginLeft: 0 }}>{renderSlateToReactNodes(node.children, opts)}</li>;
@@ -139,7 +139,7 @@ export function renderSlateToHtml(nodes: SlateNode[], options?: Partial<RenderSl
     function (match) {
       const extra = (match.length - 17) / 9;
       return " " + "&nbsp;".repeat(extra);
-    }
+    },
   );
 }
 

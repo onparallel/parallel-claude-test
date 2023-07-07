@@ -10,7 +10,7 @@ export function useIsGlobalKeyDown(key: string) {
         setIsKeyDown(true);
       }
     },
-    []
+    [],
   );
   useWindowEvent(
     "keyup",
@@ -19,14 +19,14 @@ export function useIsGlobalKeyDown(key: string) {
         setIsKeyDown(false);
       }
     },
-    []
+    [],
   );
   useWindowEvent(
     "blur",
     function handleBlur() {
       setIsKeyDown(false);
     },
-    []
+    [],
   );
   return isKeyDown;
 }

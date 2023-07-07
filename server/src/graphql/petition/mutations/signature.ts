@@ -21,7 +21,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, { petitionId, message }, ctx) => {
     try {
@@ -31,20 +31,20 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       await ctx.petitions.updatePetition(
         petitionId,
         { status: "COMPLETED" },
-        `User:${ctx.user!.id}`
+        `User:${ctx.user!.id}`,
       );
 
       if (!petition.signature_config) {
         throw new ApolloError(
           `Petition:${petition.id} was expected to have signature_config set`,
-          "MISSING_SIGNATURE_CONFIG_ERROR"
+          "MISSING_SIGNATURE_CONFIG_ERROR",
         );
       }
 
       const { signatureRequest } = await ctx.signature.createSignatureRequest(
         petition.id,
         { ...petition.signature_config, message: message ?? undefined },
-        ctx.user!
+        ctx.user!,
       );
 
       return signatureRequest;
@@ -53,12 +53,12 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
         if (error.message === "PETITION_SEND_LIMIT_REACHED") {
           throw new ApolloError(
             "Can't complete the parallel due to lack of credits",
-            "PETITION_SEND_LIMIT_REACHED"
+            "PETITION_SEND_LIMIT_REACHED",
           );
         } else if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
           throw new ApolloError(
             "Can't complete the petition without signers information",
-            "REQUIRED_SIGNER_INFO_ERROR"
+            "REQUIRED_SIGNER_INFO_ERROR",
           );
         }
       }
@@ -75,7 +75,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
-    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId);
@@ -92,7 +92,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
     const petition = await ctx.petitions.loadPetition(signature.petition_id);
     if (!petition) {
       throw new Error(
-        `Can't find Petition:${signature.petition_id} on PetitionSignatureRequest:${petitionSignatureRequestId}`
+        `Can't find Petition:${signature.petition_id} on PetitionSignatureRequest:${petitionSignatureRequestId}`,
       );
     }
 
@@ -101,7 +101,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
       "CANCELLED_BY_USER",
       {
         user_id: ctx.user!.id,
-      }
+      },
     );
 
     return signatureRequest;
@@ -113,7 +113,7 @@ export const updateSignatureRequestMetadata = mutationField("updateSignatureRequ
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
-    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
   ),
   args: {
     petitionSignatureRequestId: nonNull(globalIdArg()),
@@ -124,7 +124,7 @@ export const updateSignatureRequestMetadata = mutationField("updateSignatureRequ
       args.petitionSignatureRequestId,
       {
         metadata: args.metadata,
-      }
+      },
     );
     return signature!;
   },
@@ -136,7 +136,7 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId"),
-    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
   ),
   args: {
     petitionSignatureRequestId: nonNull(globalIdArg("PetitionSignatureRequest")),
@@ -150,7 +150,7 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
   resolve: async (_, args, ctx) => {
     try {
       const signature = await ctx.petitions.loadPetitionSignatureById(
-        args.petitionSignatureRequestId
+        args.petitionSignatureRequestId,
       );
 
       if (
@@ -159,17 +159,17 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
         (!args.downloadAuditTrail && !signature.file_upload_id)
       ) {
         throw new Error(
-          `Can't download signed doc on ${signature?.status} petitionSignatureRequest with id ${args.petitionSignatureRequestId}`
+          `Can't download signed doc on ${signature?.status} petitionSignatureRequest with id ${args.petitionSignatureRequestId}`,
         );
       }
       const file = await ctx.files.loadFileUpload(
-        args.downloadAuditTrail ? signature.file_upload_audit_trail_id! : signature.file_upload_id!
+        args.downloadAuditTrail ? signature.file_upload_audit_trail_id! : signature.file_upload_id!,
       );
       if (!file) {
         throw new Error(
           `Can't get ${
             args.downloadAuditTrail ? "audit trail" : "signed"
-          } file for signature request with id ${args.petitionSignatureRequestId}`
+          } file for signature request with id ${args.petitionSignatureRequestId}`,
         );
       }
       return {
@@ -178,7 +178,7 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
         url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file.path,
           file.filename,
-          args.preview ? "inline" : "attachment"
+          args.preview ? "inline" : "attachment",
         ),
       };
     } catch {
@@ -195,7 +195,7 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
-    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
   ),
   args: {
     petitionSignatureRequestId: nonNull(globalIdArg("PetitionSignatureRequest")),
@@ -210,7 +210,7 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
     const petition = await ctx.petitions.loadPetition(signature.petition_id);
     if (!petition) {
       throw new Error(
-        `Can't find petition with id ${signature.petition_id} on signature request with id ${petitionSignatureRequestId}`
+        `Can't find petition with id ${signature.petition_id} on signature request with id ${petitionSignatureRequestId}`,
       );
     }
 

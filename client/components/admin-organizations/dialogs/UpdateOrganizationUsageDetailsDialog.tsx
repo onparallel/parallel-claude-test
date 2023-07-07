@@ -95,7 +95,7 @@ export function UpdateOrganizationUsageDetailsDialog({
         })
         .toLowerCase(),
     }),
-    [intl]
+    [intl],
   );
 
   const { startNewPeriod, periodUnits, periodValue, renewalCycles } = watch();
@@ -133,8 +133,8 @@ export function UpdateOrganizationUsageDetailsDialog({
           now,
           multiplyDuration(
             { [periodUnits as keyof Duration]: periodValue },
-            renewalCycles - (startNewPeriod ? 0 : currentUsageLimit?.cycleNumber ?? 0)
-          )
+            renewalCycles - (startNewPeriod ? 0 : currentUsageLimit?.cycleNumber ?? 0),
+          ),
         )
       : add(
           new Date(currentUsageLimit.periodStartDate),
@@ -142,9 +142,9 @@ export function UpdateOrganizationUsageDetailsDialog({
             currentUsageLimit.period,
             multiplyDuration(
               { [periodUnits as keyof Duration]: periodValue },
-              renewalCycles - currentUsageLimit.cycleNumber
-            )
-          )
+              renewalCycles - currentUsageLimit.cycleNumber,
+            ),
+          ),
         );
 
   if (nextPeriod.getTime() - (subscriptionEndDate?.getTime() ?? 0) === 0) {

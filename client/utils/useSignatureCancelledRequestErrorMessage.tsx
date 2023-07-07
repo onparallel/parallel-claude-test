@@ -82,7 +82,7 @@ export function useSignatureCancelledRequestErrorMessage() {
           );
       }
     },
-    [intl.locale]
+    [intl.locale],
   );
 }
 

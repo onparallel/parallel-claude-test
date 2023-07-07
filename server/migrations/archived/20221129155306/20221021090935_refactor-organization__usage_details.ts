@@ -36,7 +36,7 @@ function durationToString(duration: Duration) {
 
 export async function up(knex: Knex): Promise<void> {
   const data = await knex.raw<{ rows: { id: number; usage_details: OrganizationUsageDetails }[] }>(
-    /* sql */ `select id, usage_details from "organization"`
+    /* sql */ `select id, usage_details from "organization"`,
   );
 
   if (data.rows.length > 0) {
@@ -68,14 +68,14 @@ export async function up(knex: Knex): Promise<void> {
     update "organization" o set usage_details = r.details
     from "rows_to_update" r where r.org_id = o.id;
   `,
-      newData.flatMap((d) => [d.id, d.usage_details])
+      newData.flatMap((d) => [d.id, d.usage_details]),
     );
   }
 }
 
 export async function down(knex: Knex): Promise<void> {
   const data = await knex.raw<{ rows: { id: number; usage_details: OrganizationUsageDetails }[] }>(
-    /* sql */ `select id, usage_details from "organization"`
+    /* sql */ `select id, usage_details from "organization"`,
   );
 
   if (data.rows.length > 0) {
@@ -107,7 +107,7 @@ export async function down(knex: Knex): Promise<void> {
     update "organization" o set usage_details = r.details
     from "rows_to_update" r where r.org_id = o.id;
   `,
-      newData.flatMap((d) => [d.id, d.usage_details])
+      newData.flatMap((d) => [d.id, d.usage_details]),
     );
   }
 }

@@ -41,7 +41,7 @@ async function main() {
     {
       cwd: buildDir,
       encoding: "utf-8",
-    }
+    },
   );
 
   console.log("Getting the secrets 🤫");
@@ -73,7 +73,7 @@ async function main() {
   });
   execSync(
     `echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env.${env}`,
-    { cwd: WORK_DIR, encoding: "utf-8" }
+    { cwd: WORK_DIR, encoding: "utf-8" },
   );
 
   const secretsManagerClient = new SecretsManagerClient({});
@@ -81,7 +81,7 @@ async function main() {
     new GetSecretValueCommand({
       SecretId:
         "arn:aws:secretsmanager:eu-central-1:749273139513:secret:ops/sentry-auth-token-609sGa",
-    })
+    }),
   );
   const sentryAuthToken = response.SecretString!;
 
@@ -94,13 +94,13 @@ async function main() {
     `aws s3 sync \
       ${buildDir}/client/.next/static \
       s3://parallel-static-${env}/_next/static \
-      --cache-control max-age=31536000`
+      --cache-control max-age=31536000`,
   );
   execSync(
     `aws s3 sync \
       ${buildDir}/client/public/static \
       s3://parallel-static-${env}/static \
-      --cache-control max-age=2592000`
+      --cache-control max-age=2592000`,
   );
 
   console.log("Building the server");
@@ -113,7 +113,7 @@ async function main() {
     --ignore-scripts \
     --prefer-offline \
     --frozen-lockfile`,
-    { cwd: buildDir, encoding: "utf-8" }
+    { cwd: buildDir, encoding: "utf-8" },
   );
   execSync(`yarn patch-package`, { cwd: buildDir, encoding: "utf-8" });
 

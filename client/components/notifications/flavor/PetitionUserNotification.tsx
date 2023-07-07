@@ -20,7 +20,7 @@ export interface PetitionUserNotificationProps {
 export const PetitionUserNotification = Object.assign(
   forwardRef<HTMLElement, PetitionUserNotificationProps>(function PetitionUserNotification(
     { isFirst, icon, path, notification, children },
-    ref
+    ref,
   ) {
     const { isRead, petition, createdAt } = notification;
     const intl = useIntl();
@@ -54,7 +54,7 @@ export const PetitionUserNotification = Object.assign(
             id: "component.petition-user-notification.instructions",
             defaultMessage:
               "Use up and down arrows to navigate to other notifications. Use space to toggle read status.",
-          })}`
+          })}`,
         );
       } else {
         linkRef.current!.setAttribute("aria-label", content);
@@ -185,5 +185,5 @@ export const PetitionUserNotification = Object.assign(
         }
       `,
     },
-  }
+  },
 );

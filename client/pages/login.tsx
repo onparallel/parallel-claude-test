@@ -54,7 +54,7 @@ function Login() {
         ? router.query.redirect
         : "/app" + (continueToApp ? "?continue" : ""),
       undefined,
-      { locale }
+      { locale },
     );
   }
 

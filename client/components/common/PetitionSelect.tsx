@@ -32,7 +32,7 @@ export type PetitionSelectSelection = PetitionSelect_PetitionBaseFragment;
 
 export type PetitionSelectInstance<
   IsMulti extends boolean,
-  OptionType extends PetitionSelectSelection = PetitionSelectSelection
+  OptionType extends PetitionSelectSelection = PetitionSelectSelection,
 > = SelectInstance<OptionType, IsMulti, never>;
 
 const fragments = {
@@ -84,7 +84,7 @@ const _queries = [
 export interface PetitionSelectProps<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
-  OptionType extends PetitionSelectSelection = PetitionSelectSelection
+  OptionType extends PetitionSelectSelection = PetitionSelectSelection,
 > extends Omit<CustomSelectProps<OptionType, IsMulti, never>, "value"> {
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
   type?: "PETITION" | "TEMPLATE";
@@ -98,7 +98,7 @@ export const PetitionSelect = Object.assign(
   forwardRef(function PetitionSelect<
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends PetitionSelectSelection = PetitionSelectSelection
+    OptionType extends PetitionSelectSelection = PetitionSelectSelection,
   >(
     {
       value,
@@ -112,7 +112,7 @@ export const PetitionSelect = Object.assign(
       permissionTypes,
       ...props
     }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
-    ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>
+    ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>,
   ) {
     const needsLoading =
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
@@ -137,15 +137,15 @@ export const PetitionSelect = Object.assign(
         });
         assertTypenameArray(
           result.data.petitions.items,
-          type === "PETITION" ? "Petition" : "PetitionTemplate"
+          type === "PETITION" ? "Petition" : "PetitionTemplate",
         );
 
         return result.data.petitions.items.filter((p) =>
-          excludePetitions ? !excludePetitions?.includes(p.id) : true
+          excludePetitions ? !excludePetitions?.includes(p.id) : true,
         ) as any[];
       },
       300,
-      [excludePetitions?.join(",")]
+      [excludePetitions?.join(",")],
     );
 
     const getPetitions = useGetPetitions();
@@ -184,7 +184,7 @@ export const PetitionSelect = Object.assign(
               },
               {
                 isMulti,
-              }
+              },
             )
           : intl.formatMessage(
               {
@@ -193,7 +193,7 @@ export const PetitionSelect = Object.assign(
               },
               {
                 isMulti,
-              }
+              },
             ))
       );
     }, [_placeholder, isMulti]);
@@ -240,12 +240,12 @@ export const PetitionSelect = Object.assign(
   }) as <
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends PetitionSelectSelection = PetitionSelectSelection
+    OptionType extends PetitionSelectSelection = PetitionSelectSelection,
   >(
     props: PetitionSelectProps<IsMulti, IsSync, OptionType> &
-      RefAttributes<PetitionSelectInstance<IsMulti, OptionType>>
+      RefAttributes<PetitionSelectInstance<IsMulti, OptionType>>,
   ) => ReactElement,
-  { fragments }
+  { fragments },
 );
 
 function useGetPetitions() {
@@ -262,7 +262,7 @@ function useGetPetitions() {
         });
 
         return petition ?? null;
-      })
+      }),
     );
     const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
 
@@ -283,7 +283,7 @@ function useGetPetitions() {
         },
         {
           concurrency: 1,
-        }
+        },
       );
 
       const fromServerById = indexBy(petitions.filter(isDefined), (x) => x.id);

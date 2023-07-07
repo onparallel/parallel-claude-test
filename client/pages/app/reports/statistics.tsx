@@ -144,9 +144,9 @@ export function ReportsTemplates() {
                 startDate: queryState.range?.[0].toISOString() ?? null,
                 endDate: queryState.range?.[1].toISOString() ?? null,
               },
-              { signal: taskAbortController.current!.signal, timeout: 60_000 }
+              { signal: taskAbortController.current!.signal, timeout: 60_000 },
             ),
-          2_000 + 1_000 * Math.random()
+          2_000 + 1_000 * Math.random(),
         );
         setState((state) => ({
           ...state,

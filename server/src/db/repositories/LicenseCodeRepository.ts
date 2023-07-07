@@ -45,7 +45,7 @@ export class LicenseCodeRepository extends BaseRepository {
     id: number,
     data: Partial<CreateLicenseCode>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [license] = await this.from("license_code", t)
       .where("id", id)

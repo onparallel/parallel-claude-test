@@ -45,7 +45,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
         excludeUsers: [...excludeUsers, ...exclude, user.id],
       });
     },
-    [_handleSearchUsers, delegates]
+    [_handleSearchUsers, delegates],
   );
 
   return (

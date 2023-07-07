@@ -47,7 +47,7 @@ async function main() {
             SerialNumber: mfaSerialNumber,
             TokenCode: code,
             DurationSeconds: 900,
-          })
+          }),
         )
         .then((r) => r.Credentials!);
     } catch (e) {
@@ -78,7 +78,7 @@ async function main() {
         RoleArn: "arn:aws:iam::749273139513:role/parallel-admin",
         RoleSessionName: `cli-session-${userName}`,
         DurationSeconds: duration,
-      })
+      }),
     )
     .then((r) => r.Credentials!);
   console.log(outdent`

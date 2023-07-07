@@ -140,7 +140,7 @@ function useProfileRelationshipsTableColumns(): TableColumn<ProfileRelationship>
         },
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

@@ -9,7 +9,7 @@ createCronWorker("expiring-properties", async (context) => {
   nearestMonday7am.setHours(7, 0, 0, 0);
 
   const organizations = await context.profiles.getOrganizationsForProfileAlertsDigest(
-    nearestMonday7am
+    nearestMonday7am,
   );
 
   await pMap(
@@ -31,7 +31,7 @@ createCronWorker("expiring-properties", async (context) => {
                 subscribedByUserId: user.id,
                 isInAlert: true,
               },
-            }
+            },
           );
 
           const totalCount = await inAlertProperties.totalCount;
@@ -54,9 +54,9 @@ createCronWorker("expiring-properties", async (context) => {
             });
           }
         },
-        { concurrency: 5 }
+        { concurrency: 5 },
       );
     },
-    { concurrency: 1 }
+    { concurrency: 1 },
   );
 });

@@ -18,7 +18,7 @@ export class EncryptionService implements IEncryptionService {
     const cipher = createCipheriv(
       "aes-256-gcm",
       Buffer.from(this.config.security.encryptKeyBase64, "base64"),
-      iv
+      iv,
     );
     const encrypted = Buffer.concat([cipher.update(value), cipher.final()]);
     const authTag = cipher.getAuthTag();
@@ -36,11 +36,11 @@ export class EncryptionService implements IEncryptionService {
     const decipher = createDecipheriv(
       "aes-256-gcm",
       Buffer.from(this.config.security.encryptKeyBase64, "base64"),
-      iv
+      iv,
     );
     decipher.setAuthTag(authTag);
     return Buffer.concat([decipher.update(value.subarray(ivSize + 17)), decipher.final()]).toString(
-      outputEncoding
+      outputEncoding,
     );
   }
 }

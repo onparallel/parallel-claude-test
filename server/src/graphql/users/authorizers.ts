@@ -25,14 +25,14 @@ export function rootIsContextRealUser<FieldName extends string>(): FieldAuthoriz
 }
 
 export function contextUserHasRole<TypeName extends string, FieldName extends string>(
-  minRole: UserOrganizationRole
+  minRole: UserOrganizationRole,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (root, _, ctx) => userHasRole(ctx.user!, minRole);
 }
 
 export function contextUserIsNotSso<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
     const userData = await ctx.users.loadUserData(ctx.user!.user_data_id);
@@ -43,7 +43,7 @@ export function contextUserIsNotSso<
 export function userIsNotSSO<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
@@ -55,7 +55,7 @@ export function userIsNotSSO<
 export function userIsNotOrgOwner<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
@@ -67,7 +67,7 @@ export function userIsNotOrgOwner<
 export function userIsNotContextUser<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => ctx.user!.id !== (args[argName] as unknown as number);
 }
@@ -76,7 +76,7 @@ export function emailIsNotRegisteredInTargetOrg<
   TypeName extends string,
   FieldName extends string,
   TEmail extends Arg<TypeName, FieldName, string>,
-  TOrgId extends Arg<TypeName, FieldName, Maybe<number>>
+  TOrgId extends Arg<TypeName, FieldName, Maybe<number>>,
 >(emailArg: TEmail, orgIdArg: TOrgId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const email = args[emailArg] as unknown as string;
@@ -85,7 +85,7 @@ export function emailIsNotRegisteredInTargetOrg<
     if (users.some((user) => user.org_id === targetOrgId)) {
       throw new ApolloError(
         "The provided email is already registered on the organization",
-        "USER_ALREADY_IN_ORG_ERROR"
+        "USER_ALREADY_IN_ORG_ERROR",
       );
     }
 

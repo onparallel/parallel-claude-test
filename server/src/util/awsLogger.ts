@@ -35,10 +35,10 @@ export function awsLogger(logger: ILogger) {
                 return `[[${value.constructor.name}]]`;
               }
             },
-            2
-          )
+            2,
+          ),
         );
       },
-    ])
+    ]),
   ) as unknown as Logger;
 }

@@ -55,7 +55,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
     (replyId: string) => async (value: DynamicSelectValue) => {
       await onUpdateReply(replyId, value);
     },
-    [onUpdateReply]
+    [onUpdateReply],
   );
 
   const handleDelete = useMemoFactory(
@@ -67,7 +67,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
         setShowNewReply(true);
       }
     },
-    [field.replies, onDeleteReply]
+    [field.replies, onDeleteReply],
   );
 
   async function handleCreateReply(value: string) {
@@ -155,7 +155,7 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
   RecipientViewPetitionFieldReplyDynamicSelectProps
 >(function RecipientViewPetitionFieldReplyDynamicSelect(
   { field, reply, isDisabled, onChange, onDelete },
-  ref
+  ref,
 ) {
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
   const refs = useMultipleRefs<SelectInstance>();
@@ -166,7 +166,7 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
         refs[level ?? 0].current?.focus();
       },
     }),
-    []
+    [],
   );
 
   async function handleChange(value: string, level: number) {
@@ -175,7 +175,7 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
       return;
     }
     await onChange(
-      current.map((p, i) => (i === level ? [p[0], value] : i >= level ? [p[0], null] : p))
+      current.map((p, i) => (i === level ? [p[0], value] : i >= level ? [p[0], null] : p)),
     );
     if (level < fieldOptions.labels.length - 1) {
       setTimeout(() => {
@@ -237,7 +237,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     onChange,
     onDeleteReply,
   }: RecipientViewPetitionFieldReplyDynamicSelectLevelProps,
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];

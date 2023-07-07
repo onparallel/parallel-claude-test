@@ -100,7 +100,7 @@ export function PublicLinkSettingsDialog({
       return data.isValidPublicPetitionLinkSlug;
     },
     300,
-    []
+    [],
   );
 
   const isValidSlug = async (value: string) => {

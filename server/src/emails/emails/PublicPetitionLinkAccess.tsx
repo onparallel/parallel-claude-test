@@ -30,7 +30,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         id: "from.via-parallel",
         defaultMessage: "{senderName} via Parallel",
       },
-      { senderName }
+      { senderName },
     );
   },
   subject({ emailSubject, petitionTitle }) {
@@ -45,7 +45,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           id: "public-petition-link.text-1",
           defaultMessage: "We send you the requested access to {petitionTitle}.",
         },
-        { petitionTitle, tone: theme.preferredTone }
+        { petitionTitle, tone: theme.preferredTone },
       )}
 
       ${
@@ -58,7 +58,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
               defaultMessage:
                 "The information will be automatically saved on the platform, and you can continue the process later through the same link.",
             },
-            { tone: theme.preferredTone }
+            { tone: theme.preferredTone },
           )}
 
           ${intl.formatMessage(
@@ -67,7 +67,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
               defaultMessage:
                 "If you have any questions or comments you can contact us in the designated spaces on the platform.",
             },
-            { tone: theme.preferredTone }
+            { tone: theme.preferredTone },
           )}`
       }
 

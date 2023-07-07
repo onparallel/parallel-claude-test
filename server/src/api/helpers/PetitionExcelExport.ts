@@ -11,7 +11,10 @@ export class PetitionExcelExport {
   private textRepliesTab!: TextRepliesExcelWorksheet;
   private fieldCommentsTab!: FieldCommentsExcelWorksheet;
 
-  constructor(private locale: UserLocale, private context: ApiContext | WorkerContext) {
+  constructor(
+    private locale: UserLocale,
+    private context: ApiContext | WorkerContext,
+  ) {
     this.wb = new Excel.Workbook();
   }
 
@@ -24,7 +27,7 @@ export class PetitionExcelExport {
         defaultMessage: "Replies",
       }),
       this.wb,
-      this.context
+      this.context,
     );
     await this.textRepliesTab.init(this.locale);
 
@@ -34,7 +37,7 @@ export class PetitionExcelExport {
         defaultMessage: "Comments",
       }),
       this.wb,
-      this.context
+      this.context,
     );
     await this.fieldCommentsTab.init(this.locale);
   }

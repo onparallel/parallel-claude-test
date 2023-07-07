@@ -44,7 +44,7 @@ export function monitor(container: Container) {
           new GetQueueAttributesCommand({
             QueueUrl: queueUrl,
             AttributeNames: ["ApproximateNumberOfMessages"],
-          })
+          }),
         );
         const length = parseInt(response.Attributes!.ApproximateNumberOfMessages!);
         if (isDefined(limit)) {
@@ -56,7 +56,7 @@ export function monitor(container: Container) {
         } else {
           return Text(`${length}`);
         }
-      }
+      },
     );
   return api.handler();
 }

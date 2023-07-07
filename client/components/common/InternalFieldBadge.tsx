@@ -12,7 +12,7 @@ export interface InternalFieldBadgeProps extends ThemingProps<"Badge"> {
 export const InternalFieldBadge = chakraForwardRef<"span", InternalFieldBadgeProps>(
   function InternalFieldBadge(
     { placement = "bottom", popoverWidth, fontSize = "sm", ...props },
-    ref
+    ref,
   ) {
     return (
       <SmallPopover
@@ -39,5 +39,5 @@ export const InternalFieldBadge = chakraForwardRef<"span", InternalFieldBadgePro
         </Badge>
       </SmallPopover>
     );
-  }
+  },
 );

@@ -146,7 +146,7 @@ export const docusignEventHandlers: RequestHandler = Router()
       try {
         const body = req.body as DocuSignEventBody;
         const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
-          `DOCUSIGN/${body.data.envelopeId}`
+          `DOCUSIGN/${body.data.envelopeId}`,
         );
 
         if (!isDefined(signature) || signature.status === "CANCELLED") {
@@ -168,13 +168,13 @@ export const docusignEventHandlers: RequestHandler = Router()
         req.context.logger.error(error.message, { stack: error.stack });
         next(error);
       }
-    }
+    },
   );
 
 /** email is sent to the recipient signifying that it is their turn to sign an envelope. */
 async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
 
   /* 
@@ -203,18 +203,18 @@ async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionI
     {
       email_delivered_at: new Date(body.generatedDateTime),
     },
-    ctx
+    ctx,
   );
 }
 
 /** a signer opened the signing page on the signature provider */
 async function recipientDelivered(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
   const [signer, signerIndex] = findSigner(
     signature!.signature_config.signersInfo,
-    body.data.recipientId!
+    body.data.recipientId!,
   );
 
   await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
@@ -240,15 +240,15 @@ async function recipientDelivered(ctx: ApiContext, body: DocuSignEventBody, peti
 /** signer declined the document. Whole signature process is automatically cancelled by Docusign */
 async function recipientDeclined(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
   const [canceller, cancellerIndex] = findSigner(
     signature.signature_config.signersInfo,
-    body.data.recipientId!
+    body.data.recipientId!,
   );
 
   const declineReason = body.data.envelopeSummary.recipients.signers.find(
-    (s) => s.recipientId === body.data.recipientId!
+    (s) => s.recipientId === body.data.recipientId!,
   )?.declinedReason;
 
   await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
@@ -275,7 +275,7 @@ async function recipientDeclined(ctx: ApiContext, body: DocuSignEventBody, petit
  * */
 async function envelopeVoided(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
   const [canceller, cancellerIndex] = [signature.signature_config.signersInfo[0], 0];
   await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
@@ -297,7 +297,7 @@ async function envelopeVoided(ctx: ApiContext, body: DocuSignEventBody, petition
 /** recipient signed the document */
 async function recipientCompleted(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
 
   let signerIndex: number;
@@ -305,7 +305,7 @@ async function recipientCompleted(ctx: ApiContext, body: DocuSignEventBody, peti
   try {
     [signer, signerIndex] = findSigner(
       signature.signature_config.signersInfo,
-      body.data.recipientId!
+      body.data.recipientId!,
     );
   } catch {
     return;
@@ -334,14 +334,14 @@ async function recipientCompleted(ctx: ApiContext, body: DocuSignEventBody, peti
 /** document is completed (everyone has already signed). document and audit trail are ready to be downloaded */
 async function envelopeCompleted(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
 
   // fetch signer with most recent signed_at Date to show it on the Signature Completed email
   const lastSignerIndex = parseInt(
     maxBy(Object.entries(signature.signer_status as Record<string, { signed_at: string }>), (i) =>
-      new Date(i[1]!.signed_at).getTime()
-    )![0]
+      new Date(i[1]!.signed_at).getTime(),
+    )![0],
   );
   const signer = signature.signature_config.signersInfo[lastSignerIndex];
 
@@ -353,15 +353,15 @@ async function envelopeCompleted(ctx: ApiContext, body: DocuSignEventBody, petit
 async function recipientAutoresponded(
   ctx: ApiContext,
   body: DocuSignEventBody,
-  petitionId: number
+  petitionId: number,
 ) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
 
   const bouncedSignerExternalId = body.data.recipientId!;
   const bouncedSignerIndex = signature.signature_config.signersInfo.findIndex(
-    (s) => s.externalId === bouncedSignerExternalId
+    (s) => s.externalId === bouncedSignerExternalId,
   );
   const bouncedSigner = signature.signature_config.signersInfo[bouncedSignerIndex];
 
@@ -386,20 +386,20 @@ async function recipientAutoresponded(
           bounced_at: new Date(body.generatedDateTime),
         },
       },
-    }
+    },
   );
 
   await updateSignatureStartedEvent(
     petitionId,
     { email_bounced_at: new Date(body.generatedDateTime) },
-    ctx
+    ctx,
   );
 }
 
 /** one of the recipients reassigned their signature to another person. We need to update the recipientIds to point to the new signer */
 async function recipientReassigned(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
-    `DOCUSIGN/${body.data.envelopeId}`
+    `DOCUSIGN/${body.data.envelopeId}`,
   ))!;
 
   await ctx.petitions.updatePetitionSignatureByExternalId(`DOCUSIGN/${body.data.envelopeId}`, {
@@ -420,7 +420,7 @@ async function appendEventLogs(ctx: ApiContext, body: DocuSignEventBody): Promis
 
 function findSigner(
   signers: (PetitionSignatureConfigSigner & { externalId?: string })[],
-  recipientExternalId: string
+  recipientExternalId: string,
 ): [PetitionSignatureConfigSigner, number] {
   const signerIndex = signers.findIndex((signer) => signer.externalId === recipientExternalId);
 
@@ -429,8 +429,8 @@ function findSigner(
   if (!signer) {
     throw new Error(
       `Can't find signer on signature_config. externalId: ${recipientExternalId}, signersInfo: ${JSON.stringify(
-        signers
-      )}`
+        signers,
+      )}`,
     );
   }
 
@@ -440,7 +440,7 @@ function findSigner(
 async function updateSignatureStartedEvent(
   petitionId: number,
   newData: Omit<SignatureStartedEvent["data"], "petition_signature_request_id">,
-  ctx: ApiContext
+  ctx: ApiContext,
 ) {
   const [signatureStartedEvent] = await ctx.petitions.getPetitionEventsByType(petitionId, [
     "SIGNATURE_STARTED",

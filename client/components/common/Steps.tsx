@@ -19,5 +19,5 @@ export const Steps = chakraForwardRef<"div", StepsProps>(
         })}
       </Box>
     );
-  }
+  },
 );

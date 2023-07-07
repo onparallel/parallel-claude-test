@@ -4,7 +4,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function notEmptyObject<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
-  argName: string
+  argName: string,
 ) {
   return ((_, args, ctx, info) => {
     const data = prop(args);

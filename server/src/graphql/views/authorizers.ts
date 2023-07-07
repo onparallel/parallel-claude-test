@@ -6,7 +6,7 @@ import { Arg } from "../helpers/authorize";
 export function userHasAccessToPetitionListView<
   TypeName extends string,
   FieldName extends string,
-  TArgId extends Arg<TypeName, FieldName, Maybe<number>>
+  TArgId extends Arg<TypeName, FieldName, Maybe<number>>,
 >(petitionViewIdArg: TArgId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const id = args[petitionViewIdArg] as unknown as Maybe<number>;
@@ -24,7 +24,7 @@ export function userHasAccessToPetitionListView<
 export function validPetitionListViewReorder<
   TypeName extends string,
   FieldName extends string,
-  TArgIds extends Arg<TypeName, FieldName, number[]>
+  TArgIds extends Arg<TypeName, FieldName, number[]>,
 >(idsArg: TArgIds): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const ids = args[idsArg] as unknown as number[];

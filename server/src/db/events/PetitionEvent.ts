@@ -187,7 +187,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
 
 export type GenericPetitionEvent<
   TType extends PetitionEventType,
-  IsCreate extends boolean = false
+  IsCreate extends boolean = false,
 > = Omit<
   DbPetitionEvent,
   "type" | "data" | If<IsCreate, "id" | "created_at" | "processed_at" | "processed_by">

@@ -28,7 +28,7 @@ async function main() {
         name: d.split("/")[1],
         batch: 1,
         migration_time: migrationTime,
-      }))
+      })),
     );
   });
   await db.destroy();

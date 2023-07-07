@@ -164,7 +164,7 @@ export function useShortTextFormats() {
         validate: (value) => /^\d{5}$/.test(value),
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

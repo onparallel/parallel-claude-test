@@ -23,8 +23,8 @@ export async function up(knex: Knex): Promise<void> {
     rows.flatMap((r) =>
       r.signature_config.signersInfo
         .filter((i) => i.contactId !== undefined && i.firstName === "" && i.lastName === "")
-        .map((i) => i.contactId)
-    ) as number[]
+        .map((i) => i.contactId),
+    ) as number[],
   );
 
   const contacts = await knex.from("contact").whereIn("id", contactIds).select("*");
@@ -67,7 +67,7 @@ export async function up(knex: Knex): Promise<void> {
     )
     update petition_signature_request psr set signature_config = u.signature_config from updates u where psr.id = u.id
   `,
-      updates.flatMap((u) => [u.id, JSON.stringify(u.signature_config)])
+      updates.flatMap((u) => [u.id, JSON.stringify(u.signature_config)]),
     );
   }
 }

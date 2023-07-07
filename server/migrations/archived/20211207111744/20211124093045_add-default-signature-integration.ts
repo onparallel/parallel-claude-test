@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
       update org_integration set "name" = 'Signaturit Sandbox'
       where (settings->>'API_KEY')::text = ?
     `,
-    [process.env.SIGNATURIT_SANDBOX_API_KEY!]
+    [process.env.SIGNATURIT_SANDBOX_API_KEY!],
   );
   await knex.schema.alterTable("org_integration", (t) => {
     t.string("name").notNullable().alter();
@@ -35,12 +35,12 @@ export async function up(knex: Knex): Promise<void> {
 
   // there already are some integrations using the SIGNATURIT_SANDBOX_API_KEY, so we just need to enable those
   const existing = integrations.filter(
-    (i) => i.settings.API_KEY === process.env.SIGNATURIT_SANDBOX_API_KEY
+    (i) => i.settings.API_KEY === process.env.SIGNATURIT_SANDBOX_API_KEY,
   );
 
   const orgsWithoutIntegration = difference(
     organizations.map((o) => o.id),
-    existing.map((as) => as.org_id)
+    existing.map((as) => as.org_id),
   );
 
   if (existing.length > 0) {
@@ -48,7 +48,7 @@ export async function up(knex: Knex): Promise<void> {
       .from<OrgIntegration>("org_integration")
       .whereIn(
         "id",
-        existing.map((e) => e.id)
+        existing.map((e) => e.id),
       )
       .update({
         is_enabled: true,
@@ -68,7 +68,7 @@ export async function up(knex: Knex): Promise<void> {
         is_enabled: true,
         is_default: true,
         created_by: `Migration:20211124093045`,
-      }))
+      })),
     );
   }
 }

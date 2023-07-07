@@ -16,7 +16,7 @@ export class UserRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
     private system: SystemRepository,
-    @inject(I18N_SERVICE) private intlService: II18nService
+    @inject(I18N_SERVICE) private intlService: II18nService,
   ) {
     super(knex);
   }
@@ -31,7 +31,7 @@ export class UserRepository extends BaseRepository {
         returning u.*, ud.cognito_id as ud_cognito_id
       `,
       [this.sqlIn(cognitoIds)],
-      t
+      t,
     );
     const byCognitoId = groupBy(users, (u) => u.ud_cognito_id);
     return cognitoIds.map((id) => byCognitoId[id]?.map((u) => omit(u, ["ud_cognito_id"])) ?? []);
@@ -49,7 +49,7 @@ export class UserRepository extends BaseRepository {
         where ud.user_id in ? and u.deleted_at is null and ud.deleted_at is null
       `,
       [this.sqlIn(userIds)],
-      t
+      t,
     );
     const byUserId = groupBy(users, (u) => u.user_id);
     return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["user_id"])) ?? []);
@@ -64,11 +64,11 @@ export class UserRepository extends BaseRepository {
           where ud.delegate_user_id in ? and u.deleted_at is null and ud.deleted_at is null
         `,
         [this.sqlIn(userIds)],
-        t
+        t,
       );
       const byUserId = groupBy(users, (u) => u.delegate_user_id);
       return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["delegate_user_id"])) ?? []);
-    }
+    },
   );
 
   async syncDelegates(userId: number, delegateUserIds: MaybeArray<number>, user: User) {
@@ -88,10 +88,10 @@ export class UserRepository extends BaseRepository {
                     user_id: userId,
                     delegate_user_id: id,
                     created_by: `User:${user.id}`,
-                  }))
+                  })),
                 ),
               ],
-              t
+              t,
             )
           : null,
       ]);
@@ -111,7 +111,7 @@ export class UserRepository extends BaseRepository {
         and u.deleted_at is null and ud.deleted_at is null
       `,
       [this.sqlIn(userIds)],
-      t
+      t,
     );
 
     const byUserId = indexBy(users, (u) => u.user_id);
@@ -133,7 +133,7 @@ export class UserRepository extends BaseRepository {
 
       return externalIds.map(keyBuilder(["orgId", "externalId"])).map((key) => byId[key] ?? null);
     },
-    { cacheKeyFn: keyBuilder(["orgId", "externalId"]) }
+    { cacheKeyFn: keyBuilder(["orgId", "externalId"]) },
   );
 
   readonly loadUsersByEmail = this.buildLoader<string, User[]>(async (emails, t) => {
@@ -144,21 +144,21 @@ export class UserRepository extends BaseRepository {
         where u.deleted_at is null and ud.deleted_at is null and ud.email in ?
       `,
       [this.sqlIn(emails)],
-      t
+      t,
     );
     const byEmail = groupBy(users, (u) => u.ud_email);
     return emails.map((email) => byEmail[email]?.map((u) => omit(u, ["ud_email"])) ?? []);
   });
 
   readonly loadUsersByUserDataId = this.buildLoadMultipleBy("user", "user_data_id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   async updateUserData(
     id: MaybeArray<number>,
     data: Partial<CreateUserData>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(id);
     if (ids.length === 0) return [];
@@ -182,7 +182,7 @@ export class UserRepository extends BaseRepository {
     id: MaybeArray<number>,
     data: Partial<CreateUser>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(id);
     return await this.from("user", t)
@@ -200,7 +200,7 @@ export class UserRepository extends BaseRepository {
     orgId: number,
     data: Partial<CreateUser>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<User | null> {
     const [user] = await this.from("user", t)
       .update({
@@ -222,7 +222,7 @@ export class UserRepository extends BaseRepository {
     orgId: number,
     data: Pick<CreateUserData, "first_name" | "last_name">,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [user] = await this.from("user", t)
       .where({
@@ -243,7 +243,7 @@ export class UserRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
 
     userData ? this.loadUserData.dataloader.clear(userData.id) : null;
@@ -267,7 +267,7 @@ export class UserRepository extends BaseRepository {
           updated_by: createdBy,
         }),
       ],
-      t
+      t,
     );
     return userData;
   }
@@ -276,7 +276,7 @@ export class UserRepository extends BaseRepository {
     data: Omit<CreateUser, "user_data_id">,
     userData: CreateUserData,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const _userData = await this.getOrCreateUserData(userData, createdBy, t);
     const [user] = await this.insert(
@@ -287,7 +287,7 @@ export class UserRepository extends BaseRepository {
         created_by: createdBy,
         updated_by: createdBy,
       },
-      t
+      t,
     );
 
     const intl = await this.intlService.getIntl(userData.preferred_locale);
@@ -337,7 +337,7 @@ export class UserRepository extends BaseRepository {
         created_by: `User:${user.id}`,
         updated_by: `User:${user.id}`,
       })),
-      t
+      t,
     );
 
     await this.system.createEvent(
@@ -348,7 +348,7 @@ export class UserRepository extends BaseRepository {
           from: createdBy ? "invitation" : "sign-up",
         },
       },
-      t
+      t,
     );
 
     return user;
@@ -362,7 +362,7 @@ export class UserRepository extends BaseRepository {
       includeInactive: boolean;
       excludeUsers: number[];
       excludeUserGroups: number[];
-    }
+    },
   ) {
     const [users, userGroups] = await Promise.all([
       this.from("user")
@@ -382,7 +382,7 @@ export class UserRepository extends BaseRepository {
             q.whereEscapedILike(
               this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
               `%${escapeLike(search, "\\")}%`,
-              "\\"
+              "\\",
             ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
           });
         })
@@ -401,7 +401,7 @@ export class UserRepository extends BaseRepository {
             .whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\")
             .select<({ __type: "UserGroup" } & UserGroup)[]>(
               "*",
-              this.knex.raw(`'UserGroup' as __type`)
+              this.knex.raw(`'UserGroup' as __type`),
             )
         : undefined,
     ]);
@@ -417,10 +417,10 @@ export class UserRepository extends BaseRepository {
           where ud.id in ?
         `,
         [this.sqlIn(userDataIds)],
-        t
+        t,
       );
       const resultsById = indexBy(results, (x) => x.id);
       return userDataIds.map((id) => resultsById[id]?.path ?? null);
-    }
+    },
   );
 }

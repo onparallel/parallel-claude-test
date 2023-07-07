@@ -68,7 +68,7 @@ function useTagColors() {
         value: "#D5E7DE",
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }
 

@@ -42,7 +42,7 @@ export const ProfileEvent = interfaceType({
 
 function createProfileEvent<TypeName extends string>(
   name: TypeName,
-  definition: (t: core.ObjectDefinitionBlock<TypeName>) => void
+  definition: (t: core.ObjectDefinitionBlock<TypeName>) => void,
 ) {
   return objectType({
     name,
@@ -71,7 +71,7 @@ export const ProfileFieldValueUpdatedEvent = createProfileEvent(
         return await ctx.users.loadUser(root.data.user_id);
       },
     });
-  }
+  },
 );
 export const ProfileFieldFileAddedEvent = createProfileEvent("ProfileFieldFileAddedEvent", (t) => {
   t.nullable.field("user", {
@@ -90,7 +90,7 @@ export const ProfileFieldFileRemovedEvent = createProfileEvent(
         return await ctx.users.loadUser(root.data.user_id);
       },
     });
-  }
+  },
 );
 export const ProfileFieldExpiryUpdatedEvent = createProfileEvent(
   "ProfileFieldExpiryUpdatedEvent",
@@ -101,7 +101,7 @@ export const ProfileFieldExpiryUpdatedEvent = createProfileEvent(
         return await ctx.users.loadUser(root.data.user_id);
       },
     });
-  }
+  },
 );
 export const PetitionAssociatedEvent = createProfileEvent("PetitionAssociatedEvent", (t) => {
   t.nullable.field("user", {

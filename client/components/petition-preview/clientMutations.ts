@@ -44,7 +44,7 @@ export function useDeletePetitionReply() {
   const client = useApolloClient();
 
   const [deletePetitionReply] = useMutation(
-    PreviewPetitionFieldMutations_deletePetitionReplyDocument
+    PreviewPetitionFieldMutations_deletePetitionReplyDocument,
   );
   return useCallback(
     async function _deletePetitionReply({
@@ -60,7 +60,7 @@ export function useDeletePetitionReply() {
     }) {
       if (isCacheOnly) {
         updatePreviewFieldReplies(client, fieldId, (replies) =>
-          replies.filter(({ id }) => id !== replyId)
+          replies.filter(({ id }) => id !== replyId),
         );
       } else {
         await deletePetitionReply({
@@ -68,7 +68,7 @@ export function useDeletePetitionReply() {
         });
       }
     },
-    [deletePetitionReply]
+    [deletePetitionReply],
   );
 }
 
@@ -99,7 +99,7 @@ const _updatePetitionFieldReply = gql`
 export function useUpdatePetitionFieldReply() {
   const client = useApolloClient();
   const [updatePetitionFieldReply] = useMutation(
-    PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument
+    PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument,
   );
   return useCallback(
     async function _updatePetitionFieldReply({
@@ -145,7 +145,7 @@ export function useUpdatePetitionFieldReply() {
         });
       }
     },
-    [updatePetitionFieldReply]
+    [updatePetitionFieldReply],
   );
 }
 
@@ -178,7 +178,7 @@ export function useCreatePetitionFieldReply() {
   const client = useApolloClient();
 
   const [createPetitionFieldReply] = useMutation(
-    PreviewPetitionFieldMutations_createPetitionFieldReplyDocument
+    PreviewPetitionFieldMutations_createPetitionFieldReplyDocument,
   );
   return useCallback(
     async function _createPetitionFieldReply({
@@ -235,7 +235,7 @@ export function useCreatePetitionFieldReply() {
         return data?.createPetitionFieldReply;
       }
     },
-    [createPetitionFieldReply]
+    [createPetitionFieldReply],
   );
 }
 
@@ -283,13 +283,13 @@ const _createFileUploadReplyComplete = gql`
 
 export function useCreateFileUploadReply() {
   const [createFileUploadReply] = useMutation(
-    PreviewPetitionFieldMutations_createFileUploadReplyDocument
+    PreviewPetitionFieldMutations_createFileUploadReplyDocument,
   );
   const [createFileUploadReplyComplete] = useMutation(
-    PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument
+    PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument,
   );
   const [deletePetitionReply] = useMutation(
-    PreviewPetitionFieldMutations_deletePetitionReplyDocument
+    PreviewPetitionFieldMutations_deletePetitionReplyDocument,
   );
   const apollo = useApolloClient();
 
@@ -379,11 +379,11 @@ export function useCreateFileUploadReply() {
               variables: { petitionId, replyId: reply.id },
             });
           },
-          { concurrency: 3 }
+          { concurrency: 3 },
         );
       }
     },
-    [createFileUploadReply, createFileUploadReplyComplete]
+    [createFileUploadReply, createFileUploadReplyComplete],
   );
 }
 
@@ -401,7 +401,7 @@ const _startAsyncFieldCompletion = gql`
 
 export function useStartAsyncFieldCompletion() {
   const [startAsyncFieldCompletion] = useMutation(
-    PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument
+    PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument,
   );
 
   const apollo = useApolloClient();
@@ -442,7 +442,7 @@ export function useStartAsyncFieldCompletion() {
         return data!.startAsyncFieldCompletion;
       }
     },
-    [startAsyncFieldCompletion]
+    [startAsyncFieldCompletion],
   );
 }
 
@@ -452,8 +452,8 @@ function updatePreviewFieldReplies(
   proxy: DataProxy,
   fieldId: string,
   updateFn: (
-    cached: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment["previewReplies"]
-  ) => PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment["previewReplies"]
+    cached: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment["previewReplies"],
+  ) => PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment["previewReplies"],
 ) {
   updateFragment(proxy, {
     id: fieldId,
@@ -511,7 +511,7 @@ updatePreviewFieldReplies.fragments = {
 function updateReplyContent(
   proxy: DataProxy,
   replyId: string,
-  updateFn: (cached: Record<string, any>) => Record<string, any>
+  updateFn: (cached: Record<string, any>) => Record<string, any>,
 ) {
   updateFragment(proxy, {
     fragment: PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,

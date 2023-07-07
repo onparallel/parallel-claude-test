@@ -61,7 +61,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
   const overwriteExisting = watch("overwriteExisting");
 
   const [getSelectedPetition, { data: selectedPetitionData }] = useLazyQuery(
-    ImportRepliesDialog_petitionDocument
+    ImportRepliesDialog_petitionDocument,
   );
 
   const { data: petitionData } = useQuery(ImportRepliesDialog_petitionDocument, {
@@ -71,11 +71,11 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
   const petitionSelectorRef = useRef<PetitionSelectInstance<false>>(null);
 
   const [createPetitionFieldReplies, { loading: isSubmitting }] = useMutation(
-    ImportRepliesDialog_createPetitionFieldRepliesDocument
+    ImportRepliesDialog_createPetitionFieldRepliesDocument,
   );
 
   const setInitialMapping = async (
-    sourcePetition: ImportRepliesDialog_petitionQuery | undefined | null
+    sourcePetition: ImportRepliesDialog_petitionQuery | undefined | null,
   ) => {
     const mapping = {} as Record<string, string>;
 
@@ -83,10 +83,10 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
     const sourcePetitionFields = sourcePetition?.petition?.fields ?? [];
 
     const filteredFields = fields.filter(
-      (f) => !excludedFieldsTarget.includes(f.type) && mapping[f.id] === undefined
+      (f) => !excludedFieldsTarget.includes(f.type) && mapping[f.id] === undefined,
     );
     const filteredSourceFields = sourcePetitionFields.filter(
-      (f) => !excludedFieldsOrigin.includes(f.type)
+      (f) => !excludedFieldsOrigin.includes(f.type),
     );
 
     for (const field of filteredFields) {

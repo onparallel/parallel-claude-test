@@ -23,33 +23,33 @@ export function greetingUser({ name }: { name: string | null }, intl: IntlShape)
       id: "greeting-user",
       defaultMessage: "{name, select, null {Hi,} other {Hi {name},}}",
     },
-    { name }
+    { name },
   );
 }
 
 export function greetingContact(
   { name, fullName, tone }: { name: string; fullName: string; tone: Tone },
-  intl: IntlShape
+  intl: IntlShape,
 ) {
   return intl.formatMessage(
     {
       id: "greeting-contact",
       defaultMessage: "{tone, select, INFORMAL{Hello {name},} other{Dear {fullName},}}",
     },
-    { name, fullName, tone }
+    { name, fullName, tone },
   );
 }
 
 export function greetingReminder(
   { name, fullName, tone }: { name: string; fullName: string; tone: Tone },
-  intl: IntlShape
+  intl: IntlShape,
 ) {
   return intl.formatMessage(
     {
       id: "greeting-reminder",
       defaultMessage: "{tone, select, INFORMAL{Hello {name}!} other{Dear {fullName},}}",
     },
-    { name, fullName, tone }
+    { name, fullName, tone },
   );
 }
 
@@ -59,7 +59,7 @@ export function petitionFieldList(
   }: {
     fields: PetitionField[];
   },
-  intl: IntlShape
+  intl: IntlShape,
 ) {
   return fields
     .map(
@@ -70,7 +70,7 @@ export function petitionFieldList(
             id: "generic.untitled-field",
             defaultMessage: "Untitled field",
           })
-        }`
+        }`,
     )
     .join("\n");
 }
@@ -85,7 +85,7 @@ export function disclaimer({ email }: { email: string }, intl: IntlShape) {
       id: "disclaimer",
       defaultMessage: "This is an email sent via Parallel from the verified account {email}",
     },
-    { email }
+    { email },
   );
 }
 

@@ -9,7 +9,7 @@ import { FormattedMessage } from "react-intl";
 type SolveUnreviewedRepliesDialogAction = "APPROVE" | "REJECT" | "NOTHING";
 
 export function SolveUnreviewedRepliesDialog(
-  props: DialogProps<{}, SolveUnreviewedRepliesDialogAction>
+  props: DialogProps<{}, SolveUnreviewedRepliesDialogAction>,
 ) {
   const [value, setValue] = useState<SolveUnreviewedRepliesDialogAction>();
 

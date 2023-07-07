@@ -5,7 +5,7 @@ import {
 } from "@parallel/graphql/__types";
 
 export function getPetitionSignatureEnvironment(
-  petition: getPetitionSignatureEnvironment_PetitionFragment
+  petition: getPetitionSignatureEnvironment_PetitionFragment,
 ): SignatureOrgIntegrationEnvironment | null {
   return (
     petition.currentSignatureRequest?.environment ??

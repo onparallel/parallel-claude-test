@@ -89,7 +89,7 @@ export function RecipientViewPetitionFieldDateTime({
     (replyId: string) => async (value: FieldDateTimeReply) => {
       await onUpdateReply(replyId, value);
     },
-    [onUpdateReply]
+    [onUpdateReply],
   );
 
   const handleDelete = useMemoFactory(
@@ -115,7 +115,7 @@ export function RecipientViewPetitionFieldDateTime({
         handleAddNewReply();
       }
     },
-    [field.replies, onDeleteReply]
+    [field.replies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -144,7 +144,7 @@ export function RecipientViewPetitionFieldDateTime({
       setIsSaving(false);
     },
     1000,
-    [onCreateReply]
+    [onCreateReply],
   );
 
   const inputProps = {
@@ -251,7 +251,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   RecipientViewPetitionFieldReplyDateProps
 >(function RecipientViewPetitionFieldReplyDate(
   { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.datetime ?? "");
@@ -275,7 +275,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
       setIsSaving(false);
     },
     1000,
-    [onUpdate]
+    [onUpdate],
   );
 
   const props = {

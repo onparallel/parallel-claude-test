@@ -10,7 +10,7 @@ export const PETITION_FOLDER_REGEX = /^\/([^/]+\/)*$/;
 export function validFolderId<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<string> | null | undefined,
   argName: string,
-  allowRoot = false
+  allowRoot = false,
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
@@ -26,7 +26,9 @@ export function validFolderId<TypeName extends string, FieldName extends string>
       throw new ArgValidationError(
         info,
         argName,
-        Array.isArray(value) ? `Values are not valid folder IDs` : `Value is not a valid folder ID.`
+        Array.isArray(value)
+          ? `Values are not valid folder IDs`
+          : `Value is not a valid folder ID.`,
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

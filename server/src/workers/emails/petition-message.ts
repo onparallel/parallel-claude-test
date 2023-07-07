@@ -8,7 +8,7 @@ import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function petitionMessage(
   payload: { petition_message_id: number },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const message = await context.petitions.loadMessage(payload.petition_message_id);
   if (!message) {
@@ -29,7 +29,7 @@ export async function petitionMessage(
   }
   if (!access) {
     throw new Error(
-      `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`
+      `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`,
     );
   }
   const contact = access.contact_id ? await context.contacts.loadContact(access.contact_id) : null;
@@ -44,7 +44,7 @@ export async function petitionMessage(
 
   const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
     orgId,
-    "REMOVE_WHY_WE_USE_PARALLEL"
+    "REMOVE_WHY_WE_USE_PARALLEL",
   );
 
   const contactIds = accesses
@@ -73,7 +73,7 @@ export async function petitionMessage(
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
-    { locale: petition.recipient_locale }
+    { locale: petition.recipient_locale },
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

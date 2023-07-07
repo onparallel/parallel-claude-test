@@ -21,7 +21,7 @@ function _ListOf<T extends JsonSchema>(item: T) {
 }
 
 function _OrNull<T extends JsonSchema>(
-  item: T
+  item: T,
 ): Omit<T, "type"> & {
   type: T["type"] extends string[] ? [...T["type"], "null"] : [T["type"], "null"];
 } {
@@ -1884,7 +1884,7 @@ export const _PetitionEvent = {
               example: new Date(2020, 2, 15).toISOString(),
             },
           },
-        } as const)
+        }) as const,
     ),
 } as const;
 
@@ -1999,7 +1999,7 @@ function _PaginationOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
 }
 
 function ListOf<T extends JsonSchemaFor<any>>(
-  item: T
+  item: T,
 ): T extends JsonSchemaFor<infer U> ? JsonSchemaFor<U[]> : never;
 function ListOf<T extends JsonSchema>(item: T): JsonSchemaFor<FromSchema<T>[]>;
 function ListOf(item: any) {
@@ -2511,7 +2511,7 @@ const _ProfileFieldProperty = {
           },
           {
             arrayMerge: (_, src) => src, // don't merge arrays
-          }
+          },
         ),
         value: { ..._ProfileFieldValue, type: ["object", "null"] },
       },

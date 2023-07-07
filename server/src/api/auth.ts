@@ -10,6 +10,6 @@ export const auth = Router()
   .post("/new-password", (req, res, next) => req.context.auth.newPassword(req, res, next))
   .post("/forgot-password", (req, res, next) => req.context.auth.forgotPassword(req, res, next))
   .post("/confirm-forgot-password", (req, res, next) =>
-    req.context.auth.confirmForgotPassword(req, res, next)
+    req.context.auth.confirmForgotPassword(req, res, next),
   )
   .get("/verify-email", (req, res, next) => req.context.auth.verifyEmail(req, res, next));

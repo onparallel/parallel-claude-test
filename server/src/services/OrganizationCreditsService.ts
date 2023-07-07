@@ -15,7 +15,7 @@ export interface IOrganizationCreditsService {
 export class OrganizationCreditsService implements IOrganizationCreditsService {
   constructor(
     @inject(PetitionRepository) private petitions: PetitionRepository,
-    @inject(OrganizationRepository) private organizations: OrganizationRepository
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
   ) {}
 
   async consumePetitionSendCredits(orgId: number, amount: number, t?: Knex.Transaction) {
@@ -27,7 +27,7 @@ export class OrganizationCreditsService implements IOrganizationCreditsService {
         orgId,
         "PETITION_SEND",
         amount,
-        t
+        t,
       );
     } catch (error: any) {
       if (
@@ -45,7 +45,7 @@ export class OrganizationCreditsService implements IOrganizationCreditsService {
       await this.organizations.updateOrganizationCurrentUsageLimitCredits(
         orgId,
         "SIGNATURIT_SHARED_APIKEY",
-        amount
+        amount,
       );
     } catch (error: any) {
       if (

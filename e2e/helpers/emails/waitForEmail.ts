@@ -13,7 +13,7 @@ export interface WaitForEmailOptions {
 
 export async function waitForEmail(
   predicate: (envelope: EmailEnvelope) => boolean,
-  { user, password }: WaitForEmailOptions
+  { user, password }: WaitForEmailOptions,
 ): Promise<Email> {
   const client = new ImapFlow({
     host: "imap.gmail.com",

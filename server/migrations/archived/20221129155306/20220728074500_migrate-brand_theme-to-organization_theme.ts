@@ -24,7 +24,7 @@ export async function up(knex: Knex): Promise<void> {
     "updated_by"
     from "organization" order by id
     `,
-    [defaultBrandTheme.color, defaultBrandTheme.fontFamily]
+    [defaultBrandTheme.color, defaultBrandTheme.fontFamily],
   );
 }
 

@@ -7,21 +7,21 @@ import { fullName } from "../../util/fullName";
 
 export async function contactAuthenticationRequest(
   payload: { contact_authentication_request_id: number; is_contact_verification: boolean },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const request = await context.contacts.loadContactAuthenticationRequest(
-    payload.contact_authentication_request_id
+    payload.contact_authentication_request_id,
   );
 
   if (!request) {
     throw new Error(
-      `Contact authentication request not found for id ${payload.contact_authentication_request_id}`
+      `Contact authentication request not found for id ${payload.contact_authentication_request_id}`,
     );
   }
   const access = await context.petitions.loadAccess(request.petition_access_id);
   if (!access) {
     throw new Error(
-      `Petition access not found for contact_authentication_request.petition_access_id ${request.petition_access_id}`
+      `Petition access not found for contact_authentication_request.petition_access_id ${request.petition_access_id}`,
     );
   }
   const [contact, petition] = await Promise.all([
@@ -49,7 +49,7 @@ export async function contactAuthenticationRequest(
       isContactVerification: payload.is_contact_verification,
       ...layoutProps,
     },
-    { locale: petition.recipient_locale }
+    { locale: petition.recipient_locale },
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
@@ -62,7 +62,7 @@ export async function contactAuthenticationRequest(
 
   await context.contacts.processContactAuthenticationRequest(
     payload.contact_authentication_request_id,
-    email.id
+    email.id,
   );
 
   return email;

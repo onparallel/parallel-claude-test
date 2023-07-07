@@ -17,17 +17,17 @@ export class FeatureFlagRepository extends BaseRepository {
   async userHasFeatureFlag(
     userId: number,
     featureFlag: FeatureFlagName,
-    raw?: boolean
+    raw?: boolean,
   ): Promise<boolean>;
   async userHasFeatureFlag(
     userId: number,
     featureFlags: FeatureFlagName[],
-    raw?: boolean
+    raw?: boolean,
   ): Promise<boolean[]>;
   async userHasFeatureFlag(
     userId: number,
     featureFlag: MaybeArray<FeatureFlagName>,
-    raw?: boolean
+    raw?: boolean,
   ): Promise<boolean | boolean[]> {
     const keys = Array.isArray(featureFlag)
       ? featureFlag.map((featureFlag) => ({ userId, featureFlag }))
@@ -65,30 +65,30 @@ export class FeatureFlagRepository extends BaseRepository {
               on ffou.feature_flag_name = ff.name and ffou.user_id = su.user_id and ffou.org_id is null
         `,
         [this.sqlIn(userIds), this.sqlIn(featureFlags)],
-        t
+        t,
       );
       const results = indexBy(rows, keyBuilder(["user_id", "feature_flag"]));
       return keys
         .map(keyBuilder(["userId", "featureFlag"]))
         .map((key) => results[key]?.value ?? false);
     },
-    { cacheKeyFn: keyBuilder(["userId", "featureFlag"]) }
+    { cacheKeyFn: keyBuilder(["userId", "featureFlag"]) },
   );
 
   async orgHasFeatureFlag(
     orgId: number,
     featureFlag: FeatureFlagName,
-    raw?: boolean
+    raw?: boolean,
   ): Promise<boolean>;
   async orgHasFeatureFlag(
     orgId: number,
     featureFlags: FeatureFlagName[],
-    raw?: boolean
+    raw?: boolean,
   ): Promise<boolean[]>;
   async orgHasFeatureFlag(
     orgId: number,
     featureFlag: MaybeArray<FeatureFlagName>,
-    raw?: boolean
+    raw?: boolean,
   ): Promise<boolean | boolean[]> {
     const keys = Array.isArray(featureFlag)
       ? featureFlag.map((featureFlag) => ({ orgId, featureFlag }))
@@ -122,14 +122,14 @@ export class FeatureFlagRepository extends BaseRepository {
               on ffoo.feature_flag_name = ff.name and ffoo.org_id = so.org_id and ffoo.user_id is null
         `,
         [this.sqlIn(orgIds), this.sqlIn(featureFlags)],
-        t
+        t,
       );
       const results = indexBy(rows, keyBuilder(["org_id", "feature_flag"]));
       return keys
         .map(keyBuilder(["orgId", "featureFlag"]))
         .map((key) => results[key]?.value ?? false);
     },
-    { cacheKeyFn: keyBuilder(["orgId", "featureFlag"]) }
+    { cacheKeyFn: keyBuilder(["orgId", "featureFlag"]) },
   );
 
   async getOrganizationFeatureFlags(orgId: number, t?: Knex.Transaction) {
@@ -142,7 +142,7 @@ export class FeatureFlagRepository extends BaseRepository {
           on ffoo.org_id = ? and ffoo.user_id is null and ffoo."feature_flag_name"  = ff."name" 
     `,
       [orgId],
-      t
+      t,
     );
 
     return rows;
@@ -151,7 +151,7 @@ export class FeatureFlagRepository extends BaseRepository {
   async upsertFeatureFlagOverride(
     orgId: number,
     featureFlag: MaybeArray<{ name: FeatureFlagName; value: boolean }>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const featureFlags = unMaybeArray(featureFlag);
     if (featureFlags.length === 0) {
@@ -166,7 +166,7 @@ export class FeatureFlagRepository extends BaseRepository {
         returning *;
       `,
       [this.sqlValues(featureFlags.map(({ name, value }) => [name, orgId, value]))],
-      t
+      t,
     );
   }
 

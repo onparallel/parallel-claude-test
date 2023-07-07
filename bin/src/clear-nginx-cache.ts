@@ -15,21 +15,21 @@ async function main() {
     .send(
       new DescribeInstancesCommand({
         Filters: [{ Name: "tag-key", Values: ["Release"] }],
-      })
+      }),
     )
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
 
   const descriptions = await elb.send(
     new DescribeInstanceHealthCommand({
       LoadBalancerName: "parallel-production",
-    })
+    }),
   );
   await pMap(
     descriptions.InstanceStates!.filter((s) => s.State === "InService"),
     async (state) => {
       const instance = instances.find((i) => i.InstanceId === state.InstanceId)!;
       await executeRemoteCommand(instance.PrivateIpAddress!, "sudo rm -r /var/cache/nginx/*");
-    }
+    },
   );
 }
 

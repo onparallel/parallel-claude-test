@@ -4,10 +4,10 @@ import { timestamps } from "../../helpers/timestamps";
 export async function up(knex: Knex): Promise<any> {
   return knex.schema
     .raw(
-      `alter table "petition_field_reply" drop constraint "petition_field_reply_petition_access_id_foreign"`
+      `alter table "petition_field_reply" drop constraint "petition_field_reply_petition_access_id_foreign"`,
     )
     .raw(
-      `alter table "petition_event_log" drop constraint "petition_event_log_petition_access_id_foreign"`
+      `alter table "petition_event_log" drop constraint "petition_event_log_petition_access_id_foreign"`,
     )
     .raw(`alter table "petition_sendout" rename to "petition_sendout_old"`)
     .createTable("petition_sendout", (t) => {
@@ -29,12 +29,12 @@ export async function up(knex: Knex): Promise<any> {
             ps.deleted_at, ps.deleted_by
           from petition_sendout_old as ps
           join petition as p on p.id = ps.petition_id;
-    `
+    `,
     )
     .raw(
       `
       select setval('petition_sendout_id_seq', max("id")) from "petition_sendout"
-    `
+    `,
     )
     .alterTable("petition_field_reply", (t) => {
       t.foreign("petition_sendout_id").references("petition_sendout.id");

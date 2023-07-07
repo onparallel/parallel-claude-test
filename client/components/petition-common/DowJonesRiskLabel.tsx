@@ -77,5 +77,5 @@ export const DowJonesRiskLabel = chakraForwardRef<"span", { risk: string }>(
         </Badge>
       </Tooltip>
     );
-  }
+  },
 );

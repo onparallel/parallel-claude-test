@@ -163,7 +163,7 @@ const _queries = [
 export const PetitionSignaturesCard = Object.assign(
   chakraForwardRef<"section", PetitionSignaturesCardProps>(function PetitionSignaturesCard(
     { petition, user, isDisabled, onRefetchPetition, ...props },
-    ref
+    ref,
   ) {
     usePetitionSignaturesCardPolling(petition);
 
@@ -190,19 +190,19 @@ export const PetitionSignaturesCard = Object.assign(
     const toast = useToast();
 
     const [cancelSignatureRequest] = useMutation(
-      PetitionSignaturesCard_cancelSignatureRequestDocument
+      PetitionSignaturesCard_cancelSignatureRequestDocument,
     );
     const [startSignatureRequest] = useMutation(
-      PetitionSignaturesCard_startSignatureRequestDocument
+      PetitionSignaturesCard_startSignatureRequestDocument,
     );
     const [updateSignatureConfig] = useMutation(
-      PetitionSignaturesCard_updatePetitionSignatureConfigDocument
+      PetitionSignaturesCard_updatePetitionSignatureConfigDocument,
     );
     const [downloadSignedDoc] = useMutation(
-      PetitionSignaturesCard_signedPetitionDownloadLinkDocument
+      PetitionSignaturesCard_signedPetitionDownloadLinkDocument,
     );
     const [sendSignatureRequestReminders] = useMutation(
-      PetitionSignaturesCard_sendSignatureRequestRemindersDocument
+      PetitionSignaturesCard_sendSignatureRequestRemindersDocument,
     );
     const handleCancelSignatureProcess = useCallback(
       async (petitionSignatureRequestId: string) => {
@@ -212,7 +212,7 @@ export const PetitionSignaturesCard = Object.assign(
           });
         } catch {}
       },
-      [cancelSignatureRequest]
+      [cancelSignatureRequest],
     );
 
     const [completePetition] = useMutation(PetitionSignaturesCard_completePetitionDocument);
@@ -255,7 +255,7 @@ export const PetitionSignaturesCard = Object.assign(
           }
         }
       },
-      [completePetition, startSignatureRequest, petition]
+      [completePetition, startSignatureRequest, petition],
     );
 
     const handleDownloadSignedDoc = useCallback(
@@ -270,10 +270,10 @@ export const PetitionSignaturesCard = Object.assign(
               throw new Error();
             }
             return url!;
-          })
+          }),
         );
       },
-      [downloadSignedDoc]
+      [downloadSignedDoc],
     );
     const showSignatureConfigDialog = useSignatureConfigDialog();
 
@@ -324,7 +324,7 @@ export const PetitionSignaturesCard = Object.assign(
           });
         } catch {}
       },
-      [sendSignatureRequestReminders]
+      [sendSignatureRequestReminders],
     );
 
     return (
@@ -397,7 +397,7 @@ export const PetitionSignaturesCard = Object.assign(
       </Card>
     );
   }),
-  { fragments }
+  { fragments },
 );
 
 const POLL_INTERVAL = 30_000;

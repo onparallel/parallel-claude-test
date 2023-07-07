@@ -16,7 +16,7 @@ export async function up(knex: Knex): Promise<void> {
         feature_flag_name: "CUSTOM_HOST_UI",
         org_id: org.id,
         value: true,
-      }))
+      })),
     );
   }
 }

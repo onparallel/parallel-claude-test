@@ -6,7 +6,7 @@ import { defaultBrandTheme } from "../../util/BrandTheme";
 
 export async function appSumoActivateAccount(
   payload: { redirectUrl: string; email: string },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const { html, text, subject, from } = await buildEmail(
     AppSumoActivateAccount,
@@ -18,7 +18,7 @@ export async function appSumoActivateAccount(
       logoAlt: "Parallel",
       theme: defaultBrandTheme,
     },
-    { locale: "en" }
+    { locale: "en" },
   );
 
   return await context.emailLogs.createEmail({

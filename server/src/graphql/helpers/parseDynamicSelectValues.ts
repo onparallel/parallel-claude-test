@@ -41,7 +41,7 @@ function parseEntries(
   data: string[][],
   column = 0,
   start = 0,
-  end = data.length
+  end = data.length,
 ): DynamicSelectOption[] {
   const entries: DynamicSelectOption[] = [];
   let [currentStart, current] = [start, data[start][column]];

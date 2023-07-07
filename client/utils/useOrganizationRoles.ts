@@ -29,6 +29,6 @@ export function useOrganizationRoles() {
         }),
       },
     ],
-    []
+    [],
   );
 }

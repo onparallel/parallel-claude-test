@@ -52,11 +52,11 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
       const placeholders = usePetitionMessagePlaceholderOptions({ petition });
       const [isEnabled, setIsEnabled] = useState(petition.isCompletingMessageEnabled);
       const [subject, setSubject] = useState(
-        petition.completingMessageSubject ?? messagesSubject[petition.locale]
+        petition.completingMessageSubject ?? messagesSubject[petition.locale],
       );
       const [body, setBody] = useState(
         petition.completingMessageBody ??
-          textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders)
+          textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders),
       );
 
       const myEffectivePermission = petition.myEffectivePermission!.permissionType;
@@ -177,7 +177,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
           </Box>
         </Card>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -201,5 +201,5 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
         ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
       `,
     },
-  }
+  },
 );

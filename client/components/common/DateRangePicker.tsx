@@ -82,7 +82,7 @@ export function DateRangePicker({
         setEdgeSelection("START");
       }
     },
-    [edgeSelection, startDate?.valueOf(), endDate?.valueOf()]
+    [edgeSelection, startDate?.valueOf(), endDate?.valueOf()],
   );
 
   const dateProps = useCallback<CalendarMonthDateProps>(
@@ -119,7 +119,7 @@ export function DateRangePicker({
         },
       };
     },
-    [startDate?.valueOf(), endDate?.valueOf()]
+    [startDate?.valueOf(), endDate?.valueOf()],
   );
 
   const wrapperProps = useCallback<CalendarMonthDateWrapperProps>(
@@ -206,7 +206,7 @@ export function DateRangePicker({
         },
       };
     },
-    [startDate?.valueOf(), endDate?.valueOf(), hoveredDate?.valueOf(), edgeSelection]
+    [startDate?.valueOf(), endDate?.valueOf(), hoveredDate?.valueOf(), edgeSelection],
   );
 
   return (

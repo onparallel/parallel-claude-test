@@ -14,13 +14,13 @@ interface PetitionFieldCommentContentProps {
 export const PetitionFieldCommentContent = Object.assign(
   chakraForwardRef<"div", PetitionFieldCommentContentProps>(function CommentContent(
     { comment, ...props },
-    ref
+    ref,
   ) {
     const options: HTMLReactParserOptions = {
       replace(domNode) {
         if (domNode instanceof Element && domNode.name === "mention") {
           const mention = comment.mentions.find(
-            (m) => m.mentionedId === domNode.attribs["data-mention-id"]
+            (m) => m.mentionedId === domNode.attribs["data-mention-id"],
           )!;
           return <Mention mention={mention} />;
         }
@@ -33,7 +33,7 @@ export const PetitionFieldCommentContent = Object.assign(
               ADD_TAGS: ["mention"],
               ADD_ATTR: ["data-mention-id"],
             }),
-            options
+            options,
           )
         : null;
     }, [comment.contentHtml]);
@@ -62,5 +62,5 @@ export const PetitionFieldCommentContent = Object.assign(
         ${Mention.fragments.PetitionFieldCommentMention}
       `,
     },
-  }
+  },
 );

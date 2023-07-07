@@ -21,7 +21,7 @@ const _queries = [
 ];
 
 export function usePetitionSignaturesCardPolling(
-  petition: PetitionSignaturesCard_PetitionFragment
+  petition: PetitionSignaturesCard_PetitionFragment,
 ) {
   const current = petition.signatureRequests.at(0);
   const { startPolling, stopPolling } = useQuery(PetitionSignaturesCardPolling_petitionDocument, {

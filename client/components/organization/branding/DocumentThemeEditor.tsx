@@ -84,7 +84,7 @@ export function DocumentThemeEditor({
       fonts.sort(function (a, b) {
         return a.family.localeCompare(b.family);
       }),
-    [fonts]
+    [fonts],
   );
 
   return (

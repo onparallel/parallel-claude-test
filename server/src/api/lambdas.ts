@@ -116,11 +116,11 @@ function customMessageAccountVerificationResponse(): CustomMessageRequestHandler
           activationUrl: `${
             process.env.PARALLEL_URL
           }/api/auth/verify-email?email=${encodeURIComponent(
-            email
+            email,
           )}&code=${codeParameter}&locale=${locale}`,
           ...layoutProps(req.context.config.misc),
         },
-        { locale }
+        { locale },
       );
 
       res.json({
@@ -155,7 +155,7 @@ function customMessageUserInviteResponse(): CustomMessageRequestHandler<UserInvi
           isNewUser: true, // invites sent by aws cognito will always be on new users
           ...layoutProps(req.context.config.misc),
         },
-        { locale }
+        { locale },
       );
 
       res.json({
@@ -185,7 +185,7 @@ function customMessageForgotPasswordResponse(): CustomMessageRequestHandler<Loca
           verificationCode: codeParameter,
           ...layoutProps(req.context.config.misc),
         },
-        { locale }
+        { locale },
       );
 
       res.json({
@@ -220,20 +220,20 @@ export const lambdas = Router()
   .post(
     "/CustomMessage_SignUp",
     verifyRequestPayload(customMessageSchema(LocaleMetadataSchema)),
-    customMessageAccountVerificationResponse()
+    customMessageAccountVerificationResponse(),
   )
   .post(
     "/CustomMessage_ResendCode",
     verifyRequestPayload(customMessageSchema(LocaleMetadataSchema)),
-    customMessageAccountVerificationResponse()
+    customMessageAccountVerificationResponse(),
   )
   .post(
     "/CustomMessage_AdminCreateUser",
     verifyRequestPayload(customMessageSchema(UserInviteMetadataSchema)),
-    customMessageUserInviteResponse()
+    customMessageUserInviteResponse(),
   )
   .post(
     "/CustomMessage_ForgotPassword",
     verifyRequestPayload(customMessageSchema(LocaleMetadataSchema)),
-    customMessageForgotPasswordResponse()
+    customMessageForgotPasswordResponse(),
   );

@@ -16,10 +16,11 @@ declare module "knex" {
       ): QueryBuilder<TRecord, TResult>;
     }
     interface WhereLike<TRecord = any, TResult = unknown[]> {
-      (columnName: keyof TRecord | Raw, pattern: string, escape?: string): QueryBuilder<
-        TRecord,
-        TResult
-      >;
+      (
+        columnName: keyof TRecord | Raw,
+        pattern: string,
+        escape?: string,
+      ): QueryBuilder<TRecord, TResult>;
       (columnName: string, pattern: string, escape?: string): QueryBuilder<TRecord, TResult>;
     }
   }

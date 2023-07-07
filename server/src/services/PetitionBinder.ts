@@ -61,7 +61,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(STORAGE_SERVICE) private storage: IStorageService,
     @inject(PRINTER) private printer: IPrinter,
-    @inject(LOGGER) private logger: ILogger
+    @inject(LOGGER) private logger: ILogger,
   ) {}
 
   private temporaryDirectory = "";
@@ -75,7 +75,7 @@ export class PetitionBinder implements IPetitionBinder {
       outputFileName,
       includeAnnexedDocuments,
       includeNetDocumentsLinks,
-    }: PetitionBinderOptions
+    }: PetitionBinderOptions,
   ) {
     try {
       // first of all, create temporary directory to store all tmp files and delete it when finished
@@ -92,7 +92,7 @@ export class PetitionBinder implements IPetitionBinder {
       }
 
       const documentTheme = await this.organizations.loadOrganizationTheme(
-        petition.document_organization_theme_id
+        petition.document_organization_theme_id,
       );
 
       if (documentTheme?.type !== "PDF_DOCUMENT") {
@@ -105,7 +105,7 @@ export class PetitionBinder implements IPetitionBinder {
           documentTitle,
           showSignatureBoxes,
           includeNetDocumentsLinks,
-        })
+        }),
       );
 
       const annexedDocumentPaths = includeAnnexedDocuments
@@ -120,14 +120,14 @@ export class PetitionBinder implements IPetitionBinder {
                     fieldTitle: field.title,
                     theme: documentTheme.data,
                   },
-                  petition?.recipient_locale ?? "en"
-                )
+                  petition?.recipient_locale ?? "en",
+                ),
               );
 
               const filePaths = await this.downloadFileUpload(files, userId, documentTheme);
               return [coverPagePath, ...filePaths];
             },
-            { concurrency: 2 }
+            { concurrency: 2 },
           )
         : [];
 
@@ -137,13 +137,13 @@ export class PetitionBinder implements IPetitionBinder {
           await this.downloadFileUpload(
             (
               await this.files.loadFileUpload(
-                attachments.filter((a) => a.type === type).map((a) => a.file_upload_id)
+                attachments.filter((a) => a.type === type).map((a) => a.file_upload_id),
               )
             ).filter(isDefined),
             userId,
-            documentTheme
+            documentTheme,
           ),
-        ])
+        ]),
       ) as Record<PetitionAttachmentType, string[]>;
 
       return await this.merge(
@@ -157,7 +157,7 @@ export class PetitionBinder implements IPetitionBinder {
         {
           maxOutputSize,
           outputFileName: outputFileName ? sanitizeFilename(outputFileName) : undefined,
-        }
+        },
       );
     } finally {
       try {
@@ -168,7 +168,7 @@ export class PetitionBinder implements IPetitionBinder {
 
   private async merge(
     filePaths: string[],
-    opts?: { maxOutputSize?: number; outputFileName?: string }
+    opts?: { maxOutputSize?: number; outputFileName?: string },
   ) {
     const DPIValues = [144, 110, 96, 72];
     let resultFilePath = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
@@ -223,7 +223,7 @@ export class PetitionBinder implements IPetitionBinder {
         `-sOutputFile=${output}`,
         path,
       ],
-      { timeout: 120_000, stdio: "inherit" }
+      { timeout: 120_000, stdio: "inherit" },
     );
 
     return output;
@@ -264,7 +264,7 @@ export class PetitionBinder implements IPetitionBinder {
 
   private async convertImage(fileS3Path: string, contentType: string) {
     const tmpPath = await this.writeTemporaryFile(
-      await this.storage.fileUploads.downloadFile(fileS3Path)
+      await this.storage.fileUploads.downloadFile(fileS3Path),
     );
 
     const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
@@ -279,7 +279,7 @@ export class PetitionBinder implements IPetitionBinder {
         "-flatten",
         output,
       ],
-      { timeout: 120_000, stdio: "inherit" }
+      { timeout: 120_000, stdio: "inherit" },
     );
     return output;
   }
@@ -294,11 +294,11 @@ export class PetitionBinder implements IPetitionBinder {
 
     const visibleFieldWithReplies = zip(
       fieldsWithReplies,
-      evaluateFieldVisibility(fieldsWithReplies)
+      evaluateFieldVisibility(fieldsWithReplies),
     )
       .filter(
         ([field, isVisible]) =>
-          isVisible && isFileTypeField(field.type) && !!field.options.attachToPdf
+          isVisible && isFileTypeField(field.type) && !!field.options.attachToPdf,
       )
       .map(([field]) => field);
 
@@ -329,25 +329,25 @@ export class PetitionBinder implements IPetitionBinder {
                 ? await this.storage.fileUploads.getSignedDownloadEndpoint(
                     file.path,
                     file.filename,
-                    "inline"
+                    "inline",
                   )
                 : await this.convertImage(file.path, file.content_type);
 
             return await this.writeTemporaryFile(
-              this.printer.imageToPdf(userId, { imageUrl, theme: theme.data })
+              this.printer.imageToPdf(userId, { imageUrl, theme: theme.data }),
             );
           } else if (file.content_type === "application/pdf") {
             return await this.writeTemporaryFile(
-              await this.storage.fileUploads.downloadFile(file.path)
+              await this.storage.fileUploads.downloadFile(file.path),
             );
           } else {
             this.logger.warn(
-              `Cannot annex ${file.content_type} FileUpload:${file.id} to pdf binder. Skipping...`
+              `Cannot annex ${file.content_type} FileUpload:${file.id} to pdf binder. Skipping...`,
             );
             return null;
           }
         },
-        { concurrency: 1 }
+        { concurrency: 1 },
       )
     ).filter(isDefined);
   }

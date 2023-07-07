@@ -51,7 +51,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
       }
     },
     300,
-    [field.id, aliasError]
+    [field.id, aliasError],
   );
 
   const handleAliasChange = function (event: ChangeEvent<HTMLInputElement>) {

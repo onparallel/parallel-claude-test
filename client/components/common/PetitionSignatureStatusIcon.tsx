@@ -50,7 +50,7 @@ export function PetitionSignatureStatusIcon({
           ? "gray.300"
           : "#DBBC8E",
     }),
-    [environment, status]
+    [environment, status],
   );
 
   return (

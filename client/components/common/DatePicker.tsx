@@ -26,7 +26,7 @@ export function DatePicker({
       setCurrentMonth(startOfMonth(date));
       onChange?.(date);
     },
-    [onChange]
+    [onChange],
   );
 
   const dateProps = useCallback<CalendarMonthDateProps>(
@@ -44,7 +44,7 @@ export function DatePicker({
         onClick: () => handleDateSelected(date),
       };
     },
-    [handleDateSelected, isPastAllowed, isDisabledDate, selectedDate]
+    [handleDateSelected, isPastAllowed, isDisabledDate, selectedDate],
   );
 
   return (

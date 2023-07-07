@@ -42,14 +42,14 @@ export async function loadEnv(overrides?: string) {
         const response = await secretsManager.send(new GetSecretValueCommand({ SecretId: arn }));
         return safeJsonParse(response.SecretString!);
       },
-      { concurrency: 100 }
+      { concurrency: 100 },
     );
   });
 
   // iterates over all env variables and replaces the ones that are secrets from AWS Secrets Manager
   await pMap(
     Object.entries(process.env).filter(
-      ([, value]) => isDefined(value) && SECRETS_MANAGER_REGEX.test(value)
+      ([, value]) => isDefined(value) && SECRETS_MANAGER_REGEX.test(value),
     ),
     async ([key, value]) => {
       try {
@@ -66,6 +66,6 @@ export async function loadEnv(overrides?: string) {
         console.error(`Error fetching secret ${key}=${value}`);
         throw error;
       }
-    }
+    },
   );
 }

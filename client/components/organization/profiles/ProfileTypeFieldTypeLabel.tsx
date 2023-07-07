@@ -37,5 +37,5 @@ export const ProfileTypeFieldTypeLabel = chakraForwardRef<"div", ProfileTypeFiel
         </Text>
       </Box>
     );
-  }
+  },
 );

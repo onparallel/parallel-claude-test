@@ -29,7 +29,7 @@ const email: Email<SignatureCompletedProps> = {
   },
   text(
     { signerName: fullName, signatureProvider, theme }: SignatureCompletedProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
       ${greetingContact({ name: fullName, fullName, tone: theme.preferredTone }, intl)}
@@ -40,7 +40,7 @@ const email: Email<SignatureCompletedProps> = {
           defaultMessage:
             "Please find attached a copy of the document you just signed through {signatureProvider}.",
         },
-        { signatureProvider, tone: theme.preferredTone }
+        { signatureProvider, tone: theme.preferredTone },
       )}
 
       ${closing({}, intl)}

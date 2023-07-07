@@ -86,7 +86,7 @@ if (process.env.TS_NODE_DEV) {
   express()
     .disable("x-powered-by")
     .get("/ping", (req, res, next) =>
-      res.set("content-type", "text/plain").status(200).send("pong")
+      res.set("content-type", "text/plain").status(200).send("pong"),
     )
     .use("/api", cors(), cookieParser(), api(container))
     .use(
@@ -100,7 +100,7 @@ if (process.env.TS_NODE_DEV) {
           context.req = req;
           return context;
         },
-      })
+      }),
     )
     .listen(port, () => {
       const host = `http://localhost:${port}`;

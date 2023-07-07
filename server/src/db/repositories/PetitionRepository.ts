@@ -203,7 +203,7 @@ export class PetitionRepository extends BaseRepository {
     @inject(QUEUES_SERVICE) private queues: QueuesService,
     @inject(LOGGER) private logger: ILogger,
     @inject(FileRepository) private files: FileRepository,
-    @inject(OrganizationRepository) private organizations: OrganizationRepository
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
   ) {
     super(knex);
   }
@@ -213,7 +213,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadField = this.buildLoadBy("petition_field", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadFieldReply = this.buildLoadBy("petition_field_reply", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadFieldForReply = this.buildLoader<number, PetitionField | null>(
@@ -225,17 +225,17 @@ export class PetitionRepository extends BaseRepository {
         where pfr.id in ? and pf.deleted_at is null and pfr.deleted_at is null
       `,
         [this.sqlIn(replyIds)],
-        t
+        t,
       );
       const byPfrId = indexBy(fields, (f) => f._pfr_id);
       return replyIds.map((id) => (byPfrId[id] ? omit(byPfrId[id], ["_pfr_id"]) : null));
-    }
+    },
   );
 
   async getPetitionsForTemplateRepliesReport(
     templateId: number,
     startDate?: Maybe<Date>,
-    endDate?: Maybe<Date>
+    endDate?: Maybe<Date>,
   ) {
     return await this.from("petition")
       .where({
@@ -254,12 +254,12 @@ export class PetitionRepository extends BaseRepository {
   async userHasAccessToPetitions(
     userId: number,
     petitionIds: number[],
-    permissionTypes?: PetitionPermissionType[]
+    permissionTypes?: PetitionPermissionType[],
   ) {
     const permissions = await this.userHasAccessToPetitionsRaw(
       userId,
       petitionIds,
-      permissionTypes
+      permissionTypes,
     );
     return permissions.every((p) => p);
   }
@@ -267,7 +267,7 @@ export class PetitionRepository extends BaseRepository {
   async userHasAccessToPetitionsRaw(
     userId: number,
     petitionIds: number[],
-    permissionTypes?: PetitionPermissionType[]
+    permissionTypes?: PetitionPermissionType[],
   ) {
     const rows = await this.from("petition_permission")
       .where({ user_id: userId })
@@ -301,7 +301,7 @@ export class PetitionRepository extends BaseRepository {
       comments.every((c) => !!c) &&
       (await this.userHasAccessToPetitions(
         userId,
-        comments.map((c) => c!.petition_id)
+        comments.map((c) => c!.petition_id),
       ))
     );
   }
@@ -406,7 +406,7 @@ export class PetitionRepository extends BaseRepository {
           and pfr.id in ?
           and pfr.deleted_at is null
     `,
-      [fieldId, this.sqlIn(replyIds)]
+      [fieldId, this.sqlIn(replyIds)],
     );
     return count === new Set(replyIds).size;
   }
@@ -424,7 +424,7 @@ export class PetitionRepository extends BaseRepository {
           and pfr.id in ?
           and pf.deleted_at is null and pfr.deleted_at is null
     `,
-      [petitionId, this.sqlIn(replyIds)]
+      [petitionId, this.sqlIn(replyIds)],
     );
     return count === new Set(replyIds).size;
   }
@@ -438,7 +438,7 @@ export class PetitionRepository extends BaseRepository {
       excludeAnonymized?: boolean;
       sortBy?: SortBy<"name" | "lastUsedAt" | "sentAt" | "createdAt">[];
       filters?: PetitionFilter | null;
-    } & PageOpts
+    } & PageOpts,
   ): Pagination<
     | Petition
     | {
@@ -457,7 +457,7 @@ export class PetitionRepository extends BaseRepository {
         q
           .joinRaw(
             /* sql */ `join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null`,
-            [userId]
+            [userId],
           )
           .joinRaw(/* sql */ `left join petition_message pm on p.id = pm.petition_id`)
           .where("p.org_id", orgId)
@@ -473,7 +473,7 @@ export class PetitionRepository extends BaseRepository {
         } else if (type === "PETITION") {
           q.joinRaw(/* sql */ `left join petition_access pa on p.id = pa.petition_id `)
             .joinRaw(
-              /* sql */ `left join contact c on pa.contact_id = c.id and c.deleted_at is null`
+              /* sql */ `left join contact c on pa.contact_id = c.id and c.deleted_at is null`,
             )
             .whereRaw(
               /* sql */ ` 
@@ -490,7 +490,7 @@ export class PetitionRepository extends BaseRepository {
                 )
               )
             `,
-              { search: `%${escapeLike(search, "\\")}%` }
+              { search: `%${escapeLike(search, "\\")}%` },
             );
         } else {
           q.whereRaw(
@@ -502,7 +502,7 @@ export class PetitionRepository extends BaseRepository {
               ))
               or p.template_description ilike :search escape '\\'
             )`,
-            { search: `%${escapeLike(search, "\\")}%` }
+            { search: `%${escapeLike(search, "\\")}%` },
           );
         }
       });
@@ -555,7 +555,7 @@ export class PetitionRepository extends BaseRepository {
       const { filters: sharedWithFilters, operator } = filters.sharedWith;
       builders.push((q) => {
         q.joinRaw(
-          /* sql */ `join petition_permission pp2 on pp2.petition_id = p.id and pp2.deleted_at is null`
+          /* sql */ `join petition_permission pp2 on pp2.petition_id = p.id and pp2.deleted_at is null`,
         ).modify((q) => {
           for (const filter of sharedWithFilters) {
             const { id, type } = fromGlobalId(filter.value);
@@ -570,7 +570,7 @@ export class PetitionRepository extends BaseRepository {
                 q = filter.operator.startsWith("NOT_") ? q.not : q;
                 q.havingRaw(
                   /* sql */ `? = any(array_remove(array_agg(distinct pp2.${column}), null))`,
-                  [id]
+                  [id],
                 );
                 break;
               case "IS_OWNER":
@@ -578,7 +578,7 @@ export class PetitionRepository extends BaseRepository {
                 q = filter.operator.startsWith("NOT_") ? q.not : q;
                 q.havingRaw(
                   /* sql */ `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
-                  [id]
+                  [id],
                 );
                 break;
             }
@@ -655,7 +655,7 @@ export class PetitionRepository extends BaseRepository {
               )
             `);
           }
-        })
+        }),
       );
     }
 
@@ -687,7 +687,7 @@ export class PetitionRepository extends BaseRepository {
                 }
               })
               .groupBy("p.id")
-              .select(this.knex.raw(/* sql */ `distinct p.id`))
+              .select(this.knex.raw(/* sql */ `distinct p.id`)),
           )
           .from("ps")
           .select<[{ count: number }]>(this.count()),
@@ -708,8 +708,8 @@ export class PetitionRepository extends BaseRepository {
                   .select(
                     this.knex.raw(/* sql */ `distinct get_folder_after_prefix(p.path, ?)`, [
                       filters.path,
-                    ])
-                  )
+                    ]),
+                  ),
               )
               .from("ps")
               .select<[{ count: number }]>(this.count())
@@ -735,7 +735,7 @@ export class PetitionRepository extends BaseRepository {
               q.orderByRaw(`is_folder ${order}, last_used_at ${order}`);
             } else if (column === "sentAt") {
               q.orderByRaw(
-                `is_folder ${order}, sent_at ${order}, status asc, created_at ${order}, _name ${reverse}`
+                `is_folder ${order}, sent_at ${order}, status asc, created_at ${order}, _name ${reverse}`,
               );
             } else if (column === "createdAt") {
               q.orderByRaw(`is_folder ${order}, created_at ${order}`);
@@ -763,7 +763,7 @@ export class PetitionRepository extends BaseRepository {
                   from petition as p where p.created_by = ? group by p.from_template_id
                 ) as t on t.template_id = p.id
               `,
-                [`User:${userId}`]
+                [`User:${userId}`],
               );
             }
           })
@@ -776,9 +776,9 @@ export class PetitionRepository extends BaseRepository {
             this.knex.raw(/* sql */ `min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at`),
             opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE"
               ? this.knex.raw(
-                  /* sql */ `greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at`
+                  /* sql */ `greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at`,
                 )
-              : this.knex.raw(/* sql */ `null as last_used_at`)
+              : this.knex.raw(/* sql */ `null as last_used_at`),
           );
 
         const items: (Petition & {
@@ -810,9 +810,9 @@ export class PetitionRepository extends BaseRepository {
                     .select(
                       "p.id",
                       "p.path",
-                      this.knex.raw(/* sql */ `min(pp.type) as effective_permission`)
+                      this.knex.raw(/* sql */ `min(pp.type) as effective_permission`),
                     )
-                    .groupBy("p.id")
+                    .groupBy("p.id"),
                 )
                 .with(
                   "fs",
@@ -823,9 +823,9 @@ export class PetitionRepository extends BaseRepository {
                         filters!.path!,
                       ]),
                       this.count("petition_count"),
-                      this.knex.raw(/* sql */ `max(ps.effective_permission) as min_permission`)
+                      this.knex.raw(/* sql */ `max(ps.effective_permission) as min_permission`),
                     )
-                    .groupBy("_name")
+                    .groupBy("_name"),
                 )
                 .with("p", petitionsQuery)
                 .from("p")
@@ -843,7 +843,7 @@ export class PetitionRepository extends BaseRepository {
                       "fs.min_permission",
                       "fs._name",
                       this.knex.raw(/* sql */ `null as sent_at`),
-                      this.knex.raw(/* sql */ `null as last_used_at`)
+                      this.knex.raw(/* sql */ `null as last_used_at`),
                     ),
                 ])
                 .modify(applyOrder)
@@ -858,24 +858,24 @@ export class PetitionRepository extends BaseRepository {
                 is_folder: true as const,
                 path: `${filters!.path}${i._name}/`,
               }
-            : omit(i, ["_name", "petition_count", "is_folder", "min_permission"])
+            : omit(i, ["_name", "petition_count", "is_folder", "min_permission"]),
         );
       }),
     };
   }
 
   readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>
-    q.whereNull("deleted_at").orderBy("position")
+    q.whereNull("deleted_at").orderBy("position"),
   );
 
   readonly loadFieldsForPetitionWithNullVisibility = this.buildLoadMultipleBy(
     "petition_field",
     "petition_id",
-    (q) => q.where({ deleted_at: null, visibility: null }).orderBy("position")
+    (q) => q.where({ deleted_at: null, visibility: null }).orderBy("position"),
   );
 
   readonly loadFieldCountForPetition = this.buildLoadCountBy("petition_field", "petition_id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadPetitionProgress = this.buildLoader<
@@ -896,7 +896,7 @@ export class PetitionRepository extends BaseRepository {
     }
   >(async (petitionIds) => {
     const fieldsWithRepliesByPetitionId = await this.getPetitionFieldsWithReplies(
-      petitionIds as number[]
+      petitionIds as number[],
     );
 
     return fieldsWithRepliesByPetitionId.map((fieldsWithReplies) => {
@@ -906,19 +906,19 @@ export class PetitionRepository extends BaseRepository {
 
       const visibleInternalFields = zip(
         fieldsWithReplies,
-        evaluateFieldVisibility(fieldsWithReplies)
+        evaluateFieldVisibility(fieldsWithReplies),
       )
         .filter(([field, isVisible]) => isVisible && field.is_internal)
         .map(([field]) => field);
 
       const validatedExternal = countBy(
         visibleFields,
-        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
       );
 
       const validatedInternal = countBy(
         visibleInternalFields,
-        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
       );
 
       return {
@@ -928,11 +928,11 @@ export class PetitionRepository extends BaseRepository {
             visibleFields,
             (f) =>
               completedFieldReplies(f).length > 0 &&
-              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
+              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
           ),
           optional: countBy(
             visibleFields,
-            (f) => f.optional && completedFieldReplies(f).length === 0
+            (f) => f.optional && completedFieldReplies(f).length === 0,
           ),
           total: visibleFields.length,
         },
@@ -943,11 +943,11 @@ export class PetitionRepository extends BaseRepository {
             visibleInternalFields,
             (f) =>
               completedFieldReplies(f).length > 0 &&
-              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
+              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
           ),
           optional: countBy(
             visibleInternalFields,
-            (f) => f.optional && completedFieldReplies(f).length === 0
+            (f) => f.optional && completedFieldReplies(f).length === 0,
           ),
           total: visibleInternalFields.length,
         },
@@ -964,7 +964,7 @@ export class PetitionRepository extends BaseRepository {
     }
   >(async (petitionIds) => {
     const fieldsWithRepliesByPetitionId = await this.getPetitionFieldsWithReplies(
-      petitionIds as number[]
+      petitionIds as number[],
     );
 
     return fieldsWithRepliesByPetitionId.map((fieldsWithReplies) => {
@@ -976,7 +976,7 @@ export class PetitionRepository extends BaseRepository {
         replied: countBy(visibleFields, (f) => completedFieldReplies(f).length > 0),
         optional: countBy(
           visibleFields,
-          (f) => f.optional && completedFieldReplies(f).length === 0
+          (f) => f.optional && completedFieldReplies(f).length === 0,
         ),
         total: visibleFields.length,
       };
@@ -990,13 +990,13 @@ export class PetitionRepository extends BaseRepository {
   readonly loadActiveAccessByContactId = this.buildLoadMultipleBy(
     "petition_access",
     "contact_id",
-    (q) => q.where("status", "ACTIVE")
+    (q) => q.where("status", "ACTIVE"),
   );
 
   readonly loadAccessesForPetition = this.buildLoadMultipleBy(
     "petition_access",
     "petition_id",
-    (q) => q.orderBy("id")
+    (q) => q.orderBy("id"),
   );
 
   async createAccesses(
@@ -1012,7 +1012,7 @@ export class PetitionRepository extends BaseRepository {
     >[],
     user: User,
     fromPublicPetitionLink: boolean,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const rows =
       data.length === 0
@@ -1028,7 +1028,7 @@ export class PetitionRepository extends BaseRepository {
               created_by: `User:${item.delegate_granter_id ?? user.id}`,
               updated_by: `User:${item.delegate_granter_id ?? user.id}`,
             })),
-            t
+            t,
           );
     fromPublicPetitionLink
       ? await this.createEvent(
@@ -1039,7 +1039,7 @@ export class PetitionRepository extends BaseRepository {
               petition_access_id: access.id,
             },
           })),
-          t
+          t,
         )
       : await this.createEvent(
           rows.map((access) => ({
@@ -1051,7 +1051,7 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
 
-          t
+          t,
         );
 
     return rows;
@@ -1062,7 +1062,7 @@ export class PetitionRepository extends BaseRepository {
     granterId: number,
     contactId: number | null,
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [access] = await this.insert(
       "petition_access",
@@ -1076,7 +1076,7 @@ export class PetitionRepository extends BaseRepository {
         created_by: `User:${user.id}`,
         updated_by: `User:${user.id}`,
       },
-      t
+      t,
     ).returning("*");
 
     return access;
@@ -1086,7 +1086,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     granterId: number,
     contactId: number,
-    recipient: Contact
+    recipient: Contact,
   ) {
     const [access] = await this.insert("petition_access", {
       petition_id: petitionId,
@@ -1110,13 +1110,13 @@ export class PetitionRepository extends BaseRepository {
   readonly loadMessagesByPetitionAccessId = this.buildLoadMultipleBy(
     "petition_message",
     "petition_access_id",
-    (q) => q.orderBy("created_at", "asc")
+    (q) => q.orderBy("created_at", "asc"),
   );
 
   readonly loadMessagesByPetitionId = this.buildLoadMultipleBy(
     "petition_message",
     "petition_id",
-    (q) => q.orderBy("created_at", "asc")
+    (q) => q.orderBy("created_at", "asc"),
   );
 
   async createMessages(
@@ -1127,7 +1127,7 @@ export class PetitionRepository extends BaseRepository {
       "status" | "petition_access_id" | "email_subject" | "email_body"
     >[],
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const rows =
       data.length === 0
@@ -1142,7 +1142,7 @@ export class PetitionRepository extends BaseRepository {
               sender_id: user.id,
               created_by: `User:${user.id}`,
             })),
-            t
+            t,
           );
 
     if (scheduledAt) {
@@ -1154,7 +1154,7 @@ export class PetitionRepository extends BaseRepository {
             petition_message_id: message.id,
           },
         })),
-        t
+        t,
       );
     }
 
@@ -1167,7 +1167,7 @@ export class PetitionRepository extends BaseRepository {
         {
           status: "CANCELLED",
         },
-        "*"
+        "*",
       ),
       this.createEvent({
         type: "MESSAGE_CANCELLED",
@@ -1185,7 +1185,7 @@ export class PetitionRepository extends BaseRepository {
   async cancelScheduledMessagesByAccessIds(
     accessIds: number[],
     userId?: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const messages = await this.from("petition_message", t)
       .whereIn("petition_access_id", accessIds)
@@ -1194,7 +1194,7 @@ export class PetitionRepository extends BaseRepository {
         {
           status: "CANCELLED",
         },
-        "*"
+        "*",
       );
 
     await this.createEvent(
@@ -1207,7 +1207,7 @@ export class PetitionRepository extends BaseRepository {
           reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
       })),
-      t
+      t,
     );
 
     return messages;
@@ -1218,7 +1218,7 @@ export class PetitionRepository extends BaseRepository {
     accessIds: number[],
     updatedBy: string,
     userId?: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [accesses] = await Promise.all([
       this.from("petition_access", t).whereIn("id", accessIds).where("status", "ACTIVE").update(
@@ -1229,7 +1229,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       ),
       this.cancelScheduledMessagesByAccessIds(accessIds, userId, t),
     ]);
@@ -1244,7 +1244,7 @@ export class PetitionRepository extends BaseRepository {
           reason: isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED",
         },
       })),
-      t
+      t,
     );
   }
 
@@ -1252,7 +1252,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     accessIds: number[],
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [accesses] = await Promise.all([
       this.from("petition_access", t).whereIn("id", accessIds).where("status", "ACTIVE").update(
@@ -1263,7 +1263,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       ),
       this.cancelScheduledMessagesByAccessIds(accessIds, undefined, t),
     ]);
@@ -1277,7 +1277,7 @@ export class PetitionRepository extends BaseRepository {
           reason: "PETITION_ANONYMIZED",
         },
       })),
-      t
+      t,
     );
   }
 
@@ -1291,7 +1291,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `User:${user.id}`,
         },
-        "*"
+        "*",
       );
     await this.createEvent(
       accesses.map((access) => ({
@@ -1301,7 +1301,7 @@ export class PetitionRepository extends BaseRepository {
           petition_access_id: access.id,
           user_id: user.id,
         },
-      }))
+      })),
     );
   }
 
@@ -1309,7 +1309,7 @@ export class PetitionRepository extends BaseRepository {
     accessId: number,
     contactId: number,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.from("petition_access", t)
       .where("id", accessId)
@@ -1321,7 +1321,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
   }
 
@@ -1338,7 +1338,7 @@ export class PetitionRepository extends BaseRepository {
         status: "PROCESSED",
         email_log_id: emailLogId,
       },
-      "*"
+      "*",
     );
     return row;
   }
@@ -1347,7 +1347,7 @@ export class PetitionRepository extends BaseRepository {
     data: Omit<TableCreateTypes["petition"], "org_id" | "document_organization_theme_id">,
     user: User,
     skipFields?: boolean,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.withTransaction(async (t) => {
       const [defaultDocumentTheme] = await this.from("organization_theme", t)
@@ -1369,7 +1369,7 @@ export class PetitionRepository extends BaseRepository {
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
         },
-        t
+        t,
       );
 
       await this.insert(
@@ -1380,7 +1380,7 @@ export class PetitionRepository extends BaseRepository {
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
         },
-        t
+        t,
       );
 
       if (!skipFields) {
@@ -1395,7 +1395,7 @@ export class PetitionRepository extends BaseRepository {
             created_by: `User:${user.id}`,
             updated_by: `User:${user.id}`,
           })),
-          t
+          t,
         );
       }
 
@@ -1407,7 +1407,7 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: number[],
     userId: number,
     deletedBy: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.from("petition_permission", t)
       .whereIn("petition_id", petitionIds)
@@ -1453,7 +1453,7 @@ export class PetitionRepository extends BaseRepository {
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },
-            "*"
+            "*",
           ),
         this.from("petition_message", t)
           .whereIn("petition_id", petitionIds)
@@ -1462,7 +1462,7 @@ export class PetitionRepository extends BaseRepository {
             {
               status: "CANCELLED",
             },
-            "*"
+            "*",
           ),
       ]);
       for (const [, _accesses] of Object.entries(groupBy(accesses, (a) => a.petition_id))) {
@@ -1476,7 +1476,7 @@ export class PetitionRepository extends BaseRepository {
               reason: "DEACTIVATED_BY_USER",
             },
           })),
-          t
+          t,
         );
       }
       for (const [, _messages] of Object.entries(groupBy(messages, (m) => m.petition_id))) {
@@ -1490,7 +1490,7 @@ export class PetitionRepository extends BaseRepository {
               reason: "CANCELLED_BY_USER",
             },
           })),
-          t
+          t,
         );
       }
 
@@ -1514,7 +1514,7 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: MaybeArray<number>,
     data: Partial<TableTypes["petition"]>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(petitionIds);
     if (ids.length === 0) {
@@ -1528,7 +1528,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
   }
 
@@ -1540,7 +1540,7 @@ export class PetitionRepository extends BaseRepository {
         updated_at: this.now(),
         updated_by: updatedBy,
       },
-      "*"
+      "*",
     );
   }
 
@@ -1573,7 +1573,7 @@ export class PetitionRepository extends BaseRepository {
 
       // check visibility conditions fields refer to previous fields
       const positions = Object.fromEntries(
-        Array.from(fieldIds.entries()).map(([index, id]) => [id, index])
+        Array.from(fieldIds.entries()).map(([index, id]) => [id, index]),
       );
       for (const field of fields) {
         const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
@@ -1595,10 +1595,10 @@ export class PetitionRepository extends BaseRepository {
           `User:${user.id}`,
           this.sqlValues(
             fieldIds.map((id, i) => [id, i]),
-            ["int", "int"]
+            ["int", "int"],
           ),
         ],
-        t
+        t,
       );
 
       const [petition] = await this.from("petition", t)
@@ -1608,7 +1608,7 @@ export class PetitionRepository extends BaseRepository {
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
           },
-          "*"
+          "*",
         );
       return petition;
     });
@@ -1634,7 +1634,7 @@ export class PetitionRepository extends BaseRepository {
         "alias",
       ]),
       field.position! + 1,
-      user
+      user,
     );
   }
 
@@ -1643,7 +1643,7 @@ export class PetitionRepository extends BaseRepository {
     data: Omit<CreatePetitionField, "petition_id" | "position">,
     position: number,
     user: User,
-    t?: Knex.Transaction<any, any>
+    t?: Knex.Transaction<any, any>,
   ) {
     return await this.withTransaction(async (t) => {
       const [{ max }] = await this.from("petition_field", t)
@@ -1668,7 +1668,7 @@ export class PetitionRepository extends BaseRepository {
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
           },
-          "id"
+          "id",
         );
 
       const [[field]] = await Promise.all([
@@ -1681,7 +1681,7 @@ export class PetitionRepository extends BaseRepository {
             created_by: `User:${user.id}`,
             updated_by: `User:${user.id}`,
           },
-          t
+          t,
         ),
         this.from("petition", t)
           .where("id", petitionId)
@@ -1697,7 +1697,7 @@ export class PetitionRepository extends BaseRepository {
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },
-            "*"
+            "*",
           ),
       ]);
 
@@ -1732,7 +1732,7 @@ export class PetitionRepository extends BaseRepository {
         returning f.*, f2.position as old_position;
       `,
         [`User:${user.id}`, petitionId, fieldId],
-        t
+        t,
       );
 
       if (!field) {
@@ -1795,7 +1795,7 @@ export class PetitionRepository extends BaseRepository {
     fieldId: number,
     data: Partial<CreatePetitionField>,
     user: User,
-    t?: Knex.Transaction<any, any>
+    t?: Knex.Transaction<any, any>,
   ) {
     return this.withTransaction(async (t) => {
       const [field] = await this.from("petition_field", t)
@@ -1806,7 +1806,7 @@ export class PetitionRepository extends BaseRepository {
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
           },
-          "*"
+          "*",
         );
       if (field.is_fixed && data.type !== undefined) {
         throw new Error("UPDATE_FIXED_FIELD_ERROR");
@@ -1836,7 +1836,7 @@ export class PetitionRepository extends BaseRepository {
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },
-            "*"
+            "*",
           );
       }
 
@@ -1856,20 +1856,20 @@ export class PetitionRepository extends BaseRepository {
   readonly loadRepliesForField = this.buildLoadMultipleBy(
     "petition_field_reply",
     "petition_field_id",
-    (q) => q.whereNull("deleted_at").orderBy("created_at").orderBy("id")
+    (q) => q.whereNull("deleted_at").orderBy("created_at").orderBy("id"),
   );
 
   async updateRemindersForPetition(
     petitionId: number,
     nextReminderAt: Maybe<Date>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return this.withTransaction(async (t) => {
       return await this.from("petition_access", t).where("petition_id", petitionId).update(
         {
           next_reminder_at: nextReminderAt,
         },
-        "*"
+        "*",
       );
     }, t);
   }
@@ -1877,7 +1877,7 @@ export class PetitionRepository extends BaseRepository {
   async createPetitionFieldReply(
     petitionId: number,
     data: MaybeArray<CreatePetitionFieldReply>,
-    createdBy: string
+    createdBy: string,
   ) {
     const dataArray = unMaybeArray(data);
 
@@ -1894,7 +1894,7 @@ export class PetitionRepository extends BaseRepository {
         ...data,
         updated_by: createdBy,
         created_by: createdBy,
-      }))
+      })),
     );
 
     if (fields.some((f) => isDefined(f) && !f.is_internal)) {
@@ -1904,7 +1904,7 @@ export class PetitionRepository extends BaseRepository {
           status: "PENDING",
           closed_at: null,
         },
-        createdBy
+        createdBy,
       );
       // clear cache to make sure petition status is updated in next graphql calls
       this.loadPetition.dataloader.clear(petitionId);
@@ -1925,10 +1925,10 @@ export class PetitionRepository extends BaseRepository {
               petition_field_reply_id: reply.id,
             },
           },
-          this.REPLY_EVENTS_DELAY_SECONDS
+          this.REPLY_EVENTS_DELAY_SECONDS,
         );
       },
-      { concurrency: 1 }
+      { concurrency: 1 },
     );
     return replies;
   }
@@ -1936,7 +1936,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionFieldReply(
     replyId: number,
     data: Partial<PetitionFieldReply>,
-    updater: User | PetitionAccess
+    updater: User | PetitionAccess,
   ) {
     const field = await this.loadFieldForReply(replyId);
     const oldReply = await this.loadFieldReply(replyId);
@@ -1956,7 +1956,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
 
     if (!field.is_internal) {
@@ -1966,7 +1966,7 @@ export class PetitionRepository extends BaseRepository {
           status: "PENDING",
           closed_at: null,
         },
-        updatedBy
+        updatedBy,
       );
       // clear cache to make sure petition status is updated in next graphql calls
       this.loadPetition.dataloader.clear(field.petition_id);
@@ -2037,7 +2037,7 @@ export class PetitionRepository extends BaseRepository {
           status: "PENDING",
           closed_at: null,
         },
-        deletedBy
+        deletedBy,
       );
       // clear cache to make sure petition status is updated in next graphql calls
       this.loadPetition.dataloader.clear(field.petition_id);
@@ -2060,7 +2060,7 @@ export class PetitionRepository extends BaseRepository {
             petition_field_reply_id: reply.id,
           },
         },
-        this.REPLY_EVENTS_DELAY_SECONDS // delay webhook notification to allow other REPLY_CREATED and REPLY_UPDATED events to arrive before
+        this.REPLY_EVENTS_DELAY_SECONDS, // delay webhook notification to allow other REPLY_CREATED and REPLY_UPDATED events to arrive before
       ),
     ]);
 
@@ -2085,7 +2085,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePendingPetitionFieldRepliesStatusByPetitionId(
     petitionId: number,
     status: PetitionFieldReplyStatus,
-    updater: User
+    updater: User,
   ) {
     const fields = await this.loadFieldsForPetition(petitionId);
     // only update reply status on fields that have require_approval set to true
@@ -2105,7 +2105,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `User:${updater!.id}`,
         },
-        "*"
+        "*",
       );
 
     await this.createEvent(
@@ -2118,7 +2118,7 @@ export class PetitionRepository extends BaseRepository {
           petition_field_reply_id: reply.id,
           user_id: updater.id,
         },
-      }))
+      })),
     );
 
     return replies;
@@ -2127,7 +2127,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionFieldRepliesStatus(
     replyIds: number[],
     status: PetitionFieldReplyStatus,
-    updatedBy: string
+    updatedBy: string,
   ) {
     return await this.from("petition_field_reply").whereIn("id", replyIds).update(
       {
@@ -2135,14 +2135,14 @@ export class PetitionRepository extends BaseRepository {
         updated_at: this.now(),
         updated_by: updatedBy,
       },
-      "*"
+      "*",
     );
   }
 
   async updatePetitionFieldReplyStatusesByPetitionFieldId(
     petitionFieldId: number,
     status: PetitionFieldReplyStatus,
-    updatedBy: string
+    updatedBy: string,
   ) {
     return await this.from("petition_field_reply")
       .where("petition_field_id", petitionFieldId)
@@ -2154,7 +2154,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
   }
 
@@ -2174,7 +2174,7 @@ export class PetitionRepository extends BaseRepository {
             and (pfr.content->>'file_upload_id')::int = fu.id
           where pfr.deleted_at is null and pf.petition_id in ? and pf.deleted_at is null
         `,
-        [this.sqlIn(petitionIds)]
+        [this.sqlIn(petitionIds)],
       ),
     ]);
 
@@ -2209,7 +2209,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     userOrAccess: User | PetitionAccess,
     extraData: Partial<Petition> = {},
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const isAccess = "keycode" in userOrAccess;
     const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
@@ -2222,7 +2222,7 @@ export class PetitionRepository extends BaseRepository {
         field.type === "HEADING" ||
         field.optional ||
         field.replies.length > 0 ||
-        !isVisible
+        !isVisible,
     );
 
     if (canComplete) {
@@ -2237,7 +2237,7 @@ export class PetitionRepository extends BaseRepository {
               updated_by: updatedBy,
               ...extraData,
             },
-            "*"
+            "*",
           );
         return updated;
       }, t);
@@ -2271,7 +2271,7 @@ export class PetitionRepository extends BaseRepository {
     data: Partial<Omit<TableTypes["petition"], "document_organization_theme_id">> = {},
     options?: { insertPermissions?: boolean; cloneReplies?: boolean },
     createdBy = `User:${owner.id}`,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [sourcePetition, userPermissions] = await Promise.all([
       this.loadPetition(petitionId),
@@ -2298,7 +2298,7 @@ export class PetitionRepository extends BaseRepository {
 
       const defaultSignatureOrgIntegration = await this.getDefaultSignatureOrgIntegration(
         owner.org_id,
-        t
+        t,
       );
       const [defaultOrganizationTheme] = await this.from("organization_theme", t)
         .where({
@@ -2361,7 +2361,7 @@ export class PetitionRepository extends BaseRepository {
               : sourcePetition.path, // else, use path
           ...data,
         },
-        t
+        t,
       );
 
       // insert PETITION_CREATED events for cloned petitions
@@ -2371,7 +2371,7 @@ export class PetitionRepository extends BaseRepository {
           data: { user_id: owner.id },
           petition_id: cloned.id,
         },
-        t
+        t,
       );
 
       const fields = await this.loadFieldsForPetition(petitionId);
@@ -2397,7 +2397,7 @@ export class PetitionRepository extends BaseRepository {
                   updated_by: createdBy,
                 };
               }),
-              t
+              t,
             ).returning("*");
 
       if (options?.insertPermissions ?? true) {
@@ -2415,7 +2415,7 @@ export class PetitionRepository extends BaseRepository {
             created_by: createdBy,
             updated_by: createdBy,
           },
-          t
+          t,
         );
       }
 
@@ -2427,7 +2427,7 @@ export class PetitionRepository extends BaseRepository {
             select ?, tag_id, ? from petition_tag where petition_id = ?
           `,
           [cloned.id, createdBy, petitionId],
-          t
+          t,
         );
       }
 
@@ -2446,7 +2446,7 @@ export class PetitionRepository extends BaseRepository {
               from template_default_permission where template_id = ? and deleted_at is null
           `,
           [cloned.id, createdBy, createdBy, petitionId],
-          t
+          t,
         );
       }
 
@@ -2454,8 +2454,8 @@ export class PetitionRepository extends BaseRepository {
       const newFieldIds = Object.fromEntries(
         zip(
           fields.map((f) => f.id),
-          sortBy(clonedFields, (f) => f.position!).map((f) => f.id)
-        )
+          sortBy(clonedFields, (f) => f.position!).map((f) => f.id),
+        ),
       );
 
       // on RTE texts, replace globalId placeholders with the field ids of the cloned petition
@@ -2468,7 +2468,7 @@ export class PetitionRepository extends BaseRepository {
               return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
             }
             return placeholder;
-          }
+          },
         );
       }
 
@@ -2480,7 +2480,7 @@ export class PetitionRepository extends BaseRepository {
                 return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
               }
               return placeholder;
-            })
+            }),
           );
         }
       }
@@ -2522,10 +2522,10 @@ export class PetitionRepository extends BaseRepository {
                   }),
                 ];
               }),
-              ["int", "jsonb"]
+              ["int", "jsonb"],
             ),
           ],
-          t
+          t,
         );
       }
 
@@ -2560,14 +2560,14 @@ export class PetitionRepository extends BaseRepository {
           ...omit(r, ["id", "anonymized_at"]),
           petition_field_id: newFieldsMap[r.petition_field_id],
         })),
-        "*"
+        "*",
       );
 
       return Object.fromEntries(
         zip(
           originalReplies.map((r) => r.id),
-          newReplies.map((r) => r.id)
-        )
+          newReplies.map((r) => r.id),
+        ),
       );
     } else {
       return {};
@@ -2579,7 +2579,7 @@ export class PetitionRepository extends BaseRepository {
     toPetitionId: number,
     fieldsMap: Record<string, number>,
     repliesMap: Record<string, number>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const events = (
       await this.getPetitionEventsByType(fromPetitionId, [
@@ -2592,7 +2592,7 @@ export class PetitionRepository extends BaseRepository {
         // there could be events for fields and replies that are deleted in the original petition
         // so we need to make sure the petition_field_id and petition_field_reply_id in the events are present in the maps before inserting
         isDefined(fieldsMap[e.data.petition_field_id]) &&
-        isDefined(repliesMap[e.data.petition_field_reply_id])
+        isDefined(repliesMap[e.data.petition_field_reply_id]),
     );
 
     if (events.length > 0) {
@@ -2606,7 +2606,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: toPetitionId,
           type: e.type,
           processed_at: e.created_at,
-        })) as any[]
+        })) as any[],
       );
     }
   }
@@ -2614,7 +2614,7 @@ export class PetitionRepository extends BaseRepository {
   private async cloneFieldAttachments(
     fields: PetitionField[],
     newIds: Record<string, number>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const attachmentsByFieldId = (
       await this.loadFieldAttachmentsByFieldId(fields.map((f) => f.id))
@@ -2635,12 +2635,12 @@ export class PetitionRepository extends BaseRepository {
     fromPetitionId: number,
     toPetitionId: number,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     await this.withTransaction(async (t) => {
       const petitionAttachments = await this.loadPetitionAttachmentsByPetitionId.raw(
         fromPetitionId,
-        t
+        t,
       );
 
       if (petitionAttachments.length === 0) {
@@ -2649,7 +2649,7 @@ export class PetitionRepository extends BaseRepository {
 
       const clonedFileUploads = await this.files.cloneFileUpload(
         petitionAttachments.map((a) => a.file_upload_id),
-        t
+        t,
       );
 
       await this.raw(
@@ -2667,22 +2667,22 @@ export class PetitionRepository extends BaseRepository {
           this.sqlValues(
             zip(
               petitionAttachments.map((a) => a.file_upload_id),
-              clonedFileUploads.map((f) => f.id)
+              clonedFileUploads.map((f) => f.id),
             ),
-            ["int", "int"]
+            ["int", "int"],
           ),
           toPetitionId,
           createdBy,
           fromPetitionId,
         ],
-        t
+        t,
       );
     }, t);
   }
 
   private async getDefaultSignatureOrgIntegration(
     orgId: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<OrgIntegration | null> {
     const [orgIntegration] = await this.from("org_integration", t)
       .where({
@@ -2703,13 +2703,13 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadReminderCountForAccess = this.buildLoadCountBy(
     "petition_reminder",
-    "petition_access_id"
+    "petition_access_id",
   );
 
   readonly loadRemindersByAccessId = this.buildLoadMultipleBy(
     "petition_reminder",
     "petition_access_id",
-    (q) => q.orderBy("created_at", "desc")
+    (q) => q.orderBy("created_at", "desc"),
   );
 
   async createReminders(data: CreatePetitionReminder[]) {
@@ -2720,7 +2720,7 @@ export class PetitionRepository extends BaseRepository {
       await this.from("petition_access", t)
         .whereIn(
           "id",
-          data.map((r) => r.petition_access_id)
+          data.map((r) => r.petition_access_id),
         )
         .update({
           reminders_left: this.knex.raw(`"reminders_left" - 1`),
@@ -2757,7 +2757,7 @@ export class PetitionRepository extends BaseRepository {
         next_reminder_at: null,
         reminders_opt_out: true,
       },
-      "*"
+      "*",
     );
   }
 
@@ -2776,7 +2776,7 @@ export class PetitionRepository extends BaseRepository {
           reminders_config: reminderConfig,
           next_reminder_at: calculateNextReminder(new Date(), reminderConfig),
         },
-        "*"
+        "*",
       );
   }
 
@@ -2787,7 +2787,7 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadPetitionEventsByPetitionId = this.buildLoadMultipleBy(
     "petition_event",
-    "petition_id"
+    "petition_id",
   );
 
   readonly loadPetitionFieldReplyEvents = this.buildLoader<
@@ -2801,7 +2801,7 @@ export class PetitionRepository extends BaseRepository {
         where pfr.id in ?
       `,
       [this.sqlIn(keys)],
-      t
+      t,
     );
     const events = await this.raw<
       ReplyCreatedEvent | ReplyUpdatedEvent | ReplyDeletedEvent | ReplyStatusChangedEvent
@@ -2813,13 +2813,15 @@ export class PetitionRepository extends BaseRepository {
           and data->>'petition_field_reply_id' in ?
       `,
       [this.sqlIn(petitions.map((p) => p.id)), this.sqlIn(keys)],
-      t
+      t,
     );
 
     const byReplyId = pipe(
       events,
       groupBy((e) => e.data.petition_field_reply_id),
-      mapValues(sort((a, b) => new Date(a.created_at).valueOf() - new Date(b.created_at).valueOf()))
+      mapValues(
+        sort((a, b) => new Date(a.created_at).valueOf() - new Date(b.created_at).valueOf()),
+      ),
     );
     return keys.map((id) => byReplyId[id] ?? []);
   });
@@ -2833,13 +2835,13 @@ export class PetitionRepository extends BaseRepository {
           { column: "id", order: "desc" },
         ])
         .select("*"),
-      opts
+      opts,
     );
   }
 
   async getLastEventsByType<T extends PetitionEventType>(
     petitionId: number,
-    eventTypes: T[]
+    eventTypes: T[],
   ): Promise<
     // Distribute union type
     (T extends any ? { type: T; last_used_at: Date } : never)[]
@@ -2854,7 +2856,7 @@ export class PetitionRepository extends BaseRepository {
 
   async getPetitionEventsByType<T extends PetitionEventType>(
     petitionIds: MaybeArray<number>,
-    eventType: T[]
+    eventType: T[],
   ): Promise<GenericPetitionEvent<T>[]> {
     const ids = unMaybeArray(petitionIds);
     return pMapChunk(
@@ -2866,7 +2868,7 @@ export class PetitionRepository extends BaseRepository {
           .orderBy("created_at", "desc")
           .select("*");
       },
-      { chunkSize: 1_000, concurrency: 1 }
+      { chunkSize: 1_000, concurrency: 1 },
     ) as any;
   }
 
@@ -2876,7 +2878,7 @@ export class PetitionRepository extends BaseRepository {
       eventTypes?: Maybe<PetitionEventType[]>;
       before?: Maybe<number>;
       limit: number;
-    }
+    },
   ) {
     return await this.raw<PetitionEvent>(
       /* sql */ `
@@ -2892,7 +2894,7 @@ export class PetitionRepository extends BaseRepository {
         userId,
         ...(isDefined(options.before) ? [options.before] : []),
         ...(isDefined(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
-      ]
+      ],
     );
   }
 
@@ -2902,7 +2904,7 @@ export class PetitionRepository extends BaseRepository {
       userIds.map((userId) => ({
         petition_event_id: petitionEventId,
         user_id: userId,
-      }))
+      })),
     );
   }
 
@@ -2949,7 +2951,7 @@ export class PetitionRepository extends BaseRepository {
       select * from petition_event where id in (
         select max(id) from petition_event where petition_id = ? 
       )`,
-      [petitionId]
+      [petitionId],
     );
     return event;
   }
@@ -2957,7 +2959,7 @@ export class PetitionRepository extends BaseRepository {
   private async createOrUpdateReplyEvent(
     petitionId: number,
     reply: PetitionFieldReply,
-    updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">
+    updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">,
   ) {
     const latestEvent = await this.getLatestEventForPetitionId(petitionId);
 
@@ -2975,7 +2977,7 @@ export class PetitionRepository extends BaseRepository {
       await this.updateEvent(
         latestEvent.id,
         { created_at: new Date() },
-        this.REPLY_EVENTS_DELAY_SECONDS
+        this.REPLY_EVENTS_DELAY_SECONDS,
       );
     } else {
       await this.createEventWithDelay(
@@ -2988,7 +2990,7 @@ export class PetitionRepository extends BaseRepository {
             ...updater,
           },
         },
-        this.REPLY_EVENTS_DELAY_SECONDS
+        this.REPLY_EVENTS_DELAY_SECONDS,
       );
     }
   }
@@ -3022,7 +3024,7 @@ export class PetitionRepository extends BaseRepository {
         return id.loadInternalComments ? comments : comments.filter((c) => c.is_internal === false);
       });
     },
-    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) }
+    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },
   );
 
   readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess = this.buildLoader<
@@ -3036,14 +3038,14 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_access_id", uniq(keys.map((x) => x.accessId)))
         .whereIn(
           this.knex.raw("(data ->> 'petition_field_id')::int") as any,
-          uniq(keys.map((x) => x.petitionFieldId))
+          uniq(keys.map((x) => x.petitionFieldId)),
         )
         .where("type", "COMMENT_CREATED")
         .whereNull("read_at")
         .groupBy(
           "petition_id",
           "petition_access_id",
-          this.knex.raw("(data ->> 'petition_field_id')::int")
+          this.knex.raw("(data ->> 'petition_field_id')::int"),
         )
         .select<
           (Pick<PetitionContactNotification, "petition_id" | "petition_access_id"> & {
@@ -3054,19 +3056,19 @@ export class PetitionRepository extends BaseRepository {
           "petition_id",
           "petition_access_id",
           this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
-          this.count("unread_count")
+          this.count("unread_count"),
         );
 
       const rowsById = indexBy(
         rows,
-        keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
+        keyBuilder(["petition_id", "petition_field_id", "petition_access_id"]),
       );
 
       return keys.map(keyBuilder(["petitionId", "petitionFieldId", "accessId"])).map((key) => {
         return rowsById[key]?.unread_count ?? 0;
       });
     },
-    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) }
+    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) },
   );
 
   loadContactHasUnreadCommentsInPetition = this.buildLoader<
@@ -3091,12 +3093,12 @@ export class PetitionRepository extends BaseRepository {
           this.sqlIn(uniq(keys.map((k) => k.contactId))),
           this.sqlIn(uniq(keys.map((k) => k.petitionId))),
         ],
-        t
+        t,
       );
       const byKey = indexBy(rows, keyBuilder(["contact_id", "petition_id"]));
       return keys.map(keyBuilder(["contactId", "petitionId"])).map((k) => isDefined(byKey[k]));
     },
-    { cacheKeyFn: keyBuilder(["contactId", "petitionId"]) }
+    { cacheKeyFn: keyBuilder(["contactId", "petitionId"]) },
   );
 
   readonly loadPetitionFieldUnreadCommentCountForFieldAndUser = this.buildLoader<
@@ -3110,7 +3112,7 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("user_id", uniq(keys.map((x) => x.userId)))
         .whereIn(
           this.knex.raw("(data ->> 'petition_field_id')::int") as any,
-          uniq(keys.map((x) => x.petitionFieldId))
+          uniq(keys.map((x) => x.petitionFieldId)),
         )
         .where("type", "COMMENT_CREATED")
         .whereNull("read_at")
@@ -3124,7 +3126,7 @@ export class PetitionRepository extends BaseRepository {
           "petition_id",
           "user_id",
           this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
-          this.count("unread_count")
+          this.count("unread_count"),
         );
 
       const rowsById = indexBy(rows, keyBuilder(["petition_id", "petition_field_id", "user_id"]));
@@ -3133,13 +3135,13 @@ export class PetitionRepository extends BaseRepository {
         return rowsById[key]?.unread_count ?? 0;
       });
     },
-    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "userId"]) }
+    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "userId"]) },
   );
 
   async canBeMentionedInPetitionFieldComment(
     orgId: number,
     userIds: number[],
-    userGroupIds: number[]
+    userGroupIds: number[],
   ) {
     // deleted entities can still be mentioned to avoid issues updating old comments
     // where deleted entities are deleted
@@ -3161,11 +3163,11 @@ export class PetitionRepository extends BaseRepository {
   }
 
   readonly loadPetitionFieldComment = this.buildLoadBy("petition_field_comment", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   async loadUnprocessedUserNotificationsOfType<Type extends PetitionUserNotificationType>(
-    type: Type
+    type: Type,
   ) {
     return await this.knex<GenericPetitionUserNotification<Type>>("petition_user_notification")
       .where({
@@ -3199,7 +3201,7 @@ export class PetitionRepository extends BaseRepository {
         .orderBy("created_at", "desc");
       const byUserId = groupBy(notifications, (n) => n.user_id);
       return keys.map((k) => byUserId[k]?.map((n) => n.id) ?? []);
-    }
+    },
   );
 
   async markOldPetitionUserNotificationsAsRead(months: number) {
@@ -3213,7 +3215,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   private filterPetitionUserNotificationQueryBuilder(
-    filter?: Maybe<PetitionUserNotificationFilter>
+    filter?: Maybe<PetitionUserNotificationFilter>,
   ): Knex.QueryCallback<PetitionUserNotification<false>> {
     return (q) => {
       if (filter === "UNREAD") {
@@ -3242,7 +3244,7 @@ export class PetitionRepository extends BaseRepository {
       limit?: Maybe<number>;
       filter?: Maybe<PetitionUserNotificationFilter>;
       before?: Maybe<Date>;
-    }
+    },
   ) {
     return this.from("petition_user_notification")
       .where("user_id", userId)
@@ -3272,7 +3274,7 @@ export class PetitionRepository extends BaseRepository {
     petitionUserNotificationIds: number[],
     isRead: boolean,
     userId: number,
-    filter?: Maybe<PetitionUserNotificationFilter>
+    filter?: Maybe<PetitionUserNotificationFilter>,
   ) {
     return await pMapChunk(
       petitionUserNotificationIds,
@@ -3296,10 +3298,10 @@ export class PetitionRepository extends BaseRepository {
                 processed_at: isRead ? this.now() : undefined,
               }),
             },
-            "*"
+            "*",
           );
       },
-      { chunkSize: 500, concurrency: 1 }
+      { chunkSize: 500, concurrency: 1 },
     );
   }
 
@@ -3307,7 +3309,7 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: number[],
     isRead: boolean,
     userId: number,
-    filter?: Maybe<PetitionUserNotificationFilter>
+    filter?: Maybe<PetitionUserNotificationFilter>,
   ) {
     return await pMapChunk(
       petitionIds,
@@ -3332,10 +3334,10 @@ export class PetitionRepository extends BaseRepository {
                 processed_at: isRead ? this.now() : undefined,
               }),
             },
-            "*"
+            "*",
           );
       },
-      { chunkSize: 500, concurrency: 1 }
+      { chunkSize: 500, concurrency: 1 },
     );
   }
 
@@ -3343,7 +3345,7 @@ export class PetitionRepository extends BaseRepository {
     petitionFieldCommentIds: number[],
     isRead: boolean,
     userId: number,
-    filter?: Maybe<PetitionUserNotificationFilter>
+    filter?: Maybe<PetitionUserNotificationFilter>,
   ) {
     return await pMapChunk(
       petitionFieldCommentIds,
@@ -3365,11 +3367,11 @@ export class PetitionRepository extends BaseRepository {
           .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
           .whereIn(
             this.knex.raw("data ->> 'petition_field_id'") as any,
-            uniq(comments.map((c) => c.petition_field_id))
+            uniq(comments.map((c) => c.petition_field_id)),
           )
           .whereIn(
             this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-            uniq(comments.map((c) => c.id))
+            uniq(comments.map((c) => c.id)),
           )
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
@@ -3379,20 +3381,20 @@ export class PetitionRepository extends BaseRepository {
                 processed_at: isRead ? this.now() : undefined,
               }),
             },
-            "*"
+            "*",
           );
       },
       {
         chunkSize: 500,
         concurrency: 1,
-      }
+      },
     );
   }
 
   async updatePetitionUserNotificationsReadStatusByUserId(
     filter: PetitionUserNotificationFilter,
     isRead: boolean,
-    userId: number
+    userId: number,
   ) {
     return await this.from("petition_user_notification")
       .where("user_id", userId)
@@ -3412,7 +3414,7 @@ export class PetitionRepository extends BaseRepository {
             processed_at: isRead ? this.now() : undefined,
           }),
         },
-        "*"
+        "*",
       );
   }
 
@@ -3426,7 +3428,7 @@ export class PetitionRepository extends BaseRepository {
   async deletePetitionUserNotificationsByPetitionId(
     petitionIds: number[],
     userIds?: number[],
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     if (petitionIds.length === 0) {
       return [];
@@ -3450,7 +3452,7 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionContactNotifications(
     petitionContactNotificationIds: number[],
-    data: Partial<CreatePetitionContactNotification>
+    data: Partial<CreatePetitionContactNotification>,
   ) {
     return await this.from("petition_contact_notification")
       .whereIn("id", petitionContactNotificationIds)
@@ -3470,18 +3472,18 @@ export class PetitionRepository extends BaseRepository {
     async (keys, t) => {
       const rows = await this.from<"petition_user_notification", CommentCreatedUserNotification>(
         "petition_user_notification",
-        t
+        t,
       )
         .where("type", "COMMENT_CREATED")
         .whereIn("user_id", uniq(keys.map((x) => x.userId)))
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
         .whereIn(
           this.knex.raw("data ->> 'petition_field_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldId))
+          uniq(keys.map((x) => x.petitionFieldId)),
         )
         .whereIn(
           this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldCommentId))
+          uniq(keys.map((x) => x.petitionFieldCommentId)),
         )
         .select("*");
 
@@ -3492,7 +3494,7 @@ export class PetitionRepository extends BaseRepository {
           "petition_id",
           (r) => r.data.petition_field_id,
           (r) => r.data.petition_field_comment_id,
-        ])
+        ]),
       );
       return keys
         .map(keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]))
@@ -3500,7 +3502,7 @@ export class PetitionRepository extends BaseRepository {
     },
     {
       cacheKeyFn: keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]),
-    }
+    },
   );
 
   readonly loadPetitionFieldCommentIsUnreadForContact = this.buildLoader<
@@ -3520,11 +3522,11 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
         .whereIn(
           this.knex.raw("data ->> 'petition_field_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldId))
+          uniq(keys.map((x) => x.petitionFieldId)),
         )
         .whereIn(
           this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-          uniq(keys.map((x) => x.petitionFieldCommentId))
+          uniq(keys.map((x) => x.petitionFieldCommentId)),
         )
         .select("*");
 
@@ -3535,7 +3537,7 @@ export class PetitionRepository extends BaseRepository {
           "petition_id",
           (r) => r.data.petition_field_id,
           (r) => r.data.petition_field_comment_id,
-        ])
+        ]),
       );
       return keys
         .map(
@@ -3544,7 +3546,7 @@ export class PetitionRepository extends BaseRepository {
             "petitionId",
             "petitionFieldId",
             "petitionFieldCommentId",
-          ])
+          ]),
         )
         .map((key) => byId[key]?.read_at === null);
     },
@@ -3555,7 +3557,7 @@ export class PetitionRepository extends BaseRepository {
         "petitionFieldId",
         "petitionFieldCommentId",
       ]),
-    }
+    },
   );
 
   async createPetitionFieldCommentFromUser(
@@ -3565,7 +3567,7 @@ export class PetitionRepository extends BaseRepository {
       contentJson: any;
       isInternal: boolean;
     },
-    user: User
+    user: User,
   ) {
     return await this.withTransaction(async (t) => {
       const [comment] = await this.insert(
@@ -3578,7 +3580,7 @@ export class PetitionRepository extends BaseRepository {
           is_internal: data.isInternal,
           created_by: `User:${user.id}`,
         },
-        t
+        t,
       );
 
       await this.createEvent(
@@ -3591,7 +3593,7 @@ export class PetitionRepository extends BaseRepository {
             is_internal: comment.is_internal,
           },
         },
-        t
+        t,
       );
 
       return comment;
@@ -3604,7 +3606,7 @@ export class PetitionRepository extends BaseRepository {
       petitionFieldId: number;
       contentJson: string;
     },
-    access: PetitionAccess
+    access: PetitionAccess,
   ) {
     return await this.withTransaction(async (t) => {
       const [comment] = await this.insert(
@@ -3616,7 +3618,7 @@ export class PetitionRepository extends BaseRepository {
           petition_access_id: access.id,
           created_by: `PetitionAccess:${access.id}`,
         },
-        t
+        t,
       );
 
       await this.createEvent(
@@ -3628,7 +3630,7 @@ export class PetitionRepository extends BaseRepository {
             petition_field_comment_id: comment.id,
           },
         },
-        t
+        t,
       );
 
       return comment;
@@ -3639,11 +3641,11 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     petitionFieldId: number,
     petitionFieldCommentId: number,
-    user: User
+    user: User,
   ) {
     const comment = await this.deletePetitionFieldComment(
       petitionFieldCommentId,
-      `User:${user.id}`
+      `User:${user.id}`,
     );
     await this.createEvent({
       type: "COMMENT_DELETED",
@@ -3661,7 +3663,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     petitionFieldId: number,
     petitionFieldCommentId: number,
-    access: PetitionAccess
+    access: PetitionAccess,
   ) {
     await Promise.all([
       this.deletePetitionFieldComment(petitionFieldCommentId, `PetitionAccess:${access.id}`),
@@ -3685,7 +3687,7 @@ export class PetitionRepository extends BaseRepository {
           deleted_at: this.now(),
           deleted_by: deletedBy,
         },
-        "*"
+        "*",
       );
 
     await Promise.all([
@@ -3710,7 +3712,7 @@ export class PetitionRepository extends BaseRepository {
     data: {
       contentJson: any;
     },
-    updatedBy: User
+    updatedBy: User,
   ) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
@@ -3720,7 +3722,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `User:${updatedBy.id}`,
         },
-        "*"
+        "*",
       );
     return comment;
   }
@@ -3730,7 +3732,7 @@ export class PetitionRepository extends BaseRepository {
     data: {
       contentJson: any;
     },
-    updatedBy: Contact
+    updatedBy: Contact,
   ) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
@@ -3741,17 +3743,17 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `Contact:${updatedBy.id}`,
         },
-        "*"
+        "*",
       );
     return comment;
   }
 
   async markPetitionFieldCommentsAsReadForAccess(
     petitionFieldCommentIds: number[],
-    accessId: number
+    accessId: number,
   ) {
     const comments = (await this.loadPetitionFieldComment(
-      petitionFieldCommentIds
+      petitionFieldCommentIds,
     )) as PetitionFieldComment[];
     await this.from("petition_contact_notification")
       .where("petition_access_id", accessId)
@@ -3759,11 +3761,11 @@ export class PetitionRepository extends BaseRepository {
       .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
       .whereIn(
         this.knex.raw("data ->> 'petition_field_id'") as any,
-        uniq(comments.map((c) => c.petition_field_id))
+        uniq(comments.map((c) => c.petition_field_id)),
       )
       .whereIn(
         this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-        uniq(comments.map((c) => c.id))
+        uniq(comments.map((c) => c.id)),
       )
       .update({ read_at: this.now(), processed_at: this.now() });
     return comments;
@@ -3781,7 +3783,7 @@ export class PetitionRepository extends BaseRepository {
           pa.id in ?
           and (pa.contact_id is null or c.deleted_at is null)
     `,
-      [this.sqlIn(accessIds)]
+      [this.sqlIn(accessIds)],
     );
     return count === new Set(accessIds).size;
   }
@@ -3790,7 +3792,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     fieldId: number,
     type: PetitionFieldType,
-    user: User
+    user: User,
   ) {
     return this.withTransaction(async (t) => {
       const [field] = (await this.from("petition_field", t).where({
@@ -3829,13 +3831,13 @@ export class PetitionRepository extends BaseRepository {
           ...defaultFieldProperties(type, field),
         },
         user,
-        t
+        t,
       );
     });
   }
 
   readonly loadPetitionPermission = this.buildLoadBy("petition_permission", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadEffectivePermissions = this.buildLoader<number, EffectivePetitionPermission[]>(
@@ -3850,12 +3852,12 @@ export class PetitionRepository extends BaseRepository {
             group by user_id, petition_id
         `,
         [this.sqlIn(petitionIds)],
-        t
+        t,
       );
 
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
       return petitionIds.map((id) => byPetitionId[id] ?? []);
-    }
+    },
   );
 
   readonly loadEffectiveTemplateDefaultPermissions = this.buildLoader<
@@ -3883,7 +3885,7 @@ export class PetitionRepository extends BaseRepository {
         group by user_id, template_id
       `,
       [this.sqlIn(templateIds), this.sqlIn(templateIds)],
-      t
+      t,
     );
 
     const byPetitionId = groupBy(rows, (r) => r.petition_id);
@@ -3897,13 +3899,13 @@ export class PetitionRepository extends BaseRepository {
       q
         .whereNull("deleted_at")
         .whereNull("user_group_id")
-        .orderByRaw("type asc, from_user_group_id asc nulls first, user_id asc, created_at")
+        .orderByRaw("type asc, from_user_group_id asc nulls first, user_id asc, created_at"),
   );
 
   readonly loadPetitionPermissionsByUserId = this.buildLoadMultipleBy(
     "petition_permission",
     "user_id",
-    (q) => q.whereNull("deleted_at").orderByRaw("type asc, created_at")
+    (q) => q.whereNull("deleted_at").orderByRaw("type asc, created_at"),
   );
 
   readonly loadUserAndUserGroupPermissionsByPetitionId = this.buildLoadMultipleBy(
@@ -3913,7 +3915,7 @@ export class PetitionRepository extends BaseRepository {
       q
         .whereNull("deleted_at")
         .whereNull("from_user_group_id")
-        .orderByRaw("type asc, user_group_id nulls first, created_at")
+        .orderByRaw("type asc, user_group_id nulls first, created_at"),
   );
 
   readonly loadDirectlyAssignedUserPetitionPermissionsByUserId = this.buildLoadMultipleBy(
@@ -3924,7 +3926,7 @@ export class PetitionRepository extends BaseRepository {
         .whereNull("deleted_at")
         .whereNull("user_group_id")
         .whereNull("from_user_group_id")
-        .orderByRaw("type asc, created_at")
+        .orderByRaw("type asc, created_at"),
   );
 
   readonly loadPetitionOwner = this.buildLoader<number, User | null>(async (ids, t) => {
@@ -3940,7 +3942,7 @@ export class PetitionRepository extends BaseRepository {
       .select("petition_permission.petition_id", "user.*");
     const rowsByPetitionId = indexBy(rows, (r) => r.petition_id);
     return ids.map((id) =>
-      rowsByPetitionId[id] ? (omit(rowsByPetitionId[id], ["petition_id"]) as User) : null
+      rowsByPetitionId[id] ? (omit(rowsByPetitionId[id], ["petition_id"]) as User) : null,
     );
   });
 
@@ -3951,7 +3953,7 @@ export class PetitionRepository extends BaseRepository {
     fromPetitionId: number,
     toPetitionIds: number[],
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     await this.raw(
       /* sql */ `
@@ -3966,12 +3968,12 @@ export class PetitionRepository extends BaseRepository {
         fromPetitionId,
         this.sqlValues(
           toPetitionIds.map((id) => [id]),
-          ["int"]
+          ["int"],
         ),
         createdBy,
         createdBy,
       ],
-      t
+      t,
     );
   }
 
@@ -3986,7 +3988,7 @@ export class PetitionRepository extends BaseRepository {
     creator: "User" | "PublicPetitionLink",
     creatorId: number,
     createEvents?: boolean,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const createdBy = `${creator}:${creatorId}`;
     const [newUsers, newUserGroups] = partition(data, (d) => d.type === "User");
@@ -4019,15 +4021,15 @@ export class PetitionRepository extends BaseRepository {
                       type: user.permissionType,
                       created_by: createdBy,
                       updated_by: createdBy,
-                    }))
-                  )
+                    })),
+                  ),
                 ),
                 permissionType,
                 createdBy,
                 this.now(),
                 permissionType,
               ],
-              t
+              t,
             )
           : [];
 
@@ -4056,15 +4058,15 @@ export class PetitionRepository extends BaseRepository {
                       type: userGroup.permissionType,
                       created_by: createdBy,
                       updated_by: createdBy,
-                    }))
-                  )
+                    })),
+                  ),
                 ),
                 permissionType,
                 createdBy,
                 this.now(),
                 permissionType,
               ],
-              t
+              t,
             )
           : [];
 
@@ -4092,20 +4094,20 @@ export class PetitionRepository extends BaseRepository {
               [
                 this.sqlValues(
                   newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
-                  ["int", "bool", "petition_permission_type"]
+                  ["int", "bool", "petition_permission_type"],
                 ),
                 this.sqlIn(
                   newUserGroups.map((ug) => ug.id),
-                  "int"
+                  "int",
                 ),
                 this.sqlValues(
                   petitionIds.map((id) => [id]),
-                  ["int"]
+                  ["int"],
                 ),
                 createdBy,
                 createdBy,
               ],
-              t
+              t,
             )
           : [];
 
@@ -4135,7 +4137,7 @@ export class PetitionRepository extends BaseRepository {
               },
             })),
           ],
-          t
+          t,
         );
       }
 
@@ -4160,7 +4162,7 @@ export class PetitionRepository extends BaseRepository {
     userIds: number[],
     userGroupIds: number[],
     newPermissionType: PetitionPermissionType,
-    user: User
+    user: User,
   ) {
     return this.withTransaction(async (t) => {
       const updatedPermissions = await this.from("petition_permission", t)
@@ -4172,12 +4174,12 @@ export class PetitionRepository extends BaseRepository {
               q
                 .whereIn("user_id", userIds)
                 .whereNull("from_user_group_id")
-                .whereNull("user_group_id")
+                .whereNull("user_group_id"),
             )
             .orWhere((q) => q.whereIn("user_group_id", userGroupIds).whereNotNull("user_group_id"))
             .orWhere((q) =>
-              q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id")
-            )
+              q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id"),
+            ),
         )
         .update(
           {
@@ -4185,7 +4187,7 @@ export class PetitionRepository extends BaseRepository {
             updated_by: `User:${user.id}`,
             type: newPermissionType,
           },
-          "*"
+          "*",
         );
 
       for (const petitionId of petitionIds) {
@@ -4194,7 +4196,7 @@ export class PetitionRepository extends BaseRepository {
 
       const [directlyAssigned, groupAssigned] = partition(
         updatedPermissions.filter((p) => p.from_user_group_id === null),
-        (p) => p.user_group_id === null
+        (p) => p.user_group_id === null,
       );
 
       await this.createEvent(
@@ -4218,7 +4220,7 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
-        t
+        t,
       );
 
       return await this.from("petition", t)
@@ -4234,7 +4236,7 @@ export class PetitionRepository extends BaseRepository {
     userGroupIds: number[],
     removeAll: boolean,
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return this.withTransaction(async (t) => {
       const removedPermissions = await this.from("petition_permission", t)
@@ -4249,14 +4251,14 @@ export class PetitionRepository extends BaseRepository {
                   q
                     .whereIn("user_id", userIds)
                     .whereNull("from_user_group_id")
-                    .whereNull("user_group_id")
+                    .whereNull("user_group_id"),
                 )
                 .orWhere((q) =>
-                  q.whereIn("user_group_id", userGroupIds).whereNotNull("user_group_id")
+                  q.whereIn("user_group_id", userGroupIds).whereNotNull("user_group_id"),
                 )
                 .orWhere((q) =>
-                  q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id")
-                )
+                  q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id"),
+                ),
             );
           }
         })
@@ -4265,7 +4267,7 @@ export class PetitionRepository extends BaseRepository {
             deleted_at: this.now(),
             deleted_by: `User:${user.id}`,
           },
-          "*"
+          "*",
         );
 
       for (const petitionId of petitionIds) {
@@ -4274,7 +4276,7 @@ export class PetitionRepository extends BaseRepository {
 
       const [directlyAssigned, groupAssigned] = partition(
         removedPermissions.filter((p) => p.from_user_group_id === null),
-        (p) => p.user_group_id === null
+        (p) => p.user_group_id === null,
       );
 
       await this.createEvent(
@@ -4296,7 +4298,7 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
-        t
+        t,
       );
       return removedPermissions;
     }, t);
@@ -4305,7 +4307,7 @@ export class PetitionRepository extends BaseRepository {
   private async removePetitionPermissionsById(
     petitionUserPermissionIds: number[],
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return this.withTransaction(async (t) => {
       const removedPermissions = await this.from("petition_permission", t)
@@ -4315,12 +4317,12 @@ export class PetitionRepository extends BaseRepository {
             deleted_at: this.now(),
             deleted_by: `User:${user.id}`,
           },
-          "*"
+          "*",
         );
 
       const [directlyAssigned, groupAssigned] = partition(
         removedPermissions.filter((p) => p.from_user_group_id === null),
-        (p) => p.user_group_id === null
+        (p) => p.user_group_id === null,
       );
 
       await this.createEvent(
@@ -4342,7 +4344,7 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
-        t
+        t,
       );
 
       return removedPermissions;
@@ -4356,14 +4358,14 @@ export class PetitionRepository extends BaseRepository {
     ownerId: number,
     newOwnerId: number,
     updatedBy: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [deleted] = await this.from("template_default_permission", t)
       .where({ user_id: ownerId, type: "OWNER", deleted_at: null })
       .whereRaw(
         /* sql */ `
         exists(select * from public_petition_link ppl where ppl.template_id = template_default_permission.template_id)
-        `
+        `,
       )
       .update({
         deleted_by: `User:${updatedBy.id}`,
@@ -4392,7 +4394,7 @@ export class PetitionRepository extends BaseRepository {
     toUserId: number,
     keepOriginalPermissions: boolean,
     updatedBy: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.withTransaction(async (t) => {
       // change permission of original owner to WRITE
@@ -4436,12 +4438,12 @@ export class PetitionRepository extends BaseRepository {
               type: "OWNER",
               user_id: toUserId,
               petition_id: petitionId,
-            }))
+            })),
           ),
           "OWNER",
           `User:${updatedBy.id}`,
           this.now(),
-        ]
+        ],
       );
 
       await this.createEvent(
@@ -4454,14 +4456,14 @@ export class PetitionRepository extends BaseRepository {
             owner_id: toUserId,
           },
         })),
-        t
+        t,
       );
 
       if (!keepOriginalPermissions) {
         await this.removePetitionPermissionsById(
           previousOwnerPermissions.map((p) => p.id),
           updatedBy,
-          t
+          t,
         );
       }
 
@@ -4475,14 +4477,14 @@ export class PetitionRepository extends BaseRepository {
   readonly loadTemplateDefaultPermissions = this.buildLoadMultipleBy(
     "template_default_permission",
     "template_id",
-    (q) => q.whereNull("deleted_at").orderByRaw(`"type" asc, "id" desc`)
+    (q) => q.whereNull("deleted_at").orderByRaw(`"type" asc, "id" desc`),
   );
 
   async resetTemplateDefaultPermissions(
     templateId: number,
     permissions: TemplateDefaultPermissionInput[],
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [[newOwner], rwPermissions] = partition(permissions, (p) => p.permissionType === "OWNER");
 
@@ -4494,7 +4496,7 @@ export class PetitionRepository extends BaseRepository {
           ? { userId: newOwner.userId, isSubscribed: newOwner.isSubscribed }
           : null,
         updatedBy,
-        t
+        t,
       );
       //now upsert every read/write permission
       await this.upsertTemplateDefaultRWPermissions(templateId, rwPermissions, updatedBy, t);
@@ -4505,7 +4507,7 @@ export class PetitionRepository extends BaseRepository {
     templateId: number,
     newOwner: Maybe<{ userId: number; isSubscribed: boolean }>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     await this.from("template_default_permission", t)
       .where({
@@ -4537,7 +4539,7 @@ export class PetitionRepository extends BaseRepository {
           }),
           updatedBy,
         ],
-        t
+        t,
       );
     }
   }
@@ -4546,7 +4548,7 @@ export class PetitionRepository extends BaseRepository {
     templateId: number,
     permissions: TemplateDefaultPermissionInput[],
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     if (permissions.some((p) => p.permissionType === "OWNER")) {
       throw new Error("There should be no OWNER permission in the array");
@@ -4575,11 +4577,11 @@ export class PetitionRepository extends BaseRepository {
               }),
               updatedBy,
             ],
-            t
+            t,
           );
           return row;
         },
-        { concurrency: 1 }
+        { concurrency: 1 },
       );
       await this.from("template_default_permission", t)
         .where("template_id", templateId)
@@ -4587,7 +4589,7 @@ export class PetitionRepository extends BaseRepository {
         .whereNot("type", "OWNER")
         .whereNotIn(
           "id",
-          rows.map((p) => p.id)
+          rows.map((p) => p.id),
         )
         .update({
           deleted_at: this.now(),
@@ -4599,7 +4601,7 @@ export class PetitionRepository extends BaseRepository {
   async removeTemplateDefaultPermissionsForUser(
     userId: number,
     deletedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     await this.from("template_default_permission", t)
       .where("user_id", userId)
@@ -4615,7 +4617,7 @@ export class PetitionRepository extends BaseRepository {
     templateId: number,
     creator: "User" | "PublicPetitionLink",
     creatorId: number,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const defaultPermissions = await this.loadTemplateDefaultPermissions(templateId);
     if (defaultPermissions.length > 0) {
@@ -4630,7 +4632,7 @@ export class PetitionRepository extends BaseRepository {
         creator,
         creatorId,
         false,
-        t
+        t,
       );
     }
   }
@@ -4640,7 +4642,7 @@ export class PetitionRepository extends BaseRepository {
       search?: string | null;
       locale?: ContactLocale | null;
       categories?: string[] | null;
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<Petition>(
       this.from("petition")
@@ -4659,7 +4661,7 @@ export class PetitionRepository extends BaseRepository {
               q2.whereEscapedILike("name", escapedSearch, "\\").or.whereEscapedILike(
                 "template_description",
                 escapedSearch,
-                "\\"
+                "\\",
               );
             });
           }
@@ -4680,22 +4682,22 @@ export class PetitionRepository extends BaseRepository {
                     template_public: true,
                     deleted_at: null,
                   })
-                  .select("id")
+                  .select("id"),
               )
               .whereNull("deleted_at")
               .groupBy("from_template_id")
               .select<{ template_id: number; used_count: number }[]>(
                 this.knex.raw(`"from_template_id" as template_id`),
-                this.knex.raw(`count(*) as used_count`)
+                this.knex.raw(`count(*) as used_count`),
               )
               .as("t"),
             "t.template_id",
-            "petition.id"
+            "petition.id",
           );
           q.orderByRaw(/* sql */ `t.used_count DESC NULLS LAST`).orderBy("created_at", "desc");
         })
         .select("petition.*"),
-      opts
+      opts,
     );
   }
 
@@ -4716,7 +4718,7 @@ export class PetitionRepository extends BaseRepository {
         /* sql */ `
         (("public_metadata" ->> 'slug') is not null and ("public_metadata" ->> 'slug') = ?) or (("public_metadata" ->> 'slug') is null and "id" = ?)
       `,
-        [slug, templateId]
+        [slug, templateId],
       );
 
     return row;
@@ -4733,7 +4735,7 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadPetitionSignatureByExternalId = this.buildLoadBy(
     "petition_signature_request",
-    "external_id"
+    "external_id",
   );
 
   readonly loadPetitionSignatureById = this.buildLoadBy("petition_signature_request", "id");
@@ -4745,7 +4747,7 @@ export class PetitionRepository extends BaseRepository {
       q.orderBy([
         { column: "created_at", order: "desc" },
         { column: "id", order: "desc" },
-      ])
+      ]),
   );
 
   readonly loadLatestPetitionSignatureByPetitionId = this.buildLoader<
@@ -4762,11 +4764,11 @@ export class PetitionRepository extends BaseRepository {
         select * from cte where _rank = 1
       `,
       [this.sqlIn(petitionIds)],
-      t
+      t,
     );
     const byPetitionId = indexBy(signatures, (r) => r.petition_id);
     return petitionIds.map((key) =>
-      byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null
+      byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null,
     );
   });
 
@@ -4793,14 +4795,14 @@ export class PetitionRepository extends BaseRepository {
       join petition p on pt.petition_id = p.id
       where pt.tag_id in ? and p.deleted_at is null
     `,
-      [this.sqlIn(tagIds)]
+      [this.sqlIn(tagIds)],
     );
   }
 
   async createPetitionSignature(
     petitionId: number,
     data: Omit<CreatePetitionSignatureRequest, "petition_id">,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [row] = await this.insert(
       "petition_signature_request",
@@ -4808,7 +4810,7 @@ export class PetitionRepository extends BaseRepository {
         petition_id: petitionId,
         ...data,
       },
-      t
+      t,
     ).returning("*");
 
     await this.from("petition", t)
@@ -4821,7 +4823,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionSignatures(
     petitionSignatureId: MaybeArray<number>,
     data: Partial<PetitionSignatureRequest>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(petitionSignatureId);
     const rows = await this.from("petition_signature_request", t)
@@ -4847,7 +4849,7 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionSignatureByExternalId(
     prefixedExternalId: string,
-    data: Partial<Omit<PetitionSignatureRequest, "event_logs">>
+    data: Partial<Omit<PetitionSignatureRequest, "event_logs">>,
   ) {
     const [row] = await this.from("petition_signature_request")
       .where("external_id", prefixedExternalId)
@@ -4870,14 +4872,14 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async updatePetitionSignatureRequestAsCancelled<
-    CancelReason extends PetitionSignatureCancelReason
+    CancelReason extends PetitionSignatureCancelReason,
   >(
     ids: MaybeArray<number>,
     data?: Replace<
       Partial<PetitionSignatureRequest>,
       { cancel_reason: CancelReason; cancel_data: PetitionSignatureRequestCancelData<CancelReason> }
     >,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const signatureIds = unMaybeArray(ids);
     if (signatureIds.length === 0) {
@@ -4908,7 +4910,7 @@ export class PetitionRepository extends BaseRepository {
                 : "CANCELLED",
           });
       },
-      { concurrency: 5 }
+      { concurrency: 5 },
     );
 
     await this.createEvent(
@@ -4921,7 +4923,7 @@ export class PetitionRepository extends BaseRepository {
           cancel_data: signature.cancel_data,
         },
       })),
-      t
+      t,
     );
 
     return rows;
@@ -4935,7 +4937,7 @@ export class PetitionRepository extends BaseRepository {
         updated_at = NOW()
         WHERE external_id = ?
       `,
-      [...logs, prefixedExternalId]
+      [...logs, prefixedExternalId],
     );
   }
 
@@ -4956,14 +4958,14 @@ export class PetitionRepository extends BaseRepository {
           join "user" u on u.id = pp.user_id
         where pp.user_id = ? and pp.petition_id = ? and pp.is_subscribed and pp.deleted_at is null and u.deleted_at is null
     `,
-      [userId, petitionId]
+      [userId, petitionId],
     );
   }
 
   async updatePetitionPermissionSubscription(
     petitionId: number,
     isSubscribed: boolean,
-    user: User
+    user: User,
   ) {
     const [row] = await this.from("petition_permission")
       .where({
@@ -4977,20 +4979,20 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `User:${user.id}`,
         },
-        "*"
+        "*",
       );
 
     return row;
   }
 
   readonly loadPetitionAttachment = this.buildLoadBy("petition_attachment", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadPetitionAttachmentsByPetitionId = this.buildLoadMultipleBy(
     "petition_attachment",
     "petition_id",
-    (q) => q.whereNull("deleted_at").orderBy("position", "asc")
+    (q) => q.whereNull("deleted_at").orderBy("position", "asc"),
   );
 
   async createPetitionAttachment(data: CreatePetitionAttachment[], user: User) {
@@ -4999,18 +5001,18 @@ export class PetitionRepository extends BaseRepository {
         ...attachment,
         created_by: `User:${user.id}`,
       })),
-      "*"
+      "*",
     );
   }
 
   readonly loadFieldAttachment = this.buildLoadBy("petition_field_attachment", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadFieldAttachmentsByFieldId = this.buildLoadMultipleBy(
     "petition_field_attachment",
     "petition_field_id",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at"),
   );
 
   async createPetitionFieldAttachment(data: CreatePetitionFieldAttachment, user: User) {
@@ -5052,7 +5054,7 @@ export class PetitionRepository extends BaseRepository {
   private async deletePetitionFieldAttachmentByFieldId(
     petitionFieldId: number,
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const deletedAttachments = await this.from("petition_field_attachment", t)
       .where({
@@ -5068,14 +5070,14 @@ export class PetitionRepository extends BaseRepository {
     await this.files.deleteFileUpload(
       deletedAttachments.map((a) => a.file_upload_id),
       `User:${user.id}`,
-      t
+      t,
     );
   }
 
   private async deletePetitionAttachmentByPetitionId(
     petitionIds: number[],
     user: User,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const deletedAttachments = await this.from("petition_attachment", t)
       .where({
@@ -5091,7 +5093,7 @@ export class PetitionRepository extends BaseRepository {
     await this.files.deleteFileUpload(
       deletedAttachments.map((a) => a.file_upload_id),
       `User:${user.id}`,
-      t
+      t,
     );
   }
 
@@ -5099,7 +5101,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     attachmentType: PetitionAttachmentType,
     ids: number[],
-    updatedBy: string
+    updatedBy: string,
   ) {
     return await this.withTransaction(async (t) => {
       await this.raw(
@@ -5118,12 +5120,12 @@ export class PetitionRepository extends BaseRepository {
           updatedBy,
           this.sqlValues(
             ids.map((id, i) => [id, i]),
-            ["int", "int"]
+            ["int", "int"],
           ),
           attachmentType,
           petitionId,
         ],
-        t
+        t,
       );
 
       const [petition] = await this.from("petition", t).where("id", petitionId).update(
@@ -5131,7 +5133,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
       return petition;
     });
@@ -5141,7 +5143,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     attachmentId: number,
     newType: PetitionAttachmentType,
-    updatedBy: string
+    updatedBy: string,
   ) {
     const target = (await this.loadPetitionAttachment(attachmentId))!;
     return await this.withTransaction(async (t) => {
@@ -5160,7 +5162,7 @@ export class PetitionRepository extends BaseRepository {
               returning *;
         `,
         [petitionId, newType, newType, updatedBy, attachmentId],
-        t
+        t,
       );
 
       // we also need to update positions of target type attachments so the sequence is 0...x
@@ -5180,7 +5182,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadPublicPetitionLinksByTemplateId = this.buildLoadMultipleBy(
     "public_petition_link",
     "template_id",
-    (q) => q.orderBy("created_at", "asc")
+    (q) => q.orderBy("created_at", "asc"),
   );
 
   readonly loadTemplateDefaultOwner = this.buildLoader<
@@ -5207,7 +5209,7 @@ export class PetitionRepository extends BaseRepository {
       [
         ...templateDefaultOwners.map((tdp) => tdp.user_id),
         ...templateOwners.map((t) => t.user_id),
-      ].filter(isDefined)
+      ].filter(isDefined),
     );
 
     const users = await this.from("user", t)
@@ -5229,7 +5231,7 @@ export class PetitionRepository extends BaseRepository {
   async createPublicPetitionLink(
     data: CreatePublicPetitionLink,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [row] = await this.insert(
       "public_petition_link",
@@ -5237,7 +5239,7 @@ export class PetitionRepository extends BaseRepository {
         ...data,
         created_by: createdBy,
       },
-      t
+      t,
     ).select("*");
     this.loadPublicPetitionLinksByTemplateId.dataloader.clear(data.template_id);
     return row;
@@ -5247,7 +5249,7 @@ export class PetitionRepository extends BaseRepository {
     publicPetitionLinkId: number,
     data: Partial<PublicPetitionLink>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [row] = await this.from("public_petition_link", t)
       .where("id", publicPetitionLinkId)
@@ -5257,7 +5259,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
 
     return row;
@@ -5281,7 +5283,7 @@ export class PetitionRepository extends BaseRepository {
 
   async getLatestPetitionAccessFromPublicPetitionLink(
     publicPetitionLinkId: number,
-    contactEmail: string
+    contactEmail: string,
   ) {
     const [access] = await this.from("petition_access")
       .join("petition", "petition.id", "petition_access.petition_id")
@@ -5309,14 +5311,14 @@ export class PetitionRepository extends BaseRepository {
       and pp.deleted_at is null
       and pp.user_id = ?;
     `,
-      [userId]
+      [userId],
     );
 
     return {
       petitions_sent: petitions.length,
       petitions_sent_this_month: countBy(petitions, (p) => isThisMonth(p.sent_at)),
       petitions_sent_last_month: countBy(petitions, (p) =>
-        isSameMonth(p.sent_at, subMonths(new Date(), 1))
+        isSameMonth(p.sent_at, subMonths(new Date(), 1)),
       ),
       petitions_pending: petitions.filter((s) => s.status === "PENDING").length,
     };
@@ -5325,7 +5327,7 @@ export class PetitionRepository extends BaseRepository {
   async markPetitionAccessEmailBounceStatus(
     petitionAccessId: number,
     hasBounced: boolean,
-    updatedBy: string
+    updatedBy: string,
   ) {
     await this.from("contact")
       .update({
@@ -5340,7 +5342,7 @@ export class PetitionRepository extends BaseRepository {
           .whereNull("contact.deleted_at")
           .where("contact.last_email_bounced", !hasBounced) // make sure to update only if there is a change
           .where("petition_access.id", petitionAccessId)
-          .select("contact.id")
+          .select("contact.id"),
       );
   }
 
@@ -5348,7 +5350,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     key: string,
     value: Maybe<string>,
-    updatedBy: string
+    updatedBy: string,
   ) {
     const [petition] = await this.raw<Petition>(
       /* sql */ `
@@ -5362,7 +5364,7 @@ export class PetitionRepository extends BaseRepository {
       where id = ?
       returning *;
     `,
-      [value, key, key, value, updatedBy, petitionId]
+      [value, key, key, value, updatedBy, petitionId],
     );
     return petition;
   }
@@ -5385,7 +5387,7 @@ export class PetitionRepository extends BaseRepository {
           and p.closed_at < NOW() - make_interval(months => o.anonymize_petitions_after_months)
         ))
     `,
-      [orgId]
+      [orgId],
     );
   }
 
@@ -5433,7 +5435,7 @@ export class PetitionRepository extends BaseRepository {
           .whereNull("anonymized_at")
           .whereNull("deleted_at")
           .select("id", "type", "content", "anonymized_at"),
-      { concurrency: 1, chunkSize: 200 }
+      { concurrency: 1, chunkSize: 200 },
     );
 
     const comments = await pMapChunk(
@@ -5444,7 +5446,7 @@ export class PetitionRepository extends BaseRepository {
           .whereIn("petition_field_id", fieldIdsChunk)
           .whereNull("anonymized_at")
           .select("id"),
-      { concurrency: 1, chunkSize: 200 }
+      { concurrency: 1, chunkSize: 200 },
     );
 
     await this.withTransaction(async (t) => {
@@ -5452,25 +5454,25 @@ export class PetitionRepository extends BaseRepository {
         petitionId,
         { signature_config: null, anonymized_at: this.now() },
         "AnonymizerWorker",
-        t
+        t,
       );
 
       const [messages, reminders] = await Promise.all([
         this.anonymizePetitionMessages(petitionId, t),
         this.anonymizePetitionReminders(
           accesses.map((a) => a.id),
-          t
+          t,
         ),
         this.anonymizePetitionFieldReplies(replies, t),
         this.anonymizePetitionFieldComments(
           comments.map((c) => c.id),
-          t
+          t,
         ),
         this.anonymizeAccesses(
           petitionId,
           accesses.map((a) => a.id),
           "AnonymizerWorker",
-          t
+          t,
         ),
       ]);
 
@@ -5479,7 +5481,7 @@ export class PetitionRepository extends BaseRepository {
           ...messages.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
           ...reminders.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
         ],
-        t
+        t,
       );
 
       await this.anonymizePetitionSignatureRequests(petitionId, t);
@@ -5492,14 +5494,14 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petitionId,
           data: {},
         },
-        t
+        t,
       );
     });
   }
 
   async anonymizePetitionFieldReplies(
     replies: MaybeArray<Pick<PetitionFieldReply, "id" | "type" | "content" | "anonymized_at">>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const repliesArray = unMaybeArray(replies);
     if (repliesArray.length === 0) return;
@@ -5507,7 +5509,9 @@ export class PetitionRepository extends BaseRepository {
     const fileUploadIds = repliesArray
       .filter(
         (r) =>
-          isFileTypeField(r.type) && isDefined(r.content.file_upload_id) && r.anonymized_at === null
+          isFileTypeField(r.type) &&
+          isDefined(r.content.file_upload_id) &&
+          r.anonymized_at === null,
       )
       .map((r) => r.content.file_upload_id as number);
 
@@ -5533,7 +5537,7 @@ export class PetitionRepository extends BaseRepository {
         `),
           });
       },
-      { chunkSize: 200, concurrency: 5 }
+      { chunkSize: 200, concurrency: 5 },
     );
 
     await this.files.deleteFileUpload(fileUploadIds, "AnonymizerWorker", t);
@@ -5554,7 +5558,7 @@ export class PetitionRepository extends BaseRepository {
             content_json: null,
           });
       },
-      { chunkSize: 200, concurrency: 5 }
+      { chunkSize: 200, concurrency: 5 },
     );
   }
 
@@ -5567,7 +5571,7 @@ export class PetitionRepository extends BaseRepository {
           anonymized_at: this.now(),
           email_body: null,
         },
-        "email_log_id"
+        "email_log_id",
       );
   }
 
@@ -5583,7 +5587,7 @@ export class PetitionRepository extends BaseRepository {
           anonymized_at: this.now(),
           email_body: null,
         },
-        "email_log_id"
+        "email_log_id",
       );
   }
 
@@ -5599,7 +5603,7 @@ export class PetitionRepository extends BaseRepository {
         to: "",
         subject: "",
       },
-      "*"
+      "*",
     );
   }
 
@@ -5623,7 +5627,7 @@ export class PetitionRepository extends BaseRepository {
             case cancel_reason when 'DECLINED_BY_SIGNER' then '{}'::jsonb else cancel_data end
           `),
         },
-        "*"
+        "*",
       );
 
     const fileUploadIds = [
@@ -5639,7 +5643,7 @@ export class PetitionRepository extends BaseRepository {
   private async deactivatePublicPetitionLinks(
     petitionId: number,
     updatedBy: string,
-    t: Knex.Transaction
+    t: Knex.Transaction,
   ) {
     await this.from("public_petition_link", t).where("template_id", petitionId).update({
       is_active: false,
@@ -5652,7 +5656,7 @@ export class PetitionRepository extends BaseRepository {
     fromTemplateId: number,
     orgId: number,
     startDate?: Date | null,
-    endDate?: Date | null
+    endDate?: Date | null,
   ) {
     return await this.raw<TemplateStatsReportInput>(
       /* sql */ `
@@ -5678,7 +5682,7 @@ export class PetitionRepository extends BaseRepository {
         endDate ?? null,
         startDate ?? null,
         endDate ?? null,
-      ]
+      ],
     );
   }
 
@@ -5686,7 +5690,7 @@ export class PetitionRepository extends BaseRepository {
     orgId: number,
     userId: number,
     startDate?: Date | null,
-    endDate?: Date | null
+    endDate?: Date | null,
   ) {
     // list of all the organization's petitions (excluding templates)
     const orgPetitions = await this.raw<{
@@ -5704,7 +5708,7 @@ export class PetitionRepository extends BaseRepository {
           and p.deleted_at is null 
           and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
       `,
-      [orgId, startDate ?? null, endDate ?? null, startDate ?? null, endDate ?? null]
+      [orgId, startDate ?? null, endDate ?? null, startDate ?? null, endDate ?? null],
     );
 
     const fromTemplateIds = uniq(orgPetitions.map((p) => p.from_template_id).filter(isDefined));
@@ -5723,7 +5727,7 @@ export class PetitionRepository extends BaseRepository {
               left join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
               where p.id in ? and p.deleted_at is null
             `,
-            [userId, this.sqlIn(fromTemplateIds)]
+            [userId, this.sqlIn(fromTemplateIds)],
           )
         : [];
 
@@ -5731,14 +5735,14 @@ export class PetitionRepository extends BaseRepository {
       orgPetitions,
       async (chunk) => {
         return zip(chunk, await this.getPetitionTimes(chunk.map((p) => p.id))).map(
-          ([petition, stats]) => ({ ...petition, ...stats })
+          ([petition, stats]) => ({ ...petition, ...stats }),
         );
       },
-      { chunkSize: 200, concurrency: 5 }
+      { chunkSize: 200, concurrency: 5 },
     );
 
     const templatesWithPetitionsWithStats = Object.values(
-      groupBy(petitionsWithStats, (p) => p.from_template_id ?? 0)
+      groupBy(petitionsWithStats, (p) => p.from_template_id ?? 0),
     ).map((group) => {
       const template = isDefined(group[0].from_template_id)
         ? templates.find((t) => t.id === group[0].from_template_id) ?? null
@@ -5757,11 +5761,11 @@ export class PetitionRepository extends BaseRepository {
         },
         times: {
           pending_to_complete: average(
-            petitions.map((p) => p.pending_to_complete).filter(isDefined)
+            petitions.map((p) => p.pending_to_complete).filter(isDefined),
           ),
           complete_to_close: average(petitions.map((p) => p.complete_to_close).filter(isDefined)),
           signature_completed: average(
-            petitions.map((p) => p.signature_completed).filter(isDefined)
+            petitions.map((p) => p.signature_completed).filter(isDefined),
           ),
         },
       };
@@ -5792,11 +5796,11 @@ export class PetitionRepository extends BaseRepository {
           ...groupStats(
             templatesWithPetitionsWithStats
               .filter(([t]) => !isDefined(t))
-              .flatMap(([, petitions]) => petitions)
+              .flatMap(([, petitions]) => petitions),
           ),
         },
       ].filter((r) => r.status.all > 0),
-      [(t) => t.status.all, "desc"]
+      [(t) => t.status.all, "desc"],
     );
   }
 
@@ -5824,16 +5828,16 @@ export class PetitionRepository extends BaseRepository {
         ?.created_at.getTime();
       const completedAt = findLast(
         events,
-        (e) => e.type === "PETITION_COMPLETED"
+        (e) => e.type === "PETITION_COMPLETED",
       )?.created_at.getTime();
       const closedAt = findLast(events, (e) => e.type === "PETITION_CLOSED")?.created_at.getTime();
       const signatureStartedAt = findLast(
         events,
-        (e) => e.type === "SIGNATURE_STARTED"
+        (e) => e.type === "SIGNATURE_STARTED",
       )?.created_at.getTime();
       const signatureCompletedAt = findLast(
         events,
-        (e) => e.type === "SIGNATURE_COMPLETED"
+        (e) => e.type === "SIGNATURE_COMPLETED",
       )?.created_at.getTime();
 
       return {
@@ -5874,7 +5878,7 @@ export class PetitionRepository extends BaseRepository {
       where p.deleted_at is null and p.is_template = ? and p.org_id = ?
       order by "path" asc;
     `,
-      [userId, isTemplate, orgId]
+      [userId, isTemplate, orgId],
     );
 
     return paths.map((p) => p.path);
@@ -5888,7 +5892,7 @@ export class PetitionRepository extends BaseRepository {
     orgId: number,
     isTemplate: boolean,
     paths: string[],
-    permissionType: PetitionPermissionType
+    permissionType: PetitionPermissionType,
   ) {
     const hasPetitionWithLowerPermission = await this.exists(
       /* sql */ `
@@ -5902,7 +5906,7 @@ export class PetitionRepository extends BaseRepository {
         group by p.id
         having min(pp.type) > ?
       `,
-      [userId, isTemplate, orgId, this.sqlArray(paths), permissionType]
+      [userId, isTemplate, orgId, this.sqlArray(paths), permissionType],
     );
     return !hasPetitionWithLowerPermission;
   }
@@ -5913,7 +5917,7 @@ export class PetitionRepository extends BaseRepository {
     source: string,
     destination: string,
     isTemplate: boolean,
-    user: User
+    user: User,
   ) {
     await this.raw(
       /* sql */ `
@@ -5942,7 +5946,7 @@ export class PetitionRepository extends BaseRepository {
         destination,
         source,
         `User:${user.id}`,
-      ]
+      ],
     );
   }
 
@@ -5959,7 +5963,7 @@ export class PetitionRepository extends BaseRepository {
         group by p.id
         order by p.path asc, p.id asc;
     `,
-      [user.id, isTemplate, user.org_id, this.sqlArray(paths)]
+      [user.id, isTemplate, user.org_id, this.sqlArray(paths)],
     );
   }
 
@@ -5968,7 +5972,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     throwOnNoPermission: boolean,
     userId: number,
-    sharePetition?: { permissionType: PetitionPermissionType; isSubscribed: boolean }
+    sharePetition?: { permissionType: PetitionPermissionType; isSubscribed: boolean },
   ) {
     if (mentions.length === 0) {
       return;
@@ -5980,10 +5984,10 @@ export class PetitionRepository extends BaseRepository {
       .andWhere((q) => {
         q.whereIn(
           "user_id",
-          userMentions.map((u) => u.id)
+          userMentions.map((u) => u.id),
         ).orWhereIn(
           "user_group_id",
-          userGroupMentions.map((ug) => ug.id)
+          userGroupMentions.map((ug) => ug.id),
         );
       })
       .select("user_id", "user_group_id");
@@ -6023,7 +6027,7 @@ export class PetitionRepository extends BaseRepository {
           ],
           "User",
           userId,
-          true
+          true,
         );
       }
     }
@@ -6038,13 +6042,13 @@ export class PetitionRepository extends BaseRepository {
   async pickEventToProcess<TName extends "petition_event" | "system_event">(
     id: number,
     tableName: TName,
-    createdAt: Date
+    createdAt: Date,
   ): Promise<TableTypes[TName] | undefined> {
     const [event] = await this.from(tableName)
       .update("processed_at", this.now())
       .whereRaw(
         /* sql */ `id = ? and processed_at is null and date_trunc('milliseconds', created_at) = ?::timestamptz`,
-        [id, createdAt]
+        [id, createdAt],
       )
       .returning("*");
 
@@ -6072,7 +6076,7 @@ export class PetitionRepository extends BaseRepository {
     },
     user: User,
     userDelegate: User | null,
-    fromPublicPetitionLink: boolean
+    fromPublicPetitionLink: boolean,
   ) {
     try {
       const remindersConfig =
@@ -6093,7 +6097,7 @@ export class PetitionRepository extends BaseRepository {
             : null,
         })),
         userDelegate ? userDelegate : user,
-        fromPublicPetitionLink
+        fromPublicPetitionLink,
       );
       const messages = await this.createMessages(
         petition.id,
@@ -6104,7 +6108,7 @@ export class PetitionRepository extends BaseRepository {
           email_subject: args.subject,
           email_body: JSON.stringify(args.body ?? []),
         })),
-        userDelegate ? userDelegate : user
+        userDelegate ? userDelegate : user,
       );
 
       return {
@@ -6146,10 +6150,10 @@ export class PetitionRepository extends BaseRepository {
             content,
             type: fieldType,
           },
-          `User:${owner.id}`
+          `User:${owner.id}`,
         );
       },
-      { concurrency: 1 }
+      { concurrency: 1 },
     );
     return (await this.loadPetition(petitionId))!;
   }
@@ -6187,8 +6191,8 @@ export class PetitionRepository extends BaseRepository {
         } else if (fieldReplies.every((r) => Array.isArray(r))) {
           singleReplies.push(
             ...fieldReplies.map((reply: string[]) =>
-              reply.map((value, i) => [field.options.labels[i], value])
-            )
+              reply.map((value, i) => [field.options.labels[i], value]),
+            ),
           );
         }
       } else {
@@ -6208,7 +6212,7 @@ export class PetitionRepository extends BaseRepository {
 
   async createPublicPetitionLinkPrefillData(
     data: CreatePublicPetitionLinkPrefillData,
-    createdBy: string
+    createdBy: string,
   ) {
     const [row] = await this.insert("public_petition_link_prefill_data", {
       ...data,
@@ -6221,7 +6225,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadPublicPetitionLinkPrefillDataByKeycode = this.buildLoadBy(
     "public_petition_link_prefill_data",
     "keycode",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at"),
   );
 
   async restoreDeletedPetition(petitionId: number) {
@@ -6245,7 +6249,7 @@ export class PetitionRepository extends BaseRepository {
             .whereNotNull("deleted_at")
             .orderBy("deleted_at", "desc")
             .limit(1)
-            .select("id")
+            .select("id"),
         )
         .update({ deleted_at: null, deleted_by: null });
 

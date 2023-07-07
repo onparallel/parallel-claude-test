@@ -39,17 +39,17 @@ export class ProfileRepository extends BaseRepository {
   }
 
   readonly loadProfileType = this.buildLoadBy("profile_type", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadProfileTypeField = this.buildLoadBy("profile_type_field", "id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   readonly loadProfileTypeFieldsByProfileTypeId = this.buildLoadMultipleBy(
     "profile_type_field",
     "profile_type_id",
-    (q) => q.whereNull("deleted_at").orderBy("position", "asc")
+    (q) => q.whereNull("deleted_at").orderBy("position", "asc"),
   );
 
   private readonly loadProfileTypeForProfileId = this.buildLoader<number, ProfileType | null>(
@@ -61,11 +61,11 @@ export class ProfileRepository extends BaseRepository {
         where p.id in ? and p.deleted_at is null and pt.deleted_at is null
       `,
         [this.sqlIn(keys)],
-        t
+        t,
       );
       const byId = indexBy(profileTypes, (pt) => pt.profile_id);
       return keys.map((id) => (isDefined(byId[id]) ? omit(byId[id], ["profile_id"]) : null));
-    }
+    },
   );
 
   getPaginatedProfileTypesForOrg(
@@ -77,7 +77,7 @@ export class ProfileRepository extends BaseRepository {
       filter?: {
         onlyArchived?: boolean | null;
       } | null;
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<ProfileType>(
       this.from("profile_type")
@@ -97,7 +97,7 @@ export class ProfileRepository extends BaseRepository {
               q
                 .select(this.knex.raw("1"))
                 .fromRaw(`jsonb_each_text(name) AS t(key, value)`)
-                .whereEscapedILike("value", `%${escapeLike(search, "\\")}%`)
+                .whereEscapedILike("value", `%${escapeLike(search, "\\")}%`),
             );
           }
           if (sortBy) {
@@ -107,20 +107,20 @@ export class ProfileRepository extends BaseRepository {
                   return { column: this.knex.raw(`"name"->>?`, [locale!]) as any, order };
                 }
                 return { column: field, order };
-              })
+              }),
             );
           }
         })
         .orderBy("id")
         .select("*"),
-      opts
+      opts,
     );
   }
 
   async createProfileType(
     data: MaybeArray<CreateProfileType>,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
     if (dataArr.length === 0) {
@@ -132,7 +132,7 @@ export class ProfileRepository extends BaseRepository {
         created_by: createdBy,
         updated_by: createdBy,
       })),
-      "*"
+      "*",
     );
   }
 
@@ -140,7 +140,7 @@ export class ProfileRepository extends BaseRepository {
     id: number,
     data: Partial<CreateProfileType>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [profileType] = await this.from("profile_type", t)
       .where({ id })
@@ -151,7 +151,7 @@ export class ProfileRepository extends BaseRepository {
           updated_by: updatedBy,
           updated_at: this.now(),
         },
-        "*"
+        "*",
       );
 
     return profileType;
@@ -161,18 +161,18 @@ export class ProfileRepository extends BaseRepository {
     id: number,
     data: Partial<CreateProfileType>,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.withTransaction(async (t) => {
       const sourceProfileType = (await this.loadProfileType.raw(id, t))!;
       const [profileType] = await this.createProfileType(
         { ...pick(sourceProfileType, ["org_id", "name"]), ...data },
         createdBy,
-        t
+        t,
       );
       const sourceFields = await this.loadProfileTypeFieldsByProfileTypeId.raw(
         sourceProfileType.id,
-        t
+        t,
       );
       const fields =
         sourceFields.length === 0
@@ -195,7 +195,7 @@ export class ProfileRepository extends BaseRepository {
                 created_by: createdBy,
                 updated_by: createdBy,
               })),
-              t
+              t,
             ).returning("*");
       // update profile name pattern with new fields
       const [updatedProfileType] = await this.from("profile_type", t)
@@ -212,10 +212,10 @@ export class ProfileRepository extends BaseRepository {
                   const position = sourceFields.find((sf) => sf.id === p)!.position;
                   return fields.find((f) => f.position === position)!.id;
                 }
-              })
+              }),
             ),
           },
-          "*"
+          "*",
         );
       return updatedProfileType;
     }, t);
@@ -246,7 +246,7 @@ export class ProfileRepository extends BaseRepository {
           archived_at: this.now(),
           archived_by_user_id: userId,
         },
-        "*"
+        "*",
       );
   }
 
@@ -264,7 +264,7 @@ export class ProfileRepository extends BaseRepository {
           archived_at: null,
           archived_by_user_id: null,
         },
-        "*"
+        "*",
       );
   }
 
@@ -277,7 +277,7 @@ export class ProfileRepository extends BaseRepository {
       >
     >,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
     if (dataArr.length === 0) {
@@ -301,7 +301,7 @@ export class ProfileRepository extends BaseRepository {
           created_by: createdBy,
           updated_by: createdBy,
         })),
-        t
+        t,
       );
     }, t);
   }
@@ -310,7 +310,7 @@ export class ProfileRepository extends BaseRepository {
     id: number,
     data: Partial<Omit<CreateProfileTypeField, "position">>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [profileTypeField] = await this.from("profile_type_field", t)
       .where("id", id)
@@ -324,7 +324,7 @@ export class ProfileRepository extends BaseRepository {
           updated_by: updatedBy,
           updated_at: this.now(),
         },
-        "*"
+        "*",
       );
 
     return profileTypeField;
@@ -333,7 +333,7 @@ export class ProfileRepository extends BaseRepository {
   async deleteProfileTypeFields(
     profileTypeId: number,
     profileTypeFieldIds: MaybeArray<number>,
-    deletedBy: string
+    deletedBy: string,
   ) {
     if (Array.isArray(profileTypeFieldIds) && profileTypeFieldIds.length === 0) {
       return;
@@ -359,7 +359,7 @@ export class ProfileRepository extends BaseRepository {
             where np.id = ptf.id and np.position != ptf.position
           `,
           [profileTypeId, deletedBy],
-          t
+          t,
         ),
         this.from("profile_field_value")
           .whereNull("deleted_at")
@@ -377,7 +377,7 @@ export class ProfileRepository extends BaseRepository {
   async deleteProfileTypeFieldsByProfileTypeId(
     profileTypeId: MaybeArray<number>,
     deletedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const profileTypeIds = unMaybeArray(profileTypeId);
     if (profileTypeIds.length === 0) {
@@ -395,12 +395,12 @@ export class ProfileRepository extends BaseRepository {
   async updateProfileTypeFieldPositions(
     profileTypeId: number,
     profileTypeFieldIds: number[],
-    updatedBy: string
+    updatedBy: string,
   ) {
     return await this.withTransaction(async (t) => {
       const profileTypeFields = await this.loadProfileTypeFieldsByProfileTypeId.raw(
         profileTypeId,
-        t
+        t,
       );
 
       // check only valid fieldIds and not repeated
@@ -427,10 +427,10 @@ export class ProfileRepository extends BaseRepository {
           updatedBy,
           this.sqlValues(
             profileTypeFieldIds.map((id, i) => [id, i]),
-            ["int", "int"]
+            ["int", "int"],
           ),
         ],
-        t
+        t,
       );
       this.loadProfileTypeFieldsByProfileTypeId.dataloader.clear(profileTypeId);
     });
@@ -441,7 +441,7 @@ export class ProfileRepository extends BaseRepository {
   readonly loadProfileFieldValuesByProfileId = this.buildLoadMultipleBy(
     "profile_field_value",
     "profile_id",
-    (q) => q.whereNull("removed_at").whereNull("deleted_at")
+    (q) => q.whereNull("removed_at").whereNull("deleted_at"),
   );
 
   readonly loadProfileFieldValue = this.buildLoader<
@@ -461,7 +461,7 @@ export class ProfileRepository extends BaseRepository {
       const byKey = indexBy(values, keyBuilder(["profile_id", "profile_type_field_id"]));
       return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => byKey[k] ?? null);
     },
-    { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) }
+    { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) },
   );
 
   readonly loadProfileFieldFiles = this.buildLoader<
@@ -481,17 +481,17 @@ export class ProfileRepository extends BaseRepository {
       const byKey = groupBy(files, keyBuilder(["profile_id", "profile_type_field_id"]));
       return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => byKey[k] ?? null);
     },
-    { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) }
+    { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) },
   );
 
   readonly loadProfileFieldFileById = this.buildLoadBy("profile_field_file", "id", (q) =>
-    q.whereNull("removed_at").whereNull("deleted_at")
+    q.whereNull("removed_at").whereNull("deleted_at"),
   );
 
   readonly loadProfileFieldFilesByProfileId = this.buildLoadMultipleBy(
     "profile_field_file",
     "profile_id",
-    (q) => q.whereNull("removed_at").whereNull("deleted_at")
+    (q) => q.whereNull("removed_at").whereNull("deleted_at"),
   );
 
   async deleteProfileFieldFiles(profileFieldFileId: MaybeArray<number>, userId: number) {
@@ -524,7 +524,7 @@ export class ProfileRepository extends BaseRepository {
         profileTypeId?: number[] | null;
       } | null;
       sortBy?: SortBy<"created_at" | "name">[];
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<Profile>(
       this.from("profile")
@@ -545,13 +545,13 @@ export class ProfileRepository extends BaseRepository {
             q.orderBy(
               sortBy.map(({ field, order }) => {
                 return { column: field, order };
-              })
+              }),
             );
           }
         })
         .orderBy("id")
         .select("*"),
-      opts
+      opts,
     );
   }
 
@@ -564,7 +564,7 @@ export class ProfileRepository extends BaseRepository {
           created_at: this.now(),
           created_by: `User:${userId}`,
         },
-        t
+        t,
       );
       await this.createEvent(
         {
@@ -575,7 +575,7 @@ export class ProfileRepository extends BaseRepository {
             user_id: userId,
           },
         },
-        t
+        t,
       );
       return profile;
     });
@@ -604,7 +604,7 @@ export class ProfileRepository extends BaseRepository {
             select profile_id from from_files
           ) select count(*) from from_all
     `,
-      [this.sqlIn(profileTypeFieldIds), this.sqlIn(profileTypeFieldIds)]
+      [this.sqlIn(profileTypeFieldIds), this.sqlIn(profileTypeFieldIds)],
     );
     return count;
   }
@@ -613,7 +613,7 @@ export class ProfileRepository extends BaseRepository {
     profileTypeId: number,
     pattern: (string | number)[],
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.withTransaction(async (t) => {
       await this.raw(
@@ -648,17 +648,17 @@ export class ProfileRepository extends BaseRepository {
           this.sqlIn(pattern.filter((p) => typeof p === "number")),
           profileTypeId,
           ...pattern.map((p) =>
-            typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`])
+            typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
           ),
           updatedBy,
         ],
-        t
+        t,
       );
       return await this.updateProfileType(
         profileTypeId,
         { profile_name_pattern: this.json(pattern) },
         updatedBy,
-        t
+        t,
       );
     }, t);
   }
@@ -680,7 +680,7 @@ export class ProfileRepository extends BaseRepository {
   async deleteProfilesByProfileTypeId(
     profileTypeIds: MaybeArray<number>,
     deletedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(profileTypeIds);
     if (ids.length === 0) {
@@ -700,7 +700,7 @@ export class ProfileRepository extends BaseRepository {
       content?: Record<string, any> | null;
       expiryDate?: string | null;
     }[],
-    userId: number
+    userId: number,
   ) {
     return await this.withTransaction(async (t) => {
       const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
@@ -710,7 +710,7 @@ export class ProfileRepository extends BaseRepository {
         .where("profile_id", profileId)
         .whereIn(
           "profile_type_field_id",
-          fields.map((f) => f.profileTypeFieldId)
+          fields.map((f) => f.profileTypeFieldId),
         )
         .update({ removed_at: this.now(), removed_by_user_id: userId })
         .returning("*");
@@ -730,7 +730,7 @@ export class ProfileRepository extends BaseRepository {
                   ? { expiry_date: f.expiryDate }
                   : { expiry_date: previousByPtfId[f.profileTypeFieldId]?.expiry_date ?? null }),
               })),
-              t
+              t,
             )
           : [];
       this.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
@@ -774,7 +774,7 @@ export class ProfileRepository extends BaseRepository {
               : []),
           ];
         }),
-        t
+        t,
       );
       const pattern = profileType.profile_name_pattern as (string | number)[];
       if (fields.some((f) => pattern.includes(f.profileTypeFieldId))) {
@@ -811,11 +811,11 @@ export class ProfileRepository extends BaseRepository {
             this.sqlIn(pattern.filter((p) => typeof p === "number")),
             profileId,
             ...pattern.map((p) =>
-              typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`])
+              typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
             ),
             `User:${userId}`,
           ],
-          t
+          t,
         );
         return profile;
       } else {
@@ -827,11 +827,11 @@ export class ProfileRepository extends BaseRepository {
   async profileFieldRepliesHaveExpiryDateSet(
     profileTypeFieldId: number,
     type: ProfileTypeFieldType,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [{ count }] = await this.from(
       type === "FILE" ? "profile_field_file" : "profile_field_value",
-      t
+      t,
     )
       .where({
         profile_type_field_id: profileTypeFieldId,
@@ -847,7 +847,7 @@ export class ProfileRepository extends BaseRepository {
   async updateProfileFieldValuesByProfileTypeFieldId(
     profileTypeFieldId: number,
     data: Partial<CreateProfileFieldValue>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     await this.from("profile_field_value", t)
       .where("profile_type_field_id", profileTypeFieldId)
@@ -859,7 +859,7 @@ export class ProfileRepository extends BaseRepository {
   async updateProfileFieldFilesByProfileTypeFieldId(
     profileTypeFieldId: number,
     data: Partial<CreateProfileFieldFile>,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     await this.from("profile_field_file", t)
       .where("profile_type_field_id", profileTypeFieldId)
@@ -873,7 +873,7 @@ export class ProfileRepository extends BaseRepository {
     profileTypeFieldId: number,
     fileUploadIds: number[],
     expiryDate: string | null | undefined,
-    userId: number
+    userId: number,
   ) {
     return await this.withTransaction(async (t) => {
       const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
@@ -902,7 +902,7 @@ export class ProfileRepository extends BaseRepository {
           expiry_date: previousFiles[0]?.expiry_date ?? expiryDate ?? null,
           created_by_user_id: userId,
         })),
-        t
+        t,
       );
       await this.createEvent(
         [
@@ -917,7 +917,7 @@ export class ProfileRepository extends BaseRepository {
                   profile_type_field_id: profileTypeFieldId,
                   profile_field_file_id: pff.id,
                 },
-              } satisfies ProfileFieldFileAddedEvent<true>)
+              }) satisfies ProfileFieldFileAddedEvent<true>,
           ),
           ...(expiryDate !== undefined
             ? [
@@ -934,7 +934,7 @@ export class ProfileRepository extends BaseRepository {
               ]
             : []),
         ],
-        t
+        t,
       );
       return profileFieldFiles;
     });
@@ -943,7 +943,7 @@ export class ProfileRepository extends BaseRepository {
   async updateProfileFieldFilesExpiryDate(
     profileId: number,
     profileTypeFieldId: number,
-    expiryDate: Maybe<string>
+    expiryDate: Maybe<string>,
   ) {
     return await this.from("profile_field_file")
       .where({
@@ -964,7 +964,7 @@ export class ProfileRepository extends BaseRepository {
           { column: "id", order: "desc" },
         ])
         .select("*"),
-      opts
+      opts,
     );
   }
 
@@ -986,7 +986,7 @@ export class ProfileRepository extends BaseRepository {
         isInAlert?: boolean;
         subscribedByUserId?: number;
       }>;
-    } & PageOpts
+    } & PageOpts,
   ): Pagination<{
     profile_id: number;
     profile_name: string;
@@ -1012,7 +1012,7 @@ export class ProfileRepository extends BaseRepository {
       if (isDefined(opts.filter?.isInAlert)) {
         q.whereRaw(
           /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now()`,
-          [defaultTimezone]
+          [defaultTimezone],
         );
       }
       if (isDefined(opts.filter?.subscribedByUserId)) {
@@ -1051,7 +1051,7 @@ export class ProfileRepository extends BaseRepository {
             .fromRaw(
               this.knex.raw("(?) t", [
                 filesQuery.clone().distinct("pfx.profile_id", "pfx.profile_type_field_id"),
-              ])
+              ]),
             )
             .select<{ count: number }[]>(this.count()),
         ]);
@@ -1069,12 +1069,12 @@ export class ProfileRepository extends BaseRepository {
                 "pfx.expiry_date",
                 this.knex.raw(
                   /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now() as in_alert`,
-                  [defaultTimezone]
+                  [defaultTimezone],
                 ),
                 "ptf.name as profile_type_field_name",
                 this.knex.raw(/* sql */ `(pfx.expiry_date at time zone ?) < now() as is_expired`, [
                   defaultTimezone,
-                ])
+                ]),
               ),
             filesQuery
               .clone()
@@ -1086,12 +1086,12 @@ export class ProfileRepository extends BaseRepository {
                 "pfx.expiry_date",
                 this.knex.raw(
                   /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now() as in_alert`,
-                  [defaultTimezone]
+                  [defaultTimezone],
                 ),
                 "ptf.name as profile_type_field_name",
                 this.knex.raw(/* sql */ `(pfx.expiry_date at time zone ?) < now() as is_expired`, [
                   defaultTimezone,
-                ])
+                ]),
               ),
           ])
           .orderBy("in_alert", "desc")
@@ -1125,10 +1125,10 @@ export class ProfileRepository extends BaseRepository {
               profile_id: profileId,
               user_id: userId,
               created_by: createdBy,
-            }))
-          )
+            })),
+          ),
         ),
-      ]
+      ],
     );
   }
 
@@ -1151,7 +1151,7 @@ export class ProfileRepository extends BaseRepository {
   }
 
   loadProfileSubscribers = this.buildLoadMultipleBy("profile_subscription", "profile_id", (q) =>
-    q.whereNull("deleted_at")
+    q.whereNull("deleted_at"),
   );
 
   /**
@@ -1171,7 +1171,7 @@ export class ProfileRepository extends BaseRepository {
       and ?::timestamp at time zone o.default_timezone < now()
       and (o.last_profile_digest_at is null or o.last_profile_digest_at + make_interval(days=>6) < now())
     `,
-      [afterDate.toISOString()]
+      [afterDate.toISOString()],
     );
   }
 
@@ -1196,18 +1196,18 @@ export class ProfileRepository extends BaseRepository {
         .select<Array<Profile & { petition_id: number; pp_created_at: Date }>>(
           "profile.*",
           "petition_profile.petition_id",
-          "petition_profile.created_at as pp_created_at"
+          "petition_profile.created_at as pp_created_at",
         );
 
       const byPetitionId = groupBy(results, (r) => r.petition_id);
       return petitionIds.map((id) =>
         byPetitionId[id]
           ? sortBy(byPetitionId[id], (p) => p.pp_created_at).map((p) =>
-              omit(p, ["petition_id", "pp_created_at"])
+              omit(p, ["petition_id", "pp_created_at"]),
             )
-          : []
+          : [],
       );
-    }
+    },
   );
 
   async associateProfileToPetition(profileId: number, petitionId: number, createdBy: string) {
@@ -1218,7 +1218,7 @@ export class ProfileRepository extends BaseRepository {
         created_at: this.now(),
         created_by: createdBy,
       },
-      "*"
+      "*",
     );
 
     return petitionProfile;

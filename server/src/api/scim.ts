@@ -24,7 +24,7 @@ export const scim = Router().use(
         throw new Error("Missing authentication");
       }
       const integration = await req.context.integrations.loadProvisioningIntegrationByAuthKey(
-        match[1]
+        match[1],
       );
       if (!integration) {
         throw new Error("Invalid authentication");
@@ -34,7 +34,7 @@ export const scim = Router().use(
     } catch (error) {
       return res.sendStatus(401);
     }
-  }
+  },
 );
 
 scim
@@ -94,12 +94,12 @@ scim
           [user] = await req.context.users.updateUserById(
             user.id,
             { status },
-            `Provisioning:${req.context.organization!.id}`
+            `Provisioning:${req.context.organization!.id}`,
           );
           if (status === "ON_HOLD") {
             await req.context.emails.sendTransferParallelsEmail(
               externalId,
-              req.context.organization!.id
+              req.context.organization!.id,
             );
           }
         }
@@ -110,7 +110,7 @@ scim
               first_name: givenName,
               last_name: familyName,
             },
-            `Provisioning:${req.context.organization!.id}`
+            `Provisioning:${req.context.organization!.id}`,
           );
         }
         res.json(
@@ -120,13 +120,13 @@ scim
             first_name: userData.first_name,
             last_name: userData.last_name,
             status: user.status,
-          })
+          }),
         );
       } else {
         const orgId = req.context.organization!.id;
         const ssoIntegrations = await req.context.integrations.loadIntegrationsByOrgId(
           orgId,
-          "SSO"
+          "SSO",
         );
         const email = emails?.find((e) => e.type === "work")?.value;
         if (ssoIntegrations.length > 0 && email) {
@@ -147,14 +147,14 @@ scim
               },
               preferred_locale: "en",
             },
-            `Provisioning:${req.context.organization!.id}`
+            `Provisioning:${req.context.organization!.id}`,
           );
           const userData = (await req.context.users.loadUserData(user.user_data_id))!;
           res.json(
             toScimUser({
               ...pick(user, ["status", "external_id"]),
               ...pick(userData, ["email", "first_name", "last_name"]),
-            })
+            }),
           );
         } else {
           res.sendStatus(401);
@@ -194,7 +194,7 @@ scim
         toScimUser({
           ...pick(user, ["status", "external_id"]),
           ...pick(userData, ["email", "first_name", "last_name"]),
-        })
+        }),
       );
     } catch (error) {
       next(error);
@@ -222,7 +222,7 @@ scim
               userUpdate.status = await getUserNewStatus(
                 user!.id,
                 op.value === "True",
-                req.context
+                req.context,
               );
               break;
             }
@@ -236,13 +236,13 @@ scim
           req.params.externalId,
           req.context.organization!.id,
           userUpdate,
-          `Provisioning:${req.context.organization!.id}`
+          `Provisioning:${req.context.organization!.id}`,
         );
 
         if (userUpdate.status === "ON_HOLD") {
           await req.context.emails.sendTransferParallelsEmail(
             req.params.externalId,
-            req.context.organization!.id
+            req.context.organization!.id,
           );
         }
       }
@@ -251,7 +251,7 @@ scim
           req.params.externalId,
           req.context.organization!.id,
           userDataUpdate,
-          `Provisioning:${req.context.organization!.id}`
+          `Provisioning:${req.context.organization!.id}`,
         );
       }
       const user = await req.context.users.loadUserByExternalId({
@@ -266,7 +266,7 @@ scim
           toScimUser({
             ...pick(user, ["status", "external_id"]),
             ...pick(userData, ["email", "first_name", "last_name"]),
-          })
+          }),
         );
       }
     } catch (error) {
@@ -291,7 +291,7 @@ scim
         userUpdate.status = await getUserNewStatus(
           user!.id,
           req.body.active === "True",
-          req.context
+          req.context,
         );
       }
 
@@ -300,12 +300,12 @@ scim
           req.params.externalId,
           req.context.organization!.id,
           userUpdate,
-          `Provisioning:${req.context.organization!.id}`
+          `Provisioning:${req.context.organization!.id}`,
         );
         if (userUpdate.status === "ON_HOLD") {
           await req.context.emails.sendTransferParallelsEmail(
             req.params.externalId,
-            req.context.organization!.id
+            req.context.organization!.id,
           );
         }
       }
@@ -314,7 +314,7 @@ scim
           req.params.externalId,
           req.context.organization!.id,
           userDataUpdate,
-          `Provisioning:${req.context.organization!.id}`
+          `Provisioning:${req.context.organization!.id}`,
         );
       }
       const user = await req.context.users.loadUserByExternalId({
@@ -329,7 +329,7 @@ scim
           toScimUser({
             ...pick(user, ["status", "external_id"]),
             ...pick(userData, ["email", "first_name", "last_name"]),
-          })
+          }),
         );
       }
     } catch (error) {
@@ -347,12 +347,12 @@ scim
         req.params.externalId,
         req.context.organization!.id,
         { status },
-        `Provisioning:${req.context.organization!.id}`
+        `Provisioning:${req.context.organization!.id}`,
       );
       if (status === "ON_HOLD") {
         await req.context.emails.sendTransferParallelsEmail(
           req.params.externalId,
-          req.context.organization!.id
+          req.context.organization!.id,
         );
       }
       res.sendStatus(204);
@@ -368,7 +368,7 @@ function getExternalId(filter: any): Maybe<string> {
 }
 
 function toScimUser(
-  user: Pick<User, "status" | "external_id"> & Pick<UserData, "first_name" | "last_name" | "email">
+  user: Pick<User, "status" | "external_id"> & Pick<UserData, "first_name" | "last_name" | "email">,
 ) {
   return {
     schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
@@ -391,7 +391,7 @@ function toScimUser(
 async function getUserNewStatus(
   userId: number,
   active: boolean,
-  ctx: ApiContext
+  ctx: ApiContext,
 ): Promise<UserStatus> {
   if (active) {
     return "ACTIVE";

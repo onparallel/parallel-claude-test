@@ -8,7 +8,7 @@ import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 
 function createProfileTypeAuthorizer<TRest extends any[] = []>(
-  predicate: (profileType: ProfileType, ...rest: TRest) => boolean
+  predicate: (profileType: ProfileType, ...rest: TRest) => boolean,
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
@@ -18,7 +18,7 @@ function createProfileTypeAuthorizer<TRest extends any[] = []>(
       }
       const profileTypes = await ctx.profiles.loadProfileType(profileTypeIds);
       return profileTypes.every(
-        (profileType) => isDefined(profileType) && predicate(profileType, ...rest)
+        (profileType) => isDefined(profileType) && predicate(profileType, ...rest),
       );
     };
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
@@ -30,10 +30,10 @@ export function profileIsAssociatedToPetition<
   TypeName extends string,
   FieldName extends string,
   TProfileId extends Arg<TypeName, FieldName, MaybeArray<number>>,
-  TPetitionId extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TPetitionId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   profileIdArg: TProfileId,
-  petitionIdArg: TPetitionId
+  petitionIdArg: TPetitionId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const profileIds = uniq(unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>));
@@ -52,7 +52,7 @@ export function profileIsAssociatedToPetition<
 export function userHasAccessToProfileType<
   TypeName extends string,
   FieldName extends string,
-  TProfileTypeId extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TProfileTypeId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(profileTypeIdArg: TProfileTypeId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -69,15 +69,15 @@ export function profileTypeFieldBelongsToProfileType<
   TypeName extends string,
   FieldName extends string,
   TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
-  TProfileTypeId extends Arg<TypeName, FieldName, number>
+  TProfileTypeId extends Arg<TypeName, FieldName, number>,
 >(
   profileTypeFieldIdArg: TProfileTypeFieldId,
-  profileTypeIdArg: TProfileTypeId
+  profileTypeIdArg: TProfileTypeId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const profileTypeFieldIds = unMaybeArray(
-        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>
+        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
       );
       const profileTypeId = args[profileTypeIdArg] as unknown as number;
 
@@ -93,16 +93,16 @@ export function profileHasProfileTypeFieldId<
   TypeName extends string,
   FieldName extends string,
   TProfileId extends Arg<TypeName, FieldName, number>,
-  TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   profileIdArg: TProfileId,
-  profileTypeFieldIdArg: TProfileTypeFieldId
+  profileTypeFieldIdArg: TProfileTypeFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const profileId = args[profileIdArg] as unknown as number;
       const profileTypeFieldIds = unMaybeArray(
-        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>
+        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
       );
       const [profileTypeFields, profile] = await Promise.all([
         ctx.profiles.loadProfileTypeField(profileTypeFieldIds),
@@ -111,7 +111,7 @@ export function profileHasProfileTypeFieldId<
       return (
         isDefined(profile) &&
         profileTypeFields.every(
-          (p) => isDefined(p) && p.profile_type_id === profile.profile_type_id
+          (p) => isDefined(p) && p.profile_type_id === profile.profile_type_id,
         )
       );
     } catch {
@@ -124,15 +124,15 @@ export function profileFieldFileHasProfileTypeFieldId<
   TypeName extends string,
   FieldName extends string,
   TProfileFieldFileId extends Arg<TypeName, FieldName, MaybeArray<number>>,
-  TProfileTypeFieldId extends Arg<TypeName, FieldName, number>
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, number>,
 >(
   profileFieldFileIdArg: TProfileFieldFileId,
-  profileTypeFieldIdArg: TProfileTypeFieldId
+  profileTypeFieldIdArg: TProfileTypeFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const profileFieldFileIds = unMaybeArray(
-        args[profileFieldFileIdArg] as unknown as MaybeArray<number>
+        args[profileFieldFileIdArg] as unknown as MaybeArray<number>,
       );
       const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
       const profileFieldFiles = await ctx.profiles.loadProfileFieldFileById(profileFieldFileIds);
@@ -147,15 +147,15 @@ export function profileFieldFileHasProfileTypeFieldId<
 export function profileTypeFieldIsOfType<
   TypeName extends string,
   FieldName extends string,
-  TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   profileTypeFieldIdArg: TProfileTypeFieldId,
-  types: ProfileTypeFieldType[]
+  types: ProfileTypeFieldType[],
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const profileTypeFieldIds = unMaybeArray(
-        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>
+        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>,
       );
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
 
@@ -169,7 +169,7 @@ export function profileTypeFieldIsOfType<
 export function userHasAccessToProfile<
   TypeName extends string,
   FieldName extends string,
-  TProfileId extends Arg<TypeName, FieldName, MaybeArray<number>>
+  TProfileId extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(profileIdArg: TProfileId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -188,11 +188,11 @@ export function fileUploadCanBeAttachedToProfileTypeField<
   FieldName extends string,
   TProfileId extends Arg<TypeName, FieldName, number>,
   TProfileTypeFieldId extends Arg<TypeName, FieldName, number>,
-  TData extends Arg<TypeName, FieldName, NexusGenInputs["FileUploadInput"][]>
+  TData extends Arg<TypeName, FieldName, NexusGenInputs["FileUploadInput"][]>,
 >(
   profileIdArg: TProfileId,
   profileTypeFieldIdArg: TProfileTypeFieldId,
-  dataArg: TData
+  dataArg: TData,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const profileId = args[profileIdArg] as unknown as number;
@@ -203,7 +203,7 @@ export function fileUploadCanBeAttachedToProfileTypeField<
     if ((files ?? []).length + data.length > 10) {
       throw new ApolloError(
         "You cannot upload more than 10 files on the same profile field",
-        "MAX_FILES_EXCEEDED"
+        "MAX_FILES_EXCEEDED",
       );
     }
     return true;
@@ -213,7 +213,7 @@ export function fileUploadCanBeAttachedToProfileTypeField<
 export function contextUserCanSubscribeUsersToProfile<
   TypeName extends string,
   FieldName extends string,
-  TUserIdsArg extends Arg<TypeName, FieldName, number[]>
+  TUserIdsArg extends Arg<TypeName, FieldName, number[]>,
 >(userIdsArg: TUserIdsArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const userIds = uniq(args[userIdsArg] as unknown as number[]);

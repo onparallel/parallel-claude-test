@@ -124,39 +124,39 @@ const _PetitionComposeField = chakraForwardRef<
     isAttachDisabled,
     ...props
   },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
     field.id,
     index,
     onMove,
-    field.isFixed ? "FIXED_FIELD" : "FIELD"
+    field.isFixed ? "FIXED_FIELD" : "FIELD",
   );
 
   const canChangeVisibility =
     fields
       .slice(
         0,
-        fields.findIndex((f) => f.id === field.id)
+        fields.findIndex((f) => f.id === field.id),
       )
       .filter((f) => !f.isReadOnly).length > 0;
 
   const uploads = useRef<Record<string, AbortController>>({});
   const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<Record<string, number>>(
-    {}
+    {},
   );
   const [createPetitionFieldAttachmentUploadLink] = useMutation(
-    PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument
+    PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   );
   const [petitionFieldAttachmentUploadComplete] = useMutation(
-    PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument
+    PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
   );
   const [deletePetitionFieldAttachment] = useMutation(
-    PetitionComposeField_deletePetitionFieldAttachmentDocument
+    PetitionComposeField_deletePetitionFieldAttachmentDocument,
   );
   const [petitionFieldAttachmentDownloadLink] = useMutation(
-    PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument
+    PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
   );
 
   const handleRemoveAttachment = async function (attachmentId: string) {
@@ -174,7 +174,7 @@ const _PetitionComposeField = chakraForwardRef<
         });
         const { url } = data!.petitionFieldAttachmentDownloadLink;
         return url!;
-      })
+      }),
     );
   };
 
@@ -208,7 +208,7 @@ const _PetitionComposeField = chakraForwardRef<
               values={{ size: <FileSize value={maxAttachmentSize} /> }}
             />
           ),
-        })
+        }),
       );
     },
     onDrop: async (files: File[], _, event) => {
@@ -231,7 +231,7 @@ const _PetitionComposeField = chakraForwardRef<
                   values={{ count: 10 }}
                 />
               ),
-            })
+            }),
           );
         }
         return;
@@ -249,7 +249,7 @@ const _PetitionComposeField = chakraForwardRef<
               updateAttachmentUploadingStatus(
                 cache,
                 data!.createPetitionFieldAttachmentUploadLink.attachment.id,
-                true
+                true,
               );
             },
           });
@@ -289,7 +289,7 @@ const _PetitionComposeField = chakraForwardRef<
             },
           });
         },
-        { concurrency: 3 }
+        { concurrency: 3 },
       );
     },
     onDragEnter: async (e) => {
@@ -515,7 +515,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     isAttachDisabled,
     ...props
   },
-  ref
+  ref,
 ) {
   const intl = useIntl();
   const [title, setTitle] = useState(field.title);
@@ -560,8 +560,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             focusTitle(true);
           }
         },
-      } as PetitionComposeFieldRef),
-    [field]
+      }) as PetitionComposeFieldRef,
+    [field],
   );
 
   const letter = letters();
@@ -878,7 +878,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       isAttachDisabled,
       ...props
     },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     const hasCondition = field.visibility;
@@ -1012,7 +1012,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
         </NakedLink>
       </Stack>
     );
-  }
+  },
 );
 
 const fragments = {
@@ -1137,17 +1137,17 @@ const comparePetitionComposeFieldProps = compareWithFragments<any>({
 
 const PetitionComposeFieldActions = memo(
   _PetitionComposeFieldActions,
-  comparePetitionComposeFieldProps
+  comparePetitionComposeFieldProps,
 ) as typeof _PetitionComposeFieldActions;
 
 const PetitionComposeFieldInner = memo(
   _PetitionComposeFieldInner,
-  comparePetitionComposeFieldProps
+  comparePetitionComposeFieldProps,
 ) as typeof _PetitionComposeFieldInner;
 
 export const PetitionComposeField = Object.assign(
   memo(_PetitionComposeField, comparePetitionComposeFieldProps) as typeof _PetitionComposeField,
-  { fragments }
+  { fragments },
 );
 
 interface DragItem {
@@ -1160,7 +1160,7 @@ function useDragAndDrop(
   id: string,
   index: number,
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void,
-  type = "FIELD"
+  type = "FIELD",
 ) {
   const elementRef = useRef<HTMLDivElement>(null);
 

@@ -225,7 +225,7 @@ export const User = objectType({
       authorize: rootIsContextRealUser(),
       resolve: async (root, _, ctx) => {
         const users = (await ctx.users.loadUsersByUserDataId(root.user_data_id)).filter(
-          (user) => user.status === "ACTIVE"
+          (user) => user.status === "ACTIVE",
         );
         const usersByOrgId = indexBy(users, (u) => u.org_id);
         const orgs = await ctx.organizations.loadOrg(uniq(users.map((u) => u.org_id)));

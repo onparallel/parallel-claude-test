@@ -20,7 +20,7 @@ export type IntegrationProvider<TType extends IntegrationType> =
 
 export type IntegrationSettings<
   TType extends IntegrationType,
-  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
 > = TType extends "SIGNATURE"
   ? TProvider extends "SIGNATURIT"
     ? {
@@ -58,7 +58,7 @@ export type IntegrationSettings<
 
 export type IntegrationCredentials<
   TType extends IntegrationType,
-  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
 > = EnhancedIntegrationSettings<TType, TProvider, false> extends { CREDENTIALS: any }
   ? EnhancedIntegrationSettings<TType, TProvider, false>["CREDENTIALS"]
   : never;
@@ -66,7 +66,7 @@ export type IntegrationCredentials<
 export type EnhancedIntegrationSettings<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-  TEncrypted extends boolean = true
+  TEncrypted extends boolean = true,
 > = TEncrypted extends true
   ? IntegrationSettings<TType, TProvider> extends { CREDENTIALS: any }
     ? Omit<IntegrationSettings<TType, TProvider>, "CREDENTIALS"> & { CREDENTIALS: string }
@@ -76,7 +76,7 @@ export type EnhancedIntegrationSettings<
 export type EnhancedOrgIntegration<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-  TEncrypted extends boolean = true
+  TEncrypted extends boolean = true,
 > = Replace<
   OrgIntegration,
   {
@@ -89,7 +89,7 @@ export type EnhancedOrgIntegration<
 export type EnhancedCreateOrgIntegration<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-  TEncrypted extends boolean = true
+  TEncrypted extends boolean = true,
 > = Replace<
   CreateOrgIntegration,
   {
@@ -106,18 +106,18 @@ export class IntegrationRepository extends BaseRepository {
   }
 
   readonly loadIntegration = this.buildLoadBy("org_integration", "id", (q) =>
-    q.whereNull("deleted_at").where("is_enabled", true)
+    q.whereNull("deleted_at").where("is_enabled", true),
   );
 
   readonly loadAnySignatureIntegration = this.buildLoadBy("org_integration", "id", (q) =>
-    q.where({ type: "SIGNATURE" })
+    q.where({ type: "SIGNATURE" }),
   );
 
   getPaginatedIntegrationsForOrg(
     orgId: number,
     opts: {
       type?: IntegrationType | null;
-    } & PageOpts
+    } & PageOpts,
   ) {
     return this.getPagination<OrgIntegration>(
       this.from("org_integration")
@@ -130,7 +130,7 @@ export class IntegrationRepository extends BaseRepository {
         .orderBy("created_at", "desc")
         .orderBy("id", "desc")
         .select("*"),
-      opts
+      opts,
     );
   }
 
@@ -177,28 +177,28 @@ export class IntegrationRepository extends BaseRepository {
           (i) =>
             i.org_id === orgId &&
             (!isDefined(type) || i.type === type) &&
-            (!isDefined(provider) || i.provider === provider)
-        )
+            (!isDefined(provider) || i.provider === provider),
+        ),
       );
     },
     {
       cacheKeyFn: keyBuilder(["orgId", (i) => i.type ?? null, (i) => i.provider ?? null]),
-    }
+    },
   );
 
   async loadIntegrationsByOrgId<
     TType extends IntegrationType,
-    TProvider extends IntegrationProvider<TType> & string = IntegrationProvider<TType>
+    TProvider extends IntegrationProvider<TType> & string = IntegrationProvider<TType>,
   >(
     orgId: number,
     type: TType,
     provider?: TProvider | null,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<TType, TProvider, true>[]> {
     if (isDefined(t)) {
       return (await this._loadIntegrationsByOrgId.raw(
         { orgId, type, provider },
-        t
+        t,
       )) as EnhancedOrgIntegration<TType, TProvider, true>[];
     } else {
       return (await this._loadIntegrationsByOrgId({
@@ -218,7 +218,7 @@ export class IntegrationRepository extends BaseRepository {
       and deleted_at is null
       and is_enabled is true;
     `,
-      [key]
+      [key],
     );
 
     return integration;
@@ -233,7 +233,7 @@ export class IntegrationRepository extends BaseRepository {
         and deleted_at is null
         and is_enabled is true;
       `,
-      [domain]
+      [domain],
     );
 
     return integration;
@@ -241,12 +241,12 @@ export class IntegrationRepository extends BaseRepository {
 
   async updateOrgIntegration<
     TType extends IntegrationType,
-    TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
+    TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
   >(
     integrationId: number,
     data: Partial<EnhancedOrgIntegration<TType, TProvider, true>>,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return await this.from("org_integration", t)
       .where({ id: integrationId, deleted_at: null })
@@ -256,14 +256,14 @@ export class IntegrationRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: updatedBy,
         },
-        "*"
+        "*",
       );
   }
 
   async userHasAccessToIntegration(
     ids: number[],
     user: User,
-    integrationTypes?: IntegrationType[]
+    integrationTypes?: IntegrationType[],
   ) {
     const [{ count }] = await this.from("org_integration")
       .whereIn("id", ids)
@@ -282,7 +282,7 @@ export class IntegrationRepository extends BaseRepository {
     type: IntegrationType,
     orgId: number,
     updatedBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     return this.withTransaction(async (t) => {
       const [integration] = await this.from("org_integration", t)
@@ -293,7 +293,7 @@ export class IntegrationRepository extends BaseRepository {
             updated_by: updatedBy,
             updated_at: this.now(),
           },
-          "*"
+          "*",
         );
       await this.from("org_integration", t)
         .where({ org_id: orgId, is_default: true, type, deleted_at: null })
@@ -309,11 +309,11 @@ export class IntegrationRepository extends BaseRepository {
 
   async createOrgIntegration<
     TType extends IntegrationType,
-    TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
+    TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
   >(
     data: EnhancedCreateOrgIntegration<TType, TProvider, true>,
     createdBy: string,
-    t?: Knex.Transaction
+    t?: Knex.Transaction,
   ) {
     const [integration] = await this.insert(
       "org_integration",
@@ -321,7 +321,7 @@ export class IntegrationRepository extends BaseRepository {
         ...data,
         created_by: createdBy,
       },
-      t
+      t,
     ).returning("*");
     return integration as EnhancedOrgIntegration<TType, TProvider, true>;
   }

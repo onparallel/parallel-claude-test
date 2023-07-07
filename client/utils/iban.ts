@@ -130,6 +130,6 @@ export const ibanRegex = (() => {
         })
         .join("|"),
       ")$",
-    ].join("")
+    ].join(""),
   );
 })();

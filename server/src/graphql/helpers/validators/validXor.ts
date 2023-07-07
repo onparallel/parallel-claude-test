@@ -5,7 +5,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validXor<TypeName extends string, FieldName extends string>(
   props: (args: core.ArgsValue<TypeName, FieldName>) => boolean[],
-  argNames: string
+  argNames: string,
 ) {
   return ((_, args, ctx, info) => {
     const values = props(args);

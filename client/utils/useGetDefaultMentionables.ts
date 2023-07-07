@@ -28,7 +28,7 @@ export function useGetDefaultMentionables(petitionId: string) {
           .filter(isTypename("PetitionUserGroupPermission"))
           .flatMap((p) => p.group.members.map((m) => m.user)) ?? []),
       ].filter((m) => (m.__typename === "User" && m.isMe ? false : true)),
-      (m) => m.id
+      (m) => m.id,
     );
   }, [data]);
 }

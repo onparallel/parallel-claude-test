@@ -18,7 +18,7 @@ type DialogCallbacks<TResult = void> = {
 export type DialogProps<TProps = {}, TResult = void> = TProps & DialogCallbacks<TResult>;
 
 export type DialogOpener = <TProps = {}, TResult = void>(
-  opener: (callbacks: DialogCallbacks<TResult>) => ReactElement<DialogProps<TProps, TResult>>
+  opener: (callbacks: DialogCallbacks<TResult>) => ReactElement<DialogProps<TProps, TResult>>,
 ) => Promise<TResult>;
 
 const DialogOpenerContext = createContext<DialogOpener | null>(null);
@@ -33,7 +33,7 @@ type UseDialogReturn<TProps = {}, TResult = void> = {
 
 export function useDialog<TProps = {}, TResult = void>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Dialog: ComponentType<DialogProps<TProps, TResult>>
+  Dialog: ComponentType<DialogProps<TProps, TResult>>,
 ): UseDialogReturn<TProps, TResult> {
   const opener = useContext(DialogOpenerContext)!;
   return useCallback(
@@ -41,7 +41,7 @@ export function useDialog<TProps = {}, TResult = void>(
       opener((callbacks: DialogCallbacks<TResult>) => (
         <Dialog {...callbacks} {...((props as any) ?? {})} />
       )),
-    [Dialog]
+    [Dialog],
   );
 }
 
@@ -72,7 +72,7 @@ function DialogOpenerProvider({ children }: { children?: ReactNode }) {
 
 export function withDialogs<P = {}>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Component: NextComponentType<any, P, P>
+  Component: NextComponentType<any, P, P>,
 ): NextComponentType<any, P, P> {
   const WithDialogs: NextComponentType<any, P, P> = function ({ ...props }) {
     return (

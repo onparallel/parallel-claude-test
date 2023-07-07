@@ -70,7 +70,7 @@ function ConfirmSignerInfoDialog({
                 defaultMessage="You already added this email for {signersList}. You can modify the name and add it again."
                 values={{
                   signersList: intl.formatList(
-                    repeatedSigners.map((s) => fullName(s.firstName, s.lastName))
+                    repeatedSigners.map((s) => fullName(s.firstName, s.lastName)),
                   ),
                 }}
               />

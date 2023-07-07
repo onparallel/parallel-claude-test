@@ -59,7 +59,7 @@ function ProfileSubscribersDialog({
 
   const [subscribers, setSubscribers] = useState<useProfileSubscribersDialog_UserFragment[]>(users);
   const [unsubscribers, setUnsubscribers] = useState<useProfileSubscribersDialog_UserFragment[]>(
-    isSubscribed === false ? [me] : []
+    isSubscribed === false ? [me] : [],
   );
 
   const listedUsers =
@@ -77,7 +77,7 @@ function ProfileSubscribersDialog({
         excludeUsers: [...excludeUsers, ...listedUsers.map((u) => u.id)],
       });
     },
-    [_handleSearchUsers, listedUsers.map((u) => u.id).join(",")]
+    [_handleSearchUsers, listedUsers.map((u) => u.id).join(",")],
   );
 
   const [subscribe] = useMutation(useProfileSubscribersDialog_subscribeToProfileDocument);

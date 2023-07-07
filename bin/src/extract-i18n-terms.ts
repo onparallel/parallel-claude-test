@@ -51,7 +51,7 @@ async function extractTerms(input: string) {
        --throws \
        --out-file ${tmpFileName} \
       ${isWindows ? input : `'${input}'`}`,
-      { encoding: "utf-8" }
+      { encoding: "utf-8" },
     );
     const terms = await readJson<Record<string, MessageDescriptor>>(tmpFileName);
     await fs.unlink(tmpFileName);
@@ -82,7 +82,7 @@ async function loadLocaleData(dir: string, locale: string) {
 function updateLocaleData(
   isDefault: boolean,
   data: Map<string, Term>,
-  terms: Record<string, MessageDescriptor>
+  terms: Record<string, MessageDescriptor>,
 ) {
   const updated = new Map();
   for (const [id, term] of Object.entries(terms)) {

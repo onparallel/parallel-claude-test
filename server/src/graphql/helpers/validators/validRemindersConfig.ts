@@ -5,9 +5,9 @@ import { isValidTime, isValidTimezone } from "../../../util/time";
 
 export function validRemindersConfig<TypeName extends string, FieldName extends string>(
   prop: (
-    args: core.ArgsValue<TypeName, FieldName>
+    args: core.ArgsValue<TypeName, FieldName>,
   ) => core.GetGen2<"inputTypes", "RemindersConfigInput"> | null | undefined,
-  argName: string
+  argName: string,
 ) {
   return ((_, args, ctx, info) => {
     const remindersConfig = prop(args);
@@ -17,14 +17,14 @@ export function validRemindersConfig<TypeName extends string, FieldName extends 
         throw new ArgValidationError(
           info,
           `${argName}.time`,
-          `Value must be a valid 00:00-23:59 time.`
+          `Value must be a valid 00:00-23:59 time.`,
         );
       }
       if (!isValidTimezone(timezone)) {
         throw new ArgValidationError(
           info,
           `${argName}.timezone`,
-          `Value must be a valid timezone.`
+          `Value must be a valid timezone.`,
         );
       }
       if (limit > 10 || limit < 1) {

@@ -37,7 +37,7 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
       petitionId,
       parallelUrl,
     }: SignatureCancelledRequestErrorProps,
-    intl: IntlShape
+    intl: IntlShape,
   ) {
     return outdent`
     **${intl
@@ -62,7 +62,7 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
             defaultMessage: "Unnamed parallel",
           }),
         signers: intl.formatList(signers.map((s) => `${s.name} (${s.email})`)),
-      }
+      },
     )}
 
     ${intl.formatMessage({

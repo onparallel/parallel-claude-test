@@ -60,14 +60,14 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             </Text>
           </>
         ),
-      })
+      }),
     );
   }
 
   const showImportErrorResolveDomainDialog = useDialog(ImportErrorResolveDomainDialog);
 
   const [bulkCreateContacts, { loading: isUploading }] = useMutation(
-    ImportContactsDialog_bulkCreateContactsDocument
+    ImportContactsDialog_bulkCreateContactsDocument,
   );
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {
     if (rejected.length > 0) {

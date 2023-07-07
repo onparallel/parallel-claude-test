@@ -130,6 +130,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
         slug: "other",
       },
     ],
-    [intl.locale]
+    [intl.locale],
   );
 }

@@ -52,5 +52,5 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
         </ButtonGroup>
       </HStack>
     );
-  }
+  },
 );

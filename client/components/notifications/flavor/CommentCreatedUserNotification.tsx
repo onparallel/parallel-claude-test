@@ -71,7 +71,7 @@ export const CommentCreatedUserNotification = Object.assign(
           )}
         </PetitionUserNotification>
       );
-    }
+    },
   ),
   {
     fragments: {
@@ -96,5 +96,5 @@ export const CommentCreatedUserNotification = Object.assign(
         ${ContactReference.fragments.Contact}
       `,
     },
-  }
+  },
 );

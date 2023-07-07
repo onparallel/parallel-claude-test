@@ -8,7 +8,7 @@ import { toGlobalId } from "../../util/globalId";
 
 export async function internalSignaturitAccountDepletedCredits(
   payload: { orgId: number; apiKeyHint: string; petitionId: number },
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const org = await context.organizations.loadOrg(payload.orgId);
   const user = await context.petitions.loadPetitionOwner(payload.petitionId);
@@ -27,7 +27,7 @@ export async function internalSignaturitAccountDepletedCredits(
       userEmail: userData!.email,
       theme: defaultBrandTheme,
     },
-    { locale: "es" }
+    { locale: "es" },
   );
 
   const emails: EmailLog[] = [];

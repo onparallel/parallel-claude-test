@@ -24,7 +24,7 @@ interface RichTextEditorToolbarProps {
 export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolbarProps>(
   function RichTextEditorToolbar(
     { isDisabled, hasPlaceholders, hasHeadingButton = true, hasListButtons = true, ...props },
-    ref
+    ref,
   ) {
     const intl = useIntl();
     return (
@@ -90,5 +90,5 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
         <ToolbarLinkButton isDisabled={isDisabled} />
       </Stack>
     );
-  }
+  },
 );

@@ -3,7 +3,7 @@ import { localStorageGet, localStorageSet } from "./localStorage";
 
 export function useUserPreference<S>(
   name: string,
-  defaultValue: S
+  defaultValue: S,
 ): [S, Dispatch<SetStateAction<S>>] {
   const [value, setValue] = useState<S>(() => {
     return localStorageGet(name, defaultValue);
@@ -19,7 +19,7 @@ export function useUserPreference<S>(
           return next;
         });
       },
-      [setValue]
+      [setValue],
     ),
   ];
 }

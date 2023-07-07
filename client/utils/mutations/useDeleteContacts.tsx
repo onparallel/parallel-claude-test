@@ -144,6 +144,6 @@ function useConfirmDeleteContactsDialog() {
         ),
       });
     },
-    []
+    [],
   );
 }

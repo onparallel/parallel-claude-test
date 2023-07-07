@@ -27,7 +27,7 @@ export async function up(knex: Knex): Promise<void> {
     .from("organization")
     .update(
       "usage_details",
-      JSON.stringify({ USER_LIMIT: 2, PETITION_SEND: { limit: 20, period: "1 month" } })
+      JSON.stringify({ USER_LIMIT: 2, PETITION_SEND: { limit: 20, period: "1 month" } }),
     )
     .returning("*");
 
@@ -39,7 +39,7 @@ export async function up(knex: Knex): Promise<void> {
         limit: 5000,
         used: 0,
         period: "1 month",
-      }))
+      })),
     );
   }
 }

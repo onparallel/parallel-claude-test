@@ -8,7 +8,7 @@ import { Config } from "../config";
 
 function shouldBeProcessed(
   notifications: (PetitionUserNotification | PetitionContactNotification)[],
-  minutesBeforeNotify: number
+  minutesBeforeNotify: number,
 ) {
   const lastNotification = maxBy(notifications, (n) => n.created_at.getTime())!;
   return differenceInMinutes(new Date(), lastNotification.created_at) > minutesBeforeNotify;
@@ -21,10 +21,10 @@ function shouldBeProcessed(
  */
 async function processCommentCreatedUserNotifications(
   context: WorkerContext,
-  config: Config["cronWorkers"]["petition-notifications"]
+  config: Config["cronWorkers"]["petition-notifications"],
 ) {
   const notifications = await context.petitions.loadUnprocessedUserNotificationsOfType(
-    "COMMENT_CREATED"
+    "COMMENT_CREATED",
   );
 
   if (notifications.length > 0) {
@@ -39,7 +39,7 @@ async function processCommentCreatedUserNotifications(
           await context.emails.sendPetitionCommentsUserNotificationEmail(
             petitionId,
             userId,
-            notifications.map((n) => n.data.petition_field_comment_id)
+            notifications.map((n) => n.data.petition_field_comment_id),
           );
         }
         await context.petitions.updatePetitionUserNotificationsProcessedAt(group.map((n) => n.id));
@@ -55,16 +55,16 @@ async function processCommentCreatedUserNotifications(
  */
 async function processCommentCreatedContactNotifications(
   context: WorkerContext,
-  config: Config["cronWorkers"]["petition-notifications"]
+  config: Config["cronWorkers"]["petition-notifications"],
 ) {
   const notifications = await context.petitions.loadUnprocessedContactNotificationsOfType(
-    "COMMENT_CREATED"
+    "COMMENT_CREATED",
   );
 
   if (notifications.length > 0) {
     const groupedContactNotifications = groupBy(
       notifications,
-      (n) => `${n.petition_id},${n.petition_access_id}`
+      (n) => `${n.petition_id},${n.petition_access_id}`,
     );
     for (const group of Object.values(groupedContactNotifications)) {
       if (shouldBeProcessed(group, config.minutesBeforeNotify!)) {
@@ -74,11 +74,11 @@ async function processCommentCreatedContactNotifications(
         await context.emails.sendPetitionCommentsContactNotificationEmail(
           petitionId,
           accessId,
-          group.map((n) => n.data.petition_field_comment_id)
+          group.map((n) => n.data.petition_field_comment_id),
         );
 
         await context.petitions.updatePetitionContactNotificationsProcessedAt(
-          group.map((n) => n.id)
+          group.map((n) => n.id),
         );
       }
     }
@@ -92,12 +92,12 @@ async function processCommentCreatedContactNotifications(
  */
 async function processSignatureCancelledUserNotifications(context: WorkerContext) {
   const notifications = await context.petitions.loadUnprocessedUserNotificationsOfType(
-    "SIGNATURE_CANCELLED"
+    "SIGNATURE_CANCELLED",
   );
 
   const emailBouncedNotificationIds = await processSignatureCancelledEmailBouncedUserNotifications(
     notifications,
-    context
+    context,
   );
 
   const noCreditsLeftNotificationIds =
@@ -112,7 +112,7 @@ async function processSignatureCancelledUserNotifications(context: WorkerContext
       ...emailBouncedNotificationIds,
       ...noCreditsLeftNotificationIds,
       ...declinedBySignerNotificationIds,
-    ]
+    ],
   );
   if (otherIds.length > 0) {
     await context.petitions.updatePetitionUserNotificationsProcessedAt(otherIds);
@@ -121,19 +121,19 @@ async function processSignatureCancelledUserNotifications(context: WorkerContext
 
 async function processSignatureCancelledEmailBouncedUserNotifications(
   notifications: SignatureCancelledUserNotification[],
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const emailBouncedNotifications = notifications.filter(
     (n) =>
-      n.data.cancel_reason === "REQUEST_ERROR" && n.data.cancel_data.error_code === "EMAIL_BOUNCED"
+      n.data.cancel_reason === "REQUEST_ERROR" && n.data.cancel_data.error_code === "EMAIL_BOUNCED",
   );
   const groupedEmailBouncedNotifications = groupBy(
     emailBouncedNotifications,
-    (n) => n.data.petition_signature_request_id
+    (n) => n.data.petition_signature_request_id,
   );
   for (const group of Object.values(groupedEmailBouncedNotifications)) {
     await context.emails.sendSignatureCancelledRequestErrorEmail(
-      group[0].data.petition_signature_request_id
+      group[0].data.petition_signature_request_id,
     );
     await context.petitions.updatePetitionUserNotificationsProcessedAt(group.map((n) => n.id));
   }
@@ -143,20 +143,20 @@ async function processSignatureCancelledEmailBouncedUserNotifications(
 
 async function processSignatureCancelledNoCreditsLeftUserNotifications(
   notifications: SignatureCancelledUserNotification[],
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const noCreditsLeftNotifications = notifications.filter(
     (n) =>
       n.data.cancel_reason === "REQUEST_ERROR" &&
-      n.data.cancel_data.error_code === "INSUFFICIENT_SIGNATURE_CREDITS"
+      n.data.cancel_data.error_code === "INSUFFICIENT_SIGNATURE_CREDITS",
   );
   const groupedNoCreditsLeftNotifications = groupBy(
     noCreditsLeftNotifications,
-    (n) => n.data.petition_signature_request_id
+    (n) => n.data.petition_signature_request_id,
   );
   for (const group of Object.values(groupedNoCreditsLeftNotifications)) {
     await context.emails.sendSignatureCancelledNoCreditsLeftEmail(
-      group[0].data.petition_signature_request_id
+      group[0].data.petition_signature_request_id,
     );
     await context.petitions.updatePetitionUserNotificationsProcessedAt(group.map((n) => n.id));
   }
@@ -166,18 +166,18 @@ async function processSignatureCancelledNoCreditsLeftUserNotifications(
 
 async function processSignatureCancelledDeclinedBySignerUserNotifications(
   notifications: SignatureCancelledUserNotification[],
-  context: WorkerContext
+  context: WorkerContext,
 ) {
   const declinedBySignerNotifications = notifications.filter(
-    (n) => n.data.cancel_reason === "DECLINED_BY_SIGNER"
+    (n) => n.data.cancel_reason === "DECLINED_BY_SIGNER",
   );
   const groupedDeclinedBySignerNotifications = groupBy(
     declinedBySignerNotifications,
-    (n) => n.data.petition_signature_request_id
+    (n) => n.data.petition_signature_request_id,
   );
   for (const group of Object.values(groupedDeclinedBySignerNotifications)) {
     await context.emails.sendSignatureCancelledDeclinedBySignerEmail(
-      group[0].data.petition_signature_request_id
+      group[0].data.petition_signature_request_id,
     );
     await context.petitions.updatePetitionUserNotificationsProcessedAt(group.map((n) => n.id));
   }
