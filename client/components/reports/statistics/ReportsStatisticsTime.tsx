@@ -43,7 +43,7 @@ import { getTimeSpan, TimeSpan } from "../common/TimeSpan";
 
 type RadioValues = "opened" | "first_reply" | "completed" | "signed" | "closed";
 
-ChartJS.register(BoxPlotController, BoxAndWiskers, LinearScale, CategoryScale, Tooltip);
+ChartJS.register(BoxPlotController, BoxAndWiskers as any, LinearScale, CategoryScale, Tooltip);
 
 export function ReportsStatisticsTime({
   report,

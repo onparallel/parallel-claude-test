@@ -13,7 +13,7 @@ import {
   useComboboxControls,
   useComboboxSelectors,
 } from "@udecode/plate-combobox";
-import { RenderFunction, useEditorState, useEventEditorSelectors } from "@udecode/plate-common";
+import { useEditorState, useEventEditorSelectors } from "@udecode/plate-common";
 import {
   flip,
   getRangeBoundingClientRect,
@@ -21,7 +21,7 @@ import {
   shift,
   useVirtualFloating,
 } from "@udecode/plate-floating";
-import { useCallback, useEffect, useState } from "react";
+import { ComponentType, useCallback, useEffect, useState } from "react";
 import { groupBy } from "remeda";
 import { Card } from "../Card";
 
@@ -40,8 +40,8 @@ export interface ComboboxProps<TData = NoData>
    * Render combobox item.
    * @default item.text
    */
-  onRenderItem?: RenderFunction<ComboboxItemProps<TData>>;
-  onRenderNoItems?: RenderFunction<{ search: string }>;
+  onRenderItem?: ComponentType<ComboboxItemProps<TData>>;
+  onRenderNoItems?: ComponentType<{ search: string }>;
 }
 
 const ComboboxContent = <TData extends Data = NoData>(
@@ -67,7 +67,6 @@ const ComboboxContent = <TData extends Data = NoData>(
   const targetRange = useComboboxSelectors.targetRange();
   const filteredItems = useComboboxSelectors.filteredItems();
   const highlightedIndex = useComboboxSelectors.highlightedIndex();
-  const floatingOptions = useComboboxSelectors.floatingOptions?.();
   const editor = useEditorState();
   const combobox = useComboboxControls();
   const isOpen = useComboboxSelectors.isOpen();
@@ -109,11 +108,10 @@ const ComboboxContent = <TData extends Data = NoData>(
   );
 
   // Update popper position
-  const { style, floating } = useVirtualFloating({
+  const { style, refs } = useVirtualFloating({
     placement: "bottom-start",
     getBoundingClientRect,
     middleware: [offset({ mainAxis: 4, alignmentAxis: -3 }), shift(), flip()],
-    ...floatingOptions,
   });
 
   const menuProps = combobox
@@ -124,7 +122,7 @@ const ComboboxContent = <TData extends Data = NoData>(
     <Portal>
       <Card
         {...menuProps}
-        ref={floating}
+        ref={refs.setFloating}
         style={style}
         paddingY={1}
         transition="none"

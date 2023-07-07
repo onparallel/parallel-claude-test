@@ -1,26 +1,25 @@
 import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
+import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty";
+import { UserSelectOption } from "@parallel/components/common/UserSelectOption";
 import {
   ComboboxItemProps,
   ComboboxProps,
   PlateCombobox,
 } from "@parallel/components/common/slate/PlateCombobox";
-import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty";
-import { UserSelectOption } from "@parallel/components/common/UserSelectOption";
 import { createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
 import {
-  getPluginOptions,
   PlateEditor,
-  RenderFunction,
   TRenderElementProps,
-  usePlateEditorRef,
   Value,
+  getPluginOptions,
+  usePlateEditorRef,
 } from "@udecode/plate-common";
 import {
-  createMentionPlugin as _createMentionPlugin,
   ELEMENT_MENTION_INPUT,
-  getMentionOnSelectItem,
   MentionPlugin,
+  createMentionPlugin as _createMentionPlugin,
+  getMentionOnSelectItem,
 } from "@udecode/plate-mention";
 import { useCallback, useMemo } from "react";
 import { useFocused, useSelected } from "slate-react";
@@ -129,14 +128,13 @@ export function MentionCombobox({
   );
 }
 
-const RenderMentionable: RenderFunction<ComboboxItemProps<Mentionable>> =
-  function RenderMentionable({ item, search }) {
-    return <UserSelectOption data={item.data} highlight={search} isDisabled={item.disabled} />;
-  };
+function RenderMentionable({ item, search }: ComboboxItemProps<Mentionable>) {
+  return <UserSelectOption data={item.data} highlight={search} isDisabled={item.disabled} />;
+}
 
-const RenderNoItems: RenderFunction<{ search: string }> = function RenderNoItems({ search }) {
+function RenderNoItems({ search }: { search: string }) {
   return <UserDropdownEmpty search={search} includeGroups={true} />;
-};
+}
 
 function MentionElement({
   attributes,

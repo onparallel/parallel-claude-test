@@ -25,7 +25,6 @@ import {
 import { createExitBreakPlugin } from "@udecode/plate-break";
 import { createComboboxPlugin } from "@udecode/plate-combobox";
 import {
-  PlatePlugin,
   PlatePluginComponent,
   PlateProvider,
   createHistoryPlugin,
@@ -114,7 +113,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     const hasPlaceholders = isDefined(placeholderOptions) && placeholderOptions.length > 0;
     const placeholdersRef = useUpdatingRef(placeholderOptions ?? []);
     const plugins = useConstant(() =>
-      createPlugins<RichTextEditorValue, RichTextPEditor>(
+      createPlugins(
         [
           createReactPlugin(),
           createHistoryPlugin(),
@@ -144,10 +143,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             },
           }),
           ...(hasPlaceholders
-            ? ([
-                createComboboxPlugin(),
-                createPlaceholderPlugin({ placeholdersRef }),
-              ] as PlatePlugin<any, RichTextEditorValue, RichTextPEditor>[])
+            ? [createComboboxPlugin(), createPlaceholderPlugin({ placeholdersRef })]
             : []),
           createHeadingPlugin({ options: { levels: 2 } }),
           createLinkPlugin(),
@@ -210,7 +206,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     return (
       <PlateProvider<RichTextEditorValue, RichTextPEditor>
         id={formControl.id}
-        plugins={plugins}
+        plugins={plugins as any}
         initialValue={initialValue}
         onChange={
           !isDisabled

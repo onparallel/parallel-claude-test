@@ -15,7 +15,6 @@ import {
 import { TComboboxItem } from "@udecode/plate-combobox";
 import {
   PlateEditor,
-  RenderFunction,
   TRenderElementProps,
   Value,
   getEditorString,
@@ -99,7 +98,7 @@ export function createPlaceholderPlugin<
         if (
           !editor.selection ||
           text !== trigger ||
-          (query && !query<TValue, TEditor>(editor)) ||
+          (query && !query(editor as PlateEditor)) ||
           isSelectionInMentionInput(editor)
         ) {
           for (const part of parseTextWithPlaceholders(text)) {
@@ -211,53 +210,52 @@ export function PlaceholderCombobox({
   );
 }
 
-const RenderPlaceholderOption: RenderFunction<ComboboxItemProps<ComboboxItemData>> =
-  function RenderPlaceholderOption({ item, search }) {
-    if ("data" in item && "field" in item.data && item.data.field) {
-      return (
-        <Flex alignItems="center" flex="1" minWidth={0}>
-          <PetitionFieldTypeIndicator
-            as="div"
-            isTooltipDisabled
-            marginRight={2}
-            fieldIndex={item.data.index!}
-            type={item.data.field.type}
-          />
-          {item.data.field.title ? (
-            <HighlightText
-              textAlign="left"
-              as="div"
-              flex={1}
-              minWidth={0}
-              overflow="hidden"
-              textOverflow="ellipsis"
-              whiteSpace="nowrap"
-              search={search ?? ""}
-            >
-              {item.text}
-            </HighlightText>
-          ) : (
-            <Text as="div" textStyle="hint">
-              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-            </Text>
-          )}
-        </Flex>
-      );
-    }
+function RenderPlaceholderOption({ item, search }: ComboboxItemProps<ComboboxItemData>) {
+  if ("data" in item && "field" in item.data && item.data.field) {
     return (
-      <HighlightText as="div" whiteSpace="nowrap" search={search ?? ""} textTransform="capitalize">
-        {item.text}
-      </HighlightText>
+      <Flex alignItems="center" flex="1" minWidth={0}>
+        <PetitionFieldTypeIndicator
+          as="div"
+          isTooltipDisabled
+          marginRight={2}
+          fieldIndex={item.data.index!}
+          type={item.data.field.type}
+        />
+        {item.data.field.title ? (
+          <HighlightText
+            textAlign="left"
+            as="div"
+            flex={1}
+            minWidth={0}
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+            search={search ?? ""}
+          >
+            {item.text}
+          </HighlightText>
+        ) : (
+          <Text as="div" textStyle="hint">
+            <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+          </Text>
+        )}
+      </Flex>
     );
-  };
+  }
+  return (
+    <HighlightText as="div" whiteSpace="nowrap" search={search ?? ""} textTransform="capitalize">
+      {item.text}
+    </HighlightText>
+  );
+}
 
-const RenderNoItems: RenderFunction<{ search: string }> = function RenderNoItems() {
+function RenderNoItems({}: { search: string }) {
   return (
     <Box textStyle="hint" textAlign="center" paddingY={2} paddingX={3}>
       <FormattedMessage id="generic.no-results" defaultMessage="No results" />
     </Box>
   );
-};
+}
 
 const PlaceholdersContext = createContext<PlaceholderOption[] | null>(null);
 
