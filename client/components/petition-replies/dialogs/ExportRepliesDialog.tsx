@@ -111,9 +111,14 @@ export function ExportRepliesDialog({
   const clientIdRef = useRef<HTMLInputElement>(null);
   const placeholdersRename = useFilenamePlaceholdersRename();
   const example = useMemo(() => {
-    const field = fields.find((f) => isFileTypeField(f.type) && f.replies.length > 0)!;
+    const field = fields.find(
+      (f) =>
+        isFileTypeField(f.type) &&
+        f.replies.length > 0 &&
+        f.replies.some((r) => !r.content.error && r.content.uploadComplete)
+    );
     if (!field) return [null];
-    const reply = field.replies[0];
+    const reply = field.replies.find((r) => !r.content.error && r.content.uploadComplete)!;
     return [reply.content.filename, placeholdersRename(fields)(field, reply, pattern)];
   }, [fields, placeholdersRename, pattern]);
 
