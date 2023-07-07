@@ -937,7 +937,7 @@ export const SendPetition = schema({
     },
     sendAs: {
       description:
-        "Send the parallel as one of your delegates. You can pass either the ID or the email of the delegate",
+        "Send the parallel as one of the users that delegated you to send on their behalf. You can pass either the ID or the email of the delegate",
       type: "string",
       example: toGlobalId("User", 1003),
     },
