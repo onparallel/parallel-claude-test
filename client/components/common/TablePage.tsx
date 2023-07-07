@@ -1,10 +1,8 @@
 import {
   Box,
   Button,
-  ButtonProps,
   Center,
   Flex,
-  HStack,
   IconButton,
   Menu,
   MenuButton,
@@ -19,24 +17,14 @@ import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "@parallel/ch
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Table, TableColumn, TableProps, useTableColors } from "@parallel/components/common/Table";
-import {
-  ComponentType,
-  Fragment,
-  Key,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
+import { ComponentType, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { identity, isDefined, pick } from "remeda";
+import { isDefined } from "remeda";
 
 export interface TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   extends TableProps<TRow, TContext, TImpl> {
   loading: boolean;
-  actions?: (ButtonProps & { key: Key; wrap?: (node: ReactNode) => ReactNode })[];
   header?: ReactNode;
   body?: ReactNode;
   totalCount?: number;
@@ -208,52 +196,6 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       </Box>
     </>
   );
-  const [selectedCount, setSelectedCount] = useState(0);
-  const handleSelectionChange = useCallback(
-    (selected: string[]) => {
-      onSelectionChange?.(selected);
-      setSelectedCount(selected.length);
-    },
-    [onSelectionChange]
-  );
-  const _columns = useMemo(
-    () =>
-      selectedCount > 0 && isDefined(actions)
-        ? ([
-            {
-              ...pick(columns[0], ["key", "CellContent", "cellProps"]),
-              header: "",
-              Header: ({ context }) => (
-                <Box as="th" colSpan={columns.length} fontWeight="normal">
-                  <HStack height="38px" paddingX={3} position="relative" top="1px">
-                    <Box fontSize="sm">
-                      <FormattedMessage
-                        id="component.table-page.n-selected"
-                        defaultMessage="{count} selected"
-                        values={{ count: context.selectedCount }}
-                      />
-                    </Box>
-                    {actions?.map(({ key, wrap = identity, ...props }) => (
-                      <Fragment key={key}>
-                        {wrap(<Button variant="ghost" size="sm" fontWeight="normal" {...props} />)}
-                      </Fragment>
-                    ))}
-                  </HStack>
-                </Box>
-              ),
-            },
-            ...columns.slice(1).map((column) => ({
-              ...column,
-              Header: () => null,
-            })),
-          ] as TableColumn<TRow, TContext & { selectedCount: number }>[])
-        : (columns as TableColumn<TRow, TContext & { selectedCount: number }>[]),
-    [columns, actions, selectedCount]
-  );
-  const _context = useMemo(
-    () => Object.assign({}, context, { selectedCount }),
-    [context, selectedCount]
-  );
   return (
     <Card display="flex" flexDirection="column" minHeight="300px" {...props}>
       {header ? <Box flex="none">{header}</Box> : null}
@@ -282,17 +224,18 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           </Flex>
         ) : null}
         <Table
-          columns={_columns}
+          columns={columns}
           rows={rows}
-          context={_context}
+          context={context}
           rowKeyProp={rowKeyProp}
           isExpandable={isExpandable}
           isSelectable={isSelectable}
           isHighlightable={isHighlightable}
           sort={sort}
           filter={filter}
+          actions={actions}
           onFilterChange={onFilterChange}
-          onSelectionChange={handleSelectionChange}
+          onSelectionChange={onSelectionChange}
           onRowClick={onRowClick}
           onSortChange={onSortChange}
         />

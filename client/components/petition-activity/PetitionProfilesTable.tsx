@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Center, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Button, Center, Flex, Stack, Text } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
 import {
   PetitionProfilesTable_PetitionFragment,
@@ -7,27 +7,19 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop } from "remeda";
+import { Card, CardHeader } from "../common/Card";
 import { DateTime } from "../common/DateTime";
 import { NormalLink } from "../common/Link";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { ProfileLink } from "../common/ProfileLink";
-import { Spacer } from "../common/Spacer";
-import { TableColumn } from "../common/Table";
-import { TablePage } from "../common/TablePage";
+import { Table, TableColumn } from "../common/Table";
 import { UserAvatarList } from "../common/UserAvatarList";
 
-const QUERY_STATE = {
-  page: integer({ min: 1 }).orDefault(1),
-  items: values([10, 25, 50]).orDefault(10),
-};
-
 type PetitionProfilesTableSelection = PetitionProfilesTable_ProfileFragment;
-export interface PetitionProfilesTable {
+export interface PetitionProfilesTable extends BoxProps {
   petition: PetitionProfilesTable_PetitionFragment;
   onAddProfile: () => void;
   onRemoveProfile: (profileIds: string[]) => void;
@@ -37,20 +29,30 @@ export function PetitionProfilesTable({
   petition,
   onAddProfile,
   onRemoveProfile,
+  ...props
 }: PetitionProfilesTable) {
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const columns = usePetitionProfilesColumns();
 
-  const [state, setQueryState] = useQueryState(QUERY_STATE, { prefix: "p_" });
-
   const profiles = petition.__typename === "Petition" ? petition.profiles : [];
 
   const { selectedIds, onChangeSelectedIds } = useSelection(profiles, "id");
-  const actions = usePetitionProfilesActions({
-    canRemove: myEffectivePermission !== "READ",
-    onRemoveClick: () => onRemoveProfile(selectedIds),
-  });
+  const actions = [
+    {
+      key: "remove",
+      onClick: () => onRemoveProfile(selectedIds),
+      leftIcon: <CloseIconSmall />,
+      children: (
+        <FormattedMessage
+          id="component.petition-profiles-table.remove-profile-button"
+          defaultMessage="Remove association"
+        />
+      ),
+      colorScheme: "red",
+      isDisabled: myEffectivePermission === "READ",
+    },
+  ];
 
   const navigate = useHandleNavigation();
   const handleRowClick = useCallback(function (
@@ -62,49 +64,43 @@ export function PetitionProfilesTable({
   []);
 
   return (
-    <TablePage
-      id="petition-profiles"
-      flex="0 1 auto"
-      rowKeyProp="id"
-      isSelectable
-      isHighlightable
-      loading={false}
-      columns={columns}
-      rows={profiles.slice((state.page - 1) * state.items, state.page * state.items)}
-      onRowClick={handleRowClick}
-      page={state.page}
-      pageSize={state.items}
-      totalCount={profiles.length}
-      onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-      onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items: items as any, page: 1 }))}
-      onSortChange={noop}
-      actions={actions}
-      onSelectionChange={onChangeSelectedIds}
-      header={
-        <HStack paddingX={4} paddingY={2}>
-          <Heading size="md">
-            <FormattedMessage
-              id="component.petition-profiles-table.profiles"
-              defaultMessage="Profiles"
-            />
-          </Heading>
-          <Spacer />
-          <Button
-            leftIcon={<AddIcon />}
-            colorScheme="primary"
-            onClick={onAddProfile}
-            isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-          >
-            <FormattedMessage
-              id="component.petition-profiles-table.add-profile"
-              defaultMessage="Add profile"
-            />
-          </Button>
-        </HStack>
-      }
-      body={
-        profiles.length === 0 ? (
-          <Center minHeight="60px" height="full" textAlign="center" padding={4} color="gray.400">
+    <Card {...props} data-section="petition-profiles-table">
+      <CardHeader
+        omitDivider={profiles.length > 0}
+        rightAction={
+          <Stack direction="row">
+            <Button
+              leftIcon={<AddIcon fontSize="18px" />}
+              onClick={onAddProfile}
+              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+            >
+              <FormattedMessage
+                id="component.petition-profiles-table.add-profile"
+                defaultMessage="Add profile"
+              />
+            </Button>
+          </Stack>
+        }
+      >
+        <FormattedMessage
+          id="component.petition-profiles-table.profiles"
+          defaultMessage="Profiles"
+        />
+      </CardHeader>
+      <Box overflowX="auto">
+        {profiles.length ? (
+          <Table
+            columns={columns}
+            rows={profiles}
+            rowKeyProp="id"
+            marginBottom={2}
+            onRowClick={handleRowClick}
+            isSelectable
+            onSelectionChange={onChangeSelectedIds}
+            actions={actions}
+          />
+        ) : (
+          <Center minHeight="60px" textAlign="center" padding={4} color="gray.400">
             <Stack spacing={1}>
               <Text>
                 <FormattedMessage
@@ -125,37 +121,19 @@ export function PetitionProfilesTable({
               ) : null}
             </Stack>
           </Center>
-        ) : null
-      }
-    />
+        )}
+      </Box>
+    </Card>
   );
 }
 
-function usePetitionProfilesActions({
-  canRemove,
-  onRemoveClick,
-}: {
-  canRemove: boolean;
-  onRemoveClick: () => void;
-}) {
-  return [
-    {
-      key: "remove",
-      onClick: onRemoveClick,
-      leftIcon: <CloseIconSmall />,
-      children: (
-        <FormattedMessage
-          id="component.petition-profiles-table.remove-profile-button"
-          defaultMessage="Remove association"
-        />
-      ),
-      colorScheme: "red",
-      isDisabled: !canRemove,
-    },
-  ];
-}
-
-function usePetitionProfilesColumns(): TableColumn<PetitionProfilesTableSelection>[] {
+function usePetitionProfilesColumns(): TableColumn<
+  PetitionProfilesTable_ProfileFragment,
+  {
+    petition: PetitionProfilesTable_PetitionFragment;
+    onRemoveProfile: (profileId: string) => void;
+  }
+>[] {
   const intl = useIntl();
 
   return useMemo(
@@ -185,10 +163,6 @@ function usePetitionProfilesColumns(): TableColumn<PetitionProfilesTableSelectio
           id: "component.petition-profiles-table.profile-type-header",
           defaultMessage: "Type",
         }),
-        cellProps: {
-          width: "25%",
-          minWidth: "220px",
-        },
         CellContent: ({ row: { profileType } }) => {
           return (
             <LocalizableUserTextRender
@@ -207,10 +181,6 @@ function usePetitionProfilesColumns(): TableColumn<PetitionProfilesTableSelectio
           id: "component.petition-profiles-table.subscribers-header",
           defaultMessage: "Subscribers",
         }),
-        cellProps: {
-          width: "20%",
-          minWidth: "220px",
-        },
         CellContent: ({ row: { subscribers }, column }) => {
           if (!subscribers.length)
             return (
@@ -234,10 +204,6 @@ function usePetitionProfilesColumns(): TableColumn<PetitionProfilesTableSelectio
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),
-        cellProps: {
-          width: "20%",
-          minWidth: "220px",
-        },
         CellContent: ({ row: { createdAt } }) => (
           <DateTime value={createdAt} format={FORMATS.LLL} whiteSpace="nowrap" />
         ),

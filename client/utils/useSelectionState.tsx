@@ -1,7 +1,7 @@
 import { MouseEvent, useMemo, useState } from "react";
-import { isDefined } from "remeda";
+import { countBy, isDefined } from "remeda";
 import { debounce } from "./debounce";
-import { getKey, KeyProp } from "./keyProp";
+import { KeyProp, getKey } from "./keyProp";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
 import { useUpdatingRef } from "./useUpdatingRef";
 
@@ -44,6 +44,7 @@ export function useSelectionState<T>(items: T[], keyProp: KeyProp<T>) {
     selection,
     ...useMemo(
       () => ({
+        selectedCount: countBy(items, (r) => selection[getKey(r, keyPropRef.current)]),
         selected: items.filter((r) => selection[getKey(r, keyPropRef.current)]),
         allSelected: items.every((r) => selection[getKey(r, keyPropRef.current)]),
         anySelected: items.some((r) => selection[getKey(r, keyPropRef.current)]),
@@ -121,6 +122,7 @@ export function useSelection<T>(items: T[] | undefined, keyProp: KeyProp<T>) {
   return {
     selectedIds,
     selectedRows,
+    selectedCount: selectedIds.length,
     selectedIdsRef: useUpdatingRef(selectedIds),
     selectedRowsRef: useUpdatingRef(selectedRows),
     onChangeSelectedIds: setSelectedIds,

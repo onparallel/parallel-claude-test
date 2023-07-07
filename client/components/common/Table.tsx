@@ -2,6 +2,8 @@ import { FocusLock } from "@chakra-ui/focus-lock";
 import {
   Box,
   BoxProps,
+  Button,
+  ButtonProps,
   Center,
   Checkbox,
   Collapse,
@@ -35,8 +37,12 @@ import { ValueProps } from "@parallel/utils/ValueProps";
 import useMergedRef from "@react-hook/merged-ref";
 import {
   ComponentType,
+  Fragment,
+  isValidElement,
+  Key,
   memo,
   MouseEvent,
+  ReactElement,
   ReactNode,
   useCallback,
   useEffect,
@@ -45,7 +51,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop } from "remeda";
+import { identity, isDefined, noop, pick } from "remeda";
 import { Card } from "./Card";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
@@ -72,6 +78,7 @@ export interface TableProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   isSelectable?: boolean;
   isExpandable?: boolean;
   isHighlightable?: boolean;
+  actions?: ((ButtonProps & { key: Key; wrap?: (node: ReactNode) => ReactNode }) | ReactElement)[];
   onSelectionChange?: (selected: string[]) => void;
   onRowClick?: (row: TImpl, event: MouseEvent) => void;
   onSortChange?: (sort: TableSorting<any>) => void;
@@ -132,16 +139,15 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   isHighlightable,
   sort,
   filter,
+  actions,
   onSelectionChange,
   onRowClick,
   onSortChange,
   onFilterChange,
   ...props
 }: TableProps<TRow, TContext, TImpl>) {
-  const { selection, allSelected, anySelected, toggle, toggleAll } = useSelectionState(
-    rows ?? [],
-    rowKeyProp
-  );
+  const { selection, allSelected, anySelected, selectedCount, toggle, toggleAll } =
+    useSelectionState(rows ?? [], rowKeyProp);
   const colors = useTableColors();
 
   useEffect(() => {
@@ -175,8 +181,51 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     setExpanded(value ? key : null);
   }, []);
 
-  columns = useMemo(() => {
-    const updated = [...columns];
+  const _columns = useMemo(() => {
+    const updated =
+      selectedCount > 0 && isDefined(actions)
+        ? ([
+            {
+              ...pick(columns[0], ["key", "CellContent", "cellProps"]),
+              header: "",
+              Header: ({ context }) => (
+                <Box as="th" colSpan={columns.length} fontWeight="normal">
+                  <HStack height="38px" paddingX={3} position="relative" top="1px">
+                    <Box fontSize="sm">
+                      <FormattedMessage
+                        id="component.table-page.n-selected"
+                        defaultMessage="{count} selected"
+                        values={{ count: context.selectedCount }}
+                      />
+                    </Box>
+                    {actions?.map((action) => {
+                      if (isValidElement(action)) {
+                        return action;
+                      } else {
+                        const {
+                          key,
+                          wrap = identity,
+                          ...props
+                        } = action as Exclude<typeof action, ReactElement>;
+                        return (
+                          <Fragment key={key}>
+                            {wrap(
+                              <Button variant="ghost" size="sm" fontWeight="normal" {...props} />
+                            )}
+                          </Fragment>
+                        );
+                      }
+                    })}
+                  </HStack>
+                </Box>
+              ),
+            },
+            ...columns.slice(1).map((column) => ({
+              ...column,
+              Header: () => null,
+            })),
+          ] as TableColumn<TRow, TContext & { selectedCount: number }>[])
+        : [...(columns as TableColumn<TRow, TContext & { selectedCount: number }>[])];
     if (isExpandable) {
       updated.unshift({
         key: "expand-toggle",
@@ -282,7 +331,12 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       });
     }
     return updated;
-  }, [columns, isSelectable, isExpandable]);
+  }, [columns, selectedCount, actions, isSelectable, isExpandable]);
+
+  const _context = useMemo(
+    () => Object.assign({}, context, { selectedCount }),
+    [context, selectedCount]
+  );
 
   return (
     <Box
@@ -304,13 +358,13 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             },
           }}
         >
-          {columns.map((column) => {
+          {_columns.map((column) => {
             if (column.Header) {
               return (
                 <column.Header
                   key={column.key}
                   column={column}
-                  context={context!}
+                  context={_context}
                   sort={sort}
                   filter={filter?.[column.key]}
                   onFilterChange={(value) => onFilterChange?.(column.key, value)}
@@ -323,13 +377,13 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             } else {
               const headerProps =
                 typeof column.headerProps === "function"
-                  ? column.headerProps(context!)
+                  ? column.headerProps(_context!)
                   : column.headerProps ?? {};
               return (
                 <DefaultHeader
                   key={column.key}
-                  column={column as any}
-                  context={context}
+                  column={column}
+                  context={_context}
                   sort={sort}
                   filter={filter?.[column.key]}
                   onFilterChange={(value) => onFilterChange?.(column.key, value)}
@@ -353,9 +407,9 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             <Row
               key={key}
               row={row}
-              context={context!}
+              context={_context}
               rowKey={key}
-              columns={columns}
+              columns={_columns}
               isSelected={isSelected}
               isExpanded={isExpanded}
               isExpandable={isExpandable}
@@ -492,7 +546,7 @@ function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TConte
 }
 const Cell: typeof _Cell = memo(_Cell) as any;
 
-export function DefaultHeader({
+export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
   column,
   sort,
   filter,
@@ -503,7 +557,7 @@ export function DefaultHeader({
   anySelected,
   onToggleAll,
   ...props
-}: TableHeaderProps<any>) {
+}: TableHeaderProps<TRow, TContext, TFilter>) {
   const intl = useIntl();
   const {
     onClose: onCloseFilter,
