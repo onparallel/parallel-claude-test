@@ -49,4 +49,5 @@ export const schema = makeSchema({
   },
   contextType: { module: resolve("./context.ts"), export: "ApiContext" },
   prettierConfig: path.join(__dirname, "../../.prettierrc"),
+  shouldGenerateArtifacts: process.env.NODE_ENV === "development",
 });
