@@ -124,7 +124,7 @@ export type Create${table.name} = PartialProps<
   const prettierOptions = await fs.readFile(path.join(__dirname, "../../.prettierrc"), "utf-8");
   await fs.writeFile(
     dist,
-    format(contents, { parser: "typescript", ...JSON.parse(prettierOptions) }),
+    await format(contents, { parser: "typescript", ...JSON.parse(prettierOptions) }),
   );
 }
 
