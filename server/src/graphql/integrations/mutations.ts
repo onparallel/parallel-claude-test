@@ -4,7 +4,7 @@ import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
 import { userHasFeatureFlag } from "../petition/authorizers";
-import { contextUserHasRole } from "../users/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToIntegrations } from "./authorizers";
 
 export const markSignatureIntegrationAsDefault = mutationField(
@@ -13,7 +13,7 @@ export const markSignatureIntegrationAsDefault = mutationField(
     type: "IOrgIntegration",
     description: "marks a Signature integration as default",
     authorize: authenticateAnd(
-      contextUserHasRole("ADMIN"),
+      contextUserHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS"),
       userHasFeatureFlag("PETITION_SIGNATURE"),
       userHasAccessToIntegrations("id", ["SIGNATURE"]),
     ),
@@ -34,7 +34,10 @@ export const markSignatureIntegrationAsDefault = mutationField(
 export const createSignaturitIntegration = mutationField("createSignaturitIntegration", {
   description: "Creates a new Signaturit integration on the user's organization",
   type: nonNull("SignatureOrgIntegration"),
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
+  authorize: authenticateAnd(
+    contextUserHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS"),
+    userHasFeatureFlag("PETITION_SIGNATURE"),
+  ),
   args: {
     name: nonNull(stringArg()),
     apiKey: nonNull(stringArg()),
@@ -63,7 +66,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
     "Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests",
   type: "Result",
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS"),
     userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasAccessToIntegrations("id", ["SIGNATURE"]),
   ),
@@ -130,7 +133,10 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
 export const createDowJonesKycIntegration = mutationField("createDowJonesKycIntegration", {
   description: "Creates a new Dow Jones KYC integration on the user's organization",
   type: nonNull("OrgIntegration"),
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
+  authorize: authenticateAnd(
+    contextUserHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS"),
+    userHasFeatureFlag("DOW_JONES_KYC"),
+  ),
   args: {
     clientId: nonNull(stringArg()),
     username: nonNull(stringArg()),
@@ -164,7 +170,10 @@ export const createDowJonesKycIntegration = mutationField("createDowJonesKycInte
 export const deleteDowJonesKycIntegration = mutationField("deleteDowJonesKycIntegration", {
   description: "Removes the DOW JONES integration of the user's organization",
   type: nonNull("Organization"),
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
+  authorize: authenticateAnd(
+    contextUserHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS"),
+    userHasFeatureFlag("DOW_JONES_KYC"),
+  ),
   resolve: async (_, args, ctx) => {
     const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
       ctx.user!.org_id,

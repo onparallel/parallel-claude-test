@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { WhenOrgRole } from "../common/WhenOrgRole";
+import { WhenPermission } from "../common/WhenPermission";
 
 export type OrganizationGroupsListTableHeaderProps = {
   search: string | null;
@@ -35,14 +35,14 @@ export function OrganizationGroupsListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      <WhenOrgRole role="ADMIN">
+      <WhenPermission permission="TEAMS:CRUD_TEAMS">
         <Spacer />
         <Button colorScheme="primary" onClick={onCreateGroup}>
           <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
             <FormattedMessage id="organization-groups.create-group" defaultMessage="Create team" />
           </Text>
         </Button>
-      </WhenOrgRole>
+      </WhenPermission>
     </Stack>
   );
 }

@@ -226,13 +226,10 @@ export function contextUserCanSubscribeUsersToProfile<
     }
 
     // collaborators can only subscribe/unsubscribe themselves
-    if (
-      ctx.user!.organization_role === "COLLABORATOR" &&
-      userIds.some((id) => id !== ctx.user!.id)
-    ) {
-      return false;
+    if (userIds.some((id) => id !== ctx.user!.id)) {
+      const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
+      return userPermissions.includes("PROFILES:SUBSCRIBE_PROFILES");
     }
-
     return true;
   };
 }

@@ -17,7 +17,6 @@ import {
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
-import { WhenOrgRole } from "@parallel/components/common/WhenOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
@@ -42,6 +41,9 @@ import { Box, BoxProps, Button, Center, Checkbox, Divider, Stack, Text } from "@
 import { AddIcon, DragHandleIcon, EditIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
+import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
+import { WhenPermission } from "@parallel/components/common/WhenPermission";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { useCreateOrUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeFieldDialog";
 import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldsInPatternDialog";
 import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
@@ -49,6 +51,7 @@ import { ProfileTypeFieldTypeIndicator } from "@parallel/components/organization
 import { ProfileTypeSettings } from "@parallel/components/organization/profiles/ProfileTypeSettings";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { getKey, KeyProp } from "@parallel/utils/keyProp";
+import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSelection, useSelectionState } from "@parallel/utils/useSelectionState";
 import { Reorder, useDragControls } from "framer-motion";
@@ -64,9 +67,6 @@ import {
   useState,
 } from "react";
 import { identity, noop } from "remeda";
-import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
-import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -339,7 +339,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
               onClick={handleChangeProfileTypeName}
             />
           </HStack>
-          <WhenOrgRole role="ADMIN">
+          <WhenPermission permission="PROFILE_TYPES:CRUD_PROFILE_TYPES">
             <MoreOptionsMenuButton
               variant="outline"
               options={
@@ -367,7 +367,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                 </MenuList>
               }
             />
-          </WhenOrgRole>
+          </WhenPermission>
         </Flex>
       }
       showBackButton={true}
@@ -870,7 +870,7 @@ OrganizationProfileType.getInitialProps = async ({ query, fetchQuery }: WithApol
 
 export default compose(
   withDialogs,
-  withOrgRole("ADMIN", "/app/organization"),
+  withPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES", { orPath: "/app/organization" }),
   withFeatureFlag("PROFILES", "/app/organization"),
   withApolloData,
 )(OrganizationProfileType);

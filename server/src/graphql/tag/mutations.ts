@@ -1,24 +1,24 @@
 import { booleanArg, inputObjectType, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { DatabaseError } from "pg";
 import { countBy, uniq, zip } from "remeda";
 import { CreateTag } from "../../db/__types";
 import { fullName } from "../../util/fullName";
-import { authenticate, authenticateAnd } from "../helpers/authorize";
+import { RESULT } from "../helpers/Result";
+import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/Result";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { petitionsAreNotPublicTemplates, userHasAccessToPetitions } from "../petition/authorizers";
-import { contextUserHasRole } from "../users/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToTags } from "./authorizers";
 import { validateHexColor } from "./validators";
-import { DatabaseError } from "pg";
 
 export const createTag = mutationField("createTag", {
   description: "Creates a tag in the user's organization",
   type: "Tag",
-  authorize: authenticate(),
+  authorize: authenticateAnd(contextUserHasPermission("TAGS:CRUD_TAGS")),
   validateArgs: validateAnd(
     validateHexColor((args) => args.color, "color"),
     notEmptyString((args) => args.name, "name"),
@@ -56,7 +56,7 @@ export const createTag = mutationField("createTag", {
 export const updateTag = mutationField("updateTag", {
   description: "Updates the name and color of a given tag",
   type: "Tag",
-  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasPermission("TAGS:CRUD_TAGS")),
   validateArgs: validateAnd(
     validateHexColor((args) => args.data.color, "data.color"),
     notEmptyString((args) => args.data.name, "data.name"),
@@ -104,7 +104,7 @@ export const updateTag = mutationField("updateTag", {
 export const deleteTag = mutationField("deleteTag", {
   description: "Removes the tag from every petition and soft-deletes it",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasPermission("TAGS:CRUD_TAGS")),
   args: {
     id: nonNull(globalIdArg("Tag")),
     force: nullable(

@@ -14,7 +14,7 @@ import {
   userHasEnabledIntegration,
   userHasFeatureFlag,
 } from "../petition/authorizers";
-import { contextUserHasRole } from "../users/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
@@ -98,7 +98,7 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
     "Creates a task for exporting a report grouping the replies of every petition coming from the same template",
   type: "Task",
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("REPORTS:TEMPLATE_REPLIES"),
     userHasAccessToPetitions("petitionId"),
     petitionsAreOfTypeTemplate("petitionId"),
   ),
@@ -139,7 +139,7 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   description: "Creates a task for generating a JSON report of the template usage",
   type: "Task",
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("REPORTS:TEMPLATE_STATISTICS"),
     userHasAccessToPetitions("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
   ),
@@ -198,7 +198,7 @@ export const createTemplatesOverviewReportTask = mutationField(
   {
     description: "Creates a task for generating an overview report of logged user's templates",
     type: "Task",
-    authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+    authorize: authenticateAnd(contextUserHasPermission("REPORTS:OVERVIEW")),
     args: {
       startDate: datetimeArg(),
       endDate: datetimeArg(),

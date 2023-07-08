@@ -43,7 +43,7 @@ import { argUserHasStatus, userHasAccessToUsers } from "../petition/mutations/au
 import { userHasAccessToTags } from "../tag/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import {
-  contextUserHasRole,
+  contextUserHasPermission,
   contextUserIsNotSso,
   emailIsNotRegisteredInTargetOrg,
   userIsNotContextUser,
@@ -117,7 +117,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
       and(
         orgDoesNotHaveSsoProvider(),
         orgCanCreateNewUser(),
-        contextUserHasRole("ADMIN"),
+        contextUserHasPermission("USERS:CRUD_USERS"),
         ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
       ),
     ),
@@ -210,7 +210,7 @@ export const activateUser = mutationField("activateUser", {
   description: "set user status to ACTIVE.",
   type: list("User"),
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("USERS:CRUD_USERS"),
     userHasAccessToUsers("userIds"),
     userIsNotSSO("userIds"),
   ),
@@ -232,7 +232,7 @@ export const deactivateUser = mutationField("deactivateUser", {
     "Updates user status to INACTIVE and transfers their owned petitions to another user in the org.",
   type: list("User"),
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("USERS:CRUD_USERS"),
     userHasAccessToUsers("userIds"),
     or(userIsNotSSO("userIds"), argUserHasStatus("userIds", "ON_HOLD")),
     userIsNotOrgOwner("userIds"),
@@ -342,7 +342,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   description: "Updates the role of another user in the organization.",
   type: "User",
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("USERS:CRUD_USERS"),
     userHasAccessToUsers("userId"),
     ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
   ),
@@ -594,7 +594,7 @@ export const resetTempPassword = mutationField("resetTempPassword", {
     email: nonNull(stringArg()),
     locale: nonNull("UserLocale"),
   },
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(contextUserHasPermission("USERS:CRUD_USERS")),
   validateArgs: validEmail((args) => args.email, "email"),
   resolve: async (_, { email, locale }, ctx) => {
     await ctx.auth.resetTempPassword(email, locale);
@@ -653,7 +653,7 @@ export const loginAs = mutationField("loginAs", {
     or(
       userIsSuperAdmin(),
       and(
-        contextUserHasRole("ADMIN"),
+        contextUserHasPermission("USERS:GHOST_LOGIN"),
         userHasAccessToUsers("userId"),
         userHasFeatureFlag("GHOST_LOGIN"),
       ),

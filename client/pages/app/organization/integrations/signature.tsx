@@ -21,7 +21,7 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useAddSignatureCredentialsDialog } from "@parallel/components/organization/dialogs/AddSignatureCredentialsDialog";
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
@@ -528,6 +528,6 @@ IntegrationsSignature.getInitialProps = async ({
 
 export default compose(
   withDialogs,
-  withOrgRole("ADMIN", "/app/organization"),
+  withPermission("INTEGRATIONS:CRUD_INTEGRATIONS", { orPath: "/app/organization/integrations" }),
   withApolloData,
 )(IntegrationsSignature);

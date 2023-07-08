@@ -22,7 +22,7 @@ import {
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayoutNavbar_QueryFragment } from "@parallel/graphql/__types";
-import { isAtLeast } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -51,7 +51,14 @@ export const AppLayoutNavbar = Object.assign(
       const router = useRouter();
       const { pathname, query } = router;
 
-      const hasAdminRole = isAtLeast("ADMIN", me.role);
+      const userCanViewReports = useHasPermission(
+        ["REPORTS:OVERVIEW", "REPORTS:TEMPLATE_REPLIES", "REPORTS:TEMPLATE_STATISTICS"],
+        "OR",
+      );
+
+      const userCanViewProfiles = useHasPermission("PROFILES:LIST_PROFILES");
+      const userCanViewAlerts = useHasPermission("PROFILE_ALERTS:LIST_ALERTS");
+      const userCanViewContacts = useHasPermission("CONTACTS:LIST_CONTACTS");
 
       const showProfilesContactUsDialog = useProfilesContactUsDialog();
       const handleProfilesClick = async () => {
@@ -104,44 +111,54 @@ export const AppLayoutNavbar = Object.assign(
                 )
               : undefined,
           },
-
-          {
-            section: "profiles",
-            href: "/app/profiles",
-            icon: <ProfilesIcon />,
-            isActive: pathname.startsWith("/app/profiles"),
-            isAvailable: me.hasProfilesAccess,
-            onClick: me.hasProfilesAccess ? undefined : handleProfilesClick,
-            text: intl.formatMessage({
-              id: "component.app-layout-navbar.profiles-link",
-              defaultMessage: "Profiles",
-            }),
-          },
-          {
-            section: "alerts",
-            href: "/app/alerts",
-            icon: <TimeAlarmIcon />,
-            isActive: pathname.startsWith("/app/alerts"),
-            isAvailable: me.hasProfilesAccess,
-            onClick: me.hasProfilesAccess ? undefined : handleAlertsClick,
-            text: intl.formatMessage({
-              id: "component.app-layout-navbar.alerts-link",
-              defaultMessage: "Alerts",
-            }),
-          },
-
-          {
-            section: "contacts",
-            href: "/app/contacts",
-            icon: <UsersIcon />,
-            isActive: pathname.startsWith("/app/contacts"),
-            isAvailable: true,
-            text: intl.formatMessage({
-              id: "component.app-layout-navbar.contacts-link",
-              defaultMessage: "Contacts",
-            }),
-          },
-          ...(hasAdminRole
+          ...(!me.hasProfilesAccess || userCanViewProfiles
+            ? [
+                {
+                  section: "profiles",
+                  href: "/app/profiles",
+                  icon: <ProfilesIcon />,
+                  isActive: pathname.startsWith("/app/profiles"),
+                  isAvailable: me.hasProfilesAccess,
+                  onClick: me.hasProfilesAccess ? undefined : handleProfilesClick,
+                  text: intl.formatMessage({
+                    id: "component.app-layout-navbar.profiles-link",
+                    defaultMessage: "Profiles",
+                  }),
+                },
+              ]
+            : []),
+          ...(!me.hasProfilesAccess || userCanViewAlerts
+            ? [
+                {
+                  section: "alerts",
+                  href: "/app/alerts",
+                  icon: <TimeAlarmIcon />,
+                  isActive: pathname.startsWith("/app/alerts"),
+                  isAvailable: me.hasProfilesAccess,
+                  onClick: me.hasProfilesAccess ? undefined : handleAlertsClick,
+                  text: intl.formatMessage({
+                    id: "component.app-layout-navbar.alerts-link",
+                    defaultMessage: "Alerts",
+                  }),
+                },
+              ]
+            : []),
+          ...(userCanViewContacts
+            ? [
+                {
+                  section: "contacts",
+                  href: "/app/contacts",
+                  icon: <UsersIcon />,
+                  isActive: pathname.startsWith("/app/contacts"),
+                  isAvailable: true,
+                  text: intl.formatMessage({
+                    id: "component.app-layout-navbar.contacts-link",
+                    defaultMessage: "Contacts",
+                  }),
+                },
+              ]
+            : []),
+          ...(userCanViewReports
             ? [
                 {
                   section: "reports",
@@ -329,7 +346,6 @@ export const AppLayoutNavbar = Object.assign(
             }
             me {
               id
-              role
               hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
               organization {
                 id

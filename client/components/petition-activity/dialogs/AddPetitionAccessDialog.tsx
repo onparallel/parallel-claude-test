@@ -16,23 +16,23 @@ import {
   ContactSelectProps,
   ContactSelectSelection,
 } from "@parallel/components/common/ContactSelect";
+import { UserSelect } from "@parallel/components/common/UserSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   ConfirmPetitionSignersDialog,
   useConfirmPetitionSignersDialog,
 } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
+import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
   CopySignatureConfigDialog,
   useCopySignatureConfigDialog,
 } from "@parallel/components/petition-compose/dialogs/CopySignatureConfigDialog";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
-import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
-  AddPetitionAccessDialog_createPetitionAccessDocument,
   AddPetitionAccessDialog_PetitionFragment,
   AddPetitionAccessDialog_UserFragment,
+  AddPetitionAccessDialog_createPetitionAccessDocument,
   BulkSendSigningMode,
   RemindersConfig,
   SignatureConfigInputSigner,
@@ -44,8 +44,10 @@ import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTE
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isDefined, noop, omit, pick } from "remeda";
@@ -54,8 +56,6 @@ import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
 import { MessageEmailEditor } from "../../petition-common/MessageEmailEditor";
 import { SendButton } from "../../petition-common/SendButton";
 import { useContactlessLinkDialog } from "./ContactlessLinkDialog";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { isAdmin } from "@parallel/utils/roles";
 
 export interface AddPetitionAccessDialogProps {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];
@@ -106,7 +106,9 @@ export function AddPetitionAccessDialog({
       : null,
   );
 
-  const showSendAs = user.hasOnBehalfOf && (isAdmin(user.role) || user.delegateOf.length > 0);
+  const userCanSendOnBehalf = useHasPermission("PETITIONS:SEND_ON_BEHALF");
+
+  const showSendAs = user.hasOnBehalfOf && (userCanSendOnBehalf || user.delegateOf.length > 0);
 
   const senderHasPermission = petition.effectivePermissions.some((p) => p.user.id === sendAsId);
 
@@ -352,7 +354,7 @@ export function AddPetitionAccessDialog({
                   defaultMessage="Send as..."
                 />
               </Text>
-              {isAdmin(user.role) ? (
+              {userCanSendOnBehalf ? (
                 <UserSelect
                   onSearch={handleSearchUsers}
                   isSearchable
@@ -469,7 +471,6 @@ AddPetitionAccessDialog.fragments = {
         fullName
         email
       }
-      role
       hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
       ...ConfirmPetitionSignersDialog_User
     }

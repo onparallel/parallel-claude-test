@@ -299,6 +299,7 @@ export const AppLayout = Object.assign(
             lastName
             email
             createdAt
+            permissions # useHasPermission.ts relies on this field, as it reads from cache
             role
             lastActiveAt
             organization {

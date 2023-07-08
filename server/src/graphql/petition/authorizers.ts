@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined, uniq, zip } from "remeda";
+import { countBy, isDefined, partition, uniq, zip } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -731,5 +731,24 @@ export function defaultOnBehalfUserBelongsToContextOrganization<
 
     const user = await ctx.users.loadUser(defaultOnBehalfUserId);
     return user?.org_id === ctx.user!.org_id;
+  };
+}
+
+export function contextUserCanClonePetitions<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number[]>,
+>(petitionIdsArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionIds = args[petitionIdsArg] as unknown as number[];
+
+    const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
+    const petitions = await ctx.petitions.loadPetition(petitionIds);
+    const [t, p] = partition(petitions, (p) => p!.is_template);
+
+    return (
+      (t.length === 0 || userPermissions.includes("PETITIONS:CREATE_TEMPLATES")) &&
+      (p.length === 0 || userPermissions.includes("PETITIONS:CREATE_PETITIONS"))
+    );
   };
 }

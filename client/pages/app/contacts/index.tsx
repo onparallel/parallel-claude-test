@@ -6,6 +6,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
 import { useImportContactsDialog } from "@parallel/components/contact-list/dialogs/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -22,9 +23,9 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import { isAtLeast } from "@parallel/utils/roles";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useMemo } from "react";
@@ -59,7 +60,7 @@ function Contacts() {
   });
 
   const contacts = data?.contacts;
-  const hasAdminRole = isAtLeast("ADMIN", me.role);
+  const canDeleteContacts = useHasPermission("CONTACTS:DELETE_CONTACTS");
 
   const createContact = useCreateContact();
 
@@ -131,7 +132,7 @@ function Contacts() {
           columns={columns}
           rows={contacts?.items}
           rowKeyProp={"id"}
-          isSelectable={hasAdminRole}
+          isSelectable={canDeleteContacts}
           isHighlightable
           loading={loading}
           onRowClick={handleRowClick}
@@ -318,4 +319,8 @@ Contacts.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery(Contacts_userDocument);
 };
 
-export default compose(withDialogs, withApolloData)(Contacts);
+export default compose(
+  withDialogs,
+  withPermission("CONTACTS:LIST_CONTACTS"),
+  withApolloData,
+)(Contacts);

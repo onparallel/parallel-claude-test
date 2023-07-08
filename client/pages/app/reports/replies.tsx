@@ -6,7 +6,7 @@ import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink"
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
@@ -265,4 +265,8 @@ ReportsReplies.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) =
   ]);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(ReportsReplies);
+export default compose(
+  withDialogs,
+  withPermission("REPORTS:TEMPLATE_REPLIES"),
+  withApolloData,
+)(ReportsReplies);

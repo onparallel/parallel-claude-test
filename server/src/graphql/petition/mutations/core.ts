@@ -28,6 +28,7 @@ import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { isValueCompatible } from "../../../util/isValueCompatible";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
 import { withError } from "../../../util/promises/withError";
 import {
@@ -74,13 +75,14 @@ import { validTextWithPlaceholders } from "../../helpers/validators/validTextWit
 import { validateFile } from "../../helpers/validators/validateFile";
 import { validateRegex } from "../../helpers/validators/validateRegex";
 import { userHasAccessToOrganizationTheme } from "../../organization/authorizers";
-import { contextUserHasRole } from "../../users/authorizers";
+import { contextUserHasPermission } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
   accessesHaveRemindersLeft,
   accessesHaveStatus,
   accessesIsNotOptedOut,
+  contextUserCanClonePetitions,
   defaultOnBehalfUserBelongsToContextOrganization,
   fieldHasType,
   fieldIsNotFixed,
@@ -111,19 +113,33 @@ import {
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserOrUserGroupPermissions,
 } from "./authorizers";
-import { isValueCompatible } from "../../../util/isValueCompatible";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create parallel.",
   type: "PetitionBase",
   authorize: authenticateAnd(
-    ifArgDefined(
-      "petitionId",
-      or(
-        userHasAccessToPetitions("petitionId" as never),
-        petitionsArePublicTemplates("petitionId" as never),
+    ifArgEquals(
+      "type",
+      "TEMPLATE",
+      and(
+        contextUserHasPermission("PETITIONS:CREATE_TEMPLATES"),
+        ifArgDefined(
+          "petitionId",
+          petitionsArePublicTemplates("petitionId" as never),
+          argIsDefined("locale"),
+        ),
       ),
-      and(argIsDefined("locale"), contextUserHasRole("NORMAL")),
+      and(
+        contextUserHasPermission("PETITIONS:CREATE_PETITIONS"),
+        ifArgDefined(
+          "petitionId",
+          or(
+            userHasAccessToPetitions("petitionId" as never),
+            petitionsArePublicTemplates("petitionId" as never),
+          ),
+          argIsDefined("locale"),
+        ),
+      ),
     ),
   ),
   args: {
@@ -274,8 +290,8 @@ export const clonePetitions = mutationField("clonePetitions", {
   description: "Clone petition.",
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
-    contextUserHasRole("NORMAL"),
     or(userHasAccessToPetitions("petitionIds"), petitionsArePublicTemplates("petitionIds")),
+    contextUserCanClonePetitions("petitionIds"),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -287,21 +303,18 @@ export const clonePetitions = mutationField("clonePetitions", {
     validPath((args) => args.path, "path"),
   ),
   resolve: async (_, args, ctx) => {
+    const petitions = await ctx.petitions.loadPetition(args.petitionIds);
     return await pMap(
-      unMaybeArray(args.petitionIds),
-      async (petitionId) => {
-        const {
-          name,
-          recipient_locale: locale,
-          path,
-        } = (await ctx.petitions.loadPetition(petitionId))!;
+      petitions,
+      async (petition) => {
+        const { name, recipient_locale: locale, path } = petition!;
         const intl = await ctx.i18n.getIntl(locale);
         const mark = `(${intl.formatMessage({
           id: "generic.copy",
           defaultMessage: "copy",
         })})`;
 
-        const cloned = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
+        const cloned = await ctx.petitions.clonePetition(petition!.id, ctx.user!, {
           name: args.keepTitle
             ? name
               ? name.slice(0, 255)
@@ -312,7 +325,7 @@ export const clonePetitions = mutationField("clonePetitions", {
 
         await ctx.petitions.createEvent({
           type: "PETITION_CLONED",
-          petition_id: petitionId,
+          petition_id: petition!.id,
           data: {
             new_petition_id: cloned.id,
             org_id: cloned.org_id,
@@ -2245,6 +2258,7 @@ export const movePetitions = mutationField("movePetitions", {
   description: "Moves a group of petitions or folders to another folder.",
   type: "Success",
   authorize: authenticateAnd(
+    contextUserHasPermission("PETITIONS:CHANGE_PATH"),
     ifArgDefined(
       "ids",
       and(

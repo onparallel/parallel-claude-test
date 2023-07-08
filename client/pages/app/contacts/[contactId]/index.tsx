@@ -25,6 +25,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   Contact_contactDocument,
@@ -38,7 +39,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { isAtLeast } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
@@ -64,7 +65,7 @@ function Contact({ contactId }: ContactProps) {
     variables: { id: contactId },
   });
 
-  const hasAdminRole = isAtLeast("ADMIN", me.role);
+  const canDeleteContacts = useHasPermission("CONTACTS:DELETE_CONTACTS");
 
   const [isEditing, setIsEditing] = useState(false);
   const [updateContact, { loading }] = useMutation(Contact_updateContactDocument);
@@ -138,7 +139,7 @@ function Contact({ contactId }: ContactProps) {
               headingLevel="h2"
               headingSize="md"
               rightAction={
-                hasAdminRole ? (
+                canDeleteContacts ? (
                   <IconButtonWithTooltip
                     icon={<DeleteIcon />}
                     variant="outline"
@@ -495,4 +496,8 @@ Contact.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) =
     contactId: query.contactId as string,
   };
 };
-export default compose(withDialogs, withApolloData)(Contact);
+export default compose(
+  withDialogs,
+  withPermission("CONTACTS:LIST_CONTACTS"),
+  withApolloData,
+)(Contact);

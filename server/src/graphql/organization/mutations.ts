@@ -31,7 +31,7 @@ import { validRichTextContent } from "../helpers/validators/validRichTextContent
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { validateHexColor } from "../tag/validators";
-import { contextUserHasRole } from "../users/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import {
   organizationHasOngoingUsagePeriod,
   organizationThemeIsNotDefault,
@@ -45,7 +45,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     file: nonNull(uploadArg()),
     isIcon: booleanArg(),
   },
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(contextUserHasPermission("ORG_SETTINGS")),
   validateArgs: validateFile(
     (args) => args.file,
     { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
@@ -91,7 +91,10 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
     args: {
       months: nullable(intArg()),
     },
-    authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("AUTO_ANONYMIZE")),
+    authorize: authenticateAnd(
+      contextUserHasPermission("ORG_SETTINGS"),
+      userHasFeatureFlag("AUTO_ANONYMIZE"),
+    ),
     validateArgs: inRange((args) => args.months, "months", 1),
     resolve: async (_, { months }, ctx) => {
       return await ctx.organizations.updateOrganization(
@@ -106,7 +109,7 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
 export const updateOrganizationBrandTheme = mutationField("updateOrganizationBrandTheme", {
   description: "updates the theme of the organization brand",
   type: "Organization",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(contextUserHasPermission("ORG_SETTINGS")),
   args: {
     data: nonNull(
       inputObjectType({
@@ -171,7 +174,7 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
     description: "updates the PDF_DOCUMENT theme of the organization",
     type: "Organization",
     authorize: authenticateAnd(
-      contextUserHasRole("ADMIN"),
+      contextUserHasPermission("ORG_SETTINGS"),
       userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT"),
     ),
     args: {
@@ -219,7 +222,7 @@ export const createOrganizationPdfDocumentTheme = mutationField(
   {
     type: "Organization",
     description: "Creates a new PDF_DOCUMENT theme on the user's organization",
-    authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+    authorize: authenticateAnd(contextUserHasPermission("ORG_SETTINGS")),
     args: {
       name: nonNull(stringArg()),
       isDefault: nonNull(booleanArg()),
@@ -247,7 +250,7 @@ export const deleteOrganizationPdfDocumentTheme = mutationField(
   {
     type: "Organization",
     authorize: authenticateAnd(
-      contextUserHasRole("ADMIN"),
+      contextUserHasPermission("ORG_SETTINGS"),
       userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT"),
       organizationThemeIsNotDefault("orgThemeId"),
     ),

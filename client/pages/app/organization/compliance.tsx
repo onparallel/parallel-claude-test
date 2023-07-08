@@ -31,7 +31,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import {
   OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument,
@@ -398,6 +398,6 @@ OrganizationCompliance.getInitialProps = async ({ fetchQuery }: WithApolloDataCo
 
 export default compose(
   withDialogs,
-  withOrgRole("ADMIN", "/app/organization"),
+  withPermission("ORG_SETTINGS", { orPath: "/app/organization" }),
   withApolloData,
 )(OrganizationCompliance);

@@ -2,18 +2,19 @@ import { gql, useMutation } from "@apollo/client";
 import { Flex, MenuDivider, MenuItem, MenuList, Text, useToast } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { EditableHeading } from "@parallel/components/common/EditableHeading";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { WhenOrgRole } from "@parallel/components/common/WhenOrgRole";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { WhenPermission } from "@parallel/components/common/WhenPermission";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/dialogs/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/dialogs/ConfirmRemoveMemberDialog";
-import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import {
+  OrganizationGroup_UserGroupMemberFragment,
   OrganizationGroup_addUsersToUserGroupDocument,
   OrganizationGroup_cloneUserGroupsDocument,
   OrganizationGroup_deleteUserGroupDocument,
@@ -21,15 +22,14 @@ import {
   OrganizationGroup_updateUserGroupDocument,
   OrganizationGroup_userDocument,
   OrganizationGroup_userGroupDocument,
-  OrganizationGroup_UserGroupMemberFragment,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import { isAdmin } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSelection } from "@parallel/utils/useSelectionState";
@@ -38,6 +38,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort, sortBy } from "remeda";
 import { useConfirmDeleteGroupsDialog } from "..";
+import { withPermission } from "@parallel/components/common/withPermission";
 
 const SORTING = ["fullName", "email", "addedAt"] as const;
 
@@ -73,7 +74,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     },
   });
 
-  const canEdit = isAdmin(me.role);
+  const canEdit = useHasPermission("TEAMS:CRUD_TEAMS");
 
   const [userList, searchedList] = useMemo(() => {
     const {
@@ -219,7 +220,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <EditableHeading isDisabled={!canEdit} value={name} onChange={handleChangeGroupName} />
-          <WhenOrgRole role="ADMIN">
+          <WhenPermission permission="TEAMS:CRUD_TEAMS">
             <MoreOptionsMenuButton
               variant="outline"
               options={
@@ -247,7 +248,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                 </MenuList>
               }
             />
-          </WhenOrgRole>
+          </WhenPermission>
         </Flex>
       }
       showBackButton={true}
@@ -469,4 +470,8 @@ OrganizationGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloData
   return { groupId };
 };
 
-export default compose(withDialogs, withApolloData)(OrganizationGroup);
+export default compose(
+  withDialogs,
+  withPermission("TEAMS:LIST_TEAMS", { orPath: "/app/organization" }),
+  withApolloData,
+)(OrganizationGroup);

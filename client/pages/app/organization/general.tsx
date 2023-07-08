@@ -30,7 +30,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { isAtLeast } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -43,7 +43,7 @@ function OrganizationGeneral() {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationGeneral_userDocument);
 
-  const hasAdminRole = isAtLeast("ADMIN", me.role);
+  const userCanEditOrganization = useHasPermission("ORG_SETTINGS");
 
   const dropzoneRef = useRef<DropzoneRef>(null);
 
@@ -92,7 +92,7 @@ function OrganizationGeneral() {
         paddingBottom={16}
       >
         <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.xs" }} width="100%">
-          {!hasAdminRole ? <OnlyAdminsAlert /> : null}
+          {!userCanEditOrganization ? <OnlyAdminsAlert /> : null}
           <Stack spacing={4}>
             <Stack>
               <Text>
@@ -194,7 +194,7 @@ function OrganizationGeneral() {
                   maxWidth="120px"
                   width="100%"
                   textAlign="center"
-                  disabled={!hasAdminRole}
+                  disabled={!userCanEditOrganization}
                 >
                   {loading ? (
                     <Spinner
@@ -235,7 +235,7 @@ function OrganizationGeneral() {
                   <Button
                     colorScheme="primary"
                     onClick={() => dropzoneRef.current?.open()}
-                    isDisabled={!hasAdminRole}
+                    isDisabled={!userCanEditOrganization}
                   >
                     <FormattedMessage
                       id="organization.branding.upload-logo"
@@ -270,7 +270,6 @@ OrganizationGeneral.queries = [
       ...OrganizationSettingsLayout_Query
       me {
         id
-        role
         hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST_UI)
         organization {
           id

@@ -14,6 +14,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/dialogs/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/dialogs/ConfirmDeactivateUserDialog";
@@ -32,7 +33,6 @@ import {
   OrganizationUsers_updateOrganizationUserDocument,
   OrganizationUsers_userDocument,
   OrganizationUsers_UserFragment,
-  User,
   UserStatus,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -41,9 +41,9 @@ import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviou
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import { isAdmin } from "@parallel/utils/roles";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
@@ -53,7 +53,6 @@ import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
 const QUERY_STATE = {
@@ -84,7 +83,8 @@ function OrganizationUsers() {
     },
   });
 
-  const userIsAdmin = isAdmin(me.role);
+  const userCanEditUsers = useHasPermission("USERS:CRUD_USERS");
+  const userCanGhostLogin = useHasPermission("USERS:GHOST_LOGIN");
 
   const hasSsoProvider = me.organization.hasSsoProvider;
   const users = data?.me.organization.users;
@@ -124,7 +124,7 @@ function OrganizationUsers() {
 
   const [search, setSearch] = useState(state.search);
 
-  const columns = useOrganizationUsersTableColumns(me);
+  const columns = useOrganizationUsersTableColumns();
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -468,7 +468,8 @@ function OrganizationUsers() {
         {isUserLimitReached ? <UserLimitReachedAlert /> : null}
         <TablePage
           flex="0 1 auto"
-          isSelectable={userIsAdmin}
+          minHeight={0}
+          isSelectable={userCanEditUsers}
           isHighlightable
           columns={columns}
           rows={users?.items}
@@ -484,7 +485,7 @@ function OrganizationUsers() {
             setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
           }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
-          onRowClick={userIsAdmin ? (user) => handleUpdateUser(user) : undefined}
+          onRowClick={userCanEditUsers ? (user) => handleUpdateUser(user) : undefined}
           actions={[
             {
               key: "activate",
@@ -513,7 +514,7 @@ function OrganizationUsers() {
                 />
               ),
             },
-            ...(me.hasGhostLogin
+            ...(me.hasGhostLogin && userCanGhostLogin
               ? [
                   {
                     key: "login-as",
@@ -532,7 +533,7 @@ function OrganizationUsers() {
                   },
                 ]
               : []),
-            ...(userIsAdmin
+            ...(userCanEditUsers
               ? [
                   {
                     key: "reset-password",
@@ -569,8 +570,8 @@ function OrganizationUsers() {
   );
 }
 
-function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
-  const userIsAdmin = isAdmin(user.role);
+function useOrganizationUsersTableColumns() {
+  const userCanEdit = useHasPermission("USERS:CRUD_USERS");
   const intl = useIntl();
   const roles = useOrganizationRoles();
   return useMemo<TableColumn<OrganizationUsers_UserFragment>[]>(
@@ -583,7 +584,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
           defaultMessage: "Name",
         }),
         cellProps: {
-          width: userIsAdmin ? "30%" : "46%",
+          width: userCanEdit ? "30%" : "46%",
           minWidth: "220px",
         },
         CellContent: ({ row }) => {
@@ -675,7 +676,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
           </Badge>
         ),
       },
-      ...(userIsAdmin
+      ...(userCanEdit
         ? ([
             {
               key: "lastActiveAt",
@@ -872,4 +873,8 @@ OrganizationUsers.getInitialProps = async ({ fetchQuery }: WithApolloDataContext
   await fetchQuery(OrganizationUsers_userDocument);
 };
 
-export default compose(withDialogs, withApolloData)(OrganizationUsers);
+export default compose(
+  withDialogs,
+  withPermission("USERS:LIST_USERS", { orPath: "/app/organization" }),
+  withApolloData,
+)(OrganizationUsers);

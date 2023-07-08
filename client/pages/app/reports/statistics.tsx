@@ -4,7 +4,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsErrorMessage } from "@parallel/components/reports/common/ReportsErrorMessage";
@@ -326,4 +326,8 @@ ReportsTemplates.getInitialProps = async ({ fetchQuery }: WithApolloDataContext)
   ]);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(ReportsTemplates);
+export default compose(
+  withDialogs,
+  withPermission("REPORTS:TEMPLATE_STATISTICS"),
+  withApolloData,
+)(ReportsTemplates);

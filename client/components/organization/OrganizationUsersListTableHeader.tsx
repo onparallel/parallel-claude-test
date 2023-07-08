@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { WhenOrgRole } from "../common/WhenOrgRole";
+import { WhenPermission } from "../common/WhenPermission";
 
 export interface OrganizationUsersListTableHeaderProps {
   search: string | null;
@@ -42,7 +42,7 @@ export function OrganizationUsersListTableHeader({
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
       </Box>
-      <WhenOrgRole role="ADMIN">
+      <WhenPermission permission="USERS:CRUD_USERS">
         <Spacer />
         {hasSsoProvider ? null : (
           <Button
@@ -54,7 +54,7 @@ export function OrganizationUsersListTableHeader({
             <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
           </Button>
         )}
-      </WhenOrgRole>
+      </WhenPermission>
     </Stack>
   );
 }

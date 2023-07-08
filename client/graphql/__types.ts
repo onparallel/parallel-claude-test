@@ -4877,6 +4877,7 @@ export interface User extends Timestamps {
   organization: Organization;
   /** Organizations this user belongs to */
   organizations: Array<Organization>;
+  permissions: Array<Scalars["String"]["output"]>;
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
   preferredLocale: UserLocale;
@@ -5042,6 +5043,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -5897,9 +5899,11 @@ export type HasFeatureFlagQuery = {
   me: { __typename?: "User"; id: string; hasFeatureFlag: boolean };
 };
 
-export type WithOrgRoleQueryVariables = Exact<{ [key: string]: never }>;
+export type WithPermissionQueryVariables = Exact<{ [key: string]: never }>;
 
-export type WithOrgRoleQuery = { me: { __typename?: "User"; id: string; role: OrganizationRole } };
+export type WithPermissionQuery = {
+  me: { __typename?: "User"; id: string; permissions: Array<string> };
+};
 
 export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -5929,6 +5933,7 @@ export type AdminSettingsLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -5968,6 +5973,7 @@ export type AppLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -6010,8 +6016,8 @@ export type AppLayoutNavbar_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
-    role: OrganizationRole;
     isSuperAdmin: boolean;
+    role: OrganizationRole;
     email: string;
     fullName?: string | null;
     avatarUrl?: string | null;
@@ -6068,6 +6074,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -6174,7 +6181,6 @@ export type PetitionHeader_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
-    role: OrganizationRole;
     hasProfilesAccess: boolean;
     canCopyPetitionReplies: boolean;
   };
@@ -6295,6 +6301,7 @@ export type PetitionLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -6335,6 +6342,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -6374,6 +6382,7 @@ export type SidebarLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -6433,6 +6442,7 @@ export type UserSettingsLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -7214,7 +7224,6 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
 export type BrandingDocumentTheme_UserFragment = {
   __typename?: "User";
   id: string;
-  role: OrganizationRole;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -7299,7 +7308,6 @@ export type BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeMutation = {
 export type BrandingGeneral_UserFragment = {
   __typename?: "User";
   id: string;
-  role: OrganizationRole;
   fullName?: string | null;
   hasRemovedParallelBranding: boolean;
   organization: {
@@ -7453,6 +7461,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -9066,7 +9075,6 @@ export type AddPetitionAccessDialog_UserFragment = {
   id: string;
   fullName?: string | null;
   email: string;
-  role: OrganizationRole;
   firstName?: string | null;
   lastName?: string | null;
   hasOnBehalfOf: boolean;
@@ -11126,12 +11134,6 @@ export type TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragme
   };
 };
 
-export type TemplateDetailsModal_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-};
-
 export type TemplateDetailsModal_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
@@ -11342,7 +11344,6 @@ export type useSendPetitionHandler_UserFragment = {
   id: string;
   fullName?: string | null;
   email: string;
-  role: OrganizationRole;
   firstName?: string | null;
   lastName?: string | null;
   hasOnBehalfOf: boolean;
@@ -17017,6 +17018,7 @@ export type Admin_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -17073,6 +17075,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -17201,6 +17204,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -17440,6 +17444,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -17578,6 +17583,7 @@ export type AdminOrganizations_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -17646,6 +17652,7 @@ export type AdminSupportMethods_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -17731,6 +17738,7 @@ export type Alerts_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18044,6 +18052,7 @@ export type Contact_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18200,6 +18209,7 @@ export type Contacts_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18276,6 +18286,7 @@ export type OrganizationBranding_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18350,6 +18361,7 @@ export type OrganizationCompliance_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18402,12 +18414,13 @@ export type OrganizationGeneral_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    role: OrganizationRole;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
+    role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18576,6 +18589,7 @@ export type OrganizationGroup_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18739,6 +18753,7 @@ export type OrganizationGroups_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18780,6 +18795,7 @@ export type OrganizationSettings_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -18816,12 +18832,13 @@ export type OrganizationIntegrations_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    role: OrganizationRole;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
+    role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18934,6 +18951,7 @@ export type IntegrationsSignature_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -19046,6 +19064,7 @@ export type OrganizationProfileType_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -19252,6 +19271,7 @@ export type OrganizationProfileTypes_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -19332,6 +19352,7 @@ export type OrganizationUsage_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -19486,6 +19507,7 @@ export type OrganizationUsers_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -20453,6 +20475,7 @@ export type PetitionActivity_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -22454,6 +22477,7 @@ export type PetitionActivity_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -22845,6 +22869,7 @@ export type PetitionCompose_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -23454,6 +23479,7 @@ export type PetitionCompose_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -23932,6 +23958,7 @@ export type PetitionMessages_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -23975,6 +24002,7 @@ export type PetitionMessages_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -24933,6 +24961,7 @@ export type PetitionPreview_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -25878,6 +25907,7 @@ export type PetitionPreview_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -26294,6 +26324,7 @@ export type PetitionReplies_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -27001,6 +27032,7 @@ export type PetitionReplies_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -27523,6 +27555,7 @@ export type Petitions_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -27996,6 +28029,7 @@ export type NewPetition_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type NewPetition_userQuery = {
   publicTemplateCategories: Array<string>;
+  hasTemplates: { __typename?: "PetitionBaseOrFolderPagination"; totalCount: number };
   me: {
     __typename?: "User";
     id: string;
@@ -28004,6 +28038,7 @@ export type NewPetition_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -28024,7 +28059,6 @@ export type NewPetition_userQuery = {
       } | null;
     };
   };
-  hasTemplates: { __typename?: "PetitionBaseOrFolderPagination"; totalCount: number };
   realMe: {
     __typename?: "User";
     id: string;
@@ -28217,13 +28251,14 @@ export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
 export type ProfileDetail_userQuery = {
   me: {
     __typename?: "User";
-    role: OrganizationRole;
     id: string;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
+    role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -28515,13 +28550,14 @@ export type Profiles_userQueryVariables = Exact<{ [key: string]: never }>;
 export type Profiles_userQuery = {
   me: {
     __typename?: "User";
-    role: OrganizationRole;
     id: string;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
+    role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -28691,6 +28727,7 @@ export type Reports_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -28738,6 +28775,7 @@ export type Overview_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -28803,6 +28841,7 @@ export type ReportsReplies_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -28868,6 +28907,7 @@ export type ReportsTemplates_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -28907,6 +28947,7 @@ export type Account_QueryFragment = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -28990,6 +29031,7 @@ export type Account_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -29074,6 +29116,7 @@ export type Developers_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -29116,6 +29159,7 @@ export type Settings_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -29166,6 +29210,7 @@ export type Security_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    permissions: Array<string>;
     role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
@@ -30916,10 +30961,6 @@ export type isReplyContentCompatible_PetitionFieldFragment = {
   }>;
 };
 
-export type useOrgRole_MeQueryVariables = Exact<{ [key: string]: never }>;
-
-export type useOrgRole_MeQuery = { me: { __typename?: "User"; role: OrganizationRole } };
-
 export type createMentionPlugin_UserOrUserGroup_User_Fragment = {
   __typename?: "User";
   id: string;
@@ -31329,6 +31370,10 @@ export type useGetPageFields_PetitionFieldFragment = {
   }>;
 };
 
+export type useHasPermission_MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type useHasPermission_MeQuery = { me: { __typename?: "User"; permissions: Array<string> } };
+
 export type useLiquidScope_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -31386,7 +31431,6 @@ export type useLoginAs_restoreLoginMutation = { restoreLogin: Result };
 
 export type useOrganizationSections_UserFragment = {
   __typename?: "User";
-  role: OrganizationRole;
   hasProfilesAccess: boolean;
 };
 
@@ -31787,7 +31831,6 @@ export const AppLayoutNavbar_QueryFragmentDoc = gql`
     }
     me {
       id
-      role
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       organization {
         id
@@ -31812,6 +31855,7 @@ export const AppLayout_QueryFragmentDoc = gql`
       lastName
       email
       createdAt
+      permissions
       role
       lastActiveAt
       organization {
@@ -32301,7 +32345,6 @@ export const BrandingDocumentTheme_OrganizationThemeFragmentDoc = gql`
 export const BrandingDocumentTheme_UserFragmentDoc = gql`
   fragment BrandingDocumentTheme_User on User {
     id
-    role
     organization {
       ...DocumentThemePreview_Organization
       pdfDocumentThemes {
@@ -32345,7 +32388,6 @@ export const BrandingGeneralPreview_UserFragmentDoc = gql`
 export const BrandingGeneral_UserFragmentDoc = gql`
   fragment BrandingGeneral_User on User {
     id
-    role
     hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
     organization {
       id
@@ -32382,7 +32424,6 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
 export const useOrganizationSections_UserFragmentDoc = gql`
   fragment useOrganizationSections_User on User {
-    role
     hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
   }
 ` as unknown as DocumentNode<useOrganizationSections_UserFragment, unknown>;
@@ -32646,12 +32687,6 @@ export const TemplateDefaultPermissionsDialog_PetitionTemplateFragmentDoc = gql`
   }
   ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
 ` as unknown as DocumentNode<TemplateDefaultPermissionsDialog_PetitionTemplateFragment, unknown>;
-export const TemplateDetailsModal_UserFragmentDoc = gql`
-  fragment TemplateDetailsModal_User on User {
-    id
-    role
-  }
-` as unknown as DocumentNode<TemplateDetailsModal_UserFragment, unknown>;
 export const UserListPopover_UserFragmentDoc = gql`
   fragment UserListPopover_User on User {
     id
@@ -35051,7 +35086,6 @@ export const PetitionHeader_QueryFragmentDoc = gql`
   fragment PetitionHeader_Query on Query {
     me {
       id
-      role
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
     }
@@ -35089,7 +35123,6 @@ export const AddPetitionAccessDialog_UserFragmentDoc = gql`
       fullName
       email
     }
-    role
     hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
     ...ConfirmPetitionSignersDialog_User
   }
@@ -37921,14 +37954,14 @@ export const HasFeatureFlagDocument = gql`
     }
   }
 ` as unknown as DocumentNode<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>;
-export const WithOrgRoleDocument = gql`
-  query WithOrgRole {
+export const WithPermissionDocument = gql`
+  query WithPermission {
     me {
       id
-      role
+      permissions
     }
   }
-` as unknown as DocumentNode<WithOrgRoleQuery, WithOrgRoleQueryVariables>;
+` as unknown as DocumentNode<WithPermissionQuery, WithPermissionQueryVariables>;
 export const WithSuperAdminAccessDocument = gql`
   query WithSuperAdminAccess {
     me {
@@ -40518,7 +40551,6 @@ export const OrganizationGeneral_userDocument = gql`
     ...OrganizationSettingsLayout_Query
     me {
       id
-      role
       hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST_UI)
       organization {
         id
@@ -40665,7 +40697,6 @@ export const OrganizationIntegrations_userDocument = gql`
     ...OrganizationSettingsLayout_Query
     me {
       id
-      role
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
       hasDowJonesFeature: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
@@ -41827,16 +41858,12 @@ export const NewPetition_templatesDocument = gql`
 export const NewPetition_userDocument = gql`
   query NewPetition_user {
     ...AppLayout_Query
-    me {
-      ...TemplateDetailsModal_User
-    }
     hasTemplates: petitions(filters: { type: TEMPLATE }) {
       totalCount
     }
     publicTemplateCategories
   }
   ${AppLayout_QueryFragmentDoc}
-  ${TemplateDetailsModal_UserFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_userQuery, NewPetition_userQueryVariables>;
 export const NewPetition_templateDocument = gql`
   query NewPetition_template($templateId: GID!) {
@@ -41850,7 +41877,6 @@ export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
     ...AppLayout_Query
     me {
-      role
       ...ProfileSubscribers_User
     }
     metadata {
@@ -41895,7 +41921,6 @@ export const Profiles_userDocument = gql`
   query Profiles_user {
     ...AppLayout_Query
     me {
-      role
       ...useProfileSubscribersDialog_User
     }
   }
@@ -42700,13 +42725,6 @@ export const useUpdateIsReadNotification_updatePetitionUserNotificationReadStatu
   useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusMutation,
   useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusMutationVariables
 >;
-export const useOrgRole_MeDocument = gql`
-  query useOrgRole_Me {
-    me {
-      role
-    }
-  }
-` as unknown as DocumentNode<useOrgRole_MeQuery, useOrgRole_MeQueryVariables>;
 export const useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument = gql`
   mutation useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTask($profileId: ID!) {
     createDowJonesProfileDownloadTask(profileId: $profileId) {
@@ -42950,6 +42968,13 @@ export const useGetDefaultMentionables_permissionsQueryDocument = gql`
   useGetDefaultMentionables_permissionsQueryQuery,
   useGetDefaultMentionables_permissionsQueryQueryVariables
 >;
+export const useHasPermission_MeDocument = gql`
+  query useHasPermission_Me {
+    me {
+      permissions
+    }
+  }
+` as unknown as DocumentNode<useHasPermission_MeQuery, useHasPermission_MeQueryVariables>;
 export const useLoginAs_loginAsDocument = gql`
   mutation useLoginAs_loginAs($userId: GID!) {
     loginAs(userId: $userId)

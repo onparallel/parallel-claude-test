@@ -1,12 +1,14 @@
 import { gql, useMutation } from "@apollo/client";
-import { Flex, HStack, Stack } from "@chakra-ui/react";
-import { BellIcon, BellOnIcon } from "@parallel/chakra/icons";
+import { Flex, HStack, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { BellIcon, BellOnIcon, BellSettingsIcon, DeleteIcon } from "@parallel/chakra/icons";
+import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { WhenPermission } from "@parallel/components/common/WhenPermission";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { MoreOptionsMenuProfile } from "@parallel/components/profiles/MoreOptionsMenuProfile";
 import { ProfileForm } from "@parallel/components/profiles/ProfileForm";
 import { ProfilePetitionsTable } from "@parallel/components/profiles/ProfilePetitionsTable";
 import { ProfileRelationshipsTable } from "@parallel/components/profiles/ProfileRelationshipsTable";
@@ -22,10 +24,10 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { isAtLeast } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withMetadata } from "@parallel/utils/withMetadata";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 type ProfileDetailProps = UnwrapPromise<ReturnType<typeof ProfileDetail.getInitialProps>>;
 
@@ -45,8 +47,8 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
     },
   });
 
-  const hasNormalRole = isAtLeast("NORMAL", me.role);
-  const hasAdminRole = isAtLeast("ADMIN", me.role);
+  const userCanSubscribeProfiles = useHasPermission("PROFILES:SUBSCRIBE_PROFILES");
+  const userCanDeleteProfiles = useHasPermission("PROFILES:DELETE_PROFILES");
 
   const navigate = useHandleNavigation();
   const deleteProfile = useDeleteProfile();
@@ -146,13 +148,40 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               }
               onClick={handleMySubscription}
             />
-            {hasNormalRole ? (
-              <MoreOptionsMenuProfile
-                canDelete={hasAdminRole}
-                onDelete={handleDeleteProfile}
-                onSubscribe={handleSubscribersClick}
+            <WhenPermission
+              permission={["PROFILES:SUBSCRIBE_PROFILES", "PROFILES:DELETE_PROFILES"]}
+              operator="OR"
+            >
+              <MoreOptionsMenuButton
+                variant="outline"
+                options={
+                  <MenuList width="fit-content" minWidth="200px">
+                    <MenuItem
+                      icon={<BellSettingsIcon display="block" boxSize={4} />}
+                      isDisabled={!userCanSubscribeProfiles}
+                      onClick={handleSubscribersClick}
+                    >
+                      <FormattedMessage
+                        id="component.more-options-menu-profile.manage-profile-subscriptions"
+                        defaultMessage="Manage subscriptions"
+                      />
+                    </MenuItem>
+                    <MenuDivider />
+                    <MenuItem
+                      color="red.500"
+                      icon={<DeleteIcon display="block" boxSize={4} />}
+                      onClick={handleDeleteProfile}
+                      isDisabled={!userCanDeleteProfiles}
+                    >
+                      <FormattedMessage
+                        id="component.more-options-menu-profile.delete-profile"
+                        defaultMessage="Delete profile"
+                      />
+                    </MenuItem>
+                  </MenuList>
+                }
               />
-            ) : null}
+            </WhenPermission>
           </HStack>
           <Stack spacing={6} padding={4} paddingBottom={24} flex={1} minHeight={0} overflow="auto">
             <Flex flex={1} direction="column" minHeight="305px">
@@ -205,7 +234,6 @@ const _queries = [
     query ProfileDetail_user {
       ...AppLayout_Query
       me {
-        role
         ...ProfileSubscribers_User
       }
       metadata {
@@ -263,6 +291,7 @@ ProfileDetail.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
 export default compose(
   withDialogs,
   withMetadata,
+  withPermission("PROFILES:LIST_PROFILES"),
   withFeatureFlag("PROFILES", "/app/petitions"),
   withApolloData,
 )(ProfileDetail);

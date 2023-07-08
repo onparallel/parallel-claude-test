@@ -1,0 +1,44 @@
+// Este archivo es temporal hasta que los permisos se carguen desde la BBDD
+
+import { UnwrapArray } from "../../util/types";
+
+export const PERMISSIONS = {
+  OWNER: [],
+  ADMIN: [
+    "REPORTS:OVERVIEW",
+    "REPORTS:TEMPLATE_STATISTICS",
+    "REPORTS:TEMPLATE_REPLIES",
+    "TAGS:CRUD_TAGS",
+    "PROFILES:DELETE_PROFILES",
+    "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+    "INTEGRATIONS:CRUD_INTEGRATIONS",
+    "USERS:CRUD_USERS",
+    "USERS:GHOST_LOGIN",
+    "TEAMS:CRUD_TEAMS",
+    "TEAMS:CRUD_PERMISSIONS",
+    "ORG_SETTINGS",
+    "CONTACTS:DELETE_CONTACTS",
+    "PETITIONS:SEND_ON_BEHALF",
+  ],
+  NORMAL: [
+    "PETITIONS:CHANGE_PATH",
+    "PETITIONS:CREATE_TEMPLATES",
+    "INTEGRATIONS:CRUD_API",
+    "PROFILES:SUBSCRIBE_PROFILES",
+  ],
+  COLLABORATOR: [
+    "PETITIONS:CREATE_PETITIONS",
+    "PROFILES:CREATE_PROFILES",
+    "PROFILES:LIST_PROFILES",
+    "PROFILE_ALERTS:LIST_ALERTS",
+    "CONTACTS:LIST_CONTACTS",
+    "USERS:LIST_USERS",
+    "TEAMS:LIST_TEAMS",
+  ],
+} as const;
+
+export const PermissionNameValues = (
+  Object.keys(PERMISSIONS) as (keyof typeof PERMISSIONS)[]
+).flatMap((p) => PERMISSIONS[p]);
+
+export type PermissionName = UnwrapArray<typeof PermissionNameValues>;

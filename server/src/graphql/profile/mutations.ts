@@ -48,7 +48,7 @@ import {
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../petition/authorizers";
-import { contextUserHasRole } from "../users/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import {
   contextUserCanSubscribeUsersToProfile,
   fileUploadCanBeAttachedToProfileTypeField,
@@ -69,7 +69,10 @@ import {
 
 export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
-  authorize: authenticateAnd(userHasFeatureFlag("PROFILES"), contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+  ),
   args: {
     name: nonNull(arg({ type: "LocalizableUserText" })),
   },
@@ -87,7 +90,7 @@ export const updateProfileType = mutationField("updateProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -124,7 +127,7 @@ export const cloneProfileType = mutationField("cloneProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -149,7 +152,7 @@ export const deleteProfileType = mutationField("deleteProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
     profileTypeIsArchived("profileTypeIds"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -173,7 +176,7 @@ export const archiveProfileType = mutationField("archiveProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -188,7 +191,7 @@ export const unarchiveProfileType = mutationField("unarchiveProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -203,7 +206,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
@@ -265,7 +268,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
   type: "ProfileTypeField",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
   ),
@@ -380,7 +383,7 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
   type: "ProfileType",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),
@@ -433,7 +436,7 @@ export const updateProfileTypeFieldPositions = mutationField("updateProfileTypeF
   type: "ProfileType",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),
@@ -463,6 +466,7 @@ export const createProfile = mutationField("createProfile", {
   type: "Profile",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     not(profileTypeIsArchived("profileTypeId")),
   ),
@@ -492,7 +496,7 @@ export const deleteProfile = mutationField("deleteProfile", {
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("PROFILES:DELETE_PROFILES"),
     userHasAccessToProfile("profileIds"),
   ),
   args: {

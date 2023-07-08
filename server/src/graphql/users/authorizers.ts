@@ -1,10 +1,9 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { UserOrganizationRole } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { Maybe, MaybeArray } from "../../util/types";
-import { userHasRole } from "../../util/userHasRole";
 import { Arg } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
+import { PermissionName } from "./permissions";
 
 export function rootIsContextUser<FieldName extends string>(): FieldAuthorizeResolver<
   "User",
@@ -22,12 +21,6 @@ export function rootIsContextRealUser<FieldName extends string>(): FieldAuthoriz
   return (root, _, ctx) => {
     return ctx.realUser!.id === root.id;
   };
-}
-
-export function contextUserHasRole<TypeName extends string, FieldName extends string>(
-  minRole: UserOrganizationRole,
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (root, _, ctx) => userHasRole(ctx.user!, minRole);
 }
 
 export function contextUserIsNotSso<
@@ -90,5 +83,14 @@ export function emailIsNotRegisteredInTargetOrg<
     }
 
     return true;
+  };
+}
+
+export function contextUserHasPermission<TypeName extends string, FieldName extends string>(
+  permission: MaybeArray<PermissionName>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, _, ctx) => {
+    const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
+    return unMaybeArray(permission).every((p) => userPermissions.includes(p));
   };
 }

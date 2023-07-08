@@ -13,6 +13,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
@@ -31,9 +32,9 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import { isAdmin } from "@parallel/utils/roles";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
@@ -75,7 +76,7 @@ function OrganizationGroups() {
 
   const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(userGroups?.items, "id");
 
-  const canEdit = isAdmin(me.role);
+  const canEdit = useHasPermission("TEAMS:CRUD_TEAMS");
 
   const [search, setSearch] = useState(state.search);
 
@@ -509,4 +510,8 @@ OrganizationGroups.getInitialProps = async ({ fetchQuery }: WithApolloDataContex
   await fetchQuery(OrganizationGroups_userDocument);
 };
 
-export default compose(withDialogs, withApolloData)(OrganizationGroups);
+export default compose(
+  withDialogs,
+  withPermission("TEAMS:LIST_TEAMS", { orPath: "/app/organization" }),
+  withApolloData,
+)(OrganizationGroups);

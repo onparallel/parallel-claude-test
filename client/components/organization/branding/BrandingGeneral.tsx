@@ -8,8 +8,8 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Heading,
   HStack,
+  Heading,
   Image,
   Radio,
   RadioGroup,
@@ -23,20 +23,20 @@ import { Card } from "@parallel/components/common/Card";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ColorInput } from "@parallel/components/common/ColorInput";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Divider } from "@parallel/components/common/Divider";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
-  BrandingGeneral_updateOrganizationBrandThemeDocument,
-  BrandingGeneral_updateOrgLogoDocument,
   BrandingGeneral_UserFragment,
+  BrandingGeneral_updateOrgLogoDocument,
+  BrandingGeneral_updateOrganizationBrandThemeDocument,
   Tone,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { isAtLeast } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import Color from "color";
@@ -88,7 +88,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   const isLight =
     /^#[a-f\d]{6}$/i.test(color) && new Color(color).contrast(new Color("#ffffff")) < 3;
 
-  const hasAdminRole = isAtLeast("ADMIN", user.role);
+  const userCanEditBranding = useHasPermission("ORG_SETTINGS");
   const sortedFonts = useMemo(
     () =>
       fonts.sort(function (a, b) {
@@ -153,7 +153,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
       noValidate
     >
       <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
-        {!hasAdminRole ? <OnlyAdminsAlert /> : null}
+        {!userCanEditBranding ? <OnlyAdminsAlert /> : null}
         <Stack spacing={4}>
           <Stack>
             <Heading as="h4" size="md" fontWeight="semibold">
@@ -199,7 +199,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   height="200px"
                   maxWidth="100%"
                   textAlign="center"
-                  disabled={!hasAdminRole}
+                  disabled={!userCanEditBranding}
                 >
                   <Image
                     boxSize="300px"
@@ -223,7 +223,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                     flex="1"
                     colorScheme="primary"
                     onClick={() => dropzoneRef.current?.open()}
-                    isDisabled={!hasAdminRole}
+                    isDisabled={!userCanEditBranding}
                   >
                     <FormattedMessage
                       id="organization.branding.upload-logo"
@@ -264,7 +264,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   validate: (v) => /^#[a-f\d]{6}$/i.test(v),
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <ColorInput value={value} onChange={onChange} isDisabled={!hasAdminRole} />
+                  <ColorInput value={value} onChange={onChange} isDisabled={!userCanEditBranding} />
                 )}
               />
             </HStack>
@@ -302,7 +302,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
               </FormLabel>
               <Select
                 backgroundColor="white"
-                {...register("fontFamily", { disabled: !hasAdminRole })}
+                {...register("fontFamily", { disabled: !userCanEditBranding })}
               >
                 <option key="Default" value="DEFAULT">
                   {intl.formatMessage({
@@ -332,7 +332,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                 <RadioGroup
                   as={Stack}
                   spacing={2}
-                  isDisabled={!hasAdminRole}
+                  isDisabled={!userCanEditBranding}
                   onChange={(value) => onChange(value as Tone)}
                   value={value}
                 >
@@ -379,7 +379,6 @@ BrandingGeneral.fragments = {
   User: gql`
     fragment BrandingGeneral_User on User {
       id
-      role
       hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
       organization {
         id

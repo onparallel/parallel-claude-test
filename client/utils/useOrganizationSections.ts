@@ -2,27 +2,39 @@ import { gql } from "@apollo/client";
 import { useOrganizationSections_UserFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { isAdmin } from "./roles";
+import { useHasPermission } from "./useHasPermission";
 
 export function useOrganizationSections(user: useOrganizationSections_UserFragment) {
-  const userIsAdmin = isAdmin(user.role);
+  const userOrganizationPermissions = useHasPermission("ORG_SETTINGS");
+  const userHasProfilesTypesPermissions = useHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES");
+  const userCanViewUsers = useHasPermission("USERS:LIST_USERS");
+  const userCanViewGroups = useHasPermission("TEAMS:LIST_TEAMS");
+
   const intl = useIntl();
   return useMemo(
     () => [
-      {
-        title: intl.formatMessage({
-          id: "organization.users.title",
-          defaultMessage: "Users",
-        }),
-        path: "/app/organization/users",
-      },
-      {
-        title: intl.formatMessage({
-          id: "view.groups.title",
-          defaultMessage: "Teams",
-        }),
-        path: "/app/organization/groups",
-      },
+      ...(userCanViewUsers
+        ? [
+            {
+              title: intl.formatMessage({
+                id: "organization.users.title",
+                defaultMessage: "Users",
+              }),
+              path: "/app/organization/users",
+            },
+          ]
+        : []),
+      ...(userCanViewGroups
+        ? [
+            {
+              title: intl.formatMessage({
+                id: "view.groups.title",
+                defaultMessage: "Teams",
+              }),
+              path: "/app/organization/groups",
+            },
+          ]
+        : []),
       {
         title: intl.formatMessage({
           id: "organization.general.title",
@@ -30,7 +42,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         }),
         path: "/app/organization/general",
       },
-      ...(user.hasProfilesAccess && userIsAdmin
+      ...(user.hasProfilesAccess && userHasProfilesTypesPermissions
         ? [
             {
               title: intl.formatMessage({
@@ -48,7 +60,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         }),
         path: "/app/organization/branding",
       },
-      ...(userIsAdmin
+      ...(userOrganizationPermissions
         ? [
             {
               title: intl.formatMessage({
@@ -74,14 +86,20 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         path: "/app/organization/integrations",
       },
     ],
-    [intl.locale, userIsAdmin],
+    [
+      intl.locale,
+      userOrganizationPermissions,
+      userCanViewUsers,
+      userCanViewGroups,
+      userHasProfilesTypesPermissions,
+      user.hasProfilesAccess,
+    ],
   );
 }
 
 useOrganizationSections.fragments = {
   User: gql`
     fragment useOrganizationSections_User on User {
-      role
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
     }
   `,

@@ -4,7 +4,6 @@ import { ApiContext } from "../../../context";
 import { PetitionPermissionType, UserStatus } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import { Maybe, MaybeArray } from "../../../util/types";
-import { userHasRole } from "../../../util/userHasRole";
 import { Arg } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
@@ -126,14 +125,15 @@ export function userCanSendAs<
       return true;
     }
     try {
-      const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
-        ctx.user!.org_id,
-        "ON_BEHALF_OF",
-      );
+      const [hasFeatureFlag, permissions] = await Promise.all([
+        ctx.featureFlags.orgHasFeatureFlag(ctx.user!.org_id, "ON_BEHALF_OF"),
+        ctx.users.loadUserPermissions(ctx.user!.id),
+      ]);
       if (!hasFeatureFlag) {
         return false;
       }
-      if (userHasRole(ctx.user!, "ADMIN")) {
+
+      if (permissions.includes("PETITIONS:SEND_ON_BEHALF")) {
         return true;
       }
       const delegates = await ctx.users.loadReverseUserDelegatesByUserId(ctx.user!.id);

@@ -55,14 +55,14 @@ import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/
 import {
   PetitionBaseType,
   PetitionPermissionType,
-  PetitionSignatureStatusFilter,
-  PetitionStatus,
   Petitions_movePetitionsDocument,
   Petitions_PetitionBaseOrFolderFragment,
   Petitions_petitionsDocument,
   Petitions_renameFolderDocument,
   Petitions_updatePetitionDocument,
   Petitions_userDocument,
+  PetitionSignatureStatusFilter,
+  PetitionStatus,
   PetitionTagFilter,
 } from "@parallel/graphql/__types";
 import { isTypename } from "@parallel/utils/apollo/typename";
@@ -74,6 +74,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import {
   buildStateUrl,
   integer,
@@ -162,6 +163,9 @@ function Petitions() {
   );
 
   const petitions = data?.petitions;
+
+  const userCanChangePath = useHasPermission("PETITIONS:CHANGE_PATH");
+  const userCanCreateTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
 
   const { selectedIdsRef, selectedRows, selectedRowsRef, onChangeSelectedIds } = useSelection(
     petitions?.items,
@@ -409,7 +413,8 @@ function Petitions() {
   }, [selectedRows]);
 
   const actions = usePetitionListActions({
-    user: me,
+    userCanChangePath,
+    userCanCreateTemplate,
     type: state.type,
     selectedCount: selectedRows.length,
     hasSelectedFolders: selectedRows.some((c) => c.__typename === "PetitionFolder"),
@@ -500,11 +505,11 @@ function Petitions() {
           </Box>
           <Spacer />
           <Flex gap={2}>
-            <RestrictedFeaturePopover isRestricted={me.role === "COLLABORATOR"}>
+            <RestrictedFeaturePopover isRestricted={!userCanChangePath}>
               <Button
                 display={{ base: "none", md: "block" }}
                 onClick={handleCreateFolder}
-                isDisabled={me.role === "COLLABORATOR"}
+                isDisabled={!userCanChangePath}
               >
                 <FormattedMessage
                   id="page.petitions-list.create-folder"
@@ -513,13 +518,13 @@ function Petitions() {
               </Button>
             </RestrictedFeaturePopover>
             <RestrictedFeaturePopover
-              isRestricted={me.role === "COLLABORATOR" && state.type === "TEMPLATE"}
+              isRestricted={!userCanCreateTemplate && state.type === "TEMPLATE"}
             >
               <Button
                 display={{ base: "none", md: "block" }}
                 colorScheme="primary"
                 onClick={handleCreateNewParallelOrTemplate}
-                isDisabled={me.role === "COLLABORATOR" && state.type === "TEMPLATE"}
+                isDisabled={!userCanCreateTemplate && state.type === "TEMPLATE"}
               >
                 {state.type === "PETITION" ? (
                   <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
@@ -544,7 +549,7 @@ function Petitions() {
               />
               <Portal>
                 <MenuList minWidth="fit-content">
-                  <MenuItem onClick={handleCreateFolder} isDisabled={me.role === "COLLABORATOR"}>
+                  <MenuItem onClick={handleCreateFolder} isDisabled={!userCanChangePath}>
                     <FormattedMessage
                       id="page.petitions-list.create-folder"
                       defaultMessage="Create folder"
@@ -552,7 +557,7 @@ function Petitions() {
                   </MenuItem>
                   <MenuItem
                     onClick={handleCreateNewParallelOrTemplate}
-                    isDisabled={me.role === "COLLABORATOR" && state.type === "TEMPLATE"}
+                    isDisabled={!userCanCreateTemplate && state.type === "TEMPLATE"}
                   >
                     {state.type === "PETITION" ? (
                       <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
@@ -766,7 +771,8 @@ const _mutations = [
 ];
 
 function usePetitionListActions({
-  user,
+  userCanChangePath,
+  userCanCreateTemplate,
   type,
   selectedCount,
   hasSelectedFolders,
@@ -779,7 +785,8 @@ function usePetitionListActions({
   onDeleteClick,
   onMoveToClick,
 }: {
-  user: any;
+  userCanChangePath: boolean;
+  userCanCreateTemplate: boolean;
   type: PetitionBaseType;
   selectedCount: number;
   hasSelectedFolders: boolean;
@@ -792,8 +799,11 @@ function usePetitionListActions({
   onDeleteClick: () => void;
   onMoveToClick: () => void;
 }) {
-  const restrictToCollaborators = (button: ReactNode) => (
-    <RestrictedFeaturePopover isRestricted={user.role === "COLLABORATOR"}>
+  const restrictWhenCantChangePath = (button: ReactNode) => (
+    <RestrictedFeaturePopover isRestricted={!userCanChangePath}>{button}</RestrictedFeaturePopover>
+  );
+  const restrictWhenCantCreateTemplate = (button: ReactNode) => (
+    <RestrictedFeaturePopover isRestricted={!userCanCreateTemplate}>
       {button}
     </RestrictedFeaturePopover>
   );
@@ -816,26 +826,26 @@ function usePetitionListActions({
 
     {
       key: "clone",
-      isDisabled: hasSelectedFolders || user.role === "COLLABORATOR",
+      isDisabled: hasSelectedFolders || !userCanCreateTemplate,
       onClick: onCloneClick,
       leftIcon: <CopyIcon />,
       children: <FormattedMessage id="generic.duplicate" defaultMessage="Duplicate" />,
-      wrap: restrictToCollaborators,
+      wrap: restrictWhenCantCreateTemplate,
     },
     {
       key: "move-to",
       onClick: onMoveToClick,
-      isDisabled: minimumPermission === "READ" || user.role === "COLLABORATOR",
+      isDisabled: minimumPermission === "READ" || !userCanChangePath,
       leftIcon: <FolderIcon />,
       children: <FormattedMessage id="generic.move-to" defaultMessage="Move to..." />,
-      wrap: restrictToCollaborators,
+      wrap: restrictWhenCantChangePath,
     },
 
     type === "PETITION"
       ? {
           key: "saveAsTemplate",
           onClick: onCloneAsTemplateClick,
-          isDisabled: selectedCount !== 1 || hasSelectedFolders || user.role === "COLLABORATOR",
+          isDisabled: selectedCount !== 1 || hasSelectedFolders || !userCanCreateTemplate,
           leftIcon: <CopyIcon />,
           children: (
             <FormattedMessage
@@ -843,7 +853,7 @@ function usePetitionListActions({
               defaultMessage="Save as template"
             />
           ),
-          wrap: restrictToCollaborators,
+          wrap: restrictWhenCantCreateTemplate,
         }
       : {
           key: "useTemplate",

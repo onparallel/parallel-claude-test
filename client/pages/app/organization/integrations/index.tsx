@@ -14,11 +14,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SupportButton } from "@parallel/components/common/SupportButton";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import {
   IntegrationLinkCard,
@@ -34,7 +34,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { isAtLeast } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
@@ -47,7 +47,7 @@ function OrganizationIntegrations() {
     refetch,
   } = useAssertQuery(OrganizationIntegrations_userDocument);
 
-  const hasAdminRole = isAtLeast("ADMIN", me.role);
+  const userCanEditIntegrations = useHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS");
 
   const hasDownJones = me.organization.hasDowJones;
   const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
@@ -74,7 +74,7 @@ function OrganizationIntegrations() {
 
   const integrations = [
     {
-      isDisabled: !hasAdminRole || !me.hasPetitionSignature,
+      isDisabled: !userCanEditIntegrations || !me.hasPetitionSignature,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
@@ -101,7 +101,7 @@ function OrganizationIntegrations() {
       href: "/app/organization/integrations/signature",
     },
     {
-      isDisabled: !hasAdminRole || !me.hasPetitionSignature,
+      isDisabled: !userCanEditIntegrations || !me.hasPetitionSignature,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
@@ -122,7 +122,7 @@ function OrganizationIntegrations() {
       href: "/app/organization/integrations/signature",
     },
     {
-      isDisabled: !hasAdminRole,
+      isDisabled: !userCanEditIntegrations,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
@@ -139,7 +139,7 @@ function OrganizationIntegrations() {
       isExternal: true,
     },
     {
-      isDisabled: !hasAdminRole || !me.hasDowJonesFeature,
+      isDisabled: !userCanEditIntegrations || !me.hasDowJonesFeature,
       disabledMessage: (
         <Text>
           <FormattedMessage
@@ -204,7 +204,7 @@ function OrganizationIntegrations() {
       isChecked: hasDownJones,
     },
     {
-      isDisabled: !me.hasDeveloperAccess || !hasAdminRole,
+      isDisabled: !me.hasDeveloperAccess || !userCanEditIntegrations,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
@@ -238,50 +238,52 @@ function OrganizationIntegrations() {
         </Heading>
       }
     >
-      <Alert status="info" paddingX={6}>
-        <AlertIcon />
-        <Stack
-          direction={{ base: "column", md: "row" }}
-          flex="1"
-          justifyContent="space-between"
-          spacing={4}
-        >
-          <Box>
-            <AlertTitle>
-              <FormattedMessage
-                id="organization.integrations.alert-title"
-                defaultMessage="Can't find the integration you need?"
-              />
-            </AlertTitle>
-            <AlertDescription>
-              <FormattedMessage
-                id="organization.integrations.alert-description"
-                defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
-              />
-            </AlertDescription>
-          </Box>
-          <Center>
-            <Button
-              variant="outline"
-              colorScheme="blue"
-              backgroundColor="white"
-              as="a"
-              target="_blank"
-              rel="noopener"
-              href="https://roadmap.onparallel.com/feature-requests?category=integrations&selectedCategory=integrations"
-              aria-label={intl.formatMessage({
-                id: "organization.integrations.alert-button",
-                defaultMessage: "Suggest integration",
-              })}
-            >
-              <FormattedMessage
-                id="organization.integrations.alert-button"
-                defaultMessage="Suggest integration"
-              />
-            </Button>
-          </Center>
-        </Stack>
-      </Alert>
+      <Box>
+        <Alert status="info" paddingX={6}>
+          <AlertIcon />
+          <Stack
+            direction={{ base: "column", md: "row" }}
+            flex="1"
+            justifyContent="space-between"
+            spacing={4}
+          >
+            <Box>
+              <AlertTitle>
+                <FormattedMessage
+                  id="organization.integrations.alert-title"
+                  defaultMessage="Can't find the integration you need?"
+                />
+              </AlertTitle>
+              <AlertDescription>
+                <FormattedMessage
+                  id="organization.integrations.alert-description"
+                  defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
+                />
+              </AlertDescription>
+            </Box>
+            <Center>
+              <Button
+                variant="outline"
+                colorScheme="blue"
+                backgroundColor="white"
+                as="a"
+                target="_blank"
+                rel="noopener"
+                href="https://roadmap.onparallel.com/feature-requests?category=integrations&selectedCategory=integrations"
+                aria-label={intl.formatMessage({
+                  id: "organization.integrations.alert-button",
+                  defaultMessage: "Suggest integration",
+                })}
+              >
+                <FormattedMessage
+                  id="organization.integrations.alert-button"
+                  defaultMessage="Suggest integration"
+                />
+              </Button>
+            </Center>
+          </Stack>
+        </Alert>
+      </Box>
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => {
           if (isDefined((integration as IntegrationSwitchCardProps).onChange)) {
@@ -294,7 +296,7 @@ function OrganizationIntegrations() {
             );
           }
         })}
-        {!hasAdminRole ? <OnlyAdminsAlert /> : null}
+        {!userCanEditIntegrations ? <OnlyAdminsAlert /> : null}
       </Stack>
     </OrganizationSettingsLayout>
   );
@@ -306,7 +308,6 @@ OrganizationIntegrations.queries = [
       ...OrganizationSettingsLayout_Query
       me {
         id
-        role
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
         hasDowJonesFeature: hasFeatureFlag(featureFlag: DOW_JONES_KYC)

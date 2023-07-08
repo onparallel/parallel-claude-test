@@ -3,6 +3,7 @@ import { Divider, Heading, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
 import { ApiTokensTable } from "@parallel/components/settings/developers/ApiTokensTable";
 import { WebhookSubscriptionsTable } from "@parallel/components/settings/developers/WebhookSubscriptionsTable";
@@ -96,6 +97,7 @@ Developers.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 
 export default compose(
   withDialogs,
+  withPermission("INTEGRATIONS:CRUD_API"),
   withFeatureFlag("DEVELOPER_ACCESS", "/app/organization"),
   withApolloData,
 )(Developers);

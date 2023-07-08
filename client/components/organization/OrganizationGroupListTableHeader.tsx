@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { WhenOrgRole } from "../common/WhenOrgRole";
+import { WhenPermission } from "../common/WhenPermission";
 
 export type OrganizationGroupListTableHeaderProps = {
   search: string | null;
@@ -35,7 +35,7 @@ export function OrganizationGroupListTableHeader({
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
       </Box>
-      <WhenOrgRole role="ADMIN">
+      <WhenPermission permission="TEAMS:CRUD_TEAMS">
         <Spacer />
         <Button
           colorScheme="primary"
@@ -46,7 +46,7 @@ export function OrganizationGroupListTableHeader({
             <FormattedMessage id="organization-groups.add-user" defaultMessage="Add user" />
           </Text>
         </Button>
-      </WhenOrgRole>
+      </WhenPermission>
     </Stack>
   );
 }

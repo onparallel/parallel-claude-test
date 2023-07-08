@@ -52,7 +52,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
-import { isAtLeast } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
@@ -99,7 +99,11 @@ export const PetitionHeader = Object.assign(
     const [state] = usePetitionState();
     const [shouldConfirmNavigation, setShouldConfirmNavigation] =
       usePetitionShouldConfirmNavigation();
-    const hasAdminRole = isAtLeast("ADMIN", me.role);
+    const userCanDownloadResults = useHasPermission("REPORTS:TEMPLATE_REPLIES");
+    const userCanChangePath = useHasPermission("PETITIONS:CHANGE_PATH");
+    const userCanSaveAsTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
+    const userCanCloneTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
+    const userCanClonePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
 
     const isPetition = petition.__typename === "Petition";
 
@@ -444,7 +448,7 @@ export const PetitionHeader = Object.assign(
               display="flex"
               render={({ children, ...props }) => (
                 <>
-                  {me.role === "COLLABORATOR" || myEffectivePermission === "READ" ? (
+                  {!userCanChangePath || myEffectivePermission === "READ" ? (
                     <HStack minWidth={0} paddingX={1.5} color="gray.600" fontSize="sm" {...props}>
                       <FolderIcon boxSize={4} />
                       <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
@@ -597,7 +601,7 @@ export const PetitionHeader = Object.assign(
                       />
                     </MenuItem>
                   ) : null}
-                  {hasAdminRole && !isPetition ? (
+                  {userCanDownloadResults && !isPetition ? (
                     <MenuItem
                       onClick={() => handleTemplateRepliesReportTask(petition.id)}
                       icon={<TableIcon display="block" boxSize={4} />}
@@ -612,7 +616,7 @@ export const PetitionHeader = Object.assign(
                   <MenuItem
                     onClick={handleCloneClick}
                     icon={<CopyIcon display="block" boxSize={4} />}
-                    isDisabled={me.role === "COLLABORATOR"}
+                    isDisabled={isPetition ? !userCanClonePetition : !userCanCloneTemplate}
                   >
                     {isPetition ? (
                       <FormattedMessage
@@ -631,7 +635,7 @@ export const PetitionHeader = Object.assign(
                     <MenuItem
                       onClick={handleSaveAsTemplate}
                       icon={<CopyIcon display="block" boxSize={4} />}
-                      isDisabled={me.role === "COLLABORATOR"}
+                      isDisabled={!userCanSaveAsTemplate}
                     >
                       <FormattedMessage
                         id="component.petition-header.save-as-template-button"
@@ -643,7 +647,7 @@ export const PetitionHeader = Object.assign(
                   <MenuItem
                     onClick={handleMovePetition}
                     icon={<FolderIcon display="block" boxSize={4} />}
-                    isDisabled={me.role === "COLLABORATOR"}
+                    isDisabled={!userCanChangePath}
                   >
                     <FormattedMessage id="generic.move-to" defaultMessage="Move to..." />
                   </MenuItem>
@@ -805,7 +809,6 @@ export const PetitionHeader = Object.assign(
           fragment PetitionHeader_Query on Query {
             me {
               id
-              role
               hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
               canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
             }

@@ -33,6 +33,7 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
@@ -52,6 +53,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import {
   integer,
@@ -64,7 +66,6 @@ import {
   useQueryState,
   values,
 } from "@parallel/utils/queryState";
-import { isAtLeast } from "@parallel/utils/roles";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
@@ -93,7 +94,9 @@ function Profiles() {
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
 
   const navigate = useHandleNavigation();
-  const hasNormalRole = isAtLeast("NORMAL", me.role);
+
+  const userCanSubscribeProfiles = useHasPermission("PROFILES:SUBSCRIBE_PROFILES");
+  const userCanDeleteProfiles = useHasPermission("PROFILES:DELETE_PROFILES");
 
   const { data, loading, refetch } = useQueryOrPreviousData(Profiles_profilesDocument, {
     variables: {
@@ -209,7 +212,7 @@ function Profiles() {
   }, [selectedRows, selectedIds.join(",")]);
 
   const actions = useProfileListActions({
-    canDelete: me.role === "ADMIN",
+    canDelete: userCanDeleteProfiles,
     onDeleteClick: handleDeleteClick,
     onSubscribeClick: handleSubscribeClick,
   });
@@ -304,7 +307,7 @@ function Profiles() {
             rows={profiles?.items}
             rowKeyProp="id"
             context={context}
-            isSelectable={hasNormalRole}
+            isSelectable={userCanSubscribeProfiles}
             isHighlightable
             loading={loading}
             onRowClick={handleRowClick}
@@ -583,7 +586,6 @@ const _queries = [
     query Profiles_user {
       ...AppLayout_Query
       me {
-        role
         ...useProfileSubscribersDialog_User
       }
     }
@@ -665,6 +667,7 @@ Profiles.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) 
 
 export default compose(
   withDialogs,
+  withPermission("PROFILES:LIST_PROFILES"),
   withFeatureFlag("PROFILES", "/app/petitions"),
   withApolloData,
 )(Profiles);

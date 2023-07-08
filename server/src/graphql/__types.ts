@@ -2900,6 +2900,7 @@ export interface NexusGenFieldTypes {
     notifications: NexusGenRootTypes["UserNotifications_Pagination"]; // UserNotifications_Pagination!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     organizations: NexusGenRootTypes["Organization"][]; // [Organization!]!
+    permissions: string[]; // [String!]!
     petitionListViews: NexusGenRootTypes["PetitionListView"][]; // [PetitionListView!]!
     preferredLocale: NexusGenEnums["UserLocale"]; // UserLocale!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
@@ -4957,6 +4958,7 @@ export interface NexusGenFieldTypeNames {
     notifications: "UserNotifications_Pagination";
     organization: "Organization";
     organizations: "Organization";
+    permissions: "String";
     petitionListViews: "PetitionListView";
     preferredLocale: "UserLocale";
     role: "OrganizationRole";

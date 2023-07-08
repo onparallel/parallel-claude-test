@@ -24,7 +24,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn, TableSorting } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsErrorMessage } from "@parallel/components/reports/common/ReportsErrorMessage";
@@ -446,7 +446,7 @@ Overview.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery(Overview_userDocument);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Overview);
+export default compose(withDialogs, withPermission("REPORTS:OVERVIEW"), withApolloData)(Overview);
 
 function StatsCard({ title, amount, help }: { title: string; amount: number; help: ReactNode }) {
   return (

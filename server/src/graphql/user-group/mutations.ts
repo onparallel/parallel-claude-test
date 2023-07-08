@@ -1,20 +1,20 @@
 import { inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { CreateUserGroup, UserGroup } from "../../db/__types";
+import { RESULT } from "../helpers/Result";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/Result";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
-import { contextUserHasRole } from "../users/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToUserGroups } from "./authorizers";
 
 export const createUserGroup = mutationField("createUserGroup", {
   description: "Creates a group in the user's organization",
   type: "UserGroup",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(contextUserHasPermission("TEAMS:CRUD_TEAMS")),
   validateArgs: validateAnd(
     notEmptyString((args) => args.name, "name"),
     maxLength((args) => args.name, "name", 100),
@@ -42,7 +42,10 @@ export const createUserGroup = mutationField("createUserGroup", {
 export const updateUserGroup = mutationField("updateUserGroup", {
   description: "Updates the name of a given user group",
   type: "UserGroup",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasAccessToUserGroups("id")),
+  authorize: authenticateAnd(
+    contextUserHasPermission("TEAMS:CRUD_TEAMS"),
+    userHasAccessToUserGroups("id"),
+  ),
   validateArgs: validateAnd(
     notEmptyString((args) => args.data.name, "data.name"),
     maxLength((args) => args.data.name, "data.name", 100),
@@ -76,7 +79,10 @@ export const updateUserGroup = mutationField("updateUserGroup", {
 export const deleteUserGroup = mutationField("deleteUserGroup", {
   description: "Deletes a group",
   type: "Result",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasAccessToUserGroups("ids")),
+  authorize: authenticateAnd(
+    contextUserHasPermission("TEAMS:CRUD_TEAMS"),
+    userHasAccessToUserGroups("ids"),
+  ),
   args: {
     ids: nonNull(list(nonNull(globalIdArg("UserGroup")))),
   },
@@ -98,7 +104,7 @@ export const addUsersToUserGroup = mutationField("addUsersToUserGroup", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("TEAMS:CRUD_TEAMS"),
     userHasAccessToUserGroups("userGroupId"),
     userHasAccessToUsers("userIds"),
   ),
@@ -116,7 +122,7 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("TEAMS:CRUD_TEAMS"),
     userHasAccessToUserGroups("userGroupId"),
     userHasAccessToUsers("userIds"),
   ),
@@ -138,7 +144,7 @@ export const cloneUserGroups = mutationField("cloneUserGroups", {
     locale: nonNull("UserLocale"),
   },
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
+    contextUserHasPermission("TEAMS:CRUD_TEAMS"),
     userHasAccessToUserGroups("userGroupIds"),
   ),
   resolve: async (_, args, ctx) => {

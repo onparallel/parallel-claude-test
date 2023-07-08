@@ -23,9 +23,7 @@ export async function signatureCancelledNoCreditsLeft(
   const config = signatureRequest.signature_config as PetitionSignatureConfig;
   const signatureIntegration = await context.integrations.loadIntegration(config.orgIntegrationId);
 
-  const orgOwner = (await context.organizations.loadOwnerAndAdmins(petition.org_id)).find(
-    (u) => u.organization_role === "OWNER",
-  )!;
+  const orgOwner = (await context.organizations.loadOrgOwner(petition.org_id))!;
   const orgOwnerData = await context.users.loadUserData(orgOwner.user_data_id);
   if (!orgOwnerData) {
     throw new Error(`UserData:${orgOwner.user_data_id} not found for User:${orgOwner.id}`);

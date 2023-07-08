@@ -61,6 +61,12 @@ export const User = objectType({
       type: "OrganizationRole",
       resolve: (o) => o.organization_role,
     });
+    t.list.string("permissions", {
+      authorize: rootIsContextUser(),
+      resolve: async (o, _, ctx) => {
+        return await ctx.users.loadUserPermissions(o.id);
+      },
+    });
     t.boolean("isSuperAdmin", {
       resolve: async (o, _, ctx) => {
         const org = await ctx.organizations.loadOrg(o.org_id);
@@ -70,8 +76,9 @@ export const User = objectType({
     t.boolean("canCreateUsers", {
       resolve: async (o, _, ctx) => {
         const ssoIntegrations = await ctx.integrations.loadIntegrationsByOrgId(o.org_id, "SSO");
+        const userPermissions = await ctx.users.loadUserPermissions(o.id);
         const hasSsoProvider = ssoIntegrations.length > 0;
-        return userHasRole(o, "ADMIN") && !hasSsoProvider;
+        return !hasSsoProvider && userPermissions.includes("USERS:CRUD_USERS");
       },
     });
     t.boolean("isSsoUser", {

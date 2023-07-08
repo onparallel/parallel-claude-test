@@ -34,15 +34,14 @@ import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
-import {
-  TemplateDetailsModal_PetitionTemplateFragment,
-  TemplateDetailsModal_UserFragment,
-} from "@parallel/graphql/__types";
+import { TemplateDetailsModal_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -50,13 +49,11 @@ import { zip } from "remeda";
 import { usePetitionSharingDialog } from "./PetitionSharingDialog";
 
 export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> {
-  me: TemplateDetailsModal_UserFragment;
   template: TemplateDetailsModal_PetitionTemplateFragment;
   isFromPublicTemplates?: boolean;
 }
 
 export function TemplateDetailsModal({
-  me,
   template,
   isFromPublicTemplates,
   ...props
@@ -73,6 +70,9 @@ export function TemplateDetailsModal({
   );
 
   const indices = useFieldIndices(filteredFields);
+
+  const myId = useGetMyId();
+  const userCanClone = useHasPermission("PETITIONS:CREATE_TEMPLATES");
 
   const onCopyPublicLink = useClipboardWithToast({
     text: intl.formatMessage({
@@ -111,7 +111,7 @@ export function TemplateDetailsModal({
   const handlePetitionSharingClick = async () => {
     try {
       const res = await showPetitionSharingDialog({
-        userId: me.id,
+        userId: myId,
         petitionIds: [template.id],
         type: "TEMPLATE",
       });
@@ -217,6 +217,7 @@ export function TemplateDetailsModal({
                   <Button
                     width="100%"
                     colorScheme="primary"
+                    isDisabled={!userCanClone}
                     onClick={handleCloneTemplate}
                     leftIcon={<CopyIcon />}
                   >
@@ -284,7 +285,7 @@ export function TemplateDetailsModal({
                             onClick={handleCloneTemplate}
                             data-testid="duplicate-template-button"
                             icon={<CopyIcon display="block" boxSize={4} />}
-                            isDisabled={me.role === "COLLABORATOR"}
+                            isDisabled={!userCanClone}
                           >
                             <FormattedMessage
                               id="component.template-details-modal.duplicate-template"
@@ -403,12 +404,6 @@ export function TemplateDetailsModal({
 }
 
 TemplateDetailsModal.fragments = {
-  User: gql`
-    fragment TemplateDetailsModal_User on User {
-      id
-      role
-    }
-  `,
   PetitionTemplate: gql`
     fragment TemplateDetailsModal_PetitionTemplate on PetitionTemplate {
       id

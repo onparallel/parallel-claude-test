@@ -4704,6 +4704,7 @@ export type User = Timestamps & {
   organization: Organization;
   /** Organizations this user belongs to */
   organizations: Array<Organization>;
+  permissions: Array<Scalars["String"]["output"]>;
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
   preferredLocale: UserLocale;

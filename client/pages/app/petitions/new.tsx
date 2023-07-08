@@ -42,6 +42,7 @@ import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import {
   boolean,
   parseQuery,
@@ -130,8 +131,10 @@ function NewPetition() {
     [refetch],
   );
 
+  const canCreateTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
+
   useEffect(() => {
-    if (me.role === "COLLABORATOR" && state.public) {
+    if (!canCreateTemplate && state.public) {
       setQueryState((current) => ({ ...current, public: false }));
     }
   }, [me, state.public]);
@@ -194,7 +197,7 @@ function NewPetition() {
   }, [goToPetition, createPetition, state.path]);
 
   useEffect(() => {
-    if (!hasTemplates && !state.public && me.role !== "COLLABORATOR") {
+    if (!hasTemplates && !state.public && canCreateTemplate) {
       handleTabChange(1);
     }
   }, []);
@@ -278,10 +281,7 @@ function NewPetition() {
               >
                 <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
               </Tab>
-              <RestrictedFeaturePopover
-                isRestricted={me.role === "COLLABORATOR"}
-                borderBottomRadius={0}
-              >
+              <RestrictedFeaturePopover isRestricted={!canCreateTemplate} borderBottomRadius={0}>
                 <Tab
                   data-testid="new-petition-public-templates-tab"
                   data-link="public-templates"
@@ -289,7 +289,7 @@ function NewPetition() {
                   _selected={selectTabStyles}
                   whiteSpace="nowrap"
                   paddingX={3}
-                  isDisabled={me.role === "COLLABORATOR"}
+                  isDisabled={!canCreateTemplate}
                 >
                   <FormattedMessage
                     id="new-petition.public-templates"
@@ -299,7 +299,7 @@ function NewPetition() {
               </RestrictedFeaturePopover>
             </TabList>
             <RestrictedFeaturePopover
-              isRestricted={me.role === "COLLABORATOR"}
+              isRestricted={!canCreateTemplate}
               display="flex"
               alignSelf="flex-end"
             >
@@ -313,7 +313,7 @@ function NewPetition() {
                 colorScheme="primary"
                 alignSelf="flex-end"
                 icon={<AddIcon fontSize={{ base: "16px", md: "12px" }} />}
-                isDisabled={me.role === "COLLABORATOR"}
+                isDisabled={!canCreateTemplate}
                 label={intl.formatMessage({
                   id: "new-petition.create",
                   defaultMessage: "Create",
@@ -511,7 +511,6 @@ function NewPetition() {
         <TemplateDetailsModal
           isOpen
           onClose={() => setQueryState((current) => omit(current, ["template"]))}
-          me={me}
           template={templateData?.petition as any}
           isFromPublicTemplates={state.public}
         />
@@ -570,16 +569,12 @@ NewPetition.queries = [
   gql`
     query NewPetition_user {
       ...AppLayout_Query
-      me {
-        ...TemplateDetailsModal_User
-      }
       hasTemplates: petitions(filters: { type: TEMPLATE }) {
         totalCount
       }
       publicTemplateCategories
     }
     ${AppLayout.fragments.Query}
-    ${TemplateDetailsModal.fragments.User}
   `,
   gql`
     query NewPetition_template($templateId: GID!) {

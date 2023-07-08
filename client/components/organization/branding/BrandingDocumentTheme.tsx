@@ -1,10 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, Grid, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Box, Button, Grid, HStack, Heading, Stack } from "@chakra-ui/react";
 import { EditIcon, SaveIcon } from "@parallel/chakra/icons";
-import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   DocumentThemeEditor,
   DocumentThemeEditorData,
@@ -14,13 +14,13 @@ import { DocumentThemeSelect } from "@parallel/components/organization/branding/
 import { useConfirmDeleteThemeDialog } from "@parallel/components/organization/dialogs/ConfirmDeleteThemeDialog";
 import { useCreateOrUpdateDocumentThemeDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateDocumentThemeDialog";
 import {
+  BrandingDocumentTheme_OrganizationThemeFragment,
+  BrandingDocumentTheme_UserFragment,
   BrandingDocumentTheme_createOrganizationPdfDocumentThemeDocument,
   BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeDocument,
-  BrandingDocumentTheme_OrganizationThemeFragment,
   BrandingDocumentTheme_updateOrganizationPdfDocumentThemeDocument,
-  BrandingDocumentTheme_UserFragment,
 } from "@parallel/graphql/__types";
-import { isAdmin } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -37,7 +37,7 @@ interface BrandingDocumentThemeProps {
 export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   const intl = useIntl();
 
-  const hasAdminRole = isAdmin(user.role);
+  const userHasPermission = useHasPermission("ORG_SETTINGS");
   const documentThemes = user.organization.pdfDocumentThemes;
 
   const [selectedTheme, setSelectedTheme] = useState(documentThemes.find((t) => t.isDefault)!);
@@ -180,7 +180,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               onChange={(t) => handleThemeChange(t!)}
               value={selectedTheme}
               options={documentThemes.filter((t) => t.id !== selectedTheme.id)}
-              isCreateNewThemeDisabled={!hasAdminRole}
+              isCreateNewThemeDisabled={!userHasPermission}
             />
           </Box>
           <ResponsiveButtonIcon
@@ -201,7 +201,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               id: "branding.edit-theme-tooltip",
               defaultMessage: "Edit theme",
             })}
-            isDisabled={!hasAdminRole}
+            isDisabled={!userHasPermission}
             onClick={handleEditDocumentTheme}
           />
           <Box display={{ base: "block", xl: "none" }}>
@@ -209,7 +209,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               variant="solid"
               colorScheme="primary"
               onClick={handleCreateNewDocumentTheme}
-              isDisabled={!hasAdminRole}
+              isDisabled={!userHasPermission}
               width="full"
             >
               <FormattedMessage id="branding.new-theme-button" defaultMessage="New theme" />
@@ -222,20 +222,20 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           variant="solid"
           colorScheme="primary"
           onClick={handleCreateNewDocumentTheme}
-          isDisabled={!hasAdminRole}
+          isDisabled={!userHasPermission}
           width="full"
         >
           <FormattedMessage id="branding.new-theme-button" defaultMessage="New theme" />
         </Button>
       </Box>
       <Stack spacing={8} gridArea="c">
-        {!hasAdminRole ? <OnlyAdminsAlert /> : null}
+        {!userHasPermission ? <OnlyAdminsAlert /> : null}
         <FormProvider {...form}>
           <DocumentThemeEditor
             themeId={selectedTheme.id}
             canRestoreFonts={canRestoreFonts}
             onRestoreFonts={handleRestoreFonts}
-            isDisabled={!hasAdminRole}
+            isDisabled={!userHasPermission}
           />
         </FormProvider>
       </Stack>
@@ -253,7 +253,6 @@ BrandingDocumentTheme.fragments = {
     return gql`
       fragment BrandingDocumentTheme_User on User {
         id
-        role
         organization {
           ...DocumentThemePreview_Organization
           pdfDocumentThemes {

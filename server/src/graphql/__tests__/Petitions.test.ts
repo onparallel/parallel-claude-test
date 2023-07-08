@@ -1379,24 +1379,6 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("collaborators should not be able to create a blank petition", async () => {
-      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).mutate({
-        mutation: gql`
-          mutation ($locale: PetitionLocale!) {
-            createPetition(locale: $locale) {
-              id
-            }
-          }
-        `,
-        variables: {
-          locale: "en",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
     it("collaborators should be able to create a petition from a template", async () => {
       const { errors, data } = await testClient.withApiKey(collaboratorApiKey).mutate({
         mutation: gql`
@@ -1626,7 +1608,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true, template_public: true })
       );
 
       const { errors, data } = await testClient.execute(
@@ -1728,7 +1710,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true, template_public: true })
       );
       await mocks.createRandomPetitionFields(template.id, 3);
 

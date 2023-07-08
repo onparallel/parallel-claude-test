@@ -23,10 +23,12 @@ import Select, {
   components,
 } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
+import AsyncSelect from "react-select/async";
 import { indexBy, isDefined, pick, zip } from "remeda";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 
 export type ProfileSelectSelection = ProfileSelect_ProfileFragment;
 
@@ -202,6 +204,8 @@ export const ProfileSelect = Object.assign(
       );
     };
 
+    const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
+
     async function handleCreate(name: string) {
       const profile = await onCreateProfile?.(name);
       if (profile) {
@@ -234,7 +238,7 @@ export const ProfileSelect = Object.assign(
         {...props}
         {...rsProps}
       />
-    ) : (
+    ) : userCanCreateProfiles ? (
       <AsyncCreatableSelect<OptionType, IsMulti, never>
         ref={ref as any}
         value={_value as any}
@@ -247,6 +251,20 @@ export const ProfileSelect = Object.assign(
         placeholder={placeholder}
         isClearable={props.isClearable}
         formatCreateLabel={formatCreateLabel}
+        {...props}
+        {...rsProps}
+      />
+    ) : (
+      <AsyncSelect<OptionType, IsMulti, never>
+        ref={ref as any}
+        value={_value as any}
+        onChange={onChange as any}
+        isMulti={isMulti}
+        loadOptions={loadProfiles}
+        getOptionLabel={getOptionLabel}
+        getOptionValue={getOptionValue}
+        placeholder={placeholder}
+        isClearable={props.isClearable}
         {...props}
         {...rsProps}
       />

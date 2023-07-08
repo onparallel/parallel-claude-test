@@ -24,7 +24,7 @@ import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
-import { contextUserHasRole } from "../users/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToContacts } from "./authorizers";
 
 export const createContact = mutationField("createContact", {
@@ -184,7 +184,10 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
 export const deleteContacts = mutationField("deleteContacts", {
   description: "Delete contacts.",
   type: "Result",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasAccessToContacts("ids")),
+  authorize: authenticateAnd(
+    contextUserHasPermission("CONTACTS:DELETE_CONTACTS"),
+    userHasAccessToContacts("ids"),
+  ),
   args: {
     ids: nonNull(list(nonNull(globalIdArg("Contact")))),
     force: nullable(

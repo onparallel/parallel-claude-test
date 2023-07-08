@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, omit, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, omit, uniq } from "remeda";
 import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -8,8 +8,16 @@ import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { CreateUser, CreateUserData, User, UserData, UserGroup } from "../__types";
+import {
+  CreateUser,
+  CreateUserData,
+  User,
+  UserData,
+  UserGroup,
+  UserOrganizationRoleValues,
+} from "../__types";
 import { SystemRepository } from "./SystemRepository";
+import { PERMISSIONS, PermissionName, PermissionNameValues } from "../../graphql/users/permissions";
 
 @injectable()
 export class UserRepository extends BaseRepository {
@@ -40,6 +48,20 @@ export class UserRepository extends BaseRepository {
   readonly loadUser = this.buildLoadBy("user", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadUserData = this.buildLoadBy("user_data", "id", (q) => q.whereNull("deleted_at"));
+
+  readonly loadUserPermissions = this.buildLoader<number, PermissionName[]>(async (userIds, t) => {
+    const users = await this.loadUser.raw(userIds, t);
+    return users.map((user) => {
+      return isDefined(user)
+        ? user.organization_role === "OWNER"
+          ? PermissionNameValues
+          : UserOrganizationRoleValues.slice(
+              0,
+              UserOrganizationRoleValues.indexOf(user.organization_role) + 1,
+            ).flatMap((role) => PERMISSIONS[role])
+        : [];
+    });
+  });
 
   readonly loadUserDelegatesByUserId = this.buildLoader<number, User[]>(async (userIds, t) => {
     const users = await this.raw<User & { user_id: number }>(

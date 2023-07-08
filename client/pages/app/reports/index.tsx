@@ -20,7 +20,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { Reports_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -223,4 +223,10 @@ Reports.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery(Reports_userDocument);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Reports);
+export default compose(
+  withDialogs,
+  withPermission(["REPORTS:OVERVIEW", "REPORTS:TEMPLATE_STATISTICS", "REPORTS:TEMPLATE_REPLIES"], {
+    operator: "OR",
+  }),
+  withApolloData,
+)(Reports);

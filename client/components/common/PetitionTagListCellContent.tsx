@@ -9,7 +9,7 @@ import {
   PetitionTagListCellContent_tagPetitionDocument,
   PetitionTagListCellContent_untagPetitionDocument,
 } from "@parallel/graphql/__types";
-import { isAdmin, useOrgRole } from "@parallel/utils/roles";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { MouseEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ActionMeta } from "react-select";
@@ -70,8 +70,7 @@ export function PetitionTagListCellContent({
     }
   };
 
-  const myRole = useOrgRole();
-  const userIsAdmin = myRole ? isAdmin(myRole) : false;
+  const userCanEditTags = useHasPermission("TAGS:CRUD_TAGS");
   const tags = petition.tags;
   const sample = tags.length > 4 ? tags.slice(0, 3) : tags;
   const extra = tags.length > 4 ? tags.slice(3) : [];
@@ -114,8 +113,8 @@ export function PetitionTagListCellContent({
               }),
             }}
             components={{ IndicatorsContainer }}
-            canCreateTags
-            canEditTags={userIsAdmin}
+            canCreateTags={userCanEditTags}
+            canEditTags={userCanEditTags}
           />
         </Box>
       ) : (

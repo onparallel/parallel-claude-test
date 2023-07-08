@@ -6400,6 +6400,7 @@ type User implements Timestamps {
   Organizations this user belongs to
   """
   organizations: [Organization!]!
+  permissions: [String!]!
 
   """
   The petition views of the user

@@ -18,6 +18,7 @@ import {
 } from "./authorizers";
 import { validateAnd } from "../helpers/validateArgs";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { contextUserHasPermission } from "../users/authorizers";
 
 async function challengeWebhookUrl(url: string, fetch: IFetchService) {
   const [, response] = await withError(
@@ -38,6 +39,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
   description: "Creates an event subscription for the user's petitions",
   type: "PetitionEventSubscription",
   authorize: authenticateAnd(
+    contextUserHasPermission("INTEGRATIONS:CRUD_API"),
     ifArgDefined(
       "fromTemplateId",
       and(
@@ -91,6 +93,7 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
   description: "Updates an existing event subscription for the user's petitions",
   type: "PetitionEventSubscription",
   authorize: authenticateAnd(
+    contextUserHasPermission("INTEGRATIONS:CRUD_API"),
     userHasAccessToEventSubscription("id"),
     ifArgDefined(
       "fromTemplateId",
@@ -155,7 +158,10 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
 export const deleteEventSubscriptions = mutationField("deleteEventSubscriptions", {
   type: "Result",
   description: "Deletes event subscriptions",
-  authorize: authenticateAnd(userHasAccessToEventSubscription("ids")),
+  authorize: authenticateAnd(
+    contextUserHasPermission("INTEGRATIONS:CRUD_API"),
+    userHasAccessToEventSubscription("ids"),
+  ),
   args: {
     ids: nonNull(list(nonNull(globalIdArg("PetitionEventSubscription")))),
   },
@@ -178,6 +184,7 @@ export const createEventSubscriptionSignatureKey = mutationField(
     description: "Creates a pair of asymmetric keys to be used for signing webhook events",
     type: "EventSubscriptionSignatureKey",
     authorize: authenticateAnd(
+      contextUserHasPermission("INTEGRATIONS:CRUD_API"),
       userHasAccessToEventSubscription("subscriptionId"),
       eventSubscriptionHasSignatureKeysLessThan("subscriptionId", 5),
     ),
@@ -203,7 +210,10 @@ export const deleteEventSubscriptionSignatureKeys = mutationField(
   {
     description: "Deletes a subscription signature key",
     type: "Result",
-    authorize: authenticateAnd(userHasAccessToEventSubscriptionSignatureKeys("ids")),
+    authorize: authenticateAnd(
+      contextUserHasPermission("INTEGRATIONS:CRUD_API"),
+      userHasAccessToEventSubscriptionSignatureKeys("ids"),
+    ),
     args: {
       ids: nonNull(list(nonNull(globalIdArg("EventSubscriptionSignatureKey")))),
     },

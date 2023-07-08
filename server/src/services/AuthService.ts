@@ -54,7 +54,6 @@ import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
-import { userHasRole } from "../util/userHasRole";
 import { EmailPayload } from "../workers/email-sender";
 import { ILogger, LOGGER } from "./Logger";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
@@ -777,9 +776,9 @@ export class Auth implements IAuth {
               return null;
             }
             if (isDefined(asUserId) && asUserId !== user.id) {
+              const userPermissions = await this.users.loadUserPermissions(user.id);
               // make sure user can ghost login
-              if (!userHasRole(user, "ADMIN")) {
-                // can't ghost login if not admin
+              if (!userPermissions.includes("USERS:GHOST_LOGIN")) {
                 return null;
               }
               const org = (await this.orgs.loadOrg(user.org_id))!;

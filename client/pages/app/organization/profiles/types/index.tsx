@@ -18,7 +18,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationProfilesLayout } from "@parallel/components/organization/profiles/OrganizationProfilesLayout";
 import { ProfileTypesListHeader } from "@parallel/components/organization/profiles/ProfileTypesListHeader";
 import { useCreateOrUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
@@ -478,7 +478,7 @@ OrganizationProfileTypes.getInitialProps = async ({ fetchQuery }: WithApolloData
 
 export default compose(
   withDialogs,
-  withOrgRole("ADMIN", "/app/organization"),
+  withPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES", { orPath: "/app/organization" }),
   withFeatureFlag("PROFILES", "/app/organization"),
   withApolloData,
 )(OrganizationProfileTypes);

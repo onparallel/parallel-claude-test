@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 import { Box, Grid, Heading, Stack } from "@chakra-ui/react";
 import { AppSumoLicenseAlert } from "@parallel/components/common/AppSumoLicenseAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { UsageCard } from "@parallel/components/organization/UsageCard";
 import { OrganizationUsage_userDocument } from "@parallel/graphql/__types";
@@ -120,6 +120,6 @@ OrganizationUsage.getInitialProps = async ({ fetchQuery }: WithApolloDataContext
 
 export default compose(
   withDialogs,
-  withOrgRole("ADMIN", "/app/organization"),
+  withPermission("ORG_SETTINGS", { orPath: "/app/organization" }),
   withApolloData,
 )(OrganizationUsage);
