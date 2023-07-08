@@ -8,7 +8,6 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AdminSettingsLayout } from "@parallel/components/layout/AdminSettingsLayout";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { AdminSupportMethods_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -103,9 +102,9 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
 AdminSupportMethods.queries = [
   gql`
     query AdminSupportMethods_user {
-      ...AppLayout_Query
+      ...AdminSettingsLayout_Query
     }
-    ${AppLayout.fragments.Query}
+    ${AdminSettingsLayout.fragments.Query}
   `,
 ];
 

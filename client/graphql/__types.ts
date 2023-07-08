@@ -2218,6 +2218,7 @@ export interface OrganizationusersArgs {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
+  searchByEmailOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 }
 
@@ -40394,9 +40395,9 @@ export const AdminOrganizations_createOrganizationDocument = gql`
 >;
 export const AdminSupportMethods_userDocument = gql`
   query AdminSupportMethods_user {
-    ...AppLayout_Query
+    ...AdminSettingsLayout_Query
   }
-  ${AppLayout_QueryFragmentDoc}
+  ${AdminSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<AdminSupportMethods_userQuery, AdminSupportMethods_userQueryVariables>;
 export const Alerts_userDocument = gql`
   query Alerts_user {
