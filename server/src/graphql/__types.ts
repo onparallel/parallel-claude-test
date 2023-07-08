@@ -6350,6 +6350,7 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+      searchByEmailOnly?: boolean | null; // Boolean
       sortBy?: NexusGenEnums["OrganizationUsers_OrderBy"][] | null; // [OrganizationUsers_OrderBy!]
     };
   };

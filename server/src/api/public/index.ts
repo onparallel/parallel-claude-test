@@ -1332,7 +1332,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
             query CreatePetitionRecipients_userByEmail($email: String!) {
               me {
                 organization {
-                  users(limit: 1, offset: 0, search: $email) {
+                  users(limit: 1, offset: 0, search: $email, searchByEmailOnly: true) {
                     items {
                       id
                       email

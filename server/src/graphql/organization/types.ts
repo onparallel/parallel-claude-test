@@ -175,8 +175,13 @@ export const Organization = objectType({
       extendArgs: {
         exclude: list(nonNull(globalIdArg("User"))),
         includeInactive: booleanArg(),
+        searchByEmailOnly: booleanArg(),
       },
-      resolve: (root, { offset, limit, search, sortBy, exclude, includeInactive }, ctx) => {
+      resolve: (
+        root,
+        { offset, limit, search, sortBy, exclude, includeInactive, searchByEmailOnly },
+        ctx,
+      ) => {
         const columnMap = {
           firstName: "first_name",
           lastName: "last_name",
@@ -190,6 +195,7 @@ export const Organization = objectType({
           limit,
           search,
           excludeIds: exclude,
+          searchByEmailOnly,
           includeInactive,
           sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);

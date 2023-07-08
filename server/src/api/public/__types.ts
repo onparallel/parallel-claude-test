@@ -2170,6 +2170,7 @@ export type OrganizationusersArgs = {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
+  searchByEmailOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 };
 
@@ -8744,7 +8745,7 @@ export const CreatePetitionRecipients_userByEmailDocument = gql`
   query CreatePetitionRecipients_userByEmail($email: String!) {
     me {
       organization {
-        users(limit: 1, offset: 0, search: $email) {
+        users(limit: 1, offset: 0, search: $email, searchByEmailOnly: true) {
           items {
             id
             email

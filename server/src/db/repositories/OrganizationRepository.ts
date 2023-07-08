@@ -81,10 +81,11 @@ export class OrganizationRepository extends BaseRepository {
   getPaginatedUsersForOrg(
     orgId: number,
     opts: {
-      search?: string | null;
-      excludeIds?: number[] | null;
+      search?: Maybe<string>;
+      excludeIds?: Maybe<number[]>;
+      searchByEmailOnly?: Maybe<boolean>;
       sortBy?: SortBy<keyof User | "full_name" | "email" | "first_name" | "last_name">[];
-      includeInactive?: boolean | null;
+      includeInactive?: Maybe<boolean>;
     } & PageOpts,
   ) {
     return this.getPagination<User>(
@@ -97,11 +98,15 @@ export class OrganizationRepository extends BaseRepository {
           const { search, excludeIds, sortBy, includeInactive } = opts;
           if (search) {
             q.andWhere((q2) => {
-              q2.whereEscapedILike(
-                this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
-                `%${escapeLike(search, "\\")}%`,
-                "\\",
-              ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
+              if (opts.searchByEmailOnly) {
+                q2.where("user_data.email", search);
+              } else {
+                q2.whereEscapedILike(
+                  this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
+                  `%${escapeLike(search, "\\")}%`,
+                  "\\",
+                ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
+              }
             });
           }
           if (excludeIds) {

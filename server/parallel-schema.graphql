@@ -2371,6 +2371,7 @@ type Organization implements Timestamps {
     Optional text to search in the collection.
     """
     search: String
+    searchByEmailOnly: Boolean
 
     """
     Sorting to use on the collection
