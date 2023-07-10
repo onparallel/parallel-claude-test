@@ -24,23 +24,25 @@ import {
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   RedirectError,
-  withApolloData,
   WithApolloDataContext,
+  withApolloData,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { EmptyFolderIllustration } from "@parallel/components/petition-common/EmptyFolderIllustration";
 import { useCreateFolderDialog } from "@parallel/components/petition-common/dialogs/CreateFolderDialog";
 import { useMoveToFolderDialog } from "@parallel/components/petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
-import { EmptyFolderIllustration } from "@parallel/components/petition-common/EmptyFolderIllustration";
+import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
+import { ViewTabs } from "@parallel/components/petition-list/ViewTabs";
 import {
   removeInvalidSharedWithFilterLines,
   sharedWithQueryItem,
@@ -49,21 +51,19 @@ import {
   removeInvalidTagFilterLines,
   tagFilterQueryItem,
 } from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
-import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
-import { ViewTabs } from "@parallel/components/petition-list/ViewTabs";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import {
   PetitionBaseType,
   PetitionPermissionType,
-  Petitions_movePetitionsDocument,
+  PetitionSignatureStatusFilter,
+  PetitionStatus,
+  PetitionTagFilter,
   Petitions_PetitionBaseOrFolderFragment,
+  Petitions_movePetitionsDocument,
   Petitions_petitionsDocument,
   Petitions_renameFolderDocument,
   Petitions_updatePetitionDocument,
   Petitions_userDocument,
-  PetitionSignatureStatusFilter,
-  PetitionStatus,
-  PetitionTagFilter,
 } from "@parallel/graphql/__types";
 import { isTypename } from "@parallel/utils/apollo/typename";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -74,18 +74,18 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import {
+  QueryItem,
+  QueryStateFrom,
   buildStateUrl,
   integer,
   parseQuery,
-  QueryItem,
-  QueryStateFrom,
   sorting,
   string,
   useQueryState,
   values,
 } from "@parallel/utils/queryState";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";

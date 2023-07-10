@@ -1,12 +1,12 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Heading, Text, useToast } from "@chakra-ui/react";
+import { Badge, Flex, Heading, useToast } from "@chakra-ui/react";
 import { AdminOrganizationsListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationsListTableHeader";
 import { useCreateOrganizationDialog } from "@parallel/components/admin-organizations/dialogs/CreateOrganizationDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AdminSettingsLayout } from "@parallel/components/layout/AdminSettingsLayout";
 import {
@@ -22,10 +22,6 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import {
-  useClipboardWithToast,
-  UseClipboardWithToastOptions,
-} from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
@@ -46,10 +42,6 @@ const QUERY_STATE = {
 };
 
 type OrganizationSelection = AdminOrganizations_OrganizationFragment;
-
-interface AdminOrganizationsTableContext {
-  onCopyToClipboard: (opts: Partial<UseClipboardWithToastOptions>) => void;
-}
 
 function AdminOrganizations() {
   const intl = useIntl();
@@ -73,16 +65,6 @@ function AdminOrganizations() {
   const toast = useToast();
 
   const columns = useOrganizationColumns();
-  const onCopyToClipboard = useClipboardWithToast({
-    text: intl.formatMessage({
-      id: "organization-users.header.id.copied-toast",
-      defaultMessage: "ID copied to clipboard",
-    }),
-  });
-  const context = useMemo<AdminOrganizationsTableContext>(
-    () => ({ onCopyToClipboard }),
-    [onCopyToClipboard],
-  );
 
   const [search, setSearch] = useState(state.search);
 
@@ -171,7 +153,6 @@ function AdminOrganizations() {
         <TablePage
           flex="0 1 auto"
           columns={columns}
-          context={context}
           rows={organizations?.items}
           onRowClick={handleRowClick}
           rowKeyProp={"id"}
@@ -202,7 +183,7 @@ function AdminOrganizations() {
 
 function useOrganizationColumns() {
   const intl = useIntl();
-  return useMemo<TableColumn<OrganizationSelection, AdminOrganizationsTableContext>[]>(
+  return useMemo<TableColumn<OrganizationSelection>[]>(
     () => [
       {
         key: "id",
@@ -210,18 +191,8 @@ function useOrganizationColumns() {
         cellProps: {
           width: "1px",
         },
-        CellContent: ({ row, context: { onCopyToClipboard } }) => {
-          return (
-            <Text
-              cursor="pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onCopyToClipboard({ value: row.id });
-              }}
-            >
-              {row.id}
-            </Text>
-          );
+        CellContent: ({ row }) => {
+          return <>{row.id}</>;
         },
       },
       {

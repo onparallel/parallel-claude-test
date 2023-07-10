@@ -25,10 +25,6 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
-import {
-  useClipboardWithToast,
-  UseClipboardWithToastOptions,
-} from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
@@ -52,10 +48,6 @@ export const USERS_QUERY_STATE = {
 type AdminOrganizationsMembersProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsMembers.getInitialProps>
 >;
-
-interface OrganizationMembersTableContext {
-  copyToClipboard: (opts: Partial<UseClipboardWithToastOptions>) => void;
-}
 
 function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembersProps) {
   const {
@@ -148,14 +140,6 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   }
 
   const columns = useOrganizationMembersTableColumns();
-  const context: OrganizationMembersTableContext = {
-    copyToClipboard: useClipboardWithToast({
-      text: intl.formatMessage({
-        id: "organization-users.header.id.copied-toast",
-        defaultMessage: "ID copied to clipboard",
-      }),
-    }),
-  };
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -195,7 +179,6 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           isSelectable
           isHighlightable
           columns={columns}
-          context={context}
           rows={users?.items}
           rowKeyProp="id"
           loading={loading}
@@ -264,12 +247,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
 function useOrganizationMembersTableColumns() {
   const intl = useIntl();
   const roles = useOrganizationRoles();
-  return useMemo<
-    TableColumn<
-      AdminOrganizationsMembers_OrganizationUserFragment,
-      OrganizationMembersTableContext
-    >[]
-  >(
+  return useMemo<TableColumn<AdminOrganizationsMembers_OrganizationUserFragment>[]>(
     () => [
       {
         key: "id",
@@ -281,12 +259,8 @@ function useOrganizationMembersTableColumns() {
           width: "10%",
           minWidth: "140px",
         },
-        CellContent: ({ row, context }) => {
-          return (
-            <Text cursor="pointer" onClick={() => context.copyToClipboard({ value: row.id })}>
-              {row.id}
-            </Text>
-          );
+        CellContent: ({ row }) => {
+          return <>{row.id}</>;
         },
       },
       {

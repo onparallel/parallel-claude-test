@@ -338,6 +338,11 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     [context, selectedCount],
   );
 
+  const handleRowClick = useMemo(
+    () => onRowClick && preventClickWhenSelection(onRowClick),
+    [onRowClick],
+  );
+
   return (
     <Box
       as="table"
@@ -414,7 +419,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               isExpanded={isExpanded}
               isExpandable={isExpandable}
               isHighlightable={isHighlightable}
-              onRowClick={onRowClick}
+              onRowClick={handleRowClick}
               onToggleExpand={handleToggleExpand}
               onToggleSelection={toggle}
             />
@@ -493,7 +498,7 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               borderTop: "1px solid",
               borderTopColor: colors.border,
             })}
-        onClick={(event) => onRowClick?.(row, event)}
+        onClick={onRowClick?.bind(null, row)}
       >
         {columns.map((column) => {
           return (
@@ -536,7 +541,7 @@ function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TConte
       padding={2}
       _last={{ paddingRight: 5 }}
       _first={{ paddingLeft: 5 }}
-      userSelect="none"
+      userSelect="contain"
       textAlign={column.align ?? "left"}
       {...cellProps}
     >
@@ -760,4 +765,27 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
       ) : null}
     </Box>
   );
+}
+
+function preventClickWhenSelection<T extends (...args: any[]) => void>(
+  fn: T,
+): (...args: Parameters<T>) => void {
+  return function (...args: any[]) {
+    setTimeout(() => {
+      const selection = document.getSelection();
+      if (isDefined(selection)) {
+        if (
+          !selection.isCollapsed &&
+          (selection.anchorNode?.nodeType === Node.TEXT_NODE || selection.rangeCount > 1)
+        ) {
+          return;
+        } else {
+          if ("empty" in selection) {
+            selection.empty();
+          }
+        }
+      }
+      fn(...args);
+    });
+  };
 }
