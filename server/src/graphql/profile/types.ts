@@ -166,7 +166,7 @@ export const ProfileFieldResponse = interfaceType({
       description: "Expiration datetime of the value, considering organization's timezone.",
       resolve: async (o, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
-        return o.expiry_date ? zonedTimeToUtc(o.expiry_date, org.default_timezone) : null;
+        return o.expiry_date ? zonedTimeToUtc(new Date(o.expiry_date), org.default_timezone) : null;
       },
     });
     t.nullable.string("expiryDate", {
