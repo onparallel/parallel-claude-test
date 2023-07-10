@@ -125,7 +125,13 @@ export const createPetition = mutationField("createPetition", {
         contextUserHasPermission("PETITIONS:CREATE_TEMPLATES"),
         ifArgDefined(
           "petitionId",
-          petitionsArePublicTemplates("petitionId" as never),
+          and(
+            petitionIsNotAnonymized("petitionId" as never),
+            or(
+              userHasAccessToPetitions("petitionId" as never),
+              petitionsArePublicTemplates("petitionId" as never),
+            ),
+          ),
           argIsDefined("locale"),
         ),
       ),
@@ -133,9 +139,12 @@ export const createPetition = mutationField("createPetition", {
         contextUserHasPermission("PETITIONS:CREATE_PETITIONS"),
         ifArgDefined(
           "petitionId",
-          or(
-            userHasAccessToPetitions("petitionId" as never),
-            petitionsArePublicTemplates("petitionId" as never),
+          and(
+            petitionIsNotAnonymized("petitionId" as never),
+            or(
+              userHasAccessToPetitions("petitionId" as never),
+              petitionsArePublicTemplates("petitionId" as never),
+            ),
           ),
           argIsDefined("locale"),
         ),
