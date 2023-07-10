@@ -1,9 +1,10 @@
 import { Input, InputProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useMetadata } from "@parallel/utils/withMetadata";
+import { ChangeEvent } from "react";
 
 export const DateInput = chakraForwardRef<"input", InputProps>(function DateInput(
-  { sx, ...props },
+  { sx, onChange, ...props },
   ref,
 ) {
   const { browserName } = useMetadata();
@@ -12,6 +13,17 @@ export const DateInput = chakraForwardRef<"input", InputProps>(function DateInpu
     <Input
       ref={ref}
       type="date"
+      max="9999-12-31"
+      onChange={
+        onChange &&
+        ((e: ChangeEvent<HTMLInputElement>) => {
+          const value = e.target.value;
+          if (value.match(/^\d{5}/)) {
+            e.target.value = value.replace(/^\d{5,}/, (x) => x.slice(0, 4));
+          }
+          onChange(e);
+        })
+      }
       {...props}
       sx={{
         paddingRight: 1.5,
