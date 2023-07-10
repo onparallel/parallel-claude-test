@@ -39,6 +39,7 @@ function download_and_untar() {
 echo "Installing node.js"
 curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | sudo bash -
 sudo yum install -y nodejs
+sudo npm install -g npm@latest
 
 echo "Installing yarn"
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
