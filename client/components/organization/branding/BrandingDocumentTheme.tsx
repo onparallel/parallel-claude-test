@@ -193,7 +193,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               id: "generic.save",
               defaultMessage: "Save",
             })}
-            isDisabled={!isDirty || !isValid}
+            isDisabled={!isDirty || !isValid || !userHasPermission}
           />
           <IconButtonWithTooltip
             icon={<EditIcon />}

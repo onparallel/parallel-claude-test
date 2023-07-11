@@ -270,7 +270,7 @@ export function DocumentThemeEditor({
         ))}
       </Stack>
       <HStack justifyContent="flex-end">
-        <Button variant="link" onClick={onResetFonts} isDisabled={!canResetFonts}>
+        <Button variant="link" onClick={onResetFonts} isDisabled={!canResetFonts || isDisabled}>
           <FormattedMessage
             id="component.document-theme-editor.restore-defaults"
             defaultMessage="Restore defaults"

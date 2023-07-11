@@ -109,6 +109,7 @@ function OrganizationGeneral() {
                       id: "organization.general.change-organization-name-message",
                       defaultMessage: "Hi, I would like to change my organization name.",
                     })}
+                    isDisabled={!userCanEditOrganization}
                   >
                     <FormattedMessage
                       id="organization.general.request-change"
@@ -137,7 +138,7 @@ function OrganizationGeneral() {
                 <Input value={parallelUrl} isReadOnly isDisabled backgroundColor="white" />
                 <Box>
                   <SupportButton
-                    isDisabled={!me.hasCustomHost}
+                    isDisabled={!me.hasCustomHost || !userCanEditOrganization}
                     message={intl.formatMessage({
                       id: "organization.general.change-subdomain-message",
                       defaultMessage:
