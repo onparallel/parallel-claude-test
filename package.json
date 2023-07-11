@@ -31,7 +31,7 @@
     "patch-package": "^7.0.0"
   },
   "resolutions": {
-    "@apollo/client": "^3.7.16",
+    "@apollo/client": "^3.7.17",
     "@emotion/react": "^11.11.1",
     "typescript": "^5.1.6",
     "@types/react": "^18.2.14",
