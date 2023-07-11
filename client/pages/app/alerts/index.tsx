@@ -275,6 +275,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           defaultMessage: "Property",
         }),
         cellProps: {
+          maxWidth: 0,
           width: "20%",
           minWidth: "240px",
         },
@@ -284,7 +285,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           },
         }) => {
           return (
-            <Text as="span">
+            <OverflownText>
               <LocalizableUserTextRender
                 value={name}
                 default={intl.formatMessage({
@@ -292,7 +293,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
                   defaultMessage: "Unnamed property",
                 })}
               />
-            </Text>
+            </OverflownText>
           );
         },
       },
