@@ -1,6 +1,4 @@
 import { faker } from "@faker-js/faker";
-import { parseISO } from "date-fns";
-import { format, zonedTimeToUtc } from "date-fns-tz";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { outdent } from "outdent";
@@ -895,7 +893,7 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toBeUndefined();
       expect(data2.updateProfileType).toEqual({
         id: toGlobalId("ProfileType", profileTypes[0].id),
-        profileNamePattern: `{{${lastName}}}, {{${firstName}}}`,
+        profileNamePattern: `{{ ${lastName} }}, {{ ${firstName} }}`,
       });
 
       const { data: data3 } = await testClient.execute(
@@ -950,7 +948,7 @@ describe("GraphQL/Profiles", () => {
       expect(errorsEmptyField).toBeUndefined();
       expect(dataEmptyField.updateProfileType).toEqual({
         id: toGlobalId("ProfileType", profileTypes[0].id),
-        profileNamePattern: `{{${emptyField}}}-static-text`,
+        profileNamePattern: `{{ ${emptyField} }}-static-text`,
       });
 
       const { data: dataProfilesEmptyField } = await testClient.execute(
@@ -1067,7 +1065,7 @@ describe("GraphQL/Profiles", () => {
         })),
       });
       expect(data.cloneProfileType.profileNamePattern).toEqual(
-        `{{${data.cloneProfileType.fields[0].id}}} {{${data.cloneProfileType.fields[1].id}}}`,
+        `{{ ${data.cloneProfileType.fields[0].id} }} {{ ${data.cloneProfileType.fields[1].id} }}`,
       );
     });
   });
@@ -2535,7 +2533,7 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      const rows = await mocks.knex
+      await mocks.knex
         .from("profile_field_file")
         .where(
           "id",

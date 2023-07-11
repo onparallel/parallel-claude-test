@@ -1,21 +1,17 @@
-import gql from "graphql-tag";
 import { faker } from "@faker-js/faker";
+import gql from "graphql-tag";
 import { Knex } from "knex";
-import { omit, range, sortBy } from "remeda";
-import { PetitionEvent } from "../../db/events/PetitionEvent";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { range, sortBy } from "remeda";
 import {
   Contact,
+  OrgIntegration,
   Organization,
   OrganizationUsageLimit,
-  OrgIntegration,
   Petition,
   PetitionAccess,
   PetitionField,
   PetitionFieldType,
   PetitionPermission,
-  PetitionSignatureRequest,
   PetitionStatus,
   Tag,
   TemplateDefaultPermission,
@@ -23,10 +19,12 @@ import {
   UserData,
   UserGroup,
 } from "../../db/__types";
+import { PetitionEvent } from "../../db/events/PetitionEvent";
+import { KNEX } from "../../db/knex";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { AUTH, IAuth } from "../../services/AuthService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { fromPlainText } from "../../util/slate/utils";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
   return (index: number): Partial<Petition> => ({
@@ -1378,7 +1376,7 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("collaborators should be able to create a petition from a template", async () => {
-      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).mutate({
+      const { errors } = await testClient.withApiKey(collaboratorApiKey).mutate({
         mutation: gql`
           mutation ($locale: PetitionLocale!, $petitionId: GID) {
             createPetition(locale: $locale, petitionId: $petitionId) {
@@ -1494,7 +1492,7 @@ describe("GraphQL/Petitions", () => {
         1,
         () => ({ is_template: true }),
       );
-      const users = await mocks.createRandomUsers(organization.id, 2);
+      await mocks.createRandomUsers(organization.id, 2);
       await mocks.knex.from("template_default_permission").delete();
       await mocks.knex.from<TemplateDefaultPermission>("template_default_permission").insert({
         type: "READ",
@@ -4129,8 +4127,7 @@ describe("GraphQL/Petitions", () => {
   describe("completePetition", () => {
     let petitions: Petition[];
     let signatureIntegration: OrgIntegration;
-    let contacts: Contact[];
-    let otherOrgContact: Contact;
+
     let limit: OrganizationUsageLimit;
     let signatureLimit: OrganizationUsageLimit;
     let sharedSignaturitIntegration: OrgIntegration;
@@ -4162,11 +4159,11 @@ describe("GraphQL/Petitions", () => {
         },
       ];
 
-      contacts = await mocks.createRandomContacts(organization.id, 2, () => ({
+      await mocks.createRandomContacts(organization.id, 2, () => ({
         email: faker.internet.email({ provider: "onparallel.com" }),
       }));
 
-      [otherOrgContact] = await mocks.createRandomContacts(otherOrg.id, 1);
+      await mocks.createRandomContacts(otherOrg.id, 1);
 
       [signatureIntegration] = await mocks.createOrgIntegration({
         org_id: organization.id,

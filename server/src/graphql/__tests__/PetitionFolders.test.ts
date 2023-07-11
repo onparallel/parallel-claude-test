@@ -371,7 +371,7 @@ describe("Petition Folders", () => {
         )
        */
 
-      const petitions = await Promise.all([
+      await Promise.all([
         mocks.createRandomPetitions(user.org_id, user.id, 2, (i) => ({
           path: "/spanish/clients/",
           name: `petition${i + 1}`,
@@ -386,7 +386,7 @@ describe("Petition Folders", () => {
         })),
       ]).then((p) => p.flat());
 
-      const { errors, data } = await testClient.execute(
+      const { errors } = await testClient.execute(
         gql`
           mutation (
             $ids: [GID!]
@@ -1109,7 +1109,7 @@ describe("Petition Folders", () => {
         )
          */
 
-      const petitions = await Promise.all([
+      await Promise.all([
         mocks.createRandomPetitions(user.org_id, user.id, 2, (i) => ({
           path: "/spanish/clients/",
           name: `petition${i + 1}`,

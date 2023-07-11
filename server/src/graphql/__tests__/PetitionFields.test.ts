@@ -812,9 +812,7 @@ describe("GraphQL/Petition Fields", () => {
       const files = await mocks.createRandomFileUpload(2, () => ({ path: "same-path" }));
 
       // set two attachments with the same file_upload on two different fields
-      const [firstAttachment] = await mocks.createPetitionFieldAttachment(newFields[0].id, 1, [
-        files[0],
-      ]);
+      await mocks.createPetitionFieldAttachment(newFields[0].id, 1, [files[0]]);
       const [secondAttachment] = await mocks.createPetitionFieldAttachment(newFields[1].id, 1, [
         files[1],
       ]);

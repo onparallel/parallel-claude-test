@@ -411,7 +411,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
     });
 
     it("adds default permissions so petitions created from the template inherit them", async () => {
-      const res = await testClient.mutate({
+      await testClient.mutate({
         mutation: gql`
           mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {

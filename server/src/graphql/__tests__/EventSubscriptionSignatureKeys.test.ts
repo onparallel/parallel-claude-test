@@ -1,7 +1,6 @@
 import assert from "assert";
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { CONFIG, Config } from "../../config";
 import { EventSubscriptionSignatureKey, PetitionEventSubscription, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -22,7 +21,6 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
-    const config = testClient.container.get<Config>(CONFIG);
 
     encryptionService = testClient.container.get<IEncryptionService>(ENCRYPTION_SERVICE);
     mocks = new Mocks(knex);

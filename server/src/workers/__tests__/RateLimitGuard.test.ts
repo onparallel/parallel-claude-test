@@ -1,7 +1,6 @@
 import { range } from "remeda";
-import { RateLimitGuard } from "../helpers/RateLimitGuard";
-import { assert } from "console";
 import { waitFor } from "../../util/promises/waitFor";
+import { RateLimitGuard } from "../helpers/RateLimitGuard";
 
 describe("RateLimitGuard", () => {
   beforeEach(() => {

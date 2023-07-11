@@ -369,7 +369,7 @@ export class Mocks {
 
   async createRandomTextReply(
     textFieldId: number,
-    access_id?: number,
+    accessId?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
@@ -380,7 +380,7 @@ export class Mocks {
             petition_field_id: textFieldId,
             content: { value: faker.lorem.words(10) },
             type: "TEXT",
-            petition_access_id: access_id,
+            petition_access_id: accessId,
             ...builder?.(index),
           };
         }),
@@ -390,7 +390,7 @@ export class Mocks {
 
   async createRandomNumberReply(
     numberFieldId: number,
-    access_id: number,
+    accessId: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
     min?: number,
@@ -408,7 +408,7 @@ export class Mocks {
               }),
             },
             type: "NUMBER",
-            petition_access_id: access_id,
+            petition_access_id: accessId,
             ...builder?.(index),
           };
         }),
@@ -418,7 +418,7 @@ export class Mocks {
 
   async createRandomDateReply(
     dateFieldId: number,
-    access_id: number,
+    accessId: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
@@ -431,7 +431,7 @@ export class Mocks {
               value: faker.date.soon({ days: 10 }).toISOString().substring(0, 10),
             },
             type: "DATE",
-            petition_access_id: access_id,
+            petition_access_id: accessId,
             ...builder?.(index),
           };
         }),
@@ -441,7 +441,7 @@ export class Mocks {
 
   async createRandomDatetimeReply(
     dateFieldId: number,
-    access_id: number,
+    accessId: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
@@ -457,7 +457,7 @@ export class Mocks {
               timezone: "Europe/Madrid",
             },
             type: "DATE_TIME",
-            petition_access_id: access_id,
+            petition_access_id: accessId,
             ...builder?.(index),
           };
         }),
@@ -467,7 +467,7 @@ export class Mocks {
 
   async createRandomPhoneReply(
     phoneFieldId: number,
-    access_id: number,
+    accessId: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
@@ -491,7 +491,7 @@ export class Mocks {
               value: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)],
             },
             type: "PHONE",
-            petition_access_id: access_id,
+            petition_access_id: accessId,
             ...builder?.(index),
           };
         }),
@@ -501,7 +501,7 @@ export class Mocks {
 
   async createRandomFileUploadReply(
     fieldId: number,
-    access_id?: number,
+    accessId?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
     fileUploadBuilder?: (index: number) => Partial<FileUpload>,
@@ -514,7 +514,7 @@ export class Mocks {
             petition_field_id: fieldId,
             content: { file_upload_id: fileUploads[index].id },
             type: "FILE_UPLOAD",
-            petition_access_id: access_id,
+            petition_access_id: accessId,
             ...builder?.(index),
           };
         }),

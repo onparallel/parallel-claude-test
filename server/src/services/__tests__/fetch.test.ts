@@ -1,4 +1,5 @@
 jest.mock("node-fetch");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require("node-fetch");
 const { Response } = jest.requireActual("node-fetch");
 import { RequestInfo, RequestInit } from "node-fetch";
@@ -71,7 +72,7 @@ describe("FetchService", () => {
       signal: controller.signal as any,
       maxRetries: 3,
     });
-    const wait = waitFor(2_500).then(() => controller.abort());
+    waitFor(2_500).then(() => controller.abort());
     expect(fetch).toHaveBeenCalledTimes(1);
     jest.advanceTimersByTime(1_000);
     await flushPromises();

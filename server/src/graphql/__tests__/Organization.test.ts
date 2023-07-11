@@ -1,14 +1,14 @@
-import { addDays, subDays } from "date-fns";
+import { subDays } from "date-fns";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { indexBy, omit } from "remeda";
+import { Organization, OrganizationTheme, User, UserData } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, OrganizationTheme, User, UserData } from "../../db/__types";
+import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/Organization", () => {
   let testClient: TestClient;

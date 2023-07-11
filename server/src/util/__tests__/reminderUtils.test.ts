@@ -1,4 +1,3 @@
-import { subMinutes } from "date-fns";
 import { toDate } from "date-fns-tz";
 import { calculateNextReminder } from "../reminderUtils";
 
@@ -65,7 +64,6 @@ describe("reminderUtils", () => {
   });
 
   it("calculateNextReminder weekDaysOnly", () => {
-    const fromDate = toDate("2021-10-15T00:00:00", { timeZone: "Europe/Berlin" });
     const nextReminder = calculateNextReminder(new Date("2021-10-15"), {
       offset: 2,
       time: "23:50",

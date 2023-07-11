@@ -3001,12 +3001,7 @@ describe("GraphQL/Petition Field Replies", () => {
           status: "COMPLETED",
         }),
       );
-      const [access] = await mocks.createPetitionAccess(
-        completedPetition.id,
-        user.id,
-        [contact.id],
-        user.id,
-      );
+      await mocks.createPetitionAccess(completedPetition.id, user.id, [contact.id], user.id);
       const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
         type: "TEXT",
       }));

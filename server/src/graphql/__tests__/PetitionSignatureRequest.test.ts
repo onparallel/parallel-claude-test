@@ -10,7 +10,6 @@ describe("GraphQL/PetitionSignatureRequest", () => {
   let testClient: TestClient;
   let mocks: Mocks;
 
-  let petition: Petition;
   let readPetition: Petition;
   let user: User;
   let signature: PetitionSignatureRequest;
@@ -23,13 +22,13 @@ describe("GraphQL/PetitionSignatureRequest", () => {
     let organization: Organization;
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
-    [petition, readPetition] = await mocks.createRandomPetitions(
+    [readPetition] = await mocks.createRandomPetitions(
       organization.id,
       user.id,
-      2,
+      1,
       undefined,
-      (i) => ({
-        type: i === 0 ? "OWNER" : "READ",
+      () => ({
+        type: "READ",
       }),
     );
 

@@ -1,10 +1,9 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
-import { isDefined } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
-import { KNEX } from "../../knex";
 import { Contact, Organization } from "../../__types";
+import { KNEX } from "../../knex";
 import { ContactRepository } from "../ContactRepository";
 import { Mocks } from "./mocks";
 

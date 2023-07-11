@@ -1,13 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { addMinutes } from "date-fns";
 import { toDate } from "date-fns-tz";
 import { Container } from "inversify";
 import { Knex } from "knex";
 import { isDefined, pick, range, sortBy } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
-import { calculateNextReminder } from "../../../util/reminderUtils";
-import { KNEX } from "../../knex";
 import {
   Contact,
   Organization,
@@ -19,6 +16,7 @@ import {
   PetitionUserNotification,
   User,
 } from "../../__types";
+import { KNEX } from "../../knex";
 import { EmailLogRepository } from "../EmailLogRepository";
 import { FileRepository } from "../FileRepository";
 import { PetitionRepository } from "../PetitionRepository";
@@ -121,11 +119,10 @@ describe("repositories/PetitionRepository", () => {
 
   describe("loadFieldsForPetition & loadFieldCountForPetition", () => {
     let petition1: Petition, petition2: Petition;
-    let fields: PetitionField[];
 
     beforeAll(async () => {
       [petition1, petition2] = await mocks.createRandomPetitions(organization.id, user.id, 2);
-      fields = await mocks.createRandomPetitionFields(petition1.id, 6, (i) => ({
+      await mocks.createRandomPetitionFields(petition1.id, 6, (i) => ({
         deleted_at: i === 5 ? new Date() : null,
       }));
     });
@@ -175,7 +172,8 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("fails if passed deleted field ids", async () => {
-      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
+      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: _id4 }, { id: id5 }, { id: id6 }] =
+        fields;
       await expect(
         petitions.updateFieldPositions(
           petition1.id,
@@ -186,7 +184,8 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("fails if passed fields ids from another petition", async () => {
-      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
+      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: _id4 }, { id: id5 }, { id: id6 }] =
+        fields;
       await expect(
         petitions.updateFieldPositions(
           petition1.id,
@@ -330,11 +329,11 @@ describe("repositories/PetitionRepository", () => {
 
   describe("PetitionAccess Reminders", () => {
     let petition: Petition;
-    let fields: PetitionField;
+
     let petitionAccess: PetitionAccess;
     beforeAll(async () => {
       [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
-      [fields] = await mocks.createRandomPetitionFields(petition.id, 1);
+      await mocks.createRandomPetitionFields(petition.id, 1);
       [petitionAccess] = await mocks.createPetitionAccess(
         petition.id,
         user.id,
@@ -1097,8 +1096,6 @@ describe("repositories/PetitionRepository", () => {
     let orgUser: User;
     let otherOrgUser: User;
     let userPetitions: Petition[];
-    let orgUserPetitions: Petition[];
-    let otherOrgUserPetitions: Petition[];
 
     beforeAll(async () => {
       [orgUser] = await mocks.createRandomUsers(user.org_id, 1);
@@ -1113,15 +1110,12 @@ describe("repositories/PetitionRepository", () => {
         path: ["/", "/common/", "/A/B/C/", "/A/B/C/D/E/", "/templates/"][i],
         is_template: i === 4,
       }));
-      orgUserPetitions = await mocks.createRandomPetitions(orgUser.org_id, orgUser.id, 1, () => ({
+      await mocks.createRandomPetitions(orgUser.org_id, orgUser.id, 1, () => ({
         path: "/commmon/",
       }));
-      otherOrgUserPetitions = await mocks.createRandomPetitions(
-        otherOrgUser.org_id,
-        otherOrgUser.id,
-        1,
-        () => ({ path: "/common/" }),
-      );
+      await mocks.createRandomPetitions(otherOrgUser.org_id, otherOrgUser.id, 1, () => ({
+        path: "/common/",
+      }));
     });
 
     it("gets only the user's petitions on the passed folders", async () => {

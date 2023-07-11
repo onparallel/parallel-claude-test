@@ -1273,7 +1273,7 @@ describe("GraphQL/Users", () => {
           items: [
             {
               name: { en: "Individual", es: "Persona física" },
-              profileNamePattern: `{{${profilesData.profileTypes.items[0].fields[0].id}}} {{${profilesData.profileTypes.items[0].fields[1].id}}}`,
+              profileNamePattern: `{{ ${profilesData.profileTypes.items[0].fields[0].id} }} {{ ${profilesData.profileTypes.items[0].fields[1].id} }}`,
               fields: [
                 {
                   id: expect.any(String),
@@ -1339,7 +1339,7 @@ describe("GraphQL/Users", () => {
             },
             {
               name: { en: "Legal entity", es: "Persona jurídica" },
-              profileNamePattern: `{{${profilesData.profileTypes.items[1].fields[0].id}}}`,
+              profileNamePattern: `{{ ${profilesData.profileTypes.items[1].fields[0].id} }}`,
               fields: [
                 {
                   id: expect.any(String),
@@ -1385,7 +1385,7 @@ describe("GraphQL/Users", () => {
             },
             {
               name: { en: "Contract", es: "Contrato" },
-              profileNamePattern: `{{${profilesData.profileTypes.items[2].fields[0].id}}} - {{${profilesData.profileTypes.items[2].fields[1].id}}}`,
+              profileNamePattern: `{{ ${profilesData.profileTypes.items[2].fields[0].id} }} - {{ ${profilesData.profileTypes.items[2].fields[1].id} }}`,
               fields: [
                 {
                   id: expect.any(String),

@@ -1,10 +1,10 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { Organization, User, UserAuthenticationToken } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { FeatureFlagOverride, Organization, User, UserAuthenticationToken } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/UserAuthenticationToken", () => {
   let testClient: TestClient;
