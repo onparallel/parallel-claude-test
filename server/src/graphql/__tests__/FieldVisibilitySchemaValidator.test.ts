@@ -80,8 +80,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).not.toThrowError();
   });
 
@@ -103,8 +103,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).not.toThrowError();
   });
 
@@ -126,8 +126,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).not.toThrowError();
   });
 
@@ -149,8 +149,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).not.toThrowError();
   });
 
@@ -184,8 +184,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).not.toThrowError();
   });
 
@@ -200,8 +200,8 @@ describe("Field Visibility Conditions", () => {
             conditions: [],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError();
   });
 
@@ -253,8 +253,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError();
   });
 
@@ -276,8 +276,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).not.toThrowError();
   });
 
@@ -299,8 +299,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError();
   });
 
@@ -322,8 +322,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Conditions can't reference HEADING fields");
   });
 
@@ -345,8 +345,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Invalid value type string for modifier NUMBER_OF_REPLIES");
   });
 
@@ -368,8 +368,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Invalid value type number for field of type TEXT");
   });
 
@@ -391,8 +391,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Invalid operator START_WITH for modifier NUMBER_OF_REPLIES");
   });
 
@@ -414,8 +414,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Invalid operator LESS_THAN for field of type TEXT");
   });
 
@@ -437,8 +437,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Invalid operator START_WITH for field of type SELECT");
   });
 
@@ -460,10 +460,10 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError(
-      "Invalid value Unknown option for field of type SELECT. Should be one of: Option 1, Option 2, Option 3"
+      "Invalid value Unknown option for field of type SELECT. Should be one of: Option 1, Option 2, Option 3",
     );
   });
 
@@ -485,8 +485,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Invalid modifier NONE for field of type FILE_UPLOAD");
   });
 
@@ -508,8 +508,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError();
   });
 
@@ -531,10 +531,10 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError(
-      `Can't find PetitionField:1101010 referenced in PetitionField:${textField.id}, condition 0`
+      `Can't find PetitionField:1101010 referenced in PetitionField:${textField.id}, condition 0`,
     );
   });
 
@@ -562,10 +562,10 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError(
-      `Can't find PetitionField:${deletedField.id} referenced in PetitionField:${finalTextField.id}, condition 1`
+      `Can't find PetitionField:${deletedField.id} referenced in PetitionField:${finalTextField.id}, condition 1`,
     );
   });
 
@@ -599,10 +599,10 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError(
-      `Can't find PetitionField:${fieldOnAnotherPetition.id} referenced in PetitionField:${finalTextField.id}, condition 2`
+      `Can't find PetitionField:${fieldOnAnotherPetition.id} referenced in PetitionField:${finalTextField.id}, condition 2`,
     );
   });
 
@@ -624,8 +624,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Can't reference fields that come next");
   });
 
@@ -647,8 +647,8 @@ describe("Field Visibility Conditions", () => {
             ],
           },
         },
-        allFields
-      )
+        allFields,
+      ),
     ).toThrowError("Can't reference fields that come next");
   });
 });

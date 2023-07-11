@@ -89,21 +89,21 @@ describe("repositories/ContactRepository", () => {
 
     it("anonymizes passed contacts", async () => {
       expect(
-        contacts.every((c) => c.email !== "" && c.first_name !== "" && c.last_name !== "")
+        contacts.every((c) => c.email !== "" && c.first_name !== "" && c.last_name !== ""),
       ).toEqual(true);
 
       await c.anonymizeDeletedContacts(0);
 
       const contactsAfter = await knex.from("contact").whereIn(
         "id",
-        contacts.map((c) => c.id)
+        contacts.map((c) => c.id),
       );
 
       expect(
         contactsAfter.every(
           (c) =>
-            c.anonymized_at !== null && c.email === "" && c.first_name === "" && c.last_name === ""
-        )
+            c.anonymized_at !== null && c.email === "" && c.first_name === "" && c.last_name === "",
+        ),
       ).toEqual(true);
     });
   });

@@ -37,7 +37,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       undefined,
       (i) => ({
         type: i === 0 ? "OWNER" : "READ",
-      })
+      }),
     );
     [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
       type: "SHORT_TEXT",
@@ -112,7 +112,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
             filename: "nomina.pdf",
             size: 1024,
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -313,7 +313,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           fieldId: toGlobalId("PetitionField", readField.id),
           attachmentId: toGlobalId("PetitionAttachment", readAttachment.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();

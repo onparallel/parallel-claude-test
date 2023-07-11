@@ -180,7 +180,7 @@ describe("GraphQL/PublicPetitionLink", () => {
             }
           }
         `,
-        { slug: publicPetitionLink.slug, prefill: "<jwt>" }
+        { slug: publicPetitionLink.slug, prefill: "<jwt>" },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -204,7 +204,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           prefill:
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmaXJzdE5hbWUiOiJBYmMiLCJsYXN0TmFtZSI6IkRlZiIsImVtYWlsIjoiYWJjQGRlZi5jb20iLCJyZXBsaWVzIjp7InRlc3QiOiJ0ZXN0In19.IqeO7MhKSIVvW15Gj2ZDlul-W_Q4fdBR-qF-OHcrQ7M",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -357,7 +357,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       petitionSendLimit = await mocks.createOrganizationUsageLimit(
         organization.id,
         "PETITION_SEND",
-        100
+        100,
       );
     });
 
@@ -386,7 +386,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           contactLastName: "Waters",
           contactEmail: "rogerwaters@rogerwaters.com",
           prefill: "<jwt>",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -396,7 +396,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("creates a petition via a public link and sends it to the provided email", async () => {
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPublicPetitionLinkAccessEmail"
+        "sendPublicPetitionLinkAccessEmail",
       );
 
       const { errors, data } = await testClient.mutate({
@@ -786,7 +786,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           contactFirstName: "Roger",
           contactLastName: "Waters",
           contactEmail: "rogerwaters@rogerwaters.com",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -844,7 +844,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           contactEmail: "rogerwaters@rogerwaters.com",
           prefillDataKey: "unknown",
           force: true,
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -898,7 +898,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           contactEmail: "rogerwaters@rogerwaters.com",
           prefillDataKey: keycode,
           force: true,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -961,7 +961,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends a reminder to the contact email if a petition is already created", async () => {
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionReminderEmail"
+        "sendPetitionReminderEmail",
       );
 
       const { errors: createErrors } = await testClient.mutate({
@@ -1104,7 +1104,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         () => ({
           is_template: true,
           status: null,
-        })
+        }),
       );
       [petition, readTemplate] = await mocks.createRandomPetitions(
         organization.id,
@@ -1113,7 +1113,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         (i) => ({
           is_template: i === 1,
         }),
-        (i) => ({ type: i === 0 ? "OWNER" : "READ" })
+        (i) => ({ type: i === 0 ? "OWNER" : "READ" }),
       );
       [userGroup] = await mocks.createUserGroups(1, organization.id);
       await mocks.insertUserGroupMembers(userGroup.id, [otherUsers[0].id, otherUsers[1].id]);
@@ -1344,11 +1344,11 @@ describe("GraphQL/PublicPetitionLink", () => {
         organization.id,
         otherUser.id,
         1,
-        () => ({ is_template: true, status: null })
+        () => ({ is_template: true, status: null }),
       );
       privatePublicPetitionLink = await mocks.createRandomPublicPetitionLink(
         privateTemplate.id,
-        () => ({ slug: "aaaaa" })
+        () => ({ slug: "aaaaa" }),
       );
 
       [template, readTemplate] = await mocks.createRandomPetitions(
@@ -1361,7 +1361,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         }),
         (i) => ({
           type: i === 0 ? "OWNER" : "READ",
-        })
+        }),
       );
       publicPetitionLink = await mocks.createRandomPublicPetitionLink(template.id, () => ({
         slug: "bbbb",
@@ -1387,7 +1387,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         {
           publicPetitionLinkId: toGlobalId("PublicPetitionLink", readPublicPetitionLink.id),
           isActive: false,
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1516,7 +1516,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         {
           publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicLink.id),
           data: {},
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1529,7 +1529,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         user.id,
         1,
         () => ({ is_template: true }),
-        () => ({ type: "READ" })
+        () => ({ type: "READ" }),
       );
       const publicReadLink = await mocks.createRandomPublicPetitionLink(readTemplate.id);
 
@@ -1545,7 +1545,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         {
           publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicReadLink.id),
           data: {},
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1567,7 +1567,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicLink.id),
           data: { abc: 1 },
           path: "/A/",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1580,7 +1580,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(data?.createPublicPetitionLinkPrefillData).toEqual(
         `http://www.test-onparallel.com/es/pp/${publicLink.slug}?${new URLSearchParams({
           pk: prefillData.keycode,
-        })}`
+        })}`,
       );
     });
   });

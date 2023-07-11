@@ -39,7 +39,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
     signatureKeys = await mocks.createEventSubscriptionSignatureKey(
       subscription.id,
       encryptionService,
-      2
+      2,
     );
   });
 
@@ -113,7 +113,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
         `,
         {
           id: toGlobalId("PetitionEventSubscription", subscription.id),
-        }
+        },
       );
       expect(mutationErrors).toBeUndefined();
       expect(mutationData?.createEventSubscriptionSignatureKey).toBeDefined();
@@ -148,7 +148,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
         `,
         {
           ids: [toGlobalId("EventSubscriptionSignatureKey", keyId)],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();

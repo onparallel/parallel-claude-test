@@ -47,7 +47,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       }),
       (i) => ({
         type: i === 0 ? "OWNER" : "READ",
-      })
+      }),
     );
 
     await mocks.sharePetitions([petition.id], otherUser.id, "READ");
@@ -58,7 +58,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       (i) => ({
         type: i === 0 ? "HEADING" : "TEXT",
         has_comments_enabled: i === 0,
-      })
+      }),
     );
 
     [readField] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
@@ -102,7 +102,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           isInternal: false,
           content: mocks.createRandomCommentContent(),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -132,7 +132,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           isInternal: true,
           content: mocks.createRandomCommentContent(),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -172,7 +172,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", headingField.id),
           content,
           isInternal: false,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -220,7 +220,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
           content,
           isInternal: true,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -259,7 +259,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
           content: mocks.createRandomCommentContent(),
           isInternal: false,
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -290,7 +290,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", textFieldInternal.id),
           content: mocks.createRandomCommentContent(),
           isInternal: false,
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -346,7 +346,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             },
           ],
           isInternal: true,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -398,7 +398,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             },
           ],
           isInternal: true,
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -447,7 +447,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             },
           ],
           isInternal: true,
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("NO_PERMISSIONS_MENTION_ERROR", {
@@ -514,7 +514,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           isInternal: true,
           throwOnNoPermission: false,
           sharePetition: true,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -545,14 +545,14 @@ describe("GraphQL/Petition Fields Comments", () => {
         readField.id,
         readPetition.id,
         2,
-        (i) => ({ is_internal: i === 1 })
+        (i) => ({ is_internal: i === 1 }),
       );
       [otherUserComment, otherUserInternalComment] = await mocks.createRandomCommentsFromUser(
         otherUser.id,
         readField.id,
         readPetition.id,
         2,
-        (i) => ({ is_internal: i === 1 })
+        (i) => ({ is_internal: i === 1 }),
       );
     });
 
@@ -580,7 +580,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserComment.id),
           content: mocks.createRandomCommentContent(),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -609,7 +609,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserInternalComment.id),
           content: mocks.createRandomCommentContent(),
-        }
+        },
       );
 
       expect(dataInternal.errors).toContainGraphQLError("FORBIDDEN");
@@ -640,7 +640,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", internalComment.id),
           content: mocks.createRandomCommentContent(),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -673,7 +673,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
           content,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -696,14 +696,14 @@ describe("GraphQL/Petition Fields Comments", () => {
         readField.id,
         readPetition.id,
         2,
-        (i) => ({ is_internal: i === 1 })
+        (i) => ({ is_internal: i === 1 }),
       );
       [otherUserComment, otherUserInternalComment] = await mocks.createRandomCommentsFromUser(
         otherUser.id,
         readField.id,
         readPetition.id,
         2,
-        (i) => ({ is_internal: i === 1 })
+        (i) => ({ is_internal: i === 1 }),
       );
     });
 
@@ -724,7 +724,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserComment.id),
-        }
+        },
       );
       expect(dataExternal.errors).toContainGraphQLError("FORBIDDEN");
       expect(dataExternal.data).toBeNull();
@@ -745,7 +745,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserInternalComment.id),
-        }
+        },
       );
       expect(dataInternal.errors).toContainGraphQLError("FORBIDDEN");
       expect(dataInternal.data).toBeNull();
@@ -768,7 +768,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", internalComment.id),
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.deletePetitionFieldComment).toBeDefined();
@@ -791,7 +791,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data!.deletePetitionFieldComment).toEqual({

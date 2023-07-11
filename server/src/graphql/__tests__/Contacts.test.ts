@@ -63,7 +63,7 @@ describe("GraphQL/Contacts", () => {
           }
         }
       `,
-      { search: "email.search@" }
+      { search: "email.search@" },
     );
 
     expect(errors).toBeUndefined();
@@ -82,7 +82,7 @@ describe("GraphQL/Contacts", () => {
           }
         }
       `,
-      { exclude: [toGlobalId("Contact", userContacts[0].id)] }
+      { exclude: [toGlobalId("Contact", userContacts[0].id)] },
     );
 
     expect(errors).toBeUndefined();
@@ -103,11 +103,11 @@ describe("GraphQL/Contacts", () => {
           }
         }
       `,
-      { sortBy: "email_DESC" }
+      { sortBy: "email_DESC" },
     );
 
     const orderedContacts = userContacts.sort((a, b) =>
-      b.email.localeCompare(a.email, "en-us", { ignorePunctuation: true })
+      b.email.localeCompare(a.email, "en-us", { ignorePunctuation: true }),
     );
 
     expect(errors).toBeUndefined();
@@ -140,7 +140,7 @@ describe("GraphQL/Contacts", () => {
         a.last_name!.localeCompare(b.last_name!, "en-us", {
           ignorePunctuation: true,
         }) ||
-        a.id - b.id
+        a.id - b.id,
     );
 
     expect(errors).toBeUndefined();
@@ -167,7 +167,7 @@ describe("GraphQL/Contacts", () => {
           }
         }
       `,
-      { id }
+      { id },
     );
 
     expect(errors).toBeUndefined();
@@ -188,7 +188,7 @@ describe("GraphQL/Contacts", () => {
           }
         }
       `,
-      { id: toGlobalId("Contact", otherContact.id) }
+      { id: toGlobalId("Contact", otherContact.id) },
     );
     expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data!.contact).toBeNull();
@@ -210,7 +210,7 @@ describe("GraphQL/Contacts", () => {
         email: "mark.hamill@onparallel.com",
         firstName: "Mark",
         lastName: "Hamill",
-      }
+      },
     );
 
     expect(errors).toBeUndefined();
@@ -235,7 +235,7 @@ describe("GraphQL/Contacts", () => {
       {
         email: userContacts[3].email,
         firstName: "Mark",
-      }
+      },
     );
 
     expect(errors).toBeUndefined();
@@ -259,7 +259,7 @@ describe("GraphQL/Contacts", () => {
       {
         id: toGlobalId("Contact", contact.id),
         firstName: "Harvey",
-      }
+      },
     );
 
     expect(errors).toBeUndefined();
@@ -281,7 +281,7 @@ describe("GraphQL/Contacts", () => {
       `,
       {
         id: toGlobalId("Contact", contact.id),
-      }
+      },
     );
 
     expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -300,7 +300,7 @@ describe("GraphQL/Contacts", () => {
       {
         id: toGlobalId("Contact", otherContact.id),
         firstName: "Jon",
-      }
+      },
     );
     expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data).toBeNull();
@@ -315,7 +315,7 @@ describe("GraphQL/Contacts", () => {
       `,
       {
         ids: [toGlobalId("Contact", otherContact.id)],
-      }
+      },
     );
     expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data).toBeNull();
@@ -331,7 +331,7 @@ describe("GraphQL/Contacts", () => {
       `,
       {
         ids: [toGlobalId("Contact", contact.id)],
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data!.deleteContacts).toEqual("SUCCESS");
@@ -351,7 +351,7 @@ describe("GraphQL/Contacts", () => {
           deleteContacts(ids: $ids)
         }
       `,
-      { ids: [toGlobalId("Contact", contact.id)] }
+      { ids: [toGlobalId("Contact", contact.id)] },
     );
 
     expect(errors).toContainGraphQLError("CONTACT_HAS_ACTIVE_ACCESSES_ERROR");
@@ -370,7 +370,7 @@ describe("GraphQL/Contacts", () => {
     }));
     const { apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
       "normal-token",
-      normalUser.id
+      normalUser.id,
     );
     const [contact] = await mocks.createRandomContacts(organization.id, 1);
 
@@ -382,7 +382,7 @@ describe("GraphQL/Contacts", () => {
       `,
       {
         ids: [toGlobalId("Contact", contact.id)],
-      }
+      },
     );
     expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data).toBeNull();
@@ -396,7 +396,7 @@ describe("GraphQL/Contacts", () => {
       petition.id,
       access.id,
       user.id,
-      () => ({ status: "SCHEDULED" })
+      () => ({ status: "SCHEDULED" }),
     );
 
     const { errors, data } = await testClient.execute(
@@ -405,7 +405,7 @@ describe("GraphQL/Contacts", () => {
           deleteContacts(ids: $ids, force: true)
         }
       `,
-      { ids: [toGlobalId("Contact", contact.id)] }
+      { ids: [toGlobalId("Contact", contact.id)] },
     );
 
     expect(errors).toBeUndefined();
@@ -428,7 +428,7 @@ describe("GraphQL/Contacts", () => {
           }
         }
       `,
-      { id: toGlobalId("Petition", petition.id) }
+      { id: toGlobalId("Petition", petition.id) },
     );
 
     expect(queryErrors).toBeUndefined();
@@ -461,13 +461,13 @@ describe("GraphQL/Contacts", () => {
         petitions[0].id,
         user.id,
         [contacts[0].id, contacts[1].id, contacts[2].id, contacts[3].id],
-        user.id
+        user.id,
       ),
       await mocks.createPetitionAccess(
         petitions[1].id,
         user.id,
         [contacts[2].id, contacts[3].id, contacts[4].id],
-        user.id
+        user.id,
       ),
     ].flat();
 
@@ -477,7 +477,7 @@ describe("GraphQL/Contacts", () => {
           deleteContacts(ids: $ids, force: true)
         }
       `,
-      { ids: contacts.map((c) => toGlobalId("Contact", c.id)) }
+      { ids: contacts.map((c) => toGlobalId("Contact", c.id)) },
     );
 
     expect(errors).toBeUndefined();
@@ -501,7 +501,7 @@ describe("GraphQL/Contacts", () => {
             }
           }
         `,
-        { id: toGlobalId("Petition", petition.id) }
+        { id: toGlobalId("Petition", petition.id) },
       );
 
       expect(queryErrors).toBeUndefined();

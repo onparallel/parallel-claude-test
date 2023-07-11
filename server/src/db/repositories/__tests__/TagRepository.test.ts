@@ -40,7 +40,7 @@ describe("repositories/TagRepository", () => {
         petition_id: petition.id,
         tag_id: tag.id,
         created_at: new Date(index * 10), // to make sure the creation dates are not the same
-      }))
+      })),
     );
   });
 
@@ -51,7 +51,7 @@ describe("repositories/TagRepository", () => {
 
   it("should load tags linked to organization ordered by name", async () => {
     expect(await repo.loadTagsByOrganizationId(orgs[0].id)).toEqual(
-      sortBy(tags, (tag) => tag.name)
+      sortBy(tags, (tag) => tag.name),
     );
   });
 
@@ -61,13 +61,13 @@ describe("repositories/TagRepository", () => {
 
   it("should allow to create tags with same name in different organizations", async () => {
     await expect(
-      repo.createTag({ color: "#FF00FF", name: tags[1].name }, otherUser)
+      repo.createTag({ color: "#FF00FF", name: tags[1].name }, otherUser),
     ).resolves.not.toThrowError();
   });
 
   it("should not allow to create a tag with a taken name in the same organization", async () => {
     await expect(
-      repo.createTag({ color: "#FFFFFF", name: tags[3].name }, user)
+      repo.createTag({ color: "#FFFFFF", name: tags[3].name }, user),
     ).rejects.toThrowError();
   });
 

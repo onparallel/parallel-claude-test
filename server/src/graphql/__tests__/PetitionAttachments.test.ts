@@ -31,7 +31,7 @@ describe("GraphQL/PetitionAttachments", () => {
       undefined,
       (i) => ({
         type: i === 0 ? "OWNER" : "READ",
-      })
+      }),
     );
   });
 
@@ -40,16 +40,16 @@ describe("GraphQL/PetitionAttachments", () => {
   });
 
   describe("Queries", () => {
-    let attachments: PetitionAttachment[] = [];
+    const attachments: PetitionAttachment[] = [];
     beforeAll(async () => {
       attachments.push(
-        ...(await mocks.createPetitionAttachment(petition.id, "FRONT", randomInt(10)))
+        ...(await mocks.createPetitionAttachment(petition.id, "FRONT", randomInt(10))),
       );
       attachments.push(
-        ...(await mocks.createPetitionAttachment(petition.id, "ANNEX", randomInt(10)))
+        ...(await mocks.createPetitionAttachment(petition.id, "ANNEX", randomInt(10))),
       );
       attachments.push(
-        ...(await mocks.createPetitionAttachment(petition.id, "BACK", randomInt(10)))
+        ...(await mocks.createPetitionAttachment(petition.id, "BACK", randomInt(10))),
       );
     });
     afterAll(async () => {
@@ -77,7 +77,7 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -85,15 +85,15 @@ describe("GraphQL/PetitionAttachments", () => {
         attachmentsList: {
           FRONT: sortBy(
             attachments.filter((a) => a.type === "FRONT"),
-            [(a) => a.position, "asc"]
+            [(a) => a.position, "asc"],
           ).map((a) => ({ id: toGlobalId("PetitionAttachment", a.id) })),
           ANNEX: sortBy(
             attachments.filter((a) => a.type === "ANNEX"),
-            [(a) => a.position, "asc"]
+            [(a) => a.position, "asc"],
           ).map((a) => ({ id: toGlobalId("PetitionAttachment", a.id) })),
           BACK: sortBy(
             attachments.filter((a) => a.type === "BACK"),
-            [(a) => a.position, "asc"]
+            [(a) => a.position, "asc"],
           ).map((a) => ({ id: toGlobalId("PetitionAttachment", a.id) })),
         },
       });
@@ -128,7 +128,7 @@ describe("GraphQL/PetitionAttachments", () => {
             },
           ],
           type: "ANNEX",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
@@ -155,7 +155,7 @@ describe("GraphQL/PetitionAttachments", () => {
             },
           ],
           type: "ANNEX",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -206,7 +206,7 @@ describe("GraphQL/PetitionAttachments", () => {
             },
           ],
           type: "ANNEX",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -269,7 +269,7 @@ describe("GraphQL/PetitionAttachments", () => {
             },
           ],
           type: "ANNEX",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -296,7 +296,7 @@ describe("GraphQL/PetitionAttachments", () => {
             },
           ],
           type: "FRONT",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
       expect(data).toBeNull();
@@ -332,7 +332,7 @@ describe("GraphQL/PetitionAttachments", () => {
             },
           ],
           type: "BACK",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -367,7 +367,7 @@ describe("GraphQL/PetitionAttachments", () => {
             size: 1024,
           })),
           type: "BACK",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -376,7 +376,7 @@ describe("GraphQL/PetitionAttachments", () => {
           presignedPostData: {
             url: "", //mocked
           },
-        }))
+        })),
       );
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
@@ -399,7 +399,7 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           id: toGlobalId("Petition", petition.id),
-        }
+        },
       );
 
       expect(queryErrors).toBeUndefined();
@@ -427,7 +427,7 @@ describe("GraphQL/PetitionAttachments", () => {
             size: 1024,
           })),
           type: "BACK",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -454,7 +454,7 @@ describe("GraphQL/PetitionAttachments", () => {
             size: 1024,
           })),
           type: "BACK",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -477,7 +477,7 @@ describe("GraphQL/PetitionAttachments", () => {
         readonlyPetition.id,
         "ANNEX",
         1,
-        () => ({ file_upload_id: file.id })
+        () => ({ file_upload_id: file.id }),
       );
     });
 
@@ -496,7 +496,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
           attachmentId: toGlobalId("PetitionAttachment", readAttachment.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -517,7 +517,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentId: toGlobalId("PetitionAttachment", attachment.id),
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.petitionAttachmentUploadComplete).toEqual({
@@ -557,7 +557,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentId: toGlobalId("PetitionAttachment", attachment.id),
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.petitionAttachmentDownloadLink).toEqual({
@@ -596,7 +596,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentId: toGlobalId("PetitionAttachment", attachment.id),
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.petitionAttachmentDownloadLink).toEqual({
@@ -626,7 +626,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentId: toGlobalId("PetitionAttachment", 1234),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -648,7 +648,7 @@ describe("GraphQL/PetitionAttachments", () => {
         readonlyPetition.id,
         "BACK",
         1,
-        () => ({ file_upload_id: file.id })
+        () => ({ file_upload_id: file.id }),
       );
     });
 
@@ -664,7 +664,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
           attachmentId: toGlobalId("PetitionAttachment", readAttachment.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -682,7 +682,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentId: toGlobalId("PetitionAttachment", attachment.id),
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data!.deletePetitionAttachment).toEqual({ id: toGlobalId("Petition", petition.id) });
@@ -720,7 +720,7 @@ describe("GraphQL/PetitionAttachments", () => {
             }
           }
         `,
-        { id: toGlobalId("Petition", petition.id) }
+        { id: toGlobalId("Petition", petition.id) },
       );
       expect(errorsAfter).toBeUndefined();
       expect(dataAfter).toEqual({
@@ -760,7 +760,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentId: toGlobalId("PetitionAttachment", annexes[1].id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -810,7 +810,7 @@ describe("GraphQL/PetitionAttachments", () => {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentType: "FRONT",
           attachmentIds: annexes.map((a) => toGlobalId("PetitionAttachment", a.id)),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -837,7 +837,7 @@ describe("GraphQL/PetitionAttachments", () => {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentType: "ANNEX",
           attachmentIds: annexes.slice(1).map((a) => toGlobalId("PetitionAttachment", a.id)),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -881,7 +881,7 @@ describe("GraphQL/PetitionAttachments", () => {
             toGlobalId("PetitionAttachment", fronts[1].id),
             toGlobalId("PetitionAttachment", fronts[3].id),
           ],
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.reorderPetitionAttachments).toEqual({
@@ -943,7 +943,7 @@ describe("GraphQL/PetitionAttachments", () => {
           petitionId: toGlobalId("Petition", petition.id),
           attachmentId: toGlobalId("PetitionAttachment", frontAttachments[0].id),
           type: "ANNEX",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -975,14 +975,14 @@ describe("GraphQL/PetitionAttachments", () => {
         "FRONT",
         1,
         undefined,
-        (i) => ({ filename: `front ${i}.pdf` })
+        (i) => ({ filename: `front ${i}.pdf` }),
       );
       const annex = await mocks.createPetitionAttachment(
         template.id,
         "ANNEX",
         2,
         undefined,
-        (i) => ({ filename: `annex ${i}.pdf` })
+        (i) => ({ filename: `annex ${i}.pdf` }),
       );
       const back = await mocks.createPetitionAttachment(template.id, "BACK", 1, undefined, (i) => ({
         filename: `back ${i}.pdf`,
@@ -1015,7 +1015,7 @@ describe("GraphQL/PetitionAttachments", () => {
         {
           templateId: toGlobalId("Petition", template.id),
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1049,14 +1049,14 @@ describe("GraphQL/PetitionAttachments", () => {
         "FRONT",
         1,
         undefined,
-        (i) => ({ filename: `front ${i}.pdf` })
+        (i) => ({ filename: `front ${i}.pdf` }),
       );
       const annex = await mocks.createPetitionAttachment(
         template.id,
         "ANNEX",
         2,
         undefined,
-        (i) => ({ filename: `annex ${i}.pdf` })
+        (i) => ({ filename: `annex ${i}.pdf` }),
       );
       const back = await mocks.createPetitionAttachment(template.id, "BACK", 1, undefined, (i) => ({
         filename: `back ${i}.pdf`,
@@ -1086,7 +1086,7 @@ describe("GraphQL/PetitionAttachments", () => {
             }
           }
         `,
-        { petitionIds: [toGlobalId("Petition", template.id)] }
+        { petitionIds: [toGlobalId("Petition", template.id)] },
       );
 
       expect(errors).toBeUndefined();

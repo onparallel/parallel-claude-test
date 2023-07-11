@@ -24,7 +24,7 @@ export const initServer = async () => {
   return {
     async execute<TData = any, TVariables extends Record<string, any> = Record<string, any>>(
       query: string | DocumentNode | TypedDocumentNode<TData, TVariables>,
-      variables?: TVariables
+      variables?: TVariables,
     ) {
       const context = container.get<ApiContext>(ApiContext);
       context.req = stack.length
@@ -36,7 +36,7 @@ export const initServer = async () => {
           } as any);
       const response = await server.executeOperation<TData, TVariables>(
         { query, variables },
-        { contextValue: context }
+        { contextValue: context },
       );
       assert(response.body.kind === "single");
       return response.body.singleResult;

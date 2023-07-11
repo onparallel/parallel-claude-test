@@ -30,7 +30,7 @@ describe("GraphQL/LandingTemplates", () => {
         template_public: true,
         is_template: true,
         public_metadata: { slug: i === 0 ? "template-with-slug" : null },
-      })
+      }),
     );
   });
 

@@ -44,7 +44,7 @@ describe("Worker - Event Subscriptions Listener", () => {
       2,
       (i) => ({
         from_template_id: i === 0 ? template.id : null,
-      })
+      }),
     );
 
     // users[0] -> petition OWNER. subscribed to all events
@@ -112,7 +112,7 @@ describe("Worker - Event Subscriptions Listener", () => {
       users[0].id,
       petitionFromTemplate.id,
       1,
-      ["PETITION_CREATED"]
+      ["PETITION_CREATED"],
     );
     await eventSubscriptionsListener(
       {
@@ -124,7 +124,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         processed_at: event.processed_at,
         processed_by: event.processed_by,
       },
-      ctx
+      ctx,
     );
 
     const body = JSON.stringify({
@@ -150,7 +150,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         },
         timeout: 15_000,
         maxRetries: 3,
-      }
+      },
     );
     expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
       2,
@@ -164,7 +164,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         },
         timeout: 15_000,
         maxRetries: 3,
-      }
+      },
     );
     expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
       3,
@@ -178,7 +178,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         },
         timeout: 15_000,
         maxRetries: 3,
-      }
+      },
     );
   });
 
@@ -196,7 +196,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         processed_at: event.processed_at,
         processed_by: event.processed_by,
       },
-      ctx
+      ctx,
     );
 
     const body = JSON.stringify({
@@ -222,7 +222,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         },
         timeout: 15_000,
         maxRetries: 3,
-      }
+      },
     );
   });
 
@@ -232,7 +232,7 @@ describe("Worker - Event Subscriptions Listener", () => {
     const keys = await mocks.createEventSubscriptionSignatureKey(
       subscription.id,
       encryptionService,
-      2
+      2,
     );
 
     const [event] = await mocks.createRandomPetitionEvents(users[1].id, petition.id, 1, [
@@ -249,7 +249,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         processed_at: event.processed_at,
         processed_by: event.processed_by,
       },
-      ctx
+      ctx,
     );
 
     const body = JSON.stringify({
@@ -275,7 +275,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         },
         timeout: 15_000,
         maxRetries: 3,
-      }
+      },
     );
 
     expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
@@ -292,7 +292,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         },
         timeout: 15_000,
         maxRetries: 3,
-      }
+      },
     );
 
     const lastCallArgs = fetchSpy.mock.lastCall![1] as FetchOptions;
@@ -306,8 +306,8 @@ describe("Worker - Event Subscriptions Listener", () => {
             format: "der",
             type: "spki",
           },
-          Buffer.from((lastCallArgs.headers as any)[headerKey], "base64")
-        )
+          Buffer.from((lastCallArgs.headers as any)[headerKey], "base64"),
+        ),
       ).toBe(true);
     });
   });
@@ -334,7 +334,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         processed_at: event.processed_at,
         processed_by: event.processed_by,
       },
-      ctx
+      ctx,
     );
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -353,7 +353,7 @@ describe("Worker - Event Subscriptions Listener", () => {
           userId: toGlobalId("User", users[0].id),
         },
         createdAt: event.created_at,
-      }
+      },
     );
 
     const [failingSubscription] = await mocks.knex

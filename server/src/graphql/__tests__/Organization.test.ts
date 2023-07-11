@@ -42,10 +42,10 @@ describe("GraphQL/Organization", () => {
           .knex("user_data")
           .whereIn(
             "id",
-            [user, ...orgUsers].map((u) => u.user_data_id)
+            [user, ...orgUsers].map((u) => u.user_data_id),
           )
           .select("*"),
-        (d) => d.id
+        (d) => d.id,
       );
     });
 
@@ -67,7 +67,7 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { id: toGlobalId("Organization", organization.id) }
+        { id: toGlobalId("Organization", organization.id) },
       );
 
       expect(errors).toBeUndefined();
@@ -100,7 +100,7 @@ describe("GraphQL/Organization", () => {
       }));
       ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
         "normal-token",
-        normalUser.id
+        normalUser.id,
       ));
 
       await mocks.createFeatureFlags([{ name: "AUTO_ANONYMIZE", default_value: true }]);
@@ -121,7 +121,7 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { months: 1 }
+        { months: 1 },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -138,7 +138,7 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { months: 1 }
+        { months: 1 },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -155,7 +155,7 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { months: 0 }
+        { months: 0 },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -172,7 +172,7 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { months: 25 }
+        { months: 25 },
       );
 
       expect(errors).toBeUndefined();
@@ -213,7 +213,7 @@ describe("GraphQL/Organization", () => {
               }
             }
           `,
-          { name: "X".repeat(51), isDefault: false }
+          { name: "X".repeat(51), isDefault: false },
         );
 
         expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -234,7 +234,7 @@ describe("GraphQL/Organization", () => {
               }
             }
           `,
-          { name: "Newest theme", isDefault: true }
+          { name: "Newest theme", isDefault: true },
         );
 
         expect(errors).toBeUndefined();
@@ -289,7 +289,7 @@ describe("GraphQL/Organization", () => {
               ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
               textFontFamily: "Comic Sans",
             },
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -317,7 +317,7 @@ describe("GraphQL/Organization", () => {
             orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
             isDefault: true,
             name: "My new default theme",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -364,7 +364,7 @@ describe("GraphQL/Organization", () => {
               showLogo: false,
               textColor: "#ababab",
             },
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -408,7 +408,7 @@ describe("GraphQL/Organization", () => {
               }
             }
           `,
-          { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) }
+          { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -434,13 +434,13 @@ describe("GraphQL/Organization", () => {
               }
             }
           `,
-          { orgThemeId: toGlobalId("OrganizationTheme", themeToDelete.id) }
+          { orgThemeId: toGlobalId("OrganizationTheme", themeToDelete.id) },
         );
 
         expect(deleteErrors).toBeUndefined();
         const newDefaultThemeId =
           deleteData!.deleteOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
-            (t: any) => t.isDefault
+            (t: any) => t.isDefault,
           )!.id as string;
 
         expect(newDefaultThemeId).toBeDefined();
@@ -457,7 +457,7 @@ describe("GraphQL/Organization", () => {
           `,
           {
             id: toGlobalId("Petition", petition.id),
-          }
+          },
         );
 
         expect(queryErrors).toBeUndefined();
@@ -479,7 +479,7 @@ describe("GraphQL/Organization", () => {
               }
             }
           `,
-          { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id) }
+          { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id) },
         );
 
         expect(errors).toBeUndefined();

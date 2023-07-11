@@ -145,7 +145,7 @@ describe("GraphQL/Petitions", () => {
       organization.id,
       sessionUser.id,
       10,
-      petitionsBuilder(organization.id, signatureIntegrations[0].id)
+      petitionsBuilder(organization.id, signatureIntegrations[0].id),
     );
 
     tags = await mocks.createRandomTags(organization.id, 11);
@@ -353,7 +353,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       const expectedPetitions = petitions.filter(
-        (p) => !p.is_template && p.id !== petitions[0].id && p.id !== petitions[1].id
+        (p) => !p.is_template && p.id !== petitions[0].id && p.id !== petitions[1].id,
       );
       expect(errors).toBeUndefined();
       expect(data?.petitions).toEqual({
@@ -473,7 +473,7 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        { petitionId: templateId }
+        { petitionId: templateId },
       );
 
       // templateId should be in first position for petitions query
@@ -499,7 +499,7 @@ describe("GraphQL/Petitions", () => {
       expect(data!.templates).toEqual({
         // first the recently used template, then the rest
         items: [{ id: templateId }].concat(
-          items.filter(({ id }: { id: string }) => id !== templateId)
+          items.filter(({ id }: { id: string }) => id !== templateId),
         ),
       });
     });
@@ -566,19 +566,17 @@ describe("GraphQL/Petitions", () => {
 
     it("orders public templates by use count", async () => {
       await mocks.knex.from("petition").update("from_template_id", null);
-      const { data } = await testClient.execute(
-        gql`
-          query {
-            templates(limit: 100, isPublic: true) {
-              items {
-                ... on PetitionBase {
-                  id
-                }
+      const { data } = await testClient.execute(gql`
+        query {
+          templates(limit: 100, isPublic: true) {
+            items {
+              ... on PetitionBase {
+                id
               }
             }
           }
-        `
-      );
+        }
+      `);
 
       expect(data).not.toBeNull();
       const { items } = data!.templates;
@@ -596,7 +594,7 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        { petitionId: templateId }
+        { petitionId: templateId },
       );
 
       // templateId should be in first position for templates query
@@ -618,7 +616,7 @@ describe("GraphQL/Petitions", () => {
       expect(data2!.templates).toEqual({
         // first the recently used template, then the rest
         items: [{ id: templateId }].concat(
-          items.filter(({ id }: { id: string }) => id !== templateId)
+          items.filter(({ id }: { id: string }) => id !== templateId),
         ),
       });
     });
@@ -857,7 +855,7 @@ describe("GraphQL/Petitions", () => {
           is_template: true,
           status: null,
           name: "KYC",
-        })
+        }),
       );
       await mocks.tagPetitions([publicTemplateWithTags.id], tag.id);
 
@@ -904,7 +902,7 @@ describe("GraphQL/Petitions", () => {
             timezone: "Europe/Madrid",
             weekdaysOnly: true,
           },
-        })
+        }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -964,7 +962,7 @@ describe("GraphQL/Petitions", () => {
             ],
             allowAdditionalSigners: true,
           },
-        })
+        }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -1050,7 +1048,7 @@ describe("GraphQL/Petitions", () => {
             ],
             allowAdditionalSigners: false,
           },
-        })
+        }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -1139,7 +1137,7 @@ describe("GraphQL/Petitions", () => {
           status: null,
           name: "KYC",
           deadline: new Date(),
-        })
+        }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -1180,7 +1178,7 @@ describe("GraphQL/Petitions", () => {
             timezone: "Europe/Madrid",
             weekdaysOnly: true,
           },
-        })
+        }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -1302,7 +1300,7 @@ describe("GraphQL/Petitions", () => {
           custom_properties: {
             "private org prop": "abcd",
           },
-        })
+        }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -1402,7 +1400,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
       const [user] = await mocks.createRandomUsers(organization.id, 1);
       await mocks.knex.from("template_default_permission").delete();
@@ -1427,7 +1425,7 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        { petitionId: toGlobalId("Petition", template.id) }
+        { petitionId: toGlobalId("Petition", template.id) },
       );
 
       expect(errors).toBeUndefined();
@@ -1444,7 +1442,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
       const users = await mocks.createRandomUsers(organization.id, 2);
       await mocks.knex.from("template_default_permission").delete();
@@ -1476,7 +1474,7 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        { petitionId: toGlobalId("Petition", template.id) }
+        { petitionId: toGlobalId("Petition", template.id) },
       );
 
       expect(errors).toBeUndefined();
@@ -1494,7 +1492,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
       const users = await mocks.createRandomUsers(organization.id, 2);
       await mocks.knex.from("template_default_permission").delete();
@@ -1519,7 +1517,7 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        { petitionId: toGlobalId("Petition", template.id) }
+        { petitionId: toGlobalId("Petition", template.id) },
       );
 
       expect(errors).toBeUndefined();
@@ -1535,7 +1533,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
       const [user] = await mocks.createRandomUsers(organization.id, 1);
       await mocks.knex.from("template_default_permission").delete();
@@ -1567,7 +1565,7 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        { petitionId: toGlobalId("Petition", template.id) }
+        { petitionId: toGlobalId("Petition", template.id) },
       );
 
       expect(errors).toBeUndefined();
@@ -1590,7 +1588,7 @@ describe("GraphQL/Petitions", () => {
         `,
         {
           type: ["PETITION", "TEMPLATE"][Math.round(Math.random())],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1608,7 +1606,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true, template_public: true })
+        () => ({ is_template: true, template_public: true }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -1622,7 +1620,7 @@ describe("GraphQL/Petitions", () => {
         {
           type: "TEMPLATE",
           petitionId: toGlobalId("Petition", template.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1640,7 +1638,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -1654,7 +1652,7 @@ describe("GraphQL/Petitions", () => {
         {
           type: "PETITION",
           petitionId: toGlobalId("Petition", template.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1672,13 +1670,13 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
       const [petition] = await mocks.createRandomPetitions(
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: false, from_template_id: template.id })
+        () => ({ is_template: false, from_template_id: template.id }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -1692,7 +1690,7 @@ describe("GraphQL/Petitions", () => {
         {
           type: "PETITION",
           petitionId: toGlobalId("Petition", petition.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1710,7 +1708,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true, template_public: true })
+        () => ({ is_template: true, template_public: true }),
       );
       await mocks.createRandomPetitionFields(template.id, 3);
 
@@ -1728,7 +1726,7 @@ describe("GraphQL/Petitions", () => {
         {
           type: "TEMPLATE",
           petitionId: toGlobalId("Petition", template.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1748,7 +1746,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
       const fields = await mocks.createRandomPetitionFields(template.id, 3);
 
@@ -1766,7 +1764,7 @@ describe("GraphQL/Petitions", () => {
         {
           type: "PETITION",
           petitionId: toGlobalId("Petition", template.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1794,14 +1792,14 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true })
+        () => ({ is_template: true }),
       );
       const templateFields = await mocks.createRandomPetitionFields(template.id, 3);
       const [petition] = await mocks.createRandomPetitions(
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: false, from_template_id: template.id })
+        () => ({ is_template: false, from_template_id: template.id }),
       );
       const petitionFields = await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
         from_petition_field_id: templateFields[i].id,
@@ -1821,7 +1819,7 @@ describe("GraphQL/Petitions", () => {
         {
           type: "PETITION",
           petitionId: toGlobalId("Petition", petition.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1915,7 +1913,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data!.clonePetitions[0]).toEqual({
         name: publicTemplate.name?.concat(
-          publicTemplate.recipient_locale === "en" ? " (copy)" : " (copia)"
+          publicTemplate.recipient_locale === "en" ? " (copy)" : " (copia)",
         ),
         isPublic: false,
         __typename: "PetitionTemplate",
@@ -2069,7 +2067,7 @@ describe("GraphQL/Petitions", () => {
           is_template: false,
           status: "DRAFT",
           name: "KYC",
-        })
+        }),
       );
       await mocks.tagPetitions([petitionWithTags.id], tag.id);
 
@@ -2136,7 +2134,7 @@ describe("GraphQL/Petitions", () => {
         sessionUser.id,
         1,
         () => ({}),
-        () => ({ is_subscribed: false })
+        () => ({ is_subscribed: false }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -2163,7 +2161,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: true, status: null })
+        () => ({ is_template: true, status: null }),
       );
       const [user] = await mocks.createRandomUsers(organization.id, 1);
       await mocks.knex.from("template_default_permission").insert({
@@ -2311,7 +2309,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         2,
-        petitionsBuilder(organization.id, signatureIntegrations[0].id)
+        petitionsBuilder(organization.id, signatureIntegrations[0].id),
       );
 
       await mocks.sharePetitions([petitionsToDelete[0].id], sameOrgUser.id, "WRITE");
@@ -2327,7 +2325,7 @@ describe("GraphQL/Petitions", () => {
             deletePetitions(ids: $ids, folders: $folders)
           }
         `,
-        { ids: null, folders: null }
+        { ids: null, folders: null },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -2394,7 +2392,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sameOrgUser.id,
         1,
-        petitionsBuilder(organization.id, signatureIntegrations[0].id)
+        petitionsBuilder(organization.id, signatureIntegrations[0].id),
       );
 
       //share the petition with the logged user
@@ -2477,7 +2475,7 @@ describe("GraphQL/Petitions", () => {
             deletePetitions(ids: $ids, force: $force, dryrun: $dryrun)
           }
         `,
-        { ids: [toGlobalId("Petition", petitionsToDelete[1].id)], force: true, dryrun: true }
+        { ids: [toGlobalId("Petition", petitionsToDelete[1].id)], force: true, dryrun: true },
       );
 
       expect(errors).toBeUndefined();
@@ -2785,7 +2783,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ restricted_by_user_id: sessionUser.id, restricted_at: new Date() })
+        () => ({ restricted_by_user_id: sessionUser.id, restricted_at: new Date() }),
       );
 
       fields = await mocks.createRandomPetitionFields(readonlyPetition.id, 3, (i) => ({
@@ -3229,7 +3227,7 @@ describe("GraphQL/Petitions", () => {
           ],
           subject: "petition send subject",
           body: [],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -3260,7 +3258,7 @@ describe("GraphQL/Petitions", () => {
           contactIdGroups: [[toGlobalId("Contact", contacts[0].id)]],
           subject: "petition send subject",
           body: [],
-        }
+        },
       );
 
       expect(firstSendErrors).toBeUndefined();
@@ -3291,7 +3289,7 @@ describe("GraphQL/Petitions", () => {
           ],
           subject: "petition send subject",
           body: [],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("UNSUPPORTED_USE_CASE");
@@ -3322,7 +3320,7 @@ describe("GraphQL/Petitions", () => {
           contactIdGroups: [[toGlobalId("Contact", contacts[0].id)]],
           subject: "petition send subject",
           body: [],
-        }
+        },
       );
 
       expect(firstSendErrors).toBeUndefined();
@@ -3350,7 +3348,7 @@ describe("GraphQL/Petitions", () => {
           contactIdGroups: [[toGlobalId("Contact", contacts[0].id)]],
           subject: "petition send subject",
           body: [],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("PETITION_ALREADY_SENT_ERROR");
@@ -3782,7 +3780,7 @@ describe("GraphQL/Petitions", () => {
         sessionUser.id,
         field.id,
         petition.id,
-        1
+        1,
       );
 
       const { errors, data } = await testClient.execute(
@@ -3840,7 +3838,7 @@ describe("GraphQL/Petitions", () => {
           ],
           subject: "petition send subject",
           body: [],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3939,7 +3937,7 @@ describe("GraphQL/Petitions", () => {
           contactIdGroups: range(0, 50).map((i) => [toGlobalId("Contact", contacts[i % 3].id)]),
           subject: `Sent: {{ ${toGlobalId("PetitionField", field.id)} }}`, // reference from original petition field, should match replies on every cloned petition
           body: [],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3950,7 +3948,7 @@ describe("GraphQL/Petitions", () => {
             id: expect.any(String),
             name: `Sent: my reply`.concat(i === 0 ? "" : ` (${i + 1})`),
           },
-        }))
+        })),
       );
     });
   });
@@ -4143,7 +4141,7 @@ describe("GraphQL/Petitions", () => {
       signatureLimit = await mocks.createOrganizationUsageLimit(
         organization.id,
         "SIGNATURIT_SHARED_APIKEY",
-        10
+        10,
       );
 
       signers = [
@@ -4502,7 +4500,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ status: "DRAFT" })
+        () => ({ status: "DRAFT" }),
       );
       await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "TEXT",
@@ -4574,7 +4572,7 @@ describe("GraphQL/Petitions", () => {
         petitions[1].id,
         sessionUser.id,
         [contact.id],
-        sessionUser.id
+        sessionUser.id,
       );
     });
 
@@ -4629,7 +4627,7 @@ describe("GraphQL/Petitions", () => {
           status: "CLOSED",
           closed_at: new Date(),
           anonymized_at: new Date(),
-        })
+        }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -4642,7 +4640,7 @@ describe("GraphQL/Petitions", () => {
         `,
         {
           petitionId: toGlobalId("Petition", anonymized.id),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -4656,7 +4654,7 @@ describe("GraphQL/Petitions", () => {
         1,
         () => ({
           status: ["PENDING", "DRAFT"][Math.round(Math.random())] as PetitionStatus,
-        })
+        }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -4669,7 +4667,7 @@ describe("GraphQL/Petitions", () => {
         `,
         {
           petitionId: toGlobalId("Petition", pending.id),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
@@ -4687,7 +4685,7 @@ describe("GraphQL/Petitions", () => {
         sessionUser.id,
         1,
         () => ({ is_template: false, status: "PENDING" }),
-        () => ({ type: "READ" })
+        () => ({ type: "READ" }),
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
@@ -4698,7 +4696,7 @@ describe("GraphQL/Petitions", () => {
         readPetition.id,
         sessionUser.id,
         [contact.id],
-        sessionUser.id
+        sessionUser.id,
       );
     });
 
@@ -4722,7 +4720,7 @@ describe("GraphQL/Petitions", () => {
             contactIds: [toGlobalId("Contact", contact.id)],
             subject: "petition send subject",
             body: [],
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -4746,7 +4744,7 @@ describe("GraphQL/Petitions", () => {
               name: "my petition",
               locale: "es",
             },
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -4766,7 +4764,7 @@ describe("GraphQL/Petitions", () => {
           `,
           {
             petitionId: toGlobalId("Petition", readPetition.id),
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -4788,7 +4786,7 @@ describe("GraphQL/Petitions", () => {
               }
             }
           `,
-          { petitionId: toGlobalId("Petition", readPetition.id) }
+          { petitionId: toGlobalId("Petition", readPetition.id) },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -4809,7 +4807,7 @@ describe("GraphQL/Petitions", () => {
           {
             petitionId: toGlobalId("Petition", readPetition.id),
             accessIds: [toGlobalId("PetitionAccess", access.id)],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
@@ -4833,7 +4831,7 @@ describe("GraphQL/Petitions", () => {
           {
             petitionId: toGlobalId("Petition", readPetition.id),
             accessIds: [toGlobalId("PetitionAccess", access.id)],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
@@ -4853,7 +4851,7 @@ describe("GraphQL/Petitions", () => {
           {
             petitionId: toGlobalId("Petition", readPetition.id),
             accessIds: [toGlobalId("PetitionAccess", access.id)],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
@@ -4873,7 +4871,7 @@ describe("GraphQL/Petitions", () => {
           {
             petitionId: toGlobalId("Petition", readPetition.id),
             accessIds: [toGlobalId("PetitionAccess", access.id)],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
@@ -4885,7 +4883,7 @@ describe("GraphQL/Petitions", () => {
         const [message] = await mocks.createRandomPetitionMessage(
           readPetition.id,
           access.id,
-          sessionUser.user_data_id
+          sessionUser.user_data_id,
         );
         const { errors, data } = await testClient.execute(
           gql`
@@ -4898,7 +4896,7 @@ describe("GraphQL/Petitions", () => {
           {
             petitionId: toGlobalId("Petition", readPetition.id),
             messageId: [toGlobalId("PetitionMessage", message.id)],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data?.cancelScheduledMessage).toBeNull();
@@ -4912,7 +4910,7 @@ describe("GraphQL/Petitions", () => {
           sessionUser.id,
           1,
           () => ({ is_template: false }),
-          () => ({ type: "READ" })
+          () => ({ type: "READ" }),
         );
 
         const { errors, data } = await testClient.execute(
@@ -4933,7 +4931,7 @@ describe("GraphQL/Petitions", () => {
             petitionId: toGlobalId("Petition", readPetition.id),
             isRestricted: true,
             password: "password",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -4948,7 +4946,7 @@ describe("GraphQL/Petitions", () => {
           sessionUser.id,
           1,
           () => ({ is_template: false }),
-          () => ({ type: "READ" })
+          () => ({ type: "READ" }),
         );
 
         const { errors, data } = await testClient.execute(
@@ -4962,7 +4960,7 @@ describe("GraphQL/Petitions", () => {
           {
             petitionId: toGlobalId("Petition", readPetition.id),
             metadata: { key: "value" },
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -4983,7 +4981,7 @@ describe("GraphQL/Petitions", () => {
           }),
           () => ({
             type: "READ",
-          })
+          }),
         );
 
         const { errors, data } = await testClient.execute(
@@ -4998,7 +4996,7 @@ describe("GraphQL/Petitions", () => {
             petitionId: toGlobalId("Petition", readPetition.id),
             key: "key",
             value: "abcd",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -5017,7 +5015,7 @@ describe("GraphQL/Petitions", () => {
         sessionUser.id,
         1,
         () => ({ is_template: false, status: "PENDING" }),
-        () => ({ type: "OWNER" })
+        () => ({ type: "OWNER" }),
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
@@ -5028,7 +5026,7 @@ describe("GraphQL/Petitions", () => {
         petition.id,
         sessionUser.id,
         [contact.id],
-        sessionUser.id
+        sessionUser.id,
       );
     });
 
@@ -5046,7 +5044,7 @@ describe("GraphQL/Petitions", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           accessIds: [toGlobalId("PetitionAccess", access.id)],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -5068,7 +5066,7 @@ describe("GraphQL/Petitions", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           accessIds: [toGlobalId("PetitionAccess", access.id)],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("NO_REMINDERS_LEFT");
       expect(data).toBeNull();
@@ -5090,7 +5088,7 @@ describe("GraphQL/Petitions", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           accessIds: [toGlobalId("PetitionAccess", access.id)],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
       expect(data).toBeNull();
@@ -5120,7 +5118,7 @@ describe("GraphQL/Petitions", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           accessIds: [toGlobalId("PetitionAccess", access.id)],
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.sendReminders).toEqual([
@@ -5166,7 +5164,7 @@ describe("GraphQL/Petitions", () => {
         sessionUser.id,
         1,
         () => ({ is_template: false, status: "PENDING" }),
-        () => ({ type: "OWNER" })
+        () => ({ type: "OWNER" }),
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
@@ -5177,7 +5175,7 @@ describe("GraphQL/Petitions", () => {
         petition.id,
         sessionUser.id,
         [contact.id],
-        sessionUser.id
+        sessionUser.id,
       );
     });
 
@@ -5213,7 +5211,7 @@ describe("GraphQL/Petitions", () => {
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -5253,7 +5251,7 @@ describe("GraphQL/Petitions", () => {
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("NO_REMINDERS_LEFT");
       expect(data).toBeNull();
@@ -5293,7 +5291,7 @@ describe("GraphQL/Petitions", () => {
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
       expect(data).toBeNull();
@@ -5338,7 +5336,7 @@ describe("GraphQL/Petitions", () => {
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -5387,7 +5385,7 @@ describe("GraphQL/Petitions", () => {
           petitionId: toGlobalId("Petition", petition.id),
           accessIds: [toGlobalId("PetitionAccess", access.id)],
           start: false,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();

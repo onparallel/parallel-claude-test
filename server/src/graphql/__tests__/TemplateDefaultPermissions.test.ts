@@ -34,7 +34,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
     [otherOrganization] = await mocks.createRandomOrganizations(1);
 
     users = await mocks.createRandomUsers(organization.id, 3, undefined, (i) =>
-      i === 0 ? { cognito_id: USER_COGNITO_ID } : {}
+      i === 0 ? { cognito_id: USER_COGNITO_ID } : {},
     );
     otherUsers = await mocks.createRandomUsers(otherOrganization.id, 2);
 
@@ -65,7 +65,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
         organization.id,
         users[1].id,
         1,
-        () => ({ is_template: true, status: null })
+        () => ({ is_template: true, status: null }),
       );
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -390,7 +390,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
               isSubscribed: false,
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();

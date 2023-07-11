@@ -25,7 +25,7 @@ describe("reminderUtils", () => {
     });
 
     expect(nextReminder).toEqual(
-      toDate(`2021-10-16T12:00:00`, { timeZone: "America/Argentina/Buenos_Aires" })
+      toDate(`2021-10-16T12:00:00`, { timeZone: "America/Argentina/Buenos_Aires" }),
     );
   });
 

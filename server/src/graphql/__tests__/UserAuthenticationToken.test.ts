@@ -162,7 +162,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
       [anotherUser] = await mocks.createRandomUsers(organization.id, 1);
       ({ auth: anotherUserToken } = await mocks.createUserAuthToken(
         "Another Token",
-        anotherUser.id
+        anotherUser.id,
       ));
     });
 

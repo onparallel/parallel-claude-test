@@ -64,7 +64,7 @@ describe("GraphQL/Profiles", () => {
           }
         }
       `,
-      { profileTypeId }
+      { profileTypeId },
     );
     if (isDefined(fields) && fields.length > 0) {
       return await updateProfileValue(data.createProfile.id, fields);
@@ -93,7 +93,7 @@ describe("GraphQL/Profiles", () => {
           }
         }
       `,
-      { profileId, fields }
+      { profileId, fields },
     );
     if (isDefined(errors)) {
       throw errors;
@@ -140,7 +140,7 @@ describe("GraphQL/Profiles", () => {
           { name: json({ en: "Legal entity", es: "Persona jurídica" }) },
           { name: json({ en: "Contract", es: "Contrato" }) },
           { name: json({ en: "Expirable fields", es: "Campos con expiración" }) },
-        ][i]
+        ][i],
     );
 
     profileType0Fields = await mocks.createRandomProfileTypeFields(
@@ -188,7 +188,7 @@ describe("GraphQL/Profiles", () => {
             expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
             options: {},
           },
-        ][i]
+        ][i],
     );
     await mocks.knex
       .from("profile_type")
@@ -217,7 +217,7 @@ describe("GraphQL/Profiles", () => {
             type: "TEXT" as const,
             alias: "ADDRESS",
           },
-        ][i]
+        ][i],
     );
 
     profileType2Fields = await mocks.createRandomProfileTypeFields(
@@ -237,7 +237,7 @@ describe("GraphQL/Profiles", () => {
             type: "FILE" as const,
             alias: "ID_PHOTO",
           },
-        ][i]
+        ][i],
     );
 
     profileType3Fields = await mocks.createRandomProfileTypeFields(
@@ -265,7 +265,7 @@ describe("GraphQL/Profiles", () => {
             is_expirable: true,
             expiry_alert_ahead_time: null,
           },
-        ][i]
+        ][i],
     );
 
     await mocks.knex
@@ -338,7 +338,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileId: profile.id,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -455,7 +455,7 @@ describe("GraphQL/Profiles", () => {
           offset: 0,
           sortBy: ["name_DESC"],
           locale: "en",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -527,7 +527,7 @@ describe("GraphQL/Profiles", () => {
           offset: 0,
           sortBy: ["createdAt_ASC"],
           search: "Indiv",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -552,7 +552,7 @@ describe("GraphQL/Profiles", () => {
             }
           }
         `,
-        { limit: 10, offset: 0, sortBy: ["name_ASC"] }
+        { limit: 10, offset: 0, sortBy: ["name_ASC"] },
       );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
@@ -572,7 +572,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileType", profileTypes[0].id),
             toGlobalId("ProfileType", profileTypes[1].id),
           ],
-        }
+        },
       );
 
       const { errors, data } = await testClient.execute(
@@ -611,7 +611,7 @@ describe("GraphQL/Profiles", () => {
           filter: {
             onlyArchived: true,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -660,7 +660,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           subscribe: true,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -686,7 +686,7 @@ describe("GraphQL/Profiles", () => {
         () => ({
           archived_at: new Date(),
           archived_by_user_id: sessionUser.id,
-        })
+        }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -699,7 +699,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", archivedProfileType.id),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -724,7 +724,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           name: { en: "Individual" },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -748,7 +748,7 @@ describe("GraphQL/Profiles", () => {
             }
           }
         `,
-        { name: { en: "Individual" } }
+        { name: { en: "Individual" } },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -770,7 +770,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           name: { en: "updated name" },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -793,7 +793,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           name: { en: "updated name" },
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -812,7 +812,7 @@ describe("GraphQL/Profiles", () => {
           `,
           {
             profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          }
+          },
         );
         await testClient.execute(
           gql`
@@ -834,7 +834,7 @@ describe("GraphQL/Profiles", () => {
                 content: { value: lastName },
               },
             ],
-          }
+          },
         );
       }
       await createIndividualProfile("Mickey", "Mouse");
@@ -860,7 +860,7 @@ describe("GraphQL/Profiles", () => {
           offset: 0,
           sortBy: ["name_DESC"],
           locale: "en",
-        }
+        },
       );
       expect(data.profiles).toEqual({
         totalCount: 5,
@@ -889,7 +889,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileNamePattern: `{{${lastName}}}, {{${firstName}}}`,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -915,7 +915,7 @@ describe("GraphQL/Profiles", () => {
           offset: 0,
           sortBy: ["name_DESC"],
           locale: "en",
-        }
+        },
       );
       expect(data3.profiles).toEqual({
         totalCount: 5,
@@ -944,7 +944,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileNamePattern: `{{${emptyField}}}-static-text`,
-        }
+        },
       );
 
       expect(errorsEmptyField).toBeUndefined();
@@ -970,7 +970,7 @@ describe("GraphQL/Profiles", () => {
           offset: 0,
           sortBy: ["name_DESC"],
           locale: "en",
-        }
+        },
       );
       expect(dataProfilesEmptyField.profiles).toEqual({
         totalCount: 5,
@@ -1001,7 +1001,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileNamePattern: `{{${phoneField}}}`,
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_NAME_PATTERN");
@@ -1024,7 +1024,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileNamePattern: "Hello",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_NAME_PATTERN");
@@ -1052,7 +1052,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           name: { en: "cloned profile" },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1067,7 +1067,7 @@ describe("GraphQL/Profiles", () => {
         })),
       });
       expect(data.cloneProfileType.profileNamePattern).toEqual(
-        `{{${data.cloneProfileType.fields[0].id}}} {{${data.cloneProfileType.fields[1].id}}}`
+        `{{${data.cloneProfileType.fields[0].id}}} {{${data.cloneProfileType.fields[1].id}}}`,
       );
     });
   });
@@ -1087,7 +1087,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileType", profileTypes[1].id),
             toGlobalId("ProfileType", profileTypes[2].id),
           ],
-        }
+        },
       );
 
       expect(archiveErrors).toBeUndefined();
@@ -1113,7 +1113,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileType", profileTypes[1].id),
             toGlobalId("ProfileType", profileTypes[2].id),
           ],
-        }
+        },
       );
 
       expect(archiveErrors).toBeUndefined();
@@ -1135,7 +1135,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileType", profileTypes[1].id),
             toGlobalId("ProfileType", profileTypes[2].id),
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1159,7 +1159,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileType", profileTypes[1].id),
             toGlobalId("ProfileType", profileTypes[2].id),
           ],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1179,7 +1179,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileType", profileTypes[1].id),
             toGlobalId("ProfileType", profileTypes[2].id),
           ],
-        }
+        },
       );
 
       expect(archiveErrors).toBeUndefined();
@@ -1199,7 +1199,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileType", profileTypes[1].id),
             toGlobalId("ProfileType", profileTypes[2].id),
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1237,7 +1237,7 @@ describe("GraphQL/Profiles", () => {
           limit: 10,
           offset: 0,
           sortBy: ["createdAt_ASC"],
-        }
+        },
       );
 
       expect(queryErrors).toBeUndefined();
@@ -1267,7 +1267,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeIds: [toGlobalId("ProfileType", profileTypes[0].id)],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1307,7 +1307,7 @@ describe("GraphQL/Profiles", () => {
             type: "SHORT_TEXT",
             options: {},
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1339,7 +1339,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           data: { name: { en: "field" }, type: "TEXT" },
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1363,7 +1363,7 @@ describe("GraphQL/Profiles", () => {
             name: { en: "Address", es: "Dirección" },
             type: "TEXT",
           },
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("ALIAS_ALREADY_EXISTS");
@@ -1389,7 +1389,7 @@ describe("GraphQL/Profiles", () => {
             type: "TEXT",
             options: { unknown: false },
           },
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -1410,7 +1410,7 @@ describe("GraphQL/Profiles", () => {
           expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
           alias: i === 0 ? "alias" : null,
           type: "TEXT",
-        })
+        }),
       );
     });
 
@@ -1442,7 +1442,7 @@ describe("GraphQL/Profiles", () => {
             isExpirable: false,
             name: { en: "new_name", es: "nuevo_nombre" },
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1475,7 +1475,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
           data: { name: { es: "name" } },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1502,7 +1502,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
           data: { options: { unknown: true } },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
@@ -1534,7 +1534,7 @@ describe("GraphQL/Profiles", () => {
           data: {
             alias: "alias",
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("ALIAS_ALREADY_EXISTS");
       expect(data).toBeNull();
@@ -1567,7 +1567,7 @@ describe("GraphQL/Profiles", () => {
             isExpirable: true,
             expiryAlertAheadTime: { months: 3 },
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1611,7 +1611,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
           data: { isExpirable: false },
           force: true,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1639,7 +1639,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileId: profile.id,
-        }
+        },
       );
 
       expect(query2Errors).toBeUndefined();
@@ -1700,7 +1700,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
           data: { isExpirable: false },
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR");
@@ -1729,7 +1729,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileTypeFieldIds: newOrder.map((id) => toGlobalId("ProfileTypeField", id)),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1767,7 +1767,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileTypeField", profileType0Fields[2].id),
             toGlobalId("ProfileTypeField", profileType0Fields[1].id),
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1796,7 +1796,7 @@ describe("GraphQL/Profiles", () => {
             toGlobalId("ProfileTypeField", profileType0Fields[3].id),
             toGlobalId("ProfileTypeField", profileType0Fields[1].id),
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_IDS");
@@ -1821,7 +1821,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileTypeFieldIds: [toGlobalId("ProfileTypeField", removedPtfId)],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1841,7 +1841,7 @@ describe("GraphQL/Profiles", () => {
             }
           }
         `,
-        { profileTypeId: toGlobalId("ProfileType", profileTypes[0].id) }
+        { profileTypeId: toGlobalId("ProfileType", profileTypes[0].id) },
       );
 
       expect(queryErrors).toBeUndefined();
@@ -1868,7 +1868,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[0].id)],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FIELD_USED_IN_PATTERN");
@@ -1890,7 +1890,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[0].id)],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -2039,7 +2039,7 @@ describe("GraphQL/Profiles", () => {
             content: { value: "1988-12-15" },
             expiryDate: "2030-01-01",
           },
-        ])
+        ]),
       ).rejects.toContainGraphQLError("EXPIRY_ON_NON_EXPIRABLE_FIELD");
     });
 
@@ -2062,7 +2062,7 @@ describe("GraphQL/Profiles", () => {
             content: null,
             expiryDate: "2030-01-01",
           },
-        ])
+        ]),
       ).rejects.toContainGraphQLError("EXPIRY_ON_REMOVED_FIELD");
     });
 
@@ -2075,7 +2075,7 @@ describe("GraphQL/Profiles", () => {
             profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
             content: { value: "aaa" },
           },
-        ])
+        ]),
       ).rejects.toContainGraphQLError("FORBIDDEN");
     });
 
@@ -2088,7 +2088,7 @@ describe("GraphQL/Profiles", () => {
             profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
             content: { value: 123456 },
           },
-        ])
+        ]),
       ).rejects.toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
     });
 
@@ -2101,7 +2101,7 @@ describe("GraphQL/Profiles", () => {
             profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
             expiryDate: "2030-01-01",
           },
-        ])
+        ]),
       ).rejects.toContainGraphQLError("EXPIRY_ON_NONEXISTING_VALUE");
     });
 
@@ -2134,7 +2134,7 @@ describe("GraphQL/Profiles", () => {
               content: { value: "x".repeat(1001) },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2170,7 +2170,7 @@ describe("GraphQL/Profiles", () => {
               content: { value: 123456 },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2210,7 +2210,7 @@ describe("GraphQL/Profiles", () => {
               },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2246,7 +2246,7 @@ describe("GraphQL/Profiles", () => {
               content: { value: "x".repeat(10_001) },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2282,7 +2282,7 @@ describe("GraphQL/Profiles", () => {
               content: { value: "May the 4th" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2318,7 +2318,7 @@ describe("GraphQL/Profiles", () => {
               content: { value: 1234 },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2354,7 +2354,7 @@ describe("GraphQL/Profiles", () => {
               content: { value: 1234 },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2390,7 +2390,7 @@ describe("GraphQL/Profiles", () => {
               content: { value: "0800-333-parallel" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
@@ -2423,7 +2423,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileIds: [profile.id],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2460,7 +2460,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileIds: [profile.id],
           force: false,
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("PROFILE_HAS_REPLIES_ERROR", { count: 1 });
@@ -2532,14 +2532,14 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
           expiryDate: "2025-10-01",
-        }
+        },
       );
 
       const rows = await mocks.knex
         .from("profile_field_file")
         .where(
           "id",
-          fromGlobalId(createData?.createProfileFieldFileUploadLink.property.files[0].id).id
+          fromGlobalId(createData?.createProfileFieldFileUploadLink.property.files[0].id).id,
         )
         .select("*");
 
@@ -2596,7 +2596,7 @@ describe("GraphQL/Profiles", () => {
           profileId: profile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           profileFieldFileIds: [createData!.createProfileFieldFileUploadLink.property.files[0].id],
-        }
+        },
       );
 
       expect(completeErrors).toBeUndefined();
@@ -2644,7 +2644,7 @@ describe("GraphQL/Profiles", () => {
           profileId: profile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
-        }
+        },
       );
 
       expect(createErrors).toBeUndefined();
@@ -2696,7 +2696,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [],
           expiryDate: "2024-10-10",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2742,7 +2742,7 @@ describe("GraphQL/Profiles", () => {
           profileId: profile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("VALIDATOR_CONDITION_ERROR");
@@ -2780,7 +2780,7 @@ describe("GraphQL/Profiles", () => {
           profileId: profile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
-        }
+        },
       );
 
       expect(createErrors).toBeUndefined();
@@ -2832,7 +2832,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [],
           expiryDate: "2024-10-10",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2878,7 +2878,7 @@ describe("GraphQL/Profiles", () => {
           profileId: profile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("VALIDATOR_CONDITION_ERROR");
@@ -2911,7 +2911,7 @@ describe("GraphQL/Profiles", () => {
             size: 1024,
             filename: "ID.png",
           })),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("MAX_FILES_EXCEEDED");
@@ -2945,7 +2945,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileId: profile.id,
-        }
+        },
       );
 
       expect(queryErrors).toBeUndefined();
@@ -2967,7 +2967,7 @@ describe("GraphQL/Profiles", () => {
           profileId: profile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           profileFieldFileIds: [queryData.profile.properties[1].files[0].id],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2988,7 +2988,7 @@ describe("GraphQL/Profiles", () => {
 
       ({ apiKey: collaboratorApiKey } = await mocks.createUserAuthToken(
         "collaborator-apikey",
-        users[0].id
+        users[0].id,
       ));
     });
 
@@ -3006,7 +3006,7 @@ describe("GraphQL/Profiles", () => {
             }
           }
         `,
-        { profileIds: [profile.id], userIds: users.map((u) => toGlobalId("User", u.id)) }
+        { profileIds: [profile.id], userIds: users.map((u) => toGlobalId("User", u.id)) },
       );
 
       expect(errors).toBeUndefined();
@@ -3039,7 +3039,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileIds: [profile.id],
           userIds: users.slice(1).map((u) => toGlobalId("User", u.id)),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -3076,7 +3076,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileIds: [profile.id],
           userIds: [toGlobalId("User", users[0].id)],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3138,7 +3138,7 @@ describe("GraphQL/Profiles", () => {
         {
           limit: 100,
           offset: 0,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3201,7 +3201,7 @@ describe("GraphQL/Profiles", () => {
           filter: {
             profileTypeId: [toGlobalId("ProfileType", profileTypes[0].id)],
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3243,7 +3243,7 @@ describe("GraphQL/Profiles", () => {
           filter: {
             profileTypeFieldId: [toGlobalId("ProfileTypeField", profileType3Fields[0].id)],
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3307,7 +3307,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           profileId: toGlobalId("Profile", profile.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3349,7 +3349,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           profileId: toGlobalId("Profile", profile.id),
-        }
+        },
       );
 
       expect(link1Errors).toBeUndefined();
@@ -3372,7 +3372,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           profileId: toGlobalId("Profile", profile.id),
-        }
+        },
       );
 
       expect(link2Errors).toContainGraphQLError("PROFILE_ALREADY_ASSOCIATED_TO_PETITION");
@@ -3415,7 +3415,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", otherPetition.id),
           profileId: toGlobalId("Profile", profile.id),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -3452,7 +3452,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           profileId: toGlobalId("Profile", otherProfile.id),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -3485,7 +3485,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           profileId: toGlobalId("Profile", profile.id),
-        }
+        },
       );
 
       expect(linkErrors).toBeUndefined();
@@ -3508,7 +3508,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-        }
+        },
       );
 
       expect(deleteError).toBeUndefined();
@@ -3530,7 +3530,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileId: toGlobalId("Profile", profile.id),
-        }
+        },
       );
 
       expect(queryErrors).toBeUndefined();
@@ -3576,7 +3576,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           profileId: toGlobalId("Profile", profile.id),
-        }
+        },
       );
 
       expect(linkErrors).toBeUndefined();
@@ -3597,7 +3597,7 @@ describe("GraphQL/Profiles", () => {
             deleteProfile(profileIds: [$profileId])
           }
         `,
-        { profileId: toGlobalId("Profile", profile.id) }
+        { profileId: toGlobalId("Profile", profile.id) },
       );
 
       expect(deleteError).toBeUndefined();
@@ -3618,7 +3618,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-        }
+        },
       );
 
       expect(queryErrors).toBeUndefined();
@@ -3682,7 +3682,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petitions[1].id),
           profileIds: [toGlobalId("Profile", profiles[0].id)],
-        }
+        },
       );
 
       expect(unlinkErrors).toBeUndefined();
@@ -3720,7 +3720,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petitions[1].id),
           profileId: toGlobalId("Profile", profiles[0].id),
-        }
+        },
       );
 
       expect(queryErrors).toBeUndefined();
@@ -3759,7 +3759,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileId: toGlobalId("Profile", profiles[0].id),
           petitionIds: [toGlobalId("Petition", petitions[1].id)],
-        }
+        },
       );
 
       expect(unlinkErrors).toBeUndefined();
@@ -3797,7 +3797,7 @@ describe("GraphQL/Profiles", () => {
         {
           petitionId: toGlobalId("Petition", petitions[1].id),
           profileId: toGlobalId("Profile", profiles[0].id),
-        }
+        },
       );
 
       expect(queryErrors).toBeUndefined();

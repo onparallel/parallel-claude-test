@@ -16,7 +16,7 @@ describe("slate/placeholders", () => {
           {
             children: [{ text: "Hello World!" }],
           },
-        ])
+        ]),
       ).toEqual(rootNode(paragraph("<span>Hello World!</span>")));
     });
 
@@ -25,9 +25,9 @@ describe("slate/placeholders", () => {
         renderSlateToHtml([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           { type: "paragraph", children: [{ text: "Goodbye." }] },
-        ])
+        ]),
       ).toEqual(
-        rootNode(paragraph("<span>Hello World!</span>"), paragraph("<span>Goodbye.</span>"))
+        rootNode(paragraph("<span>Hello World!</span>"), paragraph("<span>Goodbye.</span>")),
       );
     });
 
@@ -37,9 +37,9 @@ describe("slate/placeholders", () => {
           {
             children: [{ text: "Hello", bold: true }, { text: "World!" }],
           },
-        ])
+        ]),
       ).toEqual(
-        rootNode(paragraph('<span style="font-weight:bold">Hello</span>', "<span>World!</span>"))
+        rootNode(paragraph('<span style="font-weight:bold">Hello</span>', "<span>World!</span>")),
       );
     });
 
@@ -60,14 +60,14 @@ describe("slate/placeholders", () => {
               },
             ],
           },
-        ])
+        ]),
       ).toEqual(
         rootNode(
           bulletList(
             listItem(paragraph("<span>item 1</span>")),
-            listItem(paragraph("<span>item 2</span>"))
-          )
-        )
+            listItem(paragraph("<span>item 2</span>")),
+          ),
+        ),
       );
     });
 
@@ -87,14 +87,14 @@ describe("slate/placeholders", () => {
               },
             ],
           },
-        ])
+        ]),
       ).toEqual(
         rootNode(
           bulletList(
             listItem(paragraph("<span>item 1</span>")),
-            listItem(paragraph("<span>item 2</span>"))
-          )
-        )
+            listItem(paragraph("<span>item 2</span>")),
+          ),
+        ),
       );
     });
 
@@ -168,8 +168,8 @@ describe("slate/placeholders", () => {
               return "Mariano";
             }
             return "";
-          }
-        )
+          },
+        ),
       ).toEqual(
         rootNode(
           paragraph(
@@ -178,24 +178,24 @@ describe("slate/placeholders", () => {
             "<span>, enviame los </span>",
             "<span>documentos </span>",
             '<span style="font-weight:bold">siguientes </span>',
-            '<span style="font-weight:bold;text-decoration:underline">super guays</span>'
+            '<span style="font-weight:bold;text-decoration:underline">super guays</span>',
           ),
           paragraph("<span>hmmm</span>"),
           bulletList(
             listItem(
-              paragraph('<span style="font-weight:bold;text-decoration:underline">foto</span>')
+              paragraph('<span style="font-weight:bold;text-decoration:underline">foto</span>'),
             ),
             listItem(
               paragraph('<span style="font-style:italic">pasaporte</span>'),
               bulletList(
                 listItem(
-                  paragraph('<span style="font-weight:bold;text-decoration:underline">foto</span>')
+                  paragraph('<span style="font-weight:bold;text-decoration:underline">foto</span>'),
                 ),
-                listItem(paragraph('<span style="font-style:italic">pasaporte</span>'))
-              )
-            )
-          )
-        )
+                listItem(paragraph('<span style="font-style:italic">pasaporte</span>')),
+              ),
+            ),
+          ),
+        ),
       );
     });
 
@@ -206,13 +206,13 @@ describe("slate/placeholders", () => {
             type: "paragraph",
             children: [{ text: '<div style="color:red">im a malicious script!</div>' }],
           },
-        ])
+        ]),
       ).toEqual(
         rootNode(
           paragraph(
-            "<span>&lt;div style=&quot;color:red&quot;&gt;im a malicious script!&lt;/div&gt;</span>"
-          )
-        )
+            "<span>&lt;div style=&quot;color:red&quot;&gt;im a malicious script!&lt;/div&gt;</span>",
+          ),
+        ),
       );
     });
 
@@ -223,7 +223,7 @@ describe("slate/placeholders", () => {
             type: "paragraph",
             children: [{ text: "hola que  tal   estas?" }],
           },
-        ])
+        ]),
       ).toEqual(rootNode(paragraph("<span>hola que &nbsp;tal &nbsp;&nbsp;estas?</span>")));
     });
   });
@@ -234,7 +234,7 @@ describe("slate/placeholders", () => {
         renderSlateToText([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           { type: "paragraph", children: [{ text: "Goodbye." }] },
-        ])
+        ]),
       ).toEqual(outdent`
         Hello World!
         Goodbye.
@@ -259,7 +259,7 @@ describe("slate/placeholders", () => {
               },
             ],
           },
-        ])
+        ]),
       ).toEqual(outdent`
         Hello World!
           - item 1
@@ -284,7 +284,7 @@ describe("slate/placeholders", () => {
               },
             ],
           },
-        ])
+        ]),
       ).toEqual(outdent`
         Hello World!
           - item 1
@@ -337,7 +337,7 @@ describe("slate/placeholders", () => {
               },
             ],
           },
-        ])
+        ]),
       ).toEqual(outdent`
         Hello World!
           - item 1
@@ -393,7 +393,7 @@ describe("slate/placeholders", () => {
               },
             ],
           },
-        ])
+        ]),
       ).toEqual(outdent`
         Hello World!
           1. item 1

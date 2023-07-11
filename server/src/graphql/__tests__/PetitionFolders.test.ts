@@ -51,7 +51,7 @@ describe("Petition Folders", () => {
             }
           }
         `,
-        { search: "my-shared-folder", filters: { path: "/" } }
+        { search: "my-shared-folder", filters: { path: "/" } },
       );
 
       expect(errors).toBeUndefined();
@@ -95,7 +95,7 @@ describe("Petition Folders", () => {
             petitionFolders(type: $type)
           }
         `,
-        { type: "PETITION" }
+        { type: "PETITION" },
       );
 
       expect(errors).toBeUndefined();
@@ -124,7 +124,7 @@ describe("Petition Folders", () => {
             petitionFolders(type: $type)
           }
         `,
-        { type: "TEMPLATE" }
+        { type: "TEMPLATE" },
       );
 
       expect(errors).toBeUndefined();
@@ -144,7 +144,7 @@ describe("Petition Folders", () => {
             petitionFolders(type: $type)
           }
         `,
-        { type: "PETITION" }
+        { type: "PETITION" },
       );
 
       expect(errors).toBeUndefined();
@@ -163,7 +163,7 @@ describe("Petition Folders", () => {
             petitionFolders(type: $type)
           }
         `,
-        { type: "PETITION" }
+        { type: "PETITION" },
       );
 
       expect(errors).toBeUndefined();
@@ -203,7 +203,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/new-folder/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -245,7 +245,7 @@ describe("Petition Folders", () => {
           source: "/A/B/C/",
           destination: "/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -328,7 +328,7 @@ describe("Petition Folders", () => {
           source: "/spanish/",
           destination: "/english/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -338,7 +338,7 @@ describe("Petition Folders", () => {
         .from("petition")
         .whereIn(
           "id",
-          petitions.map((p) => p.id)
+          petitions.map((p) => p.id),
         )
         .select("name", "path")
         .orderBy("name", "asc");
@@ -409,7 +409,7 @@ describe("Petition Folders", () => {
           source: "/spanish/",
           destination: "/spanish/clients/closed/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -483,7 +483,7 @@ describe("Petition Folders", () => {
           source: "/spanish/",
           destination: "/closed/kyc/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -568,7 +568,7 @@ describe("Petition Folders", () => {
           source: "/spanish/",
           destination: "/closed/kyc/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -578,7 +578,7 @@ describe("Petition Folders", () => {
         .from("petition")
         .whereIn(
           "id",
-          petitions.map((p) => p.id)
+          petitions.map((p) => p.id),
         )
         .select("name", "path")
         .orderBy("name", "asc");
@@ -607,7 +607,7 @@ describe("Petition Folders", () => {
         () => ({
           name: "b. other",
           path: "/shared-folder/",
-        })
+        }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -633,7 +633,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/mine/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -686,7 +686,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/templates/",
           type: "TEMPLATE",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -696,7 +696,7 @@ describe("Petition Folders", () => {
         .from("petition")
         .whereIn(
           "id",
-          petitions.map((p) => p.id)
+          petitions.map((p) => p.id),
         )
         .orderBy("path", "asc")
         .select("path", "is_template");
@@ -737,7 +737,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/petitions/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -750,7 +750,7 @@ describe("Petition Folders", () => {
         user.id,
         1,
         undefined,
-        () => ({ type: "READ" })
+        () => ({ type: "READ" }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -776,7 +776,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/a/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -789,7 +789,7 @@ describe("Petition Folders", () => {
         user.id,
         2,
         () => ({ path: "/shared-with-me/" }),
-        (i) => ({ type: i === 0 ? "OWNER" : "READ" })
+        (i) => ({ type: i === 0 ? "OWNER" : "READ" }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -815,7 +815,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/new-folder/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -850,7 +850,7 @@ describe("Petition Folders", () => {
           source: "/ABC/",
           destination: "invalid path",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -886,7 +886,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/public/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -930,7 +930,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/A/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -961,7 +961,7 @@ describe("Petition Folders", () => {
           source: "/",
           destination: "/A/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -995,7 +995,7 @@ describe("Petition Folders", () => {
           source: "/a/b/",
           destination: "/A/",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1065,7 +1065,7 @@ describe("Petition Folders", () => {
           folderId: toGlobalId("PetitionFolder", "/spanish/clients/"),
           name: "customers",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1075,7 +1075,7 @@ describe("Petition Folders", () => {
         .from("petition")
         .whereIn(
           "id",
-          petitions.map((p) => p.id)
+          petitions.map((p) => p.id),
         )
         .select("name", "path")
         .orderBy("name", "asc");
@@ -1134,7 +1134,7 @@ describe("Petition Folders", () => {
           folderId: toGlobalId("PetitionFolder", "/spanish/clients/"),
           name: "hola/que/tal",
           type: "PETITION",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -1169,7 +1169,7 @@ describe("Petition Folders", () => {
         otherOrgUser.org_id,
         otherOrgUser.id,
         1,
-        () => ({ path: "/common/" })
+        () => ({ path: "/common/" }),
       );
     });
 
@@ -1188,7 +1188,7 @@ describe("Petition Folders", () => {
             ],
             type: "PETITION",
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1199,7 +1199,7 @@ describe("Petition Folders", () => {
         .from("petition_permission")
         .whereIn(
           "petition_id",
-          petitions.map((p) => p.id)
+          petitions.map((p) => p.id),
         )
         .orderBy("petition_id", "asc")
         .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
@@ -1244,7 +1244,7 @@ describe("Petition Folders", () => {
         .from("petition")
         .whereIn(
           "id",
-          petitions.map((p) => p.id)
+          petitions.map((p) => p.id),
         )
         .orderBy("path", "asc")
         .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
@@ -1262,7 +1262,7 @@ describe("Petition Folders", () => {
         .from("petition_permission")
         .whereIn(
           "petition_id",
-          orgUserPetitions.map((p) => p.id)
+          orgUserPetitions.map((p) => p.id),
         )
         .orderBy("petition_id", "asc")
         .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
@@ -1283,7 +1283,7 @@ describe("Petition Folders", () => {
         .from("petition")
         .whereIn(
           "id",
-          orgUserPetitions.map((p) => p.id)
+          orgUserPetitions.map((p) => p.id),
         )
         .orderBy("path", "asc")
         .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
@@ -1294,7 +1294,7 @@ describe("Petition Folders", () => {
         .from("petition_permission")
         .whereIn(
           "petition_id",
-          otherOrgUserPetitions.map((p) => p.id)
+          otherOrgUserPetitions.map((p) => p.id),
         )
         .orderBy("petition_id", "asc")
         .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
@@ -1315,7 +1315,7 @@ describe("Petition Folders", () => {
         .from("petition")
         .whereIn(
           "id",
-          otherOrgUserPetitions.map((p) => p.id)
+          otherOrgUserPetitions.map((p) => p.id),
         )
         .orderBy("path", "asc")
         .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
@@ -1335,7 +1335,7 @@ describe("Petition Folders", () => {
             folderIds: [toGlobalId("PetitionFolder", "/templates/")],
             type: "PETITION",
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();

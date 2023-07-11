@@ -70,10 +70,10 @@ describe("repositories/UserGroupRepository", () => {
       await userGroupsRepo.removeUsersFromGroups(
         [users[2].id],
         [userGroups[0].id, userGroups[1].id],
-        "test"
+        "test",
       );
       expect(
-        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id])
+        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id]),
       ).toMatchObject([
         [
           { user_id: users[0].id, user_group_id: userGroups[0].id },
@@ -92,10 +92,10 @@ describe("repositories/UserGroupRepository", () => {
       await userGroupsRepo.removeUsersFromGroups(
         [users[2].id, users[3].id],
         [userGroups[0].id, userGroups[1].id],
-        "test"
+        "test",
       );
       expect(
-        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id])
+        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id]),
       ).toMatchObject([
         [
           { user_id: users[0].id, user_group_id: userGroups[0].id },
@@ -123,7 +123,7 @@ describe("repositories/UserGroupRepository", () => {
     it("should remove a user from all their groups", async () => {
       await userGroupsRepo.removeUsersFromAllGroups([users[2].id], "test");
       expect(
-        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id])
+        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id]),
       ).toMatchObject([
         [
           { user_id: users[0].id, user_group_id: userGroups[0].id },
@@ -141,10 +141,10 @@ describe("repositories/UserGroupRepository", () => {
     it("should remove multiple users from all their groups", async () => {
       await userGroupsRepo.removeUsersFromAllGroups(
         [users[1].id, users[3].id, users[4].id, users[5].id],
-        "test"
+        "test",
       );
       expect(
-        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id])
+        await userGroupsRepo.loadUserGroupMembers([userGroups[0].id, userGroups[1].id]),
       ).toMatchObject([
         [
           { user_id: users[0].id, user_group_id: userGroups[0].id },
@@ -161,7 +161,7 @@ describe("repositories/UserGroupRepository", () => {
 
       await userGroupsRepo.removeUsersFromAllGroups(
         [users[0].id, users[3].id, users[4].id],
-        "test"
+        "test",
       );
 
       const permissionsByPetition = await petitionsRepo.loadUserPermissionsByPetitionId.raw([

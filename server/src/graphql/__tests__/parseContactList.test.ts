@@ -19,7 +19,7 @@ describe("parseContactList", () => {
       {
         validateEmail: async (email) => email.endsWith("test.com"),
         force: false,
-      }
+      },
     );
 
     expect(error).toBeDefined();

@@ -48,7 +48,7 @@ describe("GraphQL/Petition Fields", () => {
       user.id,
       1,
       undefined,
-      () => ({ type: "READ" })
+      () => ({ type: "READ" }),
     );
     [readPetitionField] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
       type: "TEXT",
@@ -80,7 +80,7 @@ describe("GraphQL/Petition Fields", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           type: "TEXT",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -331,7 +331,7 @@ describe("GraphQL/Petition Fields", () => {
         1,
         () => ({
           status: "CLOSED",
-        })
+        }),
       );
 
       const { errors, data } = await testClient.mutate({
@@ -423,7 +423,7 @@ describe("GraphQL/Petition Fields", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           fieldId: toGlobalId("PetitionField", readPetitionField.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -541,7 +541,7 @@ describe("GraphQL/Petition Fields", () => {
             ],
           }),
           fields[1].id,
-        ]
+        ],
       );
 
       const [contact] = await mocks.createRandomContacts(organization.id, 1);
@@ -550,7 +550,7 @@ describe("GraphQL/Petition Fields", () => {
         userPetition.id,
         user.id,
         [contact.id],
-        user.id
+        user.id,
       );
 
       await mocks.createRandomTextReply(fields[1].id, contactAccess.id);
@@ -568,7 +568,7 @@ describe("GraphQL/Petition Fields", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           fieldId: toGlobalId("PetitionField", readPetitionField.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -887,7 +887,7 @@ describe("GraphQL/Petition Fields", () => {
             ],
           }),
           fields[4].id,
-        ]
+        ],
       );
 
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
@@ -914,7 +914,7 @@ describe("GraphQL/Petition Fields", () => {
             toGlobalId("PetitionField", readFields[1].id),
             toGlobalId("PetitionField", readFields[3].id),
           ],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1070,7 +1070,7 @@ describe("GraphQL/Petition Fields", () => {
           data: {
             optional: false,
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1534,7 +1534,7 @@ describe("GraphQL/Petition Fields", () => {
           data: {
             requireApproval: true,
           },
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1559,7 +1559,7 @@ describe("GraphQL/Petition Fields", () => {
           data: {
             isInternal: true,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1597,7 +1597,7 @@ describe("GraphQL/Petition Fields", () => {
           data: {
             requireApproval: false,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -1646,7 +1646,7 @@ describe("GraphQL/Petition Fields", () => {
         userPetition.id,
         user.id,
         [contact.id],
-        user.id
+        user.id,
       );
 
       await mocks.createRandomTextReply(fieldWithReply.id, access.id);
@@ -1665,7 +1665,7 @@ describe("GraphQL/Petition Fields", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           fieldId: toGlobalId("PetitionField", readPetitionField.id),
           type: "HEADING",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1973,7 +1973,7 @@ describe("GraphQL/Petition Fields", () => {
         readPetitionField.id,
         undefined,
         1,
-        () => ({ user_id: user.id })
+        () => ({ user_id: user.id }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -2002,7 +2002,7 @@ describe("GraphQL/Petition Fields", () => {
           petitionFieldId: toGlobalId("PetitionField", readPetitionField.id),
           petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", readPetitionReply.id)],
           status: "REJECTED",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -2138,7 +2138,7 @@ describe("GraphQL/Petition Fields", () => {
           petitionId: toGlobalId("Petition", privatePetition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
           petitionFieldReplyIds: field2Replies.map((r) =>
-            toGlobalId("PetitionFieldReply", r.id + 1000)
+            toGlobalId("PetitionFieldReply", r.id + 1000),
           ),
           status: "APPROVED",
         },
@@ -2153,7 +2153,7 @@ describe("GraphQL/Petition Fields", () => {
         organization.id,
         user.id,
         1,
-        () => ({ status: "COMPLETED" })
+        () => ({ status: "COMPLETED" }),
       );
       const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
         type: "TEXT",
@@ -2192,7 +2192,7 @@ describe("GraphQL/Petition Fields", () => {
           petitionFieldId: toGlobalId("PetitionField", field.id),
           petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", reply.id)],
           status: "REJECTED",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2235,7 +2235,7 @@ describe("GraphQL/Petition Fields", () => {
           petitionFieldId: toGlobalId("PetitionField", fields[3].id),
           petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", field4Reply.id)],
           status: "REJECTED",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -2256,7 +2256,7 @@ describe("GraphQL/Petition Fields", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           status: "REJECTED",
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -2290,7 +2290,7 @@ describe("GraphQL/Petition Fields", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           status: "APPROVED",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2302,7 +2302,7 @@ describe("GraphQL/Petition Fields", () => {
         .from("petition_field_reply")
         .whereIn(
           "id",
-          field0Replies.map((r) => r.id)
+          field0Replies.map((r) => r.id),
         )
         .select("*");
 
@@ -2310,7 +2310,7 @@ describe("GraphQL/Petition Fields", () => {
         .from("petition_field_reply")
         .whereIn(
           "id",
-          field1Replies.map((r) => r.id)
+          field1Replies.map((r) => r.id),
         )
         .select("*");
 

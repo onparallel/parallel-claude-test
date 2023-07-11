@@ -50,7 +50,7 @@ describe("GraphQL/Petition Permissions", () => {
       undefined,
       (i) => ({
         type: i === 0 ? "OWNER" : "READ",
-      })
+      }),
     );
     [otherPetition] = await mocks.createRandomPetitions(organization.id, orgUsers[1].id, 1);
 
@@ -361,7 +361,7 @@ describe("GraphQL/Petition Permissions", () => {
         {
           petitionIds: [toGlobalId("Petition", readPetition.id)],
           userIds: [toGlobalId("User", orgUsers[1].id)],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -671,7 +671,7 @@ describe("GraphQL/Petition Permissions", () => {
     it("sends notification email to users after adding permissions", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharedEmail"
+        "sendPetitionSharedEmail",
       );
 
       await testClient.mutate({
@@ -709,7 +709,7 @@ describe("GraphQL/Petition Permissions", () => {
     it("doesn't send notification email to users if notify arg is false or undefined", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharedEmail"
+        "sendPetitionSharedEmail",
       );
 
       await testClient.mutate({
@@ -845,7 +845,7 @@ describe("GraphQL/Petition Permissions", () => {
     it("should send notification email only to users that didn't have previous permissions", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharedEmail"
+        "sendPetitionSharedEmail",
       );
       const [newUser] = await mocks.createRandomUsers(organization.id, 1);
 
@@ -922,7 +922,7 @@ describe("GraphQL/Petition Permissions", () => {
     it("notifies only once per user and petition", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharedEmail"
+        "sendPetitionSharedEmail",
       );
 
       const [newUser] = await mocks.createRandomUsers(organization.id, 1);
@@ -972,7 +972,7 @@ describe("GraphQL/Petition Permissions", () => {
     it("should not send notification to user with previous permissions", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharedEmail"
+        "sendPetitionSharedEmail",
       );
       const [newGroup] = await mocks.createUserGroups(1, organization.id);
       const [newUser] = await mocks.createRandomUsers(organization.id, 1);
@@ -1005,7 +1005,7 @@ describe("GraphQL/Petition Permissions", () => {
     it("notifies group members when sharing a petition with a group", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharedEmail"
+        "sendPetitionSharedEmail",
       );
 
       const [newGroup] = await mocks.createUserGroups(1, organization.id);
@@ -1334,7 +1334,7 @@ describe("GraphQL/Petition Permissions", () => {
           petitionIds: [toGlobalId("Petition", readPetition.id)],
           userIds: [toGlobalId("UserGroup", orgUsers[2].id)],
           type: "READ",
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1734,7 +1734,7 @@ describe("GraphQL/Petition Permissions", () => {
         {
           petitionIds: [toGlobalId("Petition", readPetition.id)],
           userIds: [toGlobalId("User", orgUsers[2].id)],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");

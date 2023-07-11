@@ -104,7 +104,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.petitionEvents).toEqual(
-        orderedEvents.slice(0, 10).map((e) => ({ id: toGlobalId("PetitionEvent", e.id) }))
+        orderedEvents.slice(0, 10).map((e) => ({ id: toGlobalId("PetitionEvent", e.id) })),
       );
     });
 
@@ -117,12 +117,12 @@ describe("GraphQL/PetitionEventSubscription", () => {
             }
           }
         `,
-        { before: toGlobalId("PetitionEvent", orderedEvents[9].id) }
+        { before: toGlobalId("PetitionEvent", orderedEvents[9].id) },
       );
 
       expect(errors).toBeUndefined();
       expect(data?.petitionEvents).toEqual(
-        orderedEvents.slice(10).map((e) => ({ id: toGlobalId("PetitionEvent", e.id) }))
+        orderedEvents.slice(10).map((e) => ({ id: toGlobalId("PetitionEvent", e.id) })),
       );
     });
   });

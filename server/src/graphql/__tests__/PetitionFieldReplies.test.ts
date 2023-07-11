@@ -42,7 +42,7 @@ describe("GraphQL/Petition Field Replies", () => {
       undefined,
       (i) => ({
         type: i === 0 ? "OWNER" : "READ",
-      })
+      }),
     );
 
     [contact] = await mocks.createRandomContacts(organization.id, 1);
@@ -50,7 +50,7 @@ describe("GraphQL/Petition Field Replies", () => {
       petition.id,
       user.id,
       [contact.id],
-      user.id
+      user.id,
     );
 
     await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 1000);
@@ -78,7 +78,7 @@ describe("GraphQL/Petition Field Replies", () => {
           (i) => ({
             type: i === 0 ? "TEXT" : "SHORT_TEXT",
             options: i === 1 ? { maxLength: 15 } : {},
-          })
+          }),
         );
         [readPetitionField] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
           type: "TEXT",
@@ -113,7 +113,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", field.id),
             reply: "my reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -140,7 +140,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", readPetition.id),
             fieldId: toGlobalId("PetitionField", readPetitionField.id),
             reply: "my reply",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -155,7 +155,7 @@ describe("GraphQL/Petition Field Replies", () => {
           () => ({
             is_template: false,
             status: "COMPLETED",
-          })
+          }),
         );
         const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
           type: "TEXT",
@@ -186,7 +186,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", completedPetition.id),
             fieldId: toGlobalId("PetitionField", field.id),
             reply: "my reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -212,7 +212,7 @@ describe("GraphQL/Petition Field Replies", () => {
           () => ({
             is_template: false,
             status: "COMPLETED",
-          })
+          }),
         );
         const [internalField] = await mocks.createRandomPetitionFields(
           completedPetition.id,
@@ -220,7 +220,7 @@ describe("GraphQL/Petition Field Replies", () => {
           () => ({
             type: "TEXT",
             is_internal: true,
-          })
+          }),
         );
 
         const { errors, data } = await testClient.execute(
@@ -248,7 +248,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", completedPetition.id),
             fieldId: toGlobalId("PetitionField", internalField.id),
             reply: "my reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -274,7 +274,7 @@ describe("GraphQL/Petition Field Replies", () => {
           () => ({
             is_template: false,
             status: "DRAFT",
-          })
+          }),
         );
         const [internalField] = await mocks.createRandomPetitionFields(draftPetition.id, 1, () => ({
           type: "TEXT",
@@ -306,7 +306,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", draftPetition.id),
             fieldId: toGlobalId("PetitionField", internalField.id),
             reply: "my reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -348,7 +348,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", singleReplyField.id),
             reply: "this is my text reply",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FIELD_ALREADY_REPLIED_ERROR");
@@ -373,7 +373,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", field.id),
             reply: "abcd",
-          }
+          },
         );
         const { errors, data } = await testClient.execute(
           gql`
@@ -388,7 +388,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", field.id),
             reply: "efgh",
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FIELD_ALREADY_REPLIED_ERROR");
         expect(data).toBeNull();
@@ -412,7 +412,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", textField.id),
             reply: "this is my text reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -426,7 +426,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
         const { id: replyId } = fromGlobalId(
           data!.createPetitionFieldReply.id,
-          "PetitionFieldReply"
+          "PetitionFieldReply",
         );
 
         const [row] = await mocks.knex
@@ -461,7 +461,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", shortTextField.id),
             reply: "short reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -475,7 +475,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
         const { id: replyId } = fromGlobalId(
           data!.createPetitionFieldReply.id,
-          "PetitionFieldReply"
+          "PetitionFieldReply",
         );
 
         const [row] = await mocks.knex
@@ -505,7 +505,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", shortTextField.id),
             reply: "A".repeat(16),
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -530,7 +530,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               fieldId: toGlobalId("PetitionField", textField.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -566,7 +566,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", selectField.id),
             reply: "option 1",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -580,7 +580,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
         const { id: replyId } = fromGlobalId(
           data!.createPetitionFieldReply.id,
-          "PetitionFieldReply"
+          "PetitionFieldReply",
         );
 
         const [row] = await mocks.knex
@@ -610,7 +610,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", selectField.id),
             reply: "option 1",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -658,7 +658,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               fieldId: toGlobalId("PetitionField", selectField.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -693,7 +693,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", dateField.id),
             reply: "2012-02-24",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -737,7 +737,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               fieldId: toGlobalId("PetitionField", dateField.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -776,7 +776,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", numberField.id),
             reply: 288,
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.createPetitionFieldReply).toEqual({
@@ -799,7 +799,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", numberField.id),
             reply: Math.PI,
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.createPetitionFieldReply).toEqual({
@@ -831,7 +831,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               fieldId: toGlobalId("PetitionField", numberField.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -872,7 +872,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               fieldId: toGlobalId("PetitionField", numberField.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -951,7 +951,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", unlimitedCheckboxField.id),
             reply: ["1", "2"],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -975,7 +975,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", radioButtonField.id),
             reply: ["1"],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -998,7 +998,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", radioButtonField.id),
             reply: ["1", "2"],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
@@ -1018,7 +1018,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", exactCheckboxField.id),
             reply: ["2", "3"],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1042,7 +1042,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", exactCheckboxField.id),
             reply: ["2", "3", "4"],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
@@ -1062,7 +1062,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", rangeCheckboxField.id),
             reply: ["1", "2", "3", "4"],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1086,7 +1086,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", rangeCheckboxField.id),
             reply: ["1"],
-          }
+          },
         );
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
@@ -1115,7 +1115,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               fieldId: toGlobalId("PetitionField", unlimitedCheckboxField.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1159,7 +1159,7 @@ describe("GraphQL/Petition Field Replies", () => {
               ["Comunidad autónoma", "Andalucía"],
               ["Provincia", "Cadiz"],
             ],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1189,7 +1189,7 @@ describe("GraphQL/Petition Field Replies", () => {
               ["Comunidad autónoma", "Andalucía"],
               ["Provincia", null],
             ],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1216,7 +1216,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
             reply: [["Comunidad autónoma", "Andalucía"]],
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1239,7 +1239,7 @@ describe("GraphQL/Petition Field Replies", () => {
               ["Comunidad autónoma", "Andalucía"],
               ["Provincia", "Buenos Aires"],
             ],
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1269,7 +1269,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1307,7 +1307,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", phoneField.id),
             reply: "+34 672 62 55 77",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1371,7 +1371,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             fieldId: toGlobalId("PetitionField", phoneField.id),
             reply: "+34 672 622 553 774",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1422,20 +1422,20 @@ describe("GraphQL/Petition Field Replies", () => {
           1,
           () => ({
             type: "TEXT",
-          })
+          }),
         );
         [readPetitionReply] = await mocks.createRandomTextReply(
           readPetitionField.id,
           undefined,
           1,
-          () => ({ user_id: user.id })
+          () => ({ user_id: user.id }),
         );
 
         [recipientTextReply] = await mocks.createRandomTextReply(
           textField.id,
           petitionAccess.id,
           1,
-          () => ({ created_by: `Contact:${contact.id}` })
+          () => ({ created_by: `Contact:${contact.id}` }),
         );
       });
 
@@ -1452,7 +1452,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", readPetition.id),
             replyId: toGlobalId("PetitionFieldReply", readPetitionReply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1467,13 +1467,13 @@ describe("GraphQL/Petition Field Replies", () => {
           () => ({
             is_template: false,
             status: "COMPLETED",
-          })
+          }),
         );
         const [access] = await mocks.createPetitionAccess(
           completedPetition.id,
           user.id,
           [contact.id],
-          user.id
+          user.id,
         );
         const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
           type: "TEXT",
@@ -1501,7 +1501,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", completedPetition.id),
             replyId: toGlobalId("PetitionFieldReply", reply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1525,13 +1525,13 @@ describe("GraphQL/Petition Field Replies", () => {
           () => ({
             is_template: false,
             status: "COMPLETED",
-          })
+          }),
         );
         const [access] = await mocks.createPetitionAccess(
           completedPetition.id,
           user.id,
           [contact.id],
-          user.id
+          user.id,
         );
         const [internalField] = await mocks.createRandomPetitionFields(
           completedPetition.id,
@@ -1539,7 +1539,7 @@ describe("GraphQL/Petition Field Replies", () => {
           () => ({
             type: "TEXT",
             is_internal: true,
-          })
+          }),
         );
         const [reply] = await mocks.createRandomTextReply(internalField.id, access.id, 1);
 
@@ -1564,7 +1564,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", completedPetition.id),
             replyId: toGlobalId("PetitionFieldReply", reply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1595,7 +1595,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", rejectedReply.id),
             reply: "new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1619,7 +1619,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", approvedReply.id),
             reply: "new reply",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
@@ -1645,7 +1645,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", reply.id),
             reply: "x".repeat(21),
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1667,7 +1667,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", recipientTextReply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1708,7 +1708,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", rejectedReply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1743,7 +1743,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", rejectedReply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1790,7 +1790,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", rejectedReply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1839,7 +1839,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", rejectedReply.id),
             reply: "my new reply",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1903,7 +1903,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", selectFieldReply.id),
             reply: "D",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -1931,7 +1931,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               replyId: toGlobalId("PetitionFieldReply", selectFieldReply.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1972,7 +1972,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", dateReply.id),
             reply: "2012-02-21",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2001,7 +2001,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               replyId: toGlobalId("PetitionFieldReply", dateReply.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2044,7 +2044,7 @@ describe("GraphQL/Petition Field Replies", () => {
               datetime: "2023-03-03T03:00",
               timezone: "Europe/Madrid",
             },
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2087,7 +2087,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               replyId: toGlobalId("PetitionFieldReply", dateTimeReply.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2116,7 +2116,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               replyId: toGlobalId("PetitionFieldReply", dateTimeReply.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2164,7 +2164,7 @@ describe("GraphQL/Petition Field Replies", () => {
           1,
           () => ({ petition_access_id: null, user_id: user.id }),
           -10,
-          200
+          200,
         );
       });
 
@@ -2183,7 +2183,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", numberReply.id),
             reply: 30,
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2212,7 +2212,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               replyId: toGlobalId("PetitionFieldReply", limitedNumberReply.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2258,7 +2258,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", checkboxReply.id),
             reply: ["2"],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2287,7 +2287,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               replyId: toGlobalId("PetitionFieldReply", checkboxReply.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2347,7 +2347,7 @@ describe("GraphQL/Petition Field Replies", () => {
               ["Comunidad autónoma", "Canarias"],
               ["Provincia", "Lanzarote"],
             ],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2379,7 +2379,7 @@ describe("GraphQL/Petition Field Replies", () => {
               ["Comunidad autónoma", "Canarias"],
               ["Provincia", null],
             ],
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2421,7 +2421,7 @@ describe("GraphQL/Petition Field Replies", () => {
               petitionId: toGlobalId("Petition", petition.id),
               replyId: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
               reply,
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2463,7 +2463,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
             reply: "+34 674 15 15 36",
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2489,7 +2489,7 @@ describe("GraphQL/Petition Field Replies", () => {
             petitionId: toGlobalId("Petition", petition.id),
             replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
             reply: "tel: +34 674 15 15 36",
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2532,7 +2532,7 @@ describe("GraphQL/Petition Field Replies", () => {
             filename: "my_file.txt",
             size: 50,
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -2563,7 +2563,7 @@ describe("GraphQL/Petition Field Replies", () => {
             filename: "my_file.txt",
             size: 50 * 1024 * 1024 + 1,
           },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
       expect(data).toBeNull();
@@ -2594,7 +2594,7 @@ describe("GraphQL/Petition Field Replies", () => {
             filename: "my_file.txt",
             size: 500,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2628,7 +2628,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: fileUploadReplyGID,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2654,7 +2654,7 @@ describe("GraphQL/Petition Field Replies", () => {
         () => ({
           is_template: false,
           status: "COMPLETED",
-        })
+        }),
       );
       const [internalField] = await mocks.createRandomPetitionFields(
         completedPetition.id,
@@ -2662,7 +2662,7 @@ describe("GraphQL/Petition Field Replies", () => {
         () => ({
           type: "FILE_UPLOAD",
           is_internal: true,
-        })
+        }),
       );
 
       const { errors, data } = await testClient.execute(
@@ -2696,7 +2696,7 @@ describe("GraphQL/Petition Field Replies", () => {
             filename: "my_file.txt",
             size: 50,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2741,7 +2741,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           replyId: toGlobalId("PetitionFieldReply", reply.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -2765,7 +2765,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           replyId: toGlobalId("PetitionFieldReply", reply.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -2787,7 +2787,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const [readPetitionField] = await mocks.createRandomPetitionFields(
         readPetition.id,
         1,
-        () => ({ type: "FILE_UPLOAD" })
+        () => ({ type: "FILE_UPLOAD" }),
       );
 
       [readPetitionReply] = await mocks.createRandomFileReply(readPetitionField.id, 1, () => ({
@@ -2814,7 +2814,7 @@ describe("GraphQL/Petition Field Replies", () => {
             filename: "my_file.txt",
             size: 500,
           },
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -2846,7 +2846,7 @@ describe("GraphQL/Petition Field Replies", () => {
             filename: "my_file.txt",
             size: 500,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2888,7 +2888,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -2954,7 +2954,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const [readPetitionField] = await mocks.createRandomPetitionFields(
         readPetition.id,
         1,
-        () => ({ type: "TEXT" })
+        () => ({ type: "TEXT" }),
       );
 
       [readPetitionReply] = await mocks.createRandomTextReply(
@@ -2963,7 +2963,7 @@ describe("GraphQL/Petition Field Replies", () => {
         1,
         () => ({
           user_id: user.id,
-        })
+        }),
       );
     });
 
@@ -2985,7 +2985,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           replyId: toGlobalId("PetitionFieldReply", readPetitionReply.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -2999,13 +2999,13 @@ describe("GraphQL/Petition Field Replies", () => {
         () => ({
           is_template: false,
           status: "COMPLETED",
-        })
+        }),
       );
       const [access] = await mocks.createPetitionAccess(
         completedPetition.id,
         user.id,
         [contact.id],
-        user.id
+        user.id,
       );
       const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
         type: "TEXT",
@@ -3032,7 +3032,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", completedPetition.id),
           replyId: toGlobalId("PetitionFieldReply", reply.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3053,7 +3053,7 @@ describe("GraphQL/Petition Field Replies", () => {
         () => ({
           is_template: false,
           status: "COMPLETED",
-        })
+        }),
       );
 
       const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
@@ -3082,7 +3082,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", completedPetition.id),
           replyId: toGlobalId("PetitionFieldReply", reply.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3103,7 +3103,7 @@ describe("GraphQL/Petition Field Replies", () => {
         () => ({
           is_template: false,
           status: "COMPLETED",
-        })
+        }),
       );
       const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
         type: "TEXT",
@@ -3130,7 +3130,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", completedPetition.id),
           replyId: toGlobalId("PetitionFieldReply", reply.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3147,7 +3147,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const [userSimpleReply] = await mocks.createRandomTextReply(
         textField.id,
         petitionAccess.id,
-        1
+        1,
       );
       const { errors, data } = await testClient.execute(
         gql`
@@ -3160,7 +3160,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: toGlobalId("PetitionFieldReply", userSimpleReply.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3179,7 +3179,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: toGlobalId("PetitionFieldReply", userFileReply.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3188,7 +3188,7 @@ describe("GraphQL/Petition Field Replies", () => {
         /* sql */ `
         SELECT id from petition_field_reply where id = ? and deleted_at is null
       `,
-        [userFileReply.id]
+        [userFileReply.id],
       );
 
       expect(reply.rowCount).toEqual(0);
@@ -3197,7 +3197,7 @@ describe("GraphQL/Petition Field Replies", () => {
         /* sql */ `
         SELECT id from file_upload where id = ? and deleted_at is null
       `,
-        [uploadedFile.id]
+        [uploadedFile.id],
       );
       expect(file.rowCount).toEqual(0);
     });
@@ -3214,7 +3214,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: toGlobalId("PetitionFieldReply", approvedReply.id),
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
@@ -3233,7 +3233,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: toGlobalId("PetitionFieldReply", rejectedReply.id),
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3256,7 +3256,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", readPetition.id),
           replies: {},
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -3368,7 +3368,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "My SHORT_TEXT reply" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3406,7 +3406,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "My TEXT reply" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3444,7 +3444,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "Option 2" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3487,7 +3487,7 @@ describe("GraphQL/Petition Field Replies", () => {
               },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3530,7 +3530,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: ["A", "C"] },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3570,7 +3570,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: 1001 },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3610,7 +3610,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "+34611677677" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3650,7 +3650,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "2022-10-19" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3690,7 +3690,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { datetime: "2022-02-28T10:00", timezone: "Europe/Madrid" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3734,7 +3734,7 @@ describe("GraphQL/Petition Field Replies", () => {
               },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3781,7 +3781,7 @@ describe("GraphQL/Petition Field Replies", () => {
               },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -3812,7 +3812,7 @@ describe("GraphQL/Petition Field Replies", () => {
               },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3859,7 +3859,7 @@ describe("GraphQL/Petition Field Replies", () => {
               },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3913,7 +3913,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { petitionFieldReplyId: toGlobalId("PetitionFieldReply", reply.id) },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -3952,7 +3952,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: 10 },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -3981,7 +3981,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "Option unknown" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -4010,7 +4010,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: ["unknown option"] },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -4047,7 +4047,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: ["C"] },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -4080,7 +4080,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "second reply" },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -4099,7 +4099,7 @@ describe("GraphQL/Petition Field Replies", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           fields: [],
-        }
+        },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -4152,7 +4152,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: ["B", "C"] },
             },
           ],
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -4244,7 +4244,7 @@ describe("GraphQL/Petition Field Replies", () => {
               content: { value: "my first reply" },
             },
           ],
-        }
+        },
       );
 
       expect(errors1).toBeUndefined();
@@ -4290,7 +4290,7 @@ describe("GraphQL/Petition Field Replies", () => {
             },
           ],
           overwriteExisting: true,
-        }
+        },
       );
 
       expect(errors2).toBeUndefined();

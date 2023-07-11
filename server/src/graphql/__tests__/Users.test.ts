@@ -55,7 +55,7 @@ describe("GraphQL/Users", () => {
         }),
         (i) => ({
           email: i < 3 ? `user${i}@onparallel.com` : faker.internet.email(),
-        })
+        }),
       );
 
       userGroups = await mocks.createUserGroups(2, organization.id, (i) => ({
@@ -63,7 +63,7 @@ describe("GraphQL/Users", () => {
       }));
       await mocks.insertUserGroupMembers(
         userGroups[0].id,
-        users.slice(1, 3).map((u) => u.id)
+        users.slice(1, 3).map((u) => u.id),
       );
     });
 
@@ -74,7 +74,7 @@ describe("GraphQL/Users", () => {
         .from("user")
         .whereIn(
           "id",
-          users.map((u) => u.id)
+          users.map((u) => u.id),
         )
         .delete();
     });
@@ -120,7 +120,7 @@ describe("GraphQL/Users", () => {
         `,
         {
           search: "@onparallel.com",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -155,7 +155,7 @@ describe("GraphQL/Users", () => {
         `,
         {
           search: "onparal",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -200,7 +200,7 @@ describe("GraphQL/Users", () => {
         `,
         {
           search: "@onparallel.com",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -238,7 +238,7 @@ describe("GraphQL/Users", () => {
             }
           }
         `,
-        { id: toGlobalId("User", users[2].id) }
+        { id: toGlobalId("User", users[2].id) },
       );
 
       expect(query1Errors).toBeUndefined();
@@ -254,7 +254,7 @@ describe("GraphQL/Users", () => {
       await userRepo.updateUserData(
         users[2].user_data_id,
         { email: "newemail@gmail.com", is_sso_user: true },
-        "Test"
+        "Test",
       );
 
       const { errors: query2Errors, data: query2Data } = await testClient.execute(
@@ -270,7 +270,7 @@ describe("GraphQL/Users", () => {
             }
           }
         `,
-        { id: toGlobalId("User", users[2].id) }
+        { id: toGlobalId("User", users[2].id) },
       );
 
       expect(query2Errors).toBeUndefined();
@@ -309,16 +309,14 @@ describe("GraphQL/Users", () => {
       });
     });
     it("refreshes correctly when updating user info", async () => {
-      const { errors: query1Errors, data: query1Data } = await testClient.execute(
-        gql`
-          query {
-            me {
-              id
-              fullName
-            }
+      const { errors: query1Errors, data: query1Data } = await testClient.execute(gql`
+        query {
+          me {
+            id
+            fullName
           }
-        `
-      );
+        }
+      `);
       expect(query1Errors).toBeUndefined();
       expect(query1Data?.me).toEqual({ id: sessionUserGID, fullName: "Mike Ross" });
 
@@ -331,7 +329,7 @@ describe("GraphQL/Users", () => {
             }
           }
         `,
-        { firstName: "Bond,", lastName: "James Bond" }
+        { firstName: "Bond,", lastName: "James Bond" },
       );
 
       expect(updateErrors).toBeUndefined();
@@ -340,16 +338,14 @@ describe("GraphQL/Users", () => {
         fullName: "Bond, James Bond",
       });
 
-      const { data: query2Data } = await testClient.execute(
-        gql`
-          query {
-            me {
-              id
-              fullName
-            }
+      const { data: query2Data } = await testClient.execute(gql`
+        query {
+          me {
+            id
+            fullName
           }
-        `
-      );
+        }
+      `);
       expect(query2Data?.me).toEqual({ id: sessionUserGID, fullName: "Bond, James Bond" });
     });
   });
@@ -390,7 +386,7 @@ describe("GraphQL/Users", () => {
         () => ({
           is_template: true,
           status: null,
-        })
+        }),
       );
       await mocks.automaticShareTemplateWithUsers(user1Template.id, [activeUsers[0].id]);
 
@@ -575,7 +571,7 @@ describe("GraphQL/Users", () => {
         from petition_permission 
         where petition_id in (?,?,?,?) and deleted_at is null
         order by petition_id asc`,
-        [user0Petition.id, ...user1Petitions.map((p) => p.id)]
+        [user0Petition.id, ...user1Petitions.map((p) => p.id)],
       );
 
       expect(petitionUserPermissions).toEqual([
@@ -739,7 +735,7 @@ describe("GraphQL/Users", () => {
         3,
         (i) => ({
           organization_role: i === 0 ? "OWNER" : i === 1 ? "ADMIN" : "NORMAL",
-        })
+        }),
       );
 
       [{ apiKey: ownerApiKey }, { apiKey: adminApiKey }, { apiKey: normalApiKey }] =
@@ -919,7 +915,7 @@ describe("GraphQL/Users", () => {
       }));
       ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
         "normal-token",
-        normalUser.id
+        normalUser.id,
       ));
 
       await mocks.knex
@@ -1145,60 +1141,61 @@ describe("GraphQL/Users", () => {
           organizationName: "MyOrganization",
           password: "sup€rs@f3P4ssw0rd",
           locale: "en",
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
 
       const { apiKey } = await mocks.createUserAuthToken(
         "api-token",
-        fromGlobalId(data!.signUp.id, "User").id
+        fromGlobalId(data!.signUp.id, "User").id,
       );
-      const { errors: queryErrors, data: queryData } = await testClient.withApiKey(apiKey)
+      const { errors: queryErrors, data: queryData } = await testClient
+        .withApiKey(apiKey)
         .execute(gql`
-        query me {
-          me {
-            id
-            fullName
-            preferredLocale
-            organization {
-              name
-              integrations(limit: 10, offset: 0) {
-                totalCount
-                items {
-                  type
+          query me {
+            me {
+              id
+              fullName
+              preferredLocale
+              organization {
+                name
+                integrations(limit: 10, offset: 0) {
+                  totalCount
+                  items {
+                    type
+                    name
+                    isDefault
+                  }
+                }
+                pdfDocumentThemes {
                   name
                   isDefault
+                  data
                 }
-              }
-              pdfDocumentThemes {
-                name
-                isDefault
-                data
-              }
-              usageDetails
-              petitionsPeriod: usagePeriods(limit: 100, offset: 0, limitName: PETITION_SEND) {
-                items {
-                  limit
-                  used
-                  period
+                usageDetails
+                petitionsPeriod: usagePeriods(limit: 100, offset: 0, limitName: PETITION_SEND) {
+                  items {
+                    limit
+                    used
+                    period
+                  }
                 }
-              }
-              signaturesPeriod: usagePeriods(
-                limit: 100
-                offset: 0
-                limitName: SIGNATURIT_SHARED_APIKEY
-              ) {
-                items {
-                  limit
-                  used
-                  period
+                signaturesPeriod: usagePeriods(
+                  limit: 100
+                  offset: 0
+                  limitName: SIGNATURIT_SHARED_APIKEY
+                ) {
+                  items {
+                    limit
+                    used
+                    period
+                  }
                 }
               }
             }
           }
-        }
-      `);
+        `);
 
       expect(queryErrors).toBeUndefined();
       expect(queryData).toEqual({
@@ -1266,7 +1263,7 @@ describe("GraphQL/Users", () => {
           {
             limit: 10,
             offset: 0,
-          }
+          },
         );
 
       expect(profilesErrors).toBeUndefined();

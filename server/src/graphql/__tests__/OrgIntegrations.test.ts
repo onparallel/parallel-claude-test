@@ -95,7 +95,7 @@ describe("GraphQL/OrgIntegrations", () => {
             review: false,
           },
         },
-        "*"
+        "*",
       );
 
     await mocks.createFeatureFlags([{ name: "PETITION_SIGNATURE", default_value: true }]);

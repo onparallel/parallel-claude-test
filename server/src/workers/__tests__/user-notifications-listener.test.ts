@@ -46,7 +46,7 @@ describe("Worker - User Notifications Listener", () => {
       petition.id,
       users[0].id,
       [contact.id],
-      users[0].id
+      users[0].id,
     );
   });
 
@@ -72,7 +72,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -89,7 +89,7 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_access_id: access.id,
         },
-      }))
+      })),
     );
   });
 
@@ -108,7 +108,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -127,7 +127,7 @@ describe("Worker - User Notifications Listener", () => {
           petition_field_comment_id: comment.id,
           is_mentioned: false,
         },
-      }))
+      })),
     );
   });
 
@@ -146,7 +146,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -185,7 +185,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -228,7 +228,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -267,7 +267,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -295,7 +295,7 @@ describe("Worker - User Notifications Listener", () => {
     const [userGroup] = await mocks.createUserGroups(1, organization.id);
     await mocks.insertUserGroupMembers(
       userGroup.id,
-      members.map((m) => m.id)
+      members.map((m) => m.id),
     );
 
     await userNotificationsListener(
@@ -312,7 +312,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -331,7 +331,7 @@ describe("Worker - User Notifications Listener", () => {
           permission_type: "WRITE",
           user_group_id: userGroup.id,
         },
-      }))
+      })),
     );
   });
 
@@ -349,7 +349,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -366,7 +366,7 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_signature_request_id: 1,
         },
-      }))
+      })),
     );
   });
 
@@ -387,7 +387,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -410,7 +410,7 @@ describe("Worker - User Notifications Listener", () => {
               user_id: users[1].id,
             },
           },
-        }))
+        })),
     );
   });
 
@@ -420,7 +420,7 @@ describe("Worker - User Notifications Listener", () => {
       petition.id,
       access.id,
       users[0].id,
-      () => ({ email_log_id: emailLog.id })
+      () => ({ email_log_id: emailLog.id }),
     );
     await userNotificationsListener(
       {
@@ -434,7 +434,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -473,7 +473,7 @@ describe("Worker - User Notifications Listener", () => {
         processed_at: null,
         processed_by: null,
       },
-      ctx
+      ctx,
     );
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
@@ -490,7 +490,7 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_access_id: access.id,
         },
-      }))
+      })),
     );
   });
 });

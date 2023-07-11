@@ -47,7 +47,7 @@ describe("GraphQL/PetitionListView", () => {
         name: "my default view",
         position: 0,
       },
-      "*"
+      "*",
     );
   });
 
@@ -187,7 +187,7 @@ describe("GraphQL/PetitionListView", () => {
             fromTemplateId: null,
             sort: { field: "sentAt", direction: "ASC" },
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -283,7 +283,7 @@ describe("GraphQL/PetitionListView", () => {
             },
             sort: null,
           },
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -333,7 +333,7 @@ describe("GraphQL/PetitionListView", () => {
             path: "/2022/",
             sort: null,
           },
-        }
+        },
       );
       secondViewGID = data!.createPetitionListView.id;
     });
@@ -353,7 +353,7 @@ describe("GraphQL/PetitionListView", () => {
         `,
         {
           petitionListViewId: secondViewGID,
-        }
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -379,7 +379,7 @@ describe("GraphQL/PetitionListView", () => {
             }
           }
         `,
-        { petitionListViewId: null }
+        { petitionListViewId: null },
       );
 
       expect(errors).toBeUndefined();
@@ -411,7 +411,7 @@ describe("GraphQL/PetitionListView", () => {
             path: "/2022/",
             sort: null,
           },
-        }
+        },
       );
       secondViewGID = data!.createPetitionListView.id;
     });
@@ -429,7 +429,7 @@ describe("GraphQL/PetitionListView", () => {
         `,
         {
           ids: [secondViewGID, toGlobalId("PetitionListView", defaultView.id)],
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.reorderPetitionListViews).toEqual({
@@ -453,7 +453,7 @@ describe("GraphQL/PetitionListView", () => {
         `,
         {
           ids: [secondViewGID],
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -474,7 +474,7 @@ describe("GraphQL/PetitionListView", () => {
         `,
         {
           id: toGlobalId("PetitionListView", defaultView.id),
-        }
+        },
       );
       expect(errors).toBeUndefined();
       expect(data?.deletePetitionListView).toEqual({

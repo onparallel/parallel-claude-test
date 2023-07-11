@@ -93,7 +93,7 @@ export class Mocks {
   async loadUserPermissionsByPetitionId(id: number): Promise<PetitionPermission[]> {
     const { rows: permissions } = await this.knex.raw(
       /* sql */ `SELECT * from petition_permission where petition_id = ? and deleted_at is null`,
-      [id]
+      [id],
     );
 
     return permissions;
@@ -104,7 +104,7 @@ export class Mocks {
       rows: [petition],
     } = await this.knex.raw(
       /* sql */ `SELECT * from petition where id = ? and deleted_at is null`,
-      [id]
+      [id],
     );
     return petition;
   }
@@ -121,7 +121,7 @@ export class Mocks {
 
   async createSessionUserAndOrganization(
     orgRole?: UserOrganizationRole,
-    orgBuilder?: () => Partial<Organization>
+    orgBuilder?: () => Partial<Organization>,
   ) {
     const [organization] = await this.createRandomOrganizations(1, () => ({
       name: "Parallel",
@@ -134,7 +134,7 @@ export class Mocks {
       () => ({
         organization_role: orgRole,
       }),
-      () => ({ cognito_id: USER_COGNITO_ID, first_name: "Harvey", last_name: "Specter" })
+      () => ({ cognito_id: USER_COGNITO_ID, first_name: "Harvey", last_name: "Specter" }),
     );
 
     return { user, organization };
@@ -142,7 +142,7 @@ export class Mocks {
 
   async createRandomOrganizations(
     amount: number,
-    builder?: (index: number) => Partial<Organization>
+    builder?: (index: number) => Partial<Organization>,
   ) {
     const orgs = await this.knex<Organization>("organization")
       .insert(
@@ -152,7 +152,7 @@ export class Mocks {
             status: "DEV",
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
 
@@ -168,7 +168,7 @@ export class Mocks {
             org_id: orgs[index].id,
             created_at: orgBuilderData?.created_at ?? undefined,
           };
-        })
+        }),
       );
     }
 
@@ -179,7 +179,7 @@ export class Mocks {
     orgId: number,
     amount: number,
     userBuilder?: (index: number) => Partial<User>,
-    userDataBuilder?: (index: number) => Partial<UserData>
+    userDataBuilder?: (index: number) => Partial<UserData>,
   ) {
     const userDatas = await this.knex<UserData>("user_data").insert(
       range(0, amount).map<CreateUserData>((index) => {
@@ -194,7 +194,7 @@ export class Mocks {
           ...userDataBuilder?.(index),
         };
       }),
-      "*"
+      "*",
     );
 
     return await this.knex<User>("user")
@@ -206,7 +206,7 @@ export class Mocks {
             org_id: orgId,
             ...userBuilder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -221,7 +221,7 @@ export class Mocks {
 
   async createFeatureFlagOverride(
     featureFlag: FeatureFlagName,
-    override: Pick<CreateFeatureFlagOverride, "user_id" | "org_id" | "value">
+    override: Pick<CreateFeatureFlagOverride, "user_id" | "org_id" | "value">,
   ) {
     await this.knex.into("feature_flag_override").insert({
       feature_flag_name: featureFlag,
@@ -232,7 +232,7 @@ export class Mocks {
   async createRandomContacts(
     orgId: number,
     amount: number,
-    builder?: (index: number) => Partial<Contact>
+    builder?: (index: number) => Partial<Contact>,
   ) {
     return await this.knex<Contact>("contact")
       .insert(
@@ -246,7 +246,7 @@ export class Mocks {
             email: faker.internet.email({ firstName, lastName }).toLowerCase(),
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -256,7 +256,7 @@ export class Mocks {
     ownerId: number,
     amount?: number,
     builder?: (index: number) => Partial<Petition>,
-    permissionBuilder?: (index: number) => Partial<PetitionPermission>
+    permissionBuilder?: (index: number) => Partial<PetitionPermission>,
   ) {
     const [theme] = await this.knex("organization_theme")
       .where({
@@ -279,7 +279,7 @@ export class Mocks {
             document_organization_theme_id: theme.id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
 
@@ -289,7 +289,7 @@ export class Mocks {
         petition_id: id,
         user_id: ownerId,
         ...permissionBuilder?.(index),
-      }))
+      })),
     );
 
     return petitions;
@@ -300,7 +300,7 @@ export class Mocks {
     ownerId: number,
     amount?: number,
     builder?: (index: number) => Partial<Petition>,
-    permissionBuilder?: (index: number) => Partial<PetitionPermission>
+    permissionBuilder?: (index: number) => Partial<PetitionPermission>,
   ) {
     const [theme] = await this.knex("organization_theme")
       .where({
@@ -323,7 +323,7 @@ export class Mocks {
             document_organization_theme_id: theme.id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
 
@@ -333,7 +333,7 @@ export class Mocks {
         petition_id: id,
         user_id: ownerId,
         ...permissionBuilder?.(index),
-      }))
+      })),
     );
 
     return petitions;
@@ -342,7 +342,7 @@ export class Mocks {
   async createRandomPetitionFields(
     petitionId: number,
     amount: number,
-    builder?: (index: number) => Partial<PetitionField>
+    builder?: (index: number) => Partial<PetitionField>,
   ) {
     const [{ count }] = await this.knex("petition_field")
       .where("petition_id", petitionId)
@@ -362,7 +362,7 @@ export class Mocks {
             options: randomPetitionFieldOptions(type),
             ...removeNotDefined(data),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -371,7 +371,7 @@ export class Mocks {
     textFieldId: number,
     access_id?: number,
     amount?: number,
-    builder?: (index: number) => Partial<PetitionFieldReply>
+    builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
     return await this.knex<PetitionFieldReply>("petition_field_reply")
       .insert(
@@ -383,7 +383,7 @@ export class Mocks {
             petition_access_id: access_id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -394,7 +394,7 @@ export class Mocks {
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
     min?: number,
-    max?: number
+    max?: number,
   ) {
     return await this.knex<PetitionFieldReply>("petition_field_reply")
       .insert(
@@ -411,7 +411,7 @@ export class Mocks {
             petition_access_id: access_id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -420,7 +420,7 @@ export class Mocks {
     dateFieldId: number,
     access_id: number,
     amount?: number,
-    builder?: (index: number) => Partial<PetitionFieldReply>
+    builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
     return await this.knex<PetitionFieldReply>("petition_field_reply")
       .insert(
@@ -434,7 +434,7 @@ export class Mocks {
             petition_access_id: access_id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -443,7 +443,7 @@ export class Mocks {
     dateFieldId: number,
     access_id: number,
     amount?: number,
-    builder?: (index: number) => Partial<PetitionFieldReply>
+    builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
     return await this.knex<PetitionFieldReply>("petition_field_reply")
       .insert(
@@ -460,7 +460,7 @@ export class Mocks {
             petition_access_id: access_id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -469,7 +469,7 @@ export class Mocks {
     phoneFieldId: number,
     access_id: number,
     amount?: number,
-    builder?: (index: number) => Partial<PetitionFieldReply>
+    builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
     const phoneNumbers = [
       "+44 7911 123456",
@@ -494,7 +494,7 @@ export class Mocks {
             petition_access_id: access_id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -504,7 +504,7 @@ export class Mocks {
     access_id?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
-    fileUploadBuilder?: (index: number) => Partial<FileUpload>
+    fileUploadBuilder?: (index: number) => Partial<FileUpload>,
   ) {
     const fileUploads = await this.createRandomFileUpload(amount, fileUploadBuilder);
     return await this.knex<PetitionFieldReply>("petition_field_reply")
@@ -517,7 +517,7 @@ export class Mocks {
             petition_access_id: access_id,
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -532,14 +532,14 @@ export class Mocks {
           size: "100",
           upload_complete: true,
           ...builder?.(index),
-        }))
+        })),
       )
       .returning("*");
   }
 
   async createRandomTemporaryFile(
     amount?: number,
-    builder?: (index: number) => Partial<TemporaryFile>
+    builder?: (index: number) => Partial<TemporaryFile>,
   ) {
     return await this.knex<TemporaryFile>("temporary_file")
       .insert(
@@ -549,7 +549,7 @@ export class Mocks {
           path: random(16),
           size: "100",
           ...builder?.(index),
-        }))
+        })),
       )
       .returning("*");
   }
@@ -561,7 +561,7 @@ export class Mocks {
         fileUploads.map((file) => ({
           file_upload_id: file.id,
           petition_field_id: fieldId,
-        }))
+        })),
       )
       .returning("*");
   }
@@ -571,7 +571,7 @@ export class Mocks {
     type: PetitionAttachmentType,
     amount?: number,
     builder?: (i: number) => Partial<PetitionAttachment>,
-    builderFileUploads?: (i: number) => Partial<FileUpload>
+    builderFileUploads?: (i: number) => Partial<FileUpload>,
   ) {
     const fileUploads = await this.createRandomFileUpload(amount ?? 1, builderFileUploads);
 
@@ -588,7 +588,7 @@ export class Mocks {
           type,
           position: position + i,
           ...builder?.(i),
-        }))
+        })),
       )
       .returning("*");
   }
@@ -596,7 +596,7 @@ export class Mocks {
   async createRandomFileReply(
     fieldId: number,
     amount?: number,
-    builder?: (index: number) => Partial<PetitionFieldReply>
+    builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
     const fileUploads = await this.createRandomFileUpload(amount || 1);
     return await this.knex<PetitionFieldReply>("petition_field_reply")
@@ -608,7 +608,7 @@ export class Mocks {
             content: { file_upload_id: fileUploads[index].id },
             ...builder?.(index),
           };
-        })
+        }),
       )
       .returning("*");
   }
@@ -616,7 +616,7 @@ export class Mocks {
   async createRandomTags(
     orgId: number,
     amount?: number,
-    builder?: (index: number) => Partial<Tag>
+    builder?: (index: number) => Partial<Tag>,
   ) {
     return await this.knex<Tag>("tag")
       .insert(
@@ -625,7 +625,7 @@ export class Mocks {
           name: faker.word.words(3),
           organization_id: orgId,
           ...builder?.(index),
-        }))
+        })),
       )
       .returning("*");
   }
@@ -635,7 +635,7 @@ export class Mocks {
       petitionIds.map((petitionId) => ({
         petition_id: petitionId,
         tag_id: tagId,
-      }))
+      })),
     );
   }
 
@@ -643,7 +643,7 @@ export class Mocks {
     petitionId: number,
     ownerId: number,
     contactIds: number[] | null[],
-    createdByUserId: number
+    createdByUserId: number,
   ) {
     return await this.knex<PetitionAccess>("petition_access")
       .insert(
@@ -655,7 +655,7 @@ export class Mocks {
           keycode: random(16),
           reminders_left: 10,
           created_by: `User:${createdByUserId}`,
-        }))
+        })),
       )
       .returning("*");
   }
@@ -664,7 +664,7 @@ export class Mocks {
     petitionIds: number[],
     toUserId: number,
     permissionType: PetitionPermissionType,
-    builder?: () => Partial<PetitionPermission>
+    builder?: () => Partial<PetitionPermission>,
   ) {
     return await this.knex<PetitionPermission>("petition_permission")
       .insert(
@@ -673,7 +673,7 @@ export class Mocks {
           user_id: toUserId,
           type: permissionType,
           ...builder?.(),
-        }))
+        })),
       )
       .returning("*");
   }
@@ -705,7 +705,7 @@ export class Mocks {
   async createUserGroups(
     amount: number,
     orgId: number,
-    builder?: (i: number) => Partial<UserGroup>
+    builder?: (i: number) => Partial<UserGroup>,
   ) {
     return await this.knex<UserGroup>("user_group").insert(
       range(0, amount).map<CreateUserGroup>((index) => ({
@@ -713,7 +713,7 @@ export class Mocks {
         org_id: orgId,
         ...builder?.(index),
       })),
-      "*"
+      "*",
     );
   }
 
@@ -723,21 +723,21 @@ export class Mocks {
         user_group_id: userGroupId,
         user_id: userId,
       })),
-      "*"
+      "*",
     );
   }
 
   async sharePetitionWithGroups(
     petitionId: number,
     userGroupIds: number[],
-    permissionType?: PetitionPermissionType
+    permissionType?: PetitionPermissionType,
   ) {
     await this.knex<PetitionPermission>("petition_permission").insert(
       userGroupIds.map((groupId) => ({
         petition_id: petitionId,
         user_group_id: groupId,
         type: permissionType ?? "WRITE",
-      }))
+      })),
     );
 
     const members = await this.knex<UserGroupMember>("user_group_member")
@@ -750,7 +750,7 @@ export class Mocks {
         from_user_group_id: m.user_group_id,
         user_id: m.user_id,
         type: permissionType ?? "WRITE",
-      }))
+      })),
     );
   }
 
@@ -760,7 +760,7 @@ export class Mocks {
         template_id: templateId,
         user_id: userId,
         type: "WRITE",
-      }))
+      })),
     );
   }
 
@@ -770,7 +770,7 @@ export class Mocks {
         template_id: templateId,
         user_group_id: groupId,
         type: "WRITE",
-      }))
+      })),
     );
   }
 
@@ -799,7 +799,7 @@ export class Mocks {
     petitionFieldId: number,
     petitionId: number,
     amount?: number,
-    builder?: (index: number) => Partial<PetitionFieldComment>
+    builder?: (index: number) => Partial<PetitionFieldComment>,
   ) {
     const content = this.createRandomCommentContent();
     return await this.knex<PetitionFieldComment>("petition_field_comment")
@@ -810,7 +810,7 @@ export class Mocks {
           petition_field_id: petitionFieldId,
           petition_id: petitionId,
           ...builder?.(i),
-        }))
+        })),
       )
       .returning("*");
   }
@@ -878,7 +878,7 @@ export class Mocks {
     petitionFieldId: number,
     petitionId: number,
     amount?: number,
-    builder?: (index: number) => Partial<PetitionFieldComment>
+    builder?: (index: number) => Partial<PetitionFieldComment>,
   ) {
     const content = this.createRandomCommentContent();
     return await this.knex<PetitionFieldComment>("petition_field_comment")
@@ -889,7 +889,7 @@ export class Mocks {
           petition_field_id: petitionFieldId,
           petition_id: petitionId,
           ...builder?.(i),
-        }))
+        })),
       )
       .returning("*");
   }
@@ -898,7 +898,7 @@ export class Mocks {
     petitionId: number,
     petitionAccessId: number,
     senderId: number,
-    builder?: () => Partial<PetitionMessage>
+    builder?: () => Partial<PetitionMessage>,
   ) {
     return await this.knex<PetitionMessage>("petition_message")
       .insert({
@@ -916,7 +916,7 @@ export class Mocks {
   async createRandomPetitionReminder(
     petitionAccessId: number,
     senderId: number,
-    builder?: () => Partial<PetitionReminder>
+    builder?: () => Partial<PetitionReminder>,
   ) {
     return await this.knex<PetitionReminder>("petition_reminder").insert({
       email_body: faker.lorem.paragraphs(),
@@ -940,14 +940,14 @@ export class Mocks {
           track_opens: false,
           created_at: new Date(),
           created_from: faker.internet.email(),
-        }))
+        })),
       )
       .returning("*");
   }
 
   async createRandomPublicPetitionLink(
     templateId: number,
-    builder?: () => Partial<PublicPetitionLink>
+    builder?: () => Partial<PublicPetitionLink>,
   ) {
     const [data] = await this.knex<PublicPetitionLink>("public_petition_link")
       .insert({
@@ -978,7 +978,7 @@ export class Mocks {
   async createOrganizationUsageLimit(
     orgId: number,
     limitName: OrganizationUsageLimitName,
-    limit: number
+    limit: number,
   ) {
     const [row] = await this.knex<OrganizationUsageLimit>("organization_usage_limit")
       .insert({ limit, limit_name: limitName, org_id: orgId, period: "P1M" as any })
@@ -987,7 +987,7 @@ export class Mocks {
   }
 
   async createOrgIntegration(
-    data: MaybeArray<Replace<CreateOrgIntegration, { name?: string | null }>>
+    data: MaybeArray<Replace<CreateOrgIntegration, { name?: string | null }>>,
   ) {
     const dataArr = unMaybeArray(data).map((d) => ({
       ...d,
@@ -1009,7 +1009,7 @@ export class Mocks {
         ...d,
         event_types: d.event_types ? this.knex.raw(`?::json`, JSON.stringify(d.event_types)) : null,
       })),
-      "*"
+      "*",
     );
   }
 
@@ -1021,7 +1021,7 @@ export class Mocks {
   async createCheckboxReply(
     fieldId: number,
     userOrAccess: { userId?: number; accessId?: number },
-    value: string[]
+    value: string[],
   ) {
     const [reply] = await this.knex
       .from<PetitionFieldReply>("petition_field_reply")
@@ -1043,7 +1043,7 @@ export class Mocks {
     userId: number,
     petitionId: number,
     amount: number,
-    types?: PetitionEventType[]
+    types?: PetitionEventType[],
   ) {
     const eventTypes = types ?? PetitionEventTypeValues;
     const petitionEvents = await this.knex<PetitionEvent>("petition_event")
@@ -1052,7 +1052,7 @@ export class Mocks {
           type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
           data: {},
           petition_id: petitionId,
-        }))
+        })),
       )
       .returning("*");
 
@@ -1061,7 +1061,7 @@ export class Mocks {
         petitionEvents.map((e) => ({
           petition_event_id: e.id,
           user_id: userId,
-        }))
+        })),
       )
       .returning("*");
 
@@ -1070,7 +1070,7 @@ export class Mocks {
 
   async createRandomPetitionSignatureRequest(
     petitionId: number,
-    builder?: () => Partial<PetitionSignatureRequest>
+    builder?: () => Partial<PetitionSignatureRequest>,
   ) {
     return await this.knex<PetitionSignatureRequest>("petition_signature_request").insert(
       {
@@ -1088,14 +1088,14 @@ export class Mocks {
         event_logs: [],
         ...builder?.(),
       },
-      "*"
+      "*",
     );
   }
 
   async createOrganizationThemes(
     orgId: number,
     amount?: number,
-    builder?: (i: number) => Partial<OrganizationTheme>
+    builder?: (i: number) => Partial<OrganizationTheme>,
   ) {
     return await this.knex<OrganizationTheme>("organization_theme")
       .insert(
@@ -1105,7 +1105,7 @@ export class Mocks {
           data: defaultPdfDocumentTheme,
           is_default: false,
           ...builder?.(i),
-        }))
+        })),
       )
       .returning("*");
   }
@@ -1113,10 +1113,10 @@ export class Mocks {
   async createEventSubscriptionSignatureKey(
     subscriptionId: number,
     encryption: IEncryptionService,
-    amount?: number
+    amount?: number,
   ) {
     return await this.knex<EventSubscriptionSignatureKey>(
-      "event_subscription_signature_key"
+      "event_subscription_signature_key",
     ).insert(
       range(0, amount || 1).map(() => {
         const { privateKey, publicKey } = generateEDKeyPair();
@@ -1126,25 +1126,25 @@ export class Mocks {
           private_key: encryption.encrypt(privateKey.toString("base64"), "base64"),
         };
       }),
-      "*"
+      "*",
     );
   }
 
   async createRandomProfileTypes(
     orgId: number,
     amount?: number,
-    builder?: (i: number) => Partial<ProfileType>
+    builder?: (i: number) => Partial<ProfileType>,
   ) {
     return await this.knex<ProfileType>("profile_type").insert(
       range(0, amount || 1).map((i) => ({
         org_id: orgId,
         name: this.knex.raw(
           "?::jsonb",
-          JSON.stringify({ es: faker.word.words(2), en: faker.word.words(2) })
+          JSON.stringify({ es: faker.word.words(2), en: faker.word.words(2) }),
         ),
         ...builder?.(i),
       })),
-      "*"
+      "*",
     );
   }
 
@@ -1152,7 +1152,7 @@ export class Mocks {
     orgId: number,
     profileTypeId: number,
     amount?: number,
-    builder?: (i: number) => Partial<ProfileTypeField>
+    builder?: (i: number) => Partial<ProfileTypeField>,
   ) {
     const [{ max }] = await this.knex("profile_type_field")
       .where("profile_type_id", profileTypeId)
@@ -1167,14 +1167,14 @@ export class Mocks {
           position: (max ?? -1) + 1 + i,
           name: this.knex.raw(
             "?::jsonb",
-            JSON.stringify({ es: faker.word.words(2), en: faker.word.words(2) })
+            JSON.stringify({ es: faker.word.words(2), en: faker.word.words(2) }),
           ),
           type,
           options: randomProfileTypeFieldOptions(type),
           ...builder?.(i),
         };
       }),
-      "*"
+      "*",
     );
   }
 
@@ -1182,7 +1182,7 @@ export class Mocks {
     orgId: number,
     profileTypeId: number,
     amount?: number,
-    builder?: (i: number) => Partial<Profile>
+    builder?: (i: number) => Partial<Profile>,
   ) {
     return await this.knex<Profile>("profile").insert(
       range(0, amount || 1).map((i) => ({
@@ -1191,7 +1191,7 @@ export class Mocks {
         profile_type_id: profileTypeId,
         ...builder?.(i),
       })),
-      "*"
+      "*",
     );
   }
 }

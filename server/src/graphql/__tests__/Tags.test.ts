@@ -39,7 +39,7 @@ describe("GraphQL/Tags", () => {
         org_id: organization.id,
         organization_role: "ADMIN",
       }),
-      () => ({ cognito_id: USER_COGNITO_ID, first_name: "Harvey", last_name: "Specter" })
+      () => ({ cognito_id: USER_COGNITO_ID, first_name: "Harvey", last_name: "Specter" }),
     );
 
     const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 2);

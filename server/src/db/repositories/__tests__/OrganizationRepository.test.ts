@@ -80,7 +80,7 @@ describe("repositories/OrganizationRepository", () => {
           ...setData(i),
           // delete even i
           deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null,
-        })
+        }),
       );
     });
 
@@ -95,7 +95,7 @@ describe("repositories/OrganizationRepository", () => {
       expect(await result.totalCount).toBe(42);
       expect(await result.items).toMatchObject(
         // First 10 users created on the client
-        org1Users.slice(0, 10).map(pick(["id"]))
+        org1Users.slice(0, 10).map(pick(["id"])),
       );
     });
 
@@ -112,7 +112,7 @@ describe("repositories/OrganizationRepository", () => {
       const result = organizations.getPaginatedUsersForOrg(org2.id, { limit: 10 });
       expect(await result.totalCount).toBe(5);
       expect(await result.items).toMatchObject(
-        org2Users.filter((_, i) => i % 2 !== 0).map(pick(["id"]))
+        org2Users.filter((_, i) => i % 2 !== 0).map(pick(["id"])),
       );
     });
 

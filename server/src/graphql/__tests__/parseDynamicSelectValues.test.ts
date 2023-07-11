@@ -17,7 +17,7 @@ describe("parseDynamicSelectValues", () => {
         ["Cataluña", "Tarragona", "Salou"],
         ["Cataluña", "Tarragona", "Tarragona"],
         ["Cataluña", "Tarragona", "Valls"],
-      ])
+      ]),
     ).toEqual({
       labels: ["Comunidad autónoma", "Provincia", "Municipio"],
       values: [
@@ -59,7 +59,7 @@ describe("parseDynamicSelectValues", () => {
         ["Cataluña", "Tarragona", "Valls"],
         ["", "", ""],
         ["", "", ""],
-      ])
+      ]),
     ).toEqual({
       labels: ["Comunidad autónoma", "Provincia", "Municipio"],
       values: [
@@ -97,7 +97,7 @@ describe("parseDynamicSelectValues", () => {
         ["Castilla y León", "Burgos", "Torresandino"],
         ["Cataluña", "Barcelona", "Terrassa"],
         ["Castilla y León", "Soria", "El Burgo de Osma"],
-      ])
+      ]),
     ).toEqual({
       labels: ["Comunidad autónoma", "Provincia", "Municipio"],
       values: [
@@ -135,7 +135,7 @@ describe("parseDynamicSelectValues", () => {
         ["Castilla y León", "Burgos", "Torresandino"],
         ["Castilla y León", "Soria", "Soria"],
         ["Castilla y León", "Soria", "El Burgo de Osma"],
-      ])
+      ]),
     ).toThrowError("Missing value at (4, 1)");
   });
 
@@ -148,7 +148,7 @@ describe("parseDynamicSelectValues", () => {
         ["Cataluña", "Barcelona", "Badalona"],
         ["Cataluña", "Barcelona", "Terrassa"],
         ["Cataluña", "Tarragona"],
-      ])
+      ]),
     ).toThrowError("Not enough data at row 5");
   });
 
@@ -168,7 +168,7 @@ describe("parseDynamicSelectValues", () => {
         ["Torresandino"],
         ["Soria"],
         ["El Burgo de Osma"],
-      ])
+      ]),
     ).toThrowError("Not enough columns");
   });
 });

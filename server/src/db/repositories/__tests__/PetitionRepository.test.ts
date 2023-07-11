@@ -94,7 +94,7 @@ describe("repositories/PetitionRepository", () => {
       });
       expect(await result.totalCount).toBe(5);
       expect(await result.items).toMatchObject(
-        _petitions.filter((p) => (p.name ?? "").toLowerCase().includes("good")).slice(2, 2 + 5)
+        _petitions.filter((p) => (p.name ?? "").toLowerCase().includes("good")).slice(2, 2 + 5),
       );
     });
 
@@ -167,10 +167,10 @@ describe("repositories/PetitionRepository", () => {
     test("fails if the ids passed do not match with the petition field ids", async () => {
       const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
       await expect(
-        petitions.updateFieldPositions(petition1.id, [id2, id5, id6], user)
+        petitions.updateFieldPositions(petition1.id, [id2, id5, id6], user),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
       await expect(
-        petitions.updateFieldPositions(petition1.id, [id1, id2, id3, id4, id5, id6, id6], user)
+        petitions.updateFieldPositions(petition1.id, [id1, id2, id3, id4, id5, id6, id6], user),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
@@ -180,8 +180,8 @@ describe("repositories/PetitionRepository", () => {
         petitions.updateFieldPositions(
           petition1.id,
           [id1, id2, id3, deleted[2].id, id5, id6, id6],
-          user
-        )
+          user,
+        ),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
@@ -191,8 +191,8 @@ describe("repositories/PetitionRepository", () => {
         petitions.updateFieldPositions(
           petition1.id,
           [id1, id2, id3, foreignField.id, id5, id6, id6],
-          user
-        )
+          user,
+        ),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
@@ -207,7 +207,7 @@ describe("repositories/PetitionRepository", () => {
           id,
           position: index,
           deleted_at: null,
-        }))
+        })),
       );
       await petitions.updateFieldPositions(petition1.id, [id6, id5, id4, id3, id2, id1], user);
       const result2 = await petitions.loadFieldsForPetition(petition1.id, {
@@ -218,7 +218,7 @@ describe("repositories/PetitionRepository", () => {
           id,
           position: index,
           deleted_at: null,
-        }))
+        })),
       );
     });
   });
@@ -239,13 +239,13 @@ describe("repositories/PetitionRepository", () => {
 
     test("fails if passed a deleted field id", async () => {
       await expect(
-        petitions.deletePetitionField(petition1.id, deleted[3].id, user)
+        petitions.deletePetitionField(petition1.id, deleted[3].id, user),
       ).rejects.toThrow("Invalid petition field id");
     });
 
     test("fails if passed a fields id from another petition", async () => {
       await expect(
-        petitions.deletePetitionField(petition1.id, foreignField.id, user)
+        petitions.deletePetitionField(petition1.id, foreignField.id, user),
       ).rejects.toThrow("Invalid petition field id");
     });
 
@@ -261,7 +261,7 @@ describe("repositories/PetitionRepository", () => {
           id,
           position: index,
           deleted_at: null,
-        }))
+        })),
       );
       await petitions.deletePetitionField(petition1.id, fields[5].id, user);
       const result2 = await petitions.loadFieldsForPetition(petition1.id, {
@@ -273,7 +273,7 @@ describe("repositories/PetitionRepository", () => {
           id,
           position: index,
           deleted_at: null,
-        }))
+        })),
       );
       await petitions.deletePetitionField(petition1.id, fields[0].id, user);
       const result3 = await petitions.loadFieldsForPetition(petition1.id, {
@@ -285,7 +285,7 @@ describe("repositories/PetitionRepository", () => {
           id,
           position: index,
           deleted_at: null,
-        }))
+        })),
       );
     });
 
@@ -294,7 +294,7 @@ describe("repositories/PetitionRepository", () => {
         petition1.id,
         user.id,
         [contact.id],
-        user.id
+        user.id,
       );
       const [fieldToDelete] = await mocks.createRandomPetitionFields(petition1.id, 1);
       await mocks.knex.from<PetitionUserNotification>("petition_user_notification").insert({
@@ -339,7 +339,7 @@ describe("repositories/PetitionRepository", () => {
         petition.id,
         user.id,
         [contact.id],
-        user.id
+        user.id,
       );
     });
 
@@ -403,7 +403,7 @@ describe("repositories/PetitionRepository", () => {
     test("should throw an error on invalid fieldId", async () => {
       const invalidFieldId = 823098123;
       await expect(petitions.clonePetitionField(petition.id, invalidFieldId, user)).rejects.toThrow(
-        "invalid fieldId: " + invalidFieldId
+        "invalid fieldId: " + invalidFieldId,
       );
     });
 
@@ -468,7 +468,7 @@ describe("repositories/PetitionRepository", () => {
               user_id: users[0].id,
               type: "OWNER",
             },
-          ]
+          ],
         );
       });
 
@@ -492,7 +492,7 @@ describe("repositories/PetitionRepository", () => {
           [user0Petitions[0].id],
           [{ type: "User", id: users[1].id, isSubscribed: true, permissionType: "READ" }],
           "User",
-          users[0].id
+          users[0].id,
         );
 
         const permissions = await petitions.loadUserPermissionsByPetitionId(user0Petitions[0].id);
@@ -519,14 +519,14 @@ describe("repositories/PetitionRepository", () => {
           [user0Petitions[0].id],
           [{ type: "User", id: users[2].id, isSubscribed: true, permissionType: "READ" }],
           "User",
-          users[0].id
+          users[0].id,
         );
 
         const { newPermissions } = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
           [{ type: "User", id: users[2].id, isSubscribed: true, permissionType: "READ" }],
           "User",
-          users[0].id
+          users[0].id,
         );
         expect(firstPermissions).toHaveLength(1);
         expect(newPermissions).toHaveLength(0);
@@ -538,7 +538,7 @@ describe("repositories/PetitionRepository", () => {
           petitionIds,
           [{ type: "User", id: users[3].id, isSubscribed: true, permissionType: "WRITE" }],
           "User",
-          users[0].id
+          users[0].id,
         );
 
         expect(newPermissions).toHaveLength(3);
@@ -568,7 +568,7 @@ describe("repositories/PetitionRepository", () => {
           [petitionId],
           userIds.map((id) => ({ type: "User", id, isSubscribed: true, permissionType: "READ" })),
           "User",
-          users[0].id
+          users[0].id,
         );
 
         expect(newPermissions).toHaveLength(userIds.length);
@@ -583,7 +583,7 @@ describe("repositories/PetitionRepository", () => {
           petitionIds,
           userIds.map((id) => ({ type: "User", id, isSubscribed: true, permissionType: "WRITE" })),
           "User",
-          users[0].id
+          users[0].id,
         );
 
         // userIds.length * petitionIds.length === 12
@@ -601,7 +601,7 @@ describe("repositories/PetitionRepository", () => {
           [petitionId],
           [{ type: "User", id: userId, permissionType: "READ", isSubscribed: true }],
           "User",
-          users[0].id
+          users[0].id,
         );
       });
 
@@ -653,7 +653,7 @@ describe("repositories/PetitionRepository", () => {
           [petitionId],
           [{ type: "User", id: userId, permissionType: "READ", isSubscribed: true }],
           "User",
-          users[0].id
+          users[0].id,
         );
       });
 
@@ -680,7 +680,7 @@ describe("repositories/PetitionRepository", () => {
             permissionType: "READ",
           })),
           "User",
-          users[0].id
+          users[0].id,
         );
 
         await petitions.removePetitionPermissions(
@@ -688,7 +688,7 @@ describe("repositories/PetitionRepository", () => {
           [users[1].id, users[2].id],
           [],
           false,
-          users[0]
+          users[0],
         );
         const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(permissions).toHaveLength(2);
@@ -712,7 +712,7 @@ describe("repositories/PetitionRepository", () => {
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [{ type: "User", id: users[1].id, isSubscribed: true, permissionType: "WRITE" }],
           "User",
-          users[0].id
+          users[0].id,
         );
 
         await petitions.removePetitionPermissions(
@@ -720,7 +720,7 @@ describe("repositories/PetitionRepository", () => {
           [users[1].id],
           [],
           false,
-          users[0]
+          users[0],
         );
 
         const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
@@ -739,7 +739,7 @@ describe("repositories/PetitionRepository", () => {
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [{ type: "User", id: users[1].id, isSubscribed: true, permissionType: "WRITE" }],
           "User",
-          users[0].id
+          users[0].id,
         );
 
         await petitions.removePetitionPermissions(
@@ -747,7 +747,7 @@ describe("repositories/PetitionRepository", () => {
           [100, 123, 234234234, 2],
           [],
           true,
-          users[0]
+          users[0],
         );
 
         const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
@@ -770,7 +770,7 @@ describe("repositories/PetitionRepository", () => {
             permissionType: "WRITE",
           })),
           "User",
-          users[0].id
+          users[0].id,
         );
 
         await petitions.removePetitionPermissions(
@@ -778,7 +778,7 @@ describe("repositories/PetitionRepository", () => {
           [users[1].id, users[2].id, users[3].id],
           [],
           false,
-          users[0]
+          users[0],
         );
 
         const permissions = (
@@ -838,7 +838,7 @@ describe("repositories/PetitionRepository", () => {
           [petitionId],
           [{ type: "User", id: userId, isSubscribed: true, permissionType: "READ" }],
           "User",
-          users[0].id
+          users[0].id,
         );
 
         await petitions.transferOwnership([petitionId], userId, true, users[0]);
@@ -864,7 +864,7 @@ describe("repositories/PetitionRepository", () => {
           [petitionId],
           [{ type: "User", id: userId, permissionType: "READ", isSubscribed: true }],
           "User",
-          users[0].id
+          users[0].id,
         );
 
         await petitions.transferOwnership([petitionId], userId, false, users[0]);
@@ -907,7 +907,7 @@ describe("repositories/PetitionRepository", () => {
           petition.id,
           user.id,
           contacts.map((c) => c.id),
-          user.id
+          user.id,
         );
       });
 
@@ -975,12 +975,12 @@ describe("repositories/PetitionRepository", () => {
               petitionFieldId: f.id,
               petitionId: petition.id,
               loadInternalComments: true,
-            }))
+            })),
           )
         ).flat();
 
         expect(
-          commentsAfter.every((c) => c.anonymized_at !== null && c.content_json === null)
+          commentsAfter.every((c) => c.anonymized_at !== null && c.content_json === null),
         ).toEqual(true);
       });
 
@@ -1011,11 +1011,11 @@ describe("repositories/PetitionRepository", () => {
         expect(reminders.length).toBeGreaterThan(0);
 
         expect(messages.every((m) => m.email_body === null && m.anonymized_at !== null)).toEqual(
-          true
+          true,
         );
 
         expect(reminders.every((r) => r.email_body === null && r.anonymized_at !== null)).toEqual(
-          true
+          true,
         );
       });
 
@@ -1043,8 +1043,8 @@ describe("repositories/PetitionRepository", () => {
               e.html === "" &&
               e.to === "" &&
               e.subject === "" &&
-              e.anonymized_at !== null
-          )
+              e.anonymized_at !== null,
+          ),
         ).toEqual(true);
       });
 
@@ -1079,8 +1079,8 @@ describe("repositories/PetitionRepository", () => {
                 s.cancel_reason !== "DECLINED_BY_SIGNER") &&
               s.data === null &&
               s.event_logs === null &&
-              s.anonymized_at !== null
-          )
+              s.anonymized_at !== null,
+          ),
         ).toEqual(true);
 
         const signedFileIds = signatures
@@ -1120,7 +1120,7 @@ describe("repositories/PetitionRepository", () => {
         otherOrgUser.org_id,
         otherOrgUser.id,
         1,
-        () => ({ path: "/common/" })
+        () => ({ path: "/common/" }),
       );
     });
 
@@ -1128,7 +1128,7 @@ describe("repositories/PetitionRepository", () => {
       const _petitions = await petitions.getUserPetitionsInsideFolders(
         ["/common/", "/A/B/C/"],
         false,
-        user
+        user,
       );
 
       expect(_petitions.map((p) => pick(p, ["id", "path", "is_template"]))).toEqual([
@@ -1154,7 +1154,7 @@ describe("repositories/PetitionRepository", () => {
       const _petitions = await petitions.getUserPetitionsInsideFolders(
         ["/templates/"],
         false,
-        user
+        user,
       );
       expect(_petitions).toHaveLength(0);
     });
@@ -1170,7 +1170,7 @@ describe("repositories/PetitionRepository", () => {
       const result = await petitions.getUserPetitionsInsideFolders(
         ["/shared-with-group/"],
         false,
-        user
+        user,
       );
 
       expect(result.map((r) => pick(r, ["id", "path"]))).toEqual([
@@ -1207,7 +1207,7 @@ describe("repositories/PetitionRepository", () => {
         { body: [], subject: "test" },
         user,
         null,
-        false
+        false,
       );
 
       expect(error).toBeUndefined();
@@ -1273,7 +1273,7 @@ describe("repositories/PetitionRepository", () => {
         },
         user,
         null,
-        true
+        true,
       );
 
       expect(error).toBeUndefined();
@@ -1333,7 +1333,7 @@ describe("repositories/PetitionRepository", () => {
         (i) => ({
           type: PetitionFieldTypeValues[i],
           alias: PetitionFieldTypeValues[i],
-        })
+        }),
       );
 
       const selectField = fields.find((f) => f.type === "SELECT")!;
@@ -1406,7 +1406,7 @@ describe("repositories/PetitionRepository", () => {
             timezone: "Europe/Madrid",
           },
         },
-        user
+        user,
       );
 
       const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
@@ -1495,7 +1495,7 @@ describe("repositories/PetitionRepository", () => {
             },
           ],
         },
-        user
+        user,
       );
 
       const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
@@ -1616,7 +1616,7 @@ describe("repositories/PetitionRepository", () => {
             timezone: "Europe/Madrid",
           },
         },
-        user
+        user,
       );
 
       const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
@@ -1679,7 +1679,7 @@ describe("repositories/PetitionRepository", () => {
         undefined,
         1,
         () => ({ user_id: user.id }),
-        () => ({ upload_complete: false })
+        () => ({ upload_complete: false }),
       );
 
       await mocks.createRandomFileUploadReply(
@@ -1687,7 +1687,7 @@ describe("repositories/PetitionRepository", () => {
         undefined,
         1,
         () => ({ user_id: user.id }),
-        () => ({ upload_complete: false })
+        () => ({ upload_complete: false }),
       );
 
       await mocks.createRandomFileUploadReply(
@@ -1695,7 +1695,7 @@ describe("repositories/PetitionRepository", () => {
         undefined,
         1,
         () => ({ user_id: user.id }),
-        () => ({ upload_complete: true })
+        () => ({ upload_complete: true }),
       );
 
       const progress = await petitions.loadPetitionProgress(petition.id);

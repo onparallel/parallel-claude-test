@@ -79,7 +79,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -117,7 +117,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -150,7 +150,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -187,7 +187,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -223,7 +223,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -263,7 +263,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -299,7 +299,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -332,7 +332,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -373,7 +373,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -409,7 +409,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -450,7 +450,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
@@ -486,7 +486,7 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      }
+      },
     );
     expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
       argName: "filters.sharedWith",

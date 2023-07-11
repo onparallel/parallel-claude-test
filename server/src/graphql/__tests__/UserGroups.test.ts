@@ -45,7 +45,7 @@ describe("GraphQL/UserGroups", () => {
     users = await mocks.createRandomUsers(organization.id, 4);
     await mocks.insertUserGroupMembers(
       userGroups[0].id,
-      users.slice(0, 3).map((user) => user.id)
+      users.slice(0, 3).map((user) => user.id),
     );
 
     await mocks.knex<PetitionPermission>("petition_permission").insert([
@@ -292,7 +292,7 @@ describe("GraphQL/UserGroups", () => {
       .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_by")
       .andWhere((q) =>
-        q.where("from_user_group_id", userGroups[0].id).orWhere("user_group_id", userGroups[0].id)
+        q.where("from_user_group_id", userGroups[0].id).orWhere("user_group_id", userGroups[0].id),
       );
 
     expect(groupPermissions).toHaveLength(0);
@@ -500,7 +500,7 @@ describe("GraphQL/UserGroups", () => {
       .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_at")
       .andWhere((q) =>
-        q.where("user_group_id", newGroupId).orWhere("from_user_group_id", newGroupId)
+        q.where("user_group_id", newGroupId).orWhere("from_user_group_id", newGroupId),
       )
       .select("*");
 

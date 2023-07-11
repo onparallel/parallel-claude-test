@@ -50,7 +50,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { id: toGlobalId("Task", task.id) }
+        { id: toGlobalId("Task", task.id) },
       );
 
       expect(errors).toBeUndefined();
@@ -76,7 +76,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { id: toGlobalId("Task", privateTask.id) }
+        { id: toGlobalId("Task", privateTask.id) },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -94,7 +94,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { petitionId: toGlobalId("Petition", petition.id) }
+        { petitionId: toGlobalId("Petition", petition.id) },
       );
       expect(errors).toBeUndefined();
       expect(data?.createPrintPdfTask).toEqual({ status: "ENQUEUED" });
@@ -109,7 +109,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { petitionId: toGlobalId("Petition", otherPetition.id) }
+        { petitionId: toGlobalId("Petition", otherPetition.id) },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -126,7 +126,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { petitionId: toGlobalId("Petition", petition.id) }
+        { petitionId: toGlobalId("Petition", petition.id) },
       );
       expect(errors).toBeUndefined();
       expect(data?.createExportRepliesTask).toEqual({ status: "ENQUEUED" });
@@ -175,7 +175,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { taskId: toGlobalId("Task", completedTask.id) }
+        { taskId: toGlobalId("Task", completedTask.id) },
       );
 
       expect(errors).toBeUndefined();
@@ -191,7 +191,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { taskId: toGlobalId("Task", privateTask.id) }
+        { taskId: toGlobalId("Task", privateTask.id) },
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -207,7 +207,7 @@ describe("GraphQL/Tasks", () => {
             }
           }
         `,
-        { taskId: toGlobalId("Task", incompleteTask.id) }
+        { taskId: toGlobalId("Task", incompleteTask.id) },
       );
 
       expect(errors).toContainGraphQLError("FILE_NOT_FOUND_ERROR");

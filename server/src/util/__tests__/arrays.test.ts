@@ -28,7 +28,7 @@ describe("Array Helper Functions", () => {
         [{ id: 8 }, [21, 22]],
       ] as [any, number[]][],
       (chunk, [_, current]) =>
-        chunk.length === 0 || sumBy(chunk, ([_, curr]) => curr.length) + current.length <= 5
+        chunk.length === 0 || sumBy(chunk, ([_, curr]) => curr.length) + current.length <= 5,
     );
 
     expect(result).toEqual([

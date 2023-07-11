@@ -43,7 +43,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
     ({ apiKey: otherUserApiKey } = await mocks.createUserAuthToken(
       "other-user-token",
-      otherUser.id
+      otherUser.id,
     ));
   });
 
@@ -61,14 +61,14 @@ describe("GraphQL - PetitionUserNotifications", () => {
       sessionUser.id,
       petitionField.id,
       petition.id,
-      1
+      1,
     );
     const [contact] = await mocks.createRandomContacts(organization.id, 1);
     [petitionAccess] = await mocks.createPetitionAccess(
       petition.id,
       sessionUser.id,
       [contact.id],
-      sessionUser.id
+      sessionUser.id,
     );
 
     notifications = await knex("petition_user_notification")
@@ -587,7 +587,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(errors).toBeUndefined();
 
     const otherUserNotifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
+      "petition_user_notification",
     )
       .where("user_id", otherUser.id)
       .select("id");

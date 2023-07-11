@@ -46,7 +46,7 @@ describe("repositories/UserAuthenticationRepository", () => {
   it("creates an auth token and returns its API key", async () => {
     const { userAuthToken, apiKey } = await userAuth.createUserAuthenticationToken(
       "My Token",
-      user
+      user,
     );
 
     expect(userAuthToken).toBeDefined();

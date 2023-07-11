@@ -93,8 +93,8 @@ describe("GraphQL custom validators", () => {
           {},
           { email: "mariano@onparallel.com" },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).resolves.not.toThrowError();
     });
 
@@ -104,10 +104,10 @@ describe("GraphQL custom validators", () => {
           {},
           { email: "mariano@ssodomain.com" },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).rejects.toThrowError(
-        new ApolloError("Email domain has a SSO provider enabled.", "SSO_DOMAIN_ENABLED_ERROR")
+        new ApolloError("Email domain has a SSO provider enabled.", "SSO_DOMAIN_ENABLED_ERROR"),
       );
     });
 
@@ -117,8 +117,8 @@ describe("GraphQL custom validators", () => {
           {},
           { email: "mariano@disabledsso.com" },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).resolves.not.toThrowError();
     });
   });
@@ -126,13 +126,13 @@ describe("GraphQL custom validators", () => {
   describe("validPassword", () => {
     it("throws error if not passing password", () => {
       expect(() =>
-        validPassword((args) => args.password)({}, { password: null }, ctx, {} as any)
+        validPassword((args) => args.password)({}, { password: null }, ctx, {} as any),
       ).toThrowError();
     });
 
     it("throws error if password has less than 8 chars", () => {
       expect(() =>
-        validPassword((args) => args.password)({}, { password: "1abcDEF" }, ctx, {} as any)
+        validPassword((args) => args.password)({}, { password: "1abcDEF" }, ctx, {} as any),
       ).toThrowError();
     });
 
@@ -142,8 +142,8 @@ describe("GraphQL custom validators", () => {
           {},
           { password: random(20).toUpperCase() },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).toThrowError();
     });
 
@@ -153,8 +153,8 @@ describe("GraphQL custom validators", () => {
           {},
           { password: random(20).toLowerCase() },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).toThrowError();
     });
 
@@ -164,8 +164,8 @@ describe("GraphQL custom validators", () => {
           {},
           { password: "lYWicILeaDOnoMpARdOWAcHeroeKiN" },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).toThrowError();
     });
 
@@ -175,8 +175,8 @@ describe("GraphQL custom validators", () => {
           {},
           { password: random(10).toLowerCase().concat(random(10).toUpperCase(), "12345") },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).not.toThrowError();
     });
   });
@@ -233,8 +233,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           { ...ctx, user: users[0] },
-          {} as any
-        )
+          {} as any,
+        ),
       ).resolves.not.toThrowError();
     });
 
@@ -258,8 +258,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           { ...ctx, user: users[0] },
-          {} as any
-        )
+          {} as any,
+        ),
       ).rejects.toThrowError();
     });
 
@@ -283,8 +283,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           { ...ctx, user: users[0] },
-          {} as any
-        )
+          {} as any,
+        ),
       ).rejects.toThrowError();
     });
 
@@ -308,8 +308,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           { ...ctx, user: users[0] },
-          {} as any
-        )
+          {} as any,
+        ),
       ).rejects.toThrowError();
     });
 
@@ -332,8 +332,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           { ...ctx, user: users[0] },
-          {} as any
-        )
+          {} as any,
+        ),
       ).resolves.not.toThrowError();
     });
 
@@ -352,8 +352,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           { ...ctx, user: users[0] },
-          {} as any
-        )
+          {} as any,
+        ),
       ).rejects.toThrowError();
     });
   });
@@ -372,8 +372,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).not.toThrowError();
     });
 
@@ -390,8 +390,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).toThrowError();
     });
 
@@ -408,8 +408,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).toThrowError();
     });
 
@@ -426,8 +426,8 @@ describe("GraphQL custom validators", () => {
             },
           },
           ctx,
-          {} as any
-        )
+          {} as any,
+        ),
       ).toThrowError();
     });
   });

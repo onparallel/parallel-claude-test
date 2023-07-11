@@ -30,7 +30,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       undefined,
       (i) => ({
         type: i === 0 ? "OWNER" : "READ",
-      })
+      }),
     );
 
     await mocks.createOrgIntegration({
@@ -59,7 +59,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         `,
         {
           petitionId: toGlobalId("Petition", readPetition.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -78,7 +78,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         `,
         {
           petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", signature.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -101,7 +101,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         {
           petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", signature.id),
           metadata: { a: "b" },
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -118,7 +118,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         `,
         {
           petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", signature.id),
-        }
+        },
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();

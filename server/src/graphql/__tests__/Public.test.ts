@@ -21,7 +21,7 @@ function setCookieHeader(testClient: TestClient, contactId: number, cookieValue:
     headers: {
       cookie: serializeCookie(
         `parallel_contact_auth_${toGlobalId("Contact", contactId)}`,
-        cookieValue
+        cookieValue,
       ),
     },
   });
@@ -85,7 +85,7 @@ describe("GraphQL/Public", () => {
           { type: "HEADING", is_fixed: true },
           { type: "TEXT", optional: true },
           { type: "FILE_UPLOAD", optional: true },
-        ][i] as Partial<PetitionField>
+        ][i] as Partial<PetitionField>,
     );
     [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
   });
@@ -156,7 +156,7 @@ describe("GraphQL/Public", () => {
 
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendContactAuthenticationRequestEmail"
+        "sendContactAuthenticationRequestEmail",
       );
 
       const res1 = await testClient.execute(
@@ -169,7 +169,7 @@ describe("GraphQL/Public", () => {
             }
           }
         `,
-        { keycode: access.keycode }
+        { keycode: access.keycode },
       );
 
       expect(emailSpy).toHaveBeenCalledTimes(1);
@@ -201,7 +201,7 @@ describe("GraphQL/Public", () => {
           keycode: access.keycode,
           token: res1.data?.publicSendVerificationCode.token,
           code,
-        }
+        },
       );
 
       expect(res2.errors).toBeUndefined();
@@ -232,7 +232,7 @@ describe("GraphQL/Public", () => {
           keycode: access.keycode,
           ip: "127.0.0.42",
           userAgent: "WAT",
-        }
+        },
       );
 
       expect(res3.errors).toBeUndefined();
@@ -300,7 +300,7 @@ describe("GraphQL/Public", () => {
 
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendContactAuthenticationRequestEmail"
+        "sendContactAuthenticationRequestEmail",
       );
 
       const res1 = await testClient.execute(
@@ -323,7 +323,7 @@ describe("GraphQL/Public", () => {
           firstName: "first name",
           lastName: "last name",
           email: "first@gmail.com",
-        }
+        },
       );
 
       const res2 = await testClient.execute(
@@ -346,7 +346,7 @@ describe("GraphQL/Public", () => {
           firstName: "first name",
           lastName: "last name",
           email: "second@gmail.com",
-        }
+        },
       );
 
       expect(emailSpy).toHaveBeenCalledTimes(3);
@@ -374,7 +374,7 @@ describe("GraphQL/Public", () => {
           keycode: access.keycode,
           token: res1.data?.publicSendVerificationCode.token,
           code: request1.code,
-        }
+        },
       );
 
       expect(res3.errors).toBeUndefined();
@@ -393,7 +393,7 @@ describe("GraphQL/Public", () => {
           keycode: access.keycode,
           token: res2.data?.publicSendVerificationCode.token,
           code: request2.code,
-        }
+        },
       );
 
       expect(res4.errors).toContainGraphQLError("ACCESS_ALREADY_WITH_CONTACT");
@@ -444,7 +444,7 @@ describe("GraphQL/Public", () => {
             keycode: access.keycode,
             fieldId: toGlobalId("PetitionField", fields[1].id),
             attachmentId: toGlobalId("PetitionFieldAttachment", attachment.id),
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.publicPetitionFieldAttachmentDownloadLink).toEqual({
@@ -490,7 +490,7 @@ describe("GraphQL/Public", () => {
             keycode: access.keycode,
             fieldId: toGlobalId("PetitionField", fields[1].id),
             attachmentId: toGlobalId("PetitionFieldAttachment", attachment.id),
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.publicPetitionFieldAttachmentDownloadLink).toEqual({
@@ -522,7 +522,7 @@ describe("GraphQL/Public", () => {
             keycode: access.keycode,
             fieldId: toGlobalId("PetitionField", fields[1].id),
             attachmentId: toGlobalId("PetitionFieldAttachment", 1234),
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
@@ -570,7 +570,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", internalField.id),
               reply: "my text reply",
-            }
+            },
           );
           expect(errors).toContainGraphQLError("FORBIDDEN");
           expect(data).toBeNull();
@@ -606,7 +606,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", textField.id),
               reply: "my reply",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -640,7 +640,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", textField.id),
               reply: "my text reply",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -666,7 +666,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", shortTextField.id),
               reply: "A".repeat(11),
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -691,7 +691,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", shortTextField.id),
               reply: "x".repeat(10),
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -717,7 +717,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", shortTextField.id),
               reply: "a",
-            }
+            },
           );
           expect(errors).toContainGraphQLError("FIELD_ALREADY_REPLIED_ERROR");
           expect(data).toBeNull();
@@ -744,13 +744,13 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", newField.id),
               reply: "reply on new field",
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
           const replyId = fromGlobalId(
             data!.publicCreatePetitionFieldReply.id,
-            "PetitionFieldReply"
+            "PetitionFieldReply",
           ).id;
 
           const events = await mocks.knex
@@ -790,7 +790,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 fieldId: toGlobalId("PetitionField", textField.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -830,7 +830,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", selectField.id),
               reply: "a",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -857,7 +857,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 fieldId: toGlobalId("PetitionField", selectField.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -896,7 +896,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", dateField.id),
               reply: "2012-12-24",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -931,7 +931,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 fieldId: toGlobalId("PetitionField", dateField.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -968,7 +968,7 @@ describe("GraphQL/Public", () => {
               },
               multiple: true,
               optional: true,
-            })
+            }),
           );
         });
 
@@ -990,7 +990,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", numberField.id),
               reply: 288,
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -1018,7 +1018,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", numberField.id),
               reply: randomFloat,
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -1045,7 +1045,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 fieldId: toGlobalId("PetitionField", limitedNumberField.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1087,7 +1087,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", checkboxField.id),
               reply: ["Option 1"],
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -1115,7 +1115,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", checkboxField.id),
               reply: ["Option 1", "Option 3"],
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -1143,7 +1143,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 fieldId: toGlobalId("PetitionField", checkboxField.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1173,7 +1173,7 @@ describe("GraphQL/Public", () => {
                   ["Galicia", ["La Coruña", "Lugo", "Orense", "Pontevedra"]],
                 ],
               },
-            })
+            }),
           );
         });
 
@@ -1198,7 +1198,7 @@ describe("GraphQL/Public", () => {
                 ["Comunidad autónoma", "Cataluña"],
                 ["Provincia", "Barcelona"],
               ],
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -1233,7 +1233,7 @@ describe("GraphQL/Public", () => {
                 ["Comunidad autónoma", "Galicia"],
                 ["Provincia", null],
               ],
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -1265,7 +1265,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
               reply: [["Comunidad autónoma", "Cataluña"]],
-            }
+            },
           );
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
           expect(data).toBeNull();
@@ -1295,7 +1295,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1335,7 +1335,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", phoneField.id),
               reply: "+34 672 62 55 77",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -1362,7 +1362,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               fieldId: toGlobalId("PetitionField", phoneField.id),
               reply: "+7 (958) 822 25 34",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicCreatePetitionFieldReply).toEqual({
@@ -1396,7 +1396,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 fieldId: toGlobalId("PetitionField", phoneField.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1425,7 +1425,7 @@ describe("GraphQL/Public", () => {
               optional: true,
               options: i === 0 ? {} : { maxLength: 15 },
               multiple: true,
-            })
+            }),
           );
           [internalField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
             type: "TEXT",
@@ -1438,14 +1438,14 @@ describe("GraphQL/Public", () => {
             shortTextField.id,
             access.id,
             1,
-            () => ({ status: "APPROVED", type: "SHORT_TEXT", content: { value: "short reply" } })
+            () => ({ status: "APPROVED", type: "SHORT_TEXT", content: { value: "short reply" } }),
           );
 
           [internalFieldReply] = await mocks.createRandomTextReply(
             internalField.id,
             access.id,
             1,
-            () => ({ status: "PENDING", type: "TEXT", content: { value: "my reply" } })
+            () => ({ status: "PENDING", type: "TEXT", content: { value: "my reply" } }),
           );
         });
 
@@ -1467,7 +1467,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", internalFieldReply.id),
               reply: "updated reply",
-            }
+            },
           );
           expect(errors).toContainGraphQLError("FORBIDDEN");
           expect(data).toBeNull();
@@ -1501,7 +1501,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", textReply.id),
               reply: "updated reply",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicUpdatePetitionFieldReply).toEqual({
@@ -1534,7 +1534,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", textReply.id),
               reply: "updated reply",
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -1562,7 +1562,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", approvedReply.id),
               reply: "updated reply",
-            }
+            },
           );
           expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
           expect(data).toBeNull();
@@ -1592,7 +1592,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", textReply.id),
               reply: "new reply",
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicUpdatePetitionFieldReply).toEqual({
@@ -1609,7 +1609,7 @@ describe("GraphQL/Public", () => {
             1,
             () => ({
               content: { value: "short!" },
-            })
+            }),
           );
 
           const { data, errors } = await testClient.execute(
@@ -1628,7 +1628,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", reply.id),
               reply: "this reply is too long for this field!!!",
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1647,7 +1647,7 @@ describe("GraphQL/Public", () => {
               type: "SELECT",
               multiple: true,
               options: { values: ["A", "B", "C", "D"] },
-            })
+            }),
           );
           [selectReply] = await mocks.createRandomTextReply(selectField.id, access.id, 1, () => ({
             type: "SELECT",
@@ -1674,7 +1674,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", selectReply.id),
               reply: "D",
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -1704,7 +1704,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", selectReply.id),
               reply: "invalid option",
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1743,7 +1743,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", dateReply.id),
               reply: "2077-02-12",
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -1772,7 +1772,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 replyId: toGlobalId("PetitionFieldReply", dateReply.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1792,7 +1792,7 @@ describe("GraphQL/Public", () => {
               type: "DATE_TIME",
               multiple: true,
               optional: true,
-            })
+            }),
           );
 
           [datetimeReply] = await mocks.createRandomDateReply(datetimeField.id, access.id, 1);
@@ -1820,7 +1820,7 @@ describe("GraphQL/Public", () => {
                 datetime: "2023-03-03T03:00",
                 timezone: "Europe/Madrid",
               },
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -1856,7 +1856,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1892,7 +1892,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1919,7 +1919,7 @@ describe("GraphQL/Public", () => {
               },
               multiple: true,
               optional: true,
-            })
+            }),
           );
 
           const [limitedNumberField] = await mocks.createRandomPetitionFields(
@@ -1935,7 +1935,7 @@ describe("GraphQL/Public", () => {
               },
               multiple: true,
               optional: true,
-            })
+            }),
           );
 
           [numberReply] = await mocks.createRandomNumberReply(numberField.id, access.id, 1);
@@ -1945,7 +1945,7 @@ describe("GraphQL/Public", () => {
             1,
             undefined,
             100,
-            200
+            200,
           );
 
           [approvedReply] = await mocks.createRandomNumberReply(
@@ -1955,7 +1955,7 @@ describe("GraphQL/Public", () => {
             () => ({
               status: "APPROVED",
               type: "NUMBER",
-            })
+            }),
           );
         });
 
@@ -1978,7 +1978,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", numberReply.id),
               reply: 30,
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -2009,7 +2009,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 replyId: toGlobalId("PetitionFieldReply", limitedNumberReply.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2038,13 +2038,13 @@ describe("GraphQL/Public", () => {
                   max: 1,
                 },
               },
-            })
+            }),
           );
 
           checkboxReply = await mocks.createCheckboxReply(
             checkboxField.id,
             { accessId: access.id },
-            ["3"]
+            ["3"],
           );
         });
 
@@ -2065,7 +2065,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", checkboxReply.id),
               reply: ["1"],
-            }
+            },
           );
           expect(errors).toBeUndefined();
           expect(data?.publicUpdatePetitionFieldReply).toEqual({
@@ -2091,7 +2091,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 replyId: toGlobalId("PetitionFieldReply", checkboxReply.id),
                 reply,
-              }
+              },
             );
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
@@ -2120,7 +2120,7 @@ describe("GraphQL/Public", () => {
                   ["Galicia", ["La Coruña", "Lugo", "Orense", "Pontevedra"]],
                 ],
               },
-            })
+            }),
           );
 
           [dynamicSelectReply] = await mocks.createRandomTextReply(
@@ -2135,7 +2135,7 @@ describe("GraphQL/Public", () => {
                   ["Provincia", null],
                 ],
               },
-            })
+            }),
           );
         });
 
@@ -2161,7 +2161,7 @@ describe("GraphQL/Public", () => {
                 ["Comunidad autónoma", "Aragón"],
                 ["Provincia", "Zaragoza"],
               ],
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -2209,7 +2209,7 @@ describe("GraphQL/Public", () => {
                 keycode: access.keycode,
                 replyId: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
                 reply,
-              }
+              },
             );
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2230,7 +2230,7 @@ describe("GraphQL/Public", () => {
               type: "PHONE",
               optional: true,
               multiple: true,
-            })
+            }),
           );
 
           [phoneReply] = await mocks.createRandomPhoneReply(phoneField.id, access.id, 1, () => ({
@@ -2257,7 +2257,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
               reply: "+34 674 15 15 36",
-            }
+            },
           );
 
           expect(errors).toBeUndefined();
@@ -2287,7 +2287,7 @@ describe("GraphQL/Public", () => {
               keycode: access.keycode,
               replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
               reply: "tel: +34 674 15 15 36",
-            }
+            },
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2308,13 +2308,13 @@ describe("GraphQL/Public", () => {
         const [fileUploadField] = await mocks.createRandomPetitionFields(
           access.petition_id,
           1,
-          () => ({ type: "FILE_UPLOAD", optional: true })
+          () => ({ type: "FILE_UPLOAD", optional: true }),
         );
 
         const [internalField] = await mocks.createRandomPetitionFields(
           access.petition_id,
           1,
-          () => ({ type: "TEXT", optional: true, is_internal: true })
+          () => ({ type: "TEXT", optional: true, is_internal: true }),
         );
 
         [simpleReply] = await mocks.createRandomTextReply(simpleField.id, access.id, 1);
@@ -2341,7 +2341,7 @@ describe("GraphQL/Public", () => {
           {
             keycode: access.keycode,
             replyId: toGlobalId("PetitionFieldReply", internalReply.id),
-          }
+          },
         );
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
@@ -2368,7 +2368,7 @@ describe("GraphQL/Public", () => {
           {
             keycode: access.keycode,
             replyId: toGlobalId("PetitionFieldReply", reply.id),
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.publicDeletePetitionFieldReply).toEqual({
@@ -2393,7 +2393,7 @@ describe("GraphQL/Public", () => {
           {
             keycode: access.keycode,
             replyId: toGlobalId("PetitionFieldReply", simpleReply.id),
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2414,7 +2414,7 @@ describe("GraphQL/Public", () => {
           {
             keycode: access.keycode,
             replyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.publicDeletePetitionFieldReply).toEqual({
@@ -2441,7 +2441,7 @@ describe("GraphQL/Public", () => {
           {
             keycode: access.keycode,
             replyId: toGlobalId("PetitionFieldReply", approvedReply.id),
-          }
+          },
         );
         expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
         expect(data).toBeNull();
@@ -2483,7 +2483,7 @@ describe("GraphQL/Public", () => {
               filename: "file.txt",
               size: 500,
             },
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2522,7 +2522,7 @@ describe("GraphQL/Public", () => {
               filename: "file.txt",
               size: 50 * 1024 * 1024 + 1,
             },
-          }
+          },
         );
 
         expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
@@ -2542,7 +2542,7 @@ describe("GraphQL/Public", () => {
           {
             keycode: access.keycode,
             replyId: fileUploadReplyId,
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.publicFileUploadReplyComplete).toEqual({
@@ -2576,7 +2576,7 @@ describe("GraphQL/Public", () => {
           `,
           {
             keycode: access.keycode,
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2613,7 +2613,7 @@ describe("GraphQL/Public", () => {
           {
             id: toGlobalId("Task", task.id),
             keycode: access.keycode,
-          }
+          },
         );
         expect(errors).toBeUndefined();
         expect(data?.publicTask).toEqual({
@@ -2635,7 +2635,7 @@ describe("GraphQL/Public", () => {
               }
             }
           `,
-          { keycode: access.keycode }
+          { keycode: access.keycode },
         );
 
         expect(errors).toBeUndefined();
@@ -2679,7 +2679,7 @@ describe("GraphQL/Public", () => {
           {
             taskId: toGlobalId("Task", completedTask.id),
             keycode: access.keycode,
-          }
+          },
         );
 
         expect(errors).toBeUndefined();
@@ -2693,7 +2693,7 @@ describe("GraphQL/Public", () => {
           access.petition_id,
           access.granter_id,
           [otherContact.id],
-          access.granter_id
+          access.granter_id,
         );
         const privateTask = await mocks.createTask({
           petition_access_id: privateAccess.id,
@@ -2710,7 +2710,7 @@ describe("GraphQL/Public", () => {
               publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
             }
           `,
-          { taskId: toGlobalId("Task", privateTask.id), keycode: privateAccess.keycode }
+          { taskId: toGlobalId("Task", privateTask.id), keycode: privateAccess.keycode },
         );
 
         expect(errors).toContainGraphQLError("CONTACT_NOT_VERIFIED");
@@ -2724,7 +2724,7 @@ describe("GraphQL/Public", () => {
               publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
             }
           `,
-          { taskId: toGlobalId("Task", incompleteTask.id), keycode: access.keycode }
+          { taskId: toGlobalId("Task", incompleteTask.id), keycode: access.keycode },
         );
 
         expect(errors).toContainGraphQLError("FILE_NOT_FOUND_ERROR");
