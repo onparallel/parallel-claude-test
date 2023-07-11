@@ -51,6 +51,7 @@ export function ShortTextSettings({
           </Text>
           <Box flex="1" minWidth="0">
             <SimpleSelect
+              singleLineOptions
               data-testid="petition-compose-short-text-format-select"
               size="sm"
               options={grouped}
