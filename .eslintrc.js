@@ -65,7 +65,7 @@ module.exports = {
     "client/public",
     "server/dist",
     "bin/dist",
-    "**/__*",
+    "**/__*.ts",
     "client/public/static/lang",
     "server/lang/compiled",
   ],
