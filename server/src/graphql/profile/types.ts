@@ -21,7 +21,7 @@ export const ProfileType = objectType({
           .map((p) =>
             typeof p === "string"
               ? p.replaceAll("{", "\\{")
-              : `{{${toGlobalId("ProfileTypeField", p)}}}`,
+              : `{{ ${toGlobalId("ProfileTypeField", p)} }}`,
           )
           .join(""),
     });
