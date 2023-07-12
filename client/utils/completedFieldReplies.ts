@@ -12,23 +12,26 @@ type PartialField =
 type Field = {
   type: PetitionFieldType;
   options: any;
+  previewReplies: { content: any; isAnonymized: boolean }[];
   replies: { content: any; isAnonymized: boolean }[];
 };
 
-// ALERT: Same logic in completedFieldReplies in client side
+// ALERT: Same logic in completedFieldReplies in server side
 /** returns the field replies that are fully completed */
-export function completedFieldReplies(field: PartialField) {
+// @usePreviewReplies is used only in client side to work with preview replies
+export function completedFieldReplies(field: PartialField, usePreviewReplies?: boolean) {
   const f = field as Field;
-  if (f.replies.every((r) => r.isAnonymized)) {
-    return f.replies;
+  const replies = usePreviewReplies ? f.previewReplies : f.replies;
+  if (replies.every((r) => r.isAnonymized)) {
+    return replies;
   }
   switch (f.type) {
     case "DYNAMIC_SELECT":
-      return f.replies.filter((reply) =>
+      return replies.filter((reply) =>
         reply.content.value.every(([, value]: [string, string | null]) => !!value),
       );
     case "CHECKBOX":
-      return f.replies.filter((reply) => {
+      return replies.filter((reply) => {
         if (f.options.limit.type === "EXACT") {
           return reply.content.value.length === f.options.limit.max;
         } else {
@@ -38,9 +41,9 @@ export function completedFieldReplies(field: PartialField) {
     case "FILE_UPLOAD":
     case "ES_TAX_DOCUMENTS":
     case "DOW_JONES_KYC":
-      return f.replies.filter((reply) => reply.content.uploadComplete);
+      return replies.filter((reply) => reply.content.uploadComplete);
     default:
-      return f.replies;
+      return replies;
   }
 }
 
@@ -49,6 +52,10 @@ completedFieldReplies.fragments = {
     fragment completedFieldReplies_PetitionField on PetitionField {
       type
       options
+      previewReplies @client {
+        content
+        isAnonymized
+      }
       replies {
         content
         isAnonymized

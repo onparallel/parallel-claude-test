@@ -13531,12 +13531,12 @@ export type PreviewPetitionField_PetitionFieldFragment = {
   hasCommentsEnabled: boolean;
   previewReplies: Array<{
     __typename?: "PetitionFieldReply";
+    content: { [key: string]: any };
+    isAnonymized: boolean;
     id: string;
     status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
-    isAnonymized: boolean;
   }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
@@ -13634,12 +13634,12 @@ export type PreviewPetitionField_PetitionFieldQuery = {
     hasCommentsEnabled: boolean;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
+      content: { [key: string]: any };
+      isAnonymized: boolean;
       id: string;
       status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
-      isAnonymized: boolean;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -14131,6 +14131,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      isAnonymized: boolean;
     }>;
   }>;
   signatureConfig?: {
@@ -14642,6 +14643,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      isAnonymized: boolean;
     }>;
   }>;
   currentSignatureRequest?: {
@@ -14749,6 +14751,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
+            isAnonymized: boolean;
           }>;
         }>;
         currentSignatureRequest?: {
@@ -14905,6 +14908,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         __typename?: "PetitionFieldReply";
         id: string;
         content: { [key: string]: any };
+        isAnonymized: boolean;
       }>;
     }>;
     currentSignatureRequest?: {
@@ -15012,6 +15016,7 @@ export type PetitionSignaturesCard_petitionQuery = {
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
+            isAnonymized: boolean;
           }>;
         }>;
         currentSignatureRequest?: {
@@ -15947,17 +15952,19 @@ export type RecipientViewContentsCard_PetitionBase_Petition_Fragment = {
     unreadCommentCount: number;
     hasCommentsEnabled: boolean;
     visibility?: { [key: string]: any } | null;
-    replies: Array<{
+    previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
       isAnonymized: boolean;
     }>;
-    previewReplies: Array<{
+    replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
+      status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
+      isAnonymized: boolean;
     }>;
   }>;
 };
@@ -15977,17 +15984,19 @@ export type RecipientViewContentsCard_PetitionBase_PetitionTemplate_Fragment = {
     unreadCommentCount: number;
     hasCommentsEnabled: boolean;
     visibility?: { [key: string]: any } | null;
-    replies: Array<{
+    previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
       isAnonymized: boolean;
     }>;
-    previewReplies: Array<{
+    replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
+      status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
+      isAnonymized: boolean;
     }>;
   }>;
 };
@@ -16009,17 +16018,19 @@ export type RecipientViewContentsCard_PetitionFieldFragment = {
   unreadCommentCount: number;
   hasCommentsEnabled: boolean;
   visibility?: { [key: string]: any } | null;
-  replies: Array<{
+  previewReplies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
     content: { [key: string]: any };
     isAnonymized: boolean;
   }>;
-  previewReplies: Array<{
+  replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
+    status: PetitionFieldReplyStatus;
     content: { [key: string]: any };
+    isAnonymized: boolean;
   }>;
 };
 
@@ -16131,6 +16142,7 @@ export type RecipientViewProgressFooter_PetitionFragment = {
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      isAnonymized: boolean;
     }>;
   }>;
   signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null;
@@ -16155,6 +16167,7 @@ export type RecipientViewProgressFooter_PetitionFieldFragment = {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+    isAnonymized: boolean;
   }>;
 };
 
@@ -16573,6 +16586,11 @@ export type RecipientViewPetitionFieldCard_PetitionFieldFragment = {
       size: number;
       isComplete: boolean;
     };
+  }>;
+  previewReplies: Array<{
+    __typename?: "PetitionFieldReply";
+    content: { [key: string]: any };
+    isAnonymized: boolean;
   }>;
 };
 
@@ -24691,11 +24709,11 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
+      isAnonymized: boolean;
       id: string;
       status: PetitionFieldReplyStatus;
       createdAt: string;
       updatedAt: string;
-      isAnonymized: boolean;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -24853,11 +24871,11 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
+      isAnonymized: boolean;
       id: string;
       status: PetitionFieldReplyStatus;
       createdAt: string;
       updatedAt: string;
-      isAnonymized: boolean;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -25088,11 +25106,11 @@ export type PetitionPreview_updatePetitionMutation = {
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
+            isAnonymized: boolean;
             id: string;
             status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
-            isAnonymized: boolean;
           }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -25249,11 +25267,11 @@ export type PetitionPreview_updatePetitionMutation = {
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
+            isAnonymized: boolean;
             id: string;
             status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
-            isAnonymized: boolean;
           }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -25434,11 +25452,11 @@ export type PetitionPreview_completePetitionMutation = {
       previewReplies: Array<{
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
+        isAnonymized: boolean;
         id: string;
         status: PetitionFieldReplyStatus;
         createdAt: string;
         updatedAt: string;
-        isAnonymized: boolean;
       }>;
       replies: Array<{
         __typename?: "PetitionFieldReply";
@@ -25638,11 +25656,11 @@ export type PetitionPreview_petitionQuery = {
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
+            isAnonymized: boolean;
             id: string;
             status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
-            isAnonymized: boolean;
           }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -25799,11 +25817,11 @@ export type PetitionPreview_petitionQuery = {
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
+            isAnonymized: boolean;
             id: string;
             status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
-            isAnonymized: boolean;
           }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -25997,6 +26015,7 @@ export type PetitionReplies_PetitionFragment = {
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
       id: string;
+      isAnonymized: boolean;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -26313,6 +26332,7 @@ export type PetitionReplies_PetitionFieldFragment = {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+    isAnonymized: boolean;
   }>;
 };
 
@@ -26463,6 +26483,7 @@ export type PetitionReplies_closePetitionMutation = {
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
         id: string;
+        isAnonymized: boolean;
       }>;
       replies: Array<{
         __typename?: "PetitionFieldReply";
@@ -26714,6 +26735,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
         id: string;
+        isAnonymized: boolean;
       }>;
       replies: Array<{
         __typename?: "PetitionFieldReply";
@@ -27131,6 +27153,7 @@ export type PetitionReplies_petitionQuery = {
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
             id: string;
+            isAnonymized: boolean;
           }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -30368,6 +30391,11 @@ export type completedFieldReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
   type: PetitionFieldType;
   options: { [key: string]: any };
+  previewReplies: Array<{
+    __typename?: "PetitionFieldReply";
+    content: { [key: string]: any };
+    isAnonymized: boolean;
+  }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     content: { [key: string]: any };
@@ -30417,6 +30445,7 @@ export type useFieldVisibility_PetitionFieldFragment = {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+    isAnonymized: boolean;
   }>;
 };
 
@@ -31368,6 +31397,7 @@ export type useGetPageFields_PetitionFieldFragment = {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+    isAnonymized: boolean;
   }>;
 };
 
@@ -31567,6 +31597,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
+            isAnonymized: boolean;
           }>;
         }>;
         currentSignatureRequest?: {
@@ -35821,6 +35852,10 @@ export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
   fragment completedFieldReplies_PetitionField on PetitionField {
     type
     options
+    previewReplies @client {
+      content
+      isAnonymized
+    }
     replies {
       content
       isAnonymized
@@ -36033,6 +36068,10 @@ export const RecipientViewContentsCard_PetitionFieldFragmentDoc = gql`
     optional
     isInternal
     isReadOnly
+    previewReplies @client {
+      id
+      status
+    }
     replies {
       id
       status

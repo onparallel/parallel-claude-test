@@ -83,13 +83,18 @@ export const RecipientViewContentsCard = Object.assign(
     }, [router.query]);
 
     const handleFocusField = (field: PetitionFieldSelection) => {
+      const replies =
+        usePreviewReplies && field.__typename === "PetitionField"
+          ? field.previewReplies
+          : field.replies;
+
       const focusFieldContainer = field.type === "HEADING" || isFileTypeField(field.type);
       let id =
         focusFieldContainer || field.type === "CHECKBOX"
           ? `field-${field.id}`
-          : `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
+          : `reply-${field.id}-${replies[0]?.id ?? "new"}`;
 
-      if (field.type === "DYNAMIC_SELECT" && field.replies.length) {
+      if (field.type === "DYNAMIC_SELECT" && replies.length) {
         id += "-0";
       }
 
@@ -212,6 +217,10 @@ export const RecipientViewContentsCard = Object.assign(
                   {index + 1 === currentPage ? (
                     <Stack as={List} spacing={1}>
                       {filteredFields.map((field) => {
+                        const replies =
+                          usePreviewReplies && field.__typename === "PetitionField"
+                            ? field.previewReplies
+                            : field.replies;
                         return (
                           <ListItem key={field.id} position="relative">
                             <Text
@@ -238,14 +247,15 @@ export const RecipientViewContentsCard = Object.assign(
                                   whiteSpace="nowrap"
                                   {...(field.title
                                     ? {
-                                        color: field.replies.some((r) => r.status === "REJECTED")
+                                        color: replies.some((r) => r.status === "REJECTED")
                                           ? "red.600"
-                                          : completedFieldReplies(field).length !== 0
+                                          : completedFieldReplies(field, usePreviewReplies)
+                                              .length !== 0
                                           ? "gray.400"
                                           : "inherit",
                                       }
                                     : {
-                                        color: field.replies.some((r) => r.status === "REJECTED")
+                                        color: replies.some((r) => r.status === "REJECTED")
                                           ? "red.600"
                                           : "gray.500",
                                         fontWeight: "normal",
@@ -346,6 +356,10 @@ export const RecipientViewContentsCard = Object.assign(
             optional
             isInternal
             isReadOnly
+            previewReplies @client {
+              id
+              status
+            }
             replies {
               id
               status
