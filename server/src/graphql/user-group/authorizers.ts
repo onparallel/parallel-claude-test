@@ -20,10 +20,13 @@ export async function contextUserHasAccessToUserGroups(userGroupIds: number[], c
 export function userHasAccessToUserGroups<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
+      if (!isDefined(args[argName])) {
+        return true;
+      }
       const userGroupIds = unMaybeArray(args[argName]) as unknown as number[];
       return await contextUserHasAccessToUserGroups(userGroupIds, ctx);
     } catch {}

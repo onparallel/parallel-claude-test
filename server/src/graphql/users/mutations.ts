@@ -118,7 +118,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
         orgDoesNotHaveSsoProvider(),
         orgCanCreateNewUser(),
         contextUserHasPermission("USERS:CRUD_USERS"),
-        ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
+        userHasAccessToUserGroups("userGroupIds"),
       ),
     ),
     emailIsNotRegisteredInTargetOrg("email", "orgId" as never),
@@ -344,7 +344,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   authorize: authenticateAnd(
     contextUserHasPermission("USERS:CRUD_USERS"),
     userHasAccessToUsers("userId"),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
+    userHasAccessToUserGroups("userGroupIds"),
   ),
   args: {
     userId: nonNull(globalIdArg("User")),

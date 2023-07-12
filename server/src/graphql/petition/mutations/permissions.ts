@@ -2,7 +2,7 @@ import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } fr
 import pMap from "p-map";
 import { DatabaseError } from "pg";
 import { differenceWith, filter, groupBy, isDefined, pipe, uniq, uniqBy, zip } from "remeda";
-import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
+import { and, authenticate, authenticateAnd, chain } from "../../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../../helpers/validateArgs";
@@ -36,8 +36,8 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
-    ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
+    userHasAccessToUsers("userIds"),
+    userHasAccessToUserGroups("userGroupIds"),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -125,8 +125,8 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
-    ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
+    userHasAccessToUsers("userIds"),
+    userHasAccessToUserGroups("userGroupIds"),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -180,8 +180,8 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
   type: nonNull(list(nullable("PetitionBase"))),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
-    ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
+    userHasAccessToUsers("userIds"),
+    userHasAccessToUserGroups("userGroupIds"),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),

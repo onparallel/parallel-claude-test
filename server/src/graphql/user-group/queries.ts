@@ -1,5 +1,5 @@
 import { list, nonNull, queryField, stringArg } from "nexus";
-import { authenticate, authenticateAnd, chain, ifArgDefined } from "../helpers/authorize";
+import { authenticate, authenticateAnd, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasAccessToUserGroups } from "./authorizers";
@@ -43,9 +43,7 @@ export const userGroupsQuery = queryField((t) => {
 export const searchUserGroups = queryField("searchUserGroups", {
   type: list("UserGroup"),
   description: "Search user groups",
-  authorize: authenticateAnd(
-    ifArgDefined("excludeUserGroups", userHasAccessToUserGroups("excludeUserGroups" as never)),
-  ),
+  authorize: authenticateAnd(userHasAccessToUserGroups("excludeUserGroups")),
   args: {
     search: nonNull(stringArg()),
     excludeUserGroups: list(nonNull(globalIdArg("UserGroup"))),

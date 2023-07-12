@@ -454,6 +454,7 @@ export interface TableTypes {
   profile_subscription: ProfileSubscription;
   profile_type: ProfileType;
   profile_type_field: ProfileTypeField;
+  profile_type_field_permission_override: ProfileTypeFieldPermissionOverride;
   public_file_upload: PublicFileUpload;
   public_petition_link: PublicPetitionLink;
   public_petition_link_prefill_data: PublicPetitionLinkPrefillData;
@@ -512,6 +513,7 @@ export interface TableCreateTypes {
   profile_subscription: CreateProfileSubscription;
   profile_type: CreateProfileType;
   profile_type_field: CreateProfileTypeField;
+  profile_type_field_permission_override: CreateProfileTypeFieldPermissionOverride;
   public_file_upload: CreatePublicFileUpload;
   public_petition_link: CreatePublicPetitionLink;
   public_petition_link_prefill_data: CreatePublicPetitionLinkPrefillData;
@@ -570,6 +572,7 @@ export interface TablePrimaryKeys {
   profile_subscription: "id";
   profile_type: "id";
   profile_type_field: "id";
+  profile_type_field_permission_override: "id";
   public_file_upload: "id";
   public_petition_link: "id";
   public_petition_link_prefill_data: "id";
@@ -1588,6 +1591,32 @@ export type CreateProfileTypeField = PartialProps<
   | "is_expirable"
   | "permission"
   | "expiry_alert_ahead_time"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface ProfileTypeFieldPermissionOverride {
+  id: number; // int4
+  profile_type_field_id: number; // int4
+  permission: ProfileTypeFieldPermission; // profile_type_field_permission
+  user_id: Maybe<number>; // int4
+  user_group_id: Maybe<number>; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileTypeFieldPermissionOverride = PartialProps<
+  Omit<ProfileTypeFieldPermissionOverride, "id">,
+  | "user_id"
+  | "user_group_id"
   | "created_at"
   | "created_by"
   | "updated_at"

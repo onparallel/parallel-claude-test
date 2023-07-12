@@ -191,6 +191,12 @@ export interface NexusGenInputs {
     en?: NexusGenScalars["JSON"] | null; // JSON
     es?: NexusGenScalars["JSON"] | null; // JSON
   };
+  OverrideProfileTypeFieldPermissionInput: {
+    // input type
+    permission: NexusGenEnums["ProfileTypeFieldPermission"]; // ProfileTypeFieldPermission!
+    userGroupId?: NexusGenScalars["GID"] | null; // GID
+    userId?: NexusGenScalars["GID"] | null; // GID
+  };
   PetitionFilter: {
     // input type
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -336,6 +342,7 @@ export interface NexusGenInputs {
   UpdateProfileTypeFieldInput: {
     // input type
     alias?: string | null; // String
+    defaultPermission?: NexusGenEnums["ProfileTypeFieldPermission"] | null; // ProfileTypeFieldPermission
     expiryAlertAheadTime?: NexusGenScalars["Duration"] | null; // Duration
     isExpirable?: boolean | null; // Boolean
     name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
@@ -1500,6 +1507,7 @@ export interface NexusGenFieldTypes {
     deleteProfileFieldFile: NexusGenEnums["Result"]; // Result!
     deleteProfileType: NexusGenEnums["Success"]; // Success!
     deleteProfileTypeField: NexusGenRootTypes["ProfileType"]; // ProfileType!
+    deleteProfileTypeFieldPermissionOverride: NexusGenEnums["Success"]; // Success!
     deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
     deleteTag: NexusGenEnums["Result"]; // Result!
     deleteUserGroup: NexusGenEnums["Result"]; // Result!
@@ -1519,6 +1527,7 @@ export interface NexusGenFieldTypes {
     modifyCurrentUsagePeriod: NexusGenRootTypes["Organization"]; // Organization!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     movePetitions: NexusGenEnums["Success"]; // Success!
+    overrideProfileTypeFieldPermission: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -3558,6 +3567,7 @@ export interface NexusGenFieldTypeNames {
     deleteProfileFieldFile: "Result";
     deleteProfileType: "Success";
     deleteProfileTypeField: "ProfileType";
+    deleteProfileTypeFieldPermissionOverride: "Success";
     deleteSignatureIntegration: "Result";
     deleteTag: "Result";
     deleteUserGroup: "Result";
@@ -3577,6 +3587,7 @@ export interface NexusGenFieldTypeNames {
     modifyCurrentUsagePeriod: "Organization";
     modifyPetitionCustomProperty: "PetitionBase";
     movePetitions: "Success";
+    overrideProfileTypeFieldPermission: "ProfileTypeField";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionAttachmentUploadComplete: "PetitionAttachment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
@@ -5595,6 +5606,13 @@ export interface NexusGenArgTypes {
       profileTypeFieldIds: NexusGenScalars["GID"][]; // [GID!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
+    deleteProfileTypeFieldPermissionOverride: {
+      // args
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
     deleteSignatureIntegration: {
       // args
       force?: boolean | null; // Boolean
@@ -5696,6 +5714,12 @@ export interface NexusGenArgTypes {
       ids?: NexusGenScalars["GID"][] | null; // [GID!]
       source: string; // String!
       type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
+    };
+    overrideProfileTypeFieldPermission: {
+      // args
+      data: NexusGenInputs["OverrideProfileTypeFieldPermissionInput"][]; // [OverrideProfileTypeFieldPermissionInput!]!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     petitionAttachmentDownloadLink: {
       // args

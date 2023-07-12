@@ -1,11 +1,17 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, uniq } from "remeda";
-import { ProfileType, ProfileTypeFieldType } from "../../db/__types";
+import {
+  ProfileType,
+  ProfileTypeFieldPermission,
+  ProfileTypeFieldType,
+  ProfileTypeFieldPermissionValues,
+} from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
+import { core } from "nexus";
 
 function createProfileTypeAuthorizer<TRest extends any[] = []>(
   predicate: (profileType: ProfileType, ...rest: TRest) => boolean,
@@ -232,4 +238,26 @@ export function contextUserCanSubscribeUsersToProfile<
     }
     return true;
   };
+}
+
+export function userHasPermissionOnProfileTypeField<
+  TypeName extends string,
+  FieldName extends string,
+>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => number[],
+  permission: ProfileTypeFieldPermission,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const ids = prop(args);
+    const myPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
+      ids.map((id) => ({ profileTypeFieldId: id, userId: ctx.user!.id })),
+    );
+    return myPermissions.every((p) => isAtLeast(p, permission));
+  };
+}
+
+function isAtLeast(p1: ProfileTypeFieldPermission, p2: ProfileTypeFieldPermission) {
+  return (
+    ProfileTypeFieldPermissionValues.indexOf(p1) >= ProfileTypeFieldPermissionValues.indexOf(p2)
+  );
 }

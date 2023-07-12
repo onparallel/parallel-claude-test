@@ -10,6 +10,7 @@ import {
   ProfileType,
   ProfileTypeField,
   User,
+  UserGroup,
 } from "../../db/__types";
 import { defaultProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../../db/knex";
@@ -122,6 +123,7 @@ describe("GraphQL/Profiles", () => {
   beforeEach(async () => {
     await mocks.knex.from("profile_field_file").delete();
     await mocks.knex.from("profile_field_value").delete();
+    await mocks.knex.from("profile_type_field_permission_override").delete();
     await mocks.knex.from("profile_type_field").delete();
     await mocks.knex.from("profile_event").delete();
     await mocks.knex.from("profile_subscription").delete();
@@ -151,12 +153,14 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "First name", es: "Nombre" }),
             type: "SHORT_TEXT" as const,
             alias: "FIRST_NAME",
+            permission: "WRITE" as const,
             options: {},
           },
           {
             name: json({ en: "Last name", es: "Apellido" }),
             type: "SHORT_TEXT" as const,
             alias: "LAST_NAME",
+            permission: "WRITE" as const,
             options: {},
           },
           {
@@ -164,18 +168,21 @@ describe("GraphQL/Profiles", () => {
             type: "DATE" as const,
             alias: "BIRTH_DATE",
             is_expirable: true,
+            permission: "WRITE" as const,
             options: { useReplyAsExpiryDate: true },
           },
           {
             name: json({ en: "Phone", es: "Teléfono" }),
             type: "PHONE" as const,
             alias: "PHONE",
+            permission: "WRITE" as const,
             options: {},
           },
           {
             name: json({ en: "Email", es: "Correo electrónico" }),
             type: "TEXT" as const,
             alias: "EMAIL",
+            permission: "WRITE" as const,
             options: {},
           },
           {
@@ -183,6 +190,7 @@ describe("GraphQL/Profiles", () => {
             type: "SHORT_TEXT" as const,
             alias: "PASSPORT",
             is_expirable: true,
+            permission: "WRITE" as const,
             expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
             options: {},
           },
@@ -221,7 +229,7 @@ describe("GraphQL/Profiles", () => {
     profileType2Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[2].id,
-      2,
+      4,
       (i) =>
         [
           {
@@ -234,6 +242,18 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "ID", es: "DNI" }),
             type: "FILE" as const,
             alias: "ID_PHOTO",
+          },
+          {
+            name: json({ en: "Contract", es: "Contrato" }),
+            type: "FILE" as const,
+            alias: "CONTRACT",
+            permission: "READ" as const,
+          },
+          {
+            name: json({ en: "Bank ID", es: "ID de Banco" }),
+            type: "TEXT" as const,
+            alias: "BANK_ID",
+            permission: "READ" as const,
           },
         ][i],
     );
@@ -423,6 +443,117 @@ describe("GraphQL/Profiles", () => {
         },
       });
     });
+
+    it("returns null values on HIDDEN fields", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harry" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Potter" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "2029-01-01" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
+          content: { value: "AA1234567" },
+          expiryDate: "2024-10-28",
+        },
+      ]);
+
+      await mocks.knex
+        .from("profile_type_field")
+        .whereIn("id", [
+          profileType0Fields[2].id,
+          profileType0Fields[3].id,
+          profileType0Fields[5].id,
+        ])
+        .update("permission", "HIDDEN");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              properties {
+                field {
+                  id
+                  myPermission
+                }
+                files {
+                  id
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: profile.id,
+        properties: [
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              myPermission: "WRITE",
+            },
+            files: null,
+            value: { content: { value: "Harry" } },
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+              myPermission: "WRITE",
+            },
+            files: null,
+            value: { content: { value: "Potter" } },
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              myPermission: "HIDDEN",
+            },
+            files: null,
+            value: null,
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+              myPermission: "HIDDEN",
+            },
+            files: null,
+            value: null,
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[4].id),
+              myPermission: "WRITE",
+            },
+            files: null,
+            value: null,
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
+              myPermission: "HIDDEN",
+            },
+            files: null,
+            value: null,
+          },
+        ],
+      });
+    });
   });
 
   describe("profileTypes", () => {
@@ -492,6 +623,14 @@ describe("GraphQL/Profiles", () => {
               {
                 name: { en: "ID", es: "DNI" },
                 position: 1,
+              },
+              {
+                name: { en: "Contract", es: "Contrato" },
+                position: 2,
+              },
+              {
+                name: { en: "Bank ID", es: "ID de Banco" },
+                position: 3,
               },
             ],
           },
@@ -633,6 +772,319 @@ describe("GraphQL/Profiles", () => {
             })),
           },
         ],
+      });
+    });
+  });
+
+  describe("profileTypeField visibility", () => {
+    let profile: Profile;
+    beforeEach(async () => {
+      [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[0].id, 1);
+    });
+
+    afterEach(async () => {
+      await mocks.knex.from("profile_type_field_permission_override").delete();
+    });
+
+    it("defaults to profile type field permission", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              profileType {
+                id
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          }
+        `,
+        { profileId: toGlobalId("Profile", profile.id) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        profileType: {
+          id: toGlobalId("ProfileType", profileTypes[0].id),
+          fields: [
+            {
+              alias: "FIRST_NAME",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "LAST_NAME",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "BIRTH_DATE",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "PHONE",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "EMAIL",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "PASSPORT",
+              myPermission: "WRITE",
+            },
+          ],
+        },
+      });
+    });
+
+    it("overrides profile type field permission for user", async () => {
+      await mocks.knex.from("profile_type_field_permission_override").insert([
+        {
+          user_id: sessionUser.id,
+          profile_type_field_id: profileType0Fields[0].id,
+          permission: "READ",
+        },
+        {
+          user_id: sessionUser.id,
+          profile_type_field_id: profileType0Fields[2].id,
+          permission: "WRITE",
+        },
+        {
+          user_id: sessionUser.id,
+          profile_type_field_id: profileType0Fields[4].id,
+          permission: "HIDDEN",
+        },
+        {
+          user_id: sessionUser.id,
+          profile_type_field_id: profileType0Fields[5].id,
+          permission: "READ",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              profileType {
+                id
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          }
+        `,
+        { profileId: toGlobalId("Profile", profile.id) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        profileType: {
+          id: toGlobalId("ProfileType", profileTypes[0].id),
+          fields: [
+            {
+              alias: "FIRST_NAME",
+              myPermission: "READ",
+            },
+            {
+              alias: "LAST_NAME",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "BIRTH_DATE",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "PHONE",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "EMAIL",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "PASSPORT",
+              myPermission: "READ",
+            },
+          ],
+        },
+      });
+    });
+
+    it("overrides profile type field permission for user group", async () => {
+      const [userGroup] = await mocks.createUserGroups(1, organization.id);
+      await mocks.insertUserGroupMembers(userGroup.id, [sessionUser.id]);
+      await mocks.knex.from("profile_type_field_permission_override").insert([
+        {
+          user_group_id: userGroup.id,
+          profile_type_field_id: profileType0Fields[0].id,
+          permission: "READ",
+        },
+        {
+          user_group_id: userGroup.id,
+          profile_type_field_id: profileType0Fields[2].id,
+          permission: "HIDDEN",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              profileType {
+                id
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          }
+        `,
+        { profileId: toGlobalId("Profile", profile.id) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        profileType: {
+          id: toGlobalId("ProfileType", profileTypes[0].id),
+          fields: [
+            {
+              alias: "FIRST_NAME",
+              myPermission: "READ",
+            },
+            {
+              alias: "LAST_NAME",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "BIRTH_DATE",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "PHONE",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "EMAIL",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "PASSPORT",
+              myPermission: "WRITE",
+            },
+          ],
+        },
+      });
+    });
+
+    it("selects greatest permission when user has multiple overrides", async () => {
+      const groups = await mocks.createUserGroups(3, organization.id);
+      await mocks.insertUserGroupMembers(groups[0].id, [sessionUser.id]);
+      await mocks.insertUserGroupMembers(groups[1].id, [sessionUser.id]);
+      await mocks.insertUserGroupMembers(groups[2].id, [sessionUser.id]);
+
+      await mocks.knex.from("profile_type_field_permission_override").insert([
+        {
+          user_id: sessionUser.id,
+          profile_type_field_id: profileType0Fields[0].id,
+          permission: "HIDDEN",
+        },
+        {
+          user_group_id: groups[0].id,
+          profile_type_field_id: profileType0Fields[0].id,
+          permission: "READ",
+        },
+        {
+          user_group_id: groups[0].id,
+          profile_type_field_id: profileType0Fields[1].id,
+          permission: "HIDDEN",
+        },
+        {
+          user_group_id: groups[1].id,
+          profile_type_field_id: profileType0Fields[1].id,
+          permission: "READ",
+        },
+        {
+          user_id: sessionUser.id,
+          profile_type_field_id: profileType0Fields[1].id,
+          permission: "WRITE",
+        },
+        {
+          user_id: sessionUser.id,
+          profile_type_field_id: profileType0Fields[2].id,
+          permission: "HIDDEN",
+        },
+        {
+          user_group_id: groups[2].id,
+          profile_type_field_id: profileType0Fields[2].id,
+          permission: "READ",
+        },
+        {
+          user_group_id: groups[1].id,
+          profile_type_field_id: profileType0Fields[2].id,
+          permission: "HIDDEN",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              profileType {
+                id
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          }
+        `,
+        { profileId: toGlobalId("Profile", profile.id) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        profileType: {
+          id: toGlobalId("ProfileType", profileTypes[0].id),
+          fields: [
+            {
+              alias: "FIRST_NAME",
+              myPermission: "READ",
+            },
+            {
+              alias: "LAST_NAME",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "BIRTH_DATE",
+              myPermission: "READ",
+            },
+            {
+              alias: "PHONE",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "EMAIL",
+              myPermission: "WRITE",
+            },
+            {
+              alias: "PASSPORT",
+              myPermission: "WRITE",
+            },
+          ],
+        },
       });
     });
   });
@@ -2394,6 +2846,32 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
       expect(data).toBeNull();
     });
+
+    it("fails if trying to update the value of a field with READ permission", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[3].id),
+              content: { value: "ABCD" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("deleteProfile", () => {
@@ -2915,6 +3393,41 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("MAX_FILES_EXCEEDED");
       expect(data).toBeNull();
     });
+
+    it("fails if trying to upload a file on a field with READ access", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $data: [FileUploadInput!]!) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              property {
+                field {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[2].id),
+          data: [
+            {
+              contentType: "image/png",
+              size: 1024,
+              filename: "ID.png",
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("deleteProfileFieldFile", () => {
@@ -2948,7 +3461,12 @@ describe("GraphQL/Profiles", () => {
 
       expect(queryErrors).toBeUndefined();
       expect(queryData.profile).toEqual({
-        properties: [{ files: null }, { files: [{ id: expect.any(String) }] }],
+        properties: [
+          { files: null },
+          { files: [{ id: expect.any(String) }] },
+          { files: null },
+          { files: null },
+        ],
       });
 
       const { errors, data } = await testClient.execute(
@@ -2970,6 +3488,42 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toBeUndefined();
       expect(data.deleteProfileFieldFile).toEqual("SUCCESS");
+    });
+
+    it("fails if trying to delete a file from a field with READ permission", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const profileId = fromGlobalId(profile.id).id;
+      const [file] = await mocks.createRandomFileUpload(1);
+      const [profileFieldFile] = await mocks.knex.from("profile_field_file").insert(
+        {
+          profile_id: profileId,
+          profile_type_field_id: profileType2Fields[2].id,
+          file_upload_id: file.id,
+          type: "FILE" as const,
+          created_by_user_id: sessionUser.id,
+        },
+        "*",
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $profileFieldFileIds: [GID!]!) {
+            deleteProfileFieldFile(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              profileFieldFileIds: $profileFieldFileIds
+            )
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[2].id),
+          profileFieldFileIds: [toGlobalId("ProfileFieldFile", profileFieldFile.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 
@@ -3821,6 +4375,331 @@ describe("GraphQL/Profiles", () => {
       expect(queryData?.profile).toEqual({
         id: toGlobalId("Profile", profiles[0].id),
         petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
+      });
+    });
+  });
+
+  describe("overrideProfileTypeFieldPermission", () => {
+    let user: User;
+    let userGroup: UserGroup;
+    let userApiKey: string;
+
+    beforeAll(async () => {
+      [user] = await mocks.createRandomUsers(organization.id, 1);
+      [userGroup] = await mocks.createUserGroups(1, organization.id);
+      await mocks.insertUserGroupMembers(userGroup.id, [user.id]);
+      ({ apiKey: userApiKey } = await mocks.createUserAuthToken("user-token", user.id));
+    });
+
+    it("overrides field permission for a given user", async () => {
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: [OverrideProfileTypeFieldPermissionInput!]!
+          ) {
+            overrideProfileTypeFieldPermission(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          data: [{ userId: toGlobalId("User", user.id), permission: "READ" }],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { errors: queryErrors, data: queryData } = await testClient
+        .withApiKey(userApiKey)
+        .execute(
+          gql`
+            query ($profileTypeId: GID!) {
+              profileType(profileTypeId: $profileTypeId) {
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          },
+        );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.profileType).toEqual({
+        fields: [
+          {
+            alias: "FIRST_NAME",
+            myPermission: "READ",
+          },
+          {
+            alias: "LAST_NAME",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "BIRTH_DATE",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PHONE",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "EMAIL",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PASSPORT",
+            myPermission: "WRITE",
+          },
+        ],
+      });
+    });
+
+    it("overrides field permission for a given user group", async () => {
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: [OverrideProfileTypeFieldPermissionInput!]!
+          ) {
+            overrideProfileTypeFieldPermission(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          data: [{ userGroupId: toGlobalId("UserGroup", userGroup.id), permission: "HIDDEN" }],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { errors: queryErrors, data: queryData } = await testClient
+        .withApiKey(userApiKey)
+        .execute(
+          gql`
+            query ($profileTypeId: GID!) {
+              profileType(profileTypeId: $profileTypeId) {
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          },
+        );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.profileType).toEqual({
+        fields: [
+          {
+            alias: "FIRST_NAME",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "LAST_NAME",
+            myPermission: "HIDDEN",
+          },
+          {
+            alias: "BIRTH_DATE",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PHONE",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "EMAIL",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PASSPORT",
+            myPermission: "WRITE",
+          },
+        ],
+      });
+    });
+
+    it("updates permission if user already has override", async () => {
+      await mocks.knex.from("profile_type_field_permission_override").insert({
+        profile_type_field_id: profileType0Fields[0].id,
+        user_id: user.id,
+        permission: "HIDDEN",
+      });
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: [OverrideProfileTypeFieldPermissionInput!]!
+          ) {
+            overrideProfileTypeFieldPermission(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          data: [{ userId: toGlobalId("User", user.id), permission: "READ" }],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { errors: queryErrors, data: queryData } = await testClient
+        .withApiKey(userApiKey)
+        .execute(
+          gql`
+            query ($profileTypeId: GID!) {
+              profileType(profileTypeId: $profileTypeId) {
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          },
+        );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.profileType).toEqual({
+        fields: [
+          {
+            alias: "FIRST_NAME",
+            myPermission: "READ",
+          },
+          {
+            alias: "LAST_NAME",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "BIRTH_DATE",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PHONE",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "EMAIL",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PASSPORT",
+            myPermission: "WRITE",
+          },
+        ],
+      });
+    });
+
+    it("updates permission if user group already has override", async () => {
+      await mocks.knex.from("profile_type_field_permission_override").insert({
+        profile_type_field_id: profileType0Fields[3].id,
+        user_group_id: userGroup.id,
+        permission: "HIDDEN",
+      });
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: [OverrideProfileTypeFieldPermissionInput!]!
+          ) {
+            overrideProfileTypeFieldPermission(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+          data: [{ userGroupId: toGlobalId("UserGroup", userGroup.id), permission: "READ" }],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { errors: queryErrors, data: queryData } = await testClient
+        .withApiKey(userApiKey)
+        .execute(
+          gql`
+            query ($profileTypeId: GID!) {
+              profileType(profileTypeId: $profileTypeId) {
+                fields {
+                  alias
+                  myPermission
+                }
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          },
+        );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.profileType).toEqual({
+        fields: [
+          {
+            alias: "FIRST_NAME",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "LAST_NAME",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "BIRTH_DATE",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PHONE",
+            myPermission: "READ",
+          },
+          {
+            alias: "EMAIL",
+            myPermission: "WRITE",
+          },
+          {
+            alias: "PASSPORT",
+            myPermission: "WRITE",
+          },
+        ],
       });
     });
   });

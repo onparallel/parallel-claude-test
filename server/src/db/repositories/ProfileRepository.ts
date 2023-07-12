@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, omit, pick, sortBy, times, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, omit, partition, pick, sortBy, times, uniq } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -18,6 +18,8 @@ import {
   ProfileFieldFile,
   ProfileFieldValue,
   ProfileType,
+  ProfileTypeFieldPermission,
+  ProfileTypeFieldPermissionOverride,
   ProfileTypeFieldType,
   User,
   UserLocale,
@@ -1249,5 +1251,132 @@ export class ProfileRepository extends BaseRepository {
       .select(this.count());
 
     return count as number;
+  }
+
+  readonly loadProfileTypeFieldUserEffectivePermission = this.buildLoader<
+    { profileTypeFieldId: number; userId: number },
+    ProfileTypeFieldPermission,
+    string
+  >(
+    async (keys, t) => {
+      const data = await this.raw<{
+        ptf_id: number;
+        user_id: number | null;
+        permission: ProfileTypeFieldPermission;
+      }>(
+        /* sql */ `
+          select
+            ptf.id as ptf_id,
+            coalesce(ugm.user_id, ptfpo.user_id) as user_id,
+            coalesce(max(ptfpo.permission), max(ptf.permission)) as permission
+          from
+            profile_type_field ptf
+            left join profile_type_field_permission_override ptfpo on ptfpo.profile_type_field_id = ptf.id
+            left join user_group ug on ptfpo.user_group_id = ug.id and ug.deleted_at is null
+            left join user_group_member ugm on ug.id = ugm.user_group_id and ugm.deleted_at is null and ugm.user_id in ?
+          where
+            ptf.id in ? and ptf.deleted_at is null
+          group by
+            ptf.id, coalesce(ugm.user_id, ptfpo.user_id)
+      `,
+        [this.sqlIn(keys.map((k) => k.userId)), this.sqlIn(keys.map((k) => k.profileTypeFieldId))],
+        t,
+      );
+
+      const byKey = indexBy(data, keyBuilder(["ptf_id", "user_id"]));
+      return keys.map(
+        (k) =>
+          (byKey[`${k.profileTypeFieldId},${k.userId}`] ?? byKey[`${k.profileTypeFieldId},null`])
+            .permission,
+      );
+    },
+    { cacheKeyFn: keyBuilder(["profileTypeFieldId", "userId"]) },
+  );
+
+  async upsertProfileTypeFieldPermissionOverride(
+    profileTypeFieldId: number,
+    data: { userId?: number; userGroupId?: number; permission: ProfileTypeFieldPermission }[],
+    updatedBy: string,
+  ) {
+    if (data.length === 0) {
+      return [];
+    }
+
+    const [byUserId, byUserGroupId] = partition(data, (d) => "userId" in d);
+    return await this.withTransaction(async (t) => {
+      const userIdRows =
+        byUserId.length > 0
+          ? await this.raw<ProfileTypeFieldPermissionOverride>(
+              /* sql */ `
+        ?
+        on conflict (profile_type_field_id, user_id) where deleted_at is null
+        do update set
+          permission = EXCLUDED.permission, updated_by = ?, updated_at = NOW()
+        returning *;
+      `,
+              [
+                this.knex.from("profile_type_field_permission_override").insert(
+                  byUserId.map((d) => ({
+                    profile_type_field_id: profileTypeFieldId,
+                    user_id: d.userId!,
+                    permission: d.permission,
+                    created_by: updatedBy,
+                    updated_by: updatedBy,
+                  })),
+                ),
+                updatedBy,
+              ],
+              t,
+            )
+          : [];
+
+      const userGroupIdRows =
+        byUserGroupId.length > 0
+          ? await this.raw<ProfileTypeFieldPermissionOverride>(
+              /* sql */ `
+        ?
+        on conflict (profile_type_field_id, user_group_id) where deleted_at is null
+        do update set
+          permission = EXCLUDED.permission, updated_by = ?, updated_at = NOW()
+        returning *;
+      `,
+              [
+                this.knex.from("profile_type_field_permission_override").insert(
+                  byUserGroupId.map((d) => ({
+                    profile_type_field_id: profileTypeFieldId,
+                    user_group_id: d.userGroupId!,
+                    permission: d.permission,
+                    created_by: updatedBy,
+                    updated_by: updatedBy,
+                  })),
+                ),
+                updatedBy,
+              ],
+              t,
+            )
+          : [];
+
+      return [...userIdRows, ...userGroupIdRows];
+    });
+  }
+
+  async deleteProfileTypeFieldPermissionOverride(
+    profileTypeFieldId: number,
+    userIds: number[],
+    userGroupIds: number[],
+    deletedBy: string,
+  ) {
+    if (userIds.length === 0 && userGroupIds.length === 0) {
+      return;
+    }
+
+    await this.from("profile_type_field_permission_override")
+      .where("profile_type_field_id", profileTypeFieldId)
+      .whereIn("user_id", userIds)
+      .orWhereIn("user_group_id", userGroupIds)
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
   }
 }

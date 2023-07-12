@@ -64,7 +64,14 @@ export const ProfileTypeField = objectType({
         return profileType.profile_name_pattern.includes(root.id);
       },
     });
-    t.field("myPermission", { type: "ProfileTypeFieldPermission", resolve: (o) => o.permission });
+    t.field("myPermission", {
+      type: "ProfileTypeFieldPermission",
+      resolve: async (o, _, ctx) =>
+        await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
+          profileTypeFieldId: o.id,
+          userId: ctx.user!.id,
+        }),
+    });
     t.jsonObject("options", { resolve: (o) => o.options });
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });
@@ -210,6 +217,14 @@ export const ProfileFieldProperty = objectType({
     t.nullable.field("value", {
       type: "ProfileFieldValue",
       resolve: async (o, _, ctx) => {
+        const myPermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
+          profileTypeFieldId: o.profile_type_field_id,
+          userId: ctx.user!.id,
+        });
+        if (myPermission === "HIDDEN") {
+          return null;
+        }
+
         return await ctx.profiles.loadProfileFieldValue({
           profileId: o.profile_id,
           profileTypeFieldId: o.profile_type_field_id,
@@ -219,6 +234,14 @@ export const ProfileFieldProperty = objectType({
     t.nullable.list.field("files", {
       type: "ProfileFieldFile",
       resolve: async (o, _, ctx) => {
+        const myPermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
+          profileTypeFieldId: o.profile_type_field_id,
+          userId: ctx.user!.id,
+        });
+        if (myPermission === "HIDDEN") {
+          return null;
+        }
+
         const field = await ctx.profiles.loadProfileTypeField(o.profile_type_field_id);
         if (field?.type === "FILE") {
           return await ctx.profiles.loadProfileFieldFiles({

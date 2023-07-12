@@ -24,27 +24,30 @@ async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
 export function userHasAccessToUsers<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
+    if (!isDefined(args[argName])) {
+      return true;
+    }
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
     return contextUserHasAccessToUsers(userIds, ctx);
   };
 }
 
-type UserOrUserGroupPermissionInput = NexusGen["inputTypes"]["UserOrUserGroupPermissionInput"];
+interface UserOrUserGroup {
+  userId?: number | null;
+  userGroupId?: number | null;
+}
 
-export function userHasAccessToUserOrUserGroupPermissions<
+export function userHasAccessToUserAndUserGroups<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, UserOrUserGroupPermissionInput[] | null | undefined>,
+  TArg extends Arg<TypeName, FieldName, UserOrUserGroup[] | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const permissions = args[argName] as unknown as
-        | UserOrUserGroupPermissionInput[]
-        | null
-        | undefined;
+      const permissions = args[argName] as unknown as UserOrUserGroup[] | null | undefined;
       if (!isDefined(permissions)) {
         return true;
       }

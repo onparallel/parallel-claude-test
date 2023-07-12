@@ -1195,6 +1195,16 @@ type Mutation {
   ): ProfileType!
 
   """
+  Delete a permission override for a profile type field for a set of users and/or user groups.
+  """
+  deleteProfileTypeFieldPermissionOverride(
+    profileTypeFieldId: GID!
+    profileTypeId: GID!
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): Success!
+
+  """
   Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests
   """
   deleteSignatureIntegration(force: Boolean = false, id: GID!): Result!
@@ -1351,6 +1361,15 @@ type Mutation {
     source: String!
     type: PetitionBaseType!
   ): Success!
+
+  """
+  Override the default permission for a profile type field for a set of users and/or user groups.
+  """
+  overrideProfileTypeFieldPermission(
+    data: [OverrideProfileTypeFieldPermissionInput!]!
+    profileTypeFieldId: GID!
+    profileTypeId: GID!
+  ): ProfileTypeField!
 
   """
   Generates a download link for a petition attachment
@@ -2517,6 +2536,12 @@ enum OrganizationUsers_OrderBy {
   lastActiveAt_DESC
   lastName_ASC
   lastName_DESC
+}
+
+input OverrideProfileTypeFieldPermissionInput {
+  permission: ProfileTypeFieldPermission!
+  userGroupId: GID
+  userId: GID
 }
 
 type OwnershipTransferredEvent implements PetitionEvent {
@@ -6300,6 +6325,7 @@ input UpdateProfileFieldValueInput {
 
 input UpdateProfileTypeFieldInput {
   alias: String
+  defaultPermission: ProfileTypeFieldPermission
   expiryAlertAheadTime: Duration
   isExpirable: Boolean
   name: LocalizableUserText

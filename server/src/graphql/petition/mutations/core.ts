@@ -111,7 +111,7 @@ import { ApolloError, ArgValidationError } from "./../../helpers/errors";
 import {
   userCanSendAs,
   userHasAccessToPublicPetitionLink,
-  userHasAccessToUserOrUserGroupPermissions,
+  userHasAccessToUserAndUserGroups,
 } from "./authorizers";
 
 export const createPetition = mutationField("createPetition", {
@@ -2054,7 +2054,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
     petitionsAreOfTypeTemplate("templateId"),
-    userHasAccessToUserOrUserGroupPermissions("permissions"),
+    userHasAccessToUserAndUserGroups("permissions"),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
