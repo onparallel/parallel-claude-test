@@ -1,7 +1,7 @@
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import gql from "graphql-tag";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, sumBy, zip } from "remeda";
+import { isDefined, sortBy, sumBy, zip } from "remeda";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { FORMATS, prettifyTimezone } from "../../util/dates";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
@@ -260,6 +260,12 @@ function PetitionExportField({
     sumBy(field.replies, () => (field.showActivityInPdf ? 3 : 0)) +
     // space for separation between replies
     (field.replies.length > 1 ? (field.replies.length - 1) * 1 : 0);
+
+  // move FILE replies with errors to the bottom of the card
+  const orderedReplies = isFileTypeField(field.type)
+    ? sortBy(field.replies, (r) => isDefined(r.content.error))
+    : field.replies;
+
   return (
     <View style={{ marginBottom: "5mm" }}>
       {field.type === "HEADING" ? (
@@ -292,38 +298,50 @@ function PetitionExportField({
             </View>
           ) : null}
           <View style={styles.fieldReplies}>
-            {field.replies.map((reply) => (
+            {orderedReplies.map((reply) => (
               <View key={reply.id}>
                 {isFileTypeField(field.type) ? (
-                  <View
-                    style={[
-                      {
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      },
-                    ]}
-                  >
-                    <Text style={[styles.text]}>
-                      {`${reply.content.filename} - ${fileSize(intl, reply.content.size)}`}
-                      {reply.status === "APPROVED" ? null : (
-                        <Text style={[styles.text]}>
-                          {" "}
-                          <FormattedMessage
-                            id="document.petition-export.file-pending-review"
-                            defaultMessage="(Pending review)"
-                          />
-                        </Text>
-                      )}
-                    </Text>
-                    {includeNetDocumentsLinks && reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
-                      <NetDocumentsExternalLink
-                        variant="button"
-                        style={{ marginLeft: "1mm" }}
-                        externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
-                      />
-                    ) : null}
-                  </View>
+                  !isDefined(reply.content.error) ? (
+                    <View
+                      style={[
+                        {
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.text]}>
+                        {`${reply.content.filename} - ${fileSize(intl, reply.content.size)}`}
+                        {reply.status === "APPROVED" ? null : (
+                          <Text style={[styles.text]}>
+                            {" "}
+                            <FormattedMessage
+                              id="document.petition-export.file-pending-review"
+                              defaultMessage="(Pending review)"
+                            />
+                          </Text>
+                        )}
+                      </Text>
+                      {includeNetDocumentsLinks && reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
+                        <NetDocumentsExternalLink
+                          variant="button"
+                          style={{ marginLeft: "1mm" }}
+                          externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
+                        />
+                      ) : null}
+                    </View>
+                  ) : field.type === "ES_TAX_DOCUMENTS" ? (
+                    <View>
+                      <Text style={[styles.text]}>
+                        {reply.content.request.model.type}{" "}
+                        <FormattedMessage
+                          id="document.petition-export.file-not-found"
+                          defaultMessage="(Not found)"
+                        />
+                      </Text>
+                    </View>
+                  ) : null
                 ) : field.type === "DYNAMIC_SELECT" ? (
                   <View>
                     {(reply.content.value as [string, string | null][]).map(([label, value], i) => (

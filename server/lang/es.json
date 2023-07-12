@@ -170,6 +170,11 @@
     "context": "Annex {n}"
   },
   {
+    "term": "document.petition-export.file-not-found",
+    "definition": "(No encontrado)",
+    "context": "(Not found)"
+  },
+  {
     "term": "document.petition-export.file-pending-review",
     "definition": "(Pendiente de revisión)",
     "context": "(Pending review)"
