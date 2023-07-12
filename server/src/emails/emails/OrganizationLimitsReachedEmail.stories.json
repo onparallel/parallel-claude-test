@@ -11,6 +11,7 @@
       "args": {
         "limitName": "PETITION_SEND",
         "senderName": "Santi",
+        "orgName": "Umbrella Corp",
         "total": 100,
         "used": 90,
         "parallelUrl": "https://staging.onparallel.com",
@@ -30,6 +31,7 @@
           "defaultValue": "PETITION_SEND"
         },
         "senderName": { "control": { "type": "text" } },
+        "orgName": { "control": { "type": "text" } },
         "total": { "control": { "type": "number" } },
         "used": { "control": { "type": "number" } },
         "parallelUrl": { "control": { "type": "text" } },

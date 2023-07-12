@@ -536,8 +536,8 @@
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",
-    "definition": "Nos alegra que estés acelerando tus procesos con Parallel. Pero parece que ya has usado gran parte de los parallels incluidos en tu plan.",
-    "context": "We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan."
+    "definition": "Nos alegra que que {orgName} esté acelerando sus procesos con Parallel. Pero parece que ya has usado gran parte de los parallels incluidos en tu plan.",
+    "context": "We are glad that {orgName} is speeding up its processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan."
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text-2",
@@ -561,8 +561,8 @@
   },
   {
     "term": "organization-limits-reached.parallel-send.last-credit-used-text",
-    "definition": "Parece que Parallel está ayudándote en muchos procesos, y es que ya <b>has alcanzado tu límite de {total, number} parallels</b>.",
-    "context": "It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} parallels</b>."
+    "definition": "Parece que Parallel está ayudando a {orgName} en muchos procesos, y es que ya <b>has alcanzado tu límite de {total, number} parallels</b>.",
+    "context": "It seems that Parallel is helping {orgName} with many of its processes, and you have already <b>reached your limit of {total, number} parallels</b>."
   },
   {
     "term": "organization-limits-reached.parallel-send.last-credit-used-warning",
@@ -576,8 +576,8 @@
   },
   {
     "term": "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-text",
-    "definition": "Nos alegra que estés firmando tus documentos con Parallel. Pero parece que ya has consumido gran parte de tus firmas disponibles.",
-    "context": "We are glad that you are signing your documents with Parallel. But it looks like you have already used a large part of the signatures included in your plan."
+    "definition": "Nos alegra que {orgName} esté firmando sus documentos con Parallel. Pero parece que ya has consumido gran parte de tus firmas disponibles.",
+    "context": "We are glad that {orgName} is signing their documents with Parallel. But it looks like you have already used a large part of the signatures included in your plan."
   },
   {
     "term": "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-text-2",
@@ -601,8 +601,8 @@
   },
   {
     "term": "organization-limits-reached.signaturit-shared-apikey.last-credit-used-text",
-    "definition": "Parece que Parallel está ayudándote a firmar muchos de tus documentos, y es que ya <b>has alcanzado tu límite de {total, number} firmas</b>.",
-    "context": "It seems that Parallel is helping you sign many of your documents, and you have already <b>reached your limit of {total, number} signatures</b>."
+    "definition": "Parece que Parallel está ayudando a {orgName} a firmar muchos de sus documentos, y es que ya <b>has alcanzado tu límite de {total, number} firmas</b>.",
+    "context": "It seems that Parallel is helping {orgName} sign many of its documents, and you have already <b>reached your limit of {total, number} signatures</b>."
   },
   {
     "term": "organization-limits-reached.signaturit-shared-apikey.last-credit-used-warning",

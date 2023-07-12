@@ -8,11 +8,16 @@ export async function organizationLimitsReached(
   payload: { org_id: number; limit_name: OrganizationUsageLimitName },
   context: WorkerContext,
 ) {
-  const [usageLimit, ownerAndAdmins, parallelOrg] = await Promise.all([
+  const [usageLimit, ownerAndAdmins, parallelOrg, organization] = await Promise.all([
     context.organizations.loadCurrentOrganizationUsageLimit(payload.org_id, payload.limit_name),
     context.organizations.loadOwnerAndAdmins(payload.org_id),
     context.organizations.loadRootOrganization(),
+    context.organizations.loadOrg(payload.org_id),
   ]);
+
+  if (!organization) {
+    throw new Error(`Could not find Organization:${payload.org_id}`);
+  }
 
   if (!usageLimit) {
     throw new Error(
@@ -32,6 +37,7 @@ export async function organizationLimitsReached(
       OrganizationLimitsReachedEmail,
       {
         limitName: payload.limit_name,
+        orgName: organization.name,
         senderName: userData.first_name!,
         total: usageLimit.limit,
         used: usageLimit.used,

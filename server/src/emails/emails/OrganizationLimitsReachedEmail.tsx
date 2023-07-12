@@ -13,6 +13,7 @@ export type OrganizationLimitsReachedEmailProps = {
   limitName: OrganizationUsageLimitName;
   total: number;
   used: number;
+  orgName: string;
 } & LayoutProps;
 
 const email: Email<OrganizationLimitsReachedEmailProps> = {
@@ -59,7 +60,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
       : (null as never);
   },
   text(
-    { senderName, used, total, limitName }: OrganizationLimitsReachedEmailProps,
+    { senderName, used, total, limitName, orgName }: OrganizationLimitsReachedEmailProps,
     intl: IntlShape,
   ) {
     const petitionSendTotalCreditsUsed = used === total && limitName === "PETITION_SEND";
@@ -75,9 +76,9 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
           {
             id: "organization-limits-reached.parallel-send.last-credit-used-text",
             defaultMessage:
-              "It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} parallels</b>.",
+              "It seems that Parallel is helping {orgName} with many of its processes, and you have already <b>reached your limit of {total, number} parallels</b>.",
           },
-          { b: (chunks: any[]) => chunks, total },
+          { b: (chunks: any[]) => chunks, total, orgName },
         )}
         
         ${intl.formatMessage(
@@ -99,9 +100,9 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
           {
             id: "organization-limits-reached.signaturit-shared-apikey.last-credit-used-text",
             defaultMessage:
-              "It seems that Parallel is helping you sign many of your documents, and you have already <b>reached your limit of {total, number} signatures</b>.",
+              "It seems that Parallel is helping {orgName} sign many of its documents, and you have already <b>reached your limit of {total, number} signatures</b>.",
           },
-          { b: (chunks: any[]) => chunks, total },
+          { b: (chunks: any[]) => chunks, total, orgName },
         )}
       
         ${intl.formatMessage(
@@ -119,11 +120,14 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
       ? outdent`
         ${greetingUser({ name: senderName }, intl)}
 
-        ${intl.formatMessage({
-          id: "organization-limits-reached.parallel-send.few-credits-remaining-text",
-          defaultMessage:
-            "We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan.",
-        })}
+        ${intl.formatMessage(
+          {
+            id: "organization-limits-reached.parallel-send.few-credits-remaining-text",
+            defaultMessage:
+              "We are glad that {orgName} is speeding up its processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan.",
+          },
+          { orgName },
+        )}
           
         ${intl.formatMessage(
           {
@@ -153,11 +157,14 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
       ? outdent`
         ${greetingUser({ name: senderName }, intl)}
 
-        ${intl.formatMessage({
-          id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-text",
-          defaultMessage:
-            "We are glad that you are signing your documents with Parallel. But it looks like you have already used a large part of the signatures included in your plan.",
-        })}
+        ${intl.formatMessage(
+          {
+            id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-text",
+            defaultMessage:
+              "We are glad that {orgName} is signing their documents with Parallel. But it looks like you have already used a large part of the signatures included in your plan.",
+          },
+          { orgName },
+        )}
         
         ${intl.formatMessage(
           {
@@ -187,6 +194,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
   html({
     limitName,
     senderName,
+    orgName,
     used,
     total,
     parallelUrl,
@@ -246,8 +254,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
                     id="organization-limits-reached.parallel-send.last-credit-used-text"
-                    defaultMessage="It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} parallels</b>."
-                    values={{ total }}
+                    defaultMessage="It seems that Parallel is helping {orgName} with many of its processes, and you have already <b>reached your limit of {total, number} parallels</b>."
+                    values={{ total, orgName }}
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
@@ -265,8 +273,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
                     id="organization-limits-reached.signaturit-shared-apikey.last-credit-used-text"
-                    defaultMessage="It seems that Parallel is helping you sign many of your documents, and you have already <b>reached your limit of {total, number} signatures</b>."
-                    values={{ total }}
+                    defaultMessage="It seems that Parallel is helping {orgName} sign many of its documents, and you have already <b>reached your limit of {total, number} signatures</b>."
+                    values={{ total, orgName }}
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
@@ -284,7 +292,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
                     id="organization-limits-reached.parallel-send.few-credits-remaining-text"
-                    defaultMessage="We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan."
+                    defaultMessage="We are glad that {orgName} is speeding up its processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan."
+                    values={{ orgName }}
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
@@ -312,7 +321,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
                     id="organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-text"
-                    defaultMessage="We are glad that you are signing your documents with Parallel. But it looks like you have already used a large part of the signatures included in your plan."
+                    defaultMessage="We are glad that {orgName} is signing their documents with Parallel. But it looks like you have already used a large part of the signatures included in your plan."
+                    values={{ orgName }}
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
