@@ -191,12 +191,6 @@ export interface NexusGenInputs {
     en?: NexusGenScalars["JSON"] | null; // JSON
     es?: NexusGenScalars["JSON"] | null; // JSON
   };
-  OverrideProfileTypeFieldPermissionInput: {
-    // input type
-    permission: NexusGenEnums["ProfileTypeFieldPermission"]; // ProfileTypeFieldPermission!
-    userGroupId?: NexusGenScalars["GID"] | null; // GID
-    userId?: NexusGenScalars["GID"] | null; // GID
-  };
   PetitionFilter: {
     // input type
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -342,11 +336,16 @@ export interface NexusGenInputs {
   UpdateProfileTypeFieldInput: {
     // input type
     alias?: string | null; // String
-    defaultPermission?: NexusGenEnums["ProfileTypeFieldPermission"] | null; // ProfileTypeFieldPermission
     expiryAlertAheadTime?: NexusGenScalars["Duration"] | null; // Duration
     isExpirable?: boolean | null; // Boolean
     name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
+  };
+  UpdateProfileTypeFieldPermissionInput: {
+    // input type
+    permission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
+    userGroupId?: NexusGenScalars["GID"] | null; // GID
+    userId?: NexusGenScalars["GID"] | null; // GID
   };
   UpdateTagInput: {
     // input type
@@ -430,7 +429,7 @@ export interface NexusGenEnums {
   PetitionTagFilterLogicalOperator: "AND" | "OR";
   PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";
   ProfileEventType: db.ProfileEventType;
-  ProfileTypeFieldPermission: db.ProfileTypeFieldPermission;
+  ProfileTypeFieldPermissionType: db.ProfileTypeFieldPermissionType;
   ProfileTypeFieldType: db.ProfileTypeFieldType;
   PublicSignatureStatus: "COMPLETED" | "STARTED";
   QueryContacts_OrderBy:
@@ -870,6 +869,7 @@ export interface NexusGenObjects {
   ProfileSubscription: db.ProfileSubscription;
   ProfileType: db.ProfileType;
   ProfileTypeField: db.ProfileTypeField;
+  ProfileTypeFieldPermission: db.ProfileTypeFieldPermission;
   ProfileTypePagination: {
     // root type
     items: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
@@ -1507,7 +1507,6 @@ export interface NexusGenFieldTypes {
     deleteProfileFieldFile: NexusGenEnums["Result"]; // Result!
     deleteProfileType: NexusGenEnums["Success"]; // Success!
     deleteProfileTypeField: NexusGenRootTypes["ProfileType"]; // ProfileType!
-    deleteProfileTypeFieldPermissionOverride: NexusGenEnums["Success"]; // Success!
     deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
     deleteTag: NexusGenEnums["Result"]; // Result!
     deleteUserGroup: NexusGenEnums["Result"]; // Result!
@@ -1527,7 +1526,6 @@ export interface NexusGenFieldTypes {
     modifyCurrentUsagePeriod: NexusGenRootTypes["Organization"]; // Organization!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     movePetitions: NexusGenEnums["Success"]; // Success!
-    overrideProfileTypeFieldPermission: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -1619,6 +1617,7 @@ export interface NexusGenFieldTypes {
     updateProfileFieldValue: NexusGenRootTypes["Profile"]; // Profile!
     updateProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
+    updateProfileTypeFieldPermission: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     updateProfileTypeFieldPositions: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     updatePublicTemplateVisibility: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2400,16 +2399,24 @@ export interface NexusGenFieldTypes {
   ProfileTypeField: {
     // field return type
     alias: string | null; // String
+    defaultPermission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
     expiryAlertAheadTime: NexusGenScalars["Duration"] | null; // Duration
     id: NexusGenScalars["GID"]; // GID!
     isExpirable: boolean; // Boolean!
     isUsedInProfileName: boolean; // Boolean!
-    myPermission: NexusGenEnums["ProfileTypeFieldPermission"]; // ProfileTypeFieldPermission!
+    myPermission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     options: NexusGenScalars["JSONObject"]; // JSONObject!
+    permissions: NexusGenRootTypes["ProfileTypeFieldPermission"][]; // [ProfileTypeFieldPermission!]!
     position: number; // Int!
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     type: NexusGenEnums["ProfileTypeFieldType"]; // ProfileTypeFieldType!
+  };
+  ProfileTypeFieldPermission: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    permission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
+    target: NexusGenRootTypes["UserOrUserGroup"]; // UserOrUserGroup!
   };
   ProfileTypePagination: {
     // field return type
@@ -3567,7 +3574,6 @@ export interface NexusGenFieldTypeNames {
     deleteProfileFieldFile: "Result";
     deleteProfileType: "Success";
     deleteProfileTypeField: "ProfileType";
-    deleteProfileTypeFieldPermissionOverride: "Success";
     deleteSignatureIntegration: "Result";
     deleteTag: "Result";
     deleteUserGroup: "Result";
@@ -3587,7 +3593,6 @@ export interface NexusGenFieldTypeNames {
     modifyCurrentUsagePeriod: "Organization";
     modifyPetitionCustomProperty: "PetitionBase";
     movePetitions: "Success";
-    overrideProfileTypeFieldPermission: "ProfileTypeField";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionAttachmentUploadComplete: "PetitionAttachment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
@@ -3679,6 +3684,7 @@ export interface NexusGenFieldTypeNames {
     updateProfileFieldValue: "Profile";
     updateProfileType: "ProfileType";
     updateProfileTypeField: "ProfileTypeField";
+    updateProfileTypeFieldPermission: "ProfileTypeField";
     updateProfileTypeFieldPositions: "ProfileType";
     updatePublicPetitionLink: "PublicPetitionLink";
     updatePublicTemplateVisibility: "SupportMethodResponse";
@@ -4460,16 +4466,24 @@ export interface NexusGenFieldTypeNames {
   ProfileTypeField: {
     // field return type name
     alias: "String";
+    defaultPermission: "ProfileTypeFieldPermissionType";
     expiryAlertAheadTime: "Duration";
     id: "GID";
     isExpirable: "Boolean";
     isUsedInProfileName: "Boolean";
-    myPermission: "ProfileTypeFieldPermission";
+    myPermission: "ProfileTypeFieldPermissionType";
     name: "LocalizableUserText";
     options: "JSONObject";
+    permissions: "ProfileTypeFieldPermission";
     position: "Int";
     profileType: "ProfileType";
     type: "ProfileTypeFieldType";
+  };
+  ProfileTypeFieldPermission: {
+    // field return type name
+    id: "GID";
+    permission: "ProfileTypeFieldPermissionType";
+    target: "UserOrUserGroup";
   };
   ProfileTypePagination: {
     // field return type name
@@ -5606,13 +5620,6 @@ export interface NexusGenArgTypes {
       profileTypeFieldIds: NexusGenScalars["GID"][]; // [GID!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
-    deleteProfileTypeFieldPermissionOverride: {
-      // args
-      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
-      profileTypeId: NexusGenScalars["GID"]; // GID!
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
     deleteSignatureIntegration: {
       // args
       force?: boolean | null; // Boolean
@@ -5714,12 +5721,6 @@ export interface NexusGenArgTypes {
       ids?: NexusGenScalars["GID"][] | null; // [GID!]
       source: string; // String!
       type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
-    };
-    overrideProfileTypeFieldPermission: {
-      // args
-      data: NexusGenInputs["OverrideProfileTypeFieldPermissionInput"][]; // [OverrideProfileTypeFieldPermissionInput!]!
-      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
-      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     petitionAttachmentDownloadLink: {
       // args
@@ -6254,6 +6255,13 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateProfileTypeFieldInput"]; // UpdateProfileTypeFieldInput!
       force?: boolean | null; // Boolean
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfileTypeFieldPermission: {
+      // args
+      data: NexusGenInputs["UpdateProfileTypeFieldPermissionInput"][]; // [UpdateProfileTypeFieldPermissionInput!]!
+      defaultPermission?: NexusGenEnums["ProfileTypeFieldPermissionType"] | null; // ProfileTypeFieldPermissionType
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };

@@ -1,17 +1,17 @@
+import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, uniq } from "remeda";
 import {
   ProfileType,
-  ProfileTypeFieldPermission,
+  ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
-  ProfileTypeFieldPermissionValues,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
-import { core } from "nexus";
+import { isAtLeast } from "../../util/profileTypeFieldPermission";
 
 function createProfileTypeAuthorizer<TRest extends any[] = []>(
   predicate: (profileType: ProfileType, ...rest: TRest) => boolean,
@@ -245,7 +245,7 @@ export function userHasPermissionOnProfileTypeField<
   FieldName extends string,
 >(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => number[],
-  permission: ProfileTypeFieldPermission,
+  permission: ProfileTypeFieldPermissionType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const ids = prop(args);
@@ -254,10 +254,4 @@ export function userHasPermissionOnProfileTypeField<
     );
     return myPermissions.every((p) => isAtLeast(p, permission));
   };
-}
-
-function isAtLeast(p1: ProfileTypeFieldPermission, p2: ProfileTypeFieldPermission) {
-  return (
-    ProfileTypeFieldPermissionValues.indexOf(p1) >= ProfileTypeFieldPermissionValues.indexOf(p2)
-  );
 }

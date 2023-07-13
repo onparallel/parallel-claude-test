@@ -48,10 +48,7 @@ import {
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../petition/authorizers";
-import {
-  userHasAccessToUserAndUserGroups,
-  userHasAccessToUsers,
-} from "../petition/mutations/authorizers";
+import { userHasAccessToUserAndUserGroups } from "../petition/mutations/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import {
   contextUserCanSubscribeUsersToProfile,
@@ -62,16 +59,15 @@ import {
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
-  userHasPermissionOnProfileTypeField,
   userHasAccessToProfile,
   userHasAccessToProfileType,
+  userHasPermissionOnProfileTypeField,
 } from "./authorizers";
 import {
   validProfileNamePattern,
   validProfileTypeFieldOptions,
   validateProfileFieldValue,
 } from "./validators";
-import { userHasAccessToUserGroups } from "../user-group/authorizers";
 
 export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
@@ -290,7 +286,6 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           t.nullable.boolean("isExpirable");
           t.nullable.duration("expiryAlertAheadTime");
           t.nullable.jsonObject("options");
-          t.nullable.field("defaultPermission", { type: "ProfileTypeFieldPermission" });
         },
       }).asArg(),
     ),
@@ -323,10 +318,6 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
       updateData.expiry_alert_ahead_time = args.data.isExpirable
         ? args.data.expiryAlertAheadTime
         : null;
-    }
-
-    if (isDefined(args.data.defaultPermission)) {
-      updateData.permission = args.data.defaultPermission;
     }
 
     if (isDefined(args.data.options)) {
@@ -391,86 +382,55 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
   },
 });
 
-export const overrideProfileTypeFieldPermission = mutationField(
-  "overrideProfileTypeFieldPermission",
-  {
-    description:
-      "Override the default permission for a profile type field for a set of users and/or user groups.",
-    type: "ProfileTypeField",
-    authorize: authenticateAnd(
-      userHasFeatureFlag("PROFILES"),
-      contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
-      userHasAccessToProfileType("profileTypeId"),
-      profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
-      userHasAccessToUserAndUserGroups("data"),
-    ),
-    args: {
-      profileTypeId: nonNull(globalIdArg("ProfileType")),
-      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
-      data: nonNull(
-        list(
-          nonNull(
-            inputObjectType({
-              name: "OverrideProfileTypeFieldPermissionInput",
-              definition(t) {
-                t.globalId("userId", { prefixName: "User" });
-                t.globalId("userGroupId", { prefixName: "UserGroup" });
-                t.nonNull.field("permission", { type: "ProfileTypeFieldPermission" });
-              },
-            }),
-          ),
+export const updateProfileTypeFieldPermission = mutationField("updateProfileTypeFieldPermission", {
+  description:
+    "Updates the default permission for a profile type field for a set of users and/or user groups.",
+  type: "ProfileTypeField",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    userHasAccessToProfileType("profileTypeId"),
+    profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
+    userHasAccessToUserAndUserGroups("data"),
+  ),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    defaultPermission: "ProfileTypeFieldPermissionType",
+    data: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "UpdateProfileTypeFieldPermissionInput",
+            definition(t) {
+              t.globalId("userId", { prefixName: "User" });
+              t.globalId("userGroupId", { prefixName: "UserGroup" });
+              t.nonNull.field("permission", { type: "ProfileTypeFieldPermissionType" });
+            },
+          }),
         ),
       ),
-    },
-    validateArgs: notEmptyArray((args) => args.data, "data"),
-    resolve: async (_, args, ctx) => {
-      await ctx.profiles.upsertProfileTypeFieldPermissionOverride(
+    ),
+  },
+  resolve: async (_, args, ctx) => {
+    if (isDefined(args.defaultPermission)) {
+      await ctx.profiles.updateProfileTypeField(
+        args.profileTypeFieldId,
+        { permission: args.defaultPermission },
+        `User:${ctx.user!.id}`,
+      );
+    }
+    if (args.data.length > 0) {
+      await ctx.profiles.resetProfileTypeFieldPermission(
         args.profileTypeFieldId,
         args.data as any,
         `User:${ctx.user!.id}`,
       );
+    }
 
-      return (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId))!;
-    },
+    return (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId, { refresh: true }))!;
   },
-);
-
-export const deleteProfileTypeFieldPermissionOverride = mutationField(
-  "deleteProfileTypeFieldPermissionOverride",
-  {
-    description:
-      "Delete a permission override for a profile type field for a set of users and/or user groups.",
-    type: "Success",
-    authorize: authenticateAnd(
-      userHasFeatureFlag("PROFILES"),
-      contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
-      userHasAccessToProfileType("profileTypeId"),
-      profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
-      userHasAccessToUsers("userIds"),
-      userHasAccessToUserGroups("userGroupIds"),
-    ),
-    args: {
-      profileTypeId: nonNull(globalIdArg("ProfileType")),
-      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
-      userIds: list(nonNull(globalIdArg("User"))),
-      userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
-    },
-    validateArgs: notEmptyArray(
-      (args) => [...(args.userIds ?? []), ...(args.userGroupIds ?? [])],
-      "userIds/userGroupIds",
-    ),
-    resolve: async (_, args, ctx) => {
-      await ctx.profiles.deleteProfileTypeFieldPermissionOverride(
-        args.profileTypeFieldId,
-        args.userIds ?? [],
-        args.userGroupIds ?? [],
-        `User:${ctx.user!.id}`,
-      );
-
-      return RESULT.SUCCESS;
-    },
-  },
-);
+});
 
 export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
   type: "ProfileType",

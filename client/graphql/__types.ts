@@ -977,6 +977,8 @@ export interface Mutation {
   updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
+  /** Updates the default permission for a profile type field for a set of users and/or user groups. */
+  updateProfileTypeFieldPermission: ProfileTypeField;
   updateProfileTypeFieldPositions: ProfileType;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
@@ -2027,6 +2029,13 @@ export interface MutationupdateProfileTypeArgs {
 export interface MutationupdateProfileTypeFieldArgs {
   data: UpdateProfileTypeFieldInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateProfileTypeFieldPermissionArgs {
+  data: Array<UpdateProfileTypeFieldPermissionInput>;
+  defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
   profileTypeFieldId: Scalars["GID"]["input"];
   profileTypeId: Scalars["GID"]["input"];
 }
@@ -3717,19 +3726,28 @@ export interface ProfileType extends Timestamps {
 export interface ProfileTypeField {
   __typename?: "ProfileTypeField";
   alias?: Maybe<Scalars["String"]["output"]>;
+  defaultPermission: ProfileTypeFieldPermissionType;
   expiryAlertAheadTime?: Maybe<Scalars["Duration"]["output"]>;
   id: Scalars["GID"]["output"];
   isExpirable: Scalars["Boolean"]["output"];
   isUsedInProfileName: Scalars["Boolean"]["output"];
-  myPermission: ProfileTypeFieldPermission;
+  myPermission: ProfileTypeFieldPermissionType;
   name: Scalars["LocalizableUserText"]["output"];
   options: Scalars["JSONObject"]["output"];
+  permissions: Array<ProfileTypeFieldPermission>;
   position: Scalars["Int"]["output"];
   profileType: ProfileType;
   type: ProfileTypeFieldType;
 }
 
-export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";
+export interface ProfileTypeFieldPermission {
+  __typename?: "ProfileTypeFieldPermission";
+  id: Scalars["GID"]["output"];
+  permission: ProfileTypeFieldPermissionType;
+  target: UserOrUserGroup;
+}
+
+export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType = "DATE" | "FILE" | "NUMBER" | "PHONE" | "SHORT_TEXT" | "TEXT";
 
@@ -4833,6 +4851,12 @@ export interface UpdateProfileTypeFieldInput {
   isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
+}
+
+export interface UpdateProfileTypeFieldPermissionInput {
+  permission: ProfileTypeFieldPermissionType;
+  userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
+  userId?: InputMaybe<Scalars["GID"]["input"]>;
 }
 
 export interface UpdateTagInput {
@@ -15061,7 +15085,7 @@ export type ProfileDrawer_profileQuery = {
         name: { [locale in UserLocale]?: string };
         position: number;
         type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermission;
+        myPermission: ProfileTypeFieldPermissionType;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
@@ -15191,7 +15215,7 @@ export type ProfileForm_ProfileTypeFieldFragment = {
   name: { [locale in UserLocale]?: string };
   position: number;
   type: ProfileTypeFieldType;
-  myPermission: ProfileTypeFieldPermission;
+  myPermission: ProfileTypeFieldPermissionType;
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
   options: { [key: string]: any };
@@ -15226,7 +15250,7 @@ export type ProfileForm_ProfileFieldPropertyFragment = {
     name: { [locale in UserLocale]?: string };
     position: number;
     type: ProfileTypeFieldType;
-    myPermission: ProfileTypeFieldPermission;
+    myPermission: ProfileTypeFieldPermissionType;
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
     options: { [key: string]: any };
@@ -15269,7 +15293,7 @@ export type ProfileForm_ProfileFragment = {
       name: { [locale in UserLocale]?: string };
       position: number;
       type: ProfileTypeFieldType;
-      myPermission: ProfileTypeFieldPermission;
+      myPermission: ProfileTypeFieldPermissionType;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
       options: { [key: string]: any };
@@ -15320,7 +15344,7 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         name: { [locale in UserLocale]?: string };
         position: number;
         type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermission;
+        myPermission: ProfileTypeFieldPermissionType;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
@@ -15387,7 +15411,7 @@ export type ProfileForm_createProfileFieldFileUploadLinkMutation = {
         name: { [locale in UserLocale]?: string };
         position: number;
         type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermission;
+        myPermission: ProfileTypeFieldPermissionType;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
@@ -28242,7 +28266,7 @@ export type ProfileDetail_ProfileFragment = {
       name: { [locale in UserLocale]?: string };
       position: number;
       type: ProfileTypeFieldType;
-      myPermission: ProfileTypeFieldPermission;
+      myPermission: ProfileTypeFieldPermissionType;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
       options: { [key: string]: any };
@@ -28352,7 +28376,7 @@ export type ProfileDetail_profileQuery = {
         name: { [locale in UserLocale]?: string };
         position: number;
         type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermission;
+        myPermission: ProfileTypeFieldPermissionType;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
@@ -28417,7 +28441,7 @@ export type ProfileDetail_subscribeToProfileMutation = {
         name: { [locale in UserLocale]?: string };
         position: number;
         type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermission;
+        myPermission: ProfileTypeFieldPermissionType;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
@@ -28482,7 +28506,7 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
         name: { [locale in UserLocale]?: string };
         position: number;
         type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermission;
+        myPermission: ProfileTypeFieldPermissionType;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };

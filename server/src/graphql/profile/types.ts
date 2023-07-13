@@ -1,7 +1,7 @@
 import { zonedTimeToUtc } from "date-fns-tz";
 import { enumType, interfaceType, nonNull, objectType } from "nexus";
 import { sortBy } from "remeda";
-import { ProfileTypeFieldPermissionValues, ProfileTypeFieldTypeValues } from "../../db/__types";
+import { ProfileTypeFieldPermissionTypeValues, ProfileTypeFieldTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 
 export const ProfileType = objectType({
@@ -38,9 +38,9 @@ export const ProfileType = objectType({
   },
 });
 
-export const ProfileTypeFieldPermission = enumType({
-  name: "ProfileTypeFieldPermission",
-  members: ProfileTypeFieldPermissionValues,
+export const ProfileTypeFieldPermissionType = enumType({
+  name: "ProfileTypeFieldPermissionType",
+  members: ProfileTypeFieldPermissionTypeValues,
 });
 
 export const ProfileTypeField = objectType({
@@ -65,17 +65,50 @@ export const ProfileTypeField = objectType({
       },
     });
     t.field("myPermission", {
-      type: "ProfileTypeFieldPermission",
+      type: "ProfileTypeFieldPermissionType",
       resolve: async (o, _, ctx) =>
         await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
           profileTypeFieldId: o.id,
           userId: ctx.user!.id,
         }),
     });
+    t.nonNull.field("defaultPermission", {
+      type: "ProfileTypeFieldPermissionType",
+      resolve: (o) => o.permission,
+    });
+    t.nonNull.list.nonNull.field("permissions", {
+      type: "ProfileTypeFieldPermission",
+      resolve: async (o, _, ctx) => {
+        return await ctx.profiles.loadProfileTypeFieldPermissionsByProfileTypeFieldId(o.id);
+      },
+    });
     t.jsonObject("options", { resolve: (o) => o.options });
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });
     t.nullable.duration("expiryAlertAheadTime", { resolve: (o) => o.expiry_alert_ahead_time });
+  },
+});
+
+export const ProfileTypeFieldPermission = objectType({
+  name: "ProfileTypeFieldPermission",
+  definition(t) {
+    t.globalId("id");
+    t.field("target", {
+      type: "UserOrUserGroup",
+      resolve: async (o, _, ctx) => {
+        if (o.user_id) {
+          const user = await ctx.users.loadUser(o.user_id);
+          return { __type: "User", ...user! };
+        } else {
+          const userGroup = await ctx.userGroups.loadUserGroup(o.user_group_id!);
+          return { __type: "UserGroup", ...userGroup! };
+        }
+      },
+    });
+    t.field("permission", {
+      type: "ProfileTypeFieldPermissionType",
+      resolve: (o) => o.permission,
+    });
   },
 });
 
