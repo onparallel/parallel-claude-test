@@ -12,6 +12,7 @@ import { Arg } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
+import { isAtLeast } from "../../util/profileTypeFieldPermission";
 
 export function validProfileNamePattern<
   TypeName extends string,
@@ -33,7 +34,11 @@ export function validProfileNamePattern<
       if (
         fields.length === 0 ||
         fields.some(
-          (f) => !isDefined(f) || f.profile_type_id !== profileTypeId || f.type !== "SHORT_TEXT",
+          (f) =>
+            !isDefined(f) ||
+            f.profile_type_id !== profileTypeId ||
+            f.type !== "SHORT_TEXT" ||
+            !isAtLeast(f.permission, "READ"),
         )
       ) {
         throw new ApolloError("Invalid profile name pattern", "INVALID_PROFILE_NAME_PATTERN");

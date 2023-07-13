@@ -1320,11 +1320,21 @@ export class ProfileRepository extends BaseRepository {
     updatedBy: string,
   ) {
     if (data.length === 0) {
-      return [];
+      await this.from("profile_type_field_permission")
+        .where({
+          profile_type_field_id: profileTypeFieldId,
+          deleted_at: null,
+        })
+        .update({
+          deleted_at: this.now(),
+          deleted_by: updatedBy,
+        });
+
+      return;
     }
 
     const [byUserId, byUserGroupId] = partition(data, (d) => "userId" in d);
-    return await this.withTransaction(async (t) => {
+    await this.withTransaction(async (t) => {
       // remove every permission that is not in the data
       await this.from("profile_type_field_permission", t)
         .where({ profile_type_field_id: profileTypeFieldId, deleted_at: null })
@@ -1346,10 +1356,9 @@ export class ProfileRepository extends BaseRepository {
           deleted_by: updatedBy,
         });
 
-      const userIdRows =
-        byUserId.length > 0
-          ? await this.raw<ProfileTypeFieldPermission>(
-              /* sql */ `
+      if (byUserId.length > 0) {
+        await this.raw<ProfileTypeFieldPermission>(
+          /* sql */ `
         ?
         on conflict (profile_type_field_id, user_id) where deleted_at is null
         do update set
@@ -1370,63 +1379,60 @@ export class ProfileRepository extends BaseRepository {
           )
         returning *;
       `,
-              [
-                this.knex.from({ ptfp: "profile_type_field_permission" }).insert(
-                  byUserId.map((d) => ({
-                    profile_type_field_id: profileTypeFieldId,
-                    user_id: d.userId!,
-                    permission: d.permission,
-                    created_by: updatedBy,
-                    updated_by: updatedBy,
-                  })),
-                ),
-                updatedBy,
-              ],
-              t,
-            )
-          : [];
+          [
+            this.knex.from({ ptfp: "profile_type_field_permission" }).insert(
+              byUserId.map((d) => ({
+                profile_type_field_id: profileTypeFieldId,
+                user_id: d.userId!,
+                permission: d.permission,
+                created_by: updatedBy,
+                updated_by: updatedBy,
+              })),
+            ),
+            updatedBy,
+          ],
+          t,
+        );
+      }
 
-      const userGroupIdRows =
-        byUserGroupId.length > 0
-          ? await this.raw<ProfileTypeFieldPermission>(
-              /* sql */ `
-        ?
-        on conflict (profile_type_field_id, user_group_id) where deleted_at is null
-        do update set
-          permission = EXCLUDED.permission,
-          updated_by = (
-            case 
-              when ptfp.permission = EXCLUDED.permission
-              then ptfp.updated_by
-              else ?
-            end
-          ),
-          updated_at = (
-            case 
-              when ptfp.permission = EXCLUDED.permission
-              then ptfp.updated_at
-              else NOW() 
-            end
-          )
-        returning *;
-      `,
-              [
-                this.knex.from({ ptfp: "profile_type_field_permission" }).insert(
-                  byUserGroupId.map((d) => ({
-                    profile_type_field_id: profileTypeFieldId,
-                    user_group_id: d.userGroupId!,
-                    permission: d.permission,
-                    created_by: updatedBy,
-                    updated_by: updatedBy,
-                  })),
-                ),
-                updatedBy,
-              ],
-              t,
-            )
-          : [];
-
-      return [...userIdRows, ...userGroupIdRows];
+      if (byUserGroupId.length > 0) {
+        await this.raw<ProfileTypeFieldPermission>(
+          /* sql */ `
+      ?
+      on conflict (profile_type_field_id, user_group_id) where deleted_at is null
+      do update set
+        permission = EXCLUDED.permission,
+        updated_by = (
+          case 
+            when ptfp.permission = EXCLUDED.permission
+            then ptfp.updated_by
+            else ?
+          end
+        ),
+        updated_at = (
+          case 
+            when ptfp.permission = EXCLUDED.permission
+            then ptfp.updated_at
+            else NOW() 
+          end
+        )
+      returning *;
+    `,
+          [
+            this.knex.from({ ptfp: "profile_type_field_permission" }).insert(
+              byUserGroupId.map((d) => ({
+                profile_type_field_id: profileTypeFieldId,
+                user_group_id: d.userGroupId!,
+                permission: d.permission,
+                created_by: updatedBy,
+                updated_by: updatedBy,
+              })),
+            ),
+            updatedBy,
+          ],
+          t,
+        );
+      }
     });
   }
 

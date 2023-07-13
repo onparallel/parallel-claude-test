@@ -413,6 +413,15 @@ export const updateProfileTypeFieldPermission = mutationField("updateProfileType
     ),
   },
   resolve: async (_, args, ctx) => {
+    if (args.defaultPermission === "HIDDEN") {
+      const profileType = await ctx.profiles.loadProfileType(args.profileTypeId);
+      if (profileType!.profile_name_pattern.includes(args.profileTypeFieldId)) {
+        throw new ApolloError(
+          "Cannot set this field to HIDDEN because it is being used as part of the profile name",
+          "PROFILE_TYPE_FIELD_IS_PART_OF_PROFILE_NAME",
+        );
+      }
+    }
     if (isDefined(args.defaultPermission)) {
       await ctx.profiles.updateProfileTypeField(
         args.profileTypeFieldId,
@@ -420,13 +429,12 @@ export const updateProfileTypeFieldPermission = mutationField("updateProfileType
         `User:${ctx.user!.id}`,
       );
     }
-    if (args.data.length > 0) {
-      await ctx.profiles.resetProfileTypeFieldPermission(
-        args.profileTypeFieldId,
-        args.data as any,
-        `User:${ctx.user!.id}`,
-      );
-    }
+
+    await ctx.profiles.resetProfileTypeFieldPermission(
+      args.profileTypeFieldId,
+      args.data as any,
+      `User:${ctx.user!.id}`,
+    );
 
     return (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId, { refresh: true }))!;
   },

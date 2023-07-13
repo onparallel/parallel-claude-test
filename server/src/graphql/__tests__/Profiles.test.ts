@@ -1345,7 +1345,7 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
-    it("updates profile names when chaging the profile name pattern", async () => {
+    it("updates profile names when changing the profile name pattern", async () => {
       async function createIndividualProfile(firstName?: string, lastName?: string) {
         const { data } = await testClient.execute(
           gql`
@@ -1562,13 +1562,39 @@ describe("GraphQL/Profiles", () => {
               profileNamePattern: $profileNamePattern
             ) {
               id
-              profileNamePattern
             }
           }
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           profileNamePattern: "Hello",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_NAME_PATTERN");
+      expect(data).toBeNull();
+    });
+
+    it("fails when using a HIDDEN field in the profile name pattern", async () => {
+      await mocks.knex.from("profile_type_field").where("id", profileType0Fields[0].id).update({
+        permission: "HIDDEN",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileNamePattern: String!) {
+            updateProfileType(
+              profileTypeId: $profileTypeId
+              profileNamePattern: $profileNamePattern
+            ) {
+              id
+              profileNamePattern
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileNamePattern: `{{ ${toGlobalId("ProfileTypeField", profileType0Fields[0].id)} }}`,
         },
       );
 
@@ -4615,7 +4641,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
           defaultPermission: "HIDDEN",
           data: [{ userGroupId: toGlobalId("UserGroup", userGroup.id), permission: "READ" }],
         },
@@ -4665,6 +4691,12 @@ describe("GraphQL/Profiles", () => {
           },
           {
             alias: "LAST_NAME",
+            defaultPermission: "WRITE",
+            myPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "BIRTH_DATE",
             defaultPermission: "HIDDEN",
             myPermission: "READ",
             permissions: [
@@ -4673,12 +4705,6 @@ describe("GraphQL/Profiles", () => {
                 target: { __typename: "UserGroup", id: toGlobalId("UserGroup", userGroup.id) },
               },
             ],
-          },
-          {
-            alias: "BIRTH_DATE",
-            defaultPermission: "WRITE",
-            myPermission: "WRITE",
-            permissions: [],
           },
           {
             alias: "PHONE",
@@ -4951,7 +4977,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
           data: [{ userId: toGlobalId("User", user.id), permission: "HIDDEN" }],
           defaultPermission: "READ",
         },
@@ -4994,14 +5020,9 @@ describe("GraphQL/Profiles", () => {
         fields: [
           {
             alias: "FIRST_NAME",
-            defaultPermission: "READ",
-            myPermission: "READ",
-            permissions: [
-              {
-                permission: "HIDDEN",
-                target: { __typename: "User", id: toGlobalId("User", user.id) },
-              },
-            ],
+            defaultPermission: "WRITE",
+            myPermission: "WRITE",
+            permissions: [],
           },
           {
             alias: "LAST_NAME",
@@ -5011,9 +5032,14 @@ describe("GraphQL/Profiles", () => {
           },
           {
             alias: "BIRTH_DATE",
-            myPermission: "WRITE",
-            defaultPermission: "WRITE",
-            permissions: [],
+            myPermission: "READ",
+            defaultPermission: "READ",
+            permissions: [
+              {
+                permission: "HIDDEN",
+                target: { __typename: "User", id: toGlobalId("User", user.id) },
+              },
+            ],
           },
           {
             alias: "PHONE",
@@ -5034,6 +5060,82 @@ describe("GraphQL/Profiles", () => {
             permissions: [],
           },
         ],
+      });
+    });
+
+    it("sends error if updating to HIDDEN a profile type field used on a profile_name_pattern", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $defaultPermission: ProfileTypeFieldPermissionType!
+            $data: [UpdateProfileTypeFieldPermissionInput!]!
+          ) {
+            updateProfileTypeFieldPermission(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              defaultPermission: $defaultPermission
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          defaultPermission: "HIDDEN",
+          data: [],
+        },
+      );
+      expect(errors).toContainGraphQLError("PROFILE_TYPE_FIELD_IS_PART_OF_PROFILE_NAME");
+      expect(data).toBeNull();
+    });
+
+    it("removes every permission when passing empty array", async () => {
+      await mocks.knex.from("profile_type_field_permission").insert({
+        user_id: user.id,
+        profile_type_field_id: profileType0Fields[2].id,
+        permission: "READ",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $defaultPermission: ProfileTypeFieldPermissionType!
+            $data: [UpdateProfileTypeFieldPermissionInput!]!
+          ) {
+            updateProfileTypeFieldPermission(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              defaultPermission: $defaultPermission
+              data: $data
+            ) {
+              id
+              defaultPermission
+              myPermission
+              permissions {
+                __typename
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          data: [],
+          defaultPermission: "WRITE",
+        },
+      );
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeFieldPermission).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+        permissions: [],
+        defaultPermission: "WRITE",
+        myPermission: "WRITE",
       });
     });
   });
