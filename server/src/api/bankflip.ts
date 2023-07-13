@@ -1,11 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import { json, Request, Response, Router } from "express";
-import {
-  ModelExtractedWebhookEvent,
-  SessionCompletedWebhookEvent,
-} from "../services/BankflipService";
-
-type BankflipWebhookBody = ModelExtractedWebhookEvent | SessionCompletedWebhookEvent;
+import { Request, Response, Router, json } from "express";
+import { BankflipWebhookEvent } from "../services/BankflipService";
+import { fromGlobalId } from "../util/globalId";
 
 const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
   const secret = req.context.bankflip.webhookSecret(req.params.orgId);
@@ -29,9 +25,15 @@ export const bankflip = Router().post(
   json({ verify: verifyHMAC }),
   async (req, res, next) => {
     try {
-      const body = req.body as BankflipWebhookBody;
+      const body = req.body as BankflipWebhookEvent;
       if (body.name === "SESSION_COMPLETED") {
-        await req.context.bankflip.sessionCompleted(req.params.orgId, body);
+        await req.context.tasks.createTask({
+          name: "BANKFLIP_SESSION_COMPLETED",
+          input: {
+            bankflip_session_id: body.payload.sessionId,
+            org_id: fromGlobalId(req.params.orgId, "Organization").id,
+          },
+        });
       }
 
       res.sendStatus(200).end();

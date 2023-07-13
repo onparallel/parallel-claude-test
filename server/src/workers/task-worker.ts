@@ -11,6 +11,7 @@ import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
+import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -20,6 +21,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   TEMPLATE_STATS_REPORT: TemplateStatsReportRunner,
   DOW_JONES_PROFILE_DOWNLOAD: DowJonesProfileDownloadRunner,
   TEMPLATES_OVERVIEW_REPORT: TemplatesOverviewReportRunner,
+  BANKFLIP_SESSION_COMPLETED: BankflipSessionCompletedRunner,
 };
 
 export interface TaskWorkerPayload {

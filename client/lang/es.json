@@ -1895,6 +1895,11 @@
     "context": "An unknown error happened."
   },
   {
+    "term": "component.es-tax-documents-content-error-message.parallel-send-limit-reached",
+    "definition": "No pudimos generar el archivo porque haz alcanzado el límite de parallels que puedes enviar.",
+    "context": "We couldn't create the file because you reached the limit of parallels you can send."
+  },
+  {
     "term": "component.es-tax-documents-content-error-message.timeout",
     "definition": "La Administración Pública tardó demasiado en procesar tu solicitud. Por favor, vuelva a intentarlo.",
     "context": "The Public Administration took too long to process your request. Please, try again."

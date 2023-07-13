@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { RequestInit } from "node-fetch";
-import pMap from "p-map";
-import { groupBy, isDefined, zip } from "remeda";
+import { isDefined } from "remeda";
 import { CONFIG, Config } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
@@ -9,9 +8,6 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../util/globalId";
-import { pFlatMap } from "../util/promises/pFlatMap";
-import { random } from "../util/token";
-import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
 import { IImageService, IMAGE_SERVICE } from "./ImageService";
 import {
@@ -19,22 +15,23 @@ import {
   OrganizationCreditsService,
 } from "./OrganizationCreditsService";
 import { STORAGE_SERVICE, StorageService } from "./StorageService";
+import { Maybe } from "../util/types";
 
-type SessionMetadata = {
+export type SessionMetadata = {
   petitionId: string;
   fieldId: string;
   orgId: string;
 } & ({ userId: string } | { accessId: string });
 
 /** When the Session is completed. (every requested model has been extracted) */
-export interface SessionCompletedWebhookEvent {
-  name: "SESSION_COMPLETED";
+export interface BankflipWebhookEvent {
+  name: string;
   payload: {
     sessionId: string;
   };
 }
 
-interface ModelRequest {
+export interface ModelRequest {
   type: string;
   year?: number;
   month?: "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12";
@@ -42,17 +39,7 @@ interface ModelRequest {
   licensePlate?: string;
 }
 
-/** Each time that modelRequest has extracted one or more documents. */
-export interface ModelExtractedWebhookEvent {
-  name: "MODEL_EXTRACTED";
-  payload: {
-    sessionId: string;
-    documentIds: string[];
-    model: ModelRequest;
-  };
-}
-
-interface ModelRequestDocument {
+export interface ModelRequestDocument {
   contentType: string;
   createdAt: string;
   extension: string;
@@ -72,7 +59,7 @@ interface NoDocumentReason {
   subreason: Maybe<string>;
 }
 
-interface ModelRequestOutcome {
+export interface ModelRequestOutcome {
   completed: boolean;
   documents: Maybe<ModelRequestDocument[]>;
   modelRequest: { model: ModelRequest };
@@ -93,8 +80,11 @@ export interface IBankflipService {
   /** called to start a session with Bankflip to request a person's documents */
   createSession(metadata: SessionMetadata): Promise<CreateSessionResponse>;
   /** webhook callback for when document extraction has finished and the session is completed */
-  sessionCompleted(orgId: string, event: SessionCompletedWebhookEvent): Promise<void>;
   webhookSecret(orgId: string): string;
+  fetchSessionMetadata(orgId: string, sessionId: string): Promise<SessionMetadata>;
+  fetchSessionSummary(orgId: string, sessionId: string): Promise<SessionSummaryResponse>;
+  fetchPdfDocumentContents(orgId: string, documentId: string): Promise<Buffer>;
+  fetchJsonDocumentContents(orgId: string, documentId: string): Promise<any>;
 }
 
 @injectable()
@@ -111,7 +101,7 @@ export class BankflipService implements IBankflipService {
     @inject(CONFIG) private config: Config,
   ) {}
 
-  public webhookSecret(orgId: string) {
+  webhookSecret(orgId: string) {
     switch (orgId) {
       case this.config.bankflip.saldadosOrgId:
         return this.config.bankflip.saldadosWebhookSecret;
@@ -199,142 +189,20 @@ export class BankflipService implements IBankflipService {
     });
   }
 
-  async sessionCompleted(orgId: string, event: SessionCompletedWebhookEvent): Promise<void> {
-    const session = await this.apiRequest<SessionResponse>(
-      orgId,
-      `/session/${event.payload.sessionId}`,
-    );
-    const { metadata } = session;
-    await this.consumePetitionCredits(metadata);
-
-    const summary = await this.apiRequest<SessionSummaryResponse>(
-      orgId,
-      `/session/${event.payload.sessionId}/summary`,
-    );
-
-    const replyContents = await pFlatMap(
-      summary.modelRequestOutcomes,
-      async (model) => await this.extractAndUploadModelDocuments(metadata, model),
-      { concurrency: 2 },
-    );
-
-    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
-    const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
-    const data =
-      "userId" in metadata
-        ? { user_id: fromGlobalId(metadata.userId, "User").id }
-        : { petition_access_id: fromGlobalId(metadata.accessId, "PetitionAccess").id };
-
-    const createdBy =
-      "user_id" in data ? `User:${data.user_id}` : `PetitionAccess:${data.petition_access_id}`;
-
-    await this.petitions.createPetitionFieldReply(
-      petitionId,
-      replyContents.map((content) => ({
-        petition_field_id: fieldId,
-        type: "ES_TAX_DOCUMENTS",
-        content: { ...content, bankflip_session_id: event.payload.sessionId },
-        ...data,
-      })),
-      createdBy,
-    );
+  async fetchSessionMetadata(orgId: string, sessionId: string) {
+    const session = await this.apiRequest<SessionResponse>(orgId, `/session/${sessionId}`);
+    return session.metadata;
   }
 
-  private async consumePetitionCredits(metadata: SessionMetadata) {
-    if ("userId" in metadata) {
-      const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
-      const userId = fromGlobalId(metadata.userId, "User").id;
-      const field = (await this.petitions.loadField(fieldId))!;
-      await this.orgCredits.ensurePetitionHasConsumedCredit(field.petition_id, `User:${userId}`);
-    }
+  async fetchSessionSummary(orgId: string, sessionId: string) {
+    return await this.apiRequest<SessionSummaryResponse>(orgId, `/session/${sessionId}/summary`);
   }
 
-  /**
-   * extracts the contents of the documents on a given model outcome, uploads the files to S3 and returns the data for creating an ES_TAX_DOCUMENTS reply.
-   */
-  private async extractAndUploadModelDocuments(
-    metadata: SessionMetadata,
-    modelRequestOutcome: ModelRequestOutcome,
-  ): Promise<any[]> {
-    if (isDefined(modelRequestOutcome.noDocumentReasons)) {
-      return [
-        {
-          file_upload_id: null,
-          request: modelRequestOutcome.modelRequest,
-          error: modelRequestOutcome.noDocumentReasons,
-        },
-      ];
-    }
+  async fetchPdfDocumentContents(orgId: string, documentId: string) {
+    return await this.apiRequest<Buffer>(orgId, `/document/${documentId}/content`, {}, "buffer");
+  }
 
-    // a set of documents with the same request model will be all part of the same PetitionFieldReply
-    // TODO cambiar la manera de agrupar documentos una vez Bankflip implemente una solución que lo permita de manera fácil (ya hablado con ellos)
-    const groupedByRequestModel = groupBy(modelRequestOutcome.documents ?? [], (d) =>
-      Object.keys(d.model)
-        .sort()
-        .map((key) => d.model[key as keyof ModelRequest])
-        .join("_"),
-    );
-    return await pFlatMap(Object.values(groupedByRequestModel), async (docs) => {
-      const documents: Record<string, ModelRequestDocument[]> = {};
-      ["pdf", "json"].forEach((extension) => {
-        documents[extension] = docs.filter((d) => d.extension === extension);
-      });
-
-      if (documents.pdf.length === 0) {
-        // should not happen
-        return [
-          {
-            file_upload_id: null,
-            request: modelRequestOutcome.modelRequest,
-            error: [],
-          },
-        ];
-      }
-
-      const pdfBuffers = await pMap(
-        documents.pdf,
-        async ({ id }) =>
-          await this.apiRequest<Buffer>(metadata.orgId, `/document/${id}/content`, {}, "buffer"),
-        { concurrency: 1 },
-      );
-
-      const results: any[] = [];
-      for (const [request, pdfBuffer] of zip(documents.pdf, pdfBuffers)) {
-        const path = random(16);
-        const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
-        const [file] = await this.files.createFileUpload(
-          {
-            path,
-            content_type: "application/pdf",
-            filename: `${request.name}.pdf`,
-            size: res["ContentLength"]!.toString(),
-            upload_complete: true,
-          },
-          "userId" in metadata
-            ? `User:${fromGlobalId(metadata.userId, "User").id}`
-            : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`,
-        );
-
-        results.push({
-          file_upload_id: file.id,
-          request: request,
-          json_contents:
-            // TODO: el modelo CARP_CIUD_CERT_CATASTRO devuelve multiples pdfs y jsons con el mismo "request".
-            // actualmente no se puede identificar cuál json corresponde a cada pdf.
-            // hablé con Gabriel para implementar algo que permita identificarlos, pero por ahora
-            // ignoramos los json de este modelo. De todas formas aún no lo están parseando.
-            // Cuando esté implementada la solución en Bankflip, hay que cambiar la manera de agrupar documentos (comentado más arriba)
-            request.model.type === "CARP_CIUD_CERT_CATASTRO"
-              ? null
-              : documents.json.length === 1
-              ? await this.apiRequest<any>(
-                  metadata.orgId,
-                  `/document/${documents.json[0].id}/content`,
-                )
-              : null,
-        });
-      }
-      return results;
-    });
+  async fetchJsonDocumentContents(orgId: string, documentId: string) {
+    return await this.apiRequest<any>(orgId, `/document/${documentId}/content`);
   }
 }

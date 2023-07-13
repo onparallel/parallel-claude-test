@@ -2,9 +2,9 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { Maybe, Replace } from "../../util/types";
+import { Task as DbTask, TaskName } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { Task as DbTask, TaskName } from "../__types";
 
 export type TaskInput<TName extends TaskName> = {
   /**
@@ -51,6 +51,10 @@ export type TaskInput<TName extends TaskName> = {
   TEMPLATES_OVERVIEW_REPORT: {
     start_date?: Date | null;
     end_date?: Date | null;
+  };
+  BANKFLIP_SESSION_COMPLETED: {
+    bankflip_session_id: string;
+    org_id: number;
   };
 }[TName];
 
@@ -125,6 +129,10 @@ export type TaskOutput<TName extends TaskName> = {
     status: PetitionReportStatusCount;
     times: PetitionReportTimes;
   }[];
+  BANKFLIP_SESSION_COMPLETED: {
+    success: boolean;
+    error?: any;
+  };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<
@@ -184,7 +192,7 @@ export class TaskRepository extends BaseRepository {
     );
   }
 
-  async createTask<TName extends TaskName>(data: Partial<Task<TName>>, createdBy: string) {
+  async createTask<TName extends TaskName>(data: Partial<Task<TName>>, createdBy?: string) {
     const [task] = await this.from("task").insert(
       {
         ...data,

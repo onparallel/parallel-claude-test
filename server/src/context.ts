@@ -146,6 +146,8 @@ export class WorkerContext {
     @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
     public readonly petitionMessageContext: PetitionMessageContextService,
+    @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
+    @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
 
     // Repositories
     public readonly contacts: ContactRepository,

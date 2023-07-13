@@ -46,6 +46,11 @@ export function EsTaxDocumentsContentErrorMessage({
         defaultMessage:
           "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically.",
       }),
+      parallel_send_limit_reached: intl.formatMessage({
+        id: "component.es-tax-documents-content-error-message.parallel-send-limit-reached",
+        defaultMessage:
+          "We couldn't create the file because you reached the limit of parallels you can send.",
+      }),
       generic: intl.formatMessage({
         id: "component.es-tax-documents-content-error-message.generic",
         defaultMessage: "An unknown error happened.",
