@@ -68,9 +68,9 @@ export interface RestOperationOptions<TQuery, TBody, TResponses extends RestResp
   [x: string]: unknown;
 }
 
-export type RestResponses<T> = {
+export interface RestResponses<T> {
   [status: number]: RestResponse<T>;
-};
+}
 
 export interface RestResponse<T> extends OpenAPIV3.ResponseObject {
   _type?: T;
@@ -118,13 +118,13 @@ type RestResponseReturnType<TResponses extends RestResponses<any>> =
 const methods: RestMethod[] = ["get", "put", "post", "delete", "options", "head", "patch", "trace"];
 
 const _PathResolver: any = (function () {
-  type PathResolver<TContext, TPath extends string, TParams extends PathParameters<TPath>> = {
+  interface PathResolver<TContext, TPath extends string, TParams extends PathParameters<TPath>> {
     router: Router;
     apiOptions: RestApiOptions<TContext>;
     path: TPath;
     pathOptions: _RestPathOptions<TPath, TParams>;
     spec: OpenAPIV3.PathItemObject;
-  };
+  }
   function PathResolver<TContext, TPath extends string, TParams extends PathParameters<TPath>>(
     this: PathResolver<TContext, TPath, TParams>,
     router: Router,

@@ -11,10 +11,10 @@ import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
 
-export type TimelineReplyUpdatedEventProps = {
+export interface TimelineReplyUpdatedEventProps {
   event: TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
   userId: string;
-};
+}
 
 export function TimelineReplyUpdatedEvent({
   event: { updatedBy, field, reply, createdAt },

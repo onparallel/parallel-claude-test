@@ -1,10 +1,10 @@
 import { PetitionFieldType } from "../db/__types";
 
-type PartialField = {
+interface PartialField {
   type: PetitionFieldType;
   options: any;
   replies: { content: any; anonymized_at: Date | null }[];
-};
+}
 
 // ALERT: Same logic in completedFieldReplies in client side
 /** returns the field replies that are fully completed */

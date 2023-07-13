@@ -8,7 +8,7 @@ import { FieldOptions } from "./petitionFields";
 
 type PartialField = validatePetitionFields_PetitionFieldFragment;
 
-type ValidationResult<T extends PartialField> = {
+interface ValidationResult<T extends PartialField> {
   error:
     | "NO_REPLIABLE_FIELDS"
     | "FIELD_WITHOUT_TITLE"
@@ -18,7 +18,7 @@ type ValidationResult<T extends PartialField> = {
     | null;
   fieldsWithIndices?: { fieldIndex: PetitionFieldIndex; field: T }[];
   message?: ReactNode;
-};
+}
 
 /**
  * validates if the petition fields contains every required information before sending to recipients.

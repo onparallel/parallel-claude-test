@@ -3,9 +3,9 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
-export type FailureGeneratingLinkDialogProps = {
+export interface FailureGeneratingLinkDialogProps {
   filename: string;
-};
+}
 
 export function FailureGeneratingLinkDialog({
   filename,

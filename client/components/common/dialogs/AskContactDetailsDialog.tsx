@@ -8,15 +8,15 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type ContactDetailsFormData = {
+export interface ContactDetailsFormData {
   email: string;
   firstName: string;
   lastName: string | null;
-};
+}
 
-export type AskContactDetailsDialogResult = {
+export interface AskContactDetailsDialogResult {
   defaultEmail?: string;
-};
+}
 
 export function AskContactDetailsDialog({
   defaultEmail,

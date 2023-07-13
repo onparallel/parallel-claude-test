@@ -194,11 +194,11 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   };
 }[TType];
 
-export type GenericAnalyticsEvent<TType extends AnalyticsEventType> = {
+export interface GenericAnalyticsEvent<TType extends AnalyticsEventType> {
   type: TType;
   data: AnalyticsEventPayload<TType>;
   user_id: number;
-};
+}
 
 export type AnalyticsEvent =
   | GenericAnalyticsEvent<"PETITION_CREATED">

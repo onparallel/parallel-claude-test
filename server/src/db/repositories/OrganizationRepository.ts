@@ -26,18 +26,18 @@ import {
 } from "../__types";
 import { SystemRepository } from "./SystemRepository";
 
-type TUsageDetail = {
+interface TUsageDetail {
   limit: number;
   duration: Duration;
   renewal_cycles?: Maybe<number>; // null will renew indefinitely
-};
+}
 
-export type OrganizationUsageDetails = {
+export interface OrganizationUsageDetails {
   USER_LIMIT: number;
   PETITION_SEND: TUsageDetail;
   // limits the number of uses of the signature production service with our shared API_KEY
   SIGNATURIT_SHARED_APIKEY?: TUsageDetail;
-};
+}
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {

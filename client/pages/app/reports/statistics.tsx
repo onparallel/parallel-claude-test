@@ -78,12 +78,12 @@ const QUERY_STATE = {
   template: string(),
 };
 
-export type ActiveReportData = {
+export interface ActiveReportData {
   templateName?: string | null;
   templateId: string;
   range: Date[] | null;
   report: ReportTypeStatistics;
-};
+}
 
 export function ReportsTemplates() {
   const intl = useIntl();

@@ -1,7 +1,10 @@
 import archiver from "archiver";
 import { PassThrough, pipeline, Readable } from "stream";
 
-export type ZipFileInput = { filename: string; stream: Readable };
+export interface ZipFileInput {
+  filename: string;
+  stream: Readable;
+}
 
 export function createZipFile(files: AsyncGenerator<ZipFileInput>) {
   const zip = archiver("zip");

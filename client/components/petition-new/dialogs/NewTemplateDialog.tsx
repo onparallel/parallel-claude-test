@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 type NewTemplateDialogData = string | null;
 
-type PreviewsType = {
+interface PreviewsType {
   key: string;
   icon: ReactNode;
   background: string;
@@ -15,7 +15,7 @@ type PreviewsType = {
   description: string;
   image: string;
   templateId: string | null;
-};
+}
 
 export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialogData>) {
   const intl = useIntl();

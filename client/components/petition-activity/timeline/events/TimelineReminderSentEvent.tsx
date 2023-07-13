@@ -14,10 +14,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineReminderSentEventProps = {
+export interface TimelineReminderSentEventProps {
   userId: string;
   event: TimelineReminderSentEvent_ReminderSentEventFragment;
-};
+}
 
 export function TimelineReminderSentEvent({
   event: { reminder, createdAt },

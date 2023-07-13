@@ -24,11 +24,11 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldTypeIndicator } from "../PetitionFieldTypeIndicator";
 
-type CreateReferenceDialogProps = {
+interface CreateReferenceDialogProps {
   field: CreateReferenceDialog_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
-};
+}
 
 export function useCreateReferenceDialog() {
   return useDialog(CreateReferenceDialog);

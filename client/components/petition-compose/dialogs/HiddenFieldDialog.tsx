@@ -8,10 +8,10 @@ import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldVisibilityEditor } from "../PetitionFieldVisibilityEditor";
 
-type HiddenFieldDialogProps = {
+interface HiddenFieldDialogProps {
   field: HiddenFieldDialog_PetitionFieldFragment;
   fields: HiddenFieldDialog_PetitionFieldFragment[];
-};
+}
 
 export function HiddenFieldDialog({
   field,

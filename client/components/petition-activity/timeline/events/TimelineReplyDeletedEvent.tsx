@@ -9,10 +9,10 @@ import { UserOrContactReference } from "../../UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineReplyDeletedEventProps = {
+export interface TimelineReplyDeletedEventProps {
   event: TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
   userId: string;
-};
+}
 
 export function TimelineReplyDeletedEvent({
   event: { deletedBy, field, createdAt },

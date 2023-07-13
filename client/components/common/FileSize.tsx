@@ -3,9 +3,9 @@ import { FormatNumberOptions, IntlShape, useIntl } from "react-intl";
 
 const UNITS = ["B", "kB", "MB", "GB", "TB", "PB"] as const;
 
-export type FileSizeProps = {
+export interface FileSizeProps {
   value: number;
-};
+}
 
 export function fileSize(
   intl: IntlShape,

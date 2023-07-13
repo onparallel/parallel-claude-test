@@ -8,10 +8,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelinePetitionClonedEventProps = {
+export interface TimelinePetitionClonedEventProps {
   userId: string;
   event: TimelinePetitionClonedEvent_PetitionClonedEventFragment;
-};
+}
 
 export function TimelinePetitionClonedEvent({ event, userId }: TimelinePetitionClonedEventProps) {
   return (

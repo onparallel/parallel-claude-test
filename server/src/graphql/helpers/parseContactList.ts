@@ -5,18 +5,18 @@ export type ExcelParsingCodeErrors =
   | "INVALID_EMAIL_FORMAT"
   | "CANNOT_RESOLVE_DOMAIN";
 
-export type ExcelParsingError = {
+export interface ExcelParsingError {
   code: ExcelParsingCodeErrors;
   message: string;
   row: number;
   column: number;
-};
+}
 
-type ParsedContact = {
+interface ParsedContact {
   firstName: string;
   lastName?: string;
   email: string;
-};
+}
 
 export async function parseContactList(
   data: string[][],

@@ -6,12 +6,12 @@ import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { WhenPermission } from "../common/WhenPermission";
 
-export type OrganizationGroupsListTableHeaderProps = {
+export interface OrganizationGroupsListTableHeaderProps {
   search: string | null;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onCreateGroup: () => void;
-};
+}
 
 export function OrganizationGroupsListTableHeader({
   search,

@@ -14,11 +14,11 @@ import { PetitionSignatureRequest } from "../src/db/__types";
  * for empty objects or missing information about a particular signer (the signer didn't sign/decline yet), search and try to add sent_at and opened_at dates
  */
 
-type SignatureRequestRow = {
+interface SignatureRequestRow {
   id: number;
   signers: { email: string }[];
   event_logs: { type: string; created_at: string; document?: { email: string } }[];
-};
+}
 
 export async function up(knex: Knex): Promise<void> {
   const { rows } = await knex.raw<{ rows: SignatureRequestRow[] }>(

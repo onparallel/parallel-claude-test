@@ -10,10 +10,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineGroupPermissionAddedEventProps = {
+export interface TimelineGroupPermissionAddedEventProps {
   userId: string;
   event: TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment;
-};
+}
 
 export function TimelineGroupPermissionAddedEvent({
   event,

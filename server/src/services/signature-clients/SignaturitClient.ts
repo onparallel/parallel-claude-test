@@ -482,7 +482,7 @@ export class SignaturitClient implements ISignatureClient {
   }
 }
 
-type SignaturitBrandingParams<IsResponse extends boolean = false> = {
+interface SignaturitBrandingParams<IsResponse extends boolean = false> {
   /** List with all the customizable texts for application widgets. */
   application_texts?: {
     /** Send button text. */
@@ -538,19 +538,19 @@ type SignaturitBrandingParams<IsResponse extends boolean = false> = {
      */
     sms_validate?: string;
   };
-};
+}
 
 type SignaturitBrandingResponse = {
   id: string;
   created_at: Date;
 } & SignaturitBrandingParams<true>;
 
-type SignaturitRecipient = {
+interface SignaturitRecipient {
   email: string;
   name: string;
-};
+}
 
-type SignaturitSignatureParams = {
+interface SignaturitSignatureParams {
   /** Email body (html code is allowed) for email and sms type requests. */
   body?: string;
   /** Use a custom branding for the signature request */
@@ -579,9 +579,9 @@ type SignaturitSignatureParams = {
   signing_mode?: "sequential" | "parallel";
   /** The type of the signature. Note: the default value is the advanced signature request. */
   type?: "simple" | "advanced" | "smart";
-};
+}
 
-type SignaturItWidget = {
+interface SignaturItWidget {
   page?: number; // range 1...N
   editable?: number; // 0 or 1
   required?: number; // 0 or 1
@@ -596,9 +596,9 @@ type SignaturItWidget = {
    */
   word_anchor?: string;
   options?: any;
-};
+}
 
-type SignaturitDocument = {
+interface SignaturitDocument {
   id: string;
   decline_reason?: string;
   created_at: Date;
@@ -614,15 +614,15 @@ type SignaturitDocument = {
   email: string;
   name: string;
   status: string;
-};
+}
 
-type SignaturitSignatureResponse = {
+interface SignaturitSignatureResponse {
   id: string;
   created_at: Date;
   data: any[];
   documents: SignaturitDocument[];
   url?: string;
-};
+}
 
 export type SignaturitEvents =
   | "email_processed"

@@ -65,7 +65,7 @@ type RecipientEvent =
   // Sent when the recipient selects finish within the web application on an Envelope. Only available in JSON SIM message format.
   | "recipient-finish-later";
 
-export type DocuSignEventBody = {
+export interface DocuSignEventBody {
   event: EnvelopeEvent | RecipientEvent;
   apiVersion: string;
   uri: string;
@@ -92,7 +92,7 @@ export type DocuSignEventBody = {
       };
     };
   };
-};
+}
 
 const HANDLERS: Partial<
   Record<

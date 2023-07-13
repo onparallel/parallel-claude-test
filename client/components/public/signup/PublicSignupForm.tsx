@@ -21,16 +21,16 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-type PublicSignupFormData = {
+interface PublicSignupFormData {
   email: string;
   password: string;
-};
+}
 
-type PublicSignupFormProps = {
+interface PublicSignupFormProps {
   onNext: (data: PublicSignupFormData) => void;
   email?: string;
   source?: string;
-};
+}
 export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProps) {
   const intl = useIntl();
 

@@ -22,9 +22,9 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   TEMPLATES_OVERVIEW_REPORT: TemplatesOverviewReportRunner,
 };
 
-export type TaskWorkerPayload = {
+export interface TaskWorkerPayload {
   taskId: number;
-};
+}
 
 createQueueWorker(
   "task-worker",

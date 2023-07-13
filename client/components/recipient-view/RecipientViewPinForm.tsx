@@ -2,12 +2,12 @@ import { Button, Flex, HStack, PinInput, PinInputField, Text } from "@chakra-ui/
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-type RecipientViewPinFormProps = {
+interface RecipientViewPinFormProps {
   onSubmit: (code: string) => void;
   isInvalid?: boolean;
   isLoading?: boolean;
   remainingAttempts?: number;
-};
+}
 
 export function RecipientViewPinForm({
   onSubmit,

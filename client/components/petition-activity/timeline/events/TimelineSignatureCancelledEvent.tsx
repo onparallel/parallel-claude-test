@@ -15,10 +15,10 @@ import { useSignatureCancelledRequestErrorDialog } from "../../dialogs/Signature
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineSignatureCancelledEventProps = {
+export interface TimelineSignatureCancelledEventProps {
   userId: string;
   event: TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
-};
+}
 
 export function TimelineSignatureCancelledEvent({
   event,

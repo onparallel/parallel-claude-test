@@ -10,10 +10,10 @@ import {
   useState,
 } from "react";
 
-type DialogCallbacks<TResult = void> = {
+interface DialogCallbacks<TResult = void> {
   onResolve: (value?: TResult) => void;
   onReject: (reason?: string) => void;
-};
+}
 
 export type DialogProps<TProps = {}, TResult = void> = TProps & DialogCallbacks<TResult>;
 
@@ -23,13 +23,13 @@ export type DialogOpener = <TProps = {}, TResult = void>(
 
 const DialogOpenerContext = createContext<DialogOpener | null>(null);
 
-type UseDialogReturn<TProps = {}, TResult = void> = {
+interface UseDialogReturn<TProps = {}, TResult = void> {
   (
     ...args: [keyof Omit<TProps, keyof DialogCallbacks>] extends [never]
       ? []
       : [props: Omit<TProps, keyof DialogCallbacks>]
   ): Promise<TResult>;
-};
+}
 
 export function useDialog<TProps = {}, TResult = void>(
   // eslint-disable-next-line @typescript-eslint/naming-convention

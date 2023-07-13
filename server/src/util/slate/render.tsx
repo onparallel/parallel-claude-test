@@ -4,7 +4,7 @@ import { isDefined } from "remeda";
 import { renderToString } from "react-dom/server";
 import { paragraphIsEmpty } from "./utils";
 
-export type SlateNode = {
+export interface SlateNode {
   children?: SlateNode[];
   type?:
     | "paragraph"
@@ -24,7 +24,7 @@ export type SlateNode = {
   italic?: boolean;
   underline?: boolean;
   mention?: string;
-};
+}
 
 export interface RenderSlateOptions<TResult = string> {
   override: Record<string, (node: SlateNode) => TResult>;

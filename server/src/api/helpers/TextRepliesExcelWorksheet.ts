@@ -6,10 +6,10 @@ import { FORMATS } from "../../util/dates";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
-export type TextReplyRow = {
+export interface TextReplyRow {
   title: Maybe<string>;
   answer: string | number;
-};
+}
 
 export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
   constructor(

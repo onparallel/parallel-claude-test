@@ -9,9 +9,9 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineProfileDisassociatedEventProps = {
+export interface TimelineProfileDisassociatedEventProps {
   event: TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment;
-};
+}
 
 export function TimelineProfileDisassociatedEvent({
   event,

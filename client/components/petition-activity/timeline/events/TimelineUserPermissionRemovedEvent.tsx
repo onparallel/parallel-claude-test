@@ -8,10 +8,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineUserPermissionRemovedEventProps = {
+export interface TimelineUserPermissionRemovedEventProps {
   userId: string;
   event: TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
-};
+}
 
 export function TimelineUserPermissionRemovedEvent({
   event,

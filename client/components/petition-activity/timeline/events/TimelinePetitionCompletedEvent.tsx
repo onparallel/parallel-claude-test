@@ -8,10 +8,10 @@ import { UserOrContactReference } from "../../UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelinePetitionCompletedEventProps = {
+export interface TimelinePetitionCompletedEventProps {
   event: TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
   userId: string;
-};
+}
 
 export function TimelinePetitionCompletedEvent({
   event,

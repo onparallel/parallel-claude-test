@@ -98,10 +98,10 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
   },
 );
 
-type RTELink = {
+interface RTELink {
   url: string;
   text?: string;
-};
+}
 
 function AddLinkDialog({
   showTextInput,

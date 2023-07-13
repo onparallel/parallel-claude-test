@@ -18,11 +18,11 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
-type UpdateProfileFieldValueInput = {
+interface UpdateProfileFieldValueInput {
   profileTypeFieldId: string;
   content?: Record<string, any> | null;
   expiryDate?: string | null;
-};
+}
 
 describe("GraphQL/Profiles", () => {
   let testClient: TestClient;

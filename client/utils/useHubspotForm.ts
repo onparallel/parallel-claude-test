@@ -2,12 +2,12 @@ import { useCallback } from "react";
 
 declare const hbspt: any;
 
-export type HubspotFormProps = {
+export interface HubspotFormProps {
   target: string;
   portalId: string;
   formId: string;
   onFormSubmit?: () => any;
-};
+}
 
 export function useHubspotForm(data: HubspotFormProps | null) {
   return useCallback(() => {

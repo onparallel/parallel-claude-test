@@ -8,9 +8,9 @@ import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineRecipientSignedEventProps = {
+export interface TimelineRecipientSignedEventProps {
   event: TimelineRecipientSignedEvent_RecipientSignedEventFragment;
-};
+}
 
 export function TimelineRecipientSignedEvent({
   event: { signer, createdAt },

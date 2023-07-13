@@ -10,12 +10,12 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 
 export type EventType = PetitionEventType | SystemEventType;
 
-export type EventProcessorPayload = {
+export interface EventProcessorPayload {
   id: number;
   type: EventType;
   created_at: Date; // this helps with content-based deduplication and is used to check if the event should be processed or not
   table_name: "petition_event" | "system_event";
-};
+}
 
 export type EventListener<
   TPayload extends PetitionEvent | SystemEvent = PetitionEvent | SystemEvent,

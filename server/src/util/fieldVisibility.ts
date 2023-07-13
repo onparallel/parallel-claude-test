@@ -34,13 +34,13 @@ export interface PetitionFieldVisibilityCondition {
   value: string | string[] | number | null;
 }
 
-type VisibilityField = {
+interface VisibilityField {
   id: number;
   type: PetitionFieldType;
   options: any;
   visibility: PetitionFieldVisibility | null;
   replies: { content: any; anonymized_at: Date | null }[];
-};
+}
 
 function evaluatePredicate(
   reply: string | number | string[],

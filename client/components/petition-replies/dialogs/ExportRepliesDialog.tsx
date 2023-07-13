@@ -33,10 +33,10 @@ import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type ExportRepliesDialogProps = {
+export interface ExportRepliesDialogProps {
   user: ExportRepliesDialog_UserFragment;
   fields: ExportRepliesDialog_PetitionFieldFragment[];
-};
+}
 
 export type ExportParams =
   | { type: "DOWNLOAD_ZIP"; pattern: string }
@@ -44,11 +44,11 @@ export type ExportParams =
 
 export type ExportType = ExportParams["type"];
 
-export type ExportOption = {
+export interface ExportOption {
   type: ExportType;
   title: string;
   description: string;
-};
+}
 
 export function ExportRepliesDialog({
   user,

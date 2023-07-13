@@ -4,9 +4,9 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
-export type DeleteSignatureErrorConfirmationDialogProps = {
+export interface DeleteSignatureErrorConfirmationDialogProps {
   pendingSignaturesCount: number;
-};
+}
 
 function DeleteSignatureErrorConfirmationDialog({
   pendingSignaturesCount,

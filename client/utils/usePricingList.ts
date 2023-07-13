@@ -1,15 +1,15 @@
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-export type PricingListFeatures = {
+export interface PricingListFeatures {
   label: string;
   plan: "FREE" | "BASIC" | "PROFESSIONAL" | "ENTERPRISE" | "ON_DEMAND";
-};
+}
 
-export type PricingListCategory = {
+export interface PricingListCategory {
   category: string;
   features: PricingListFeatures[];
-};
+}
 
 export function usePricingList(): PricingListCategory[] {
   const intl = useIntl();

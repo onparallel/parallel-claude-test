@@ -5,11 +5,11 @@ import { Tone } from "./types";
 
 type EmailThemeColor = Record<50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900, "string">;
 
-export type EmailTheme = {
+export interface EmailTheme {
   fontFamily: string | undefined;
   colors: Record<"primary", EmailThemeColor>;
   tone: Tone;
-};
+}
 
 const ThemeContext = createContext<EmailTheme | undefined>(undefined);
 

@@ -8,9 +8,9 @@ import { SentReminderMessageDialog_PetitionReminderFragment } from "@parallel/gr
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 
-export type SentReminderMessageDialogProps = {
+export interface SentReminderMessageDialogProps {
   reminder: SentReminderMessageDialog_PetitionReminderFragment;
-};
+}
 
 export function SentReminderMessageDialog({
   reminder,

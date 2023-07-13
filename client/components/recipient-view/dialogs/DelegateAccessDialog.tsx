@@ -23,12 +23,12 @@ import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
-type DelegateAccessDialogData = {
+interface DelegateAccessDialogData {
   email: string;
   firstName: string;
   lastName: string;
   messageBody: any;
-};
+}
 
 const messages: Record<PetitionLocale, (organization: string, contactName: string) => string> = {
   en: (organization, contactName) => outdent`

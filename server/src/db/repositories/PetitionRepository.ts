@@ -111,13 +111,13 @@ import { isValueCompatible } from "../../util/isValueCompatible";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 
-type PetitionSharedWithFilter = {
+interface PetitionSharedWithFilter {
   operator: "AND" | "OR";
   filters: {
     value: string;
     operator: "SHARED_WITH" | "NOT_SHARED_WITH" | "IS_OWNER" | "NOT_IS_OWNER";
   }[];
-};
+}
 
 type PetitionSignatureStatusFilter =
   | "NO_SIGNATURE"
@@ -162,13 +162,13 @@ type EffectivePetitionPermission = Pick<
   PetitionPermission,
   "petition_id" | "user_id" | "type" | "is_subscribed"
 >;
-export type PetitionSignatureConfigSigner = {
+export interface PetitionSignatureConfigSigner {
   firstName: string;
   lastName: string;
   email: string;
-};
+}
 
-export type PetitionSignatureConfig = {
+export interface PetitionSignatureConfig {
   orgIntegrationId: number;
   signersInfo: PetitionSignatureConfigSigner[];
   timezone: string;
@@ -177,7 +177,7 @@ export type PetitionSignatureConfig = {
   allowAdditionalSigners?: boolean;
   message?: string;
   additionalSignersInfo?: PetitionSignatureConfigSigner[];
-};
+}
 
 type TemplateDefaultPermissionInput = {
   permissionType: PetitionPermissionType;

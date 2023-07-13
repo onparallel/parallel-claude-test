@@ -24,11 +24,11 @@ import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
-type ConfirmDeactivateUserDialogData = {
+interface ConfirmDeactivateUserDialogData {
   userId: string;
   tagIds: string[];
   includeDrafts: boolean;
-};
+}
 
 interface ConfirmDeactivateUserDialogProps extends DialogProps {
   users: useConfirmDeactivateUserDialog_UserFragment[];

@@ -29,7 +29,7 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "delay-queue": DelayQueuePayload;
 }[Q];
 
-export type QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> = {
+export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
   forkHandlers?: boolean;
   forkTimeout?: number;
   onForkTimeout?: (
@@ -39,7 +39,7 @@ export type QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> = {
   ) => MaybePromise<void>;
   parser?: (message: string) => QueueWorkerPayload<Q>;
   batchSize?: number;
-};
+}
 
 export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
   name: Q,

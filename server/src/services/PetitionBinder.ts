@@ -37,7 +37,7 @@ function isPrintableContentType(contentType: string) {
   ].includes(contentType);
 }
 
-type PetitionBinderOptions = {
+interface PetitionBinderOptions {
   petitionId: number;
   documentTitle: string | null;
   maxOutputSize?: number;
@@ -45,7 +45,7 @@ type PetitionBinderOptions = {
   showSignatureBoxes?: boolean;
   includeAnnexedDocuments?: boolean;
   includeNetDocumentsLinks?: boolean;
-};
+}
 
 export interface IPetitionBinder {
   createBinder(petitionId: number, options: PetitionBinderOptions): Promise<string>;

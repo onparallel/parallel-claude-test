@@ -15,7 +15,7 @@ export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionF
   );
 };
 
-export type FieldOptions = {
+export interface FieldOptions {
   HEADING: {
     hasPageBreak: boolean;
   };
@@ -68,7 +68,7 @@ export type FieldOptions = {
   };
   DATE: {};
   DOW_JONES_KYC: {};
-};
+}
 
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
   const intl = useIntl();

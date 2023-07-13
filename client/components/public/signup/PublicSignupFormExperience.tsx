@@ -15,18 +15,18 @@ import ReCaptcha from "react-google-recaptcha";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
-type PublicSignupFormExperienceData = {
+interface PublicSignupFormExperienceData {
   industry: string | undefined;
   role: string | undefined;
   position: string | undefined;
   captcha: string;
-};
+}
 
-export type PublicSignupFormExperienceProps = {
+export interface PublicSignupFormExperienceProps {
   isLoading: boolean;
   onBack: () => void;
   onFinish: (data: PublicSignupFormExperienceData) => void;
-};
+}
 
 export function PublicSignupFormExperience({
   onBack,

@@ -45,9 +45,9 @@ export interface PetitionFieldOptionsListEditorProps extends EditableProps {
   isReadOnly?: boolean;
 }
 
-export type PetitionFieldOptionsListEditorRef = {
+export interface PetitionFieldOptionsListEditorRef {
   focus: (position?: "START" | "END") => void;
-};
+}
 
 function valuesToSlateNodes(values: string[]): PetitionFieldOptionsListEditorValue {
   return (values.length ? values : [""]).map((option) => ({

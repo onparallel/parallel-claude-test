@@ -7,9 +7,9 @@ import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-type TimelinePetitionAnonymizedEventProps = {
+interface TimelinePetitionAnonymizedEventProps {
   event: TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment;
-};
+}
 
 export function TimelinePetitionAnonymizedEvent({ event }: TimelinePetitionAnonymizedEventProps) {
   return (

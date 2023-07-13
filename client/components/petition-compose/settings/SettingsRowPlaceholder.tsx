@@ -3,11 +3,11 @@ import { ChangeEvent } from "react";
 import { FormattedMessage } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
 
-type SettingsRowPlaceholderProps = {
+interface SettingsRowPlaceholderProps {
   placeholder: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   isReadOnly?: boolean;
-};
+}
 
 export function SettingsRowPlaceholder({
   placeholder,

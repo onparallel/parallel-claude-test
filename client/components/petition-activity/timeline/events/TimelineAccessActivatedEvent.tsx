@@ -9,10 +9,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-type TimelineAccessActivatedEventProps = {
+interface TimelineAccessActivatedEventProps {
   userId: string;
   event: TimelineAccessActivatedEvent_AccessActivatedEventFragment;
-};
+}
 
 export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessActivatedEventProps) {
   return (

@@ -10,7 +10,7 @@ export const DOW_JONES_CLIENT = Symbol.for("DOW_JONES_CLIENT");
 
 type RiskEntityType = "Person" | "Entity";
 
-type RiskEntitySearchResult = {
+interface RiskEntitySearchResult {
   meta: { total_count: number };
   data?: {
     id: string;
@@ -30,18 +30,28 @@ type RiskEntitySearchResult = {
       }[];
     };
   }[];
-};
+}
 
-type RiskEntityPersonName = { first_name?: string; surname?: string; middle_name?: string };
-type RiskEntityEntityName = { name: string };
-type RiskEntityDate = { day?: number; month?: number; year?: number };
-type RiskEntityPlace = {
+interface RiskEntityPersonName {
+  first_name?: string;
+  surname?: string;
+  middle_name?: string;
+}
+interface RiskEntityEntityName {
+  name: string;
+}
+interface RiskEntityDate {
+  day?: number;
+  month?: number;
+  year?: number;
+}
+interface RiskEntityPlace {
   code: string;
   descriptor: string;
   iso_alpha2: string;
-};
+}
 
-type RiskEntityProfileResult = {
+interface RiskEntityProfileResult {
   data: {
     id: string;
     attributes: {
@@ -89,13 +99,13 @@ type RiskEntityProfileResult = {
       };
     };
   };
-};
+}
 
-type RiskEntityProfilePdfResult = {
+interface RiskEntityProfilePdfResult {
   mime_type: string;
   binary_encoding: string;
   binary_stream: string;
-};
+}
 
 export interface IDowJonesClient {
   riskEntitySearch(

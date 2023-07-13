@@ -47,11 +47,11 @@ import {
   SignerSelectSelection,
 } from "./ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
-export type SignatureConfigDialogProps = {
+export interface SignatureConfigDialogProps {
   petition: SignatureConfigDialog_PetitionBaseFragment;
   integrations: SignatureConfigDialog_SignatureOrgIntegrationFragment[];
   user: SignatureConfigDialog_UserFragment;
-};
+}
 
 export const MAX_SIGNERS_ALLOWED = 40;
 

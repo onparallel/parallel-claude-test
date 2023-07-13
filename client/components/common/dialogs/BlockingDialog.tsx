@@ -3,12 +3,12 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { ReactNode, useEffect } from "react";
 import { BaseDialog } from "./BaseDialog";
 
-export type BlockingDialogProps = {
+export interface BlockingDialogProps {
   header: ReactNode;
   body: ReactNode;
   footer?: ReactNode;
   task: Promise<any>;
-};
+}
 
 export function BlockingDialog({
   header,

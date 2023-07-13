@@ -21,12 +21,12 @@ import { HtmlBlock } from "../common/HtmlBlock";
 import { getDefaultInputTypeValue } from "./helpers";
 import { SupportMethodArgumentInput } from "./SupportMethodArgumentInput";
 
-type MethodModalProps = {
+interface MethodModalProps {
   field: IntrospectionField;
   queryType: "query" | "mutation";
   schemaTypes: readonly IntrospectionType[];
   onClose: () => void;
-};
+}
 
 function reset(field: IntrospectionField, schemaTypes: readonly IntrospectionType[]) {
   return () =>

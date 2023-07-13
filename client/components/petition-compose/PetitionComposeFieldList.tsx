@@ -45,10 +45,10 @@ import { useReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
-type FieldsState = {
+interface FieldsState {
   fieldsById: Record<string, FieldSelection>;
   fieldIds: string[];
-};
+}
 
 function reset(fields: FieldSelection[]): () => FieldsState {
   return () => ({

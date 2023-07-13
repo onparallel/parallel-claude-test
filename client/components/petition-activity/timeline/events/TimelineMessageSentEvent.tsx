@@ -15,10 +15,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineMessageSentEventProps = {
+export interface TimelineMessageSentEventProps {
   userId: string;
   event: TimelineMessageSentEvent_MessageSentEventFragment;
-};
+}
 
 export function TimelineMessageSentEvent({
   event: { message, createdAt },

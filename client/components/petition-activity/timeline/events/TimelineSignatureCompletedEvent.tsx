@@ -8,9 +8,9 @@ import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineSignatureCompletedEventProps = {
+export interface TimelineSignatureCompletedEventProps {
   event: TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
-};
+}
 
 export function TimelineSignatureCompletedEvent({ event }: TimelineSignatureCompletedEventProps) {
   return (

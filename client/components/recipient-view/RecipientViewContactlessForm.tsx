@@ -41,11 +41,11 @@ import { omit } from "remeda";
 import { useTone } from "../common/ToneProvider";
 import { useRecipientViewContactlessHelpDialog } from "./dialogs/RecipientViewContactlessHelpDialog";
 
-export type RecipientViewContactlessFormData = {
+export interface RecipientViewContactlessFormData {
   firstName: string;
   lastName: string;
   email: string;
-};
+}
 
 type RecipientViewContactlessState =
   | { step: "FORM" }

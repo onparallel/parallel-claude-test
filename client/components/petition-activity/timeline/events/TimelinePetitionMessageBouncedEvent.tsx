@@ -8,9 +8,9 @@ import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-type TimelinePetitionMessageBouncedEventProps = {
+interface TimelinePetitionMessageBouncedEventProps {
   event: TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragment;
-};
+}
 
 export function TimelinePetitionMessageBouncedEvent({
   event,

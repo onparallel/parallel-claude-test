@@ -48,10 +48,10 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
-type ContactDetailsFormData = {
+interface ContactDetailsFormData {
   firstName: string;
   lastName: string;
-};
+}
 
 function Contact({ contactId }: ContactProps) {
   const intl = useIntl();

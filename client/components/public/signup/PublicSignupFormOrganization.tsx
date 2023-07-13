@@ -19,7 +19,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type PublicSignupFormOrganizationProps = {
+export interface PublicSignupFormOrganizationProps {
   onBack: () => void;
   onNext: ({
     organizationName,
@@ -28,7 +28,7 @@ export type PublicSignupFormOrganizationProps = {
     organizationName: string;
     organizationLogo: Maybe<File> | undefined;
   }) => void;
-};
+}
 
 export function PublicSignupFormOrganization({
   onBack,

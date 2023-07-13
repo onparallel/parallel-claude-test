@@ -38,9 +38,9 @@ type AdminOrganizationsFeaturesProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsFeatures.getInitialProps>
 >;
 
-type FeaturesFormData = {
+interface FeaturesFormData {
   features: FeatureFlagNameValue[];
-};
+}
 
 function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeaturesProps) {
   const {

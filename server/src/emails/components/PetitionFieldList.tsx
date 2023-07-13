@@ -2,21 +2,21 @@ import { Fragment } from "react";
 import { MjmlText } from "@faire/mjml-react";
 import { FormattedMessage } from "react-intl";
 
-export type PetitionField = {
+export interface PetitionField {
   position: number;
   id: number;
   title: string | null;
   type: string;
-};
+}
 
-export type PetitionFieldListProps = {
+export interface PetitionFieldListProps {
   fields: PetitionField[];
-};
+}
 
-type GroupedField = {
+interface GroupedField {
   heading?: PetitionField;
   children: PetitionField[];
-};
+}
 
 function groupByHeading(groups: GroupedField[], field: PetitionField): GroupedField[] {
   if (field.type === "HEADING") {

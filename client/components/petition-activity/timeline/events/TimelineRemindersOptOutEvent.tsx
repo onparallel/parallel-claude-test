@@ -13,9 +13,9 @@ import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineRemindersOptOutEventProps = {
+export interface TimelineRemindersOptOutEventProps {
   event: TimelineRemindersOptOutEvent_RemindersOptOutEventFragment;
-};
+}
 
 export function TimelineRemindersOptOutEvent({ event }: TimelineRemindersOptOutEventProps) {
   const answers = useReminderOptOutReasons();

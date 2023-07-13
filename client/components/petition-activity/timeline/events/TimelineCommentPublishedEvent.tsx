@@ -17,10 +17,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineCommentPublishedEventProps = {
+export interface TimelineCommentPublishedEventProps {
   userId: string;
   event: TimelineCommentPublishedEvent_CommentPublishedEventFragment;
-};
+}
 
 export function TimelineCommentPublishedEvent({
   userId,

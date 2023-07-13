@@ -33,7 +33,7 @@ export function parseSortBy<T extends string>(
   }
 }
 
-export type PaginationPluginConfig = {};
+export interface PaginationPluginConfig {}
 
 type ObjectOrInterfaceNames = core.GetGen<"objectNames"> | core.GetGen<"interfaceNames">;
 

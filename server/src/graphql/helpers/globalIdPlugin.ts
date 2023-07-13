@@ -12,9 +12,9 @@ import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { If, UnwrapArray } from "../../util/types";
 import { ForbiddenError } from "./errors";
 
-export type GlobalIdConfig = {
+export interface GlobalIdConfig {
   prefixName: string;
-};
+}
 
 export type GlobalIdInputFieldConfig<
   TypeName extends string,
@@ -41,9 +41,9 @@ export type GlobalIdOutputFieldConfigSpread<TypeName extends string, FieldName e
   [] | [GlobalIdOutputFieldConfig<TypeName, FieldName, false>]
 >;
 
-export type GlobalIdResolverConfig<TypeName extends string, FieldName extends string> = {
+export interface GlobalIdResolverConfig<TypeName extends string, FieldName extends string> {
   resolve: GlobalIdFieldResolver<TypeName, FieldName>;
-};
+}
 
 type GlobalIdFieldResolver<TypeName extends string, FieldName extends string> = (
   root: core.GetGen2<"rootTypes", TypeName>,

@@ -20,7 +20,7 @@ import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-type SignupFormData = {
+interface SignupFormData {
   email: string;
   password: string;
   firstName: string;
@@ -31,7 +31,7 @@ type SignupFormData = {
   role?: Maybe<string> | undefined;
   position?: Maybe<string> | undefined;
   captcha: string;
-};
+}
 
 interface SignupProps {
   code?: string;

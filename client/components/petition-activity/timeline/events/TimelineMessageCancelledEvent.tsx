@@ -9,10 +9,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineMessageCancelledEventProps = {
+export interface TimelineMessageCancelledEventProps {
   userId: string;
   event: TimelineMessageCancelledEvent_MessageCancelledEventFragment;
-};
+}
 
 export function TimelineMessageCancelledEvent({
   event: { message, user, createdAt, reason },

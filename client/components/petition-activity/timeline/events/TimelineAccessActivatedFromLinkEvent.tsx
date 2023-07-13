@@ -8,9 +8,9 @@ import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineAccessActivatedFromLinkEventProps = {
+export interface TimelineAccessActivatedFromLinkEventProps {
   event: TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragment;
-};
+}
 
 export function TimelineAccessActivatedFromLinkEvent({
   event,

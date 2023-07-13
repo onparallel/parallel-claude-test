@@ -1,11 +1,11 @@
 import { Knex } from "knex";
 import pMap from "p-map";
 
-type Contact = {
+interface Contact {
   id: number;
   email: string;
   org_id: number;
-};
+}
 
 async function getDuplicatedContacts(t: Knex.Transaction<any, any>): Promise<Contact[]> {
   const { rows: duplicatedContacts } = await t.raw<{

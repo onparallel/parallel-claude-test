@@ -9,12 +9,12 @@ type PartialField =
   | completedFieldReplies_PetitionFieldFragment
   | completedFieldReplies_PublicPetitionFieldFragment;
 
-type Field = {
+interface Field {
   type: PetitionFieldType;
   options: any;
   previewReplies: { content: any; isAnonymized: boolean }[];
   replies: { content: any; isAnonymized: boolean }[];
-};
+}
 
 // ALERT: Same logic in completedFieldReplies in server side
 /** returns the field replies that are fully completed */

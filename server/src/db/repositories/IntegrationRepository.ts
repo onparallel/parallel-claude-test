@@ -8,10 +8,10 @@ import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
 
-export type IntegrationProviders = {
+export interface IntegrationProviders {
   SIGNATURE: "SIGNATURIT" | "DOCUSIGN";
   DOW_JONES_KYC: "DOW_JONES_KYC";
-};
+}
 
 export type SignatureProvider = IntegrationProviders["SIGNATURE"];
 

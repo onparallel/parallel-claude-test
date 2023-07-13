@@ -11,13 +11,13 @@ import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-type ReportsDoughnutChartProps = {
+interface ReportsDoughnutChartProps {
   petitionsTotal: number;
   pendingPetitions: number;
   completedPetitions: number;
   closedPetitions: number;
   onDownload: () => void;
-};
+}
 
 export function ReportsDoughnutChart({
   petitionsTotal,

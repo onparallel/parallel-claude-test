@@ -15,11 +15,11 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineMessageScheduledEventProps = {
+export interface TimelineMessageScheduledEventProps {
   userId: string;
   event: TimelineMessageScheduledEvent_MessageScheduledEventFragment;
   onCancelScheduledMessage: () => void;
-};
+}
 
 export function TimelineMessageScheduledEvent({
   event: { message, createdAt },

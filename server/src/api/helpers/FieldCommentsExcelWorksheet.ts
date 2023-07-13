@@ -15,14 +15,14 @@ import { renderSlateWithMentionsToText } from "../../util/slate/mentions";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
-export type FieldCommentRow = {
+export interface FieldCommentRow {
   content: string;
   fieldName: Maybe<string>;
   authorFullName: string;
   authorEmail: string;
   createdAt: string;
   isInternal: string;
-};
+}
 
 export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow> {
   constructor(

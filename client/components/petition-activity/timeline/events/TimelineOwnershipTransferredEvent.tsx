@@ -8,10 +8,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineOwnershipTransferredEventProps = {
+export interface TimelineOwnershipTransferredEventProps {
   userId: string;
   event: TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
-};
+}
 
 export function TimelineOwnershipTransferredEvent({
   event,

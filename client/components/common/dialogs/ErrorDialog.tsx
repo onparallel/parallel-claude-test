@@ -5,10 +5,10 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
-export type ErrorDialogProps = {
+export interface ErrorDialogProps {
   message: ReactNode;
   header?: ReactNode;
-};
+}
 
 export function ErrorDialog({ message, header, ...props }: DialogProps<ErrorDialogProps>) {
   const focusRef = useRef<HTMLButtonElement>(null);

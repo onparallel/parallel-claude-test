@@ -8,9 +8,9 @@ import { SentPetitionMessageDialog_PetitionMessageFragment } from "@parallel/gra
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 
-export type SentPetitionMessageDialogProps = {
+export interface SentPetitionMessageDialogProps {
   message: SentPetitionMessageDialog_PetitionMessageFragment;
-};
+}
 
 export function SentPetitionMessageDialog({
   message,

@@ -9,10 +9,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineSignatureReminderEventProps = {
+export interface TimelineSignatureReminderEventProps {
   userId: string;
   event: TimelineSignatureReminderEvent_SignatureReminderEventFragment;
-};
+}
 
 export function TimelineSignatureReminderEvent({
   event,

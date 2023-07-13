@@ -9,9 +9,9 @@ import { EmailEventsIndicator } from "../../EmailEventsIndicator";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelineSignatureStartedEventProps = {
+export interface TimelineSignatureStartedEventProps {
   event: TimelineSignatureStartedEvent_SignatureStartedEventFragment;
-};
+}
 
 export function TimelineSignatureStartedEvent({ event }: TimelineSignatureStartedEventProps) {
   return (

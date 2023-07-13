@@ -1,13 +1,13 @@
 import { parse, addDays, isWeekend, startOfToday } from "date-fns";
 import { format, utcToZonedTime, toDate } from "date-fns-tz";
 
-export type PetitionAccessReminderConfig = {
+export interface PetitionAccessReminderConfig {
   offset: number;
   limit?: number;
   time: string;
   timezone: string;
   weekdaysOnly: boolean;
-};
+}
 
 export function calculateNextReminder(fromDate: Date, config: PetitionAccessReminderConfig) {
   // Calculate next reminder

@@ -11,14 +11,14 @@ import {
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
-type PublicSignupFormNameData = {
+interface PublicSignupFormNameData {
   firstName: string;
   lastName: string;
-};
+}
 
-type PublicSignupFormNameProps = {
+interface PublicSignupFormNameProps {
   onNext: (data: PublicSignupFormNameData) => void;
-};
+}
 
 export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
   const {

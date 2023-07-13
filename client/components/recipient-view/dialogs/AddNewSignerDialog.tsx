@@ -8,11 +8,11 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
 
-type NewSignerInfo = {
+interface NewSignerInfo {
   firstName: string;
   lastName: string;
   email: string;
-};
+}
 function AddNewSignerDialog({ tone, ...props }: DialogProps<{ tone: Tone }, NewSignerInfo>) {
   const intl = useIntl();
   const {

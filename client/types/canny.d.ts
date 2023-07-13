@@ -1,10 +1,10 @@
 declare namespace Canny {
-  type CannySettings = {
+  interface CannySettings {
     appID: "string";
     position?: "top" | "bottom" | "left" | "right";
     align?: "top" | "bottom" | "left" | "right";
     labelIDs?: string[];
-  };
+  }
 
   type CannyActions = "initChangelog" | "closeChangelog";
 }

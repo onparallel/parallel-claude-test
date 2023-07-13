@@ -1,13 +1,13 @@
 import { Knex } from "knex";
 import { indexBy, isDefined, uniq } from "remeda";
 
-type SignatureConfig = {
+interface SignatureConfig {
   signersInfo: {
     contactId?: number;
     firstName?: string;
     lastName?: string;
   }[];
-};
+}
 
 export async function up(knex: Knex): Promise<void> {
   const { rows } = await knex.raw<{

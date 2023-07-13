@@ -24,7 +24,7 @@ export type FieldValidateArgsResolver<TypeName extends string, FieldName extends
   info: GraphQLResolveInfo,
 ) => core.MaybePromise<void>;
 
-export type ValidateArgsPluginConfig = {};
+export interface ValidateArgsPluginConfig {}
 
 export const validateArgsPlugin = () => {
   return plugin({

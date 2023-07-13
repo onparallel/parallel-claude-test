@@ -19,13 +19,13 @@ import {
 } from "graphql";
 import { findNamedTypeRef } from "./helpers";
 
-type SupportMethodArgumentInputProps = {
+interface SupportMethodArgumentInputProps {
   arg: IntrospectionInputValue;
   isInvalid?: boolean;
   schemaTypes: readonly IntrospectionType[];
   value: any;
   onValue: (value: any) => void;
-};
+}
 
 /**
  * parses a querystring like type=textarea&min=5&max=10...

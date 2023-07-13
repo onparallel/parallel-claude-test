@@ -62,17 +62,17 @@ import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 import { isTypename } from "@parallel/utils/apollo/typename";
 
-type PetitionSharingDialogData = {
+interface PetitionSharingDialogData {
   selection: UserSelectSelection<true>[];
   permissionType: PetitionPermissionTypeRW;
   notify: boolean;
   subscribe: boolean;
   message: string;
-};
+}
 
-type PetitionSharingDialogResult = {
+interface PetitionSharingDialogResult {
   close?: boolean;
-};
+}
 
 export function usePetitionSharingDialog() {
   return useDialog(PetitionSharingDialog);

@@ -22,12 +22,12 @@ import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-export type ConfigureRemindersDialogProps = {
+export interface ConfigureRemindersDialogProps {
   accesses: PetitionAccessTable_PetitionAccessFragment[];
   defaultRemindersConfig: Maybe<useConfigureRemindersDialog_RemindersConfigFragment>;
   remindersActive: boolean;
   hideRemindersActiveCheckbox?: boolean;
-};
+}
 
 export function ConfigureRemindersDialog({
   accesses,

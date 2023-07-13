@@ -146,9 +146,9 @@ interface RecipientViewPetitionFieldReplyDynamicSelectProps {
   onDelete: () => void;
 }
 
-type RecipientViewPetitionFieldReplyDynamicSelectInstance = {
+interface RecipientViewPetitionFieldReplyDynamicSelectInstance {
   focus: (level?: number) => void;
-};
+}
 
 const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
   RecipientViewPetitionFieldReplyDynamicSelectInstance,

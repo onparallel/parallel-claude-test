@@ -30,10 +30,10 @@ import {
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 import { useMetadata } from "@parallel/utils/withMetadata";
 
-type FieldDateTimeReply = {
+interface FieldDateTimeReply {
   datetime: string;
   timezone: string;
-};
+}
 
 export interface RecipientViewPetitionFieldDateTimeProps
   extends Omit<

@@ -9,10 +9,10 @@ import { UserReference } from "../../UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
-export type TimelinePetitionClosedNotifiedEventProps = {
+export interface TimelinePetitionClosedNotifiedEventProps {
   userId: string;
   event: TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
-};
+}
 
 export function TimelinePetitionClosedNotifiedEvent({
   event,

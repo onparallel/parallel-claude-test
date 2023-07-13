@@ -28,11 +28,11 @@ import { SettingsRow } from "./SettingsRow";
 
 export type AliasErrorType = "UNIQUE" | "INVALID";
 
-type SettingsRowAliasProps = {
+interface SettingsRowAliasProps {
   field: SettingsRowAlias_PetitionFieldFragment;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   isReadOnly?: boolean;
-};
+}
 
 export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRowAliasProps) {
   const [alias, setAlias] = useState(field.alias ?? "");

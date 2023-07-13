@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-export type PublicTemplateCategory = {
+export interface PublicTemplateCategory {
   label: string;
   slug: string;
-};
+}
 
 export function usePublicTemplateCategories(): PublicTemplateCategory[] {
   const intl = useIntl();
