@@ -36,6 +36,7 @@ import {
   expirationToDuration,
   useExpirationOptions,
 } from "@parallel/utils/useExpirationOptions";
+import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -83,6 +84,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
     setError,
     setValue,
   } = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
+    mode: "onBlur",
     defaultValues: {
       name,
       type,
@@ -311,12 +313,26 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 </Text>
               </HelpPopover>
             </FormLabel>
-            <Input {...register("alias")} maxLength={50} />
+            <Input
+              {...register("alias", {
+                validate: (value) => {
+                  return value ? REFERENCE_REGEX.test(value) : true;
+                },
+              })}
+              maxLength={50}
+            />
             <FormErrorMessage>
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.unique-identifier-alredy-exists"
-                defaultMessage="This identifier is already in use"
-              />
+              {errors.alias?.type === "unavailable" ? (
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.unique-identifier-alredy-exists"
+                  defaultMessage="This identifier is already in use"
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.only-letters-numbers-alias-error"
+                  defaultMessage="Use only letters, numbers or _"
+                />
+              )}
             </FormErrorMessage>
           </FormControl>
           <Stack spacing={2}>

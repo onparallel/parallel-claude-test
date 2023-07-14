@@ -617,6 +617,7 @@ export type Mutation = {
    * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
+  copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a new Dow Jones KYC integration on the user's organization */
@@ -1059,6 +1060,13 @@ export type MutationcompletePetitionArgs = {
   additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcopyFileReplyToProfileFieldFileArgs = {
+  fileReplyIds: Array<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateContactArgs = {

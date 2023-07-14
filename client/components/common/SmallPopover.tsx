@@ -17,11 +17,13 @@ export function SmallPopover({
   children,
   content,
   width = "container.5xs",
+  maxWidth,
   ...props
 }: {
   isDisabled?: boolean;
   content: ReactNode;
   width?: BoxProps["width"];
+  maxWidth?: BoxProps["maxWidth"];
 } & PopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverId = useId(id, "small-popover");
@@ -47,7 +49,7 @@ export function SmallPopover({
         })}
       </PopoverTrigger>
       <Portal>
-        <PopoverContent width={width}>
+        <PopoverContent width={width} maxWidth={maxWidth}>
           <PopoverBody id={popoverId}>{content}</PopoverBody>
           <PopoverArrow />
         </PopoverContent>

@@ -13,10 +13,9 @@ import {
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
-import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
+import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
@@ -50,24 +49,7 @@ export function PetitionRepliesFieldReply({
 
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const contents = isFileTypeField(type)
-    ? [reply.content]
-    : type === "NUMBER"
-    ? [formatNumberWithPrefix(reply.content.value, reply.field!.options as FieldOptions["NUMBER"])]
-    : type === "DATE"
-    ? [intl.formatDate(reply.content.value as string, { ...FORMATS.L, timeZone: "UTC" })]
-    : type === "DATE_TIME"
-    ? [
-        `${intl.formatDate(reply.content.value as string, {
-          timeZone: reply.content.timezone,
-          ...FORMATS["L+LT"],
-        })} (${prettifyTimezone(reply.content.timezone)})`,
-      ]
-    : Array.isArray(reply.content.value)
-    ? type === "DYNAMIC_SELECT"
-      ? reply.content.value.map((v) => v[1])
-      : reply.content.value
-    : [reply.content.value];
+  const contents = getReplyContents({ intl, reply, petitionField: reply.field! });
 
   const buildUrlToSection = useBuildUrlToPetitionSection();
   const editReplyIconButton = (idSuffix = "") => {
@@ -323,8 +305,8 @@ PetitionRepliesFieldReply.fragments = {
       field {
         id
         type
-        options
         requireApproval
+        ...getReplyContents_PetitionField
       }
       updatedBy {
         ...UserOrContactReference_UserOrPetitionAccess
@@ -339,9 +321,12 @@ PetitionRepliesFieldReply.fragments = {
       lastReviewedAt
       isAnonymized
       ...CopyOrDownloadReplyButton_PetitionFieldReply
+      ...getReplyContents_PetitionFieldReply
     }
     ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${CopyOrDownloadReplyButton.fragments.PetitionFieldReply}
+    ${getReplyContents.fragments.PetitionFieldReply}
+    ${getReplyContents.fragments.PetitionField}
   `,
 };
 

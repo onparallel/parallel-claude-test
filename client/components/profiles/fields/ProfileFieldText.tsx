@@ -1,10 +1,11 @@
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
+import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
-interface ProfileFieldTextProps extends ProfileFieldProps {
-  showExpiryDateDialog: (force?: boolean) => void;
-  expiryDate?: string | null;
+interface ProfileFieldTextProps
+  extends ProfileFieldProps,
+    Omit<ProfileFieldInputGroupProps, "field"> {
+  showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
 export function ProfileFieldText({
@@ -13,16 +14,17 @@ export function ProfileFieldText({
   register,
   expiryDate,
   showExpiryDateDialog,
+  ...props
 }: ProfileFieldTextProps) {
   return (
-    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
       <GrowingTextarea
         borderColor="transparent"
         maxLength={10_000}
         {...register(`fields.${index}.content.value`)}
         onBlur={(e) => {
           if (e.target.value) {
-            return showExpiryDateDialog();
+            return showExpiryDateDialog({});
           }
         }}
       />

@@ -45,6 +45,8 @@ import { validateRegex } from "../helpers/validators/validateRegex";
 import {
   petitionIsNotAnonymized,
   petitionsAreNotPublicTemplates,
+  repliesBelongsToPetition,
+  replyIsForFieldOfType,
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../petition/authorizers";
@@ -851,6 +853,46 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
     } catch {
       return RESULT.FAILURE;
     }
+  },
+});
+
+export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToProfileFieldFile", {
+  type: list("ProfileFieldFile"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    userHasAccessToPetitions("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    repliesBelongsToPetition("petitionId", "fileReplyIds"),
+    replyIsForFieldOfType("fileReplyIds", ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"]),
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    petitionId: nonNull(globalIdArg("Petition")),
+    fileReplyIds: nonNull(list(nonNull(globalIdArg("PetitionFieldReply")))),
+    expiryDate: dateArg(),
+  },
+  resolve: async (_, { profileId, profileTypeFieldId, fileReplyIds, expiryDate }, ctx) => {
+    const fileReplies =
+      fileReplyIds.length > 0
+        ? (await ctx.petitions.loadFieldReply(fileReplyIds)).filter(isDefined)
+        : [];
+
+    const fileUploadIds = fileReplies
+      .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+      .map((r) => r.content.file_upload_id as number);
+
+    const clonedFiles = await ctx.files.cloneFileUpload(fileUploadIds);
+
+    return await ctx.profiles.createProfileFieldFiles(
+      profileId,
+      profileTypeFieldId,
+      clonedFiles.map((f) => f.id),
+      expiryDate,
+      ctx.user!.id,
+    );
   },
 });
 

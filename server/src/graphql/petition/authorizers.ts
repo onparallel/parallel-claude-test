@@ -251,18 +251,21 @@ export function fieldHasType<
 export function replyIsForFieldOfType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argReplyId: TArg,
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const field = (await ctx.petitions.loadFieldForReply(args[argReplyId] as unknown as number))!;
+    const replyIds = unMaybeArray(args[argReplyId] as unknown as MaybeArray<number>);
+    const fields = await ctx.petitions.loadFieldForReply(replyIds);
     const validFieldTypes = unMaybeArray(fieldType);
 
-    if (!validFieldTypes.includes(field.type)) {
+    const invalidField = fields.find((field) => !validFieldTypes.includes(field!.type));
+
+    if (invalidField) {
       throw new ApolloError(
-        `Expected ${validFieldTypes.join(" or ")}, got ${field.type}`,
+        `Expected ${validFieldTypes.join(" or ")}, got ${invalidField.type}`,
         "INVALID_FIELD_TYPE_ERROR",
       );
     }

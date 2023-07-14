@@ -1,11 +1,12 @@
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { Controller } from "react-hook-form";
 import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
+import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
-interface ProfileFieldNumberProps extends ProfileFieldProps {
-  showExpiryDateDialog: (force?: boolean) => void;
-  expiryDate?: string | null;
+interface ProfileFieldNumberProps
+  extends ProfileFieldProps,
+    Omit<ProfileFieldInputGroupProps, "field"> {
+  showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
 export function ProfileFieldNumber({
@@ -14,9 +15,10 @@ export function ProfileFieldNumber({
   control,
   expiryDate,
   showExpiryDateDialog,
+  ...props
 }: ProfileFieldNumberProps) {
   return (
-    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
       <Controller
         name={`fields.${index}.content.value`}
         control={control}
@@ -31,7 +33,7 @@ export function ProfileFieldNumber({
               }}
               onBlur={() => {
                 if (value) {
-                  return showExpiryDateDialog();
+                  return showExpiryDateDialog({});
                 }
               }}
             />

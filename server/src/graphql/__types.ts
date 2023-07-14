@@ -1455,6 +1455,7 @@ export interface NexusGenFieldTypes {
     cloneUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
+    copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -3523,6 +3524,7 @@ export interface NexusGenFieldTypeNames {
     cloneUserGroups: "UserGroup";
     closePetition: "Petition";
     completePetition: "Petition";
+    copyFileReplyToProfileFieldFile: "ProfileFieldFile";
     createContact: "Contact";
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
@@ -5332,6 +5334,14 @@ export interface NexusGenArgTypes {
       additionalSigners?: NexusGenInputs["PublicPetitionSignerDataInput"][] | null; // [PublicPetitionSignerDataInput!]
       message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    copyFileReplyToProfileFieldFile: {
+      // args
+      expiryDate?: NexusGenScalars["Date"] | null; // Date
+      fileReplyIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
     createContact: {
       // args

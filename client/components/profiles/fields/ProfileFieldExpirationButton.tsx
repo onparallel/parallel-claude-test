@@ -60,6 +60,7 @@ export function ProfileFieldExpirationButton({
           defaultMessage: "Set expiration",
         })}
         onClick={onEditVisibilityClick}
+        placement="left"
       />
     </ButtonGroup>
   );

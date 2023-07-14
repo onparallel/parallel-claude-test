@@ -27,16 +27,15 @@ import {
   MapFieldsTable_PetitionFieldFragment,
   MapFieldsTable_PetitionFieldReplyFragment,
   PetitionFieldType,
+  getReplyContents_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
 import {
   PetitionFieldIndex,
   unzipFieldsWithIndices,
   useFieldWithIndices,
 } from "@parallel/utils/fieldIndices";
-import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
+import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -194,7 +193,9 @@ export const MapFieldsTable = Object.assign(
             status
             content
             isAnonymized
+            ...getReplyContents_PetitionFieldReply
           }
+          ${getReplyContents.fragments.PetitionFieldReply}
         `;
       },
       get PetitionField() {
@@ -215,10 +216,12 @@ export const MapFieldsTable = Object.assign(
             }
             ...PetitionFieldSelect_PetitionField
             ...isReplyContentCompatible_PetitionField
+            ...getReplyContents_PetitionField
           }
           ${this.PetitionFieldReply}
           ${PetitionFieldSelect.fragments.PetitionField}
           ${isReplyContentCompatible.fragments.PetitionField}
+          ${getReplyContents.fragments.PetitionField}
         `;
       },
       get ProfileFieldProperty() {
@@ -485,24 +488,11 @@ function FieldReplies({
 }) {
   const intl = useIntl();
 
-  const contents = isFileTypeField(type)
-    ? [reply.content]
-    : type === "NUMBER"
-    ? [formatNumberWithPrefix(reply.content.value, options as FieldOptions["NUMBER"])]
-    : type === "DATE"
-    ? [intl.formatDate(reply.content.value as string, { ...FORMATS.L, timeZone: "UTC" })]
-    : type === "DATE_TIME"
-    ? [
-        `${intl.formatDate(reply.content.value as string, {
-          timeZone: reply.content.timezone,
-          ...FORMATS["L+LT"],
-        })} (${prettifyTimezone(reply.content.timezone)})`,
-      ]
-    : Array.isArray(reply.content.value)
-    ? type === "DYNAMIC_SELECT"
-      ? reply.content.value.map((v) => v[1])
-      : reply.content.value
-    : [reply.content.value];
+  const contents = getReplyContents({
+    intl,
+    reply,
+    petitionField: { type, options } as getReplyContents_PetitionFieldFragment,
+  });
 
   return (
     <>

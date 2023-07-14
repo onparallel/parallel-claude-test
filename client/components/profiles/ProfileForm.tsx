@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -20,8 +21,10 @@ import { useAutoConfirmDiscardChangesDialog } from "@parallel/components/organiz
 import { ProfileField } from "@parallel/components/profiles/fields/ProfileField";
 import { ProfileFieldFileAction } from "@parallel/components/profiles/fields/ProfileFieldFileUpload";
 import {
+  ProfileForm_PetitionFieldFragment,
   ProfileForm_ProfileFieldPropertyFragment,
   ProfileForm_ProfileFragment,
+  ProfileForm_copyFileReplyToProfileFieldFileDocument,
   ProfileForm_createProfileFieldFileUploadLinkDocument,
   ProfileForm_deleteProfileFieldFileDocument,
   ProfileForm_profileFieldFileUploadCompleteDocument,
@@ -31,6 +34,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { discriminator } from "@parallel/utils/discriminator";
+import { useFieldWithIndices } from "@parallel/utils/fieldIndices";
 import { withError } from "@parallel/utils/promises/withError";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
@@ -40,7 +44,6 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 
 export interface ProfileFormData {
   fields: ({ type: ProfileTypeFieldType } & UpdateProfileFieldValueInput)[];
@@ -50,11 +53,28 @@ interface ProfileFormProps {
   profile: ProfileForm_ProfileFragment;
   refetch: () => void;
   overlapsIntercomBadge?: boolean;
+  petitionFields?: ProfileForm_PetitionFieldFragment[];
+  petitionId?: string;
+}
+
+function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragment[]) {
+  return {
+    fields: properties.map(({ field: { id, type, isExpirable }, files, value }) => {
+      return {
+        type,
+        profileTypeFieldId: id,
+        content: type === "FILE" ? { value: [] } : value?.content ?? { value: "" },
+        expiryDate: isExpirable
+          ? (type === "FILE" ? files?.[0]?.expiryDate : value?.expiryDate) ?? null
+          : null,
+      };
+    }),
+  };
 }
 
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
-    { profile, refetch, overlapsIntercomBadge, ...props },
+    { profile, refetch, overlapsIntercomBadge, petitionFields, petitionId, ...props },
     ref,
   ) {
     const intl = useIntl();
@@ -65,31 +85,6 @@ export const ProfileForm = Object.assign(
       profile.properties,
       (property) => property.field.myPermission !== "HIDDEN",
     );
-
-    const mapPropertiesToFields = (properties: ProfileForm_ProfileFieldPropertyFragment[]) => {
-      return properties.map((prop) => {
-        const { id: profileTypeFieldId, type, isExpirable } = prop.field;
-        let content = {};
-        let expiryDate = null;
-
-        if (type === "FILE") {
-          content = {
-            value: [],
-          };
-          expiryDate = prop.files?.[0]?.expiryDate;
-        } else {
-          content = prop.value?.content ?? { value: "" };
-          expiryDate = prop.value?.expiryDate;
-        }
-
-        return {
-          type,
-          profileTypeFieldId,
-          content,
-          expiryDate: expiryDate && isExpirable ? expiryDate : null,
-        };
-      });
-    };
 
     const {
       register,
@@ -102,22 +97,13 @@ export const ProfileForm = Object.assign(
       handleSubmit,
       setValue,
     } = useForm<ProfileFormData>({
-      defaultValues: {
-        fields: mapPropertiesToFields(properties),
-      },
+      defaultValues: buildFormDefaultValue(properties),
     });
+    useEffectSkipFirst(() => reset(buildFormDefaultValue(properties)), [profile]);
 
     useAutoConfirmDiscardChangesDialog(formState.isDirty);
 
     const { fields } = useFieldArray({ name: "fields", control });
-
-    useEffectSkipFirst(() => {
-      handleResetForm(properties);
-    }, [profile]);
-
-    const handleResetForm = (properties?: ProfileForm_ProfileFieldPropertyFragment[]) => {
-      reset(properties ? { fields: mapPropertiesToFields(properties) } : undefined);
-    };
 
     useTempQueryParam("field", async (fieldId) => {
       try {
@@ -137,9 +123,15 @@ export const ProfileForm = Object.assign(
       ProfileForm_profileFieldFileUploadCompleteDocument,
     );
 
+    const [copyFileReplyToProfileFieldFile] = useMutation(
+      ProfileForm_copyFileReplyToProfileFieldFileDocument,
+    );
+
     const [deleteProfileFieldFile] = useMutation(ProfileForm_deleteProfileFieldFileDocument);
 
     const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isDefined(f)).length;
+
+    const fieldsWithIndices = useFieldWithIndices(petitionFields ?? []);
 
     return (
       <Flex
@@ -192,6 +184,7 @@ export const ProfileForm = Object.assign(
                 const deleteFiles = events.filter(discriminator("type", "DELETE"));
                 const addFiles = events.filter(discriminator("type", "ADD"));
                 const updateExpiresAt = events.filter(discriminator("type", "UPDATE"));
+                const copyFiles = events.filter(discriminator("type", "COPY"));
 
                 if (updateExpiresAt.length && !addFiles.length) {
                   await createProfileFieldFileUploadLink({
@@ -214,6 +207,17 @@ export const ProfileForm = Object.assign(
                   });
                 }
 
+                if (copyFiles.length && isDefined(petitionId)) {
+                  await copyFileReplyToProfileFieldFile({
+                    variables: {
+                      profileId,
+                      profileTypeFieldId,
+                      petitionId,
+                      fileReplyIds: copyFiles.map(({ id }) => id),
+                      expiryDate,
+                    },
+                  });
+                }
                 if (addFiles.length) {
                   const { data } = await createProfileFieldFileUploadLink({
                     variables: {
@@ -342,7 +346,7 @@ export const ProfileForm = Object.assign(
             editedFieldsCount={editedFieldsCount}
             isSubmitting={formState.isSubmitting}
             hasErrors={Object.keys(formState.errors).length !== 0}
-            onCancel={() => handleResetForm()}
+            onCancel={() => reset()}
           />
         ) : null}
         <Stack
@@ -355,6 +359,10 @@ export const ProfileForm = Object.assign(
           <Stack as="ul" width="100%">
             {properties.map(({ field, value, files }, i) => {
               const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
+
+              const compatibleFieldsWithIndices = fieldsWithIndices?.filter(
+                ([pf, _]) => isDefined(pf.alias) && pf.alias === field.alias,
+              );
 
               return (
                 <ProfileField
@@ -369,6 +377,7 @@ export const ProfileForm = Object.assign(
                   register={register}
                   setError={setError}
                   clearErrors={clearErrors}
+                  fieldsWithIndices={compatibleFieldsWithIndices}
                 />
               );
             })}
@@ -489,6 +498,15 @@ export const ProfileForm = Object.assign(
           ${this.ProfileFieldProperty}
         `;
       },
+      get PetitionField() {
+        return gql`
+          fragment ProfileForm_PetitionField on PetitionField {
+            id
+            ...ProfileField_PetitionField
+          }
+          ${ProfileField.fragments.PetitionField}
+        `;
+      },
     },
   },
 );
@@ -567,6 +585,26 @@ function EditedFieldsAlert({
 }
 
 const _mutations = [
+  gql`
+    mutation ProfileForm_copyFileReplyToProfileFieldFile(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+      $petitionId: GID!
+      $fileReplyIds: [GID!]!
+      $expiryDate: Date
+    ) {
+      copyFileReplyToProfileFieldFile(
+        profileId: $profileId
+        profileTypeFieldId: $profileTypeFieldId
+        petitionId: $petitionId
+        fileReplyIds: $fileReplyIds
+        expiryDate: $expiryDate
+      ) {
+        ...ProfileForm_ProfileFieldFile
+      }
+    }
+    ${ProfileForm.fragments.ProfileFieldFile}
+  `,
   gql`
     mutation ProfileForm_updateProfileFieldValue(
       $profileId: GID!

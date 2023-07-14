@@ -631,6 +631,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             onAssociateProfile={handleAssociateProfile}
             isReadOnly={petition.isAnonymized}
             canAddProfiles={petition.myEffectivePermission?.permissionType !== "READ"}
+            petitionId={petitionId}
+            petitionFields={petition.fields}
           />
         ) : null
       }
@@ -764,6 +766,7 @@ PetitionReplies.fragments = {
         fields {
           id
           ...PetitionReplies_PetitionField
+          ...ProfileDrawer_PetitionField
         }
         ...ShareButton_PetitionBase
         currentSignatureRequest {
@@ -792,6 +795,7 @@ PetitionReplies.fragments = {
       ${useClosePetitionDialog.fragments.Petition}
       ${useLiquidScope.fragments.PetitionBase}
       ${ProfileDrawer.fragments.Profile}
+      ${ProfileDrawer.fragments.PetitionField}
     `;
   },
   get PetitionField() {

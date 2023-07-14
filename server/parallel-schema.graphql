@@ -799,6 +799,13 @@ type Mutation {
     message: String
     petitionId: GID!
   ): Petition!
+  copyFileReplyToProfileFieldFile(
+    expiryDate: Date
+    fileReplyIds: [GID!]!
+    petitionId: GID!
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): [ProfileFieldFile!]!
 
   """
   Create a contact.

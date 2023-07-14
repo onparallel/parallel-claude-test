@@ -4,8 +4,10 @@ import { Knex } from "knex";
 import { outdent } from "outdent";
 import { isDefined, range, times } from "remeda";
 import {
+  FileUpload,
   Organization,
   Petition,
+  PetitionFieldReply,
   Profile,
   ProfileType,
   ProfileTypeField,
@@ -3645,6 +3647,68 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+  });
+
+  describe("copyFileReplyToProfileFieldFile", () => {
+    let fileUploadReply: PetitionFieldReply;
+    let file: FileUpload;
+    let petition: Petition;
+
+    beforeAll(async () => {
+      [file] = await mocks.createRandomFileUpload(1);
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1, () => ({
+        is_template: false,
+        status: "DRAFT",
+      }));
+      const [fileUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+        multiple: true,
+      }));
+      [fileUploadReply] = await mocks.createRandomFileReply(fileUploadField.id, 1, () => ({
+        content: { file_upload_id: file.id },
+        type: "FILE_UPLOAD",
+        user_id: sessionUser.id,
+      }));
+    });
+
+    it("copy file reply from petition field to profile FILE field", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $petitionId: GID!
+            $fileReplyIds: [GID!]!
+          ) {
+            copyFileReplyToProfileFieldFile(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              petitionId: $petitionId
+              fileReplyIds: $fileReplyIds
+            ) {
+              file {
+                contentType
+                filename
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          petitionId: toGlobalId("Petition", petition.id),
+          fileReplyIds: [toGlobalId("PetitionFieldReply", fileUploadReply.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.copyFileReplyToProfileFieldFile).toEqual([
+        {
+          file: { contentType: file.content_type, filename: file.filename },
+        },
+      ]);
     });
   });
 

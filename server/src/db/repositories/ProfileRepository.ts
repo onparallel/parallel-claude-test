@@ -878,6 +878,9 @@ export class ProfileRepository extends BaseRepository {
     expiryDate: string | null | undefined,
     userId: number,
   ) {
+    if (fileUploadIds.length === 0) {
+      return [];
+    }
     return await this.withTransaction(async (t) => {
       const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
       const previousFiles =

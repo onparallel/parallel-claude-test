@@ -1300,6 +1300,11 @@
     "context": "New property"
   },
   {
+    "term": "component.create-or-update-property-dialog.only-letters-numbers-alias-error",
+    "definition": "Use only letters, numbers or _",
+    "context": "Use only letters, numbers or _"
+  },
+  {
     "term": "component.create-or-update-property-dialog.property-name",
     "definition": "Property name",
     "context": "Property name"
@@ -4648,6 +4653,21 @@
     "term": "component.profile-field-input-group.alert-inactive",
     "definition": "The alert will be activated on {date}.",
     "context": "The alert will be activated on {date}."
+  },
+  {
+    "term": "component.profile-field-input-group.hide-suggestions-button",
+    "definition": "Hide suggestions",
+    "context": "Hide suggestions"
+  },
+  {
+    "term": "component.profile-field-input-group.show-suggestions-button",
+    "definition": "Show suggestions",
+    "context": "Show suggestions"
+  },
+  {
+    "term": "component.profile-field-suggestion.popover",
+    "definition": "Suggested reply from:",
+    "context": "Suggested reply from:"
   },
   {
     "term": "component.profile-field.expiration-date",

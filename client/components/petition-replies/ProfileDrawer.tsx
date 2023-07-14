@@ -3,6 +3,7 @@ import { Box, Button, Flex, HStack, IconButton } from "@chakra-ui/react";
 import { AddIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ProfileForm } from "@parallel/components/profiles/ProfileForm";
 import {
+  ProfileDrawer_PetitionFieldFragment,
   ProfileDrawer_ProfileFragment,
   ProfileDrawer_profileDocument,
 } from "@parallel/graphql/__types";
@@ -17,7 +18,9 @@ import {
 
 interface ProfileDrawerProps {
   profileId: string;
+  petitionId: string;
   profiles: ProfileDrawer_ProfileFragment[];
+  petitionFields: ProfileDrawer_PetitionFieldFragment[];
   onChangeProfile: (profileId: string | null) => void;
   onAssociateProfile: () => void;
   isReadOnly?: boolean;
@@ -26,7 +29,16 @@ interface ProfileDrawerProps {
 
 export const ProfileDrawer = Object.assign(
   forwardRef<ProfileSelectInstance<false>, ProfileDrawerProps>(function ProfileDrawer(
-    { profileId, profiles, onChangeProfile, onAssociateProfile, isReadOnly, canAddProfiles },
+    {
+      profileId,
+      petitionId,
+      profiles,
+      onChangeProfile,
+      onAssociateProfile,
+      isReadOnly,
+      canAddProfiles,
+      petitionFields,
+    },
     ref,
   ) {
     const intl = useIntl();
@@ -85,6 +97,8 @@ export const ProfileDrawer = Object.assign(
             refetch={handleRefetchProfile}
             flex={1}
             minHeight={0}
+            petitionFields={petitionFields}
+            petitionId={petitionId}
           />
         ) : null}
       </Flex>
@@ -104,6 +118,16 @@ export const ProfileDrawer = Object.assign(
             ...ProfileSelect_Profile
           }
           ${ProfileSelect.fragments.Profile}
+        `;
+      },
+      get PetitionField() {
+        return gql`
+          fragment ProfileDrawer_PetitionField on PetitionField {
+            id
+            ...ProfileForm_PetitionField
+          }
+
+          ${ProfileForm.fragments.PetitionField}
         `;
       },
     },

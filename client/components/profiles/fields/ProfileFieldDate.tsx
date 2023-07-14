@@ -5,11 +5,12 @@ import { useMetadata } from "@parallel/utils/withMetadata";
 import { isPast, sub } from "date-fns";
 import { isDefined } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
+import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
-interface ProfileFieldDateProps extends ProfileFieldProps {
-  showExpiryDateDialog: (force?: boolean) => void;
-  expiryDate?: string | null;
+interface ProfileFieldDateProps
+  extends ProfileFieldProps,
+    Omit<ProfileFieldInputGroupProps, "field"> {
+  showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
 export function ProfileFieldDate({
@@ -18,6 +19,7 @@ export function ProfileFieldDate({
   expiryDate,
   register,
   showExpiryDateDialog,
+  ...props
 }: ProfileFieldDateProps) {
   const { browserName } = useMetadata();
 
@@ -27,7 +29,7 @@ export function ProfileFieldDate({
     isPast(sub(new Date(expiryDate), field.expiryAlertAheadTime));
 
   return (
-    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
       <Flex flex="1" position="relative">
         <DateInput
           {...register(`fields.${index}.content.value`)}
@@ -35,7 +37,7 @@ export function ProfileFieldDate({
           color={field.options?.useReplyAsExpiryDate && alertIsActive ? "red.500" : undefined}
           onBlur={(e) => {
             if (e.target.value) {
-              showExpiryDateDialog();
+              showExpiryDateDialog({});
             }
           }}
         />

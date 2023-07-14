@@ -18,15 +18,19 @@ import { Controller } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isDefined, sumBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldExpiresAtIcon } from "./ProfileFieldInputGroup";
+import { ProfileFieldExpiresAtIcon, SuggestionsButton } from "./ProfileFieldInputGroup";
 
 interface ProfileFieldFileUploadProps extends ProfileFieldProps {
-  showExpiryDateDialog: (force?: boolean) => void;
+  showSuggestionsButton: boolean;
+  areSuggestionsVisible: boolean;
+  onToggleSuggestions: () => void;
+  showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
   expiryDate?: string | null;
 }
 
 export type ProfileFieldFileAction =
   | { type: "ADD"; file: File; id: string }
+  | { type: "COPY"; file: { name: string; type: string; size: number }; id: string }
   | { type: "DELETE"; id: string }
   | { type: "UPDATE" };
 
@@ -38,6 +42,9 @@ export function ProfileFieldFileUpload({
   control,
   expiryDate,
   showExpiryDateDialog,
+  showSuggestionsButton,
+  areSuggestionsVisible,
+  onToggleSuggestions,
 }: ProfileFieldFileUploadProps) {
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
   const intl = useIntl();
@@ -130,26 +137,40 @@ export function ProfileFieldFileUpload({
                     />
                   );
                 })}
-                {actions.filter(discriminator("type", "ADD")).map(({ id, file }) => {
-                  return (
-                    <ProfileFile
-                      key={id}
-                      name={file.name}
-                      type={file.type}
-                      size={file.size}
-                      onPreview={(preview) => handleDownloadLocalFile(file, preview)}
-                      onRemove={() => {
-                        onChange(actions.filter((a) => !(a.type === "ADD" && a.id === id)));
-                      }}
-                    />
-                  );
-                })}
+                {actions
+                  .filter(discriminator("type", ["ADD", "COPY"]))
+                  .map(({ id, file, type }) => {
+                    return (
+                      <ProfileFile
+                        key={id}
+                        name={file.name}
+                        type={file.type}
+                        size={file.size}
+                        onPreview={(preview) =>
+                          type === "ADD" && handleDownloadLocalFile(file, preview)
+                        }
+                        onRemove={() => {
+                          onChange(
+                            actions.filter(
+                              (a) => !((a.type === "ADD" || a.type === "COPY") && a.id === id),
+                            ),
+                          );
+                        }}
+                      />
+                    );
+                  })}
               </Flex>
               {field.isExpirable && expiryDate ? (
                 <ProfileFieldExpiresAtIcon
                   expiryDate={expiryDate}
                   expiryAlertAheadTime={field.expiryAlertAheadTime}
                   paddingTop={2}
+                />
+              ) : null}
+              {showSuggestionsButton ? (
+                <SuggestionsButton
+                  areSuggestionsVisible={areSuggestionsVisible}
+                  onClick={onToggleSuggestions}
                 />
               ) : null}
             </HStack>
@@ -191,7 +212,7 @@ export function ProfileFieldFileUpload({
                     ...value,
                     ...acceptedFiles.map((file) => ({ id: nanoid(), type: "ADD", file })),
                   ]);
-                  showExpiryDateDialog(true);
+                  showExpiryDateDialog({ force: true });
                 }
               }}
               {...rest}
