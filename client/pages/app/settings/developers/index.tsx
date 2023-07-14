@@ -1,18 +1,31 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { Stack } from "@chakra-ui/react";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
+import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { withPermission } from "@parallel/components/common/withPermission";
+import { DevelopersLayout } from "@parallel/components/layout/DevelopersLayout";
+import {
+  Subscriptions_subscriptionsDocument,
+  Subscriptions_userDocument,
+} from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { compose } from "@parallel/utils/compose";
+
+import { useMutation } from "@apollo/client";
 import {
   Badge,
+  Box,
   Button,
   Center,
   HStack,
-  Heading,
   List,
   ListItem,
-  Stack,
   Switch,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { AlertCircleFilledIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { AlertCircleFilledIcon, DeleteIcon, EditIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -22,54 +35,48 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
+import { useConfirmDeactivateEventSubscriptionDialog } from "@parallel/components/settings/dialogs/ConfirmDeactivateEventSubscriptionDialog";
+import {
+  CreateOrUpdateEventSubscriptionDialog,
+  useCreateOrUpdateEventSubscriptionDialog,
+} from "@parallel/components/settings/dialogs/CreateOrUpdateEventSubscriptionDialog";
 import {
   PetitionEventType,
-  WebhookSubscriptionsTable_PetitionEventSubscriptionFragment,
-  WebhookSubscriptionsTable_createEventSubscriptionDocument,
-  WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyDocument,
-  WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysDocument,
-  WebhookSubscriptionsTable_deleteEventSubscriptionsDocument,
-  WebhookSubscriptionsTable_updateEventSubscriptionDocument,
+  Subscriptions_PetitionEventSubscriptionFragment,
+  Subscriptions_createEventSubscriptionDocument,
+  Subscriptions_createEventSubscriptionSignatureKeyDocument,
+  Subscriptions_deleteEventSubscriptionSignatureKeysDocument,
+  Subscriptions_deleteEventSubscriptionsDocument,
+  Subscriptions_updateEventSubscriptionDocument,
 } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { useConfirmDeactivateEventSubscriptionDialog } from "../dialogs/ConfirmDeactivateEventSubscriptionDialog";
-import {
-  CreateOrUpdateEventSubscriptionDialog,
-  useCreateOrUpdateEventSubscriptionDialog,
-} from "../dialogs/CreateOrUpdateEventSubscriptionDialog";
 
-interface WebhookSubscriptionsTableProps {
-  subscriptions: WebhookSubscriptionsTable_PetitionEventSubscriptionFragment[];
-  onRefetch?: () => void;
-}
-
-export function WebhookSubscriptionsTable({
-  subscriptions,
-  onRefetch,
-}: WebhookSubscriptionsTableProps) {
+function Subscriptions() {
   const intl = useIntl();
+  const {
+    data: { me, realMe },
+  } = useAssertQuery(Subscriptions_userDocument);
+
+  const {
+    data: { subscriptions },
+    refetch: refetchSubscriptions,
+  } = useAssertQuery(Subscriptions_subscriptionsDocument);
 
   const [selectedSubscriptions, setSelectedSubscriptions] = useState<string[]>([]);
 
-  const [updateEventSubscription] = useMutation(
-    WebhookSubscriptionsTable_updateEventSubscriptionDocument,
-  );
-  const [deleteEventSubscriptions] = useMutation(
-    WebhookSubscriptionsTable_deleteEventSubscriptionsDocument,
-  );
-  const [createEventSubscription] = useMutation(
-    WebhookSubscriptionsTable_createEventSubscriptionDocument,
-  );
+  const [updateEventSubscription] = useMutation(Subscriptions_updateEventSubscriptionDocument);
+  const [deleteEventSubscriptions] = useMutation(Subscriptions_deleteEventSubscriptionsDocument);
+  const [createEventSubscription] = useMutation(Subscriptions_createEventSubscriptionDocument);
 
   const [createEventSubscriptionSignatureKey] = useMutation(
-    WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyDocument,
+    Subscriptions_createEventSubscriptionSignatureKeyDocument,
   );
 
   const [deleteEventSubscriptionSignatureKeys] = useMutation(
-    WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysDocument,
+    Subscriptions_deleteEventSubscriptionSignatureKeysDocument,
   );
 
   const createOrUpdateSubscriptionHandlers = {
@@ -100,19 +107,19 @@ export function WebhookSubscriptionsTable({
         subscriptionId = result.data!.createEventSubscription.id;
       }
 
-      onRefetch?.();
+      await refetchSubscriptions();
       return subscriptionId!;
     },
     onAddSignatureKey: async (subscriptionId: string) => {
       const response = await createEventSubscriptionSignatureKey({
         variables: { subscriptionId },
       });
-      onRefetch?.();
+      await refetchSubscriptions();
       return response.data!.createEventSubscriptionSignatureKey;
     },
     onDeleteSignatureKey: async (signatureKeyId: string) => {
       await deleteEventSubscriptionSignatureKeys({ variables: { ids: [signatureKeyId] } });
-      onRefetch?.();
+      await refetchSubscriptions();
     },
   };
 
@@ -134,7 +141,7 @@ export function WebhookSubscriptionsTable({
           ids: selectedSubscriptions,
         },
       });
-      onRefetch?.();
+      await refetchSubscriptions();
       setSelectedSubscriptions([]);
     } catch {}
   };
@@ -183,78 +190,81 @@ export function WebhookSubscriptionsTable({
 
   const subscriptionsColumns = useSubscriptionsColumns();
 
+  const actions = [
+    {
+      key: "edit",
+      onClick: () => handleEditEventSubscription(),
+      leftIcon: <EditIcon />,
+      children: <FormattedMessage id="generic.edit" defaultMessage="Edit" />,
+      isDisabled: selectedSubscriptions.length !== 1,
+    },
+    {
+      key: "delete",
+      onClick: () => handleDeleteEventSubscriptions(),
+      leftIcon: <DeleteIcon />,
+      children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+      colorScheme: "red",
+    },
+  ];
+
   return (
-    <Stack>
-      <Heading as="h4" size="md">
-        <FormattedMessage
-          id="component.webhook-subscriptions-table.subscriptions-title"
-          defaultMessage="Subscriptions"
-        />
-      </Heading>
-      <Text>
-        <FormattedMessage
-          id="component.webhook-subscriptions-table.subscriptions-explanation"
-          defaultMessage="Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
-        />
-      </Text>
-      <Card display="flex" flexDirection="column" overflow="hidden">
-        <Stack direction="row" padding={2}>
-          <IconButtonWithTooltip
-            onClick={() => onRefetch?.()}
-            icon={<RepeatIcon />}
-            placement="bottom"
-            variant="outline"
-            label={intl.formatMessage({
-              id: "generic.reload-data",
-              defaultMessage: "Reload",
-            })}
+    <DevelopersLayout currentTabKey="subscriptions" me={me} realMe={realMe}>
+      <Stack padding={6} spacing={6} paddingBottom={24}>
+        <Text>
+          <FormattedMessage
+            id="page.subscriptions.subscriptions-explanation"
+            defaultMessage="Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
           />
-          <Spacer />
-          {selectedSubscriptions.length ? (
-            <HStack>
-              <Button
-                isDisabled={selectedSubscriptions.length > 1}
-                onClick={handleEditEventSubscription}
-              >
-                <FormattedMessage id="generic.edit" defaultMessage="Edit" />
-              </Button>
-              <Button colorScheme="red" variant="ghost" onClick={handleDeleteEventSubscriptions}>
-                <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-              </Button>
-            </HStack>
-          ) : null}
-          <Button colorScheme="primary" onClick={handleCreateEventSubscription}>
-            <FormattedMessage
-              id="component.webhook-subscriptions-table.create-subscription"
-              defaultMessage="Create subscription"
+        </Text>
+        <Card display="flex" flexDirection="column" overflow="hidden">
+          <Stack direction="row" padding={2}>
+            <IconButtonWithTooltip
+              onClick={() => refetchSubscriptions()}
+              icon={<RepeatIcon />}
+              placement="bottom"
+              variant="outline"
+              label={intl.formatMessage({
+                id: "generic.reload-data",
+                defaultMessage: "Reload",
+              })}
             />
-          </Button>
-        </Stack>
-        {subscriptions.length ? (
-          <Table
-            context={subscriptionsTableContext}
-            flex="0 1 auto"
-            minHeight={0}
-            isSelectable
-            isHighlightable
-            columns={subscriptionsColumns}
-            rows={subscriptions}
-            rowKeyProp="id"
-            onSelectionChange={setSelectedSubscriptions}
-          />
-        ) : (
-          <>
-            <Divider />
-            <Center textStyle="hint" minHeight="60px">
+            <Spacer />
+            <Button colorScheme="primary" onClick={handleCreateEventSubscription}>
               <FormattedMessage
-                id="component.webhook-subscriptions-table.no-subscriptions-message"
-                defaultMessage="You haven't created any subscriptions yet"
+                id="page.subscriptions.create-subscription"
+                defaultMessage="Create subscription"
               />
-            </Center>
-          </>
-        )}
-      </Card>
-    </Stack>
+            </Button>
+          </Stack>
+          <Box overflowX="auto">
+            {subscriptions.length ? (
+              <Table
+                context={subscriptionsTableContext}
+                flex="0 1 auto"
+                minHeight={0}
+                isSelectable
+                isHighlightable
+                columns={subscriptionsColumns}
+                rows={subscriptions}
+                rowKeyProp="id"
+                onSelectionChange={setSelectedSubscriptions}
+                actions={actions}
+              />
+            ) : (
+              <>
+                <Divider />
+                <Center textStyle="hint" minHeight="60px">
+                  <FormattedMessage
+                    id="page.subscriptions.no-subscriptions-message"
+                    defaultMessage="You haven't created any subscriptions yet"
+                  />
+                </Center>
+              </>
+            )}
+          </Box>
+        </Card>
+      </Stack>
+    </DevelopersLayout>
   );
 }
 
@@ -267,7 +277,7 @@ interface SubscriptionsTableContext {
 }
 
 function useSubscriptionsColumns(): TableColumn<
-  WebhookSubscriptionsTable_PetitionEventSubscriptionFragment,
+  Subscriptions_PetitionEventSubscriptionFragment,
   SubscriptionsTableContext
 >[] {
   const intl = useIntl();
@@ -276,15 +286,18 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "name",
         header: intl.formatMessage({
-          id: "component.webhook-subscriptions-table.header.name",
+          id: "page.subscriptions.header.name",
           defaultMessage: "Name",
         }),
+        cellProps: {
+          width: "20%",
+        },
         CellContent: ({ row }) => (
           <HStack>
             {row.isFailing ? (
               <Tooltip
                 label={intl.formatMessage({
-                  id: "component.webhook-subscriptions-table.webhook-is-failing",
+                  id: "page.subscriptions.webhook-is-failing",
                   defaultMessage:
                     "The events could not be sent to the URL, if the error persists check the webhook",
                 })}
@@ -295,7 +308,7 @@ function useSubscriptionsColumns(): TableColumn<
             <Text textStyle={row.name ? undefined : "hint"}>
               {row.name ?? (
                 <FormattedMessage
-                  id="component.webhook-subscriptions-table.unnamed-subscription"
+                  id="page.subscriptions.unnamed-subscription"
                   defaultMessage="Unnamed subscription"
                 />
               )}
@@ -306,13 +319,14 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "eventsUrl",
         header: intl.formatMessage({
-          id: "component.webhook-subscriptions-table.header.events-url",
+          id: "page.subscriptions.header.events-url",
           defaultMessage: "Events URL",
         }),
         cellProps: {
           width: "30%",
-          maxWidth: 0,
+          minWidth: "200px",
           fontSize: "sm",
+          maxWidth: 0,
         },
         CellContent: ({ row }) => {
           return <OverflownText>{row.eventsUrl}</OverflownText>;
@@ -321,10 +335,12 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "fromTemplate",
         header: intl.formatMessage({
-          id: "component.webhook-subscriptions-table.header.from-template",
+          id: "page.subscriptions.header.from-template",
           defaultMessage: "From template",
         }),
         cellProps: {
+          width: "30%",
+          minWidth: "200px",
           fontSize: "sm",
           maxWidth: 0,
         },
@@ -345,7 +361,7 @@ function useSubscriptionsColumns(): TableColumn<
               ) : (
                 <Text textStyle="hint">
                   <FormattedMessage
-                    id="component.webhook-subscriptions-table.header.from-any-petition"
+                    id="page.subscriptions.header.from-any-petition"
                     defaultMessage="Any parallel"
                   />
                 </Text>
@@ -357,11 +373,11 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "eventTypes",
         header: intl.formatMessage({
-          id: "component.webhook-subscriptions-table.header.event-types",
+          id: "page.subscriptions.header.event-types",
           defaultMessage: "Event types",
         }),
         align: "center",
-        cellProps: { width: "1%", whiteSpace: "nowrap" },
+        cellProps: { minWidth: "170px", width: "10%", whiteSpace: "nowrap" },
         CellContent: ({ row }) => {
           return !isDefined(row.eventTypes) ? (
             <Text fontSize="sm">
@@ -385,7 +401,7 @@ function useSubscriptionsColumns(): TableColumn<
             >
               <Text color="primary.500" fontSize="sm">
                 <FormattedMessage
-                  id="component.webhook-subscriptions-table.n-events"
+                  id="page.subscriptions.n-events"
                   defaultMessage="{count} events"
                   values={{ count: row.eventTypes.length }}
                 />
@@ -397,10 +413,11 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "signatureKeys",
         header: intl.formatMessage({
-          id: "component.webhook-subscriptions-table.header.signature-keys",
+          id: "page.subscriptions.header.signature-keys",
           defaultMessage: "Keys",
         }),
         align: "center",
+        cellProps: { minWidth: "100px", width: "5%" },
         CellContent: ({ row, context: { onSignatureKeysClick } }) => {
           return (
             <Button
@@ -411,7 +428,7 @@ function useSubscriptionsColumns(): TableColumn<
               onClick={() => onSignatureKeysClick(row.id)}
             >
               <FormattedMessage
-                id="component.webhook-subscriptions-table.n-keys"
+                id="page.subscriptions.n-keys"
                 defaultMessage="{count, plural, =1{# key} other {# keys}}"
                 values={{ count: row.signatureKeys.length }}
               />
@@ -422,11 +439,11 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "isEnabled",
         header: intl.formatMessage({
-          id: "component.webhook-subscriptions-table.header.is-enabled",
+          id: "page.subscriptions.header.is-enabled",
           defaultMessage: "Enabled",
         }),
         align: "center",
-        cellProps: { width: "1%" },
+        cellProps: { minWidth: "100px", width: "5%" },
         CellContent: ({
           row,
           context: { onToggleEnabled, showConfirmDeactivateEventSubscriptionDialog },
@@ -449,9 +466,42 @@ function useSubscriptionsColumns(): TableColumn<
   );
 }
 
-WebhookSubscriptionsTable.fragments = {
+function useConfirmDeleteSubscriptionDialog() {
+  const showDialog = useConfirmDeleteDialog();
+  return useCallback(async ({ count }: { count: number }) => {
+    return await showDialog({
+      header: (
+        <FormattedMessage
+          id="page.subscriptions.confirm-delete-header"
+          defaultMessage="Delete event {count, plural, =1 {subscription} other {subscriptions}}"
+          values={{ count }}
+        />
+      ),
+      description: (
+        <Stack>
+          <Text>
+            <FormattedMessage
+              id="page.subscriptions.confirm-delete-body"
+              defaultMessage="Are you sure you want to delete the {count, plural, =1 {selected event subscription} other {# selected event subscriptions}}?"
+              values={{ count }}
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="page.subscriptions.confirm-delete-warning"
+              defaultMessage="Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
+              values={{ count }}
+            />
+          </Text>
+        </Stack>
+      ),
+    });
+  }, []);
+}
+
+const _fragments = {
   PetitionEventSubscription: gql`
-    fragment WebhookSubscriptionsTable_PetitionEventSubscription on PetitionEventSubscription {
+    fragment Subscriptions_PetitionEventSubscription on PetitionEventSubscription {
       id
       eventsUrl
       eventTypes
@@ -473,7 +523,7 @@ WebhookSubscriptionsTable.fragments = {
 
 const _mutations = [
   gql`
-    mutation WebhookSubscriptionsTable_createEventSubscription(
+    mutation Subscriptions_createEventSubscription(
       $eventsUrl: String!
       $eventTypes: [PetitionEventType!]
       $name: String
@@ -487,13 +537,13 @@ const _mutations = [
         fromTemplateId: $fromTemplateId
         fromTemplateFieldIds: $fromTemplateFieldIds
       ) {
-        ...WebhookSubscriptionsTable_PetitionEventSubscription
+        ...Subscriptions_PetitionEventSubscription
       }
     }
-    ${WebhookSubscriptionsTable.fragments.PetitionEventSubscription}
+    ${_fragments.PetitionEventSubscription}
   `,
   gql`
-    mutation WebhookSubscriptionsTable_updateEventSubscription(
+    mutation Subscriptions_updateEventSubscription(
       $id: GID!
       $isEnabled: Boolean
       $eventsUrl: String
@@ -511,20 +561,20 @@ const _mutations = [
         fromTemplateId: $fromTemplateId
         fromTemplateFieldIds: $fromTemplateFieldIds
       ) {
-        ...WebhookSubscriptionsTable_PetitionEventSubscription
+        ...Subscriptions_PetitionEventSubscription
         ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
       }
     }
-    ${WebhookSubscriptionsTable.fragments.PetitionEventSubscription}
+    ${_fragments.PetitionEventSubscription}
     ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionEventSubscription}
   `,
   gql`
-    mutation WebhookSubscriptionsTable_deleteEventSubscriptions($ids: [GID!]!) {
+    mutation Subscriptions_deleteEventSubscriptions($ids: [GID!]!) {
       deleteEventSubscriptions(ids: $ids)
     }
   `,
   gql`
-    mutation WebhookSubscriptionsTable_createEventSubscriptionSignatureKey($subscriptionId: GID!) {
+    mutation Subscriptions_createEventSubscriptionSignatureKey($subscriptionId: GID!) {
       createEventSubscriptionSignatureKey(subscriptionId: $subscriptionId) {
         id
         publicKey
@@ -532,41 +582,39 @@ const _mutations = [
     }
   `,
   gql`
-    mutation WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeys($ids: [GID!]!) {
+    mutation Subscriptions_deleteEventSubscriptionSignatureKeys($ids: [GID!]!) {
       deleteEventSubscriptionSignatureKeys(ids: $ids)
     }
   `,
 ];
 
-function useConfirmDeleteSubscriptionDialog() {
-  const showDialog = useConfirmDeleteDialog();
-  return useCallback(async ({ count }: { count: number }) => {
-    return await showDialog({
-      header: (
-        <FormattedMessage
-          id="component.webhook-subscriptions-table.confirm-delete-header"
-          defaultMessage="Delete event {count, plural, =1 {subscription} other {subscriptions}}"
-          values={{ count }}
-        />
-      ),
-      description: (
-        <Stack>
-          <Text>
-            <FormattedMessage
-              id="component.webhook-subscriptions-table.confirm-delete-body"
-              defaultMessage="Are you sure you want to delete the {count, plural, =1 {selected event subscription} other {# selected event subscriptions}}?"
-              values={{ count }}
-            />
-          </Text>
-          <Text>
-            <FormattedMessage
-              id="component.webhook-subscriptions-table.confirm-delete-warning"
-              defaultMessage="Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
-              values={{ count }}
-            />
-          </Text>
-        </Stack>
-      ),
-    });
-  }, []);
-}
+const _queries = [
+  gql`
+    query Subscriptions_subscriptions {
+      subscriptions {
+        ...Subscriptions_PetitionEventSubscription
+      }
+    }
+    ${_fragments.PetitionEventSubscription}
+  `,
+  gql`
+    query Subscriptions_user {
+      ...DevelopersLayout_Query
+    }
+    ${DevelopersLayout.fragments.Query}
+  `,
+];
+
+Subscriptions.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await Promise.all([
+    fetchQuery(Subscriptions_userDocument),
+    fetchQuery(Subscriptions_subscriptionsDocument),
+  ]);
+};
+
+export default compose(
+  withDialogs,
+  withPermission("INTEGRATIONS:CRUD_API"),
+  withFeatureFlag("DEVELOPER_ACCESS", "/app/organization"),
+  withApolloData,
+)(Subscriptions);

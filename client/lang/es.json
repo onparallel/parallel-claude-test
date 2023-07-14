@@ -255,51 +255,6 @@
     "context": "Subscribers"
   },
   {
-    "term": "component.api-tokens-table.confirm-delete-body",
-    "definition": "¿Estás seguro que quieres eliminar {count, plural, =1 {el token seleccionado} other {los # tokens seleccionados}}?",
-    "context": "Are you sure you want to delete the {count, plural, =1 {selected access token} other {# selected access tokens}}?"
-  },
-  {
-    "term": "component.api-tokens-table.confirm-delete-header",
-    "definition": "Revocar {count, plural, =1 {token} other {tokens}} de acceso",
-    "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
-  },
-  {
-    "term": "component.api-tokens-table.confirm-delete-warning",
-    "definition": "Cualquier aplicación o programa que utilice {count, plural, =1 {este token} other {estos tokens}} no podrá acceder a la API de Parallel. Esta acción <b>no puede deshacerse</b>.",
-    "context": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
-  },
-  {
-    "term": "component.api-tokens-table.create-token",
-    "definition": "Crear token",
-    "context": "Create token"
-  },
-  {
-    "term": "component.api-tokens-table.explanation",
-    "definition": "Las claves de acceso personal pueden ser utilizadas para acceder a la <a>API de Parallel</a>.",
-    "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
-  },
-  {
-    "term": "component.api-tokens-table.header.hint",
-    "definition": "Token",
-    "context": "Token"
-  },
-  {
-    "term": "component.api-tokens-table.header.token-name",
-    "definition": "Nombre",
-    "context": "Name"
-  },
-  {
-    "term": "component.api-tokens-table.no-tokens-message",
-    "definition": "No has creado ningún token API todavía",
-    "context": "You haven't created any API tokens yet"
-  },
-  {
-    "term": "component.api-tokens-table.title",
-    "definition": "Tokens API",
-    "context": "API Tokens"
-  },
-  {
     "term": "component.app-layout-navbar.alerts-link",
     "definition": "Alertas",
     "context": "Alerts"
@@ -1568,6 +1523,16 @@
     "term": "component.delete-signature-error-confirmation.title",
     "definition": "Firmas pendientes",
     "context": "Pending signatures"
+  },
+  {
+    "term": "component.developers-layout.subscriptions",
+    "definition": "Suscripciones",
+    "context": "Subscriptions"
+  },
+  {
+    "term": "component.developers-layout.tokens",
+    "definition": "Tokens",
+    "context": "Tokens"
   },
   {
     "term": "component.document-theme-editor.font-color",
@@ -7280,96 +7245,6 @@
     "context": "Rename view"
   },
   {
-    "term": "component.webhook-subscriptions-table.confirm-delete-body",
-    "definition": "¿Estás seguro de que quieres borrar {count, plural, =1 {la suscripción seleccionada} other {las # suscripciones seleccionadas}}?",
-    "context": "Are you sure you want to delete the {count, plural, =1 {selected event subscription} other {# selected event subscriptions}}?"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.confirm-delete-header",
-    "definition": "Borrar {count, plural, =1 {suscripción} other {suscripciones}}",
-    "context": "Delete event {count, plural, =1 {subscription} other {subscriptions}}"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.confirm-delete-warning",
-    "definition": "Cualquier aplicación o script utilizando {count, plural, =1 {esta suscripción} other {estas suscripciones}} dejarán de recibir notificaciones de eventos de Parallel.",
-    "context": "Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
-  },
-  {
-    "term": "component.webhook-subscriptions-table.create-subscription",
-    "definition": "Crear suscripción",
-    "context": "Create subscription"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.header.event-types",
-    "definition": "Tipos de evento",
-    "context": "Event types"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.header.events-url",
-    "definition": "URL de eventos",
-    "context": "Events URL"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.header.from-any-petition",
-    "definition": "Cualquier parallel",
-    "context": "Any parallel"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.header.from-template",
-    "definition": "Desde la plantilla",
-    "context": "From template"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.header.is-enabled",
-    "definition": "Activado",
-    "context": "Enabled"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.header.name",
-    "definition": "Nombre",
-    "context": "Name"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.header.signature-keys",
-    "definition": "Claves",
-    "context": "Keys"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.n-events",
-    "definition": "{count} eventos",
-    "context": "{count} events"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.n-keys",
-    "definition": "{count, plural, =1{# clave} other {# claves}}",
-    "context": "{count, plural, =1{# key} other {# keys}}"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.no-subscriptions-message",
-    "definition": "No has creado ninguna suscripción todavía",
-    "context": "You haven't created any subscriptions yet"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.subscriptions-explanation",
-    "definition": "Aquí puedes registrar webhooks para ser notificado cuando ocurra cualquier cosa en uno de tus parallels (por ejemplo, cuando un destinatario envía un comentario o cuando se completa el parallel)",
-    "context": "Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.subscriptions-title",
-    "definition": "Suscripciones",
-    "context": "Subscriptions"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.unnamed-subscription",
-    "definition": "Suscripción sin nombre",
-    "context": "Unnamed subscription"
-  },
-  {
-    "term": "component.webhook-subscriptions-table.webhook-is-failing",
-    "definition": "No se han podido enviar los eventos a la URL, si el error continúa revisa el webhook",
-    "context": "The events could not be sent to the URL, if the error persists check the webhook"
-  },
-  {
     "term": "components.view-tabs.confirm-delete-body",
     "definition": "¿Estás seguro de que quieres borrar <b>{name}</b>?",
     "context": "Are you sure you want to delete <b>{name}</b>?"
@@ -10273,6 +10148,131 @@
     "term": "page.signature.upgrade-plan-support-message",
     "definition": "Hola, quiero utilizar la integración de firma electrónica. ¿Podéis darme más información?",
     "context": "Hi, I would like to use eSignatures. Could I have more information, please?"
+  },
+  {
+    "term": "page.subscriptions.confirm-delete-body",
+    "definition": "¿Estás seguro de que quieres borrar {count, plural, =1 {la suscripción seleccionada} other {las # suscripciones seleccionadas}}?",
+    "context": "Are you sure you want to delete the {count, plural, =1 {selected event subscription} other {# selected event subscriptions}}?"
+  },
+  {
+    "term": "page.subscriptions.confirm-delete-header",
+    "definition": "Borrar {count, plural, =1 {suscripción} other {suscripciones}}",
+    "context": "Delete event {count, plural, =1 {subscription} other {subscriptions}}"
+  },
+  {
+    "term": "page.subscriptions.confirm-delete-warning",
+    "definition": "Cualquier aplicación o script utilizando {count, plural, =1 {esta suscripción} other {estas suscripciones}} dejarán de recibir notificaciones de eventos de Parallel.",
+    "context": "Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
+  },
+  {
+    "term": "page.subscriptions.create-subscription",
+    "definition": "Crear suscripción",
+    "context": "Create subscription"
+  },
+  {
+    "term": "page.subscriptions.header.event-types",
+    "definition": "Tipos de evento",
+    "context": "Event types"
+  },
+  {
+    "term": "page.subscriptions.header.events-url",
+    "definition": "URL de eventos",
+    "context": "Events URL"
+  },
+  {
+    "term": "page.subscriptions.header.from-any-petition",
+    "definition": "Cualquier parallel",
+    "context": "Any parallel"
+  },
+  {
+    "term": "page.subscriptions.header.from-template",
+    "definition": "Desde la plantilla",
+    "context": "From template"
+  },
+  {
+    "term": "page.subscriptions.header.is-enabled",
+    "definition": "Activado",
+    "context": "Enabled"
+  },
+  {
+    "term": "page.subscriptions.header.name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "page.subscriptions.header.signature-keys",
+    "definition": "Claves",
+    "context": "Keys"
+  },
+  {
+    "term": "page.subscriptions.n-events",
+    "definition": "{count} eventos",
+    "context": "{count} events"
+  },
+  {
+    "term": "page.subscriptions.n-keys",
+    "definition": "{count, plural, =1{# clave} other {# claves}}",
+    "context": "{count, plural, =1{# key} other {# keys}}"
+  },
+  {
+    "term": "page.subscriptions.no-subscriptions-message",
+    "definition": "No has creado ninguna suscripción todavía",
+    "context": "You haven't created any subscriptions yet"
+  },
+  {
+    "term": "page.subscriptions.subscriptions-explanation",
+    "definition": "Aquí puedes registrar webhooks para ser notificado cuando ocurra cualquier cosa en uno de tus parallels (por ejemplo, cuando un destinatario envía un comentario o cuando se completa el parallel)",
+    "context": "Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
+  },
+  {
+    "term": "page.subscriptions.unnamed-subscription",
+    "definition": "Suscripción sin nombre",
+    "context": "Unnamed subscription"
+  },
+  {
+    "term": "page.subscriptions.webhook-is-failing",
+    "definition": "No se han podido enviar los eventos a la URL, si el error continúa revisa el webhook",
+    "context": "The events could not be sent to the URL, if the error persists check the webhook"
+  },
+  {
+    "term": "page.tokens.confirm-delete-body",
+    "definition": "¿Estás seguro que quieres eliminar {count, plural, =1 {el token seleccionado} other {los # tokens seleccionados}}?",
+    "context": "Are you sure you want to delete the {count, plural, =1 {selected access token} other {# selected access tokens}}?"
+  },
+  {
+    "term": "page.tokens.confirm-delete-header",
+    "definition": "Revocar {count, plural, =1 {token} other {tokens}} de acceso",
+    "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
+  },
+  {
+    "term": "page.tokens.confirm-delete-warning",
+    "definition": "Cualquier aplicación o programa que utilice {count, plural, =1 {este token} other {estos tokens}} no podrá acceder a la API de Parallel. Esta acción <b>no puede deshacerse</b>.",
+    "context": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
+  },
+  {
+    "term": "page.tokens.create-token",
+    "definition": "Crear token",
+    "context": "Create token"
+  },
+  {
+    "term": "page.tokens.explanation",
+    "definition": "Las claves de acceso personal pueden ser utilizadas para acceder a la <a>API de Parallel</a>.",
+    "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
+  },
+  {
+    "term": "page.tokens.header.hint",
+    "definition": "Token",
+    "context": "Token"
+  },
+  {
+    "term": "page.tokens.header.token-name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "page.tokens.no-tokens-message",
+    "definition": "No has creado ningún token API todavía",
+    "context": "You haven't created any API tokens yet"
   },
   {
     "term": "page.usage.parallels",
