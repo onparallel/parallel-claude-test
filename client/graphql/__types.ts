@@ -4115,6 +4115,8 @@ export interface Query {
   petitionField: PetitionField;
   /** Lists every path of the user's petitions as a string array */
   petitionFolders: Array<Scalars["String"]["output"]>;
+  /** Returns information about a petition: The name of the organization and emails of users with access to the petition */
+  petitionInformation: SupportMethodResponse;
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
@@ -4270,6 +4272,10 @@ export interface QuerypetitionFieldArgs {
 export interface QuerypetitionFoldersArgs {
   currentPath?: InputMaybe<Scalars["String"]["input"]>;
   type: PetitionBaseType;
+}
+
+export interface QuerypetitionInformationArgs {
+  petitionId: Scalars["GID"]["input"];
 }
 
 export interface QuerypetitionsArgs {
@@ -4742,6 +4748,7 @@ export interface Task {
 }
 
 export type TaskName =
+  | "BANKFLIP_SESSION_COMPLETED"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"

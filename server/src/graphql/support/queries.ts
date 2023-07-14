@@ -1,10 +1,11 @@
 import { idArg, nonNull, queryField, stringArg } from "nexus";
-import { isDefined } from "remeda";
+import { isDefined, zip } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { hash } from "../../util/token";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
 import { supportMethodAccess } from "./authorizers";
+import { outdent } from "outdent";
 
 export const globalIdDecode = queryField("globalIdDecode", {
   description: "Decodes the given Global ID into an entity in the database.",
@@ -94,5 +95,44 @@ export const exportPetitionToJson = queryField("exportPetitionToJson", {
       console.error(e);
     }
     return { result: RESULT.FAILURE, message: "Something went wrong..." };
+  },
+});
+
+export const petitionInformation = queryField("petitionInformation", {
+  description:
+    "Returns information about a petition: The name of the organization and emails of users with access to the petition",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, { petitionId }, ctx) => {
+    try {
+      const petition = await ctx.petitions.loadPetition(petitionId);
+      if (!petition) {
+        throw new Error(`Petition:${petitionId} not found`);
+      }
+
+      const organization = (await ctx.organizations.loadOrg(petition.org_id))!;
+      const permissions = (await ctx.petitions.loadEffectivePermissions(petitionId))!;
+      const userDatas = (
+        await ctx.users.loadUserDataByUserId(permissions.map((p) => p.user_id!))
+      ).filter(isDefined);
+
+      return {
+        result: RESULT.SUCCESS,
+        message: outdent`
+          Organization:${organization.id} (${toGlobalId("Organization", organization.id)})
+          Name: ${organization.name}
+          Users: 
+          ${zip(permissions, userDatas)
+            .map(([p, ud]) => `  - ${ud.email} (${p.type})`)
+            .join("\n")}
+      `,
+      };
+    } catch (e) {
+      console.error(e);
+      return { result: RESULT.FAILURE, message: (e as any).message };
+    }
   },
 });

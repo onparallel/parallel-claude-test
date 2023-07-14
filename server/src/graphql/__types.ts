@@ -2623,6 +2623,7 @@ export interface NexusGenFieldTypes {
     petitionEvents: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
     petitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petitionFolders: string[]; // [String!]!
+    petitionInformation: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     petitions: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     profile: NexusGenRootTypes["Profile"]; // Profile!
@@ -4690,6 +4691,7 @@ export interface NexusGenFieldTypeNames {
     petitionEvents: "PetitionEvent";
     petitionField: "PetitionField";
     petitionFolders: "String";
+    petitionInformation: "SupportMethodResponse";
     petitions: "PetitionBaseOrFolderPagination";
     petitionsById: "PetitionBase";
     profile: "Profile";
@@ -6542,6 +6544,10 @@ export interface NexusGenArgTypes {
       // args
       currentPath?: string | null; // String
       type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
+    };
+    petitionInformation: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     petitions: {
       // args
