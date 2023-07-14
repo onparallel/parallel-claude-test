@@ -1,5 +1,5 @@
-import { parse, addDays, isWeekend, startOfToday } from "date-fns";
-import { format, utcToZonedTime, toDate } from "date-fns-tz";
+import { addDays, isWeekend, parse, startOfToday } from "date-fns";
+import { format, formatInTimeZone, toDate } from "date-fns-tz";
 
 export interface PetitionAccessReminderConfig {
   offset: number;
@@ -13,9 +13,7 @@ export function calculateNextReminder(fromDate: Date, config: PetitionAccessRemi
   // Calculate next reminder
   const sendDate = fromDate;
   const date = parse(
-    format(utcToZonedTime(sendDate, config.timezone), "yyyy-MM-dd", {
-      timeZone: config.timezone,
-    }),
+    formatInTimeZone(sendDate, config.timezone, "yyyy-MM-dd"),
     "yyyy-MM-dd",
     startOfToday(),
   );
