@@ -18,6 +18,7 @@ export function ProfileFieldDate({
   field,
   expiryDate,
   register,
+  isDisabled,
   showExpiryDateDialog,
   ...props
 }: ProfileFieldDateProps) {
@@ -29,7 +30,12 @@ export function ProfileFieldDate({
     isPast(sub(new Date(expiryDate), field.expiryAlertAheadTime));
 
   return (
-    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup
+      {...props}
+      field={field}
+      expiryDate={expiryDate}
+      isDisabled={isDisabled}
+    >
       <Flex flex="1" position="relative">
         <DateInput
           {...register(`fields.${index}.content.value`)}
@@ -40,6 +46,7 @@ export function ProfileFieldDate({
               showExpiryDateDialog({});
             }
           }}
+          isDisabled={isDisabled}
         />
         {browserName === "Firefox" ? null : (
           <Center

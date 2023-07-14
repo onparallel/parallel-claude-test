@@ -1795,6 +1795,11 @@
     "context": "File name"
   },
   {
+    "term": "component.draggable-list.configure-visiblity",
+    "definition": "Configurar visibilidad",
+    "context": "Configure visibility"
+  },
+  {
     "term": "component.draggable-list.delete-property",
     "definition": "Eliminar propiedad",
     "context": "Delete property"
@@ -1813,6 +1818,11 @@
     "term": "component.draggable-list.heading",
     "definition": "Propiedades",
     "context": "Properties"
+  },
+  {
+    "term": "component.draggable-list.visiblity",
+    "definition": "Visibilidad",
+    "context": "Visibility"
   },
   {
     "term": "component.email-verification-required-alert.body",
@@ -4681,8 +4691,8 @@
   },
   {
     "term": "component.profile-file.aria-label",
-    "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
-    "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
+    "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. {isReadOnly, select, true{} other {Para eliminarlo, pulsa Suprimir.}}",
+    "context": "Attached file: {filename}. To see the file, press Enter. {isReadOnly, select, true{} other {To remove it, press Delete.}}"
   },
   {
     "term": "component.profile-file.remove-attachment",
@@ -4778,6 +4788,41 @@
     "term": "component.profile-table-columns.type",
     "definition": "Tipo",
     "context": "Type"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.all-in-organization",
+    "definition": "Todos en la organización",
+    "context": "Everyone in the organization"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.header",
+    "definition": "Quién puede ver esta propiedad",
+    "context": "Who can see this property"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.hidden",
+    "definition": "Oculto",
+    "context": "Hidden"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.permissions-conflict-popover",
+    "definition": "Hay un permiso superior para todos en la organización que sobreescribe este.",
+    "context": "There is a higher-level permission for everyone in the organization that overrides this one."
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.read",
+    "definition": "Lectura",
+    "context": "Can read"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.used-in-profile-name-warning",
+    "definition": "Las propiedades del nombre no pueden ocultarse.",
+    "context": "Properties used in the name cannot be hidden."
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.write",
+    "definition": "Escritura",
+    "context": "Can write"
   },
   {
     "term": "component.profile-type-header.clone-label",

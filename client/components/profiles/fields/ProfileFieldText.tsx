@@ -13,11 +13,17 @@ export function ProfileFieldText({
   field,
   register,
   expiryDate,
+  isDisabled,
   showExpiryDateDialog,
   ...props
 }: ProfileFieldTextProps) {
   return (
-    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup
+      {...props}
+      field={field}
+      expiryDate={expiryDate}
+      isDisabled={isDisabled}
+    >
       <GrowingTextarea
         borderColor="transparent"
         maxLength={10_000}
@@ -27,6 +33,7 @@ export function ProfileFieldText({
             return showExpiryDateDialog({});
           }
         }}
+        isDisabled={isDisabled}
       />
     </ProfileFieldInputGroup>
   );

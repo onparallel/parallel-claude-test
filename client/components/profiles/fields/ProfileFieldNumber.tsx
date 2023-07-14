@@ -14,11 +14,17 @@ export function ProfileFieldNumber({
   field,
   control,
   expiryDate,
+  isDisabled,
   showExpiryDateDialog,
   ...props
 }: ProfileFieldNumberProps) {
   return (
-    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup
+      {...props}
+      field={field}
+      expiryDate={expiryDate}
+      isDisabled={isDisabled}
+    >
       <Controller
         name={`fields.${index}.content.value`}
         control={control}
@@ -36,6 +42,7 @@ export function ProfileFieldNumber({
                   return showExpiryDateDialog({});
                 }
               }}
+              isDisabled={isDisabled}
             />
           );
         }}

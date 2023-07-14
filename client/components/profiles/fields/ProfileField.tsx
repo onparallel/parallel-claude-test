@@ -65,6 +65,7 @@ export interface ProfileFieldProps {
   value?: ProfileField_ProfileFieldValueFragment | null;
   files?: ProfileField_ProfileFieldFileFragment[] | null;
   fieldsWithIndices: [ProfileField_PetitionFieldFragment, PetitionFieldIndex][];
+  isDisabled?: boolean;
 }
 
 export function ProfileField(props: ProfileFieldProps) {
@@ -260,7 +261,7 @@ export function ProfileField(props: ProfileFieldProps) {
           ) : null}
           {needsExpirationDialog ? (
             <ProfileFieldExpirationButton
-              isDisabled={fieldIsEmpty}
+              isDisabled={fieldIsEmpty || props.isDisabled === true}
               expiryDate={expiryDate}
               fieldName={field.name}
               expiryAlertAheadTime={field.expiryAlertAheadTime}

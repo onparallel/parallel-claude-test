@@ -16,7 +16,7 @@ import { nanoid } from "nanoid";
 import { useRef } from "react";
 import { Controller } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { differenceWith, isDefined, sumBy } from "remeda";
+import { differenceWith, isDefined, noop, sumBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldExpiresAtIcon, SuggestionsButton } from "./ProfileFieldInputGroup";
 
@@ -41,6 +41,7 @@ export function ProfileFieldFileUpload({
   index,
   control,
   expiryDate,
+  isDisabled,
   showExpiryDateDialog,
   showSuggestionsButton,
   areSuggestionsVisible,
@@ -134,6 +135,7 @@ export function ProfileFieldFileUpload({
                       size={size}
                       onPreview={(preview) => handleDownloadAttachment(id, preview)}
                       onRemove={() => onChange([...(value ?? []), { type: "DELETE", id }])}
+                      isDisabled={isDisabled}
                     />
                   );
                 })}
@@ -156,6 +158,7 @@ export function ProfileFieldFileUpload({
                             ),
                           );
                         }}
+                        isDisabled={isDisabled}
                       />
                     );
                   })}
@@ -179,9 +182,10 @@ export function ProfileFieldFileUpload({
               maxSize={MAX_FILE_SIZE}
               maxFiles={10}
               disabled={
+                isDisabled ||
                 (files ?? []).length +
                   sumBy(actions, (a) => (a.type === "ADD" ? 1 : a.type === "DELETE" ? -1 : 0)) >=
-                10
+                  10
               }
               multiple={true}
               onDrop={async (acceptedFiles, rejectedFiles) => {
@@ -237,9 +241,10 @@ interface ProfileFileProps {
   size: number;
   onRemove: () => void;
   onPreview: (preview: boolean) => void;
+  isDisabled?: boolean;
 }
 
-function ProfileFile({ name, type, size, onRemove, onPreview }: ProfileFileProps) {
+function ProfileFile({ name, type, size, onRemove, onPreview, isDisabled }: ProfileFileProps) {
   const intl = useIntl();
 
   const nameRef = useRef<HTMLSpanElement>(null);
@@ -273,21 +278,25 @@ function ProfileFile({ name, type, size, onRemove, onPreview }: ProfileFileProps
         {
           id: "component.profile-file.aria-label",
           defaultMessage:
-            "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
+            "Attached file: {filename}. To see the file, press Enter. {isReadOnly, select, true{} other {To remove it, press Delete.}}",
         },
-        { filename: name },
+        { filename: name, isReadOnly: isDisabled },
       )}
-      onKeyDown={(e) => {
-        switch (e.key) {
-          case "Enter":
-            onPreview(isShiftDown ? false : true);
-            break;
-          case "Delete":
-          case "Backspace":
-            onRemove();
-            break;
-        }
-      }}
+      onKeyDown={
+        isDisabled
+          ? noop
+          : (e) => {
+              switch (e.key) {
+                case "Enter":
+                  onPreview(isShiftDown ? false : true);
+                  break;
+                case "Delete":
+                case "Backspace":
+                  onRemove();
+                  break;
+              }
+            }
+      }
     >
       <FileIcon boxSize="18px" filename={name} contentType={type} hasFailed={false} />
       <Flex marginX={2}>
@@ -306,6 +315,7 @@ function ProfileFile({ name, type, size, onRemove, onPreview }: ProfileFileProps
         </Text>
       </Flex>
       <IconButton
+        isDisabled={isDisabled}
         tabIndex={-1}
         variant="ghost"
         aria-label={intl.formatMessage({

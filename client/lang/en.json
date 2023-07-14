@@ -1795,6 +1795,11 @@
     "context": "File name"
   },
   {
+    "term": "component.draggable-list.configure-visiblity",
+    "definition": "Configure visibility",
+    "context": "Configure visibility"
+  },
+  {
     "term": "component.draggable-list.delete-property",
     "definition": "Delete property",
     "context": "Delete property"
@@ -1813,6 +1818,11 @@
     "term": "component.draggable-list.heading",
     "definition": "Properties",
     "context": "Properties"
+  },
+  {
+    "term": "component.draggable-list.visiblity",
+    "definition": "Visibility",
+    "context": "Visibility"
   },
   {
     "term": "component.email-verification-required-alert.body",
@@ -4681,8 +4691,8 @@
   },
   {
     "term": "component.profile-file.aria-label",
-    "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
-    "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
+    "definition": "Attached file: {filename}. To see the file, press Enter. {isReadOnly, select, true{} other {To remove it, press Delete.}}",
+    "context": "Attached file: {filename}. To see the file, press Enter. {isReadOnly, select, true{} other {To remove it, press Delete.}}"
   },
   {
     "term": "component.profile-file.remove-attachment",
@@ -4778,6 +4788,41 @@
     "term": "component.profile-table-columns.type",
     "definition": "Type",
     "context": "Type"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.all-in-organization",
+    "definition": "Everyone in the organization",
+    "context": "Everyone in the organization"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.header",
+    "definition": "Who can see this property",
+    "context": "Who can see this property"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.hidden",
+    "definition": "Hidden",
+    "context": "Hidden"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.permissions-conflict-popover",
+    "definition": "There is a higher-level permission for everyone in the organization that overrides this one.",
+    "context": "There is a higher-level permission for everyone in the organization that overrides this one."
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.read",
+    "definition": "Can read",
+    "context": "Can read"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.used-in-profile-name-warning",
+    "definition": "Properties used in the name cannot be hidden.",
+    "context": "Properties used in the name cannot be hidden."
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.write",
+    "definition": "Can write",
+    "context": "Can write"
   },
   {
     "term": "component.profile-type-header.clone-label",

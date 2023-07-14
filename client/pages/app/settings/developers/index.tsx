@@ -163,9 +163,7 @@ function Subscriptions() {
         initialStep: 1,
         ...createOrUpdateSubscriptionHandlers,
       });
-    } catch (e) {
-      console.log(e);
-    }
+    } catch {}
   };
 
   const showConfirmDeactivateEventSubscriptionDialog =

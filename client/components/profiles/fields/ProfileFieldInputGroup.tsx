@@ -18,6 +18,7 @@ export interface ProfileFieldInputGroupProps {
   field: ProfileFieldInputGroup_ProfileTypeFieldFragment;
   children?: ReactNode;
   expiryDate?: string | null;
+  isDisabled?: boolean;
 }
 
 export function ProfileFieldInputGroup({
@@ -27,6 +28,7 @@ export function ProfileFieldInputGroup({
   field,
   expiryDate,
   children,
+  isDisabled,
 }: ProfileFieldInputGroupProps) {
   const { browserName } = useMetadata();
 
@@ -53,7 +55,7 @@ export function ProfileFieldInputGroup({
         }}
       >
         {children}
-        {browserName === "Firefox" && field.type === "DATE" ? null : (
+        {(browserName === "Firefox" && field.type === "DATE") || isDisabled ? null : (
           <InputRightElement pointerEvents="none">
             <Flex className="edit-icon" opacity={0} transitionDuration="normal" color="gray.600">
               <EditIcon boxSize={4} />

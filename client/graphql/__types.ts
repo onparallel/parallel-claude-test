@@ -761,8 +761,6 @@ export interface Mutation {
   deleteProfileFieldFile: Result;
   deleteProfileType: Success;
   deleteProfileTypeField: ProfileType;
-  /** Delete a permission override for a profile type field for a set of users and/or user groups. */
-  deleteProfileTypeFieldPermissionOverride: Success;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;
   /** Removes the tag from every petition and soft-deletes it */
@@ -800,8 +798,6 @@ export interface Mutation {
   modifyPetitionCustomProperty: PetitionBase;
   /** Moves a group of petitions or folders to another folder. */
   movePetitions: Success;
-  /** Override the default permission for a profile type field for a set of users and/or user groups. */
-  overrideProfileTypeFieldPermission: ProfileTypeField;
   /** Generates a download link for a petition attachment */
   petitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the petition attachment was correctly uploaded to S3 */
@@ -1408,13 +1404,6 @@ export interface MutationdeleteProfileTypeFieldArgs {
   profileTypeId: Scalars["GID"]["input"];
 }
 
-export interface MutationdeleteProfileTypeFieldPermissionOverrideArgs {
-  profileTypeFieldId: Scalars["GID"]["input"];
-  profileTypeId: Scalars["GID"]["input"];
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-}
-
 export interface MutationdeleteSignatureIntegrationArgs {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   id: Scalars["GID"]["input"];
@@ -1515,12 +1504,6 @@ export interface MutationmovePetitionsArgs {
   ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   source: Scalars["String"]["input"];
   type: PetitionBaseType;
-}
-
-export interface MutationoverrideProfileTypeFieldPermissionArgs {
-  data: Array<OverrideProfileTypeFieldPermissionInput>;
-  profileTypeFieldId: Scalars["GID"]["input"];
-  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface MutationpetitionAttachmentDownloadLinkArgs {
@@ -2360,12 +2343,6 @@ export type OrganizationUsers_OrderBy =
   | "lastActiveAt_DESC"
   | "lastName_ASC"
   | "lastName_DESC";
-
-export interface OverrideProfileTypeFieldPermissionInput {
-  permission: ProfileTypeFieldPermission;
-  userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
-  userId?: InputMaybe<Scalars["GID"]["input"]>;
-}
 
 export interface OwnershipTransferredEvent extends PetitionEvent {
   __typename?: "OwnershipTransferredEvent";
@@ -4886,7 +4863,6 @@ export interface UpdateProfileFieldValueInput {
 
 export interface UpdateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]["input"]>;
-  defaultPermission?: InputMaybe<ProfileTypeFieldPermission>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
@@ -7603,6 +7579,7 @@ export type ProfileTypeSettings_ProfileTypeFieldFragment = {
   id: string;
   name: { [locale in UserLocale]?: string };
   type: ProfileTypeFieldType;
+  defaultPermission: ProfileTypeFieldPermissionType;
 };
 
 export type ProfileTypeSettings_ProfileTypeFragment = {
@@ -7615,6 +7592,7 @@ export type ProfileTypeSettings_ProfileTypeFragment = {
     id: string;
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
+    defaultPermission: ProfileTypeFieldPermissionType;
   }>;
 };
 
@@ -7667,6 +7645,57 @@ export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutati
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
   };
+};
+
+export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment = {
+  __typename?: "ProfileTypeFieldPermission";
+  id: string;
+  permission: ProfileTypeFieldPermissionType;
+  target:
+    | {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      }
+    | {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        memberCount: number;
+        groupInitials: string;
+      };
+};
+
+export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  myPermission: ProfileTypeFieldPermissionType;
+  defaultPermission: ProfileTypeFieldPermissionType;
+  isUsedInProfileName: boolean;
+  permissions: Array<{
+    __typename?: "ProfileTypeFieldPermission";
+    id: string;
+    permission: ProfileTypeFieldPermissionType;
+    target:
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        }
+      | {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          memberCount: number;
+          groupInitials: string;
+        };
+  }>;
 };
 
 export type useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
@@ -15831,6 +15860,7 @@ export type useCreateProfileDialog_ProfileTypeFragment = {
     type: ProfileTypeFieldType;
     name: { [locale in UserLocale]?: string };
     isUsedInProfileName: boolean;
+    myPermission: ProfileTypeFieldPermissionType;
   }>;
 };
 
@@ -15848,6 +15878,7 @@ export type useCreateProfileDialog_ProfileTypePaginationFragment = {
       type: ProfileTypeFieldType;
       name: { [locale in UserLocale]?: string };
       isUsedInProfileName: boolean;
+      myPermission: ProfileTypeFieldPermissionType;
     }>;
   }>;
 };
@@ -15868,6 +15899,7 @@ export type useCreateProfileDialog_profileTypeQuery = {
       type: ProfileTypeFieldType;
       name: { [locale in UserLocale]?: string };
       isUsedInProfileName: boolean;
+      myPermission: ProfileTypeFieldPermissionType;
     }>;
   };
 };
@@ -19141,10 +19173,34 @@ export type OrganizationProfileType_ProfileTypeFieldFragment = {
   id: string;
   name: { [locale in UserLocale]?: string };
   type: ProfileTypeFieldType;
-  alias?: string | null;
-  options: { [key: string]: any };
+  myPermission: ProfileTypeFieldPermissionType;
+  defaultPermission: ProfileTypeFieldPermissionType;
+  isUsedInProfileName: boolean;
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
+  alias?: string | null;
+  options: { [key: string]: any };
+  permissions: Array<{
+    __typename?: "ProfileTypeFieldPermission";
+    id: string;
+    permission: ProfileTypeFieldPermissionType;
+    target:
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        }
+      | {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          memberCount: number;
+          groupInitials: string;
+        };
+  }>;
 };
 
 export type OrganizationProfileType_ProfileTypeFragment = {
@@ -19158,10 +19214,34 @@ export type OrganizationProfileType_ProfileTypeFragment = {
     id: string;
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
-    alias?: string | null;
-    options: { [key: string]: any };
+    defaultPermission: ProfileTypeFieldPermissionType;
+    myPermission: ProfileTypeFieldPermissionType;
+    isUsedInProfileName: boolean;
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
+    alias?: string | null;
+    options: { [key: string]: any };
+    permissions: Array<{
+      __typename?: "ProfileTypeFieldPermission";
+      id: string;
+      permission: ProfileTypeFieldPermissionType;
+      target:
+        | {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            email: string;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          }
+        | {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            memberCount: number;
+            groupInitials: string;
+          };
+    }>;
   }>;
 };
 
@@ -19181,10 +19261,34 @@ export type OrganizationProfileType_profileTypeQuery = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
-      alias?: string | null;
-      options: { [key: string]: any };
+      defaultPermission: ProfileTypeFieldPermissionType;
+      myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
+      alias?: string | null;
+      options: { [key: string]: any };
+      permissions: Array<{
+        __typename?: "ProfileTypeFieldPermission";
+        id: string;
+        permission: ProfileTypeFieldPermissionType;
+        target:
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            }
+          | {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              memberCount: number;
+              groupInitials: string;
+            };
+      }>;
     }>;
   };
 };
@@ -19231,6 +19335,44 @@ export type OrganizationProfileType_userQuery = {
   };
 };
 
+export type OrganizationProfileType_updateProfileTypeFieldPermissionMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  defaultPermission?: InputMaybe<ProfileTypeFieldPermissionType>;
+  data: Array<UpdateProfileTypeFieldPermissionInput> | UpdateProfileTypeFieldPermissionInput;
+}>;
+
+export type OrganizationProfileType_updateProfileTypeFieldPermissionMutation = {
+  updateProfileTypeFieldPermission: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    myPermission: ProfileTypeFieldPermissionType;
+    defaultPermission: ProfileTypeFieldPermissionType;
+    isUsedInProfileName: boolean;
+    permissions: Array<{
+      __typename?: "ProfileTypeFieldPermission";
+      id: string;
+      permission: ProfileTypeFieldPermissionType;
+      target:
+        | {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            email: string;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          }
+        | {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            memberCount: number;
+            groupInitials: string;
+          };
+    }>;
+  };
+};
+
 export type OrganizationProfileType_updateProfileTypeMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
@@ -19249,10 +19391,34 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
-      alias?: string | null;
-      options: { [key: string]: any };
+      defaultPermission: ProfileTypeFieldPermissionType;
+      myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
+      alias?: string | null;
+      options: { [key: string]: any };
+      permissions: Array<{
+        __typename?: "ProfileTypeFieldPermission";
+        id: string;
+        permission: ProfileTypeFieldPermissionType;
+        target:
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            }
+          | {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              memberCount: number;
+              groupInitials: string;
+            };
+      }>;
     }>;
   };
 };
@@ -19274,10 +19440,34 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
-      alias?: string | null;
-      options: { [key: string]: any };
+      defaultPermission: ProfileTypeFieldPermissionType;
+      myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
+      alias?: string | null;
+      options: { [key: string]: any };
+      permissions: Array<{
+        __typename?: "ProfileTypeFieldPermission";
+        id: string;
+        permission: ProfileTypeFieldPermissionType;
+        target:
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            }
+          | {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              memberCount: number;
+              groupInitials: string;
+            };
+      }>;
     }>;
   };
 };
@@ -19299,10 +19489,34 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
-      alias?: string | null;
-      options: { [key: string]: any };
+      defaultPermission: ProfileTypeFieldPermissionType;
+      myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
+      alias?: string | null;
+      options: { [key: string]: any };
+      permissions: Array<{
+        __typename?: "ProfileTypeFieldPermission";
+        id: string;
+        permission: ProfileTypeFieldPermissionType;
+        target:
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            }
+          | {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              memberCount: number;
+              groupInitials: string;
+            };
+      }>;
     }>;
   };
 };
@@ -19320,10 +19534,34 @@ export type OrganizationProfileType_updateProfileTypeFieldMutation = {
     id: string;
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
-    alias?: string | null;
-    options: { [key: string]: any };
+    myPermission: ProfileTypeFieldPermissionType;
+    defaultPermission: ProfileTypeFieldPermissionType;
+    isUsedInProfileName: boolean;
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
+    alias?: string | null;
+    options: { [key: string]: any };
+    permissions: Array<{
+      __typename?: "ProfileTypeFieldPermission";
+      id: string;
+      permission: ProfileTypeFieldPermissionType;
+      target:
+        | {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            email: string;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          }
+        | {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            memberCount: number;
+            groupInitials: string;
+          };
+    }>;
   };
 };
 
@@ -19345,10 +19583,34 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
-      alias?: string | null;
-      options: { [key: string]: any };
+      defaultPermission: ProfileTypeFieldPermissionType;
+      myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
+      alias?: string | null;
+      options: { [key: string]: any };
+      permissions: Array<{
+        __typename?: "ProfileTypeFieldPermission";
+        id: string;
+        permission: ProfileTypeFieldPermissionType;
+        target:
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            }
+          | {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              memberCount: number;
+              groupInitials: string;
+            };
+      }>;
     }>;
   };
 };
@@ -19469,10 +19731,34 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
-      alias?: string | null;
-      options: { [key: string]: any };
+      defaultPermission: ProfileTypeFieldPermissionType;
+      myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
+      alias?: string | null;
+      options: { [key: string]: any };
+      permissions: Array<{
+        __typename?: "ProfileTypeFieldPermission";
+        id: string;
+        permission: ProfileTypeFieldPermissionType;
+        target:
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            }
+          | {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              memberCount: number;
+              groupInitials: string;
+            };
+      }>;
     }>;
   };
 };
@@ -32806,13 +33092,6 @@ export const OrganizationProfilesLayout_QueryFragmentDoc = gql`
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfilesLayout_QueryFragment, unknown>;
-export const useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
-  fragment useUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
-    id
-    isExpirable
-    expiryAlertAheadTime
-  }
-` as unknown as DocumentNode<useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment, unknown>;
 export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
   fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
     offset
@@ -33482,6 +33761,7 @@ export const useCreateProfileDialog_ProfileTypeFragmentDoc = gql`
       type
       name
       isUsedInProfileName
+      myPermission
     }
   }
 ` as unknown as DocumentNode<useCreateProfileDialog_ProfileTypeFragment, unknown>;
@@ -33896,6 +34176,49 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     invalidCredentials
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
+export const useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragmentDoc = gql`
+  fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
+    id
+    permission
+    target {
+      ... on User {
+        id
+        fullName
+        email
+        ...UserAvatar_User
+      }
+      ... on UserGroup {
+        id
+        name
+        groupInitials: initials
+        memberCount
+      }
+    }
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment,
+  unknown
+>;
+export const useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useProfileTypeFieldPermissionDialog_ProfileTypeField on ProfileTypeField {
+    id
+    myPermission
+    defaultPermission
+    isUsedInProfileName
+    permissions {
+      ...useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission
+    }
+  }
+  ${useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragmentDoc}
+` as unknown as DocumentNode<useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment, unknown>;
+export const useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
+    id
+    isExpirable
+    expiryAlertAheadTime
+  }
+` as unknown as DocumentNode<useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment, unknown>;
 export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
   fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
     id
@@ -33916,6 +34239,7 @@ export const ProfileTypeSettings_ProfileTypeFieldFragmentDoc = gql`
     id
     name
     type
+    defaultPermission
   }
 ` as unknown as DocumentNode<ProfileTypeSettings_ProfileTypeFieldFragment, unknown>;
 export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
@@ -33923,9 +34247,13 @@ export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
     id
     name
     type
+    ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+    ...useUpdateProfileTypeFieldDialog_ProfileTypeField
     ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     ...ProfileTypeSettings_ProfileTypeField
   }
+  ${useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragmentDoc}
+  ${useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${ProfileTypeSettings_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileType_ProfileTypeFieldFragment, unknown>;
@@ -41154,6 +41482,27 @@ export const OrganizationProfileType_userDocument = gql`
 ` as unknown as DocumentNode<
   OrganizationProfileType_userQuery,
   OrganizationProfileType_userQueryVariables
+>;
+export const OrganizationProfileType_updateProfileTypeFieldPermissionDocument = gql`
+  mutation OrganizationProfileType_updateProfileTypeFieldPermission(
+    $profileTypeId: GID!
+    $profileTypeFieldId: GID!
+    $defaultPermission: ProfileTypeFieldPermissionType
+    $data: [UpdateProfileTypeFieldPermissionInput!]!
+  ) {
+    updateProfileTypeFieldPermission(
+      profileTypeId: $profileTypeId
+      profileTypeFieldId: $profileTypeFieldId
+      defaultPermission: $defaultPermission
+      data: $data
+    ) {
+      ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+    }
+  }
+  ${useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationProfileType_updateProfileTypeFieldPermissionMutation,
+  OrganizationProfileType_updateProfileTypeFieldPermissionMutationVariables
 >;
 export const OrganizationProfileType_updateProfileTypeDocument = gql`
   mutation OrganizationProfileType_updateProfileType(

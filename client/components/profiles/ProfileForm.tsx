@@ -378,12 +378,13 @@ export const ProfileForm = Object.assign(
                   setError={setError}
                   clearErrors={clearErrors}
                   fieldsWithIndices={compatibleFieldsWithIndices}
+                  isDisabled={field.myPermission === "READ"}
                 />
               );
             })}
           </Stack>
           {hiddenProperties.length ? (
-            <Stack width="sm" spacing={4}>
+            <Stack spacing={4}>
               <HStack>
                 <LockClosedIcon />
                 <Heading as="h3" size="sm" fontWeight={600}>

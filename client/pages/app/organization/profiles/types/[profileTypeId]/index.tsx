@@ -9,7 +9,7 @@ import {
   MenuList,
   useToast,
 } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon, EditSimpleIcon } from "@parallel/chakra/icons";
+import { CopyIcon, DeleteIcon, EditSimpleIcon, EyeIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -28,6 +28,7 @@ import {
   OrganizationProfileType_ProfileTypeFieldFragment,
   OrganizationProfileType_updateProfileTypeDocument,
   OrganizationProfileType_updateProfileTypeFieldDocument,
+  OrganizationProfileType_updateProfileTypeFieldPermissionDocument,
   OrganizationProfileType_updateProfileTypeFieldPositionsDocument,
   OrganizationProfileType_userDocument,
 } from "@parallel/graphql/__types";
@@ -67,6 +68,7 @@ import {
   useState,
 } from "react";
 import { identity, noop } from "remeda";
+import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -229,23 +231,33 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     }
   };
 
-  const [updateProfileTypeField] = useMutation(
-    OrganizationProfileType_updateProfileTypeFieldDocument,
+  const showProfileTypeFieldPermissionDialog = useProfileTypeFieldPermissionDialog();
+  const [updateProfileTypeFieldPermission] = useMutation(
+    OrganizationProfileType_updateProfileTypeFieldPermissionDocument,
   );
   const handleConfigureVisibility = async (
     rows: OrganizationProfileType_ProfileTypeFieldFragment[],
   ) => {
     try {
-      const data = {};
-      await updateProfileTypeField({
+      const { defaultPermission, permissions: data } = await showProfileTypeFieldPermissionDialog({
+        profileTypeField: rows[0],
+        userId: me.id,
+      });
+
+      await updateProfileTypeFieldPermission({
         variables: {
           profileTypeId,
           profileTypeFieldId: rows[0].id,
+          defaultPermission,
           data,
         },
       });
     } catch {}
   };
+
+  const [updateProfileTypeField] = useMutation(
+    OrganizationProfileType_updateProfileTypeFieldDocument,
+  );
 
   const handleEditProperty = async (fields: OrganizationProfileType_ProfileTypeFieldFragment[]) => {
     try {
@@ -301,6 +313,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       handleConfigureVisibility(profileType.fields.filter((f) => selectedIds.includes(f.id))),
     onEditClick: () =>
       handleEditProperty(profileType.fields.filter((f) => selectedIds.includes(f.id))),
+    visibilityIsDisabled: selectedIds.length !== 1,
   });
 
   return (
@@ -632,7 +645,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
                     defaultMessage="Edit property"
                   />
                 </MenuItem>
-                {/* <MenuItem
+                <MenuItem
                   icon={<EyeIcon display="block" boxSize={4} />}
                   onClick={onConfigureVisibility}
                 >
@@ -640,7 +653,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
                     id="component.draggable-list.configure-visiblity"
                     defaultMessage="Configure visibility"
                   />
-                </MenuItem> */}
+                </MenuItem>
                 <MenuDivider />
                 <MenuItem
                   icon={<DeleteIcon display="block" boxSize={4} />}
@@ -665,10 +678,12 @@ function useProfileTypeFieldsActions({
   onEditClick,
   onConfigureVisibilityClick,
   onDeleteClick,
+  visibilityIsDisabled,
 }: {
   onEditClick: () => void;
   onConfigureVisibilityClick: () => void;
   onDeleteClick: () => void;
+  visibilityIsDisabled: boolean;
 }) {
   return [
     {
@@ -681,6 +696,15 @@ function useProfileTypeFieldsActions({
           defaultMessage="Edit property"
         />
       ),
+    },
+    {
+      key: "visibility",
+      onClick: onConfigureVisibilityClick,
+      leftIcon: <EyeIcon />,
+      children: (
+        <FormattedMessage id="component.draggable-list.visiblity" defaultMessage="Visibility" />
+      ),
+      isDisabled: visibilityIsDisabled,
     },
     {
       key: "delete",
@@ -738,9 +762,12 @@ const _fragments = {
         id
         name
         type
+        ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+        ...useUpdateProfileTypeFieldDialog_ProfileTypeField
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         ...ProfileTypeSettings_ProfileTypeField
       }
+      ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}
       ${useUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${ProfileTypeSettings.fragments.ProfileTypeField}
@@ -782,6 +809,24 @@ const _queries = [
 ];
 
 const _mutations = [
+  gql`
+    mutation OrganizationProfileType_updateProfileTypeFieldPermission(
+      $profileTypeId: GID!
+      $profileTypeFieldId: GID!
+      $defaultPermission: ProfileTypeFieldPermissionType
+      $data: [UpdateProfileTypeFieldPermissionInput!]!
+    ) {
+      updateProfileTypeFieldPermission(
+        profileTypeId: $profileTypeId
+        profileTypeFieldId: $profileTypeFieldId
+        defaultPermission: $defaultPermission
+        data: $data
+      ) {
+        ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+      }
+    }
+    ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}
+  `,
   gql`
     mutation OrganizationProfileType_updateProfileType(
       $profileTypeId: GID!

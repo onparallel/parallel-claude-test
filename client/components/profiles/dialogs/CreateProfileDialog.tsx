@@ -56,12 +56,21 @@ function CreateProfileDialog({
       const fields = profileTypeData.profileType.fields.filter((f) => f.isUsedInProfileName);
       const suggestions = suggestedName.split(" ");
       replace(
-        fields.map((field, i) => ({
-          profileTypeFieldId: field.id,
-          content: {
-            value: i < fields.length - 1 ? suggestions[i] ?? "" : suggestions.slice(i).join(" "),
-          },
-        })) ?? [],
+        fields.map((field, i) => {
+          const value =
+            field.myPermission !== "WRITE"
+              ? ""
+              : i < fields.length - 1
+              ? suggestions[i] ?? ""
+              : suggestions.slice(i).join(" ");
+
+          return {
+            profileTypeFieldId: field.id,
+            content: {
+              value,
+            },
+          };
+        }) ?? [],
       );
       setTimeout(() => setFocus(`fieldValues.0.content.value`));
     }
@@ -121,7 +130,7 @@ function CreateProfileDialog({
           </FormControl>
           {profileTypeData?.profileType?.fields
             .filter((f) => f.isUsedInProfileName)
-            .map(({ id, name }) => {
+            .map(({ id, name, myPermission }) => {
               const index = fields.findIndex((f) => f.profileTypeFieldId === id)!;
 
               return (
@@ -129,7 +138,10 @@ function CreateProfileDialog({
                   <FormLabel fontWeight={400}>
                     <LocalizableUserTextRender value={name} default="" />
                   </FormLabel>
-                  <Input {...register(`fieldValues.${index}.content.value`)} />
+                  <Input
+                    {...register(`fieldValues.${index}.content.value`)}
+                    isDisabled={myPermission !== "WRITE"}
+                  />
                 </FormControl>
               );
             })}
@@ -160,6 +172,7 @@ const _fragments = {
           type
           name
           isUsedInProfileName
+          myPermission
         }
       }
     `;

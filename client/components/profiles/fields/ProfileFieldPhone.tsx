@@ -17,11 +17,17 @@ export function ProfileFieldPhone({
   clearErrors,
   setError,
   expiryDate,
+  isDisabled,
   showExpiryDateDialog,
   ...props
 }: ProfileFieldPhoneProps) {
   return (
-    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup
+      {...props}
+      field={field}
+      expiryDate={expiryDate}
+      isDisabled={isDisabled}
+    >
       <Controller
         name={`fields.${index}.content.value`}
         control={control}
@@ -44,6 +50,7 @@ export function ProfileFieldPhone({
                 return showExpiryDateDialog({});
               }
             }}
+            isDisabled={isDisabled}
           />
         )}
       />

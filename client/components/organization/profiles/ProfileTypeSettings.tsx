@@ -45,7 +45,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
   useAutoConfirmDiscardChangesDialog(isDirty);
 
   const placeholders = profileType.fields
-    .filter((field) => field.type === "SHORT_TEXT")
+    .filter((field) => field.type === "SHORT_TEXT" && field.defaultPermission !== "HIDDEN")
     .map((field) => ({
       key: field.id,
       text: localizableUserTextRender({
@@ -165,6 +165,7 @@ ProfileTypeSettings.fragments = {
         id
         name
         type
+        defaultPermission
       }
     `;
   },

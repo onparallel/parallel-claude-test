@@ -13,11 +13,17 @@ export function ProfileFieldShortText({
   field,
   register,
   expiryDate,
+  isDisabled,
   showExpiryDateDialog,
   ...props
 }: ProfileFieldShortTextProps) {
   return (
-    <ProfileFieldInputGroup {...props} field={field} expiryDate={expiryDate}>
+    <ProfileFieldInputGroup
+      {...props}
+      field={field}
+      expiryDate={expiryDate}
+      isDisabled={isDisabled}
+    >
       <Input
         borderColor="transparent"
         maxLength={1_000}
@@ -27,6 +33,7 @@ export function ProfileFieldShortText({
             showExpiryDateDialog({});
           }
         }}
+        isDisabled={isDisabled}
       />
     </ProfileFieldInputGroup>
   );
