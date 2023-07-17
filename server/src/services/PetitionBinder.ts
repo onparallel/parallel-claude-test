@@ -26,15 +26,7 @@ import { IPrinter, PRINTER } from "./Printer";
 import { IStorageService, STORAGE_SERVICE } from "./StorageService";
 
 function isPrintableContentType(contentType: string) {
-  return [
-    "application/pdf",
-    "image/png",
-    "image/jpeg",
-    "image/gif",
-    "image/heic",
-    "image/tiff",
-    "image/webp",
-  ].includes(contentType);
+  return ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType);
 }
 
 interface PetitionBinderOptions {
