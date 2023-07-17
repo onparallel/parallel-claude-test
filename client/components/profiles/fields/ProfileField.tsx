@@ -6,12 +6,10 @@ import {
   LocalizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import {
-  PetitionFieldType,
   ProfileField_PetitionFieldFragment,
   ProfileField_ProfileFieldFileFragment,
   ProfileField_ProfileFieldValueFragment,
   ProfileField_ProfileTypeFieldFragment,
-  ProfileTypeFieldType,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { discriminator } from "@parallel/utils/discriminator";
@@ -43,15 +41,6 @@ import { ProfileFieldNumber } from "./ProfileFieldNumber";
 import { ProfileFieldPhone } from "./ProfileFieldPhone";
 import { ProfileFieldShortText } from "./ProfileFieldShortText";
 import { ProfileFieldText } from "./ProfileFieldText";
-
-const ALLOWED_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]> = {
-  DATE: ["DATE"],
-  FILE: ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"],
-  NUMBER: ["NUMBER"],
-  PHONE: ["PHONE"],
-  SHORT_TEXT: ["SHORT_TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
-  TEXT: ["SHORT_TEXT", "TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
-};
 
 export interface ProfileFieldProps {
   index: number;
@@ -139,9 +128,6 @@ export function ProfileField(props: ProfileFieldProps) {
     return petitionField.replies.flatMap((reply) => {
       return getReplyContents({ intl, reply, petitionField })
         .filter((c) => {
-          if (!ALLOWED_TYPE_MAPPING[field.type].includes(petitionFieldType)) {
-            return false;
-          }
           switch (field.type) {
             case "DATE": {
               return reply.content.value !== content?.value;

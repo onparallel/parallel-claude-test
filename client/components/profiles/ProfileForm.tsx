@@ -21,6 +21,7 @@ import { useAutoConfirmDiscardChangesDialog } from "@parallel/components/organiz
 import { ProfileField } from "@parallel/components/profiles/fields/ProfileField";
 import { ProfileFieldFileAction } from "@parallel/components/profiles/fields/ProfileFieldFileUpload";
 import {
+  PetitionFieldType,
   ProfileForm_PetitionFieldFragment,
   ProfileForm_ProfileFieldPropertyFragment,
   ProfileForm_ProfileFragment,
@@ -40,6 +41,7 @@ import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import pMap from "p-map";
+import { useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
@@ -72,6 +74,15 @@ function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragm
   };
 }
 
+const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]> = {
+  DATE: ["DATE"],
+  FILE: ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"],
+  NUMBER: ["NUMBER"],
+  PHONE: ["PHONE"],
+  SHORT_TEXT: ["SHORT_TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
+  TEXT: ["SHORT_TEXT", "TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
+};
+
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
     { profile, refetch, overlapsIntercomBadge, petitionFields, petitionId, ...props },
@@ -81,9 +92,9 @@ export const ProfileForm = Object.assign(
     const showErrorDialog = useErrorDialog();
     const profileId = profile.id;
 
-    const [properties, hiddenProperties] = partition(
-      profile.properties,
-      (property) => property.field.myPermission !== "HIDDEN",
+    const [properties, hiddenProperties] = useMemo(
+      () => partition(profile.properties, (property) => property.field.myPermission !== "HIDDEN"),
+      [profile.properties],
     );
 
     const {
@@ -132,6 +143,26 @@ export const ProfileForm = Object.assign(
     const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isDefined(f)).length;
 
     const fieldsWithIndices = useFieldWithIndices(petitionFields ?? []);
+
+    const propertiesWithSuggestedFields = useMemo(
+      () =>
+        properties.map(
+          (property) =>
+            [
+              property,
+              isDefined(property.field.alias)
+                ? fieldsWithIndices.filter(
+                    ([pf]) =>
+                      SUGGESTIONS_TYPE_MAPPING[property.field.type].includes(pf.type) &&
+                      isDefined(pf.alias) &&
+                      (pf.alias.toLowerCase().includes(property.field.alias!.toLowerCase()) ||
+                        property.field.alias!.toLowerCase().includes(pf.alias.toLowerCase())),
+                  )
+                : [],
+            ] as const,
+        ),
+      [properties, fieldsWithIndices],
+    );
 
     return (
       <Flex
@@ -357,13 +388,8 @@ export const ProfileForm = Object.assign(
           overflow="auto"
         >
           <Stack as="ul" width="100%">
-            {properties.map(({ field, value, files }, i) => {
-              const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
-
-              const compatibleFieldsWithIndices = fieldsWithIndices?.filter(
-                ([pf, _]) => isDefined(pf.alias) && pf.alias === field.alias,
-              );
-
+            {propertiesWithSuggestedFields.map(([{ field, value, files }, suggestedFields]) => {
+              const fieldIndex = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
               return (
                 <ProfileField
                   key={field.id}
@@ -371,13 +397,13 @@ export const ProfileForm = Object.assign(
                   field={field}
                   value={value}
                   files={files}
-                  index={index}
+                  index={fieldIndex}
                   setValue={setValue}
                   control={control}
                   register={register}
                   setError={setError}
                   clearErrors={clearErrors}
-                  fieldsWithIndices={compatibleFieldsWithIndices}
+                  fieldsWithIndices={suggestedFields}
                   isDisabled={field.myPermission === "READ"}
                 />
               );
