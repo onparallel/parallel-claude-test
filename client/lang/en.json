@@ -9975,11 +9975,6 @@
     "context": "Overview report"
   },
   {
-    "term": "page.reports-replies.can-download-replies-excel",
-    "definition": "For the moment, you can download the replies report in excel.",
-    "context": "For the moment, you can download the replies report in excel."
-  },
-  {
     "term": "page.reports-replies.download-replies",
     "definition": "Download replies",
     "context": "Download replies"
@@ -9990,19 +9985,14 @@
     "context": "Download a report with the replies to your templates."
   },
   {
-    "term": "page.reports-replies.preparing-something",
-    "definition": "We are preparing something amazing for you.",
-    "context": "We are preparing something amazing for you."
+    "term": "page.reports-replies.generated-successfully",
+    "definition": "Report generated successfully",
+    "context": "Report generated successfully"
   },
   {
     "term": "page.reports-replies.ready-to-generate",
     "definition": "Analyze the replies from a template",
     "context": "Analyze the replies from a template"
-  },
-  {
-    "term": "page.reports-replies.under-construction",
-    "definition": "Oops! This section is under construction",
-    "context": "Oops! This section is under construction"
   },
   {
     "term": "page.reports-statistics.export-file-name",

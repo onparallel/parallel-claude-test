@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
-import { DownloadIcon } from "@parallel/chakra/icons";
+import { Box, Button, Center, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { CheckIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -158,27 +158,13 @@ export function ReportsReplies() {
         </Stack>
         {showDownload ? (
           <Center as={Stack} spacing={6} padding={6} paddingTop={16}>
-            <Image
-              maxWidth="140px"
-              height="104px"
-              width="100%"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/under-construction.svg`}
-            />
-            <Text fontWeight="bold">
+            <Center margin="auto" borderRadius="full" background="green.500" boxSize={10}>
+              <CheckIcon color="white" role="presentation" boxSize={6} />
+            </Center>
+            <Text>
               <FormattedMessage
-                id="page.reports-replies.under-construction"
-                defaultMessage="Oops! This section is under construction"
-              />
-            </Text>
-            <Text fontSize="sm" textAlign="center">
-              <FormattedMessage
-                id="page.reports-replies.preparing-something"
-                defaultMessage="We are preparing something amazing for you."
-              />
-              <br />
-              <FormattedMessage
-                id="page.reports-replies.can-download-replies-excel"
-                defaultMessage="For the moment, you can download the replies report in excel."
+                id="page.reports-replies.generated-successfully"
+                defaultMessage="Report generated successfully"
               />
             </Text>
             <Button
