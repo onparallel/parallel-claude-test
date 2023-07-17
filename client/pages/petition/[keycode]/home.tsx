@@ -291,7 +291,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     <Text as="span" fontSize="3xl" fontWeight={600}>
                       {completed}
                     </Text>
-                    <CheckIcon boxSize={8} color="green.400" />
+                    <CheckIcon boxSize={6} color="green.400" />
                   </HStack>
                   <Text noOfLines={1} wordBreak="break-all">
                     <FormattedMessage
