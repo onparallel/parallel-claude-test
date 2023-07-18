@@ -1,26 +1,14 @@
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Portal,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
+import { Box, Button, Center, Flex, IconButton, Spinner, Stack } from "@chakra-ui/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
-import { ComponentType, ReactNode, useEffect, useMemo } from "react";
+import { ComponentType, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { SimpleMenuSelect } from "./SimpleMenuSelect";
+import { useSimpleSelectOptions } from "./SimpleSelect";
 
 export interface TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   extends TableProps<TRow, TContext, TImpl> {
@@ -34,8 +22,7 @@ export interface TablePageProps<TRow, TContext = unknown, TImpl extends TRow = T
    * Esto es un apaño temporal hasta que haya mas casos de querer renderizar cosas
    * al final de la tabla. Si aparecen más casos pensar una solución mejor.
    */
-  Footer?: ComponentType<any>;
-  footerProps?: any;
+  Footer?: ComponentType<PropsWithChildren<TContext>>;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
   pageSizeOptions?: number[];
@@ -64,7 +51,6 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   pageSize,
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Footer,
-  footerProps,
   onPageSizeChange,
   onPageChange,
   pageSizeOptions = [10, 25, 50],
@@ -84,46 +70,26 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   }, [page, pageSize, totalCount, loading]);
 
   const pagination = usePagination({ current: page, pageSize, totalCount: totalCount ?? 0 });
+  const options = useSimpleSelectOptions(
+    (intl) =>
+      pageSizeOptions.map((items) => ({
+        label: intl.formatMessage(
+          { id: "component.table.page-size", defaultMessage: "{items} items" },
+          { items },
+        ),
+        value: `${items}`,
+      })),
+    [],
+  );
   const bottom = (
     <>
-      <Menu placement="bottom-start">
-        <MenuButton
-          fontWeight={400}
-          size={"sm"}
-          as={Button}
-          variant="ghost"
-          rightIcon={<ChevronDownIcon boxSize={4} />}
-        >
-          <FormattedMessage
-            id="component.table.page-size"
-            defaultMessage="{items} items"
-            values={{
-              items: pageSize,
-            }}
-          />
-        </MenuButton>
-        <Portal>
-          <MenuList minWidth={0} width="auto" fontSize="sm">
-            <MenuOptionGroup value={pageSize.toString()}>
-              {pageSizeOptions.map((items) => (
-                <MenuItemOption
-                  key={items}
-                  value={items.toString()}
-                  onClick={() => onPageSizeChange?.(items)}
-                >
-                  <FormattedMessage
-                    id="component.table.page-size"
-                    defaultMessage="{items} items"
-                    values={{
-                      items,
-                    }}
-                  />
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Portal>
-      </Menu>
+      <SimpleMenuSelect
+        options={options}
+        value={`${pageSize}`}
+        onChange={(value) => onPageSizeChange?.(parseInt(value))}
+        size="sm"
+        variant="ghost"
+      />
 
       <Box fontSize="sm">
         {totalCount ? (
@@ -260,7 +226,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         alignItems="center"
         borderTopColor={colors.border}
       >
-        {Footer ? <Footer {...footerProps}>{bottom}</Footer> : <>{bottom}</>}
+        {Footer ? <Footer {...(context as any)}>{bottom}</Footer> : <>{bottom}</>}
       </Stack>
     </Card>
   );

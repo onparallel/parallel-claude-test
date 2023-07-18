@@ -1,18 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Button,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Portal,
-  Text,
-} from "@chakra-ui/react";
-import { ArchiveIcon, ChevronDownIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
+import { Flex, Text } from "@chakra-ui/react";
+import { ArchiveIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
+import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -49,7 +41,7 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { MouseEvent, useCallback, useMemo } from "react";
+import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["name", "createdAt"] as const;
@@ -62,10 +54,15 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "ASC",
   }),
-  showArchived: boolean(),
+  showArchived: boolean().orDefault(false),
 };
 
 export type ProfileTypesQueryState = QueryStateFrom<typeof QUERY_STATE>;
+
+interface OrganizationProfileTypesContext {
+  showArchived: boolean;
+  setShowArchived: (value: boolean) => void;
+}
 
 function OrganizationProfileTypes() {
   const intl = useIntl();
@@ -175,49 +172,10 @@ function OrganizationProfileTypes() {
     onArchiveClick: handleArchiveClick,
   });
 
-  function CustomFooter({ children }: { children: React.ReactNode }) {
-    return (
-      <>
-        <Menu placement="bottom-start">
-          <MenuButton
-            fontWeight={400}
-            size={"sm"}
-            as={Button}
-            variant="ghost"
-            rightIcon={<ChevronDownIcon boxSize={4} />}
-          >
-            {showArchived ? (
-              <FormattedMessage
-                id="component.profile-types-table.archived"
-                defaultMessage="Archived"
-              />
-            ) : (
-              <FormattedMessage id="component.profile-types-table.active" defaultMessage="Active" />
-            )}
-          </MenuButton>
-          <Portal>
-            <MenuList fontSize="sm" minWidth={0} width="auto">
-              <MenuOptionGroup value={showArchived ? "ARCHIVED" : "ACTIVE"}>
-                <MenuItemOption value="ACTIVE" onClick={() => setShowArchived(null)}>
-                  <FormattedMessage
-                    id="component.profile-types-table.active"
-                    defaultMessage="Active"
-                  />
-                </MenuItemOption>
-                <MenuItemOption value="ARCHIVED" onClick={() => setShowArchived(true)}>
-                  <FormattedMessage
-                    id="component.profile-types-table.archived"
-                    defaultMessage="Archived"
-                  />
-                </MenuItemOption>
-              </MenuOptionGroup>
-            </MenuList>
-          </Portal>
-        </Menu>
-        {children}
-      </>
-    );
-  }
+  const context = useMemo<OrganizationProfileTypesContext>(
+    () => ({ showArchived, setShowArchived }),
+    [showArchived, setShowArchived],
+  );
 
   return (
     <OrganizationProfilesLayout currentTabKey="types" me={me} realMe={realMe}>
@@ -226,9 +184,9 @@ function OrganizationProfileTypes() {
           flex="0 1 auto"
           minHeight="305px"
           columns={profileTypesColumns}
+          context={context}
           rows={profileTypes?.items}
           rowKeyProp="id"
-          context={me}
           isSelectable
           isHighlightable
           loading={loading}
@@ -292,7 +250,48 @@ function OrganizationProfileTypes() {
   );
 }
 
-function useProfileTypesTableColumns(): TableColumn<OrganizationProfileTypes_ProfileTypeFragment>[] {
+function CustomFooter({
+  showArchived,
+  setShowArchived,
+  children,
+}: PropsWithChildren<OrganizationProfileTypesContext>) {
+  const options = useSimpleSelectOptions(
+    (intl) => [
+      {
+        label: intl.formatMessage({
+          id: "component.profile-types-table.active",
+          defaultMessage: "Active",
+        }),
+        value: "false",
+      },
+      {
+        label: intl.formatMessage({
+          id: "component.profile-types-table.archived",
+          defaultMessage: "Archived",
+        }),
+        value: "true",
+      },
+    ],
+    [],
+  );
+  return (
+    <>
+      <SimpleMenuSelect
+        options={options}
+        value={showArchived ? "true" : "false"}
+        onChange={(value) => setShowArchived(value === "true")}
+        size="sm"
+        variant="ghost"
+      />
+      {children}
+    </>
+  );
+}
+
+function useProfileTypesTableColumns(): TableColumn<
+  OrganizationProfileTypes_ProfileTypeFragment,
+  any
+>[] {
   const intl = useIntl();
   return useMemo(
     () => [

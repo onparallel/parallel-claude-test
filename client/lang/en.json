@@ -8840,6 +8840,21 @@
     "context": "Upgrade to enable this feature."
   },
   {
+    "term": "generic.user-status-active",
+    "definition": "Active",
+    "context": "Active"
+  },
+  {
+    "term": "generic.user-status-inactive",
+    "definition": "Inactive",
+    "context": "Inactive"
+  },
+  {
+    "term": "generic.user-status-on-hold",
+    "definition": "On hold",
+    "context": "On hold"
+  },
+  {
     "term": "generic.users",
     "definition": "Users",
     "context": "Users"
@@ -9518,6 +9533,11 @@
     "term": "page.organization-profile-type.changes-saved-body",
     "definition": "The \"Name of each profile\" changes have been saved.",
     "context": "The \"Name of each profile\" changes have been saved."
+  },
+  {
+    "term": "page.organization-users.no-search-results",
+    "definition": "There's no users matching your criteria",
+    "context": "There's no users matching your criteria"
   },
   {
     "term": "page.organizations.features-active",

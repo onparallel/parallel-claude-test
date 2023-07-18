@@ -433,13 +433,7 @@ const _queries = [
     ) {
       organization(id: $id) {
         id
-        users(
-          offset: $offset
-          limit: $limit
-          search: $search
-          sortBy: $sortBy
-          includeInactive: true
-        ) {
+        users(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
           totalCount
           items {
             ...AdminOrganizationsMembers_OrganizationUser

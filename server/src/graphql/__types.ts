@@ -356,6 +356,10 @@ export interface NexusGenInputs {
     // input type
     name?: string | null; // String
   };
+  UserFilter: {
+    // input type
+    status?: NexusGenEnums["UserStatus"][] | null; // [UserStatus!]
+  };
   UserOrUserGroupPermissionInput: {
     // input type
     isSubscribed: boolean; // Boolean!
@@ -6390,7 +6394,7 @@ export interface NexusGenArgTypes {
     users: {
       // args
       exclude?: NexusGenScalars["GID"][] | null; // [GID!]
-      includeInactive?: boolean | null; // Boolean
+      filters?: NexusGenInputs["UserFilter"] | null; // UserFilter
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String

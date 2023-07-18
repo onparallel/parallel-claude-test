@@ -23,6 +23,7 @@ import {
   OrganizationUsageLimit,
   OrganizationUsageLimitName,
   User,
+  UserStatus,
 } from "../__types";
 import { SystemRepository } from "./SystemRepository";
 
@@ -85,7 +86,7 @@ export class OrganizationRepository extends BaseRepository {
       excludeIds?: Maybe<number[]>;
       searchByEmailOnly?: Maybe<boolean>;
       sortBy?: SortBy<keyof User | "full_name" | "email" | "first_name" | "last_name">[];
-      includeInactive?: Maybe<boolean>;
+      status?: Maybe<UserStatus[]>;
     } & PageOpts,
   ) {
     return this.getPagination<User>(
@@ -95,7 +96,7 @@ export class OrganizationRepository extends BaseRepository {
         .whereNull("user.deleted_at")
         .whereNull("user_data.deleted_at")
         .mmodify((q) => {
-          const { search, excludeIds, sortBy, includeInactive } = opts;
+          const { search, excludeIds, sortBy, status } = opts;
           if (search) {
             q.andWhere((q2) => {
               if (opts.searchByEmailOnly) {
@@ -137,8 +138,9 @@ export class OrganizationRepository extends BaseRepository {
                 .join(", "),
             );
           }
-          if (!includeInactive) {
-            q.where("status", "ACTIVE");
+
+          if (isDefined(status) && status.length > 0) {
+            q.whereIn("status", status);
           }
         })
         .orderBy("user.id")

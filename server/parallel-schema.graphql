@@ -2372,7 +2372,7 @@ type Organization implements Timestamps {
   """
   users(
     exclude: [GID!]
-    includeInactive: Boolean
+    filters: UserFilter
 
     """
     Number of elements to take from the list.
@@ -6470,6 +6470,10 @@ type UserAuthenticationToken implements CreatedAt {
   id: GID!
   lastUsedAt: DateTime
   tokenName: String!
+}
+
+input UserFilter {
+  status: [UserStatus!]
 }
 
 type UserGroup implements Timestamps {

@@ -1063,6 +1063,7 @@ export type MutationcompletePetitionArgs = {
 };
 
 export type MutationcopyFileReplyToProfileFieldFileArgs = {
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   fileReplyIds: Array<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   profileId: Scalars["GID"]["input"];
@@ -2183,7 +2184,7 @@ export type OrganizationusagePeriodsArgs = {
 /** An organization in the system. */
 export type OrganizationusersArgs = {
   exclude?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  filters?: InputMaybe<UserFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
@@ -4781,6 +4782,10 @@ export type UserAuthenticationToken = CreatedAt & {
   id: Scalars["GID"]["output"];
   lastUsedAt: Maybe<Scalars["DateTime"]["output"]>;
   tokenName: Scalars["String"]["output"];
+};
+
+export type UserFilter = {
+  status?: InputMaybe<Array<UserStatus>>;
 };
 
 export type UserGroup = Timestamps & {

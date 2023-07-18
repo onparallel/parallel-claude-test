@@ -2232,7 +2232,7 @@ export interface OrganizationusagePeriodsArgs {
 /** An organization in the system. */
 export interface OrganizationusersArgs {
   exclude?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  filters?: InputMaybe<UserFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
@@ -4957,6 +4957,10 @@ export interface UserAuthenticationToken extends CreatedAt {
   id: Scalars["GID"]["output"];
   lastUsedAt?: Maybe<Scalars["DateTime"]["output"]>;
   tokenName: Scalars["String"]["output"];
+}
+
+export interface UserFilter {
+  status?: InputMaybe<Array<UserStatus>>;
 }
 
 export interface UserGroup extends Timestamps {
@@ -19991,6 +19995,7 @@ export type OrganizationUsers_userQuery = {
       activeUserCount: number;
       usageDetails: { [key: string]: any };
       name: string;
+      hasUserProvisioning: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -20016,6 +20021,7 @@ export type OrganizationUsers_orgUsersQueryVariables = Exact<{
   limit: Scalars["Int"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
+  filters?: InputMaybe<UserFilter>;
 }>;
 
 export type OrganizationUsers_orgUsersQuery = {
@@ -41046,13 +41052,7 @@ export const AdminOrganizationsMembers_organizationDocument = gql`
   ) {
     organization(id: $id) {
       id
-      users(
-        offset: $offset
-        limit: $limit
-        search: $search
-        sortBy: $sortBy
-        includeInactive: true
-      ) {
+      users(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
         totalCount
         items {
           ...AdminOrganizationsMembers_OrganizationUser
@@ -41845,6 +41845,7 @@ export const OrganizationUsers_userDocument = gql`
       organization {
         id
         hasSsoProvider
+        hasUserProvisioning: hasIntegration(integration: USER_PROVISIONING)
         activeUserCount
         usageDetails
       }
@@ -41858,18 +41859,13 @@ export const OrganizationUsers_orgUsersDocument = gql`
     $limit: Int!
     $search: String
     $sortBy: [OrganizationUsers_OrderBy!]
+    $filters: UserFilter
   ) {
     me {
       id
       organization {
         id
-        users(
-          offset: $offset
-          limit: $limit
-          search: $search
-          sortBy: $sortBy
-          includeInactive: true
-        ) {
+        users(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
           totalCount
           items {
             ...OrganizationUsers_User

@@ -174,12 +174,17 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       extendArgs: {
         exclude: list(nonNull(globalIdArg("User"))),
-        includeInactive: booleanArg(),
         searchByEmailOnly: booleanArg(),
+        filters: inputObjectType({
+          name: "UserFilter",
+          definition(t) {
+            t.nullable.list.nonNull.field("status", { type: "UserStatus" });
+          },
+        }),
       },
       resolve: (
         root,
-        { offset, limit, search, sortBy, exclude, includeInactive, searchByEmailOnly },
+        { offset, limit, search, sortBy, exclude, filters, searchByEmailOnly },
         ctx,
       ) => {
         const columnMap = {
@@ -196,7 +201,7 @@ export const Organization = objectType({
           search,
           excludeIds: exclude,
           searchByEmailOnly,
-          includeInactive,
+          status: filters?.status,
           sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);
             return { field: columnMap[field], order };

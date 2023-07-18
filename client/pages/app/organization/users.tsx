@@ -9,30 +9,32 @@ import {
   UserXIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
+import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { OrganizationUsersListTableHeader } from "@parallel/components/organization/OrganizationUsersListTableHeader";
+import { UserLimitReachedAlert } from "@parallel/components/organization/UserLimitReachedAlert";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/dialogs/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/dialogs/ConfirmDeactivateUserDialog";
 import { useConfirmResendInvitationDialog } from "@parallel/components/organization/dialogs/ConfirmResendInvitationDialog";
 import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateUserDialog";
-import { OrganizationUsersListTableHeader } from "@parallel/components/organization/OrganizationUsersListTableHeader";
-import { UserLimitReachedAlert } from "@parallel/components/organization/UserLimitReachedAlert";
 import {
   OrganizationRole,
+  OrganizationUsers_OrderBy,
+  OrganizationUsers_UserFragment,
   OrganizationUsers_activateUserDocument,
   OrganizationUsers_deactivateUserDocument,
   OrganizationUsers_inviteUserToOrganizationDocument,
-  OrganizationUsers_OrderBy,
   OrganizationUsers_orgUsersDocument,
   OrganizationUsers_resetTempPasswordDocument,
   OrganizationUsers_updateOrganizationUserDocument,
   OrganizationUsers_userDocument,
-  OrganizationUsers_UserFragment,
   UserStatus,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -41,16 +43,23 @@ import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviou
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
-import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
+import {
+  integer,
+  sorting,
+  string,
+  useQueryState,
+  useQueryStateSlice,
+  values,
+} from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
@@ -63,23 +72,33 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "ASC",
   }),
+  status: values(["ACTIVE", "INACTIVE", "ON_HOLD"]).orDefault("ACTIVE"),
 };
+
+interface OrganizationUserTableContext {
+  status: UserStatus;
+  setStatus: (status: UserStatus) => void;
+  hasUserProvisioning: boolean;
+}
 
 function OrganizationUsers() {
   const intl = useIntl();
   const toast = useToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const [status, setStatus] = useQueryStateSlice(state, setQueryState, "status");
 
   const {
     data: { me, realMe },
   } = useAssertQuery(OrganizationUsers_userDocument);
 
   const { data, loading, refetch } = useQueryOrPreviousData(OrganizationUsers_orgUsersDocument, {
+    fetchPolicy: "cache-and-network",
     variables: {
       offset: state.items * (state.page - 1),
       limit: state.items,
       search: state.search,
       sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
+      filters: { status: [status] },
     },
   });
 
@@ -233,6 +252,9 @@ function OrganizationUsers() {
             tagIds,
             includeDrafts,
           },
+          update: () => {
+            refetch();
+          },
         });
         toast({
           title: intl.formatMessage({
@@ -279,6 +301,9 @@ function OrganizationUsers() {
           variables: {
             userIds: selectedIds,
           },
+          update: () => {
+            refetch();
+          },
         });
       } else if (newStatus === "INACTIVE") {
         const { userId, tagIds, includeDrafts } = await showConfirmDeactivateUserDialog({
@@ -291,6 +316,9 @@ function OrganizationUsers() {
             transferToUserId: userId,
             tagIds,
             includeDrafts,
+          },
+          update: () => {
+            refetch();
           },
         });
       }
@@ -450,6 +478,11 @@ function OrganizationUsers() {
     }
   };
 
+  const context = useMemo<OrganizationUserTableContext>(
+    () => ({ status, setStatus, hasUserProvisioning: me.organization.hasUserProvisioning }),
+    [status, setStatus],
+  );
+
   return (
     <OrganizationSettingsLayout
       title={intl.formatMessage({
@@ -471,6 +504,7 @@ function OrganizationUsers() {
           minHeight={0}
           isSelectable={userCanEditUsers}
           isHighlightable
+          context={context}
           columns={columns}
           rows={users?.items}
           rowKeyProp="id"
@@ -486,73 +520,76 @@ function OrganizationUsers() {
           }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
           onRowClick={userCanEditUsers ? (user) => handleUpdateUser(user) : undefined}
-          actions={[
-            {
-              key: "activate",
-              onClick: () => handleUpdateSelectedUsersStatus("ACTIVE"),
-              isDisabled:
-                selectedRows.every((u) => u.status === "ACTIVE") || isActivateUserButtonDisabled,
-              leftIcon: <UserCheckIcon />,
-              children: (
-                <FormattedMessage
-                  id="organization-users.activate"
-                  defaultMessage="Activate {count, plural, =1{user} other {users}}"
-                  values={{ count: selectedRows.length }}
-                />
-              ),
-            },
-            {
-              key: "deactivate",
-              onClick: () => handleUpdateSelectedUsersStatus("INACTIVE"),
-              isDisabled: selectedRows.every((u) => u.status === "INACTIVE"),
-              leftIcon: <UserXIcon />,
-              children: (
-                <FormattedMessage
-                  id="organization-users.deactivate"
-                  defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-                  values={{ count: selectedRows.length }}
-                />
-              ),
-            },
-            ...(me.hasGhostLogin && userCanGhostLogin
+          actions={
+            status === "INACTIVE"
               ? [
                   {
-                    key: "login-as",
-                    onClick: handleLoginAs,
-                    isDisabled:
-                      selectedRows.length !== 1 ||
-                      selectedRows[0].id === me.id ||
-                      selectedRows[0].status === "INACTIVE",
-                    leftIcon: <LogInIcon />,
+                    key: "activate",
+                    onClick: () => handleUpdateSelectedUsersStatus("ACTIVE"),
+                    isDisabled: isActivateUserButtonDisabled,
+                    leftIcon: <UserCheckIcon />,
                     children: (
                       <FormattedMessage
-                        id="organization-users.login-as"
-                        defaultMessage="Login as..."
+                        id="organization-users.activate"
+                        defaultMessage="Activate {count, plural, =1{user} other {users}}"
+                        values={{ count: selectedRows.length }}
                       />
                     ),
                   },
                 ]
-              : []),
-            ...(userCanEditUsers
-              ? [
+              : [
                   {
-                    key: "reset-password",
-                    onClick: handleResendInvitation,
-                    isDisabled:
-                      selectedRows.some(
-                        (u) => u.lastActiveAt || u.status === "INACTIVE" || u.isSsoUser,
-                      ) || selectedRows.length !== 1,
-                    leftIcon: <ArrowUpRightIcon />,
+                    key: "deactivate",
+                    onClick: () => handleUpdateSelectedUsersStatus("INACTIVE"),
+                    leftIcon: <UserXIcon />,
                     children: (
                       <FormattedMessage
-                        id="organization-users.resend-invitation"
-                        defaultMessage="Resend invitation"
+                        id="organization-users.deactivate"
+                        defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
+                        values={{ count: selectedRows.length }}
                       />
                     ),
                   },
+                  ...(me.hasGhostLogin && userCanGhostLogin
+                    ? [
+                        {
+                          key: "login-as",
+                          onClick: handleLoginAs,
+                          isDisabled:
+                            selectedRows.length !== 1 ||
+                            selectedRows[0].id === me.id ||
+                            selectedRows[0].status === "INACTIVE",
+                          leftIcon: <LogInIcon />,
+                          children: (
+                            <FormattedMessage
+                              id="organization-users.login-as"
+                              defaultMessage="Login as..."
+                            />
+                          ),
+                        },
+                      ]
+                    : []),
+                  ...(userCanEditUsers
+                    ? [
+                        {
+                          key: "reset-password",
+                          onClick: handleResendInvitation,
+                          isDisabled:
+                            selectedRows.some(
+                              (u) => u.lastActiveAt || u.status === "INACTIVE" || u.isSsoUser,
+                            ) || selectedRows.length !== 1,
+                          leftIcon: <ArrowUpRightIcon />,
+                          children: (
+                            <FormattedMessage
+                              id="organization-users.resend-invitation"
+                              defaultMessage="Resend invitation"
+                            />
+                          ),
+                        },
+                      ]
+                    : []),
                 ]
-              : []),
-          ]}
+          }
           header={
             <OrganizationUsersListTableHeader
               search={search}
@@ -564,9 +601,71 @@ function OrganizationUsers() {
               onSearchChange={handleSearchChange}
             />
           }
+          body={
+            users && users.totalCount === 0 && !loading ? (
+              state.search || state.status[0] !== "ACTIVE" ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="page.organization-users.no-search-results"
+                      defaultMessage="There's no users matching your criteria"
+                    />
+                  </Text>
+                </Flex>
+              ) : null
+            ) : null
+          }
+          Footer={CustomFooter}
         />
       </Flex>
     </OrganizationSettingsLayout>
+  );
+}
+
+function CustomFooter({
+  status,
+  setStatus,
+  hasUserProvisioning,
+  children,
+}: PropsWithChildren<OrganizationUserTableContext>) {
+  const options = useSimpleSelectOptions<UserStatus>(
+    (intl) => [
+      {
+        label: intl.formatMessage({ id: "generic.user-status-active", defaultMessage: "Active" }),
+        value: "ACTIVE",
+      },
+      {
+        label: intl.formatMessage({
+          id: "generic.user-status-inactive",
+          defaultMessage: "Inactive",
+        }),
+        value: "INACTIVE",
+      },
+      ...(hasUserProvisioning
+        ? [
+            {
+              label: intl.formatMessage({
+                id: "generic.user-status-on-hold",
+                defaultMessage: "On hold",
+              }),
+              value: "ON_HOLD" as UserStatus,
+            },
+          ]
+        : []),
+    ],
+    [hasUserProvisioning],
+  );
+  return (
+    <>
+      <SimpleMenuSelect
+        options={options}
+        value={status}
+        onChange={setStatus as any}
+        size="sm"
+        variant="ghost"
+      />
+      {children}
+    </>
   );
 }
 
@@ -574,7 +673,7 @@ function useOrganizationUsersTableColumns() {
   const userCanEdit = useHasPermission("USERS:CRUD_USERS");
   const intl = useIntl();
   const roles = useOrganizationRoles();
-  return useMemo<TableColumn<OrganizationUsers_UserFragment>[]>(
+  return useMemo<TableColumn<OrganizationUsers_UserFragment, OrganizationUserTableContext>[]>(
     () => [
       {
         key: "fullName",
@@ -704,7 +803,7 @@ function useOrganizationUsersTableColumns() {
                   </Text>
                 ),
             },
-          ] as TableColumn<OrganizationUsers_UserFragment>[])
+          ] as TableColumn<OrganizationUsers_UserFragment, OrganizationUserTableContext>[])
         : []),
       {
         key: "createdAt",
@@ -832,6 +931,7 @@ OrganizationUsers.queries = [
         organization {
           id
           hasSsoProvider
+          hasUserProvisioning: hasIntegration(integration: USER_PROVISIONING)
           activeUserCount
           usageDetails
         }
@@ -845,6 +945,7 @@ OrganizationUsers.queries = [
       $limit: Int!
       $search: String
       $sortBy: [OrganizationUsers_OrderBy!]
+      $filters: UserFilter
     ) {
       me {
         id
@@ -855,7 +956,7 @@ OrganizationUsers.queries = [
             limit: $limit
             search: $search
             sortBy: $sortBy
-            includeInactive: true
+            filters: $filters
           ) {
             totalCount
             items {
