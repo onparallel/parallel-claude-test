@@ -217,7 +217,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleFieldSettingsClick = useCallback(
     function (fieldId: string) {
-      setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : fieldId));
+      setActiveFieldId(fieldId);
     },
     [petitionId],
   );

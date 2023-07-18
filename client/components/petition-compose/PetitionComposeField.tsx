@@ -1,6 +1,7 @@
 import { DataProxy, gql, useMutation } from "@apollo/client";
 import {
   Box,
+  Button,
   Center,
   Flex,
   FormControl,
@@ -26,38 +27,39 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
+  PetitionComposeField_PetitionFieldFragment,
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   PetitionComposeField_deletePetitionFieldAttachmentDocument,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
-  PetitionComposeField_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
-import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { PetitionFieldIndex, letters } from "@parallel/utils/fieldIndices";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
+import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
 import pMap from "p-map";
-import { memo, RefObject, useCallback, useImperativeHandle, useRef, useState } from "react";
-import { useDrag, useDrop, XYCoord } from "react-dnd";
+import { RefObject, memo, useCallback, useImperativeHandle, useRef, useState } from "react";
+import { XYCoord, useDrag, useDrop } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
-import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { ConfimationPopover } from "../common/ConfirmationPopover";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
@@ -352,7 +354,8 @@ const _PetitionComposeField = chakraForwardRef<
         display="flex"
         flexDirection="row"
         opacity={isDragging ? 0 : 1}
-        backgroundColor={isActive ? "primary.50" : "white"}
+        data-active={isActive ? true : undefined}
+        backgroundColor="white"
         sx={{
           "[draggable]": {
             opacity: 0,
@@ -364,10 +367,19 @@ const _PetitionComposeField = chakraForwardRef<
           "&:hover [draggable]": {
             opacity: 1,
           },
-          "&:hover, &:focus-within": {
-            backgroundColor: isActive ? "primary.50" : "gray.50",
+          _active: {
+            backgroundColor: "primary.50",
             ".field-actions": {
               display: "flex",
+            },
+          },
+          _hover: {
+            backgroundColor: "gray.50",
+            ".field-actions": {
+              display: "flex",
+            },
+            _active: {
+              backgroundColor: "primary.50",
             },
           },
         }}
@@ -983,19 +995,33 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           aria-expanded={isActive}
           onClick={onSettingsClick}
         />
-        <IconButtonWithTooltip
-          icon={<DeleteIcon />}
-          isDisabled={field.isFixed || isReadOnly}
-          size="sm"
-          variant="ghost"
-          placement="bottom"
-          color="gray.600"
-          label={intl.formatMessage({
-            id: "component.petition-compose-field.field-delete",
-            defaultMessage: "Delete field",
-          })}
-          onClick={onDeleteClick}
-        />
+        <ConfimationPopover
+          description={
+            <FormattedMessage
+              id="component.petition-compose-field.confirm-delete"
+              defaultMessage="Do you want to delete this field?"
+            />
+          }
+          confirm={
+            <Button onClick={onDeleteClick} size="sm" colorScheme="red">
+              <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+            </Button>
+          }
+        >
+          <IconButtonWithTooltip
+            icon={<DeleteIcon />}
+            onClick={onSettingsClick}
+            isDisabled={field.isFixed || isReadOnly}
+            size="sm"
+            variant="ghost"
+            placement="bottom"
+            color="gray.600"
+            label={intl.formatMessage({
+              id: "component.petition-compose-field.field-delete",
+              defaultMessage: "Delete field",
+            })}
+          />
+        </ConfimationPopover>
         <NakedLink href={buildUrlToSection("preview", { field: field.id })}>
           <IconButtonWithTooltip
             as="a"
