@@ -7647,6 +7647,27 @@ export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutati
   };
 };
 
+export type useProfileTypeFieldPermissionDialog_UserOrUserGroup_User_Fragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+  avatarUrl?: string | null;
+  initials?: string | null;
+};
+
+export type useProfileTypeFieldPermissionDialog_UserOrUserGroup_UserGroup_Fragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  memberCount: number;
+  groupInitials: string;
+};
+
+export type useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment =
+  | useProfileTypeFieldPermissionDialog_UserOrUserGroup_User_Fragment
+  | useProfileTypeFieldPermissionDialog_UserOrUserGroup_UserGroup_Fragment;
+
 export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment = {
   __typename?: "ProfileTypeFieldPermission";
   id: string;
@@ -7696,6 +7717,32 @@ export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment = {
           groupInitials: string;
         };
   }>;
+};
+
+export type useProfileTypeFieldPermissionDialog_searchUsersQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
+  excludeUsers?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+}>;
+
+export type useProfileTypeFieldPermissionDialog_searchUsersQuery = {
+  searchUsers: Array<
+    | {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      }
+    | {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        memberCount: number;
+        groupInitials: string;
+      }
+  >;
 };
 
 export type useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
@@ -34176,26 +34223,50 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     invalidCredentials
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
+export const UserSelectOption_UserGroupFragmentDoc = gql`
+  fragment UserSelectOption_UserGroup on UserGroup {
+    id
+    name
+    memberCount
+  }
+` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
+export const UserSelect_UserGroupFragmentDoc = gql`
+  fragment UserSelect_UserGroup on UserGroup {
+    id
+    name
+    memberCount
+    ...UserSelectOption_UserGroup
+  }
+  ${UserSelectOption_UserGroupFragmentDoc}
+` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
+export const useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc = gql`
+  fragment useProfileTypeFieldPermissionDialog_UserOrUserGroup on UserOrUserGroup {
+    ... on User {
+      id
+      fullName
+      email
+      ...UserAvatar_User
+    }
+    ... on UserGroup {
+      id
+      name
+      groupInitials: initials
+      memberCount
+      ...UserSelect_UserGroup
+    }
+  }
+  ${UserAvatar_UserFragmentDoc}
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment, unknown>;
 export const useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragmentDoc = gql`
   fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
     id
     permission
     target {
-      ... on User {
-        id
-        fullName
-        email
-        ...UserAvatar_User
-      }
-      ... on UserGroup {
-        id
-        name
-        groupInitials: initials
-        memberCount
-      }
+      ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
     }
   }
-  ${UserAvatar_UserFragmentDoc}
+  ${useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc}
 ` as unknown as DocumentNode<
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment,
   unknown
@@ -34315,22 +34386,6 @@ export const OrganizationProfileTypes_ProfileTypePaginationFragmentDoc = gql`
   }
   ${OrganizationProfileTypes_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileTypes_ProfileTypePaginationFragment, unknown>;
-export const UserSelectOption_UserGroupFragmentDoc = gql`
-  fragment UserSelectOption_UserGroup on UserGroup {
-    id
-    name
-    memberCount
-  }
-` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
-export const UserSelect_UserGroupFragmentDoc = gql`
-  fragment UserSelect_UserGroup on UserGroup {
-    id
-    name
-    memberCount
-    ...UserSelectOption_UserGroup
-  }
-  ${UserSelectOption_UserGroupFragmentDoc}
-` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
 export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
   fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
     id
@@ -38966,6 +39021,27 @@ export const useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocum
 ` as unknown as DocumentNode<
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutation,
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutationVariables
+>;
+export const useProfileTypeFieldPermissionDialog_searchUsersDocument = gql`
+  query useProfileTypeFieldPermissionDialog_searchUsers(
+    $search: String!
+    $excludeUsers: [GID!]
+    $excludeUserGroups: [GID!]
+  ) {
+    searchUsers(
+      search: $search
+      excludeUsers: $excludeUsers
+      excludeUserGroups: $excludeUserGroups
+      includeGroups: true
+      includeInactive: false
+    ) {
+      ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
+    }
+  }
+  ${useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileTypeFieldPermissionDialog_searchUsersQuery,
+  useProfileTypeFieldPermissionDialog_searchUsersQueryVariables
 >;
 export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
   mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {

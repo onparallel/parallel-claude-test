@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -27,11 +27,7 @@ import {
 } from "@parallel/components/common/SimpleSelect";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import {
-  UserSelect,
-  UserSelectInstance,
-  UserSelectSelection,
-} from "@parallel/components/common/UserSelect";
+import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -39,11 +35,15 @@ import {
   UpdateProfileTypeFieldPermissionInput,
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment,
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment,
+  useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment,
+  useProfileTypeFieldPermissionDialog_searchUsersDocument,
 } from "@parallel/graphql/__types";
+import { assertTypename, isTypename } from "@parallel/utils/apollo/typename";
 import { Focusable } from "@parallel/utils/types";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { forwardRef, useCallback, useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { nanoid } from "nanoid";
+import { forwardRef, useRef } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
 const ProfileTypeFieldPermissionTypeValues = [
@@ -60,7 +60,6 @@ function isAtLeast(p1: ProfileTypeFieldPermissionType, p2: ProfileTypeFieldPermi
 }
 
 interface ProfileTypeFieldPermissionDialogData {
-  selection: UserSelectSelection<true>[];
   permissionType: ProfileTypeFieldPermissionType;
   defaultPermission: ProfileTypeFieldPermissionType;
   permissions: useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment[];
@@ -86,41 +85,60 @@ export function ProfileTypeFieldPermissionDialog({
   },
   ProfileTypeFieldPermissionDialogResult
 >) {
-  const permissions = profileTypeField.permissions;
-
-  const { handleSubmit, control, watch } = useForm<ProfileTypeFieldPermissionDialogData>({
-    mode: "onChange",
-    defaultValues: {
-      selection: [],
-      permissionType: "WRITE",
-      defaultPermission: profileTypeField.defaultPermission,
-      permissions,
+  const { handleSubmit, control, watch, getValues } = useForm<ProfileTypeFieldPermissionDialogData>(
+    {
+      mode: "onChange",
+      defaultValues: {
+        permissionType: "WRITE",
+        defaultPermission: profileTypeField.defaultPermission,
+        permissions: profileTypeField.permissions,
+      },
     },
-  });
+  );
 
-  const hasUsers = watch("selection").length;
   const defaultPermission = watch("defaultPermission");
+  const {
+    append,
+    update,
+    remove,
+    fields: permissions,
+  } = useFieldArray({ name: "permissions", control });
+
   const isUsedInProfileName = profileTypeField.isUsedInProfileName;
 
-  const usersRef = useRef<UserSelectInstance<true, true>>(null);
+  const usersRef =
+    useRef<
+      UserSelectInstance<false, true, useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment>
+    >(null);
 
-  const userPermissions = permissions.filter(({ target }) => target.__typename === "User") ?? [];
-  const groupPermissions =
-    permissions.filter(({ target }) => target.__typename === "UserGroup") ?? [];
-
-  const usersToExclude = userPermissions.map((p) => p.target.id) ?? [];
-  const groupsToExclude = groupPermissions.map((p) => p.target.id) ?? [];
-
-  const _handleSearchUsers = useSearchUsers();
-  const handleSearchUsers = useCallback(
+  const client = useApolloClient();
+  const handleSearchUsers = useDebouncedAsync(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
-      return await _handleSearchUsers(search, {
-        includeGroups: true,
-        excludeUsers: [...excludeUsers, ...usersToExclude],
-        excludeUserGroups: [...excludeUserGroups, ...groupsToExclude],
+      const { data } = await client.query({
+        query: useProfileTypeFieldPermissionDialog_searchUsersDocument,
+        variables: {
+          search,
+          excludeUsers: [
+            ...excludeUsers,
+            ...permissions
+              .map((p) => p.target)
+              .filter(isTypename("User"))
+              .map((u) => u.id),
+          ],
+          excludeUserGroups: [
+            ...excludeUserGroups,
+            ...permissions
+              .map((p) => p.target)
+              .filter(isTypename("UserGroup"))
+              .map((u) => u.id),
+          ],
+        },
+        fetchPolicy: "no-cache",
       });
+      return data!.searchUsers;
     },
-    [_handleSearchUsers, usersToExclude.join(","), groupsToExclude.join(",")],
+    150,
+    [permissions.map((p) => p.target.id).join(",")],
   );
 
   return (
@@ -131,25 +149,16 @@ export function ProfileTypeFieldPermissionDialog({
       {...props}
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ selection, defaultPermission, permissions, permissionType }) => {
+        onSubmit: handleSubmit(({ defaultPermission, permissions }) => {
           props.onResolve({
             defaultPermission,
-            permissions: [
-              ...permissions.map((p) => {
-                return {
-                  userGroupId: p.target.__typename === "UserGroup" ? p.target.id : undefined,
-                  userId: p.target.__typename === "User" ? p.target.id : undefined,
-                  permission: p.permission,
-                };
-              }),
-              ...selection.map((s) => {
-                return {
-                  userGroupId: s.__typename === "UserGroup" ? s.id : undefined,
-                  userId: s.__typename === "User" ? s.id : undefined,
-                  permission: permissionType,
-                };
-              }),
-            ],
+            permissions: permissions.map((p) => {
+              return {
+                userGroupId: p.target.__typename === "UserGroup" ? p.target.id : undefined,
+                userId: p.target.__typename === "User" ? p.target.id : undefined,
+                permission: p.permission,
+              };
+            }),
           });
         }),
       }}
@@ -174,50 +183,41 @@ export function ProfileTypeFieldPermissionDialog({
           ) : null}
           <Flex>
             <FormControl id="selection" flex="1 1 auto" minWidth={0} width="auto">
+              <UserSelect
+                includeGroups
+                ref={usersRef}
+                value={null}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(value) => {
+                  append({ id: nanoid(), target: value!, permission: getValues("permissionType") });
+                }}
+                onSearch={handleSearchUsers}
+              />
+            </FormControl>
+            <FormControl id="permissionType" minWidth="130px" width="auto" marginLeft={2}>
               <Controller
-                name="selection"
+                name="permissionType"
                 control={control}
-                rules={{ minLength: 1 }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <UserSelect
-                    isMulti
-                    includeGroups
-                    ref={usersRef}
+                render={({ field: { value, onChange } }) => (
+                  <ProfileTypeFieldPermissionTypeSelect
                     value={value}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    onSearch={handleSearchUsers}
+                    onChange={(value) => onChange(value! as "READ" | "WRITE" | "HIDDEN")}
+                    isHiddenDisabled={isUsedInProfileName}
                   />
                 )}
               />
             </FormControl>
-            {hasUsers ? (
-              <FormControl id="permissionType" minWidth="120px" width="120px" marginLeft={2}>
-                <Controller
-                  name="permissionType"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <ProfileTypeFieldPermissionTypeSelect
-                      value={value}
-                      onChange={(value) => onChange(value! as "READ" | "WRITE" | "HIDDEN")}
-                      isHiddenDisabled={isUsedInProfileName}
-                    />
-                  )}
-                />
-              </FormControl>
-            ) : null}
           </Flex>
           <Stack paddingTop={2}>
             <Controller
               name="defaultPermission"
               control={control}
               render={({ field: { value, onChange } }) => (
-                <HStack alignItems="center">
+                <HStack alignItems="center" height="42px">
                   <Avatar
                     role="presentation"
                     icon={<BusinessIcon boxSize={4} />}
@@ -262,118 +262,105 @@ export function ProfileTypeFieldPermissionDialog({
                 </HStack>
               )}
             />
-            <Controller
-              name="permissions"
-              control={control}
-              rules={{ minLength: 1 }}
-              render={({ field: { onChange, value } }) => {
-                return (
-                  <>
-                    {value.map(({ permission, target, id }) => (
-                      <Flex key={target.id} alignItems="center">
-                        {target.__typename === "User" ? (
-                          <HStack flex={1}>
-                            <UserAvatar role="presentation" user={target} size="sm" />
-                            <Box flex="1" minWidth={0} fontSize="sm">
-                              <Text noOfLines={1} wordBreak="break-all">
-                                {target.fullName}
-                                {userId === target.id ? (
-                                  <>
-                                    {" ("}
-                                    <FormattedMessage id="generic.you" defaultMessage="You" />
-                                    {")"}
-                                  </>
-                                ) : null}
-                              </Text>
-                              <Text color="gray.500" noOfLines={1}>
-                                {target.email}
-                              </Text>
-                            </Box>
-                          </HStack>
-                        ) : target.__typename === "UserGroup" ? (
+            {permissions.map(({ id, target, permission }, index) => (
+              <Flex key={id} alignItems="center">
+                {target.__typename === "User" ? (
+                  <HStack flex={1}>
+                    <UserAvatar role="presentation" user={target} size="sm" />
+                    <Box flex="1" minWidth={0} fontSize="sm">
+                      <Text noOfLines={1} wordBreak="break-all">
+                        {target.fullName}
+                        {userId === target.id ? (
                           <>
-                            <Avatar
-                              role="presentation"
-                              getInitials={() => target.groupInitials}
-                              name={target.name}
-                              size="sm"
-                            />
-                            <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                              <HStack align="center">
-                                <UsersIcon />
-                                <Text noOfLines={1} wordBreak="break-all">
-                                  {target.name}
-                                </Text>
-                              </HStack>
-                              <Box>
-                                <UserGroupMembersPopover userGroupId={target.id}>
-                                  <Text color="gray.500" cursor="default" noOfLines={1}>
-                                    <FormattedMessage
-                                      id="generic.n-group-members"
-                                      defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-                                      values={{ count: target.memberCount }}
-                                    />
-                                  </Text>
-                                </UserGroupMembersPopover>
-                              </Box>
-                            </Box>
+                            {" ("}
+                            <FormattedMessage id="generic.you" defaultMessage="You" />
+                            {")"}
                           </>
-                        ) : (
-                          (null as never)
-                        )}
-                        <HStack>
-                          {isAtLeast(permission, defaultPermission) ? null : (
-                            <AlertPopover>
-                              <Text>
-                                <FormattedMessage
-                                  id="component.profile-type-field-permission-dialog.permissions-conflict-popover"
-                                  defaultMessage="There is a higher-level permission for everyone in the organization that overrides this one."
-                                />
-                              </Text>
-                            </AlertPopover>
-                          )}
-                          <Menu placement="bottom-end">
-                            <MenuButton
-                              as={Button}
-                              variant="ghost"
-                              size="sm"
-                              rightIcon={<ChevronDownIcon />}
-                            >
-                              <ProfileTypeFieldPermissionTypeText type={permission} />
-                            </MenuButton>
-                            <MenuList minWidth={40}>
-                              {(
-                                ["WRITE", "READ", "HIDDEN"] as ProfileTypeFieldPermissionType[]
-                              ).map((permission) => (
-                                <MenuItem
-                                  key={permission}
-                                  isDisabled={permission === "HIDDEN" && isUsedInProfileName}
-                                  onClick={() =>
-                                    onChange(
-                                      value.map((p) => (p.id === id ? { ...p, permission } : p)),
-                                    )
-                                  }
-                                >
-                                  <ProfileTypeFieldPermissionTypeText type={permission} />
-                                </MenuItem>
-                              ))}
-                              <MenuDivider />
-                              <MenuItem
-                                color="red.500"
-                                onClick={() => onChange(value.filter((p) => p.id !== id))}
-                                icon={<DeleteIcon display="block" boxSize={4} />}
-                              >
-                                <FormattedMessage id="generic.remove" defaultMessage="Remove" />
-                              </MenuItem>
-                            </MenuList>
-                          </Menu>
-                        </HStack>
+                        ) : null}
+                      </Text>
+                      <Text color="gray.500" noOfLines={1}>
+                        {target.email}
+                      </Text>
+                    </Box>
+                  </HStack>
+                ) : target.__typename === "UserGroup" ? (
+                  <>
+                    <Avatar
+                      role="presentation"
+                      getInitials={() => (
+                        assertTypename(target, "UserGroup"), target.groupInitials
+                      )}
+                      name={target.name}
+                      size="sm"
+                    />
+                    <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                      <HStack align="center">
+                        <UsersIcon />
+                        <Text noOfLines={1} wordBreak="break-all">
+                          {target.name}
+                        </Text>
+                      </HStack>
+                      <Flex>
+                        <UserGroupMembersPopover userGroupId={target.id}>
+                          <Text color="gray.500" cursor="default" noOfLines={1}>
+                            <FormattedMessage
+                              id="generic.n-group-members"
+                              defaultMessage="{count, plural, =1 {1 member} other {# members}}"
+                              values={{ count: target.memberCount }}
+                            />
+                          </Text>
+                        </UserGroupMembersPopover>
                       </Flex>
-                    ))}
+                    </Box>
                   </>
-                );
-              }}
-            />
+                ) : (
+                  (null as never)
+                )}
+                <HStack>
+                  {isAtLeast(permission, defaultPermission) ? null : (
+                    <AlertPopover>
+                      <Text>
+                        <FormattedMessage
+                          id="component.profile-type-field-permission-dialog.permissions-conflict-popover"
+                          defaultMessage="There is a higher-level permission for everyone in the organization that overrides this one."
+                        />
+                      </Text>
+                    </AlertPopover>
+                  )}
+                  <Menu placement="bottom-end">
+                    <MenuButton
+                      as={Button}
+                      variant="ghost"
+                      size="sm"
+                      rightIcon={<ChevronDownIcon />}
+                    >
+                      <ProfileTypeFieldPermissionTypeText type={permission} />
+                    </MenuButton>
+                    <MenuList minWidth={40}>
+                      {(["WRITE", "READ", "HIDDEN"] as ProfileTypeFieldPermissionType[]).map(
+                        (permission) => (
+                          <MenuItem
+                            key={permission}
+                            isDisabled={permission === "HIDDEN" && isUsedInProfileName}
+                            onClick={() => update(index, { id, target, permission })}
+                          >
+                            <ProfileTypeFieldPermissionTypeText type={permission} />
+                          </MenuItem>
+                        ),
+                      )}
+                      <MenuDivider />
+                      <MenuItem
+                        color="red.500"
+                        onClick={() => remove(index)}
+                        icon={<DeleteIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage id="generic.remove" defaultMessage="Remove" />
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                </HStack>
+              </Flex>
+            ))}
           </Stack>
         </Stack>
       }
@@ -387,27 +374,38 @@ export function ProfileTypeFieldPermissionDialog({
 }
 
 useProfileTypeFieldPermissionDialog.fragments = {
-  ProfileTypeFieldPermission: gql`
-    fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
-      id
-      permission
-      target {
-        ... on User {
-          id
-          fullName
-          email
-          ...UserAvatar_User
-        }
-        ... on UserGroup {
-          id
-          name
-          groupInitials: initials
-          memberCount
-        }
+  UserOrUserGroup: gql`
+    fragment useProfileTypeFieldPermissionDialog_UserOrUserGroup on UserOrUserGroup {
+      ... on User {
+        id
+        fullName
+        email
+        ...UserAvatar_User
+      }
+      ... on UserGroup {
+        id
+        name
+        groupInitials: initials
+        memberCount
+        ...UserSelect_UserGroup
       }
     }
     ${UserAvatar.fragments.User}
+    ${UserSelect.fragments.User}
+    ${UserSelect.fragments.UserGroup}
   `,
+  get ProfileTypeFieldPermission() {
+    return gql`
+      fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
+        id
+        permission
+        target {
+          ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
+        }
+      }
+      ${this.UserOrUserGroup}
+    `;
+  },
   get ProfileTypeField() {
     return gql`
       fragment useProfileTypeFieldPermissionDialog_ProfileTypeField on ProfileTypeField {
@@ -423,6 +421,27 @@ useProfileTypeFieldPermissionDialog.fragments = {
     `;
   },
 };
+
+const _queries = [
+  gql`
+    query useProfileTypeFieldPermissionDialog_searchUsers(
+      $search: String!
+      $excludeUsers: [GID!]
+      $excludeUserGroups: [GID!]
+    ) {
+      searchUsers(
+        search: $search
+        excludeUsers: $excludeUsers
+        excludeUserGroups: $excludeUserGroups
+        includeGroups: true
+        includeInactive: false
+      ) {
+        ...useProfileTypeFieldPermissionDialog_UserOrUserGroup
+      }
+    }
+    ${useProfileTypeFieldPermissionDialog.fragments.UserOrUserGroup}
+  `,
+];
 
 interface ProfileTypeFieldPermissionTypeSelectProps
   extends Omit<SimpleSelectProps<ProfileTypeFieldPermissionType, false>, "options"> {
