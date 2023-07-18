@@ -205,8 +205,7 @@ export function ProfileTypeFieldPermissionDialog({
                 render={({ field: { value, onChange } }) => (
                   <ProfileTypeFieldPermissionTypeSelect
                     value={value}
-                    onChange={(value) => onChange(value! as "READ" | "WRITE" | "HIDDEN")}
-                    isHiddenDisabled={isUsedInProfileName}
+                    onChange={(value) => onChange(value! as "READ" | "WRITE")}
                   />
                 )}
               />
@@ -337,17 +336,14 @@ export function ProfileTypeFieldPermissionDialog({
                       <ProfileTypeFieldPermissionTypeText type={permission} />
                     </MenuButton>
                     <MenuList minWidth={40}>
-                      {(["WRITE", "READ", "HIDDEN"] as ProfileTypeFieldPermissionType[]).map(
-                        (permission) => (
-                          <MenuItem
-                            key={permission}
-                            isDisabled={permission === "HIDDEN" && isUsedInProfileName}
-                            onClick={() => update(index, { id, target, permission })}
-                          >
-                            <ProfileTypeFieldPermissionTypeText type={permission} />
-                          </MenuItem>
-                        ),
-                      )}
+                      {(["WRITE", "READ"] as ProfileTypeFieldPermissionType[]).map((permission) => (
+                        <MenuItem
+                          key={permission}
+                          onClick={() => update(index, { id, target, permission })}
+                        >
+                          <ProfileTypeFieldPermissionTypeText type={permission} />
+                        </MenuItem>
+                      ))}
                       <MenuDivider />
                       <MenuItem
                         color="red.500"
@@ -444,14 +440,12 @@ const _queries = [
 ];
 
 interface ProfileTypeFieldPermissionTypeSelectProps
-  extends Omit<SimpleSelectProps<ProfileTypeFieldPermissionType, false>, "options"> {
-  isHiddenDisabled?: boolean;
-}
+  extends Omit<SimpleSelectProps<ProfileTypeFieldPermissionType, false>, "options"> {}
 
 const ProfileTypeFieldPermissionTypeSelect = forwardRef<
   Focusable,
   ProfileTypeFieldPermissionTypeSelectProps
->(function ProfileTypeFieldPermissionTypeSelect({ isHiddenDisabled, ...props }, ref) {
+>(function ProfileTypeFieldPermissionTypeSelect({ ...props }, ref) {
   const options = useSimpleSelectOptions(
     (intl) => [
       {
@@ -467,14 +461,6 @@ const ProfileTypeFieldPermissionTypeSelect = forwardRef<
           defaultMessage: "Can read",
         }),
         value: "READ",
-      },
-      {
-        label: intl.formatMessage({
-          id: "component.profile-type-field-permission-dialog.hidden",
-          defaultMessage: "Hidden",
-        }),
-        value: "HIDDEN",
-        isDisabled: isHiddenDisabled,
       },
     ],
     [],
