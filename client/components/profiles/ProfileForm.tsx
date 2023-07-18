@@ -83,6 +83,10 @@ const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]
   TEXT: ["SHORT_TEXT", "TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
 };
 
+function normalize(alias: string) {
+  return alias.toLowerCase().replaceAll("_", "");
+}
+
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
     { profile, refetch, overlapsIntercomBadge, petitionFields, petitionId, ...props },
@@ -155,8 +159,8 @@ export const ProfileForm = Object.assign(
                     ([pf]) =>
                       SUGGESTIONS_TYPE_MAPPING[property.field.type].includes(pf.type) &&
                       isDefined(pf.alias) &&
-                      (pf.alias.toLowerCase().includes(property.field.alias!.toLowerCase()) ||
-                        property.field.alias!.toLowerCase().includes(pf.alias.toLowerCase())),
+                      (normalize(pf.alias).includes(normalize(property.field.alias!)) ||
+                        normalize(property.field.alias!).includes(normalize(pf.alias))),
                   )
                 : [],
             ] as const,
