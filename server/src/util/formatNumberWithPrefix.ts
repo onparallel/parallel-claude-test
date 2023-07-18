@@ -1,8 +1,7 @@
-import { useIntl } from "react-intl";
+import { IntlShape } from "react-intl";
 import { isDefined } from "remeda";
 
-export function formatNumberWithPrefix(value: number, options: any): string {
-  const intl = useIntl();
+export function formatNumberWithPrefix(intl: IntlShape, value: number, options: any): string {
   const hasPrefix = isDefined(options.prefix) || isDefined(options.suffix) ? true : false;
   const formattedValue = intl.formatNumber(value, {
     minimumFractionDigits: 0,

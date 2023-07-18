@@ -34,9 +34,7 @@ export function ProfileFieldNumber({
               name={name}
               borderColor="transparent"
               value={value || undefined}
-              onChange={(value) => {
-                onChange(value?.toString() ?? "");
-              }}
+              onChange={onChange}
               onBlur={() => {
                 if (value) {
                   return showExpiryDateDialog({});

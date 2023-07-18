@@ -11,11 +11,13 @@ import {
   ProfileField_ProfileFieldValueFragment,
   ProfileField_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
+import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
 import { discriminator } from "@parallel/utils/discriminator";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { getReplyContents } from "@parallel/utils/getReplyContents";
+import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { unMaybeArray } from "@parallel/utils/types";
 import usePrevious from "@react-hook/previous";
 import { isPast, sub } from "date-fns";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
@@ -122,83 +124,136 @@ export function ProfileField(props: ProfileFieldProps) {
 
   const needsExpirationDialog =
     field.isExpirable && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate);
-
   const suggestions = fieldsWithIndices.flatMap(([petitionField, fieldIndex]) => {
-    const { type: petitionFieldType } = petitionField;
-    return petitionField.replies.flatMap((reply) => {
-      return getReplyContents({ intl, reply, petitionField })
-        .filter((c) => {
-          switch (field.type) {
-            case "DATE": {
-              return reply.content.value !== content?.value;
-            }
-            case "FILE": {
-              return (
-                !isDefined(c.error) &&
-                isDefined(content?.value) &&
-                !content?.value.some(
-                  (event: ProfileFieldFileAction) => event.type === "COPY" && event.id === reply.id,
-                ) &&
-                !files?.some(({ file }) => file?.filename === c.filename)
-              );
-            }
-            default:
-              return c !== content?.value && reply.content.value !== content?.value;
+    return petitionField.replies
+      .filter((reply) => {
+        if (reply.isAnonymized) {
+          return false;
+        }
+        if (field.type === "FILE") {
+          return !isDefined(reply.content.error);
+        } else {
+          return isDefined(reply.content.value);
+        }
+      })
+      .flatMap((reply) => {
+        if (isFileTypeField(petitionField.type)) {
+          if (
+            content?.value.some(
+              (event: ProfileFieldFileAction) => event.type === "COPY" && event.id === reply.id,
+            ) ||
+            files?.some(({ file }) => file?.filename === reply.content.filename)
+          ) {
+            return [];
           }
-        })
-        .map((replyContent, i) => {
           return (
             <ProfileFieldSuggestion
-              key={reply.id + index + i}
+              key={reply.id}
               petitionField={petitionField}
-              fieldIndex={fieldIndex}
-              replyId={reply.id}
-              value={isFileTypeField(petitionFieldType) ? replyContent.filename : replyContent}
-              onReplyClick={() => {
-                if (isFileTypeField(petitionFieldType)) {
-                  setValue(
-                    `fields.${index}.content.value`,
-                    [
-                      ...(content?.value ?? []),
-                      {
-                        type: "COPY",
-                        file: {
-                          name: reply.content.filename,
-                          type: reply.content.contentType,
-                          size: reply.content.size,
-                        },
-                        id: reply.id,
-                      },
-                    ],
+              petitionFieldIndex={fieldIndex}
+              onClick={() => {
+                setValue(
+                  `fields.${index}.content.value`,
+                  [
+                    ...(content?.value ?? []),
                     {
-                      shouldDirty: true,
+                      type: "COPY",
+                      file: {
+                        name: reply.content.filename,
+                        type: reply.content.contentType,
+                        size: reply.content.size,
+                      },
+                      id: reply.id,
                     },
-                  );
-                } else {
-                  let value = "";
-                  switch (petitionFieldType) {
-                    case "DATE":
-                      value = reply.content.value;
-                      break;
-                    default:
-                      value = replyContent;
-                      break;
-                  }
-                  setValue(`fields.${index}.content.value`, value, { shouldDirty: true });
+                  ],
+                  { shouldDirty: true },
+                );
+                if (needsExpirationDialog) {
+                  showModifyExpirationDialog({ isDirty: true });
                 }
-                needsExpirationDialog && showModifyExpirationDialog({ isDirty: true });
               }}
-            />
+            >
+              {reply.content.filename}
+            </ProfileFieldSuggestion>
           );
-        });
-    });
+        } else {
+          /**
+           * hay que tener en cuenta varias cosas
+           * - NUMBER y DATE tienen representaciones visuales, si se important a campos que no son
+           *   del mismo tipo hay que importar la representacion visual
+           * - DATE_TIME tiene representacion visual que es la que se importa siempre (no hay campo
+           *   de perfiles de tipo DATE_TIME)
+           * - Los campos CHECKBOX tienen varias respuestas, de ahí todos los unMaybeArray, para
+           *   gestionar el caso ese
+           * - El resto de campos se toma directamente el value que deberia ser siempre string
+           */
+          return unMaybeArray(
+            petitionField.type === "NUMBER"
+              ? {
+                  text: formatNumberWithPrefix(
+                    intl,
+                    reply.content.value,
+                    petitionField.options as FieldOptions["NUMBER"],
+                  ),
+                  value:
+                    field.type === "NUMBER"
+                      ? reply.content.value
+                      : formatNumberWithPrefix(
+                          intl,
+                          reply.content.value,
+                          petitionField.options as FieldOptions["NUMBER"],
+                        ),
+                }
+              : petitionField.type === "DATE"
+              ? {
+                  text: intl.formatDate(reply.content.value as string, {
+                    ...FORMATS.L,
+                    timeZone: "UTC",
+                  }),
+                  value:
+                    field.type === "DATE"
+                      ? reply.content.value
+                      : intl.formatDate(reply.content.value as string, {
+                          ...FORMATS.L,
+                          timeZone: "UTC",
+                        }),
+                }
+              : unMaybeArray(
+                  petitionField.type === "DATE_TIME"
+                    ? `${intl.formatDate(reply.content.value as string, {
+                        timeZone: reply.content.timezone,
+                        ...FORMATS["L+LT"],
+                      })} (${prettifyTimezone(reply.content.timezone)})`
+                    : petitionField.type === "CHECKBOX"
+                    ? (reply.content.value as string[])
+                    : (reply.content.value as string),
+                ).map((text) => ({ text, value: text })),
+          )
+            .filter(({ value }) => content?.value !== value)
+            .map(({ value, text }, i) => (
+              <ProfileFieldSuggestion
+                key={`${reply.id}-${i}`}
+                petitionField={petitionField}
+                petitionFieldIndex={fieldIndex}
+                onClick={() => {
+                  setValue(`fields.${index}.content.value`, value, { shouldDirty: true });
+                  if (needsExpirationDialog) {
+                    showModifyExpirationDialog({ isDirty: true });
+                  }
+                }}
+              >
+                {text}
+              </ProfileFieldSuggestion>
+            ));
+        }
+      });
   });
 
   const commonProps = {
     ...props,
     expiryDate,
-    showSuggestionsButton: suggestions.length > 0 && fieldHasValue,
-    areSuggestionsVisible: showSuggestions,
+    showSuggestionsButton: suggestions.length > 0 && fieldHasValue && !props.isDisabled,
+    areSuggestionsVisible: showSuggestions && !props.isDisabled,
     onToggleSuggestions: () => setShowSuggestions((v) => !v),
     showExpiryDateDialog: needsExpirationDialog ? showModifyExpirationDialog : noop,
   };
@@ -307,10 +362,8 @@ ProfileField.fragments = {
         expiryAlertAheadTime
         options
         ...ProfileFieldInputGroup_ProfileTypeField
-        ...ProfileFieldSuggestion_ProfileTypeField
       }
       ${ProfileFieldInputGroup.fragments.ProfileTypeField}
-      ${ProfileFieldSuggestion.fragments.ProfileTypeField}
     `;
   },
   get ProfileFieldValue() {
@@ -333,6 +386,12 @@ ProfileField.fragments = {
     return gql`
       fragment ProfileField_PetitionField on PetitionField {
         id
+        options
+        replies {
+          id
+          isAnonymized
+          content
+        }
         ...ProfileFieldSuggestion_PetitionField
       }
       ${ProfileFieldSuggestion.fragments.PetitionField}

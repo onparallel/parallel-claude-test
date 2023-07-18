@@ -1,9 +1,12 @@
-import { useIntl } from "react-intl";
+import { IntlShape } from "react-intl";
 import { isDefined } from "remeda";
 import { FieldOptions } from "./petitionFields";
 
-export function formatNumberWithPrefix(value: number, options: FieldOptions["NUMBER"]): string {
-  const intl = useIntl();
+export function formatNumberWithPrefix(
+  intl: IntlShape,
+  value: number,
+  options: FieldOptions["NUMBER"],
+): string {
   const hasPrefix = isDefined(options.prefix) || isDefined(options.suffix) ? true : false;
   const formattedValue = intl.formatNumber(value, {
     minimumFractionDigits: 0,

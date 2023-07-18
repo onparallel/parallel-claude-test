@@ -17,12 +17,12 @@ export function getReplyContents({
   intl: IntlShape;
   petitionField: getReplyContents_PetitionFieldFragment;
   reply: getReplyContents_PetitionFieldReplyFragment;
-}) {
+}): any[] {
   const { type, options } = petitionField;
   return isFileTypeField(type)
     ? [reply.content]
     : type === "NUMBER"
-    ? [formatNumberWithPrefix(reply.content.value, options as FieldOptions["NUMBER"])]
+    ? [formatNumberWithPrefix(intl, reply.content.value, options as FieldOptions["NUMBER"])]
     : type === "DATE"
     ? [intl.formatDate(reply.content.value as string, { ...FORMATS.L, timeZone: "UTC" })]
     : type === "DATE_TIME"
@@ -32,10 +32,10 @@ export function getReplyContents({
           ...FORMATS["L+LT"],
         })} (${prettifyTimezone(reply.content.timezone)})`,
       ]
-    : Array.isArray(reply.content.value)
-    ? type === "DYNAMIC_SELECT"
-      ? reply.content.value.map((v) => v[1])
-      : reply.content.value
+    : type === "CHECKBOX"
+    ? reply.content.value
+    : type === "DYNAMIC_SELECT"
+    ? reply.content.value.map((v: [string, string]) => v[1])
     : [reply.content.value];
 }
 

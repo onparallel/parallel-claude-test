@@ -65,7 +65,7 @@ function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragm
       return {
         type,
         profileTypeFieldId: id,
-        content: type === "FILE" ? { value: [] } : value?.content ?? { value: "" },
+        content: type === "FILE" ? { value: [] } : value?.content ?? { value: undefined },
         expiryDate: isExpirable
           ? (type === "FILE" ? files?.[0]?.expiryDate : value?.expiryDate) ?? null
           : null,
@@ -466,6 +466,7 @@ export const ProfileForm = Object.assign(
             position
             type
             myPermission
+            alias
             ...ProfileField_ProfileTypeField
           }
           ${ProfileField.fragments.ProfileTypeField}
@@ -533,6 +534,7 @@ export const ProfileForm = Object.assign(
         return gql`
           fragment ProfileForm_PetitionField on PetitionField {
             id
+            alias
             ...ProfileField_PetitionField
           }
           ${ProfileField.fragments.PetitionField}

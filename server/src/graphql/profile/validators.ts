@@ -121,7 +121,16 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
       return;
     }
     case "NUMBER": {
-      const valid = ajv.validate(stringValueSchema(), content);
+      const valid = ajv.validate(
+        {
+          type: "object",
+          properties: {
+            value: { type: "number" },
+          },
+          additionalProperties: false,
+        },
+        content,
+      );
       if (!valid) {
         throw new Error(ajv.errorsText());
       }

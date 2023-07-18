@@ -15227,21 +15227,15 @@ export type ProfileDrawer_ProfileFragment = {
 export type ProfileDrawer_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  alias?: string | null;
+  options: { [key: string]: any };
   title?: string | null;
   type: PetitionFieldType;
-  visibility?: { [key: string]: any } | null;
-  options: { [key: string]: any };
-  position: number;
-  multiple: boolean;
-  isInternal: boolean;
-  isReadOnly: boolean;
-  alias?: string | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
     isAnonymized: boolean;
+    content: { [key: string]: any };
   }>;
 };
 
@@ -15268,10 +15262,10 @@ export type ProfileDrawer_profileQuery = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
-        alias?: string | null;
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -15392,40 +15386,11 @@ export type ExportRepliesProgressDialog_petitionQuery = {
     | null;
 };
 
-export type ProfileFieldSuggestion_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
-  id: string;
-  status: PetitionFieldReplyStatus;
-  content: { [key: string]: any };
-  isAnonymized: boolean;
-};
-
 export type ProfileFieldSuggestion_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   title?: string | null;
   type: PetitionFieldType;
-  visibility?: { [key: string]: any } | null;
-  options: { [key: string]: any };
-  position: number;
-  multiple: boolean;
-  isInternal: boolean;
-  isReadOnly: boolean;
-  alias?: string | null;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    isAnonymized: boolean;
-  }>;
-};
-
-export type ProfileFieldSuggestion_ProfileTypeFieldFragment = {
-  __typename?: "ProfileTypeField";
-  id: string;
-  alias?: string | null;
-  type: ProfileTypeFieldType;
 };
 
 export type ProfileForm_ProfileTypeFieldFragment = {
@@ -15435,10 +15400,10 @@ export type ProfileForm_ProfileTypeFieldFragment = {
   position: number;
   type: ProfileTypeFieldType;
   myPermission: ProfileTypeFieldPermissionType;
+  alias?: string | null;
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
   options: { [key: string]: any };
-  alias?: string | null;
 };
 
 export type ProfileForm_ProfileFieldFileFragment = {
@@ -15471,10 +15436,10 @@ export type ProfileForm_ProfileFieldPropertyFragment = {
     position: number;
     type: ProfileTypeFieldType;
     myPermission: ProfileTypeFieldPermissionType;
+    alias?: string | null;
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
     options: { [key: string]: any };
-    alias?: string | null;
   };
   files?: Array<{
     __typename?: "ProfileFieldFile";
@@ -15515,10 +15480,10 @@ export type ProfileForm_ProfileFragment = {
       position: number;
       type: ProfileTypeFieldType;
       myPermission: ProfileTypeFieldPermissionType;
+      alias?: string | null;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
       options: { [key: string]: any };
-      alias?: string | null;
     };
     files?: Array<{
       __typename?: "ProfileFieldFile";
@@ -15546,21 +15511,15 @@ export type ProfileForm_ProfileFragment = {
 export type ProfileForm_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  alias?: string | null;
+  options: { [key: string]: any };
   title?: string | null;
   type: PetitionFieldType;
-  visibility?: { [key: string]: any } | null;
-  options: { [key: string]: any };
-  position: number;
-  multiple: boolean;
-  isInternal: boolean;
-  isReadOnly: boolean;
-  alias?: string | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
     isAnonymized: boolean;
+    content: { [key: string]: any };
   }>;
 };
 
@@ -15611,10 +15570,10 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
-        alias?: string | null;
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -15679,10 +15638,10 @@ export type ProfileForm_createProfileFieldFileUploadLinkMutation = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
-        alias?: string | null;
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -16037,7 +15996,6 @@ export type ProfileField_ProfileTypeFieldFragment = {
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
   options: { [key: string]: any };
-  alias?: string | null;
 };
 
 export type ProfileField_ProfileFieldValueFragment = {
@@ -16062,21 +16020,14 @@ export type ProfileField_ProfileFieldFileFragment = {
 export type ProfileField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  options: { [key: string]: any };
   title?: string | null;
   type: PetitionFieldType;
-  visibility?: { [key: string]: any } | null;
-  options: { [key: string]: any };
-  position: number;
-  multiple: boolean;
-  isInternal: boolean;
-  isReadOnly: boolean;
-  alias?: string | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
     isAnonymized: boolean;
+    content: { [key: string]: any };
   }>;
 };
 
@@ -26467,7 +26418,6 @@ export type PetitionReplies_PetitionFragment = {
     title?: string | null;
     description?: string | null;
     hasCommentsEnabled: boolean;
-    position: number;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
@@ -26936,7 +26886,6 @@ export type PetitionReplies_closePetitionMutation = {
       title?: string | null;
       description?: string | null;
       hasCommentsEnabled: boolean;
-      position: number;
       previewReplies: Array<{
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
@@ -27189,7 +27138,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       title?: string | null;
       description?: string | null;
       hasCommentsEnabled: boolean;
-      position: number;
       previewReplies: Array<{
         __typename?: "PetitionFieldReply";
         content: { [key: string]: any };
@@ -27608,7 +27556,6 @@ export type PetitionReplies_petitionQuery = {
           title?: string | null;
           description?: string | null;
           hasCommentsEnabled: boolean;
-          position: number;
           previewReplies: Array<{
             __typename?: "PetitionFieldReply";
             content: { [key: string]: any };
@@ -28703,10 +28650,10 @@ export type ProfileDetail_ProfileFragment = {
       position: number;
       type: ProfileTypeFieldType;
       myPermission: ProfileTypeFieldPermissionType;
+      alias?: string | null;
       isExpirable: boolean;
       expiryAlertAheadTime?: Duration | null;
       options: { [key: string]: any };
-      alias?: string | null;
     };
     files?: Array<{
       __typename?: "ProfileFieldFile";
@@ -28814,10 +28761,10 @@ export type ProfileDetail_profileQuery = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
-        alias?: string | null;
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -28880,10 +28827,10 @@ export type ProfileDetail_subscribeToProfileMutation = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
-        alias?: string | null;
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -28946,10 +28893,10 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
         isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
         options: { [key: string]: any };
-        alias?: string | null;
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -37015,35 +36962,22 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFieldFragment, unknown>;
-export const ProfileFieldSuggestion_PetitionFieldReplyFragmentDoc = gql`
-  fragment ProfileFieldSuggestion_PetitionFieldReply on PetitionFieldReply {
-    id
-    status
-    content
-    isAnonymized
-  }
-` as unknown as DocumentNode<ProfileFieldSuggestion_PetitionFieldReplyFragment, unknown>;
 export const ProfileFieldSuggestion_PetitionFieldFragmentDoc = gql`
   fragment ProfileFieldSuggestion_PetitionField on PetitionField {
     id
     title
     type
-    visibility
-    options
-    position
-    multiple
-    isInternal
-    isReadOnly
-    alias
-    replies {
-      ...ProfileFieldSuggestion_PetitionFieldReply
-    }
   }
-  ${ProfileFieldSuggestion_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ProfileFieldSuggestion_PetitionFieldFragment, unknown>;
 export const ProfileField_PetitionFieldFragmentDoc = gql`
   fragment ProfileField_PetitionField on PetitionField {
     id
+    options
+    replies {
+      id
+      isAnonymized
+      content
+    }
     ...ProfileFieldSuggestion_PetitionField
   }
   ${ProfileFieldSuggestion_PetitionFieldFragmentDoc}
@@ -37051,6 +36985,7 @@ export const ProfileField_PetitionFieldFragmentDoc = gql`
 export const ProfileForm_PetitionFieldFragmentDoc = gql`
   fragment ProfileForm_PetitionField on PetitionField {
     id
+    alias
     ...ProfileField_PetitionField
   }
   ${ProfileField_PetitionFieldFragmentDoc}
@@ -37592,13 +37527,6 @@ export const ProfileFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
     expiryAlertAheadTime
   }
 ` as unknown as DocumentNode<ProfileFieldInputGroup_ProfileTypeFieldFragment, unknown>;
-export const ProfileFieldSuggestion_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileFieldSuggestion_ProfileTypeField on ProfileTypeField {
-    id
-    alias
-    type
-  }
-` as unknown as DocumentNode<ProfileFieldSuggestion_ProfileTypeFieldFragment, unknown>;
 export const ProfileField_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileField_ProfileTypeField on ProfileTypeField {
     id
@@ -37608,10 +37536,8 @@ export const ProfileField_ProfileTypeFieldFragmentDoc = gql`
     expiryAlertAheadTime
     options
     ...ProfileFieldInputGroup_ProfileTypeField
-    ...ProfileFieldSuggestion_ProfileTypeField
   }
   ${ProfileFieldInputGroup_ProfileTypeFieldFragmentDoc}
-  ${ProfileFieldSuggestion_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileField_ProfileTypeFieldFragment, unknown>;
 export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileForm_ProfileTypeField on ProfileTypeField {
@@ -37620,6 +37546,7 @@ export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
     position
     type
     myPermission
+    alias
     ...ProfileField_ProfileTypeField
   }
   ${ProfileField_ProfileTypeFieldFragmentDoc}

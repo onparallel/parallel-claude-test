@@ -368,7 +368,7 @@ function PetitionExportField({
                   </View>
                 ) : field.type === "NUMBER" ? (
                   <Text style={[styles.text]}>
-                    {formatNumberWithPrefix(reply.content.value, field!.options)}
+                    {formatNumberWithPrefix(intl, reply.content.value, field!.options)}
                   </Text>
                 ) : field.type === "DATE" ? (
                   <Text style={[styles.text]}>
