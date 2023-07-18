@@ -113,7 +113,7 @@ export const petitionInformation = queryField("petitionInformation", {
         throw new Error(`Petition:${petitionId} not found`);
       }
 
-      const organization = (await ctx.organizations.loadOrg(petition.org_id))!;
+      const org = (await ctx.organizations.loadOrg(petition.org_id))!;
       const permissions = (await ctx.petitions.loadEffectivePermissions(petitionId))!;
       const userDatas = (
         await ctx.users.loadUserDataByUserId(permissions.map((p) => p.user_id!))
@@ -122,11 +122,14 @@ export const petitionInformation = queryField("petitionInformation", {
       return {
         result: RESULT.SUCCESS,
         message: outdent`
-          Organization:${organization.id} (${toGlobalId("Organization", organization.id)})
-          Name: ${organization.name}
+          Petition: ${petition.name} (${petition.id} | ${toGlobalId("Petition", petition.id)})
+          Organization: ${org.name} (${org.id} | ${toGlobalId("Organization", org.id)})
           Users: 
           ${zip(permissions, userDatas)
-            .map(([p, ud]) => `  - ${ud.email} (${p.type})`)
+            .map(
+              ([p, ud]) =>
+                `  - ${ud.email} ${p.type} (${p.user_id} | ${toGlobalId("User", p.user_id!)})`,
+            )
             .join("\n")}
       `,
       };
