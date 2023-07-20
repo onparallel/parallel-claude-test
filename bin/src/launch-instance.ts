@@ -43,7 +43,7 @@ const SUBNET_ID = {
   "eu-central-1b": "subnet-77f2e10a",
   "eu-central-1c": "subnet-eb22c4a7",
 };
-const numInstances = {
+const NUM_INSTANCES = {
   production: 2,
   staging: 1,
 };
@@ -75,7 +75,7 @@ async function main() {
     .then((res) => res.Images![0]);
 
   pMap(
-    range(0, numInstances[env]),
+    range(0, NUM_INSTANCES[env]),
     async (i) => {
       const name = `parallel-${env}-${commit}-${i + 1}`;
       const result = await (async () => {
