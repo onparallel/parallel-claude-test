@@ -3,7 +3,13 @@ import { formatInTimeZone } from "date-fns-tz";
 import Excel from "exceljs";
 import { isDefined, minBy, zip } from "remeda";
 import { Readable } from "stream";
-import { PetitionField, PetitionFieldReply, PetitionMessage } from "../../db/__types";
+import {
+  PetitionField,
+  PetitionFieldReply,
+  PetitionMessage,
+  PetitionSignatureRequest,
+  PetitionStatus,
+} from "../../db/__types";
 import { FORMATS } from "../../util/dates";
 import { getFieldIndices } from "../../util/fieldIndices";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
@@ -12,6 +18,45 @@ import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
+import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
+
+function getPetitionSignatureStatus({
+  status,
+  currentSignatureRequest,
+  signatureConfig,
+}: {
+  status: PetitionStatus;
+  currentSignatureRequest?: PetitionSignatureRequest | null;
+  signatureConfig?: PetitionSignatureConfig | null;
+}) {
+  if (
+    isDefined(signatureConfig) &&
+    ["COMPLETED", "CLOSED"].includes(status) &&
+    (!currentSignatureRequest ||
+      currentSignatureRequest.status === "COMPLETED" ||
+      currentSignatureRequest.cancel_reason === "CANCELLED_BY_USER")
+  ) {
+    // petition is completed and configured to be reviewed before starting signature
+    // and signature was never started or the last one is already completed (now we're starting a new request)
+    // this means the user has to manually trigger the start of the signature request
+    return "PENDING_START";
+  }
+
+  if (isDefined(currentSignatureRequest)) {
+    // signature request is already started, return the current status
+    if (["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignatureRequest.status)) {
+      return "PROCESSING";
+    } else {
+      return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
+    }
+  } else if (isDefined(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
+    // petition has signature configured but it's not yet completed
+    return "NOT_STARTED";
+  }
+
+  // petition doesn't have signature configured and never started a signature request
+  return "NO_SIGNATURE";
+}
 
 export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
   async run() {
@@ -60,6 +105,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         petitionsOwner,
         petitionsTags,
         petitionsEvents,
+        latestSignatures,
       ] = await Promise.all([
         this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
@@ -67,6 +113,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
         this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.loadLatestPetitionSignatureByPetitionId(
+          petitions.map((p) => p.id),
+        ),
       ]);
 
       const petitionsAccessesContacts = await Promise.all(
@@ -119,6 +168,12 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           .filter((e) => e.type === "SIGNATURE_COMPLETED")
           .at(-1);
 
+        const latestSignatureStatus = getPetitionSignatureStatus({
+          status: petition.status!,
+          currentSignatureRequest: latestSignatures[petitionIndex],
+          signatureConfig: petition.signature_config,
+        });
+
         const row: Record<string, Maybe<string | Date>> = {
           "parallel-id": toGlobalId("Petition", petition.id),
           "parallel-name": petition.name || "",
@@ -153,6 +208,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
                 }),
               }[petition.status]
             : null,
+          "signature-status": latestSignatureStatus,
           "completed-at": latestPetitionCompletedEvent?.created_at ?? null,
           "closed-at": latestPetitionClosedEvent?.created_at ?? null,
           "signed-at": latestSignatureCompletedEvent?.created_at ?? null,
@@ -318,6 +374,13 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         title: intl.formatMessage({
           id: "export-template-report.column-header.parallel-status",
           defaultMessage: "Status",
+        }),
+      },
+      {
+        id: "signature-status",
+        title: intl.formatMessage({
+          id: "export-template-report.column-header.parallel-signature-status",
+          defaultMessage: "Signature status",
         }),
       },
       {

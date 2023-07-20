@@ -220,6 +220,11 @@
     "context": "Owner"
   },
   {
+    "term": "export-template-report.column-header.parallel-signature-status",
+    "definition": "Signature status",
+    "context": "Signature status"
+  },
+  {
     "term": "export-template-report.column-header.parallel-signed-at",
     "definition": "Signed at",
     "context": "Signed at"
