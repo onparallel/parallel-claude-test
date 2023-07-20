@@ -8531,13 +8531,13 @@
   },
   {
     "term": "generic.profile-type-field-type.short-text",
-    "definition": "Respuestas cortas",
-    "context": "Short replies"
+    "definition": "Texto corto",
+    "context": "Short text"
   },
   {
     "term": "generic.profile-type-field-type.text",
-    "definition": "Respuestas largas",
-    "context": "Long replies"
+    "definition": "Texto largo",
+    "context": "Long text"
   },
   {
     "term": "generic.recommended",

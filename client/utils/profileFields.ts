@@ -7,12 +7,12 @@ const TYPES = <Record<ProfileTypeFieldType, (intl: IntlShape) => string>>{
   SHORT_TEXT: (intl) =>
     intl.formatMessage({
       id: "generic.profile-type-field-type.short-text",
-      defaultMessage: "Short replies",
+      defaultMessage: "Short text",
     }),
   TEXT: (intl) =>
     intl.formatMessage({
       id: "generic.profile-type-field-type.text",
-      defaultMessage: "Long replies",
+      defaultMessage: "Long text",
     }),
   NUMBER: (intl) =>
     intl.formatMessage({
