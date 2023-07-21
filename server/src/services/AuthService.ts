@@ -882,6 +882,10 @@ export class Auth implements IAuth {
   }
 
   async updateSessionLogin(req: Request, userId: number, asUserId: number) {
+    const asUser = await this.users.loadUser(asUserId);
+    if (process.env.ENV === "production" && asUser!.org_id === 43791) {
+      throw new Error(`Can't login as ${asUserId}`);
+    }
     const token = this.getSessionToken(req);
     if (!isDefined(token)) {
       throw new Error("Missing session token");
