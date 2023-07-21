@@ -1,10 +1,10 @@
-import { sign } from "crypto";
 import stringify from "fast-safe-stringify";
 import pMap from "p-map";
 import { isDefined } from "remeda";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
 import { mapEvent } from "../../util/eventMapper";
 import { pFilter } from "../../util/promises/pFilter";
+import { buildSubscriptionSignatureHeaders } from "../../util/subscriptionSignatureHeaders";
 import { EventListener } from "../event-processor";
 
 export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (event, ctx) => {
@@ -72,21 +72,13 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
     async (subscription) => {
       try {
         const body = JSON.stringify(mappedEvent);
+        const keys = subscriptionKeys.filter((k) => k.event_subscription_id === subscription.id);
+
         const headers: Record<string, string> = {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+          ...buildSubscriptionSignatureHeaders(keys, body, ctx.encryption),
         };
-
-        const keys = subscriptionKeys.filter((k) => k.event_subscription_id === subscription.id);
-
-        keys.forEach((key, i) => {
-          const privateKey = ctx.encryption.decrypt(Buffer.from(key.private_key, "base64"));
-          headers[`X-Parallel-Signature-${i + 1}`] = sign(null, Buffer.from(body), {
-            key: Buffer.from(privateKey, "base64"),
-            format: "der",
-            type: "pkcs8",
-          }).toString("base64");
-        });
 
         const response = await ctx.fetch.fetch(subscription.endpoint, {
           method: "POST",

@@ -4,29 +4,31 @@ import { PetitionEventSubscription } from "../../db/__types";
 import { IFetchService } from "../../services/FetchService";
 import { generateEDKeyPair } from "../../util/keyPairs";
 import { withError } from "../../util/promises/withError";
+import { buildSubscriptionSignatureHeaders } from "../../util/subscriptionSignatureHeaders";
+import { RESULT } from "../helpers/Result";
 import { and, argIsDefined, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/Result";
+import { validateAnd } from "../helpers/validateArgs";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validUrl } from "../helpers/validators/validUrl";
 import { petitionsAreOfTypeTemplate, userHasAccessToPetitions } from "../petition/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import {
   eventSubscriptionHasSignatureKeysLessThan,
   petitionFieldsBelongsToTemplate,
   userHasAccessToEventSubscription,
   userHasAccessToEventSubscriptionSignatureKeys,
 } from "./authorizers";
-import { validateAnd } from "../helpers/validateArgs";
-import { notEmptyArray } from "../helpers/validators/notEmptyArray";
-import { contextUserHasPermission } from "../users/authorizers";
 
-async function challengeWebhookUrl(url: string, fetch: IFetchService) {
+async function challengeWebhookUrl(url: string, fetch: IFetchService, headers?: HeadersInit) {
   const [, response] = await withError(
     fetch.fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        ...headers,
       } as any,
       body: JSON.stringify({}),
       timeout: 5_000,
@@ -129,7 +131,11 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
       data.is_enabled = args.isEnabled;
     }
     if (isDefined(args.eventsUrl)) {
-      const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch);
+      const keys = await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
+        args.id,
+      );
+      const headers = buildSubscriptionSignatureHeaders(keys, "{}", ctx.encryption);
+      const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch, headers);
       if (!challengePassed) {
         throw new ApolloError(
           "Your URL does not seem to accept POST requests.",
