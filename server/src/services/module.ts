@@ -48,7 +48,6 @@ import {
 } from "./ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE, QueuesService } from "./QueuesService";
 import { IRedis, REDIS, Redis } from "./Redis";
-import { IReportsService, REPORTS_SERVICE, ReportsService } from "./ReportsService";
 import { ISignatureService, SIGNATURE, SignatureService } from "./SignatureService";
 import { ISmtp, SMTP, Smtp } from "./Smtp";
 import { IStorageService, STORAGE_SERVICE, StorageService } from "./StorageService";
@@ -78,7 +77,6 @@ export const servicesModule = new ContainerModule((bind) => {
     PetitionImportExportService,
   );
   bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE).to(OrganizationLayoutService);
-  bind<IReportsService>(REPORTS_SERVICE).to(ReportsService);
   bind<IAccountSetupService>(ACCOUNT_SETUP_SERVICE).to(AccountSetupService);
   bind<IIntegrationsSetupService>(INTEGRATIONS_SETUP_SERVICE).to(IntegrationsSetupService);
   bind<IProfilesSetupService>(PROFILES_SETUP_SERVICE).to(ProfilesSetupService);

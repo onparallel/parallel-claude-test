@@ -22,27 +22,28 @@ import {
 import { RESULT } from "../../graphql";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
-import { TemplateStatsReportInput } from "../../services/ReportsService";
 import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { PetitionFieldVisibility, evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { isValueCompatible } from "../../util/isValueCompatible";
 import { keyBuilder } from "../../util/keyBuilder";
-import {
-  replacePlaceholdersInSlate,
-  replacePlaceholdersInText,
-} from "../../util/slate/placeholders";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { PetitionAccessReminderConfig, calculateNextReminder } from "../../util/reminderUtils";
 import { safeJsonParse } from "../../util/safeJsonParse";
-import { SlateNode } from "../../util/slate/render";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
+import {
+  replacePlaceholdersInSlate,
+  replacePlaceholdersInText,
+} from "../../util/slate/placeholders";
+import { SlateNode } from "../../util/slate/render";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
 import { validateReplyValue } from "../../util/validateReplyValue";
+import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
 import {
   Contact,
   ContactLocale,
@@ -107,7 +108,6 @@ import {
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
 import { OrganizationRepository } from "./OrganizationRepository";
-import { isValueCompatible } from "../../util/isValueCompatible";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 
