@@ -85,7 +85,7 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
               <Text>
                 <FormattedMessage
                   id="component.branding-general-preview.body"
-                  defaultMessage="We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
+                  defaultMessage="We remind you that <b>{name}</b> shared with you a link and some of the requested information has not yet been submitted."
                   values={{ tone: brand.preferredTone, name: user.fullName }}
                 />
               </Text>

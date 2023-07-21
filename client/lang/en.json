@@ -401,8 +401,8 @@
   },
   {
     "term": "component.branding-general-preview.body",
-    "definition": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted.",
-    "context": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
+    "definition": "We remind you that <b>{name}</b> shared with you a link and some of the requested information has not yet been submitted.",
+    "context": "We remind you that <b>{name}</b> shared with you a link and some of the requested information has not yet been submitted."
   },
   {
     "term": "component.branding-general-preview.complete-information",

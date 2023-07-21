@@ -401,8 +401,8 @@
   },
   {
     "term": "component.branding-general-preview.body",
-    "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió un parallel en el que queda información pendiente de completar.}}",
-    "context": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
+    "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un enlace en el que queda información pendiente de completar.} other{Le recordamos que <b>{name}</b> le envió un parallel en el que queda información pendiente de completar.}}",
+    "context": "We remind you that <b>{name}</b> shared with you a link and some of the requested information has not yet been submitted."
   },
   {
     "term": "component.branding-general-preview.complete-information",
@@ -426,7 +426,7 @@
   },
   {
     "term": "component.branding-general-preview.pending-fields",
-    "definition": "{tone, select, INFORMAL{En este momento hay 12/40 campos pendientes} other{Tiene 12/40 campos pendientes}}",
+    "definition": "{tone, select, INFORMAL{Tienes 12/40 campos pendientes} other{En este momento hay 12/40 campos pendientes}}",
     "context": "{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
   },
   {
