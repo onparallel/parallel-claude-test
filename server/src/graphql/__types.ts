@@ -191,6 +191,11 @@ export interface NexusGenInputs {
     en?: NexusGenScalars["JSON"] | null; // JSON
     es?: NexusGenScalars["JSON"] | null; // JSON
   };
+  OrganizationUpdateInput: {
+    // input type
+    name?: string | null; // String
+    status?: NexusGenEnums["OrganizationStatus"] | null; // OrganizationStatus
+  };
   PetitionFilter: {
     // input type
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -1599,6 +1604,7 @@ export interface NexusGenFieldTypes {
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateOrganization: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationAutoAnonymizePeriod: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationBrandTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
@@ -3668,6 +3674,7 @@ export interface NexusGenFieldTypeNames {
     updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
+    updateOrganization: "Organization";
     updateOrganizationAutoAnonymizePeriod: "Organization";
     updateOrganizationBrandTheme: "Organization";
     updateOrganizationLogo: "Organization";
@@ -6132,6 +6139,11 @@ export interface NexusGenArgTypes {
       image?: NexusGenScalars["Upload"] | null; // Upload
       slug?: string | null; // String
       templateId: NexusGenScalars["GID"]; // GID!
+    };
+    updateOrganization: {
+      // args
+      data: NexusGenInputs["OrganizationUpdateInput"]; // OrganizationUpdateInput!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     updateOrganizationAutoAnonymizePeriod: {
       // args

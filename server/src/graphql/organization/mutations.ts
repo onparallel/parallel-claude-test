@@ -11,9 +11,9 @@ import {
   stringArg,
 } from "nexus";
 import { isDefined, pick } from "remeda";
-import { OrganizationTheme } from "../../db/__types";
-import { fullName } from "../../util/fullName";
+import { Organization, OrganizationTheme } from "../../db/__types";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
+import { fullName } from "../../util/fullName";
 import { removeKeys } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { authenticateAnd, userIsSuperAdmin } from "../helpers/authorize";
@@ -24,11 +24,11 @@ import { validateAnd } from "../helpers/validateArgs";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { inRange } from "../helpers/validators/inRange";
 import { maxLength } from "../helpers/validators/maxLength";
-import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validFontFamily } from "../helpers/validators/validFontFamily";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
+import { validateFile } from "../helpers/validators/validateFile";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { validateHexColor } from "../tag/validators";
 import { contextUserHasPermission } from "../users/authorizers";
@@ -37,6 +37,7 @@ import {
   organizationThemeIsNotDefault,
   userHasAccessToOrganizationTheme,
 } from "./authorizers";
+import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   description: "Updates the logo of an organization",
@@ -369,6 +370,48 @@ export const updateOrganizationUserLimit = mutationField("updateOrganizationUser
     return await ctx.organizations.updateOrganizationUsageDetails(
       orgId,
       { USER_LIMIT: limit },
+      `User:${ctx.user!.id}`,
+    );
+  },
+});
+
+export const updateOrganization = mutationField("updateOrganization", {
+  description: "Updates the organization",
+  type: "Organization",
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    data: nonNull(
+      inputObjectType({
+        name: "OrganizationUpdateInput",
+        definition(t) {
+          t.nullable.string("name");
+          t.nullable.field("status", { type: "OrganizationStatus" });
+        },
+      }).asArg(),
+    ),
+  },
+  authorize: authenticateAnd(userIsSuperAdmin()),
+  validateArgs: validateAnd(
+    (_, args, ctx, info) => {
+      if (args.data.status === "ROOT") {
+        throw new ArgValidationError(info, "data.status", "Can't update an org with ROOT status");
+      }
+    },
+    notEmptyObject((args) => args.data, "data"),
+  ),
+  resolve: async (_, { orgId, data }, ctx) => {
+    const updatedOrgData = {} as Organization;
+
+    if (isDefined(data.name)) {
+      updatedOrgData.name = data.name;
+    }
+
+    if (isDefined(data.status)) {
+      updatedOrgData.status = data.status;
+    }
+    return await ctx.organizations.updateOrganization(
+      orgId,
+      updatedOrgData,
       `User:${ctx.user!.id}`,
     );
   },

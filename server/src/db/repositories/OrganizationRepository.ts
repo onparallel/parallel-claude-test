@@ -155,7 +155,7 @@ export class OrganizationRepository extends BaseRepository {
 
   async updateOrganization(
     id: number,
-    data: Partial<CreateOrganization>,
+    data: Partial<Organization>,
     updatedBy: string,
     t?: Knex.Transaction,
   ) {

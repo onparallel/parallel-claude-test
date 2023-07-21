@@ -3030,6 +3030,16 @@
     "context": "SSO provider"
   },
   {
+    "term": "component.organization-status-dialog.organization-status",
+    "definition": "Organization status",
+    "context": "Organization status"
+  },
+  {
+    "term": "component.organization-status-dialog.update-organization-status",
+    "definition": "Update organization status",
+    "context": "Update organization status"
+  },
+  {
     "term": "component.organization-usage-periods-table.limit.header",
     "definition": "Limit",
     "context": "Limit"

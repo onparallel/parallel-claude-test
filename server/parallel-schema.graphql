@@ -1919,6 +1919,11 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Updates the organization
+  """
+  updateOrganization(data: OrganizationUpdateInput!, orgId: GID!): Organization!
+
+  """
   Updates the period after closed petitions of this organization are automatically anonymized.
   """
   updateOrganizationAutoAnonymizePeriod(months: Int): Organization!
@@ -2489,6 +2494,11 @@ type OrganizationTheme {
   id: GID!
   isDefault: Boolean!
   name: String!
+}
+
+input OrganizationUpdateInput {
+  name: String
+  status: OrganizationStatus
 }
 
 type OrganizationUsageLimit {

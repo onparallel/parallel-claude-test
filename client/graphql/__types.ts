@@ -929,6 +929,8 @@ export interface Mutation {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates the organization */
+  updateOrganization: Organization;
   /** Updates the period after closed petitions of this organization are automatically anonymized. */
   updateOrganizationAutoAnonymizePeriod: Organization;
   /** updates the theme of the organization brand */
@@ -1901,6 +1903,11 @@ export interface MutationupdateLandingTemplateMetadataArgs {
   templateId: Scalars["GID"]["input"];
 }
 
+export interface MutationupdateOrganizationArgs {
+  data: OrganizationUpdateInput;
+  orgId: Scalars["GID"]["input"];
+}
+
 export interface MutationupdateOrganizationAutoAnonymizePeriodArgs {
   months?: InputMaybe<Scalars["Int"]["input"]>;
 }
@@ -2306,6 +2313,11 @@ export interface OrganizationTheme {
   id: Scalars["GID"]["output"];
   isDefault: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
+}
+
+export interface OrganizationUpdateInput {
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<OrganizationStatus>;
 }
 
 export interface OrganizationUsageLimit {
@@ -5077,6 +5089,7 @@ export type AdminOrganizationsLayout_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
   name: string;
+  status: OrganizationStatus;
 };
 
 export type AdminOrganizationsLayout_QueryFragment = {
@@ -5099,6 +5112,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
+      status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -5116,6 +5130,20 @@ export type AdminOrganizationsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type AdminOrganizationsLayout_updateOrganizationMutationVariables = Exact<{
+  orgId: Scalars["GID"]["input"];
+  data: OrganizationUpdateInput;
+}>;
+
+export type AdminOrganizationsLayout_updateOrganizationMutation = {
+  updateOrganization: {
+    __typename?: "Organization";
+    id: string;
+    name: string;
+    status: OrganizationStatus;
   };
 };
 
@@ -17223,6 +17251,7 @@ export type AdminOrganizationsFeatures_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
   name: string;
+  status: OrganizationStatus;
   features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
 };
 
@@ -17235,6 +17264,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     __typename?: "Organization";
     id: string;
     name: string;
+    status: OrganizationStatus;
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   } | null;
   me: {
@@ -17256,6 +17286,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -17286,6 +17317,7 @@ export type AdminOrganizationsFeatures_updateFeatureFlagsMutation = {
     __typename?: "Organization";
     id: string;
     name: string;
+    status: OrganizationStatus;
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   };
 };
@@ -17320,6 +17352,7 @@ export type AdminOrganizationsSubscriptions_OrganizationFragment = {
   activeUserCount: number;
   usageDetails: { [key: string]: any };
   name: string;
+  status: OrganizationStatus;
   petitionsSubscriptionEndDate?: string | null;
   signaturitSubscriptionEndDate?: string | null;
   petitionsPeriod?: {
@@ -17349,6 +17382,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    status: OrganizationStatus;
     petitionsSubscriptionEndDate?: string | null;
     signaturitSubscriptionEndDate?: string | null;
     petitionsPeriod?: {
@@ -17385,6 +17419,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -17458,6 +17493,7 @@ export type AdminOrganizationsSubscriptions_updateOrganizationUserLimitMutation 
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    status: OrganizationStatus;
     petitionsSubscriptionEndDate?: string | null;
     signaturitSubscriptionEndDate?: string | null;
     petitionsPeriod?: {
@@ -17494,6 +17530,7 @@ export type AdminOrganizationsSubscriptions_updateOrganizationUsageDetailsMutati
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    status: OrganizationStatus;
     petitionsSubscriptionEndDate?: string | null;
     signaturitSubscriptionEndDate?: string | null;
     petitionsPeriod?: {
@@ -17526,6 +17563,7 @@ export type AdminOrganizationsSubscriptions_shareSignaturitApiKeyMutation = {
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    status: OrganizationStatus;
     petitionsSubscriptionEndDate?: string | null;
     signaturitSubscriptionEndDate?: string | null;
     petitionsPeriod?: {
@@ -17558,6 +17596,7 @@ export type AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodMutation = {
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    status: OrganizationStatus;
     petitionsSubscriptionEndDate?: string | null;
     signaturitSubscriptionEndDate?: string | null;
     petitionsPeriod?: {
@@ -17593,6 +17632,7 @@ export type AdminOrganizationsMembers_OrganizationFragment = {
   id: string;
   name: string;
   hasSsoProvider: boolean;
+  status: OrganizationStatus;
 };
 
 export type AdminOrganizationsMembers_queryQueryVariables = Exact<{
@@ -17605,6 +17645,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     id: string;
     name: string;
     hasSsoProvider: boolean;
+    status: OrganizationStatus;
   } | null;
   me: {
     __typename?: "User";
@@ -17625,6 +17666,7 @@ export type AdminOrganizationsMembers_queryQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      status: OrganizationStatus;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -32495,6 +32537,7 @@ export const AdminOrganizationsLayout_OrganizationFragmentDoc = gql`
   fragment AdminOrganizationsLayout_Organization on Organization {
     id
     name
+    status
   }
 ` as unknown as DocumentNode<AdminOrganizationsLayout_OrganizationFragment, unknown>;
 export const AdminOrganizationsLayout_QueryFragmentDoc = gql`
@@ -38453,6 +38496,20 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
+export const AdminOrganizationsLayout_updateOrganizationDocument = gql`
+  mutation AdminOrganizationsLayout_updateOrganization(
+    $orgId: GID!
+    $data: OrganizationUpdateInput!
+  ) {
+    updateOrganization(orgId: $orgId, data: $data) {
+      ...AdminOrganizationsLayout_Organization
+    }
+  }
+  ${AdminOrganizationsLayout_OrganizationFragmentDoc}
+` as unknown as DocumentNode<
+  AdminOrganizationsLayout_updateOrganizationMutation,
+  AdminOrganizationsLayout_updateOrganizationMutationVariables
+>;
 export const PetitionSelect_petitionsDocument = gql`
   query PetitionSelect_petitions(
     $offset: Int
