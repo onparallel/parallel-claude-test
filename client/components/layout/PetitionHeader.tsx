@@ -117,7 +117,10 @@ export const PetitionHeader = Object.assign(
     const handleDeleteClick = async function () {
       try {
         setShouldConfirmNavigation(false);
-        await deletePetitions([petition], "PETITION");
+        await deletePetitions(
+          [petition],
+          petition.__typename === "Petition" ? "PETITION" : "TEMPLATE",
+        );
         router.push("/app/petitions/");
       } catch {}
     };
