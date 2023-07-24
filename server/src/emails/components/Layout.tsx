@@ -165,7 +165,7 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
                     <MjmlSocialElement
                       alt="Twitter"
                       name="twitter-noshare"
-                      href="https://twitter.com/Parallel_SO"
+                      href="https://twitter.com/onparallelHQ"
                       backgroundColor={theme.colors.primary[500]}
                     />
                   </MjmlSocial>

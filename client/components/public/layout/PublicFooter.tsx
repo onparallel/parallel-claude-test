@@ -39,7 +39,7 @@ export function PublicFooter(props: BoxProps) {
             <LinkedInIcon role="presentation" boxSize={6} />
           </NormalLink>
           <NormalLink
-            href="https://twitter.com/Parallel_SO"
+            href="https://twitter.com/onparallelHQ"
             aria-label="Twitter"
             isExternal
             color="primary.800"

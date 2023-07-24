@@ -104,7 +104,7 @@ function ThanksFooter() {
             <LinkedInSimpleIcon color="white" role="presentation" />
           </Center>
         </NormalLink>
-        <NormalLink href="https://twitter.com/Parallel_SO" aria-label="Twitter" isExternal>
+        <NormalLink href="https://twitter.com/onparallelHQ" aria-label="Twitter" isExternal>
           <Center boxSize="24px" backgroundColor="primary.500" borderRadius="md">
             <TwitterIcon color="white" role="presentation" />
           </Center>
