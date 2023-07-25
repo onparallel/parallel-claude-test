@@ -163,7 +163,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, []);
 
   useTempQueryParam("field", (fieldId) => {
-    handlePetitionContentsFieldClick(fieldId);
+    setTimeout(() => handlePetitionContentsFieldClick(fieldId));
   });
 
   const wrapper = usePetitionStateWrapper();
@@ -289,7 +289,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const highlight = useHighlightElement();
   const handlePetitionContentsFieldClick = useCallback((fieldId: string) => {
-    highlight(fieldRefs[fieldId].current);
+    setTimeout(() => highlight(fieldRefs[fieldId].current));
   }, []);
   const handlePetitionContentsSignatureClick = useCallback(() => {
     highlight(signaturesRef.current);
