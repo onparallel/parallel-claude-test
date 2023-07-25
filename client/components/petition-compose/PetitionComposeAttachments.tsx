@@ -707,7 +707,8 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
     >
       <HStack
         ref={ref}
-        paddingX={3}
+        paddingLeft={5}
+        paddingRight={3}
         _hover={{ backgroundColor: "gray.50" }}
         borderRadius="md"
         backgroundColor="white"
@@ -745,7 +746,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
           })}
           onPointerDown={(event) => (isDraggable && !isDisabled ? dragControls.start(event) : noop)}
         >
-          <DragHandleIcon role="presentation" boxSize={3} />
+          <DragHandleIcon role="presentation" pointerEvents="none" boxSize={3} />
         </Box>
         <Menu>
           <Box>
