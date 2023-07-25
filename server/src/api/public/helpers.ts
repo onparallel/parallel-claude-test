@@ -9,7 +9,7 @@ import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor } from "../../util/promises/waitFor";
 import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
-import { Maybe } from "../../util/types";
+import { Maybe, UnwrapArray } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
 import { InternalError } from "../rest/errors";
 import {
@@ -176,10 +176,8 @@ function mapPetitionTags<T extends Pick<PetitionFragment, "tags">>(petition: T) 
 }
 
 function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petition: T) {
-  function mapReplyContentsForAlias(
-    replies: { content: any; metadata: any; id: string }[],
-    type: PetitionFieldType,
-  ) {
+  function mapReplyContentsForAlias(field: UnwrapArray<PetitionFragment["replies"]>) {
+    const { type, replies } = field;
     switch (type) {
       case "TEXT":
       case "SHORT_TEXT":
@@ -197,10 +195,20 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
       case "ES_TAX_DOCUMENTS":
       case "DOW_JONES_KYC":
         if (replies.length > 1) {
-          return replies.map((r) => ({ ...r.content, replyId: r.id, metadata: r.metadata }));
+          return replies.map((r) => ({
+            ...r.content,
+            replyId: r.id,
+            metadata: r.metadata,
+            fieldId: field.id,
+          }));
         } else {
           return (
-            { ...replies[0].content, replyId: replies[0].id, metadata: replies[0].metadata } ?? null
+            {
+              ...replies[0].content,
+              replyId: replies[0].id,
+              metadata: replies[0].metadata,
+              fieldId: field.id,
+            } ?? null
           );
         }
       case "DYNAMIC_SELECT":
@@ -223,7 +231,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
   const replies: Record<string, any> = {};
   petition.replies?.forEach((field) => {
     if (isDefined(field.alias) && field.replies.length > 0) {
-      replies[field.alias] = mapReplyContentsForAlias(field.replies, field.type);
+      replies[field.alias] = mapReplyContentsForAlias(field);
     }
   });
 

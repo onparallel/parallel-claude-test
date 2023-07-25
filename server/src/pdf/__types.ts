@@ -884,6 +884,8 @@ export type Mutation = {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates the organization */
+  updateOrganization: Organization;
   /** Updates the period after closed petitions of this organization are automatically anonymized. */
   updateOrganizationAutoAnonymizePeriod: Organization;
   /** updates the theme of the organization brand */
@@ -1856,6 +1858,11 @@ export type MutationupdateLandingTemplateMetadataArgs = {
   templateId: Scalars["GID"]["input"];
 };
 
+export type MutationupdateOrganizationArgs = {
+  data: OrganizationUpdateInput;
+  orgId: Scalars["GID"]["input"];
+};
+
 export type MutationupdateOrganizationAutoAnonymizePeriodArgs = {
   months?: InputMaybe<Scalars["Int"]["input"]>;
 };
@@ -2255,6 +2262,11 @@ export type OrganizationTheme = {
   id: Scalars["GID"]["output"];
   isDefault: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
+};
+
+export type OrganizationUpdateInput = {
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<OrganizationStatus>;
 };
 
 export type OrganizationUsageLimit = {

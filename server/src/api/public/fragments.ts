@@ -127,6 +127,7 @@ export const PetitionFragment = gql`
       ...PetitionFieldWithReplies
     }
     replies: fields @include(if: $includeReplies) {
+      id
       alias
       type
       replies {
