@@ -5100,9 +5100,11 @@ export interface UserGroup extends Timestamps {
   id: Scalars["GID"]["output"];
   imMember: Scalars["Boolean"]["output"];
   initials: Scalars["String"]["output"];
+  localizableName: Scalars["LocalizableUserText"]["output"];
   memberCount: Scalars["Int"]["output"];
   members: Array<UserGroupMember>;
   name: Scalars["String"]["output"];
+  type: UserGroupType;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 }
@@ -5122,6 +5124,8 @@ export interface UserGroupPagination {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
 }
+
+export type UserGroupType = "ALL_USERS" | "NORMAL";
 
 /** The preferred locale for the user */
 export type UserLocale = "en" | "es";
@@ -5396,7 +5400,14 @@ export type MapFieldsTable_ProfileFieldPropertyFragment = {
 export type Mention_PetitionFieldCommentMention_PetitionFieldCommentUserGroupMention_Fragment = {
   __typename?: "PetitionFieldCommentUserGroupMention";
   mentionedId: string;
-  userGroup?: { __typename?: "UserGroup"; id: string; name: string; imMember: boolean } | null;
+  userGroup?: {
+    __typename?: "UserGroup";
+    id: string;
+    imMember: boolean;
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
 };
 
 export type Mention_PetitionFieldCommentMention_PetitionFieldCommentUserMention_Fragment = {
@@ -5452,8 +5463,10 @@ export type PetitionFieldComment_PetitionFieldCommentFragment = {
         userGroup?: {
           __typename?: "UserGroup";
           id: string;
-          name: string;
           imMember: boolean;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
         } | null;
       }
     | {
@@ -5480,8 +5493,10 @@ export type PetitionFieldCommentContent_PetitionFieldCommentFragment = {
         userGroup?: {
           __typename?: "UserGroup";
           id: string;
-          name: string;
           imMember: boolean;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
         } | null;
       }
     | {
@@ -5840,12 +5855,18 @@ export type ShareButton_PetitionBase_Petition_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: string | null };
+        user: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
       }
   >;
 };
@@ -5856,12 +5877,18 @@ export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: string | null };
+        user: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
       }
   >;
 };
@@ -5928,14 +5955,18 @@ export type UserAvatarList_UserFragment = {
 export type UserAvatarList_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
-  name: string;
   initials: string;
+  name: string;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
 };
 
 export type UserGroupMembersPopover_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
   name: string;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
   members: Array<{
     __typename?: "UserGroupMember";
     user: {
@@ -5959,6 +5990,8 @@ export type UserGroupMembersPopover_getMembersQuery = {
         __typename?: "UserGroup";
         id: string;
         name: string;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
         members: Array<{
           __typename?: "UserGroupMember";
           user: {
@@ -5984,6 +6017,8 @@ export type useSearchUserGroups_searchUserGroupsQuery = {
     id: string;
     name: string;
     memberCount: number;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
   }>;
 };
 
@@ -5998,8 +6033,10 @@ export type UserListPopover_UserFragment = {
 export type UserListPopover_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
-  name: string;
   initials: string;
+  name: string;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
 };
 
 export type UserSelect_UserFragment = {
@@ -6014,6 +6051,8 @@ export type UserSelect_UserGroupFragment = {
   id: string;
   name: string;
   memberCount: number;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
 };
 
 export type UserSelect_canCreateUsersQueryVariables = Exact<{ [key: string]: never }>;
@@ -6029,7 +6068,14 @@ export type UserSelect_useGetUsersOrGroupsQueryVariables = Exact<{
 export type UserSelect_useGetUsersOrGroupsQuery = {
   getUsersOrGroups: Array<
     | { __typename?: "User"; id: string; fullName?: string | null; email: string }
-    | { __typename?: "UserGroup"; id: string; name: string; memberCount: number }
+    | {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        memberCount: number;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
+      }
   >;
 };
 
@@ -6045,6 +6091,8 @@ export type UserSelectOption_UserGroupFragment = {
   id: string;
   name: string;
   memberCount: number;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
 };
 
 export type ConfirmCommentMentionAndShareDialog_PetitionFragment = {
@@ -7663,7 +7711,14 @@ export type useCreateOrUpdateUserDialog_UserFragment = {
   role: OrganizationRole;
   status: UserStatus;
   isMe: boolean;
-  userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
+  userGroups: Array<{
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    memberCount: number;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  }>;
 };
 
 export type useCreateOrUpdateUserDialog_UserGroupFragment = {
@@ -7671,6 +7726,8 @@ export type useCreateOrUpdateUserDialog_UserGroupFragment = {
   id: string;
   name: string;
   memberCount: number;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
 };
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
@@ -7816,6 +7873,8 @@ export type useProfileTypeFieldPermissionDialog_UserOrUserGroup_UserGroup_Fragme
   id: string;
   name: string;
   memberCount: number;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
   groupInitials: string;
 };
 
@@ -7841,6 +7900,8 @@ export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragme
         id: string;
         name: string;
         memberCount: number;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
         groupInitials: string;
       };
 };
@@ -7869,6 +7930,8 @@ export type useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment = {
           id: string;
           name: string;
           memberCount: number;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
           groupInitials: string;
         };
   }>;
@@ -7895,6 +7958,8 @@ export type useProfileTypeFieldPermissionDialog_searchUsersQuery = {
         id: string;
         name: string;
         memberCount: number;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
         groupInitials: string;
       }
   >;
@@ -8130,8 +8195,10 @@ export type PetitionActivityTimeline_PetitionFragment = {
                   userGroup?: {
                     __typename?: "UserGroup";
                     id: string;
-                    name: string;
                     imMember: boolean;
+                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
+                    type: UserGroupType;
                   } | null;
                 }
               | {
@@ -8159,7 +8226,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+          permissionGroup?: {
+            __typename?: "UserGroup";
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          } | null;
         }
       | {
           __typename?: "GroupPermissionEditedEvent";
@@ -8172,7 +8244,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+          permissionGroup?: {
+            __typename?: "UserGroup";
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          } | null;
         }
       | {
           __typename?: "GroupPermissionRemovedEvent";
@@ -8184,7 +8261,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+          permissionGroup?: {
+            __typename?: "UserGroup";
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          } | null;
         }
       | {
           __typename?: "MessageCancelledEvent";
@@ -8826,8 +8908,10 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -8851,7 +8935,12 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fra
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment = {
@@ -8860,7 +8949,12 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fr
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment = {
@@ -8868,7 +8962,12 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_F
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
@@ -9394,7 +9493,12 @@ export type PetitionProfilesTable_PetitionFragment = {
   }>;
 };
 
-export type UserGroupReference_UserGroupFragment = { __typename?: "UserGroup"; name: string };
+export type UserGroupReference_UserGroupFragment = {
+  __typename?: "UserGroup";
+  name: string;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
+};
 
 export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
   __typename?: "PetitionAccess";
@@ -9804,8 +9908,10 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -9828,7 +9934,12 @@ export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment 
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
 };
 
 export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment = {
@@ -9836,14 +9947,24 @@ export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmen
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
 };
 
 export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment = {
   __typename?: "GroupPermissionRemovedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
 };
 
 export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
@@ -10591,6 +10712,8 @@ export type PetitionSharingModal_PetitionBase_Petition_Fragment = {
           initials: string;
           memberCount: number;
           imMember: boolean;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
         };
       }
     | {
@@ -10604,6 +10727,7 @@ export type PetitionSharingModal_PetitionBase_Petition_Fragment = {
           fullName?: string | null;
           avatarUrl?: string | null;
           initials?: string | null;
+          status: UserStatus;
         };
       }
   >;
@@ -10635,6 +10759,8 @@ export type PetitionSharingModal_PetitionBase_PetitionTemplate_Fragment = {
           initials: string;
           memberCount: number;
           imMember: boolean;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
         };
       }
     | {
@@ -10648,6 +10774,7 @@ export type PetitionSharingModal_PetitionBase_PetitionTemplate_Fragment = {
           fullName?: string | null;
           avatarUrl?: string | null;
           initials?: string | null;
+          status: UserStatus;
         };
       }
   >;
@@ -10678,6 +10805,7 @@ export type PetitionSharingModal_PetitionUserPermissionFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    status: UserStatus;
   };
 };
 
@@ -10691,6 +10819,8 @@ export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
     initials: string;
     memberCount: number;
     imMember: boolean;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
   };
 };
 
@@ -10701,6 +10831,7 @@ export type PetitionSharingModal_UserFragment = {
   fullName?: string | null;
   avatarUrl?: string | null;
   initials?: string | null;
+  status: UserStatus;
 };
 
 export type PetitionSharingModal_UserGroupFragment = {
@@ -10710,6 +10841,8 @@ export type PetitionSharingModal_UserGroupFragment = {
   initials: string;
   memberCount: number;
   imMember: boolean;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
 };
 
 export type PetitionSharingModal_addPetitionPermissionMutationVariables = Exact<{
@@ -10740,6 +10873,8 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -10753,6 +10888,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -10783,6 +10919,8 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -10796,6 +10934,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -10837,6 +10976,8 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -10850,6 +10991,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -10880,6 +11022,8 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -10893,6 +11037,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -10936,6 +11081,8 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -10949,6 +11096,7 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -10979,6 +11127,8 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -10992,6 +11142,7 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -11032,6 +11183,8 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -11045,6 +11198,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -11075,6 +11229,8 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -11088,6 +11244,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -11128,6 +11285,8 @@ export type PetitionSharingModal_petitionsQuery = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -11141,6 +11300,7 @@ export type PetitionSharingModal_petitionsQuery = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -11171,6 +11331,8 @@ export type PetitionSharingModal_petitionsQuery = {
                 initials: string;
                 memberCount: number;
                 imMember: boolean;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -11184,6 +11346,7 @@ export type PetitionSharingModal_petitionsQuery = {
                 fullName?: string | null;
                 avatarUrl?: string | null;
                 initials?: string | null;
+                status: UserStatus;
               };
             }
         >;
@@ -11345,6 +11508,8 @@ export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateD
       initials: string;
       name: string;
       memberCount: number;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
     };
   };
 
@@ -11388,6 +11553,8 @@ export type TemplateDefaultPermissionsDialog_PetitionTemplateFragment = {
           initials: string;
           name: string;
           memberCount: number;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
         };
       }
     | {
@@ -11434,6 +11601,8 @@ export type TemplateDefaultPermissionsDialog_petitionQuery = {
                 initials: string;
                 name: string;
                 memberCount: number;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               };
             }
           | {
@@ -11466,6 +11635,8 @@ export type TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermis
     initials: string;
     name: string;
     memberCount: number;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
   };
 };
 
@@ -11497,7 +11668,14 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -11557,7 +11735,14 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -13017,6 +13202,8 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
             initials: string;
             name: string;
             memberCount: number;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           };
         }
       | {
@@ -13662,7 +13849,14 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -13716,7 +13910,14 @@ export type TemplateActiveSettingsIcons_PetitionTemplateFragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -13750,7 +13951,14 @@ export type TemplateCard_PetitionTemplateFragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -13787,7 +13995,14 @@ export type TemplateCard_PetitionTemplateFragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -13819,7 +14034,14 @@ export type TemplateIconDefaultPermissions_PetitionTemplateFragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -13950,8 +14172,10 @@ export type PreviewPetitionField_PetitionFieldFragment = {
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -14058,8 +14282,10 @@ export type PreviewPetitionField_PetitionFieldQuery = {
             userGroup?: {
               __typename?: "UserGroup";
               id: string;
-              name: string;
               imMember: boolean;
+              name: string;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
             } | null;
           }
         | {
@@ -14324,8 +14550,10 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -14393,8 +14621,10 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
             userGroup?: {
               __typename?: "UserGroup";
               id: string;
-              name: string;
               imMember: boolean;
+              name: string;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
             } | null;
           }
         | {
@@ -14727,8 +14957,10 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -14802,8 +15034,10 @@ export type PetitionRepliesFieldComments_petitionFieldQueryQuery = {
             userGroup?: {
               __typename?: "UserGroup";
               id: string;
-              name: string;
               imMember: boolean;
+              name: string;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
             } | null;
           }
         | {
@@ -18212,7 +18446,14 @@ export type Contact_ContactFragment = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                initials: string;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
+              };
             }
           | {
               __typename?: "PetitionUserPermission";
@@ -18284,7 +18525,14 @@ export type Contact_PetitionAccessFragment = {
       | {
           __typename?: "PetitionUserGroupPermission";
           permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+          group: {
+            __typename?: "UserGroup";
+            id: string;
+            initials: string;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          };
         }
       | {
           __typename?: "PetitionUserPermission";
@@ -18342,7 +18590,14 @@ export type Contact_PetitionFragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -18474,7 +18729,14 @@ export type Contact_contactQuery = {
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+                group: {
+                  __typename?: "UserGroup";
+                  id: string;
+                  initials: string;
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                };
               }
             | {
                 __typename?: "PetitionUserPermission";
@@ -18822,6 +19084,8 @@ export type OrganizationGroup_UserGroupFragment = {
   id: string;
   name: string;
   createdAt: string;
+  type: UserGroupType;
+  localizableName: { [locale in UserLocale]?: string };
   members: Array<{
     __typename?: "UserGroupMember";
     id: string;
@@ -18848,6 +19112,8 @@ export type OrganizationGroup_updateUserGroupMutation = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       id: string;
@@ -18868,6 +19134,8 @@ export type OrganizationGroup_addUsersToUserGroupMutation = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       id: string;
@@ -18888,6 +19156,8 @@ export type OrganizationGroup_removeUsersFromGroupMutation = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       id: string;
@@ -18914,6 +19184,8 @@ export type OrganizationGroup_cloneUserGroupsMutation = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       id: string;
@@ -18933,6 +19205,8 @@ export type OrganizationGroup_userGroupQuery = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       id: string;
@@ -18992,6 +19266,8 @@ export type OrganizationGroups_UserGroupPaginationFragment = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       user: {
@@ -19010,6 +19286,8 @@ export type OrganizationGroups_UserGroupFragment = {
   id: string;
   name: string;
   createdAt: string;
+  type: UserGroupType;
+  localizableName: { [locale in UserLocale]?: string };
   members: Array<{
     __typename?: "UserGroupMember";
     user: {
@@ -19033,6 +19311,8 @@ export type OrganizationGroups_createUserGroupMutation = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       user: {
@@ -19063,6 +19343,8 @@ export type OrganizationGroups_cloneUserGroupsMutation = {
     id: string;
     name: string;
     createdAt: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
     members: Array<{
       __typename?: "UserGroupMember";
       user: {
@@ -19092,6 +19374,8 @@ export type OrganizationGroups_userGroupsQuery = {
       id: string;
       name: string;
       createdAt: string;
+      type: UserGroupType;
+      localizableName: { [locale in UserLocale]?: string };
       members: Array<{
         __typename?: "UserGroupMember";
         user: {
@@ -19394,6 +19678,8 @@ export type OrganizationProfileType_ProfileTypeFieldFragment = {
           id: string;
           name: string;
           memberCount: number;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
           groupInitials: string;
         };
   }>;
@@ -19435,6 +19721,8 @@ export type OrganizationProfileType_ProfileTypeFragment = {
             id: string;
             name: string;
             memberCount: number;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
             groupInitials: string;
           };
     }>;
@@ -19482,6 +19770,8 @@ export type OrganizationProfileType_profileTypeQuery = {
               id: string;
               name: string;
               memberCount: number;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
               groupInitials: string;
             };
       }>;
@@ -19563,6 +19853,8 @@ export type OrganizationProfileType_updateProfileTypeFieldPermissionMutation = {
             id: string;
             name: string;
             memberCount: number;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
             groupInitials: string;
           };
     }>;
@@ -19612,6 +19904,8 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
               id: string;
               name: string;
               memberCount: number;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
               groupInitials: string;
             };
       }>;
@@ -19661,6 +19955,8 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
               id: string;
               name: string;
               memberCount: number;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
               groupInitials: string;
             };
       }>;
@@ -19710,6 +20006,8 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
               id: string;
               name: string;
               memberCount: number;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
               groupInitials: string;
             };
       }>;
@@ -19755,6 +20053,8 @@ export type OrganizationProfileType_updateProfileTypeFieldMutation = {
             id: string;
             name: string;
             memberCount: number;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
             groupInitials: string;
           };
     }>;
@@ -19804,6 +20104,8 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
               id: string;
               name: string;
               memberCount: number;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
               groupInitials: string;
             };
       }>;
@@ -19952,6 +20254,8 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
               id: string;
               name: string;
               memberCount: number;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
               groupInitials: string;
             };
       }>;
@@ -20034,7 +20338,14 @@ export type OrganizationUsers_UserFragment = {
   status: UserStatus;
   isSsoUser: boolean;
   isMe: boolean;
-  userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
+  userGroups: Array<{
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    memberCount: number;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  }>;
 };
 
 export type OrganizationUsers_inviteUserToOrganizationMutationVariables = Exact<{
@@ -20060,7 +20371,14 @@ export type OrganizationUsers_inviteUserToOrganizationMutation = {
     status: UserStatus;
     isSsoUser: boolean;
     isMe: boolean;
-    userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
+    userGroups: Array<{
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      memberCount: number;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
+    }>;
   };
 };
 
@@ -20084,7 +20402,14 @@ export type OrganizationUsers_updateOrganizationUserMutation = {
     status: UserStatus;
     isSsoUser: boolean;
     isMe: boolean;
-    userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
+    userGroups: Array<{
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      memberCount: number;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
+    }>;
   };
 };
 
@@ -20197,6 +20522,8 @@ export type OrganizationUsers_orgUsersQuery = {
             id: string;
             name: string;
             memberCount: number;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           }>;
         }>;
       };
@@ -20414,8 +20741,10 @@ export type PetitionActivity_PetitionFragment = {
                   userGroup?: {
                     __typename?: "UserGroup";
                     id: string;
-                    name: string;
                     imMember: boolean;
+                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
+                    type: UserGroupType;
                   } | null;
                 }
               | {
@@ -20443,7 +20772,12 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+          permissionGroup?: {
+            __typename?: "UserGroup";
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          } | null;
         }
       | {
           __typename?: "GroupPermissionEditedEvent";
@@ -20456,7 +20790,12 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+          permissionGroup?: {
+            __typename?: "UserGroup";
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          } | null;
         }
       | {
           __typename?: "GroupPermissionRemovedEvent";
@@ -20468,7 +20807,12 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+          permissionGroup?: {
+            __typename?: "UserGroup";
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          } | null;
         }
       | {
           __typename?: "MessageCancelledEvent";
@@ -21006,12 +21350,18 @@ export type PetitionActivity_PetitionFragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: string | null };
+        user: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
       }
   >;
   effectivePermissions: Array<{
@@ -21369,8 +21719,10 @@ export type PetitionActivity_updatePetitionMutation = {
                         userGroup?: {
                           __typename?: "UserGroup";
                           id: string;
-                          name: string;
                           imMember: boolean;
+                          name: string;
+                          localizableName: { [locale in UserLocale]?: string };
+                          type: UserGroupType;
                         } | null;
                       }
                     | {
@@ -21398,7 +21750,12 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+                permissionGroup?: {
+                  __typename?: "UserGroup";
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                } | null;
               }
             | {
                 __typename?: "GroupPermissionEditedEvent";
@@ -21411,7 +21768,12 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+                permissionGroup?: {
+                  __typename?: "UserGroup";
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                } | null;
               }
             | {
                 __typename?: "GroupPermissionRemovedEvent";
@@ -21423,7 +21785,12 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+                permissionGroup?: {
+                  __typename?: "UserGroup";
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                } | null;
               }
             | {
                 __typename?: "MessageCancelledEvent";
@@ -21995,12 +22362,23 @@ export type PetitionActivity_updatePetitionMutation = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
+              };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: string | null };
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              };
             }
         >;
         effectivePermissions: Array<{
@@ -22399,8 +22777,10 @@ export type PetitionActivity_petitionQuery = {
                         userGroup?: {
                           __typename?: "UserGroup";
                           id: string;
-                          name: string;
                           imMember: boolean;
+                          name: string;
+                          localizableName: { [locale in UserLocale]?: string };
+                          type: UserGroupType;
                         } | null;
                       }
                     | {
@@ -22428,7 +22808,12 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+                permissionGroup?: {
+                  __typename?: "UserGroup";
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                } | null;
               }
             | {
                 __typename?: "GroupPermissionEditedEvent";
@@ -22441,7 +22826,12 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+                permissionGroup?: {
+                  __typename?: "UserGroup";
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                } | null;
               }
             | {
                 __typename?: "GroupPermissionRemovedEvent";
@@ -22453,7 +22843,12 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
+                permissionGroup?: {
+                  __typename?: "UserGroup";
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                } | null;
               }
             | {
                 __typename?: "MessageCancelledEvent";
@@ -23025,12 +23420,23 @@ export type PetitionActivity_petitionQuery = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
+              };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: string | null };
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              };
             }
         >;
         effectivePermissions: Array<{
@@ -25408,8 +25814,10 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
             userGroup?: {
               __typename?: "UserGroup";
               id: string;
-              name: string;
               imMember: boolean;
+              name: string;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
             } | null;
           }
         | {
@@ -25570,8 +25978,10 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
             userGroup?: {
               __typename?: "UserGroup";
               id: string;
-              name: string;
               imMember: boolean;
+              name: string;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
             } | null;
           }
         | {
@@ -25805,8 +26215,10 @@ export type PetitionPreview_updatePetitionMutation = {
                   userGroup?: {
                     __typename?: "UserGroup";
                     id: string;
-                    name: string;
                     imMember: boolean;
+                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
+                    type: UserGroupType;
                   } | null;
                 }
               | {
@@ -25966,8 +26378,10 @@ export type PetitionPreview_updatePetitionMutation = {
                   userGroup?: {
                     __typename?: "UserGroup";
                     id: string;
-                    name: string;
                     imMember: boolean;
+                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
+                    type: UserGroupType;
                   } | null;
                 }
               | {
@@ -26151,8 +26565,10 @@ export type PetitionPreview_completePetitionMutation = {
               userGroup?: {
                 __typename?: "UserGroup";
                 id: string;
-                name: string;
                 imMember: boolean;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               } | null;
             }
           | {
@@ -26355,8 +26771,10 @@ export type PetitionPreview_petitionQuery = {
                   userGroup?: {
                     __typename?: "UserGroup";
                     id: string;
-                    name: string;
                     imMember: boolean;
+                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
+                    type: UserGroupType;
                   } | null;
                 }
               | {
@@ -26516,8 +26934,10 @@ export type PetitionPreview_petitionQuery = {
                   userGroup?: {
                     __typename?: "UserGroup";
                     id: string;
-                    name: string;
                     imMember: boolean;
+                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
+                    type: UserGroupType;
                   } | null;
                 }
               | {
@@ -26732,8 +27152,10 @@ export type PetitionReplies_PetitionFragment = {
             userGroup?: {
               __typename?: "UserGroup";
               id: string;
-              name: string;
               imMember: boolean;
+              name: string;
+              localizableName: { [locale in UserLocale]?: string };
+              type: UserGroupType;
             } | null;
           }
         | {
@@ -26787,12 +27209,18 @@ export type PetitionReplies_PetitionFragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: string | null };
+        user: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
       }
   >;
   signatureRequests: Array<{
@@ -26937,8 +27365,10 @@ export type PetitionReplies_PetitionFieldFragment = {
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -27200,8 +27630,10 @@ export type PetitionReplies_closePetitionMutation = {
               userGroup?: {
                 __typename?: "UserGroup";
                 id: string;
-                name: string;
                 imMember: boolean;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               } | null;
             }
           | {
@@ -27255,12 +27687,18 @@ export type PetitionReplies_closePetitionMutation = {
       | {
           __typename?: "PetitionUserGroupPermission";
           permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string; name: string };
+          group: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          };
         }
       | {
           __typename?: "PetitionUserPermission";
           permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string; fullName?: string | null };
+          user: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
         }
     >;
     signatureRequests: Array<{
@@ -27452,8 +27890,10 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
               userGroup?: {
                 __typename?: "UserGroup";
                 id: string;
-                name: string;
                 imMember: boolean;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
               } | null;
             }
           | {
@@ -27507,12 +27947,18 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       | {
           __typename?: "PetitionUserGroupPermission";
           permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string; name: string };
+          group: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          };
         }
       | {
           __typename?: "PetitionUserPermission";
           permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string; fullName?: string | null };
+          user: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
         }
     >;
     signatureRequests: Array<{
@@ -27870,8 +28316,10 @@ export type PetitionReplies_petitionQuery = {
                   userGroup?: {
                     __typename?: "UserGroup";
                     id: string;
-                    name: string;
                     imMember: boolean;
+                    name: string;
+                    localizableName: { [locale in UserLocale]?: string };
+                    type: UserGroupType;
                   } | null;
                 }
               | {
@@ -27925,12 +28373,23 @@ export type PetitionReplies_petitionQuery = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
+              };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: string | null };
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              };
             }
         >;
         signatureRequests: Array<{
@@ -28073,7 +28532,14 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -28148,7 +28614,14 @@ export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -28187,7 +28660,14 @@ export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -28356,7 +28836,14 @@ export type Petitions_petitionsQuery = {
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+                group: {
+                  __typename?: "UserGroup";
+                  id: string;
+                  initials: string;
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                };
               }
             | {
                 __typename?: "PetitionUserPermission";
@@ -28429,7 +28916,14 @@ export type Petitions_petitionsQuery = {
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+                group: {
+                  __typename?: "UserGroup";
+                  id: string;
+                  initials: string;
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                };
               }
             | {
                 __typename?: "PetitionUserPermission";
@@ -28468,7 +28962,14 @@ export type Petitions_petitionsQuery = {
                 isSubscribed: boolean;
                 id: string;
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+                group: {
+                  __typename?: "UserGroup";
+                  id: string;
+                  initials: string;
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                };
               }
             | {
                 __typename?: "TemplateDefaultUserPermission";
@@ -28548,7 +29049,14 @@ export type NewPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -28585,7 +29093,14 @@ export type NewPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -28652,7 +29167,14 @@ export type NewPetition_templatesQuery = {
           permissions: Array<
             | {
                 __typename?: "PetitionUserGroupPermission";
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+                group: {
+                  __typename?: "UserGroup";
+                  id: string;
+                  initials: string;
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                };
               }
             | {
                 __typename?: "PetitionUserPermission";
@@ -28689,7 +29211,14 @@ export type NewPetition_templatesQuery = {
                 isSubscribed: boolean;
                 id: string;
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+                group: {
+                  __typename?: "UserGroup";
+                  id: string;
+                  initials: string;
+                  name: string;
+                  localizableName: { [locale in UserLocale]?: string };
+                  type: UserGroupType;
+                };
               }
             | {
                 __typename?: "TemplateDefaultUserPermission";
@@ -28779,7 +29308,14 @@ export type NewPetition_templateQuery = {
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                initials: string;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
+              };
             }
           | {
               __typename?: "PetitionUserPermission";
@@ -28839,7 +29375,14 @@ export type NewPetition_templateQuery = {
               isSubscribed: boolean;
               id: string;
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                initials: string;
+                name: string;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
+              };
             }
           | {
               __typename?: "TemplateDefaultUserPermission";
@@ -31366,7 +31909,12 @@ export type usePetitionCommentsMutations_getUsersOrGroupsQueryVariables = Exact<
 export type usePetitionCommentsMutations_getUsersOrGroupsQuery = {
   getUsersOrGroups: Array<
     | { __typename: "User"; id: string; fullName?: string | null; status: UserStatus }
-    | { __typename: "UserGroup"; name: string }
+    | {
+        __typename: "UserGroup";
+        name: string;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
+      }
   >;
 };
 
@@ -31409,8 +31957,10 @@ export type usePetitionCommentsMutations_PetitionFieldCommentFragment = {
         userGroup?: {
           __typename?: "UserGroup";
           id: string;
-          name: string;
           imMember: boolean;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
         } | null;
       }
     | {
@@ -31477,8 +32027,10 @@ export type usePetitionCommentsMutations_createPetitionFieldCommentMutation = {
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -31546,8 +32098,10 @@ export type usePetitionCommentsMutations_updatePetitionFieldCommentMutation = {
           userGroup?: {
             __typename?: "UserGroup";
             id: string;
-            name: string;
             imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
           } | null;
         }
       | {
@@ -31896,6 +32450,8 @@ export type createMentionPlugin_UserOrUserGroup_UserGroup_Fragment = {
   id: string;
   name: string;
   memberCount: number;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
 };
 
 export type createMentionPlugin_UserOrUserGroupFragment =
@@ -32191,6 +32747,8 @@ export type useGetDefaultMentionables_permissionsQueryQuery = {
                 id: string;
                 name: string;
                 memberCount: number;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
                 members: Array<{
                   __typename?: "UserGroupMember";
                   id: string;
@@ -32228,6 +32786,8 @@ export type useGetDefaultMentionables_permissionsQueryQuery = {
                 id: string;
                 name: string;
                 memberCount: number;
+                localizableName: { [locale in UserLocale]?: string };
+                type: UserGroupType;
                 members: Array<{
                   __typename?: "UserGroupMember";
                   id: string;
@@ -32536,7 +33096,14 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -32597,7 +33164,14 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "PetitionUserPermission";
@@ -32636,7 +33210,14 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
         isSubscribed: boolean;
         id: string;
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          initials: string;
+          name: string;
+          localizableName: { [locale in UserLocale]?: string };
+          type: UserGroupType;
+        };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
@@ -32710,7 +33291,14 @@ export type useSearchUsers_searchUsersQueryVariables = Exact<{
 export type useSearchUsers_searchUsersQuery = {
   searchUsers: Array<
     | { __typename?: "User"; id: string; fullName?: string | null; email: string }
-    | { __typename?: "UserGroup"; id: string; name: string; memberCount: number }
+    | {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        memberCount: number;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
+      }
   >;
 };
 
@@ -32993,6 +33581,13 @@ export const ProfileTypeSelect_ProfileTypeFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<ProfileTypeSelect_ProfileTypeFragment, unknown>;
+export const UserGroupReference_UserGroupFragmentDoc = gql`
+  fragment UserGroupReference_UserGroup on UserGroup {
+    name
+    localizableName
+    type
+  }
+` as unknown as DocumentNode<UserGroupReference_UserGroupFragment, unknown>;
 export const UserGroupMembersPopover_UserGroupFragmentDoc = gql`
   fragment UserGroupMembersPopover_UserGroup on UserGroup {
     id
@@ -33004,15 +33599,18 @@ export const UserGroupMembersPopover_UserGroupFragmentDoc = gql`
         ...UserAvatar_User
       }
     }
+    ...UserGroupReference_UserGroup
   }
   ${UserAvatar_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<UserGroupMembersPopover_UserGroupFragment, unknown>;
 export const UserListPopover_UserGroupFragmentDoc = gql`
   fragment UserListPopover_UserGroup on UserGroup {
     id
-    name
     initials
+    ...UserGroupReference_UserGroup
   }
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<UserListPopover_UserGroupFragment, unknown>;
 export const ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc = gql`
   fragment ConfirmCommentMentionAndShareDialog_Petition on Petition {
@@ -33526,9 +34124,11 @@ export const PetitionSharingModal_UserFragmentDoc = gql`
     fullName
     ...UserAvatar_User
     ...UserSelect_User
+    ...UserReference_User
   }
   ${UserAvatar_UserFragmentDoc}
   ${UserSelect_UserFragmentDoc}
+  ${UserReference_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSharingModal_UserFragment, unknown>;
 export const PetitionSharingModal_PetitionUserPermissionFragmentDoc = gql`
   fragment PetitionSharingModal_PetitionUserPermission on PetitionUserPermission {
@@ -33547,7 +34147,9 @@ export const PetitionSharingModal_UserGroupFragmentDoc = gql`
     initials
     memberCount
     imMember
+    ...UserGroupReference_UserGroup
   }
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<PetitionSharingModal_UserGroupFragment, unknown>;
 export const PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc = gql`
   fragment PetitionSharingModal_PetitionUserGroupPermission on PetitionUserGroupPermission {
@@ -33612,9 +34214,11 @@ export const TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermi
         initials
         name
         memberCount
+        ...UserGroupReference_UserGroup
       }
       isSubscribed
     }
+    ${UserGroupReference_UserGroupFragmentDoc}
   ` as unknown as DocumentNode<
     TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
     unknown
@@ -33673,9 +34277,10 @@ export const UserAvatarList_UserFragmentDoc = gql`
 export const UserAvatarList_UserGroupFragmentDoc = gql`
   fragment UserAvatarList_UserGroup on UserGroup {
     id
-    name
     initials
+    ...UserGroupReference_UserGroup
   }
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<UserAvatarList_UserGroupFragment, unknown>;
 export const TemplateIconSignature_SignatureConfigFragmentDoc = gql`
   fragment TemplateIconSignature_SignatureConfig on SignatureConfig {
@@ -33711,8 +34316,8 @@ export const TemplateIconDefaultPermissions_PetitionTemplateFragmentDoc = gql`
       ... on TemplateDefaultUserGroupPermission {
         group {
           id
-          name
           initials
+          ...UserGroupReference_UserGroup
         }
         isSubscribed
       }
@@ -33726,6 +34331,7 @@ export const TemplateIconDefaultPermissions_PetitionTemplateFragmentDoc = gql`
     }
   }
   ${UserAvatar_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<TemplateIconDefaultPermissions_PetitionTemplateFragment, unknown>;
 export const TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc = gql`
   fragment TemplateActiveSettingsIcons_PetitionTemplate on PetitionTemplate {
@@ -34466,8 +35072,11 @@ export const OrganizationGroup_UserGroupFragmentDoc = gql`
     members {
       ...OrganizationGroup_UserGroupMember
     }
+    type
+    ...UserGroupReference_UserGroup
   }
   ${OrganizationGroup_UserGroupMemberFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroup_UserGroupFragment, unknown>;
 export const OrganizationGroups_UserGroupFragmentDoc = gql`
   fragment OrganizationGroups_UserGroup on UserGroup {
@@ -34479,8 +35088,11 @@ export const OrganizationGroups_UserGroupFragmentDoc = gql`
         ...UserAvatarList_User
       }
     }
+    type
+    ...UserGroupReference_UserGroup
   }
   ${UserAvatarList_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroups_UserGroupFragment, unknown>;
 export const OrganizationGroups_UserGroupPaginationFragmentDoc = gql`
   fragment OrganizationGroups_UserGroupPagination on UserGroupPagination {
@@ -34506,7 +35118,9 @@ export const UserSelectOption_UserGroupFragmentDoc = gql`
     id
     name
     memberCount
+    ...UserGroupReference_UserGroup
   }
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
 export const UserSelect_UserGroupFragmentDoc = gql`
   fragment UserSelect_UserGroup on UserGroup {
@@ -34514,8 +35128,10 @@ export const UserSelect_UserGroupFragmentDoc = gql`
     name
     memberCount
     ...UserSelectOption_UserGroup
+    ...UserGroupReference_UserGroup
   }
   ${UserSelectOption_UserGroupFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
 export const useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc = gql`
   fragment useProfileTypeFieldPermissionDialog_UserOrUserGroup on UserOrUserGroup {
@@ -34531,10 +35147,12 @@ export const useProfileTypeFieldPermissionDialog_UserOrUserGroupFragmentDoc = gq
       groupInitials: initials
       memberCount
       ...UserSelect_UserGroup
+      ...UserGroupReference_UserGroup
     }
   }
   ${UserAvatar_UserFragmentDoc}
   ${UserSelect_UserGroupFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<useProfileTypeFieldPermissionDialog_UserOrUserGroupFragment, unknown>;
 export const useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragmentDoc = gql`
   fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
@@ -35149,11 +35767,12 @@ export const Mention_PetitionFieldCommentMentionFragmentDoc = gql`
       mentionedId
       userGroup {
         id
-        name
         imMember
+        ...UserGroupReference_UserGroup
       }
     }
   }
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<Mention_PetitionFieldCommentMentionFragment, unknown>;
 export const PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionFieldCommentContent_PetitionFieldComment on PetitionFieldComment {
@@ -35409,11 +36028,6 @@ export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
   }
   ${ContactReference_ContactFragmentDoc}
 ` as unknown as DocumentNode<TimelineAccessDelegatedEvent_AccessDelegatedEventFragment, unknown>;
-export const UserGroupReference_UserGroupFragmentDoc = gql`
-  fragment UserGroupReference_UserGroup on UserGroup {
-    name
-  }
-` as unknown as DocumentNode<UserGroupReference_UserGroupFragment, unknown>;
 export const TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc = gql`
   fragment TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent on GroupPermissionAddedEvent {
     user {
@@ -35800,16 +36414,19 @@ export const ShareButton_PetitionBaseFragmentDoc = gql`
         user {
           id
           fullName
+          ...UserReference_User
         }
       }
       ... on PetitionUserGroupPermission {
         group {
           id
-          name
+          ...UserGroupReference_UserGroup
         }
       }
     }
   }
+  ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<ShareButton_PetitionBaseFragment, unknown>;
 export const SelectedSignerRow_PetitionSignerFragmentDoc = gql`
   fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
@@ -38771,10 +39388,12 @@ export const createMentionPlugin_UserOrUserGroupFragmentDoc = gql`
       name
       memberCount
       ...UserSelectOption_UserGroup
+      ...UserGroupReference_UserGroup
     }
   }
   ${UserSelectOption_UserFragmentDoc}
   ${UserSelectOption_UserGroupFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<createMentionPlugin_UserOrUserGroupFragment, unknown>;
 export const useExportExcelTask_TaskFragmentDoc = gql`
   fragment useExportExcelTask_Task on Task {

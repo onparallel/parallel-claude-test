@@ -226,7 +226,7 @@ export function TemplateDefaultPermissionsDialog({
               />
             </Text>
             <Flex>
-              <FormControl id="editors">
+              <FormControl id="editors" flex="1 1 auto" minWidth={0} width="auto">
                 <Controller
                   name="editors"
                   control={control}

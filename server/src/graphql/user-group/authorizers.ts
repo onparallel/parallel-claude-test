@@ -4,6 +4,7 @@ import { ApiContext } from "../../context";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
+import { UserGroupType } from "../../db/__types";
 
 export async function contextUserHasAccessToUserGroups(userGroupIds: number[], ctx: ApiContext) {
   try {
@@ -31,5 +32,19 @@ export function userHasAccessToUserGroups<
       return await contextUserHasAccessToUserGroups(userGroupIds, ctx);
     } catch {}
     return false;
+  };
+}
+
+export function userGroupHasType<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(argName: TArg, types: MaybeArray<UserGroupType>): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const userGroupIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+    const userGroups = await ctx.userGroups.loadUserGroup(userGroupIds);
+    const allowedTypes = unMaybeArray(types);
+
+    return userGroups.every((ug) => isDefined(ug) && allowedTypes.includes(ug.type));
   };
 }

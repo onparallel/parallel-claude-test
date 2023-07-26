@@ -61,12 +61,22 @@ export const searchUsers = queryField("searchUsers", {
     { search, includeGroups, includeInactive, excludeUsers, excludeUserGroups },
     ctx,
   ) => {
-    return await ctx.users.searchUsers(ctx.user!.org_id, search, {
-      includeGroups: includeGroups ?? false,
-      includeInactive: includeInactive ?? false,
-      excludeUsers: excludeUsers ?? [],
-      excludeUserGroups: excludeUserGroups ?? [],
-    });
+    const [users, userGroups] = await Promise.all([
+      ctx.users
+        .searchUsers(ctx.user!.org_id, search, {
+          includeInactive: includeInactive ?? false,
+          excludeUsers: excludeUsers ?? [],
+        })
+        .then((us) => us.map((u) => ({ ...u, __type: "User" as const }))),
+      includeGroups
+        ? ctx.userGroups
+            .searchUserGroups(ctx.user!.org_id, search, {
+              excludeUserGroups: excludeUserGroups ?? [],
+            })
+            .then((ugs) => ugs.map((ug) => ({ ...ug, __type: "UserGroup" as const })))
+        : [],
+    ]);
+    return [...userGroups, ...users];
   },
 });
 

@@ -1,23 +1,16 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, isDefined, omit, uniq } from "remeda";
+import { PERMISSIONS, PermissionName, PermissionNameValues } from "../../graphql/users/permissions";
 import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray } from "../../util/types";
+import { CreateUser, CreateUserData, User, UserData, UserOrganizationRoleValues } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import {
-  CreateUser,
-  CreateUserData,
-  User,
-  UserData,
-  UserGroup,
-  UserOrganizationRoleValues,
-} from "../__types";
 import { SystemRepository } from "./SystemRepository";
-import { PERMISSIONS, PermissionName, PermissionNameValues } from "../../graphql/users/permissions";
 
 @injectable()
 export class UserRepository extends BaseRepository {
@@ -380,54 +373,32 @@ export class UserRepository extends BaseRepository {
     orgId: number,
     search: string,
     opts: {
-      includeGroups: boolean;
       includeInactive: boolean;
       excludeUsers: number[];
-      excludeUserGroups: number[];
     },
   ) {
-    const [users, userGroups] = await Promise.all([
-      this.from("user")
-        .join("user_data", "user.user_data_id", "user_data.id")
-        .where({
-          org_id: orgId,
+    return await this.from("user")
+      .join("user_data", "user.user_data_id", "user_data.id")
+      .where({
+        org_id: orgId,
 
-          ...(opts.includeInactive ? {} : { status: "ACTIVE" }),
-        })
-        .whereNull("user.deleted_at")
-        .whereNull("user_data.deleted_at")
-        .mmodify((q) => {
-          if (opts.excludeUsers.length > 0) {
-            q.whereNotIn("user.id", opts.excludeUsers);
-          }
-          q.andWhere((q) => {
-            q.whereEscapedILike(
-              this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
-              `%${escapeLike(search, "\\")}%`,
-              "\\",
-            ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
-          });
-        })
-        .select<({ __type: "User" } & User)[]>("user.*", this.knex.raw(`'User' as __type`)),
-      opts.includeGroups
-        ? this.from("user_group")
-            .where({
-              org_id: orgId,
-              deleted_at: null,
-            })
-            .mmodify((q) => {
-              if (opts.excludeUserGroups.length > 0) {
-                q.whereNotIn("id", opts.excludeUserGroups);
-              }
-            })
-            .whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\")
-            .select<({ __type: "UserGroup" } & UserGroup)[]>(
-              "*",
-              this.knex.raw(`'UserGroup' as __type`),
-            )
-        : undefined,
-    ]);
-    return [...(userGroups ?? []), ...users];
+        ...(opts.includeInactive ? {} : { status: "ACTIVE" }),
+      })
+      .whereNull("user.deleted_at")
+      .whereNull("user_data.deleted_at")
+      .mmodify((q) => {
+        if (opts.excludeUsers.length > 0) {
+          q.whereNotIn("user.id", opts.excludeUsers);
+        }
+        q.andWhere((q) => {
+          q.whereEscapedILike(
+            this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
+            `%${escapeLike(search, "\\")}%`,
+            "\\",
+          ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
+        });
+      })
+      .select<User[]>("user.*");
   }
 
   readonly loadAvatarPathByUserDataId = this.buildLoader<number, Maybe<string>>(

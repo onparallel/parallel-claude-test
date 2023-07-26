@@ -29,7 +29,7 @@ export function TimelineGroupPermissionEditedEvent({
         values={{
           userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
-          groupName: <UserGroupReference userGroup={event.permissionGroup} />,
+          groupName: <UserGroupReference userGroup={event.permissionGroup} as="strong" />,
           permissionType: (
             <PetitionPermissionTypeText
               as="em"

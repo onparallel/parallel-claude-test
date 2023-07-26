@@ -67,7 +67,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
                 defaultMessage="Team name"
               />
             </FormLabel>
-            <Input {...nameRegisterProps} />
+            <Input {...nameRegisterProps} maxLength={100} />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.invalid-group-name-error"

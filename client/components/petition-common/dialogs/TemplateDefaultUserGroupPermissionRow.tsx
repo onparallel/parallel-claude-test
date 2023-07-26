@@ -15,6 +15,7 @@ import {
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
+import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
@@ -36,12 +37,17 @@ export function TemplateDefaultUserGroupPermissionRow({
   const { group } = permission;
   return (
     <Flex key={group.id} alignItems="center">
-      <Avatar role="presentation" getInitials={() => group.initials} name={group.name} size="sm" />
+      <Avatar
+        role="presentation"
+        getInitials={() => group.initials}
+        name={group.name}
+        icon={<UsersIcon />}
+        size="sm"
+      />
       <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
         <Stack direction={"row"} spacing={1} align="center">
-          <UsersIcon />
-          <Text paddingLeft={1} noOfLines={1} wordBreak="break-all">
-            {group.name}
+          <Text noOfLines={1} wordBreak="break-all">
+            <UserGroupReference userGroup={group} />
           </Text>
           {permission.isSubscribed ? <SubscribedNotificationsIcon /> : null}
         </Stack>
@@ -100,8 +106,10 @@ TemplateDefaultUserGroupPermissionRow.fragments = {
         initials
         name
         memberCount
+        ...UserGroupReference_UserGroup
       }
       isSubscribed
     }
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };

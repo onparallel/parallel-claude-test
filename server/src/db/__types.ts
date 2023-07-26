@@ -410,6 +410,10 @@ export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 export const TaskStatusValues = ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"] as TaskStatus[];
 
+export type UserGroupType = "NORMAL" | "ALL_USERS";
+
+export const UserGroupTypeValues = ["NORMAL", "ALL_USERS"] as UserGroupType[];
+
 export type UserLocale = "en" | "es";
 
 export const UserLocaleValues = ["en", "es"] as UserLocale[];
@@ -1940,11 +1944,20 @@ export interface UserGroup {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  type: UserGroupType; // user_group_type
+  localizable_name: any; // jsonb
 }
 
 export type CreateUserGroup = PartialProps<
   Omit<UserGroup, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "type"
+  | "localizable_name"
 >;
 
 export interface UserGroupMember {

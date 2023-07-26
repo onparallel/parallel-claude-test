@@ -7,7 +7,7 @@ import {
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { difference, isDefined, partition, zip } from "remeda";
+import { difference, isDefined, partition, uniq, zip } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { withError } from "../../util/promises/withError";
@@ -194,13 +194,15 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
       }),
     ]);
 
-    if (args.userGroupIds) {
-      await pMap(args.userGroupIds, (userGroupId) =>
-        ctx.userGroups.addUsersToGroup(userGroupId, user.id, `User:${ctx.user!.id}`),
-      );
+    const allUsersGroups = await ctx.userGroups.loadAllUsersGroupsByOrgId(orgId);
 
-      ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(user.id);
-    }
+    await ctx.userGroups.addUsersToGroups(
+      uniq([...(args.userGroupIds ?? []), ...allUsersGroups.map((ug) => ug.id)]),
+      user.id,
+      `User:${ctx.user!.id}`,
+    );
+
+    ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(user.id);
 
     return user;
   },
@@ -223,6 +225,13 @@ export const activateUser = mutationField("activateUser", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   resolve: async (_, { userIds }, ctx) => {
+    const allUsersGroups = await ctx.userGroups.loadAllUsersGroupsByOrgId(ctx.user!.org_id);
+    await ctx.userGroups.addUsersToGroups(
+      allUsersGroups.map((ug) => ug.id),
+      userIds,
+      `User:${ctx.user!.id}`,
+    );
+
     return await ctx.users.updateUserById(userIds, { status: "ACTIVE" }, `User:${ctx.user!.id}`);
   },
 });
@@ -382,15 +391,15 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
         const userGroupsIdsToDelete = difference(actualUserGroupsIds, userGroupIds);
         const userGroupsIdsToAdd = difference(userGroupIds, actualUserGroupsIds);
 
-        await pMap(
+        await ctx.userGroups.addUsersToGroups(
           userGroupsIdsToAdd,
-          async (userGroupId) =>
-            await ctx.userGroups.addUsersToGroup(userGroupId, userId, `User:${ctx.user!.id}`, t),
-          { concurrency: 5 },
+          userId,
+          `User:${ctx.user!.id}`,
+          t,
         );
 
         await ctx.userGroups.removeUsersFromGroups(
-          [userId],
+          userId,
           userGroupsIdsToDelete,
           `User:${ctx.user!.id}`,
           t,

@@ -9,10 +9,15 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { WhenPermission } from "@parallel/components/common/WhenPermission";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
+import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/dialogs/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/dialogs/ConfirmRemoveMemberDialog";
+import {
+  UserGroupReference,
+  userGroupReferenceText,
+} from "@parallel/components/petition-activity/UserGroupReference";
 import {
   OrganizationGroup_UserGroupMemberFragment,
   OrganizationGroup_addUsersToUserGroupDocument,
@@ -22,23 +27,23 @@ import {
   OrganizationGroup_updateUserGroupDocument,
   OrganizationGroup_userDocument,
   OrganizationGroup_userGroupDocument,
+  UserLocale,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort, sortBy } from "remeda";
 import { useConfirmDeleteGroupsDialog } from "..";
-import { withPermission } from "@parallel/components/common/withPermission";
 
 const SORTING = ["fullName", "email", "addedAt"] as const;
 
@@ -74,7 +79,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     },
   });
 
-  const canEdit = useHasPermission("TEAMS:CRUD_TEAMS");
+  const canEdit = useHasPermission("TEAMS:CRUD_TEAMS") && userGroup!.type === "NORMAL";
 
   const [userList, searchedList] = useMemo(() => {
     const {
@@ -106,10 +111,10 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const { selectedRows, onChangeSelectedIds } = useSelection(userList, "id");
 
   const [search, setSearch] = useState(state.search);
-  const [name, setName] = useState(userGroup?.name ?? "");
+  const [name, setName] = useState(userGroupReferenceText(userGroup!, intl.locale as UserLocale));
 
   useEffect(() => {
-    setName(userGroup?.name ?? "");
+    setName(userGroupReferenceText(userGroup!, intl.locale as UserLocale));
   }, [userGroup]);
 
   const columns = useOrganizationGroupTableColumns();
@@ -219,7 +224,12 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       realMe={realMe}
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
-          <EditableHeading isDisabled={!canEdit} value={name} onChange={handleChangeGroupName} />
+          <EditableHeading
+            maxLength={100}
+            isDisabled={!canEdit}
+            value={name}
+            onChange={handleChangeGroupName}
+          />
           <WhenPermission permission="TEAMS:CRUD_TEAMS">
             <MoreOptionsMenuButton
               variant="outline"
@@ -227,6 +237,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                 <MenuList>
                   <MenuItem
                     onClick={handleCloneGroup}
+                    isDisabled={!canEdit}
                     icon={<CopyIcon display="block" boxSize={4} />}
                   >
                     <FormattedMessage
@@ -238,6 +249,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                   <MenuItem
                     color="red.500"
                     onClick={handleDeleteGroup}
+                    isDisabled={!canEdit}
                     icon={<DeleteIcon display="block" boxSize={4} />}
                   >
                     <FormattedMessage
@@ -292,6 +304,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onAddMember={handleAddMember}
+              canAddMember={canEdit}
             />
           }
           body={
@@ -385,8 +398,11 @@ const _fragments = {
         members {
           ...OrganizationGroup_UserGroupMember
         }
+        type
+        ...UserGroupReference_UserGroup
       }
       ${this.UserGroupMember}
+      ${UserGroupReference.fragments.UserGroup}
     `;
   },
   get UserGroupMember() {

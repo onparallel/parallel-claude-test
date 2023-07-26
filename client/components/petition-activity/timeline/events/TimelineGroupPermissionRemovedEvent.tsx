@@ -28,7 +28,7 @@ export function TimelineGroupPermissionRemovedEvent({
         values={{
           userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
-          groupName: <UserGroupReference userGroup={event.permissionGroup} />,
+          groupName: <UserGroupReference userGroup={event.permissionGroup} as="strong" />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),

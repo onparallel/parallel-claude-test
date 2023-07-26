@@ -6,6 +6,7 @@ import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
 import { SubscribedNotificationsIcon } from "../common/SubscribedNotificationsIcon";
 import { UserAvatar } from "../common/UserAvatar";
+import { UserGroupReference } from "../petition-activity/UserGroupReference";
 
 export interface TemplateIconDefaultPermissionsProps extends PopoverProps {
   template: TemplateIconDefaultPermissions_PetitionTemplateFragment;
@@ -83,7 +84,7 @@ export function TemplateIconDefaultPermissions({
                     />
                     <Flex marginLeft={2} direction="row" alignItems="center" gap={1}>
                       <Text noOfLines={1} wordBreak="break-all">
-                        {p.group.name}
+                        <UserGroupReference userGroup={p.group} />
                       </Text>
                       <Text as="span" fontSize="xs" color="gray.600">
                         ({permissionType})
@@ -122,8 +123,8 @@ TemplateIconDefaultPermissions.fragments = {
         ... on TemplateDefaultUserGroupPermission {
           group {
             id
-            name
             initials
+            ...UserGroupReference_UserGroup
           }
           isSubscribed
         }
@@ -137,5 +138,6 @@ TemplateIconDefaultPermissions.fragments = {
       }
     }
     ${UserAvatar.fragments.User}
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };

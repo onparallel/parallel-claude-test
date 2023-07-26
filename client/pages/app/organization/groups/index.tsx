@@ -2,27 +2,28 @@ import { gql, useMutation } from "@apollo/client";
 import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { OverflownText } from "@parallel/components/common/OverflownText";
+import { TableColumn } from "@parallel/components/common/Table";
+import { TablePage } from "@parallel/components/common/TablePage";
+import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
   withDialogs,
 } from "@parallel/components/common/dialogs/DialogProvider";
-import { OverflownText } from "@parallel/components/common/OverflownText";
-import { TableColumn } from "@parallel/components/common/Table";
-import { TablePage } from "@parallel/components/common/TablePage";
-import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
-import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
+import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
+import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 import {
+  OrganizationGroups_UserGroupFragment,
   OrganizationGroups_cloneUserGroupsDocument,
   OrganizationGroups_createUserGroupDocument,
   OrganizationGroups_deleteUserGroupDocument,
   OrganizationGroups_userDocument,
-  OrganizationGroups_UserGroupFragment,
   OrganizationGroups_userGroupsDocument,
   QueryUserGroups_OrderBy,
 } from "@parallel/graphql/__types";
@@ -32,10 +33,10 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -256,6 +257,7 @@ function OrganizationGroups() {
               key: "clone",
               onClick: handleCloneClick,
               leftIcon: <CopyIcon />,
+              isDisabled: selectedRows.some((r) => r.type === "ALL_USERS"),
               children: (
                 <FormattedMessage
                   id="organization-groups.clone-group"
@@ -269,6 +271,7 @@ function OrganizationGroups() {
               onClick: handleDeleteClick,
               colorScheme: "red",
               leftIcon: <DeleteIcon />,
+              isDisabled: selectedRows.some((r) => r.type === "ALL_USERS"),
               children: (
                 <FormattedMessage
                   id="organization-groups.delete-group"
@@ -329,9 +332,14 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
         cellProps: {
           width: "30%",
           minWidth: "240px",
+          maxWidth: 0,
         },
         CellContent: ({ row }) => {
-          return <OverflownText>{row.name}</OverflownText>;
+          return (
+            <OverflownText>
+              <UserGroupReference userGroup={row} />
+            </OverflownText>
+          );
         },
       },
       {
@@ -454,8 +462,11 @@ OrganizationGroups.fragments = {
             ...UserAvatarList_User
           }
         }
+        type
+        ...UserGroupReference_UserGroup
       }
       ${UserAvatarList.fragments.User}
+      ${UserGroupReference.fragments.UserGroup}
     `;
   },
 };

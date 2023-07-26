@@ -28,7 +28,7 @@ export function LocalizableUserTextRender({
 }
 
 interface LocalizableUserTextRenderOptions {
-  intl: IntlShape;
+  intl?: IntlShape;
   value: LocalizableUserText;
   locale?: UserLocale;
   default: string;
@@ -42,7 +42,7 @@ export function localizableUserTextRender({
 }: LocalizableUserTextRenderOptions) {
   const locale = [
     _locale,
-    asSupportedUserLocale(intl.locale),
+    intl ? asSupportedUserLocale(intl.locale) : null,
     "en" as UserLocale,
     Object.keys(value)[0] as UserLocale,
   ].find((l) => isDefined(l) && isDefined(value[l]));

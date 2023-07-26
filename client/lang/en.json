@@ -12865,6 +12865,11 @@
     "context": "We started an eSignature process on the parallel {timeAgo}"
   },
   {
+    "term": "user-group.all-members.description",
+    "definition": "This team contains all users from the organization.",
+    "context": "This team contains all users from the organization."
+  },
+  {
     "term": "validate-petition-fields..number-field-with-invalid-limits-error",
     "definition": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum.",
     "context": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum."

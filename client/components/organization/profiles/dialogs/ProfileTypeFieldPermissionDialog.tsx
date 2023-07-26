@@ -30,6 +30,7 @@ import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMe
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 import {
   ProfileTypeFieldPermissionType,
   UpdateProfileTypeFieldPermissionInput,
@@ -290,15 +291,13 @@ export function ProfileTypeFieldPermissionDialog({
                         assertTypename(target, "UserGroup"), target.groupInitials
                       )}
                       name={target.name}
+                      icon={<UsersIcon />}
                       size="sm"
                     />
                     <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                      <HStack align="center">
-                        <UsersIcon />
-                        <Text noOfLines={1} wordBreak="break-all">
-                          {target.name}
-                        </Text>
-                      </HStack>
+                      <Text noOfLines={1} wordBreak="break-all">
+                        <UserGroupReference userGroup={target} />
+                      </Text>
                       <Flex>
                         <UserGroupMembersPopover userGroupId={target.id}>
                           <Text color="gray.500" cursor="default" noOfLines={1}>
@@ -384,11 +383,13 @@ useProfileTypeFieldPermissionDialog.fragments = {
         groupInitials: initials
         memberCount
         ...UserSelect_UserGroup
+        ...UserGroupReference_UserGroup
       }
     }
     ${UserAvatar.fragments.User}
     ${UserSelect.fragments.User}
     ${UserSelect.fragments.UserGroup}
+    ${UserGroupReference.fragments.UserGroup}
   `,
   get ProfileTypeFieldPermission() {
     return gql`

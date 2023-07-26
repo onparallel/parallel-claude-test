@@ -491,6 +491,7 @@ export interface NexusGenEnums {
   TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
   Tone: "FORMAL" | "INFORMAL";
+  UserGroupType: db.UserGroupType;
   UserLocale: db.UserLocale;
   UserStatus: db.UserStatus;
 }
@@ -3019,9 +3020,11 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     imMember: boolean; // Boolean!
     initials: string; // String!
+    localizableName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     memberCount: number; // Int!
     members: NexusGenRootTypes["UserGroupMember"][]; // [UserGroupMember!]!
     name: string; // String!
+    type: NexusGenEnums["UserGroupType"]; // UserGroupType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserGroupMember: {
@@ -5132,9 +5135,11 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     imMember: "Boolean";
     initials: "String";
+    localizableName: "LocalizableUserText";
     memberCount: "Int";
     members: "UserGroupMember";
     name: "String";
+    type: "UserGroupType";
     updatedAt: "DateTime";
   };
   UserGroupMember: {

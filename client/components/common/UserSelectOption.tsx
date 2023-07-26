@@ -2,10 +2,15 @@ import { gql } from "@apollo/client";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
+  UserLocale,
   UserSelectOption_UserFragment,
   UserSelectOption_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
+import {
+  UserGroupReference,
+  userGroupReferenceText,
+} from "../petition-activity/UserGroupReference";
 import { HighlightText } from "./HighlightText";
 
 interface UserSelectOptionProps {
@@ -44,7 +49,7 @@ export function UserSelectOption({ data, highlight, isDisabled }: UserSelectOpti
       />
       <Box verticalAlign="baseline">
         <HighlightText search={highlight} as="span">
-          {data.name}
+          {userGroupReferenceText(data, intl.locale as UserLocale)}
         </HighlightText>
         <Text as="span" display="inline-block" width={2} />
         <Text as="span" fontSize="85%" opacity={0.7}>
@@ -72,6 +77,8 @@ UserSelectOption.fragments = {
       id
       name
       memberCount
+      ...UserGroupReference_UserGroup
     }
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };

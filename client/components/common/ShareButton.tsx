@@ -3,6 +3,8 @@ import { Button, ButtonProps, Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ShareButton_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
+import { UserGroupReference } from "../petition-activity/UserGroupReference";
+import { UserReference } from "../petition-activity/UserReference";
 import { SmallPopover } from "./SmallPopover";
 
 export function ShareButton({
@@ -13,14 +15,6 @@ export function ShareButton({
   petition: ShareButton_PetitionBaseFragment;
   userId: string;
 }) {
-  const names = petition!.permissions.map((p) =>
-    p.__typename === "PetitionUserPermission"
-      ? p.user.fullName
-      : p.__typename === "PetitionUserGroupPermission"
-      ? p.group.name
-      : (null as never),
-  );
-
   return (
     <SmallPopover
       content={
@@ -30,7 +24,17 @@ export function ShareButton({
               id="component.share-button.shared-with"
               defaultMessage="Shared with:"
             />{" "}
-            <FormattedList value={names} />
+            <FormattedList
+              value={petition!.permissions.map((p) =>
+                p.__typename === "PetitionUserPermission" ? (
+                  <UserReference key={p.user.id} user={p.user} />
+                ) : p.__typename === "PetitionUserGroupPermission" ? (
+                  <UserGroupReference key={p.group.id} userGroup={p.group} as="strong" />
+                ) : (
+                  (null as never)
+                ),
+              )}
+            />
           </Text>
         ) : (
           <Text>
@@ -65,15 +69,18 @@ ShareButton.fragments = {
           user {
             id
             fullName
+            ...UserReference_User
           }
         }
         ... on PetitionUserGroupPermission {
           group {
             id
-            name
+            ...UserGroupReference_UserGroup
           }
         }
       }
     }
+    ${UserReference.fragments.User}
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };

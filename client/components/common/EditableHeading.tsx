@@ -28,9 +28,10 @@ const EditableControls = ({ ...props }) => {
 
 interface EditableHeadingProps extends ValueProps<string, false> {
   isDisabled?: boolean;
+  maxLength?: number;
 }
 
-export function EditableHeading({ isDisabled, value, onChange }: EditableHeadingProps) {
+export function EditableHeading({ isDisabled, value, maxLength, onChange }: EditableHeadingProps) {
   const intl = useIntl();
   const [name, setName] = useState(value);
   const [inputWidth, setInputWidth] = useState(0);
@@ -73,7 +74,13 @@ export function EditableHeading({ isDisabled, value, onChange }: EditableHeading
             maxWidth={655}
           />
 
-          <EditableInput paddingY={1} paddingX={2} minWidth={255} width={inputWidth} />
+          <EditableInput
+            paddingY={1}
+            paddingX={2}
+            minWidth={255}
+            width={inputWidth}
+            maxLength={maxLength}
+          />
           <EditableControls
             marginLeft={1}
             background={"white"}

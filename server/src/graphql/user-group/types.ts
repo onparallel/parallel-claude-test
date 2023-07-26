@@ -1,4 +1,5 @@
-import { objectType } from "nexus";
+import { enumType, objectType } from "nexus";
+import { UserGroupTypeValues } from "../../db/__types";
 import { getInitials } from "../../util/initials";
 
 export const UserGroup = objectType({
@@ -6,6 +7,10 @@ export const UserGroup = objectType({
   definition(t) {
     t.globalId("id", { prefixName: "UserGroup" });
     t.string("name");
+    t.field("localizableName", {
+      type: "LocalizableUserText",
+      resolve: (o) => o.localizable_name,
+    });
     t.string("initials", {
       resolve: (o) => getInitials(o.name, { removeAffixes: false }),
     });
@@ -27,6 +32,12 @@ export const UserGroup = objectType({
       resolve: async (root, _, ctx) => {
         return await ctx.userGroups.loadUserGroupCount(root.id);
       },
+    });
+    t.field("type", {
+      type: enumType({
+        name: "UserGroupType",
+        members: UserGroupTypeValues,
+      }),
     });
     t.implements("Timestamps");
   },

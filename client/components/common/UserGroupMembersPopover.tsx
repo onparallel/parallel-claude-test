@@ -16,12 +16,13 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
-  UserGroupMembersPopover_getMembersDocument,
   UserGroupMembersPopover_UserGroupFragment,
+  UserGroupMembersPopover_getMembersDocument,
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
+import { UserGroupReference } from "../petition-activity/UserGroupReference";
 import { UserAvatar } from "./UserAvatar";
 
 export interface UserGroupMembersPopoverProps {
@@ -55,7 +56,7 @@ export function UserGroupMembersPopover({
                 id="component.user-group-members-popover.members-of"
                 defaultMessage="Members of {name}:"
                 values={{
-                  name: <Text as="strong">{group.name}</Text>,
+                  name: <UserGroupReference userGroup={group} />,
                 }}
               />
             </PopoverHeader>
@@ -116,8 +117,10 @@ const _fragments = {
           ...UserAvatar_User
         }
       }
+      ...UserGroupReference_UserGroup
     }
     ${UserAvatar.fragments.User}
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };
 

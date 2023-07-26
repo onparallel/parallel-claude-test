@@ -10,6 +10,11 @@
     "context": "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
   },
   {
+    "term": "account-setup.all-members-group.name",
+    "definition": "All users",
+    "context": "All users"
+  },
+  {
     "term": "account-verification.activate-button",
     "definition": "Activate my account",
     "context": "Activate my account"

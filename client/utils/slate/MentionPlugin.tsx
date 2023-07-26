@@ -7,7 +7,11 @@ import {
   ComboboxProps,
   PlateCombobox,
 } from "@parallel/components/common/slate/PlateCombobox";
-import { createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
+import {
+  UserGroupReference,
+  userGroupReferenceText,
+} from "@parallel/components/petition-activity/UserGroupReference";
+import { UserLocale, createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
 import {
   PlateEditor,
   TRenderElementProps,
@@ -40,7 +44,7 @@ export interface MentionInputElement extends SlateElement<typeof ELEMENT_MENTION
 export function createMentionPlugin<
   TValue extends Value = Value,
   TEditor extends PlateEditor<TValue> = PlateEditor<TValue>,
->() {
+>(locale?: UserLocale) {
   return _createMentionPlugin<MentionPlugin<Mentionable>, TValue, TEditor>({
     options: {
       insertSpaceAfterMention: true,
@@ -55,7 +59,7 @@ export function createMentionPlugin<
                 mentionable.__typename === "User"
                   ? mentionable.fullName
                   : mentionable.__typename === "UserGroup"
-                  ? mentionable.name
+                  ? userGroupReferenceText(mentionable, locale ?? "en")
                   : "",
             },
           ],
@@ -212,9 +216,11 @@ createMentionPlugin.fragments = {
         name
         memberCount
         ...UserSelectOption_UserGroup
+        ...UserGroupReference_UserGroup
       }
     }
     ${UserSelectOption.fragments.User}
     ${UserSelectOption.fragments.UserGroup}
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };

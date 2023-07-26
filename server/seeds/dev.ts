@@ -201,7 +201,8 @@ export async function seed(knex: Knex): Promise<any> {
         [
           {
             org_id: orgIds[0],
-            name: "All",
+            localizable_name: { es: "Todos los usuarios", en: "All users" },
+            type: "ALL_USERS",
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
           },
@@ -219,7 +220,7 @@ export async function seed(knex: Knex): Promise<any> {
         users.map((u) => ({
           user_group_id: groups[0].id,
           user_id: u.id,
-          created_by: `User:${ownerId}`,
+          created_by: `User:${u.id}`,
         })),
       );
 

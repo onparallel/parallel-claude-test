@@ -6612,9 +6612,11 @@ type UserGroup implements Timestamps {
   id: GID!
   imMember: Boolean!
   initials: String!
+  localizableName: LocalizableUserText!
   memberCount: Int!
   members: [UserGroupMember!]!
   name: String!
+  type: UserGroupType!
 
   """
   Time when the resource was last updated.
@@ -6641,6 +6643,11 @@ type UserGroupPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+enum UserGroupType {
+  ALL_USERS
+  NORMAL
 }
 
 """

@@ -19,6 +19,7 @@ import {
   UserListPopover_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
+import { UserGroupReference } from "../petition-activity/UserGroupReference";
 import { UserAvatar } from "./UserAvatar";
 
 export function UserListPopover({
@@ -38,7 +39,14 @@ export function UserListPopover({
       <Portal>
         <PopoverContent width="fit-content">
           <PopoverArrow />
-          <PopoverBody paddingX={0} paddingY={2} overflow="auto" maxHeight="300px" as={Stack}>
+          <PopoverBody
+            paddingX={0}
+            paddingY={2}
+            overflow="auto"
+            maxHeight="300px"
+            maxWidth="320px"
+            as={Stack}
+          >
             <Stack as={List}>
               {usersOrGroups.map((u) => (
                 <Flex key={u.id} as={ListItem} alignItems="center" paddingX={4}>
@@ -58,7 +66,7 @@ export function UserListPopover({
                         color="gray.800"
                       />
                       <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
-                        {u.name}
+                        <UserGroupReference userGroup={u} />
                       </Text>
                     </>
                   ) : null}
@@ -87,9 +95,10 @@ UserListPopover.fragments = {
     return gql`
       fragment UserListPopover_UserGroup on UserGroup {
         id
-        name
         initials
+        ...UserGroupReference_UserGroup
       }
+      ${UserGroupReference.fragments.UserGroup}
     `;
   },
 };

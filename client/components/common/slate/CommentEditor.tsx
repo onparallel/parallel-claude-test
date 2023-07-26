@@ -31,6 +31,8 @@ import { isDefined, omit, pick } from "remeda";
 import { Editor, Transforms } from "slate";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
+import { useIntl } from "react-intl";
+import { UserLocale } from "@parallel/graphql/__types";
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
@@ -118,6 +120,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
     },
     ref,
   ) {
+    const intl = useIntl();
     const plugins = useMemo(
       () =>
         createPlugins<CommentEditorValue, CommentPEditor>(
@@ -127,7 +130,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
             createParagraphPlugin(),
             createComboboxPlugin(),
             ...(isDefined(onSearchMentionables)
-              ? [createMentionPlugin<CommentEditorValue, CommentPEditor>()]
+              ? [createMentionPlugin<CommentEditorValue, CommentPEditor>(intl.locale as UserLocale)]
               : []),
           ],
           {

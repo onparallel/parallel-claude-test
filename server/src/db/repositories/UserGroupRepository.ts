@@ -3,10 +3,10 @@ import { Knex } from "knex";
 import { groupBy, omit, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike, SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
 import { CreateUserGroup, User, UserGroup } from "../__types";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { SortBy, escapeLike } from "../helpers/utils";
+import { KNEX } from "../knex";
 
 @injectable()
 export class UserGroupRepository extends BaseRepository {
@@ -26,7 +26,18 @@ export class UserGroupRepository extends BaseRepository {
         .where({ org_id: orgId, deleted_at: null })
         .mmodify((q) => {
           if (opts.search) {
-            q.whereEscapedILike("name", `%${escapeLike(opts.search, "\\")}%`, "\\");
+            q.where((q2) => {
+              q2.whereEscapedILike(
+                "name",
+                `%${escapeLike(opts.search!, "\\")}%`,
+                "\\",
+              ).or.whereExists((q3) =>
+                q3
+                  .select(this.knex.raw("1"))
+                  .fromRaw(`jsonb_each_text(localizable_name) AS t(key, value)`)
+                  .whereEscapedILike("value", `%${escapeLike(opts.search!, "\\")}%`),
+              );
+            });
           }
           if (opts.sortBy) {
             q.orderByRaw(opts.sortBy.map((s) => `"${s.field}" ${s.order}`).join(", "));
@@ -233,34 +244,42 @@ export class UserGroupRepository extends BaseRepository {
     }, t);
   }
 
-  async addUsersToGroup(
-    userGroupId: number,
-    userIds: MaybeArray<number>,
+  async addUsersToGroups(
+    userGroupId: MaybeArray<number>,
+    userId: MaybeArray<number>,
     createdBy: string,
     t?: Knex.Transaction,
   ) {
-    const ids = unMaybeArray(userIds);
-    if (ids.length > 0) {
-      await this.withTransaction(async (t) => {
-        await t.raw(
-          /* sql */ `
+    const groupIds = unMaybeArray(userGroupId);
+    const userIds = unMaybeArray(userId);
+
+    if (userIds.length === 0 || groupIds.length === 0) {
+      return;
+    }
+
+    const data = groupIds.flatMap((groupId) =>
+      userIds.map((userId) => ({ user_group_id: groupId, user_id: userId })),
+    );
+
+    await this.withTransaction(async (t) => {
+      await t.raw(
+        /* sql */ `
         ? on conflict do nothing;
         `,
-          [
-            this.from("user_group_member", t).insert(
-              ids.map((userId) => ({
-                user_group_id: userGroupId,
-                user_id: userId,
-                created_by: createdBy,
-              })),
-            ),
-          ],
-        );
+        [
+          this.from("user_group_member", t).insert(
+            data.map((d) => ({
+              user_group_id: d.user_group_id,
+              user_id: d.user_id,
+              created_by: createdBy,
+            })),
+          ),
+        ],
+      );
 
-        /** add group permissions on the new group members */
-        await this.addUserGroupMemberPermissions(userGroupId, ids, createdBy, t);
-      }, t);
-    }
+      /** add group permissions on the new group members */
+      await this.addUserGroupMemberPermissions(groupIds, userIds, createdBy, t);
+    }, t);
   }
 
   async searchUserGroups(
@@ -270,7 +289,7 @@ export class UserGroupRepository extends BaseRepository {
       excludeUserGroups: number[];
     },
   ) {
-    const userGroups = await this.from("user_group")
+    return await this.from("user_group")
       .where({
         org_id: orgId,
         deleted_at: null,
@@ -280,13 +299,19 @@ export class UserGroupRepository extends BaseRepository {
           q.whereNotIn("id", opts.excludeUserGroups);
         }
       })
-      .whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\")
-      .select<({ __type: "UserGroup" } & UserGroup)[]>("*", this.knex.raw(`'UserGroup' as __type`));
-    return userGroups;
+      .where((q) => {
+        q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\").or.whereExists((q2) =>
+          q2
+            .select(this.knex.raw("1"))
+            .fromRaw(`jsonb_each_text(localizable_name) AS t(key, value)`)
+            .whereEscapedILike("value", `%${escapeLike(search, "\\")}%`),
+        );
+      })
+      .select("*");
   }
 
   private async addUserGroupMemberPermissions(
-    userGroupId: number,
+    userGroupIds: number[],
     memberIds: number[],
     createdBy: string,
     t?: Knex.Transaction,
@@ -296,15 +321,19 @@ export class UserGroupRepository extends BaseRepository {
         t.raw(
           /* sql */ `
           with 
-            pp as (select * from petition_permission where user_group_id = ? and deleted_at is null),
+            ug as (select * from (?) as t(user_group_id)),
             u as (select * from (?) as t(user_id))
           insert into petition_permission(type, user_id, petition_id, from_user_group_id, created_by, updated_by)
             select pp.type, u.user_id, pp.petition_id, pp.user_group_id, ?, ?
-            from pp cross join u
+            from u cross join ug
+            join petition_permission pp on pp.user_group_id = ug.user_group_id and pp.deleted_at is null
           on conflict do nothing;
         `,
           [
-            userGroupId,
+            this.sqlValues(
+              userGroupIds.map((id) => [id]),
+              ["int"],
+            ),
             this.sqlValues(
               memberIds.map((id) => [id]),
               ["int"],
@@ -316,4 +345,8 @@ export class UserGroupRepository extends BaseRepository {
       t,
     );
   }
+
+  readonly loadAllUsersGroupsByOrgId = this.buildLoadMultipleBy("user_group", "org_id", (q) =>
+    q.where("type", "ALL_USERS").whereNull("deleted_at"),
+  );
 }

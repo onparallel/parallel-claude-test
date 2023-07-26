@@ -4,6 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Mention_PetitionFieldCommentMentionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { UserGroupReference } from "../petition-activity/UserGroupReference";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 
 export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMentionFragment }) {
@@ -49,7 +50,7 @@ export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMent
         return (
           <UserGroupMembersPopover userGroupId={userGroup.id}>
             <MentionBadge mentionId={mention.mentionedId} isHighlighted={userGroup.imMember}>
-              @{userGroup.name}
+              @<UserGroupReference userGroup={userGroup} disablePopover />
             </MentionBadge>
           </UserGroupMembersPopover>
         );
@@ -103,10 +104,11 @@ Mention.fragments = {
         mentionedId
         userGroup {
           id
-          name
           imMember
+          ...UserGroupReference_UserGroup
         }
       }
     }
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };

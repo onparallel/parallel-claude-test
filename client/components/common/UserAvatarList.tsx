@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { Avatar, Box, Flex, Stack, Text, Tooltip, useMultiStyleConfig } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Tooltip, useMultiStyleConfig } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   UserAvatarList_UserFragment,
   UserAvatarList_UserGroupFragment,
 } from "@parallel/graphql/__types";
+import { UserGroupReference } from "../petition-activity/UserGroupReference";
 import { UserAvatar } from "./UserAvatar";
 import { UserListPopover } from "./UserListPopover";
 
@@ -51,21 +52,17 @@ export const UserAvatarList = Object.assign(
           </UserListPopover>
         )}
         {slice.map((u, i) => {
-          const tooltipDisabled =
-            u.__typename === "User" ? !u.fullName : u.__typename === "UserGroup" ? !u.name : true;
-
           const label =
             u.__typename === "User" ? (
               u.fullName
+            ) : u.__typename === "UserGroup" ? (
+              <UserGroupReference userGroup={u} fontWeight="normal" />
             ) : (
-              <Stack direction="row" spacing={2} alignItems="center">
-                <UsersIcon />
-                <Text>{u.__typename === "UserGroup" ? u.name : null}</Text>
-              </Stack>
+              (null as never)
             );
 
           return (
-            <Tooltip key={u.id} label={label} isDisabled={tooltipDisabled}>
+            <Tooltip key={u.id} label={label}>
               <Box
                 marginY={-1}
                 marginRight={i === 0 && !excess ? 0 : -2}
@@ -90,6 +87,7 @@ export const UserAvatarList = Object.assign(
                   <Avatar
                     size={size}
                     name={u.name}
+                    icon={<UsersIcon />}
                     getInitials={() => u.initials}
                     transitionProperty="transform"
                     transitionDuration="150ms"
@@ -123,9 +121,10 @@ export const UserAvatarList = Object.assign(
         return gql`
           fragment UserAvatarList_UserGroup on UserGroup {
             id
-            name
             initials
+            ...UserGroupReference_UserGroup
           }
+          ${UserGroupReference.fragments.UserGroup}
         `;
       },
     },

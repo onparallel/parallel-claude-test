@@ -11,10 +11,12 @@ export interface OrganizationGroupListTableHeaderProps {
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onAddMember: () => void;
+  canAddMember?: boolean;
 }
 
 export function OrganizationGroupListTableHeader({
   search,
+  canAddMember,
   onSearchChange,
   onReload,
   onAddMember,
@@ -41,6 +43,7 @@ export function OrganizationGroupListTableHeader({
           colorScheme="primary"
           leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddMember}
+          isDisabled={!canAddMember}
         >
           <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
             <FormattedMessage id="organization-groups.add-user" defaultMessage="Add user" />

@@ -1,36 +1,40 @@
 import { gql, useApolloClient, useQuery } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
-  UserSelect_canCreateUsersDocument,
-  UserSelect_useGetUsersOrGroupsDocument,
+  UserLocale,
   UserSelect_UserFragment,
   UserSelect_UserFragmentDoc,
   UserSelect_UserGroupFragment,
   UserSelect_UserGroupFragmentDoc,
+  UserSelect_canCreateUsersDocument,
+  UserSelect_useGetUsersOrGroupsDocument,
 } from "@parallel/graphql/__types";
+import { isTypename } from "@parallel/utils/apollo/typename";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
-import { ForwardedRef, forwardRef, ReactElement, RefAttributes, useCallback, useMemo } from "react";
+import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
-  components,
   MultiValueGenericProps,
   NoticeProps,
   OptionProps,
   SelectComponentsConfig,
   SelectInstance,
   SingleValueProps,
+  components,
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
+import {
+  UserGroupReference,
+  userGroupReferenceText,
+} from "../petition-activity/UserGroupReference";
 import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 import { UserSelectOption } from "./UserSelectOption";
-import { isTypename } from "@parallel/utils/apollo/typename";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =
   | UserSelect_UserFragment
@@ -58,8 +62,10 @@ const fragments = {
       name
       memberCount
       ...UserSelectOption_UserGroup
+      ...UserGroupReference_UserGroup
     }
     ${UserSelectOption.fragments.UserGroup}
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };
 
@@ -218,7 +224,7 @@ export const UserSelect = Object.assign(
         onChange={onChange as any}
         isMulti={isMulti}
         options={options}
-        getOptionLabel={getOptionLabel}
+        getOptionLabel={getOptionLabel(intl.locale as UserLocale)}
         getOptionValue={getOptionValue}
         placeholder={placeholder}
         isClearable={props.isClearable}
@@ -299,11 +305,11 @@ function useGetUsersOrGroups() {
   }, []);
 }
 
-const getOptionLabel = (option: UserSelectSelection<any>) => {
+const getOptionLabel = (locale: UserLocale) => (option: UserSelectSelection<any>) => {
   if (option.__typename === "User") {
     return option.fullName ? `${option.fullName} <${option.email}>` : option.email;
   } else if (option.__typename === "UserGroup") {
-    return option.name;
+    return userGroupReferenceText(option, locale);
   } else if ((option as any).__isNew__) {
     return (option as any).label;
   }
@@ -351,7 +357,7 @@ function MultiValueLabel({
         </OverflownText>
       ) : data.__typename === "UserGroup" ? (
         <UserGroupMembersPopover userGroupId={data.id}>
-          <Box>
+          <OverflownText>
             <UsersIcon
               marginRight={1}
               aria-label={intl.formatMessage({
@@ -359,14 +365,14 @@ function MultiValueLabel({
                 defaultMessage: "Team",
               })}
             />
-            {data.name} (
+            {userGroupReferenceText(data, intl.locale as UserLocale)} (
             <FormattedMessage
               id="generic.n-group-members"
               defaultMessage="{count, plural, =1 {1 member} other {# members}}"
               values={{ count: data.memberCount }}
             />
             )
-          </Box>
+          </OverflownText>
         </UserGroupMembersPopover>
       ) : null}
     </components.MultiValueLabel>
@@ -374,6 +380,7 @@ function MultiValueLabel({
 }
 
 function Option({ children, ...props }: OptionProps<UserSelectSelection<boolean>>) {
+  const intl = useIntl();
   return (
     <components.Option
       {...props}
@@ -389,7 +396,8 @@ function Option({ children, ...props }: OptionProps<UserSelectSelection<boolean>
           ? {
               "data-option-type": "UserGroup",
               "data-user-group-id": props.data.id,
-              "data-name": props.data.name,
+              "data-all-users-group": props.data.type === "ALL_USERS",
+              "data-name": userGroupReferenceText(props.data, intl.locale as UserLocale),
             }
           : {}),
       }}

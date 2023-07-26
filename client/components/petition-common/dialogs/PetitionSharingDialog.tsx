@@ -25,30 +25,33 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel/chakra/icons";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
+import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import {
   NewPetition_templatesDocument,
   PetitionActivity_petitionDocument,
   PetitionBaseType,
   PetitionPermissionType,
   PetitionPermissionTypeRW,
+  PetitionSharingModal_PetitionUserGroupPermissionFragment,
+  PetitionSharingModal_PetitionUserPermissionFragment,
+  PetitionSharingModal_UserFragment,
+  PetitionSharingModal_UserGroupFragment,
   PetitionSharingModal_addPetitionPermissionDocument,
   PetitionSharingModal_editPetitionPermissionDocument,
   PetitionSharingModal_petitionsDocument,
-  PetitionSharingModal_PetitionUserGroupPermissionFragment,
-  PetitionSharingModal_PetitionUserPermissionFragment,
   PetitionSharingModal_removePetitionPermissionDocument,
   PetitionSharingModal_transferPetitionOwnershipDocument,
-  PetitionSharingModal_UserFragment,
-  PetitionSharingModal_UserGroupFragment,
 } from "@parallel/graphql/__types";
+import { isTypename } from "@parallel/utils/apollo/typename";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
-import { useCallback, useEffect, useRef } from "react";
+import { ReactNode, useCallback, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -60,7 +63,6 @@ import { UserAvatar } from "../../common/UserAvatar";
 import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
-import { isTypename } from "@parallel/utils/apollo/typename";
 
 interface PetitionSharingDialogData {
   selection: UserSelectSelection<true>[];
@@ -194,7 +196,11 @@ export function PetitionSharingDialog({
   }: PetitionPermissionProps) => {
     try {
       const prop = user ? "userIds" : "userGroupIds";
-      const name = user ? user.fullName : userGroup?.name;
+      const name = user ? (
+        <UserReference user={user} />
+      ) : userGroup ? (
+        <UserGroupReference userGroup={userGroup} />
+      ) : undefined;
       const id = user ? user.id : userGroup?.id;
 
       await confirmRemovePetitionPermission({ name: id === userId ? undefined : name });
@@ -524,15 +530,13 @@ export function PetitionSharingDialog({
                         role="presentation"
                         getInitials={() => group.initials}
                         name={group.name!}
+                        icon={<UsersIcon />}
                         size="sm"
                       />
                       <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                        <Stack direction={"row"} spacing={2} align="center">
-                          <UsersIcon />
-                          <Text noOfLines={1} wordBreak="break-all">
-                            {group.name}
-                          </Text>
-                        </Stack>
+                        <Text noOfLines={1} wordBreak="break-all">
+                          <UserGroupReference userGroup={group} />
+                        </Text>
                         <Flex
                           role="group"
                           flexDirection="row-reverse"
@@ -773,7 +777,9 @@ const fragments = {
         fullName
         ...UserAvatar_User
         ...UserSelect_User
+        ...UserReference_User
       }
+      ${UserReference.fragments.User}
       ${UserSelect.fragments.User}
       ${UserAvatar.fragments.User}
     `;
@@ -786,7 +792,9 @@ const fragments = {
         initials
         memberCount
         imMember
+        ...UserGroupReference_UserGroup
       }
+      ${UserGroupReference.fragments.UserGroup}
     `;
   },
 };
@@ -872,10 +880,10 @@ const _queries = [
 ];
 
 function ConfirmRemovePetitionPermissionDialog({
-  name = "",
+  name,
   ...props
 }: DialogProps<{
-  name?: Maybe<string>;
+  name?: Maybe<ReactNode>;
 }>) {
   return (
     <ConfirmDialog

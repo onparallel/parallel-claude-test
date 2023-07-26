@@ -1150,7 +1150,7 @@ describe("GraphQL/Users", () => {
         "api-token",
         fromGlobalId(data!.signUp.id, "User").id,
       );
-      const { errors: queryErrors, data: queryData } = await testClient
+      const { errors: orgQueryErrors, data: orgQueryData } = await testClient
         .withApiKey(apiKey)
         .execute(gql`
           query me {
@@ -1197,8 +1197,8 @@ describe("GraphQL/Users", () => {
           }
         `);
 
-      expect(queryErrors).toBeUndefined();
-      expect(queryData).toEqual({
+      expect(orgQueryErrors).toBeUndefined();
+      expect(orgQueryData).toEqual({
         me: {
           id: data!.signUp.id,
           fullName: "Test User",
@@ -1461,6 +1461,48 @@ describe("GraphQL/Users", () => {
             },
           ],
         },
+      });
+
+      // make sure default user group is created
+      const { errors: userGroupsQueryErrors, data: userGroupsQueryData } = await testClient
+        .withApiKey(apiKey)
+        .execute(
+          gql`
+            query ($limit: Int, $offset: Int) {
+              userGroups(limit: $limit, offset: $offset) {
+                items {
+                  imMember
+                  memberCount
+                  name
+                  type
+                  members {
+                    user {
+                      id
+                    }
+                  }
+                }
+                totalCount
+              }
+            }
+          `,
+          {
+            limit: 1_000,
+            offset: 0,
+          },
+        );
+
+      expect(userGroupsQueryErrors).toBeUndefined();
+      expect(userGroupsQueryData?.userGroups).toEqual({
+        totalCount: 1,
+        items: [
+          {
+            imMember: true,
+            memberCount: 1,
+            name: "",
+            type: "ALL_USERS",
+            members: [{ user: { id: data!.signUp.id } }],
+          },
+        ],
       });
     });
   });

@@ -4920,9 +4920,11 @@ export type UserGroup = Timestamps & {
   id: Scalars["GID"]["output"];
   imMember: Scalars["Boolean"]["output"];
   initials: Scalars["String"]["output"];
+  localizableName: Scalars["LocalizableUserText"]["output"];
   memberCount: Scalars["Int"]["output"];
   members: Array<UserGroupMember>;
   name: Scalars["String"]["output"];
+  type: UserGroupType;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
 };
@@ -4940,6 +4942,8 @@ export type UserGroupPagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
 };
+
+export type UserGroupType = "ALL_USERS" | "NORMAL";
 
 /** The preferred locale for the user */
 export type UserLocale = "en" | "es";
