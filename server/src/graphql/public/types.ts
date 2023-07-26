@@ -677,6 +677,9 @@ export const PublicPublicPetitionLink = objectType({
         return true;
       },
     });
+    t.nonNull.boolean("allowMultiplePetitions", {
+      resolve: (o) => o.allow_multiple_petitions,
+    });
   },
 });
 

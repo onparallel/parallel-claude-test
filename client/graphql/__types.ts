@@ -1270,6 +1270,7 @@ export interface MutationcreateProfileTypeFieldArgs {
 }
 
 export interface MutationcreatePublicPetitionLinkArgs {
+  allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
   prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
@@ -2062,6 +2063,7 @@ export interface MutationupdateProfileTypeFieldPositionsArgs {
 }
 
 export interface MutationupdatePublicPetitionLinkArgs {
+  allowMultiplePetitions?: InputMaybe<Scalars["Boolean"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
   isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
   prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
@@ -3994,6 +3996,7 @@ export interface PublicPetitionFieldReply extends Timestamps {
 
 export interface PublicPetitionLink {
   __typename?: "PublicPetitionLink";
+  allowMultiplePetitions: Scalars["Boolean"]["output"];
   description: Scalars["String"]["output"];
   id: Scalars["GID"]["output"];
   isActive: Scalars["Boolean"]["output"];
@@ -4024,6 +4027,7 @@ export interface PublicPetitionSignerDataInput {
 
 export interface PublicPublicPetitionLink {
   __typename?: "PublicPublicPetitionLink";
+  allowMultiplePetitions: Scalars["Boolean"]["output"];
   description: Scalars["String"]["output"];
   isActive: Scalars["Boolean"]["output"];
   /** If the organization has enough credits to send a petition with this public link or not */
@@ -11100,6 +11104,7 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   slug: string;
   url: string;
   prefillSecret?: string | null;
+  allowMultiplePetitions: boolean;
 };
 
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
@@ -12696,6 +12701,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     description: string;
     slug: string;
     prefillSecret?: string | null;
+    allowMultiplePetitions: boolean;
   } | null;
   defaultPermissions: Array<
     | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
@@ -12803,6 +12809,7 @@ export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
   title: Scalars["String"]["input"];
   description: Scalars["String"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
+  allowMultiplePetitions: Scalars["Boolean"]["input"];
 }>;
 
 export type PetitionSettings_createPublicPetitionLinkMutation = {
@@ -12815,6 +12822,7 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
     slug: string;
     url: string;
     prefillSecret?: string | null;
+    allowMultiplePetitions: boolean;
     template: {
       __typename?: "PetitionTemplate";
       id: string;
@@ -12830,6 +12838,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
   description?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
   prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
+  allowMultiplePetitions?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type PetitionSettings_updatePublicPetitionLinkMutation = {
@@ -12842,6 +12851,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
     slug: string;
     url: string;
     prefillSecret?: string | null;
+    allowMultiplePetitions: boolean;
     template: {
       __typename?: "PetitionTemplate";
       id: string;
@@ -23233,6 +23243,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     description: string;
     slug: string;
     prefillSecret?: string | null;
+    allowMultiplePetitions: boolean;
   } | null;
   defaultPermissions: Array<
     | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
@@ -23550,6 +23561,7 @@ export type PetitionCompose_updatePetitionMutation = {
           description: string;
           slug: string;
           prefillSecret?: string | null;
+          allowMultiplePetitions: boolean;
         } | null;
         defaultPermissions: Array<
           | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
@@ -24276,6 +24288,7 @@ export type PetitionCompose_petitionQuery = {
           description: string;
           slug: string;
           prefillSecret?: string | null;
+          allowMultiplePetitions: boolean;
         } | null;
         defaultPermissions: Array<
           | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
@@ -30701,6 +30714,7 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
   title: string;
   isAvailable: boolean;
   description: string;
+  allowMultiplePetitions: boolean;
   owner: {
     __typename?: "PublicUser";
     fullName: string;
@@ -30751,6 +30765,7 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
     title: string;
     isAvailable: boolean;
     description: string;
+    allowMultiplePetitions: boolean;
     owner: {
       __typename?: "PublicUser";
       fullName: string;
@@ -35911,6 +35926,7 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
     slug
     url
     prefillSecret
+    allowMultiplePetitions
   }
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
 export const PetitionSettings_PetitionBaseFragmentDoc = gql`
@@ -38361,6 +38377,7 @@ export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
         }
       }
     }
+    allowMultiplePetitions
   }
 ` as unknown as DocumentNode<PublicPetitionLink_PublicPublicPetitionLinkFragment, unknown>;
 export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
@@ -39651,12 +39668,14 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
     $title: String!
     $description: String!
     $slug: String
+    $allowMultiplePetitions: Boolean!
   ) {
     createPublicPetitionLink(
       templateId: $templateId
       title: $title
       description: $description
       slug: $slug
+      allowMultiplePetitions: $allowMultiplePetitions
     ) {
       ...PublicLinkSettingsDialog_PublicPetitionLink
       template {
@@ -39680,6 +39699,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
     $description: String
     $slug: String
     $prefillSecret: String
+    $allowMultiplePetitions: Boolean
   ) {
     updatePublicPetitionLink(
       publicPetitionLinkId: $publicPetitionLinkId
@@ -39688,6 +39708,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       description: $description
       slug: $slug
       prefillSecret: $prefillSecret
+      allowMultiplePetitions: $allowMultiplePetitions
     ) {
       ...PublicLinkSettingsDialog_PublicPetitionLink
       template {

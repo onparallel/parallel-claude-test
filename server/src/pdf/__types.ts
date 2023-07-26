@@ -1225,6 +1225,7 @@ export type MutationcreateProfileTypeFieldArgs = {
 };
 
 export type MutationcreatePublicPetitionLinkArgs = {
+  allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
   prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
@@ -2017,6 +2018,7 @@ export type MutationupdateProfileTypeFieldPositionsArgs = {
 };
 
 export type MutationupdatePublicPetitionLinkArgs = {
+  allowMultiplePetitions?: InputMaybe<Scalars["Boolean"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
   isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
   prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
@@ -3853,6 +3855,7 @@ export type PublicPetitionFieldReply = Timestamps & {
 };
 
 export type PublicPetitionLink = {
+  allowMultiplePetitions: Scalars["Boolean"]["output"];
   description: Scalars["String"]["output"];
   id: Scalars["GID"]["output"];
   isActive: Scalars["Boolean"]["output"];
@@ -3881,6 +3884,7 @@ export type PublicPetitionSignerDataInput = {
 };
 
 export type PublicPublicPetitionLink = {
+  allowMultiplePetitions: Scalars["Boolean"]["output"];
   description: Scalars["String"]["output"];
   isActive: Scalars["Boolean"]["output"];
   /** If the organization has enough credits to send a petition with this public link or not */

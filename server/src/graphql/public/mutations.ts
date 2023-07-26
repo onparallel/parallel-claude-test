@@ -24,7 +24,7 @@ import {
 } from "../../util/slate/placeholders";
 import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
+import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
 import { jsonArg } from "../helpers/scalars/JSON";
@@ -731,14 +731,21 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
     ),
     resolve: async (_, args, ctx) => {
       const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
-      if (
-        !args.force &&
-        (await ctx.petitions.contactHasAccessFromPublicPetitionLink(args.contactEmail, link.id))
-      ) {
+
+      const hasAccess = await ctx.petitions.contactHasAccessFromPublicPetitionLink(
+        args.contactEmail,
+        link.id,
+      );
+
+      if (!args.force && hasAccess) {
         throw new ApolloError(
           "Contact already has access on this link.",
           "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR",
         );
+      }
+
+      if (hasAccess && !link.allow_multiple_petitions) {
+        throw new ForbiddenError("Can't create more than one parallel from this link.");
       }
 
       const owner = await ctx.petitions.loadTemplateDefaultOwner(link.template_id);

@@ -1036,6 +1036,7 @@ type Mutation {
   Creates a public link from a user's template
   """
   createPublicPetitionLink(
+    allowMultiplePetitions: Boolean!
     description: String!
     prefillSecret: String
     slug: String
@@ -2155,6 +2156,7 @@ type Mutation {
   Updates the info and permissions of a public link
   """
   updatePublicPetitionLink(
+    allowMultiplePetitions: Boolean
     description: String
     isActive: Boolean
     prefillSecret: String
@@ -5169,6 +5171,7 @@ type PublicPetitionFieldReply implements Timestamps {
 }
 
 type PublicPetitionLink {
+  allowMultiplePetitions: Boolean!
   description: String!
   id: GID!
   isActive: Boolean!
@@ -5207,6 +5210,7 @@ input PublicPetitionSignerDataInput {
 }
 
 type PublicPublicPetitionLink {
+  allowMultiplePetitions: Boolean!
   description: String!
   isActive: Boolean!
 

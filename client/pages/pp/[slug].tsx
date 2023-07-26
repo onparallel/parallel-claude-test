@@ -67,6 +67,7 @@ function PublicPetitionLink({
     description,
     title,
     owner: { organization },
+    allowMultiplePetitions,
   } = publicPetitionLink;
 
   const hasRemoveParallelBranding = organization.hasRemoveParallelBranding;
@@ -87,9 +88,8 @@ function PublicPetitionLink({
   const showGenericErrorToast = useGenericErrorToast();
 
   const handleNewPublicPetition = async ({ formData, force }: HandleNewPublicPetitionProps) => {
+    const _data = formData ?? submittedData;
     try {
-      const _data = formData ?? submittedData;
-
       const { data } = await createPublicPetition({
         variables: {
           slug,
@@ -110,31 +110,27 @@ function PublicPetitionLink({
     } catch (error) {
       if (isApolloError(error, "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR")) {
         setStep("EMAIL_EXISTS");
+        if (!allowMultiplePetitions) {
+          await handleSendReminder(_data!.email);
+        }
       } else {
         showGenericErrorToast(error);
       }
     }
   };
 
-  const handleContinueExisting = async () => {
+  const handleSendReminder = async (email: string) => {
     try {
       const { data } = await sendReminder({
         variables: {
           slug,
-          contactEmail: submittedData?.email ?? "",
+          contactEmail: submittedData?.email ?? email,
         },
       });
 
-      if (data?.publicSendReminder === "SUCCESS") {
-        setStep("REMINDER_SENT");
-      } else if (data?.publicSendReminder === "FAILURE") {
-        showGenericErrorToast();
-      }
+      return data?.publicSendReminder;
     } catch (error) {
-      if (
-        isApolloError(error) &&
-        error.graphQLErrors[0]?.extensions?.code === "REMINDER_ALREADY_SENT_ERROR"
-      ) {
+      if (isApolloError(error, "REMINDER_ALREADY_SENT_ERROR")) {
         toast({
           title: intl.formatMessage({
             id: "public.public-petition.error-reminder-title",
@@ -151,6 +147,15 @@ function PublicPetitionLink({
       } else {
         showGenericErrorToast(error);
       }
+    }
+  };
+
+  const handleContinueExisting = async () => {
+    const result = await handleSendReminder(submittedData!.email);
+    if (result === "SUCCESS") {
+      setStep("REMINDER_SENT");
+    } else if (result === "FAILURE") {
+      showGenericErrorToast();
     }
   };
 
@@ -223,14 +228,23 @@ function PublicPetitionLink({
                   email={submittedData?.email ?? ""}
                 />
               ) : step === "EMAIL_EXISTS" ? (
-                <PublicPetitionEmailExists
-                  organizationName={organization.name}
-                  logoUrl={organization.logoUrl}
-                  onContinue={handleContinueExisting}
-                  onNewPetition={handleNewPublicPetition}
-                  isNewRequestLoading={loading}
-                  isReminderLoading={reminderLoading}
-                />
+                publicPetitionLink.allowMultiplePetitions ? (
+                  <PublicPetitionEmailExists
+                    organizationName={organization.name}
+                    logoUrl={organization.logoUrl}
+                    onContinue={handleContinueExisting}
+                    onNewPetition={handleNewPublicPetition}
+                    isNewRequestLoading={loading}
+                    isReminderLoading={reminderLoading}
+                  />
+                ) : (
+                  <PublicPetitionEmailSent
+                    organizationName={organization.name}
+                    logoUrl={organization.logoUrl}
+                    email={submittedData?.email ?? ""}
+                    hasExistingProcess={true}
+                  />
+                )
               ) : (
                 <PublicPetitionInitialForm
                   organizationName={organization.name}
@@ -297,6 +311,7 @@ PublicPetitionLink.fragments = {
           }
         }
       }
+      allowMultiplePetitions
     }
   `,
 };

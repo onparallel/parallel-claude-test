@@ -6290,6 +6290,16 @@
     "context": "Reminder sent to {recipient} on {date}"
   },
   {
+    "term": "component.settings-public-link-dialog.allow-multiple-parallels",
+    "definition": "Allow more than one parallel per contact",
+    "context": "Allow more than one parallel per contact"
+  },
+  {
+    "term": "component.settings-public-link-dialog.allow-multiple-parallels-popover",
+    "definition": "By default, each contact will be able to create one parallel. Check this option to allow contacts to create more than one parallel from this template.",
+    "context": "By default, each contact will be able to create one parallel. Check this option to allow contacts to create more than one parallel from this template."
+  },
+  {
     "term": "component.settings-public-link-dialog.description",
     "definition": "Generates a link that allows third parties to start a parallel. These parallels will be assigned by default to the template owner.",
     "context": "Generates a link that allows third parties to start a parallel. These parallels will be assigned by default to the template owner."
@@ -11191,13 +11201,18 @@
   },
   {
     "term": "public-petition-email-sent.body.explanation-1",
-    "definition": "We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security.",
-    "context": "We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security."
+    "definition": "We have sent an email to {email} with access to complete the information. This will help us verify your email and ensure your privacy and security.",
+    "context": "We have sent an email to {email} with access to complete the information. This will help us verify your email and ensure your privacy and security."
   },
   {
     "term": "public-petition-email-sent.body.explanation-2",
     "definition": "Can't find our email? Check your spam folder and if you don't find it contact with the person who shared you the link.",
     "context": "Can't find our email? Check your spam folder and if you don't find it contact with the person who shared you the link."
+  },
+  {
+    "term": "public-petition-email-sent.body.explanation-existing-process",
+    "definition": "You have an existing process with this email ({email}). We have resent you the access so you can continue with it.",
+    "context": "You have an existing process with this email ({email}). We have resent you the access so you can continue with it."
   },
   {
     "term": "public-petition-email-sent.title",

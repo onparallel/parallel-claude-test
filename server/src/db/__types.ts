@@ -1658,11 +1658,18 @@ export interface PublicPetitionLink {
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
   prefill_secret: Maybe<string>; // varchar
+  allow_multiple_petitions: boolean; // bool
 }
 
 export type CreatePublicPetitionLink = PartialProps<
   Omit<PublicPetitionLink, "id">,
-  "is_active" | "created_at" | "created_by" | "updated_at" | "updated_by" | "prefill_secret"
+  | "is_active"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "prefill_secret"
+  | "allow_multiple_petitions"
 >;
 
 export interface PublicPetitionLinkPrefillData {

@@ -1135,6 +1135,9 @@ export const PublicPetitionLink = objectType({
     t.nullable.string("prefillSecret", {
       resolve: (o) => o.prefill_secret,
     });
+    t.nonNull.boolean("allowMultiplePetitions", {
+      resolve: (o) => o.allow_multiple_petitions,
+    });
   },
 });
 

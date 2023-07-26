@@ -2095,12 +2095,17 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     description: nonNull(stringArg()),
     slug: nullable(stringArg()),
     prefillSecret: nullable(stringArg()),
+    allowMultiplePetitions: nonNull(booleanArg()),
   },
   validateArgs: validateIfDefined(
     (args) => args.slug,
     validatePublicPetitionLinkSlug((args) => args.slug!, "slug"),
   ),
-  resolve: async (_, { templateId, title, description, slug, prefillSecret }, ctx) => {
+  resolve: async (
+    _,
+    { templateId, title, description, slug, prefillSecret, allowMultiplePetitions },
+    ctx,
+  ) => {
     return await ctx.petitions.createPublicPetitionLink(
       {
         template_id: templateId,
@@ -2109,6 +2114,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
         slug: slug ?? random(10),
         is_active: true,
         prefill_secret: prefillSecret || null,
+        allow_multiple_petitions: allowMultiplePetitions,
       },
       `User:${ctx.user!.id}`,
     );
@@ -2128,6 +2134,7 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     description: stringArg(),
     slug: stringArg(),
     prefillSecret: stringArg(),
+    allowMultiplePetitions: booleanArg(),
   },
   validateArgs: validateIf(
     (args) => isDefined(args.slug),
@@ -2154,6 +2161,10 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
 
     if (args.prefillSecret !== undefined) {
       publicPetitionLinkData.prefill_secret = args.prefillSecret;
+    }
+
+    if (isDefined(args.allowMultiplePetitions)) {
+      publicPetitionLinkData.allow_multiple_petitions = args.allowMultiplePetitions;
     }
 
     return await ctx.petitions.updatePublicPetitionLink(

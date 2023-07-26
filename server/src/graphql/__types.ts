@@ -2559,6 +2559,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionLink: {
     // field return type
+    allowMultiplePetitions: boolean; // Boolean!
     description: string; // String!
     id: NexusGenScalars["GID"]; // GID!
     isActive: boolean; // Boolean!
@@ -2577,6 +2578,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPublicPetitionLink: {
     // field return type
+    allowMultiplePetitions: boolean; // Boolean!
     description: string; // String!
     isActive: boolean; // Boolean!
     isAvailable: boolean; // Boolean!
@@ -4629,6 +4631,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetitionLink: {
     // field return type name
+    allowMultiplePetitions: "Boolean";
     description: "String";
     id: "GID";
     isActive: "Boolean";
@@ -4647,6 +4650,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPublicPetitionLink: {
     // field return type name
+    allowMultiplePetitions: "Boolean";
     description: "String";
     isActive: "Boolean";
     isAvailable: "Boolean";
@@ -5508,6 +5512,7 @@ export interface NexusGenArgTypes {
     };
     createPublicPetitionLink: {
       // args
+      allowMultiplePetitions: boolean; // Boolean!
       description: string; // String!
       prefillSecret?: string | null; // String
       slug?: string | null; // String
@@ -6300,6 +6305,7 @@ export interface NexusGenArgTypes {
     };
     updatePublicPetitionLink: {
       // args
+      allowMultiplePetitions?: boolean | null; // Boolean
       description?: string | null; // String
       isActive?: boolean | null; // Boolean
       prefillSecret?: string | null; // String

@@ -6,12 +6,14 @@ interface PublicPetitionEmailSentProps {
   organizationName: string;
   logoUrl?: string | null;
   email: string;
+  hasExistingProcess?: boolean;
 }
 
 export function PublicPetitionEmailSent({
   organizationName,
   logoUrl,
   email,
+  hasExistingProcess,
 }: PublicPetitionEmailSentProps) {
   return (
     <Stack
@@ -42,11 +44,19 @@ export function PublicPetitionEmailSent({
         </Text>
         <Stack spacing={4}>
           <Text>
-            <FormattedMessage
-              id="public-petition-email-sent.body.explanation-1"
-              defaultMessage="We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security."
-              values={{ email }}
-            />
+            {hasExistingProcess ? (
+              <FormattedMessage
+                id="public-petition-email-sent.body.explanation-existing-process"
+                defaultMessage="You have an existing process with this email ({email}). We have resent you the access so you can continue with it."
+                values={{ email: <Text as="b">{email}</Text> }}
+              />
+            ) : (
+              <FormattedMessage
+                id="public-petition-email-sent.body.explanation-1"
+                defaultMessage="We have sent an email to {email} with access to complete the information. This will help us verify your email and ensure your privacy and security."
+                values={{ email: <Text as="b">{email}</Text> }}
+              />
+            )}
           </Text>
           <Text>
             <FormattedMessage

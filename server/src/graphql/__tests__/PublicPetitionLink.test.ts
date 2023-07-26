@@ -55,6 +55,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     publicPetitionLink = await mocks.createRandomPublicPetitionLink(templates[0].id, () => ({
       slug: "public-link-slug",
       is_active: true,
+      allow_multiple_petitions: true,
     }));
   });
 
@@ -926,6 +927,70 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(replies).toHaveLength(1);
       expect(replies[0].content).toEqual({ value: "hello!" });
     });
+
+    it("fails if trying to create a second petition on a single-petition link", async () => {
+      const link = await mocks.createRandomPublicPetitionLink(templates[1].id, () => ({
+        allow_multiple_petitions: false,
+        slug: "single-petition-link",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $contactEmail: String!
+            $contactFirstName: String!
+            $contactLastName: String!
+            $slug: ID!
+          ) {
+            publicCreateAndSendPetitionFromPublicLink(
+              contactEmail: $contactEmail
+              contactFirstName: $contactFirstName
+              contactLastName: $contactLastName
+              slug: $slug
+            )
+          }
+        `,
+        {
+          contactEmail: "user@company.com",
+          contactFirstName: "User",
+          contactLastName: "User",
+          slug: link.slug,
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.publicCreateAndSendPetitionFromPublicLink).toEqual("SUCCESS");
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation (
+            $contactEmail: String!
+            $contactFirstName: String!
+            $contactLastName: String!
+            $slug: ID!
+            $force: Boolean
+          ) {
+            publicCreateAndSendPetitionFromPublicLink(
+              contactEmail: $contactEmail
+              contactFirstName: $contactFirstName
+              contactLastName: $contactLastName
+              slug: $slug
+              force: $force
+            )
+          }
+        `,
+        {
+          contactEmail: "user@company.com",
+          contactFirstName: "User",
+          contactLastName: "User",
+          slug: link.slug,
+          force: true,
+        },
+      );
+
+      expect(errors2).toContainGraphQLError("FORBIDDEN");
+      expect(data2).toBeNull();
+    });
   });
 
   describe("publicSendReminder", () => {
@@ -1122,11 +1187,17 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("should send error when creating a public link with READ access", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!) {
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $allowMultiplePetitions: Boolean!
+          ) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
+              allowMultiplePetitions: $allowMultiplePetitions
             ) {
               id
             }
@@ -1136,6 +1207,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", readTemplate.id),
           title: "link title",
           description: "link description",
+          allowMultiplePetitions: false,
         },
       });
 
@@ -1146,11 +1218,17 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if user does not have access to the template", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!) {
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $allowMultiplePetitions: Boolean!
+          ) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
+              allowMultiplePetitions: $allowMultiplePetitions
             ) {
               id
             }
@@ -1160,6 +1238,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", privateTemplate.id),
           title: "link title",
           description: "link description",
+          allowMultiplePetitions: false,
         },
       });
 
@@ -1170,11 +1249,17 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if trying to pass a petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!) {
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $allowMultiplePetitions: Boolean!
+          ) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
+              allowMultiplePetitions: $allowMultiplePetitions
             ) {
               id
             }
@@ -1184,6 +1269,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", petition.id),
           title: "link title",
           description: "link description",
+          allowMultiplePetitions: false,
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1247,14 +1333,22 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(errors1).toBeUndefined();
       const { errors: errors2, data: data2 } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!, $slug: String) {
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $slug: String
+            $allowMultiplePetitions: Boolean!
+          ) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
               slug: $slug
+              allowMultiplePetitions: $allowMultiplePetitions
             ) {
               isActive
+              allowMultiplePetitions
               slug
               owner {
                 id
@@ -1267,6 +1361,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           title: "link title",
           description: "link description",
           slug: "this-is-my-valid-slug",
+          allowMultiplePetitions: false,
         },
       });
       expect(errors2).toBeUndefined();
@@ -1274,17 +1369,24 @@ describe("GraphQL/PublicPetitionLink", () => {
         isActive: true,
         slug: "this-is-my-valid-slug",
         owner: { id: toGlobalId("User", user.id) },
+        allowMultiplePetitions: false,
       });
     });
 
     it("sends error if trying to create a second public link on the same template", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!) {
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $allowMultiplePetitions: Boolean!
+          ) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
+              allowMultiplePetitions: $allowMultiplePetitions
             ) {
               id
             }
@@ -1294,6 +1396,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", templates[0].id),
           title: "link title",
           description: "link description",
+          allowMultiplePetitions: false,
         },
       });
 
@@ -1304,12 +1407,19 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if passing an invalid slug", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!, $slug: String) {
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $slug: String
+            $allowMultiplePetitions: Boolean!
+          ) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
               slug: $slug
+              allowMultiplePetitions: $allowMultiplePetitions
             ) {
               id
             }
@@ -1320,6 +1430,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           title: "link title",
           description: "link description",
           slug: "you cant use this slug!!!",
+          allowMultiplePetitions: false,
         },
       });
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {

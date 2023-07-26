@@ -3,6 +3,7 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Checkbox,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -42,6 +43,7 @@ interface PublicLinkSettingsData {
   description: string;
   slug: string;
   prefillSecret: Maybe<string>;
+  allowMultiplePetitions: boolean;
 }
 
 interface PublicLinkSettingsDialogProps {
@@ -66,6 +68,7 @@ export function PublicLinkSettingsDialog({
         description: publicLink?.description ?? "",
         slug: publicLink?.slug ?? "",
         prefillSecret: publicLink?.prefillSecret ?? "",
+        allowMultiplePetitions: publicLink?.allowMultiplePetitions ?? false,
       },
     });
   const { errors, dirtyFields, isValidating } = formState;
@@ -134,7 +137,7 @@ export function PublicLinkSettingsDialog({
         as: "form",
         onSubmit: handleSubmit((data) => {
           props.onResolve({
-            ...pick(data, ["title", "description", "slug"]),
+            ...pick(data, ["title", "description", "slug", "allowMultiplePetitions"]),
             prefillSecret: data.prefillSecret || null,
           });
         }),
@@ -295,9 +298,25 @@ export function PublicLinkSettingsDialog({
               </Stack>
             </FormErrorMessage>
           </FormControl>
+          <FormControl id="allowMultiplePetitions" alignItems="center" display="flex">
+            <Checkbox {...register("allowMultiplePetitions")}>
+              <Text>
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.allow-multiple-parallels"
+                  defaultMessage="Allow more than one parallel per contact"
+                />
+              </Text>
+            </Checkbox>
+            <HelpPopover>
+              <FormattedMessage
+                id="component.settings-public-link-dialog.allow-multiple-parallels-popover"
+                defaultMessage="By default, each contact will be able to create one parallel. Check this option to allow contacts to create more than one parallel from this template."
+              />
+            </HelpPopover>
+          </FormControl>
           {user.hasPrefillSecret ? (
             <FormControl id="prefillSecret">
-              <FormLabel>
+              <FormLabel alignItems="center" display="flex">
                 <Text as="span">
                   <FormattedMessage
                     id="component.settings-public-link-dialog.prefill-secret-label"
@@ -370,6 +389,7 @@ PublicLinkSettingsDialog.fragments = {
       slug
       url
       prefillSecret
+      allowMultiplePetitions
     }
   `,
 };
