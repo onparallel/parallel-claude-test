@@ -612,6 +612,8 @@ export type Mutation = {
   cloneUserGroups: Array<UserGroup>;
   /** Closes an open petition. */
   closePetition: Petition;
+  /** Closes a profile that is in OPEN or DELETION_SCHEDULED status */
+  closeProfile: Array<Profile>;
   /**
    * Marks a petition as COMPLETED.
    * If the petition has a signature configured and does not require a review, starts the signing process.
@@ -712,6 +714,7 @@ export type Mutation = {
   deletePetitionReply: PetitionField;
   /** Delete petitions and folders. */
   deletePetitions: Success;
+  /** Permanently deletes the profile */
   deleteProfile: Success;
   deleteProfileFieldFile: Result;
   deleteProfileType: Success;
@@ -831,6 +834,8 @@ export type Mutation = {
   renameFolder: Success;
   /** Reopens the petition */
   reopenPetition: Petition;
+  /** Reopens a profile that is in CLOSED or DELETION_SCHEDULED status */
+  reopenProfile: Array<Profile>;
   /** Reorders the positions of attachments in the petition */
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
@@ -846,6 +851,8 @@ export type Mutation = {
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  /** Moves a profile to DELETION_SCHEDULED status */
+  scheduleProfileForDeletion: Array<Profile>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
   sendPetition: Array<SendPetitionResult>;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
@@ -1071,6 +1078,10 @@ export type MutationcloneUserGroupsArgs = {
 
 export type MutationclosePetitionArgs = {
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcloseProfileArgs = {
+  profileIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationcompletePetitionArgs = {
@@ -1690,6 +1701,10 @@ export type MutationreopenPetitionArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
+export type MutationreopenProfileArgs = {
+  profileIds: Array<Scalars["GID"]["input"]>;
+};
+
 export type MutationreorderPetitionAttachmentsArgs = {
   attachmentIds: Array<Scalars["GID"]["input"]>;
   attachmentType: PetitionAttachmentType;
@@ -1721,6 +1736,10 @@ export type MutationrestoreDeletedPetitionArgs = {
 
 export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationscheduleProfileForDeletionArgs = {
+  profileIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationsendPetitionArgs = {
@@ -3052,7 +3071,7 @@ export type PetitionListViewSort = {
 
 export type PetitionListViewSortDirection = "ASC" | "DESC";
 
-export type PetitionListViewSortField = "name" | "sentAt";
+export type PetitionListViewSortField = "createdAt" | "name" | "sentAt";
 
 export type PetitionListViewSortInput = {
   direction: PetitionListViewSortDirection;
@@ -3454,9 +3473,11 @@ export type Profile = Timestamps & {
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
   name: Scalars["String"]["output"];
+  permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
   petitions: PetitionPagination;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
+  status: ProfileStatus;
   subscribers: Array<ProfileSubscription>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
@@ -3472,6 +3493,13 @@ export type ProfilepetitionsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
+export type ProfileAnonymizedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+};
+
 export type ProfileAssociatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -3479,6 +3507,14 @@ export type ProfileAssociatedEvent = PetitionEvent & {
   petition: Maybe<Petition>;
   profile: Maybe<Profile>;
   type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type ProfileClosedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
   user: Maybe<User>;
 };
 
@@ -3517,11 +3553,15 @@ export type ProfileEventPagination = {
 export type ProfileEventType =
   | "PETITION_ASSOCIATED"
   | "PETITION_DISASSOCIATED"
+  | "PROFILE_ANONYMIZED"
+  | "PROFILE_CLOSED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"
   | "PROFILE_FIELD_FILE_REMOVED"
-  | "PROFILE_FIELD_VALUE_UPDATED";
+  | "PROFILE_FIELD_VALUE_UPDATED"
+  | "PROFILE_REOPENED"
+  | "PROFILE_SCHEDULED_FOR_DELETION";
 
 export type ProfileFieldExpiryUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
@@ -3634,6 +3674,7 @@ export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
 export type ProfileFilter = {
   profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  status?: InputMaybe<Array<ProfileStatus>>;
 };
 
 export type ProfilePagination = {
@@ -3647,6 +3688,24 @@ export type ProfilePropertyFilter = {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
+
+export type ProfileReopenedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
+};
+
+export type ProfileScheduledForDeletionEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
+};
+
+export type ProfileStatus = "CLOSED" | "DELETION_SCHEDULED" | "OPEN";
 
 export type ProfileSubscription = {
   id: Scalars["GID"]["output"];

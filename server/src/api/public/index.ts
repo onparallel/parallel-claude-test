@@ -83,6 +83,7 @@ import {
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_repliesDocument,
   PetitionTagFilter,
+  ProfileStatus,
   ReadPetitionCustomPropertiesDocument,
   RemindPetitionRecipient_sendRemindersDocument,
   RemoveUserGroupPermission_removePetitionPermissionDocument,
@@ -3243,6 +3244,12 @@ api
           required: false,
           array: true,
         }),
+        status: stringParam({
+          description: "Filter profiles by status",
+          example: "OPEN",
+          required: false,
+          array: true,
+        }),
       },
       responses: { 200: SuccessResponse(PaginatedProfiles) },
       tags: ["Profiles"],
@@ -3255,6 +3262,7 @@ api
           $sortBy: [QueryProfiles_OrderBy!]
           $search: String
           $profileTypeIds: [GID!]
+          $status: [ProfileStatus!]
           $includeFields: Boolean!
           $includeFieldsByAlias: Boolean!
           $includeSubscribers: Boolean!
@@ -3264,7 +3272,7 @@ api
             limit: $limit
             sortBy: $sortBy
             search: $search
-            filter: { profileTypeId: $profileTypeIds }
+            filter: { profileTypeId: $profileTypeIds, status: $status }
           ) {
             totalCount
             items {
@@ -3277,6 +3285,7 @@ api
 
       const result = await client.request(GetProfiles_profilesDocument, {
         ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
+        status: query.status as ProfileStatus[] | undefined,
         ...getProfileIncludesFromQuery(query),
       });
       return Ok({
@@ -3433,7 +3442,8 @@ api
       operationId: "CreateProfileFieldValue",
       summary: "Submit values by profile field alias",
       description: outdent`
-      Submit a list of values on a profile given a form-data where each key is a field alias.
+        Submit a list of values on a profile given a form-data where each key is a field alias.
+        The profile has to be in \`OPEN\` status.
       `,
       middleware: anyFileUploadMiddleware(),
       body: FormDataBody(CreateProfileFieldValue, {
@@ -3622,6 +3632,7 @@ api
       description: outdent`
       Removes a value on the profile field.
       If the field is of type \`FILE\`, the related files will be deleted.
+      The profile has to be in \`OPEN\` status.
     `,
       tags: ["Profiles"],
       responses: { 200: SuccessResponse() },
@@ -3694,6 +3705,7 @@ api
       summary: "Submit values",
       description: outdent`
       Creates or updates a value of a profile field.
+      The profile has to be in \`OPEN\` status.
       `,
       tags: ["Profiles"],
       middleware: anyFileUploadMiddleware(),

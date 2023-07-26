@@ -1,4 +1,6 @@
 import { uniq } from "remeda";
+import { Config } from "../config";
+import { WorkerContext } from "../context";
 import { createCronWorker } from "./helpers/createCronWorker";
 
 createCronWorker("anonymizer", async (ctx, config) => {
@@ -32,7 +34,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
 
   // there can be multiple file_uploads with same path (e.g. when doing massive sends of a petition with submitted file replies)
   // so we need to make sure to only delete the entry in S3 if there are no other files referencing to that object
-  const filesToDelete = await ctx.files.getFileUploadsToDelete();
+  const filesToDelete = await ctx.files.getFileUploadsToDelete(DAYS);
   ctx.logger.debug(`Anonymizing ${filesToDelete.length} deleted files`);
   const filePaths = uniq(filesToDelete.map((f) => f.path));
   await ctx.storage.fileUploads.deleteFile(filePaths);
@@ -60,4 +62,60 @@ createCronWorker("anonymizer", async (ctx, config) => {
   // delete information of tasks created more than `anonymizeAfterDays` days ago
   ctx.logger.debug(`Anonymizing old tasks`);
   await ctx.tasks.anonymizeOldTasks(DAYS);
+
+  await profilesAnonymizer(ctx, config);
 });
+
+async function profilesAnonymizer(ctx: WorkerContext, config: Config["cronWorkers"]["anonymizer"]) {
+  // profile field files and values are deleted after 30 days of being removed
+  const filesCount = await ctx.profiles.deleteRemovedProfileFieldFiles(
+    config.anonymizeAfterDays,
+    "AnonymizerWorker",
+  );
+  ctx.logger.debug(`Deleted ${filesCount} profile field files`);
+
+  const valuesCount = await ctx.profiles.deleteRemovedProfileFieldValues(
+    config.anonymizeAfterDays,
+    "AnonymizerWorker",
+  );
+  ctx.logger.debug(`Deleted ${valuesCount} profile field values`);
+
+  // delete profiles in DELETION_SCHEDULED status for more than 90 days
+  const profilesScheduledForDeletion = await ctx.profiles.getProfileIdsReadyForDeletion(
+    config.deleteScheduledProfilesAfterDays,
+  );
+  if (profilesScheduledForDeletion.length > 0) {
+    ctx.logger.debug(
+      `Deleting ${profilesScheduledForDeletion.length} profiles in DELETION_SCHEDULED state`,
+    );
+    await ctx.profiles.deleteProfile(profilesScheduledForDeletion, "AnonymizerWorker");
+  }
+
+  const fileIdsToDelete: number[] = [];
+
+  const profileIds = await ctx.profiles.getDeletedProfilesToAnonymize(config.anonymizeAfterDays);
+  if (profileIds.length > 0) {
+    ctx.logger.debug(`Anonymizing ${profileIds.length} deleted profiles`);
+    fileIdsToDelete.push(...(await ctx.profiles.anonymizeProfile(profileIds)));
+  }
+
+  const fieldValues = await ctx.profiles.getDeletedProfileFieldValuesToAnonymize(
+    config.anonymizeAfterDays,
+  );
+  if (fieldValues.length > 0) {
+    ctx.logger.debug(`Anonymizing ${fieldValues.length} deleted profile field values`);
+    await ctx.profiles.anonymizeProfileFieldValues(fieldValues);
+  }
+
+  const fieldFiles = await ctx.profiles.getDeletedProfileFieldFilesToAnonymize(
+    config.anonymizeAfterDays,
+  );
+  if (fieldFiles.length > 0) {
+    ctx.logger.debug(`Anonymizing ${fieldFiles.length} deleted profile field files`);
+    fileIdsToDelete.push(...(await ctx.profiles.anonymizeProfileFieldFiles(fieldFiles)));
+  }
+
+  if (fileIdsToDelete.length > 0) {
+    await ctx.files.deleteFileUpload(uniq(fileIdsToDelete), "AnonymizerWorker");
+  }
+}

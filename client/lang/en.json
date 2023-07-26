@@ -575,6 +575,36 @@
     "context": "Visible columns"
   },
   {
+    "term": "component.close-profile-dialog.alert-description",
+    "definition": "If a profile has alerts, they will be disabled upon closing it.",
+    "context": "If a profile has alerts, they will be disabled upon closing it."
+  },
+  {
+    "term": "component.close-profile-dialog.body",
+    "definition": "When you close a profile, the content is preserved but you won't be able to edit it.",
+    "context": "When you close a profile, the content is preserved but you won't be able to edit it."
+  },
+  {
+    "term": "component.close-profile-dialog.body-2",
+    "definition": "Personal data will be anonymized after the retention period set by your organization.",
+    "context": "Personal data will be anonymized after the retention period set by your organization."
+  },
+  {
+    "term": "component.close-profile-dialog.body-question",
+    "definition": "Are you sure you want to close {count, plural, =1 {the profile of {profileName}} other {the selected profiles}}?",
+    "context": "Are you sure you want to close {count, plural, =1 {the profile of {profileName}} other {the selected profiles}}?"
+  },
+  {
+    "term": "component.close-profile-dialog.close-profile-button",
+    "definition": "Close {count, plural, =1 {profile} other {profiles}}",
+    "context": "Close {count, plural, =1 {profile} other {profiles}}"
+  },
+  {
+    "term": "component.close-profile-dialog.header",
+    "definition": "Close {count, plural, =1 {profile} other {# profiles}}",
+    "context": "Close {count, plural, =1 {profile} other {# profiles}}"
+  },
+  {
     "term": "component.completing-message-dialog.go-to-pending-processes-button",
     "definition": "Go to my pending processes",
     "context": "Go to my pending processes"
@@ -743,6 +773,16 @@
     "term": "component.confirm-delete-petitions-dialog.template-header",
     "definition": "Delete {count, plural, =1 {template} other {templates}}",
     "context": "Delete {count, plural, =1 {template} other {templates}}"
+  },
+  {
+    "term": "component.confirm-delete-profile-dialog.description",
+    "definition": "If you continue, {profileCount, plural, =1 {this profile} other {the selected profiles}} will go to the recycle bin and will be permanently deleted after {n} days.",
+    "context": "If you continue, {profileCount, plural, =1 {this profile} other {the selected profiles}} will go to the recycle bin and will be permanently deleted after {n} days."
+  },
+  {
+    "term": "component.confirm-delete-profile-dialog.header",
+    "definition": "Delete {count, plural, =1 {profile} other {# profiles}}",
+    "context": "Delete {count, plural, =1 {profile} other {# profiles}}"
   },
   {
     "term": "component.confirm-delete-profile-type.confirm-delete-header",
@@ -2755,6 +2795,16 @@
     "context": "The email was opened on {date}"
   },
   {
+    "term": "component.more-options-menu-profile.close-profile",
+    "definition": "Close profile",
+    "context": "Close profile"
+  },
+  {
+    "term": "component.more-options-menu-profile.delete-permanently",
+    "definition": "Delete permanently",
+    "context": "Delete permanently"
+  },
+  {
     "term": "component.more-options-menu-profile.delete-profile",
     "definition": "Delete profile",
     "context": "Delete profile"
@@ -2763,6 +2813,16 @@
     "term": "component.more-options-menu-profile.manage-profile-subscriptions",
     "definition": "Manage subscriptions",
     "context": "Manage subscriptions"
+  },
+  {
+    "term": "component.more-options-menu-profile.recover-profile",
+    "definition": "Recover profile",
+    "context": "Recover profile"
+  },
+  {
+    "term": "component.more-options-menu-profile.reopen-profile",
+    "definition": "Reopen profile",
+    "context": "Reopen profile"
   },
   {
     "term": "component.move-to-folder-dialog.currently-in",
@@ -4750,9 +4810,29 @@
     "context": "Remove attachment"
   },
   {
+    "term": "component.profile-form.closed-status",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
+    "term": "component.profile-form.deleted-status",
+    "definition": "Deleted",
+    "context": "Deleted"
+  },
+  {
     "term": "component.profile-form.max-files-exceeded-error.message",
     "definition": "You exceeded the maximum amount of files you can upload on the field.",
     "context": "You exceeded the maximum amount of files you can upload on the field."
+  },
+  {
+    "term": "component.profile-form.recover-button",
+    "definition": "Recover",
+    "context": "Recover"
+  },
+  {
+    "term": "component.profile-form.recover-profile-alert",
+    "definition": "This profile will be permanently deleted on {date}.",
+    "context": "This profile will be permanently deleted on {date}."
   },
   {
     "term": "component.profile-petitions-table.add-petition",
@@ -5710,6 +5790,31 @@
     "context": "Remember to click Finalize when you finish entering all the information."
   },
   {
+    "term": "component.recover-profile-dialog.body",
+    "definition": "Recover the profile {profileName} and its content.",
+    "context": "Recover the profile {profileName} and its content."
+  },
+  {
+    "term": "component.recover-profile-dialog.header",
+    "definition": "Recover {count, plural, =1 {profile} other {# profiles}}",
+    "context": "Recover {count, plural, =1 {profile} other {# profiles}}"
+  },
+  {
+    "term": "component.recover-profile-dialog.radio-closed",
+    "definition": "<b>Keep {count, plural, =1 {profile closed} other {profiles closed}}</b> and edition locked.",
+    "context": "<b>Keep {count, plural, =1 {profile closed} other {profiles closed}}</b> and edition locked."
+  },
+  {
+    "term": "component.recover-profile-dialog.radio-reopened",
+    "definition": "<b>Reopen the {count, plural, =1 {profile} other {profiles}}</b> to edit its content.",
+    "context": "<b>Reopen the {count, plural, =1 {profile} other {profiles}}</b> to edit its content."
+  },
+  {
+    "term": "component.recover-profile-dialog.recover-button",
+    "definition": "Recover",
+    "context": "Recover"
+  },
+  {
     "term": "component.reference-options-menu.and",
     "definition": "and",
     "context": "and"
@@ -5898,6 +6003,26 @@
     "term": "component.rename-dialog.header-template",
     "definition": "Rename template",
     "context": "Rename template"
+  },
+  {
+    "term": "component.reopen-profile-dialog.body",
+    "definition": "When you reopen a profile, you will be able to edit its content again. Any data already anonymized cannot be recovered.",
+    "context": "When you reopen a profile, you will be able to edit its content again. Any data already anonymized cannot be recovered."
+  },
+  {
+    "term": "component.reopen-profile-dialog.body-question",
+    "definition": "Do you want to reopen {count, plural, =1 {the profile of {profileName}} other {the selected profiles}}?",
+    "context": "Do you want to reopen {count, plural, =1 {the profile of {profileName}} other {the selected profiles}}?"
+  },
+  {
+    "term": "component.reopen-profile-dialog.header",
+    "definition": "Reopen {count, plural, =1 {profile} other {# profiles}}",
+    "context": "Reopen {count, plural, =1 {profile} other {# profiles}}"
+  },
+  {
+    "term": "component.reopen-profile-dialog.reopen-button",
+    "definition": "Reopen",
+    "context": "Reopen"
   },
   {
     "term": "component.replies-field-comment.mark-as-unread",
@@ -7100,16 +7225,6 @@
     "context": "The alert will be activated on {date}."
   },
   {
-    "term": "component.use-confirm-delete-profile-dialog.description",
-    "definition": "You are about to delete {profileCount, plural, =1 {this profile} other {the selected profiles}}. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to {profileCount, plural, =1 {on this profile} other {in these profiles}}, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted.",
-    "context": "You are about to delete {profileCount, plural, =1 {this profile} other {the selected profiles}}. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to {profileCount, plural, =1 {on this profile} other {in these profiles}}, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted."
-  },
-  {
-    "term": "component.use-confirm-delete-profile-dialog.header",
-    "definition": "Delete {count, plural, =1 {profile} other {# profiles}}",
-    "context": "Delete {count, plural, =1 {profile} other {# profiles}}"
-  },
-  {
     "term": "component.use-confirm-delete-profile-type-field-dialog.description",
     "definition": "You are about to delete {count, plural, =1 {this property} other {# properties}}. Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently.",
     "context": "You are about to delete {count, plural, =1 {this property} other {# properties}}. Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently."
@@ -7118,6 +7233,16 @@
     "term": "component.use-confirm-delete-profile-type-field-dialog.header",
     "definition": "Delete {count, plural, =1 {property} other {# properties}}",
     "context": "Delete {count, plural, =1 {property} other {# properties}}"
+  },
+  {
+    "term": "component.use-confirm-permanently-delete-profile-dialog.description",
+    "definition": "If you continue, {profileCount, plural, =1 {the profile {profileName}} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it.",
+    "context": "If you continue, {profileCount, plural, =1 {the profile {profileName}} other {the selected profiles}} and its content will be permanently deleted and you won't be able to recover it."
+  },
+  {
+    "term": "component.use-confirm-permanently-delete-profile-dialog.header",
+    "definition": "Permanently delete",
+    "context": "Permanently delete"
   },
   {
     "term": "component.use-create-contact.create-contact",
@@ -9865,14 +9990,44 @@
     "context": "All profiles"
   },
   {
+    "term": "page.profiles.bin",
+    "definition": "Bin",
+    "context": "Bin"
+  },
+  {
+    "term": "page.profiles.close-profile",
+    "definition": "Close {count, plural, =1 {profile} other {profiles}}",
+    "context": "Close {count, plural, =1 {profile} other {profiles}}"
+  },
+  {
+    "term": "page.profiles.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
     "term": "page.profiles.create-profile",
     "definition": "Create profile",
     "context": "Create profile"
   },
   {
+    "term": "page.profiles.delete-permanently",
+    "definition": "Delete permanently",
+    "context": "Delete permanently"
+  },
+  {
     "term": "page.profiles.multiple-profile-types",
     "definition": "Multiple types",
     "context": "Multiple types"
+  },
+  {
+    "term": "page.profiles.no-closed-profiles",
+    "definition": "There is no closed profile",
+    "context": "There is no closed profile"
+  },
+  {
+    "term": "page.profiles.no-deleted-profiles",
+    "definition": "No profile in the bin",
+    "context": "No profile in the bin"
   },
   {
     "term": "page.profiles.no-profiles",
@@ -9883,6 +10038,21 @@
     "term": "page.profiles.no-results",
     "definition": "There's no profiles matching your criteria",
     "context": "There's no profiles matching your criteria"
+  },
+  {
+    "term": "page.profiles.open",
+    "definition": "Open",
+    "context": "Open"
+  },
+  {
+    "term": "page.profiles.recover-profile",
+    "definition": "Recover {count, plural, =1 {profile} other {profiles}}",
+    "context": "Recover {count, plural, =1 {profile} other {profiles}}"
+  },
+  {
+    "term": "page.profiles.reopen-profile",
+    "definition": "Reopen {count, plural, =1 {profile} other {profiles}}",
+    "context": "Reopen {count, plural, =1 {profile} other {profiles}}"
   },
   {
     "term": "page.profiles.title",

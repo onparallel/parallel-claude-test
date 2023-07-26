@@ -52,10 +52,12 @@ describe("GraphQL/Profiles", () => {
           createProfile(profileTypeId: $profileTypeId) {
             id
             name
+            status
             properties {
               field {
                 id
                 isExpirable
+                isUsedInProfileName
               }
               value {
                 content
@@ -81,10 +83,12 @@ describe("GraphQL/Profiles", () => {
           updateProfileFieldValue(profileId: $profileId, fields: $fields) {
             id
             name
+            status
             properties {
               field {
                 id
                 isExpirable
+                isUsedInProfileName
               }
               value {
                 content
@@ -338,6 +342,7 @@ describe("GraphQL/Profiles", () => {
                   name
                   options
                   isExpirable
+                  isUsedInProfileName
                 }
                 files {
                   id
@@ -350,6 +355,24 @@ describe("GraphQL/Profiles", () => {
               events(limit: 10, offset: 0) {
                 items {
                   type
+                  profile {
+                    id
+                  }
+                  ... on ProfileCreatedEvent {
+                    user {
+                      id
+                    }
+                  }
+                  ... on ProfileFieldValueUpdatedEvent {
+                    user {
+                      id
+                    }
+                  }
+                  ... on ProfileFieldExpiryUpdatedEvent {
+                    user {
+                      id
+                    }
+                  }
                 }
                 totalCount
               }
@@ -376,6 +399,7 @@ describe("GraphQL/Profiles", () => {
               name: { en: "First name", es: "Nombre" },
               options: {},
               isExpirable: false,
+              isUsedInProfileName: true,
             },
             files: null,
             value: { expiryDate: null, content: { value: "Harry" } },
@@ -386,6 +410,7 @@ describe("GraphQL/Profiles", () => {
               name: { en: "Last name", es: "Apellido" },
               options: {},
               isExpirable: false,
+              isUsedInProfileName: true,
             },
             files: null,
             value: { expiryDate: null, content: { value: "Potter" } },
@@ -396,6 +421,7 @@ describe("GraphQL/Profiles", () => {
               name: { en: "Birth date", es: "Fecha de nacimiento" },
               options: { useReplyAsExpiryDate: true },
               isExpirable: true,
+              isUsedInProfileName: false,
             },
             files: null,
             value: { expiryDate: "2029-01-01", content: { value: "2029-01-01" } },
@@ -406,6 +432,7 @@ describe("GraphQL/Profiles", () => {
               name: { en: "Phone", es: "Teléfono" },
               options: {},
               isExpirable: false,
+              isUsedInProfileName: false,
             },
             files: null,
             value: null,
@@ -416,6 +443,7 @@ describe("GraphQL/Profiles", () => {
               name: { en: "Email", es: "Correo electrónico" },
               options: {},
               isExpirable: false,
+              isUsedInProfileName: false,
             },
             files: null,
             value: null,
@@ -426,6 +454,7 @@ describe("GraphQL/Profiles", () => {
               name: { en: "Passport", es: "Pasaporte" },
               options: {},
               isExpirable: true,
+              isUsedInProfileName: false,
             },
             files: null,
             value: { expiryDate: "2024-10-28", content: { value: "AA1234567" } },
@@ -433,13 +462,55 @@ describe("GraphQL/Profiles", () => {
         ],
         events: {
           items: [
-            { type: "PROFILE_FIELD_EXPIRY_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_FIELD_EXPIRY_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_CREATED" },
+            {
+              type: "PROFILE_FIELD_EXPIRY_UPDATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_FIELD_VALUE_UPDATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_FIELD_EXPIRY_UPDATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_FIELD_VALUE_UPDATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_FIELD_VALUE_UPDATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_FIELD_VALUE_UPDATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_CREATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
           ],
           totalCount: 7,
         },
@@ -1652,6 +1723,10 @@ describe("GraphQL/Profiles", () => {
           mutation ($profileTypeIds: [GID!]!) {
             archiveProfileType(profileTypeIds: $profileTypeIds) {
               id
+              archivedAt
+              archivedBy {
+                id
+              }
             }
           }
         `,
@@ -1665,8 +1740,16 @@ describe("GraphQL/Profiles", () => {
 
       expect(archiveErrors).toBeUndefined();
       expect(archiveData?.archiveProfileType).toEqual([
-        { id: toGlobalId("ProfileType", profileTypes[1].id) },
-        { id: toGlobalId("ProfileType", profileTypes[2].id) },
+        {
+          id: toGlobalId("ProfileType", profileTypes[1].id),
+          archivedAt: expect.any(Date),
+          archivedBy: { id: toGlobalId("User", sessionUser.id) },
+        },
+        {
+          id: toGlobalId("ProfileType", profileTypes[2].id),
+          archivedAt: expect.any(Date),
+          archivedBy: { id: toGlobalId("User", sessionUser.id) },
+        },
       ]);
     });
   });
@@ -1861,6 +1944,7 @@ describe("GraphQL/Profiles", () => {
               options
               position
               type
+              isUsedInProfileName
               profileType {
                 id
                 fields {
@@ -1893,6 +1977,7 @@ describe("GraphQL/Profiles", () => {
         options: defaultProfileTypeFieldOptions("SHORT_TEXT"),
         position: 3,
         type: "SHORT_TEXT",
+        isUsedInProfileName: false,
         profileType: {
           id: toGlobalId("ProfileType", profileTypes[1].id),
           fields: [{ position: 0 }, { position: 1 }, { position: 2 }, { position: 3 }],
@@ -2476,10 +2561,15 @@ describe("GraphQL/Profiles", () => {
       expect(profile).toEqual({
         id: expect.any(String),
         name: "",
-        properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+        properties: profileType0Fields.map((f, i) => ({
+          field: {
+            id: toGlobalId("ProfileTypeField", f.id),
+            isExpirable: f.is_expirable,
+            isUsedInProfileName: i < 2,
+          },
           value: null,
         })),
+        status: "OPEN",
       });
 
       const updateProfileFieldInPattern = await updateProfileValue(profile.id, [
@@ -2492,8 +2582,13 @@ describe("GraphQL/Profiles", () => {
       expect(updateProfileFieldInPattern).toEqual({
         id: expect.any(String),
         name: "John",
-        properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+        status: "OPEN",
+        properties: profileType0Fields.map((f, i) => ({
+          field: {
+            id: toGlobalId("ProfileTypeField", f.id),
+            isExpirable: f.is_expirable,
+            isUsedInProfileName: i < 2,
+          },
           value:
             f.id === profileType0Fields[0].id
               ? { content: { value: "John" }, expiryDate: null }
@@ -2511,8 +2606,13 @@ describe("GraphQL/Profiles", () => {
       expect(updateProfileFieldInPattern2).toEqual({
         id: expect.any(String),
         name: "John Wick",
-        properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+        status: "OPEN",
+        properties: profileType0Fields.map((f, i) => ({
+          field: {
+            id: toGlobalId("ProfileTypeField", f.id),
+            isExpirable: f.is_expirable,
+            isUsedInProfileName: i < 2,
+          },
           value:
             f.id === profileType0Fields[0].id
               ? { content: { value: "John" }, expiryDate: null }
@@ -2531,8 +2631,13 @@ describe("GraphQL/Profiles", () => {
       expect(removesOneValue).toEqual({
         id: expect.any(String),
         name: "John",
-        properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+        status: "OPEN",
+        properties: profileType0Fields.map((f, i) => ({
+          field: {
+            id: toGlobalId("ProfileTypeField", f.id),
+            isExpirable: f.is_expirable,
+            isUsedInProfileName: i < 2,
+          },
           value:
             f.id === profileType0Fields[0].id
               ? { content: { value: "John" }, expiryDate: null }
@@ -2549,11 +2654,60 @@ describe("GraphQL/Profiles", () => {
       expect(removesAllValuesInNamePattern).toEqual({
         id: expect.any(String),
         name: "",
-        properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+        status: "OPEN",
+        properties: profileType0Fields.map((f, i) => ({
+          field: {
+            id: toGlobalId("ProfileTypeField", f.id),
+            isExpirable: f.is_expirable,
+            isUsedInProfileName: i < 2,
+          },
           value: null,
         })),
       });
+    });
+
+    it("fails if trying to update on a closed profile", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      expect(profile).toEqual({
+        id: expect.any(String),
+        name: "",
+        properties: profileType0Fields.map((f, i) => ({
+          field: {
+            id: toGlobalId("ProfileTypeField", f.id),
+            isExpirable: f.is_expirable,
+            isUsedInProfileName: i < 2,
+          },
+          value: null,
+        })),
+        status: "OPEN",
+      });
+
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .update({ status: "CLOSED", closed_at: new Date() });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              content: { value: "John" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("updates the expiry date on fields that expire", async () => {
@@ -2579,8 +2733,13 @@ describe("GraphQL/Profiles", () => {
       expect(profile2).toEqual({
         id: expect.any(String),
         name: "Harry Potter",
-        properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+        status: "OPEN",
+        properties: profileType0Fields.map((f, i) => ({
+          field: {
+            id: toGlobalId("ProfileTypeField", f.id),
+            isExpirable: f.is_expirable,
+            isUsedInProfileName: i < 2,
+          },
           value:
             f.id === profileType0Fields[0].id
               ? { content: { value: "Harry" }, expiryDate: null }
@@ -2999,20 +3158,15 @@ describe("GraphQL/Profiles", () => {
 
   describe("deleteProfile", () => {
     it("deletes a profile", async () => {
-      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
-
-      const { errors: query1Errors, data: query1Data } = await testClient.execute(gql`
-        query {
-          profiles(offset: 0, limit: 10) {
-            items {
-              id
-            }
-            totalCount
-          }
-        }
-      `);
-      expect(query1Errors).toBeUndefined();
-      expect(query1Data.profiles).toEqual({ items: [{ id: profile.id }], totalCount: 1 });
+      const [profile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileTypes[0].id,
+        1,
+        () => ({
+          status: "CLOSED",
+          closed_at: new Date(),
+        }),
+      );
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -3021,7 +3175,7 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
-          profileIds: [profile.id],
+          profileIds: [toGlobalId("Profile", profile.id)],
         },
       );
 
@@ -3050,6 +3204,11 @@ describe("GraphQL/Profiles", () => {
         },
       ]);
 
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .update({ status: "CLOSED", closed_at: new Date() });
+
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($profileIds: [GID!]!, $force: Boolean) {
@@ -3063,6 +3222,25 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(errors).toContainGraphQLError("PROFILE_HAS_REPLIES_ERROR", { count: 1 });
+      expect(data).toBeNull();
+    });
+
+    it("fails to delete an OPEN profile", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      expect(profile.status).toEqual("OPEN");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            deleteProfile(profileIds: $profileIds)
+          }
+        `,
+        {
+          profileIds: [profile.id],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -3085,6 +3263,30 @@ describe("GraphQL/Profiles", () => {
               expiryDate: $expiryDate
             ) {
               property {
+                profile {
+                  id
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      ... on ProfileCreatedEvent {
+                        user {
+                          id
+                        }
+                      }
+                      ... on ProfileFieldFileAddedEvent {
+                        user {
+                          id
+                        }
+                      }
+                      ... on ProfileFieldExpiryUpdatedEvent {
+                        user {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
                 field {
                   id
                 }
@@ -3145,6 +3347,26 @@ describe("GraphQL/Profiles", () => {
       expect(createErrors).toBeUndefined();
       expect(createData?.createProfileFieldFileUploadLink).toEqual({
         property: {
+          profile: {
+            id: profile.id,
+            events: {
+              totalCount: 3,
+              items: [
+                {
+                  type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                  user: { id: toGlobalId("User", sessionUser.id) },
+                },
+                {
+                  type: "PROFILE_FIELD_FILE_ADDED",
+                  user: { id: toGlobalId("User", sessionUser.id) },
+                },
+                {
+                  type: "PROFILE_CREATED",
+                  user: { id: toGlobalId("User", sessionUser.id) },
+                },
+              ],
+            },
+          },
           field: {
             id: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           },
@@ -3551,6 +3773,43 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("fails if trying to upload a file on a closed profile", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      await mocks.knex.from("profile").where("id", fromGlobalId(profile.id).id).update({
+        status: "CLOSED",
+        closed_at: new Date(),
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $data: [FileUploadInput!]!
+            $expiryDate: Date
+          ) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+              expiryDate: $expiryDate
+            ) {
+              __typename
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
+          expiryDate: "2025-10-01",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("deleteProfileFieldFile", () => {
@@ -3611,6 +3870,252 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toBeUndefined();
       expect(data.deleteProfileFieldFile).toEqual("SUCCESS");
+
+      const { errors: profileEventsQueryErrors, data: profileEventsQueryData } =
+        await testClient.execute(
+          gql`
+            query ($profileId: GID!) {
+              profile(profileId: $profileId) {
+                events(limit: 100, offset: 0) {
+                  totalCount
+                  items {
+                    type
+                    ... on ProfileCreatedEvent {
+                      user {
+                        id
+                      }
+                    }
+                    ... on ProfileFieldFileRemovedEvent {
+                      user {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          {
+            profileId: profile.id,
+          },
+        );
+
+      expect(profileEventsQueryErrors).toBeUndefined();
+      expect(profileEventsQueryData.profile).toEqual({
+        events: {
+          totalCount: 2,
+          items: [
+            {
+              type: "PROFILE_FIELD_FILE_REMOVED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_CREATED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("deletes all files from the profile field", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const files = await mocks.createRandomFileUpload(3);
+      await mocks.knex.from("profile_field_file").insert(
+        files.map((file) => ({
+          file_upload_id: file.id,
+          profile_id: fromGlobalId(profile.id).id,
+          profile_type_field_id: profileType2Fields[1].id,
+          type: "FILE" as const,
+          created_by_user_id: sessionUser.id,
+        })),
+      );
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              properties {
+                files {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData.profile).toEqual({
+        properties: [
+          { files: null },
+          {
+            files: [
+              { id: expect.any(String) },
+              { id: expect.any(String) },
+              { id: expect.any(String) },
+            ],
+          },
+          { files: null },
+          { files: null },
+        ],
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!) {
+            deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data.deleteProfileFieldFile).toEqual("SUCCESS");
+
+      const { errors: profileEventsQueryErrors, data: profileEventsQueryData } =
+        await testClient.execute(
+          gql`
+            query ($profileId: GID!) {
+              profile(profileId: $profileId) {
+                properties {
+                  files {
+                    id
+                  }
+                }
+                events(limit: 100, offset: 0) {
+                  totalCount
+                  items {
+                    type
+                    ... on ProfileCreatedEvent {
+                      user {
+                        id
+                      }
+                    }
+                    ... on ProfileFieldFileRemovedEvent {
+                      user {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          {
+            profileId: profile.id,
+          },
+        );
+
+      expect(profileEventsQueryErrors).toBeUndefined();
+      expect(profileEventsQueryData.profile).toEqual({
+        properties: [{ files: null }, { files: null }, { files: null }, { files: null }],
+        events: {
+          totalCount: 4,
+          items: [
+            {
+              type: "PROFILE_FIELD_FILE_REMOVED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_FIELD_FILE_REMOVED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_FIELD_FILE_REMOVED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
+              type: "PROFILE_CREATED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("fails if trying to delete a file on a closed profile", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      await mocks.knex.from("profile").where("id", fromGlobalId(profile.id).id).update({
+        status: "CLOSED",
+        closed_at: new Date(),
+      });
+
+      const [file] = await mocks.createRandomFileUpload(1);
+      await mocks.knex.from("profile_field_file").insert({
+        file_upload_id: file.id,
+        profile_id: fromGlobalId(profile.id).id,
+        profile_type_field_id: profileType2Fields[1].id,
+        type: "FILE" as const,
+        created_by_user_id: sessionUser.id,
+      });
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              status
+              properties {
+                files {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData.profile).toEqual({
+        status: "CLOSED",
+        properties: [
+          { files: null },
+          { files: [{ id: expect.any(String) }] },
+          { files: null },
+          { files: null },
+        ],
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $profileFieldFileIds: [GID!]!) {
+            deleteProfileFieldFile(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              profileFieldFileIds: $profileFieldFileIds
+            )
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          profileFieldFileIds: [queryData.profile.properties[1].files[0].id],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("fails if trying to delete a file from a field with READ permission", async () => {
@@ -3709,6 +4214,46 @@ describe("GraphQL/Profiles", () => {
           file: { contentType: file.content_type, filename: file.filename },
         },
       ]);
+    });
+
+    it("fails if copying file reply from petition into a closed profile", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      await mocks.knex.from("profile").where("id", fromGlobalId(profile.id).id).update({
+        status: "CLOSED",
+        closed_at: new Date(),
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $petitionId: GID!
+            $fileReplyIds: [GID!]!
+          ) {
+            copyFileReplyToProfileFieldFile(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              petitionId: $petitionId
+              fileReplyIds: $fileReplyIds
+            ) {
+              file {
+                contentType
+                filename
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          petitionId: toGlobalId("Petition", petition.id),
+          fileReplyIds: [toGlobalId("PetitionFieldReply", fileUploadReply.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 
@@ -4018,6 +4563,17 @@ describe("GraphQL/Profiles", () => {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
               profile {
                 id
+                events(limit: 100, offset: 0) {
+                  totalCount
+                  items {
+                    type
+                    ... on PetitionAssociatedEvent {
+                      user {
+                        id
+                      }
+                    }
+                  }
+                }
                 petitions(limit: 10) {
                   items {
                     id
@@ -4051,6 +4607,17 @@ describe("GraphQL/Profiles", () => {
       expect(data?.associateProfileToPetition).toEqual({
         profile: {
           id: toGlobalId("Profile", profile.id),
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PETITION_ASSOCIATED",
+                user: {
+                  id: toGlobalId("User", sessionUser.id),
+                },
+              },
+            ],
+          },
           petitions: { items: [{ id: toGlobalId("Petition", petition.id) }], totalCount: 1 },
         },
         petition: {
@@ -4328,6 +4895,11 @@ describe("GraphQL/Profiles", () => {
         },
       });
 
+      await mocks.knex
+        .from("profile")
+        .where("id", profile.id)
+        .update({ status: "CLOSED", closed_at: new Date() });
+
       const { errors: deleteError, data: deleteData } = await testClient.execute(
         gql`
           mutation ($profileId: GID!) {
@@ -4376,7 +4948,7 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
-  describe("disassociateProfileFromPetition, disassociatePetitionFromProfile", () => {
+  describe('"disassociateProfileFromPetition", "disassociatePetitionFromProfile"', () => {
     let petitions: Petition[];
     let profiles: Profile[];
 
@@ -4445,6 +5017,17 @@ describe("GraphQL/Profiles", () => {
             }
             profile(profileId: $profileId) {
               id
+              events(limit: 100, offset: 0) {
+                totalCount
+                items {
+                  type
+                  ... on PetitionDisassociatedEvent {
+                    user {
+                      id
+                    }
+                  }
+                }
+              }
               petitions(limit: 10) {
                 items {
                   id
@@ -4461,29 +5044,59 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(queryErrors).toBeUndefined();
-      expect(queryData?.petition).toEqual({
-        id: toGlobalId("Petition", petitions[1].id),
-        profiles: [
-          { id: toGlobalId("Profile", profiles[1].id) },
-          { id: toGlobalId("Profile", profiles[2].id) },
-        ],
-        events: {
-          items: [
-            {
-              type: "PROFILE_DISASSOCIATED",
-              data: {
-                userId: toGlobalId("User", sessionUser.id),
-                profileId: toGlobalId("Profile", profiles[0].id),
-              },
-            },
+      expect(queryData).toEqual({
+        petition: {
+          id: toGlobalId("Petition", petitions[1].id),
+          profiles: [
+            { id: toGlobalId("Profile", profiles[1].id) },
+            { id: toGlobalId("Profile", profiles[2].id) },
           ],
-          totalCount: 1,
+          events: {
+            items: [
+              {
+                type: "PROFILE_DISASSOCIATED",
+                data: {
+                  userId: toGlobalId("User", sessionUser.id),
+                  profileId: toGlobalId("Profile", profiles[0].id),
+                },
+              },
+            ],
+            totalCount: 1,
+          },
+        },
+        profile: {
+          id: toGlobalId("Profile", profiles[0].id),
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PETITION_DISASSOCIATED",
+                user: {
+                  id: toGlobalId("User", sessionUser.id),
+                },
+              },
+            ],
+          },
+          petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
         },
       });
-      expect(queryData?.profile).toEqual({
-        id: toGlobalId("Profile", profiles[0].id),
-        petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
-      });
+    });
+
+    it("sends error when not all profiles are associated", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileIds: [GID!]!) {
+            disassociateProfileFromPetition(petitionId: $petitionId, profileIds: $profileIds)
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petitions[0].id),
+          profileIds: [toGlobalId("Profile", profiles[1].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("PROFILE_ASSOCIATION_ERROR");
+      expect(data).toBeNull();
     });
 
     it("disassociate petition from profile", async () => {
@@ -4522,6 +5135,17 @@ describe("GraphQL/Profiles", () => {
             }
             profile(profileId: $profileId) {
               id
+              events(limit: 100, offset: 0) {
+                totalCount
+                items {
+                  type
+                  ... on PetitionDisassociatedEvent {
+                    user {
+                      id
+                    }
+                  }
+                }
+              }
               petitions(limit: 10) {
                 items {
                   id
@@ -4538,29 +5162,63 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(queryErrors).toBeUndefined();
-      expect(queryData?.petition).toEqual({
-        id: toGlobalId("Petition", petitions[1].id),
-        profiles: [
-          { id: toGlobalId("Profile", profiles[1].id) },
-          { id: toGlobalId("Profile", profiles[2].id) },
-        ],
-        events: {
-          items: [
-            {
-              type: "PROFILE_DISASSOCIATED",
-              data: {
-                userId: toGlobalId("User", sessionUser.id),
-                profileId: toGlobalId("Profile", profiles[0].id),
-              },
-            },
+      expect(queryData).toEqual({
+        petition: {
+          id: toGlobalId("Petition", petitions[1].id),
+          profiles: [
+            { id: toGlobalId("Profile", profiles[1].id) },
+            { id: toGlobalId("Profile", profiles[2].id) },
           ],
-          totalCount: 1,
+          events: {
+            items: [
+              {
+                type: "PROFILE_DISASSOCIATED",
+                data: {
+                  userId: toGlobalId("User", sessionUser.id),
+                  profileId: toGlobalId("Profile", profiles[0].id),
+                },
+              },
+            ],
+            totalCount: 1,
+          },
+        },
+        profile: {
+          id: toGlobalId("Profile", profiles[0].id),
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PETITION_DISASSOCIATED",
+                user: {
+                  id: toGlobalId("User", sessionUser.id),
+                },
+              },
+            ],
+          },
+          petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
         },
       });
-      expect(queryData?.profile).toEqual({
-        id: toGlobalId("Profile", profiles[0].id),
-        petitions: { items: [{ id: toGlobalId("Petition", petitions[0].id) }], totalCount: 1 },
-      });
+    });
+
+    it("sends error when not all petitions are associated", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $petitionIds: [GID!]!) {
+            disassociatePetitionFromProfile(profileId: $profileId, petitionIds: $petitionIds)
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profiles[0].id),
+          petitionIds: [
+            toGlobalId("Petition", petitions[0].id),
+            toGlobalId("Petition", petitions[1].id),
+            toGlobalId("Petition", petitions[2].id),
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("PROFILE_ASSOCIATION_ERROR");
+      expect(data).toBeNull();
     });
   });
 
@@ -5200,6 +5858,346 @@ describe("GraphQL/Profiles", () => {
         permissions: [],
         defaultPermission: "WRITE",
         myPermission: "WRITE",
+      });
+    });
+  });
+
+  describe("reopenProfile", () => {
+    let closedProfile: Profile;
+    let openProfile: Profile;
+
+    beforeEach(async () => {
+      [closedProfile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileTypes[0].id,
+        1,
+        () => ({
+          status: "CLOSED",
+          closed_at: new Date(),
+        }),
+      );
+      [openProfile] = await mocks.createRandomProfiles(organization.id, profileTypes[0].id);
+    });
+
+    it("updates profile status to OPEN", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            reopenProfile(profileIds: $profileIds) {
+              id
+              status
+              events(limit: 100, offset: 0) {
+                items {
+                  type
+                  ... on ProfileReopenedEvent {
+                    user {
+                      id
+                    }
+                  }
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", closedProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.reopenProfile).toEqual([
+        {
+          id: toGlobalId("Profile", closedProfile.id),
+          status: "OPEN",
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PROFILE_REOPENED",
+                user: { id: toGlobalId("User", sessionUser.id) },
+              },
+            ],
+          },
+        },
+      ]);
+
+      const [dbProfile] = await mocks.knex
+        .from("profile")
+        .where("id", closedProfile.id)
+        .select("*");
+
+      expect(dbProfile).toMatchObject({
+        id: closedProfile.id,
+        status: "OPEN",
+        closed_at: null,
+        deletion_scheduled_at: null,
+      });
+    });
+
+    it("sends error if profile is already in wanted status", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            reopenProfile(profileIds: $profileIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", openProfile.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("closeProfile", () => {
+    let profile: Profile;
+
+    beforeEach(async () => {
+      [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[0].id);
+    });
+
+    it("updates profile status to CLOSED", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            closeProfile(profileIds: $profileIds) {
+              id
+              status
+              events(limit: 100, offset: 0) {
+                items {
+                  type
+                  ... on ProfileClosedEvent {
+                    user {
+                      id
+                    }
+                  }
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", profile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.closeProfile).toEqual([
+        {
+          id: toGlobalId("Profile", profile.id),
+          status: "CLOSED",
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PROFILE_CLOSED",
+                user: { id: toGlobalId("User", sessionUser.id) },
+              },
+            ],
+          },
+        },
+      ]);
+
+      const [dbProfile] = await mocks.knex.from("profile").where("id", profile.id).select("*");
+
+      expect(dbProfile).toMatchObject({
+        id: profile.id,
+        status: "CLOSED",
+        closed_at: expect.any(Date),
+        deletion_scheduled_at: null,
+      });
+    });
+  });
+
+  describe("scheduleProfileForDeletion", () => {
+    let openProfile: Profile;
+    let closedProfile: Profile;
+    const closedAtDate = new Date("2023-07-24T00:00:00.000Z");
+
+    beforeEach(async () => {
+      [openProfile, closedProfile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileTypes[0].id,
+        2,
+        (i) => ({
+          status: i === 0 ? "OPEN" : "CLOSED",
+          closed_at: i === 0 ? null : closedAtDate,
+        }),
+      );
+    });
+
+    it("schedules an OPEN profile for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            scheduleProfileForDeletion(profileIds: $profileIds) {
+              id
+              status
+              events(limit: 100, offset: 0) {
+                items {
+                  type
+                  ... on ProfileScheduledForDeletionEvent {
+                    user {
+                      id
+                    }
+                  }
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", openProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.scheduleProfileForDeletion).toEqual([
+        {
+          id: toGlobalId("Profile", openProfile.id),
+          status: "DELETION_SCHEDULED",
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PROFILE_SCHEDULED_FOR_DELETION",
+                user: { id: toGlobalId("User", sessionUser.id) },
+              },
+            ],
+          },
+        },
+      ]);
+
+      const [dbProfile] = await mocks.knex.from("profile").where("id", openProfile.id).select("*");
+
+      expect(dbProfile).toMatchObject({
+        id: openProfile.id,
+        status: "DELETION_SCHEDULED",
+        deletion_scheduled_at: expect.any(Date),
+        closed_at: null,
+      });
+    });
+
+    it("schedules a CLOSED profile for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            scheduleProfileForDeletion(profileIds: $profileIds) {
+              id
+              status
+              events(limit: 100, offset: 0) {
+                items {
+                  type
+                  ... on ProfileScheduledForDeletionEvent {
+                    user {
+                      id
+                    }
+                  }
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", closedProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.scheduleProfileForDeletion).toEqual([
+        {
+          id: toGlobalId("Profile", closedProfile.id),
+          status: "DELETION_SCHEDULED",
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PROFILE_SCHEDULED_FOR_DELETION",
+                user: { id: toGlobalId("User", sessionUser.id) },
+              },
+            ],
+          },
+        },
+      ]);
+
+      const [dbProfile] = await mocks.knex
+        .from("profile")
+        .where("id", closedProfile.id)
+        .select("*");
+
+      expect(dbProfile).toMatchObject({
+        id: closedProfile.id,
+        status: "DELETION_SCHEDULED",
+        deletion_scheduled_at: expect.any(Date),
+        closed_at: closedAtDate,
+      });
+
+      expect(dbProfile.closed_at!.getTime()).toBeLessThan(
+        dbProfile.deletion_scheduled_at!.getTime(),
+      );
+    });
+
+    it("going from CLOSED to DELETION_SCHEDULED and back to CLOSED should keep first closed_at date", async () => {
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            scheduleProfileForDeletion(profileIds: $profileIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", closedProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const [scheduledDbProfile] = await mocks.knex
+        .from("profile")
+        .where("id", closedProfile.id)
+        .select("*");
+
+      expect(scheduledDbProfile).toMatchObject({
+        id: closedProfile.id,
+        status: "DELETION_SCHEDULED",
+        deletion_scheduled_at: expect.any(Date),
+        closed_at: closedAtDate,
+      });
+
+      const { errors: errors2 } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            closeProfile(profileIds: $profileIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileIds: [toGlobalId("Profile", closedProfile.id)],
+        },
+      );
+
+      expect(errors2).toBeUndefined();
+
+      const [closedDbProfile] = await mocks.knex
+        .from("profile")
+        .where("id", closedProfile.id)
+        .select("*");
+
+      expect(closedDbProfile).toMatchObject({
+        id: closedProfile.id,
+        status: "CLOSED",
+        deletion_scheduled_at: null,
+        closed_at: closedAtDate,
       });
     });
   });

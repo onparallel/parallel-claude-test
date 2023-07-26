@@ -35,6 +35,14 @@ export const ProfileEvent = interfaceType({
         return "PetitionAssociatedEvent";
       case "PETITION_DISASSOCIATED":
         return "PetitionDisassociatedEvent";
+      case "PROFILE_CLOSED":
+        return "ProfileClosedEvent";
+      case "PROFILE_SCHEDULED_FOR_DELETION":
+        return "ProfileScheduledForDeletionEvent";
+      case "PROFILE_REOPENED":
+        return "ProfileReopenedEvent";
+      case "PROFILE_ANONYMIZED":
+        return "ProfileAnonymizedEvent";
     }
   },
   sourceType: "profileEvents.ProfileEvent",
@@ -120,3 +128,35 @@ export const PetitionDisassociatedEvent = createProfileEvent("PetitionDisassocia
     },
   });
 });
+
+export const ProfileClosedEvent = createProfileEvent("ProfileClosedEvent", (t) => {
+  t.nullable.field("user", {
+    type: "User",
+    resolve: async (root, _, ctx) => {
+      return await ctx.users.loadUser(root.data.user_id);
+    },
+  });
+});
+
+export const ProfileScheduledForDeletionEvent = createProfileEvent(
+  "ProfileScheduledForDeletionEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+  },
+);
+
+export const ProfileReopenedEvent = createProfileEvent("ProfileReopenedEvent", (t) => {
+  t.nullable.field("user", {
+    type: "User",
+    resolve: async (root, _, ctx) => {
+      return await ctx.users.loadUser(root.data.user_id);
+    },
+  });
+});
+
+export const ProfileAnonymizedEvent = createProfileEvent("ProfileAnonymizedEvent", () => {});

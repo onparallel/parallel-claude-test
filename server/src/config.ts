@@ -129,6 +129,9 @@ export function buildConfig() {
       anonymizer: {
         rule: process.env.WORKERS_ANONYMIZER_RULE!,
         anonymizeAfterDays: parseInt(process.env.WORKERS_ANONYMIZER_AFTER_DAYS!),
+        deleteScheduledProfilesAfterDays: parseInt(
+          process.env.WORKERS_ANONYMIZER_DELETE_SCHEDULED_PROFILES_AFTER_DAYS!,
+        ),
       },
       "old-notifications": {
         rule: process.env.WORKERS_OLD_NOTIFICATIONS_RULE!,

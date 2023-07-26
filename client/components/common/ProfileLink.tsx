@@ -5,7 +5,7 @@ import { Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 
 export function ProfileLink({ profile }: { profile?: ProfileLink_ProfileFragment | null }) {
-  return profile ? (
+  return profile && ["OPEN", "CLOSED"].includes(profile.status) ? (
     <Link href={`/app/profiles/${profile.id}`}>
       {profile.name || (
         <Text textStyle="hint" as="span">
@@ -25,6 +25,7 @@ ProfileLink.fragments = {
     fragment ProfileLink_Profile on Profile {
       id
       name
+      status
     }
   `,
 };

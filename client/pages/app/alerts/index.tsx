@@ -255,9 +255,11 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           id: "component.alerts-table-columns.profile",
           defaultMessage: "Profile",
         }),
+        headerProps: {
+          minWidth: "240px",
+        },
         cellProps: {
           maxWidth: 0,
-          width: "28%",
           minWidth: "240px",
         },
         CellContent: ({
@@ -274,9 +276,11 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           id: "component.alerts-table-columns.property",
           defaultMessage: "Property",
         }),
+        headerProps: {
+          minWidth: "240px",
+        },
         cellProps: {
           maxWidth: 0,
-          width: "20%",
           minWidth: "240px",
         },
         CellContent: ({
@@ -303,8 +307,10 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           id: "component.alerts-table-columns.expiration-date",
           defaultMessage: "Expiration date",
         }),
+        headerProps: {
+          minWidth: "220px",
+        },
         cellProps: {
-          width: "12%",
           minWidth: "220px",
         },
         CellContent: ({ row }) => {
@@ -326,8 +332,10 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           id: "component.alerts-table-columns.subscribers",
           defaultMessage: "Subscribers",
         }),
+        headerProps: {
+          minWidth: "240px",
+        },
         cellProps: {
-          width: "20%",
           minWidth: "240px",
         },
         CellContent: ({ row, column }) => {
@@ -344,8 +352,10 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           id: "component.alerts-table-columns.profile-type",
           defaultMessage: "Profile Type",
         }),
+        headerProps: {
+          minWidth: "240px",
+        },
         cellProps: {
-          width: "20%",
           minWidth: "240px",
         },
         CellContent: ({

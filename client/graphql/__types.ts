@@ -657,6 +657,8 @@ export interface Mutation {
   cloneUserGroups: Array<UserGroup>;
   /** Closes an open petition. */
   closePetition: Petition;
+  /** Closes a profile that is in OPEN or DELETION_SCHEDULED status */
+  closeProfile: Array<Profile>;
   /**
    * Marks a petition as COMPLETED.
    * If the petition has a signature configured and does not require a review, starts the signing process.
@@ -757,6 +759,7 @@ export interface Mutation {
   deletePetitionReply: PetitionField;
   /** Delete petitions and folders. */
   deletePetitions: Success;
+  /** Permanently deletes the profile */
   deleteProfile: Success;
   deleteProfileFieldFile: Result;
   deleteProfileType: Success;
@@ -876,6 +879,8 @@ export interface Mutation {
   renameFolder: Success;
   /** Reopens the petition */
   reopenPetition: Petition;
+  /** Reopens a profile that is in CLOSED or DELETION_SCHEDULED status */
+  reopenProfile: Array<Profile>;
   /** Reorders the positions of attachments in the petition */
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
@@ -891,6 +896,8 @@ export interface Mutation {
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  /** Moves a profile to DELETION_SCHEDULED status */
+  scheduleProfileForDeletion: Array<Profile>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
   sendPetition: Array<SendPetitionResult>;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
@@ -1116,6 +1123,10 @@ export interface MutationcloneUserGroupsArgs {
 
 export interface MutationclosePetitionArgs {
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationcloseProfileArgs {
+  profileIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationcompletePetitionArgs {
@@ -1735,6 +1746,10 @@ export interface MutationreopenPetitionArgs {
   petitionId: Scalars["GID"]["input"];
 }
 
+export interface MutationreopenProfileArgs {
+  profileIds: Array<Scalars["GID"]["input"]>;
+}
+
 export interface MutationreorderPetitionAttachmentsArgs {
   attachmentIds: Array<Scalars["GID"]["input"]>;
   attachmentType: PetitionAttachmentType;
@@ -1766,6 +1781,10 @@ export interface MutationrestoreDeletedPetitionArgs {
 
 export interface MutationrevokeUserAuthTokenArgs {
   authTokenIds: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationscheduleProfileForDeletionArgs {
+  profileIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationsendPetitionArgs {
@@ -3146,7 +3165,7 @@ export interface PetitionListViewSort {
 
 export type PetitionListViewSortDirection = "ASC" | "DESC";
 
-export type PetitionListViewSortField = "name" | "sentAt";
+export type PetitionListViewSortField = "createdAt" | "name" | "sentAt";
 
 export interface PetitionListViewSortInput {
   direction: PetitionListViewSortDirection;
@@ -3562,9 +3581,11 @@ export interface Profile extends Timestamps {
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
   name: Scalars["String"]["output"];
+  permanentDeletionAt?: Maybe<Scalars["DateTime"]["output"]>;
   petitions: PetitionPagination;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
+  status: ProfileStatus;
   subscribers: Array<ProfileSubscription>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
@@ -3580,6 +3601,14 @@ export interface ProfilepetitionsArgs {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 }
 
+export interface ProfileAnonymizedEvent extends ProfileEvent {
+  __typename?: "ProfileAnonymizedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
+}
+
 export interface ProfileAssociatedEvent extends PetitionEvent {
   __typename?: "ProfileAssociatedEvent";
   createdAt: Scalars["DateTime"]["output"];
@@ -3588,6 +3617,15 @@ export interface ProfileAssociatedEvent extends PetitionEvent {
   petition?: Maybe<Petition>;
   profile?: Maybe<Profile>;
   type: PetitionEventType;
+  user?: Maybe<User>;
+}
+
+export interface ProfileClosedEvent extends ProfileEvent {
+  __typename?: "ProfileClosedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
   user?: Maybe<User>;
 }
 
@@ -3629,11 +3667,15 @@ export interface ProfileEventPagination {
 export type ProfileEventType =
   | "PETITION_ASSOCIATED"
   | "PETITION_DISASSOCIATED"
+  | "PROFILE_ANONYMIZED"
+  | "PROFILE_CLOSED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"
   | "PROFILE_FIELD_FILE_REMOVED"
-  | "PROFILE_FIELD_VALUE_UPDATED";
+  | "PROFILE_FIELD_VALUE_UPDATED"
+  | "PROFILE_REOPENED"
+  | "PROFILE_SCHEDULED_FOR_DELETION";
 
 export interface ProfileFieldExpiryUpdatedEvent extends ProfileEvent {
   __typename?: "ProfileFieldExpiryUpdatedEvent";
@@ -3756,6 +3798,7 @@ export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
 export interface ProfileFilter {
   profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  status?: InputMaybe<Array<ProfileStatus>>;
 }
 
 export interface ProfilePagination {
@@ -3770,6 +3813,26 @@ export interface ProfilePropertyFilter {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
+
+export interface ProfileReopenedEvent extends ProfileEvent {
+  __typename?: "ProfileReopenedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
+  user?: Maybe<User>;
+}
+
+export interface ProfileScheduledForDeletionEvent extends ProfileEvent {
+  __typename?: "ProfileScheduledForDeletionEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
+  user?: Maybe<User>;
+}
+
+export type ProfileStatus = "CLOSED" | "DELETION_SCHEDULED" | "OPEN";
 
 export interface ProfileSubscription {
   __typename?: "ProfileSubscription";
@@ -5654,7 +5717,12 @@ export type PetitionTagListCellContent_untagPetitionMutation = {
       };
 };
 
-export type ProfileLink_ProfileFragment = { __typename?: "Profile"; id: string; name: string };
+export type ProfileLink_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  name: string;
+  status: ProfileStatus;
+};
 
 export type ProfileSelect_ProfileFragment = {
   __typename?: "Profile";
@@ -8374,7 +8442,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          profile?: { __typename?: "Profile"; id: string; name: string } | null;
+          profile?: {
+            __typename?: "Profile";
+            id: string;
+            name: string;
+            status: ProfileStatus;
+          } | null;
         }
       | {
           __typename?: "ProfileDisassociatedEvent";
@@ -8386,7 +8459,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          profile?: { __typename?: "Profile"; id: string; name: string } | null;
+          profile?: {
+            __typename?: "Profile";
+            id: string;
+            name: string;
+            status: ProfileStatus;
+          } | null;
         }
       | {
           __typename?: "RecipientSignedEvent";
@@ -8980,7 +9058,7 @@ export type PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragme
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string } | null;
+  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fragment = {
@@ -8988,7 +9066,7 @@ export type PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fra
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string } | null;
+  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment = {
@@ -9263,6 +9341,7 @@ export type PetitionProfilesTable_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   name: string;
+  status: ProfileStatus;
   createdAt: string;
   profileType: {
     __typename?: "ProfileType";
@@ -9294,6 +9373,7 @@ export type PetitionProfilesTable_PetitionFragment = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
     createdAt: string;
     profileType: {
       __typename?: "ProfileType";
@@ -9933,14 +10013,14 @@ export type TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment = {
   __typename?: "ProfileAssociatedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string } | null;
+  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
 };
 
 export type TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment = {
   __typename?: "ProfileDisassociatedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  profile?: { __typename?: "Profile"; id: string; name: string } | null;
+  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
 };
 
 export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
@@ -15342,6 +15422,8 @@ export type ProfileDrawer_profileQuery = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -15560,6 +15642,8 @@ export type ProfileForm_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   name: string;
+  status: ProfileStatus;
+  permanentDeletionAt?: string | null;
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -15650,6 +15734,8 @@ export type ProfileForm_updateProfileFieldValueMutation = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -15793,6 +15879,7 @@ export type ProfilePetitionsTable_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   name: string;
+  status: ProfileStatus;
 };
 
 export type ProfilePetitionsTable_PetitionFragment = {
@@ -15856,7 +15943,7 @@ export type ProfilePetitionsTable_associateProfileToPetitionMutationVariables = 
 export type ProfilePetitionsTable_associateProfileToPetitionMutation = {
   associateProfileToPetition: {
     __typename?: "PetitionProfile";
-    profile: { __typename?: "Profile"; id: string };
+    profile: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus };
   };
 };
 
@@ -15880,6 +15967,7 @@ export type ProfilePetitionsTable_petitionsQuery = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
     petitions: {
       __typename?: "PetitionPagination";
       totalCount: number;
@@ -20638,7 +20726,12 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          profile?: { __typename?: "Profile"; id: string; name: string } | null;
+          profile?: {
+            __typename?: "Profile";
+            id: string;
+            name: string;
+            status: ProfileStatus;
+          } | null;
         }
       | {
           __typename?: "ProfileDisassociatedEvent";
@@ -20650,7 +20743,12 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          profile?: { __typename?: "Profile"; id: string; name: string } | null;
+          profile?: {
+            __typename?: "Profile";
+            id: string;
+            name: string;
+            status: ProfileStatus;
+          } | null;
         }
       | {
           __typename?: "RecipientSignedEvent";
@@ -20978,6 +21076,7 @@ export type PetitionActivity_PetitionFragment = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
     createdAt: string;
     profileType: {
       __typename?: "ProfileType";
@@ -21587,7 +21686,12 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                profile?: { __typename?: "Profile"; id: string; name: string } | null;
+                profile?: {
+                  __typename?: "Profile";
+                  id: string;
+                  name: string;
+                  status: ProfileStatus;
+                } | null;
               }
             | {
                 __typename?: "ProfileDisassociatedEvent";
@@ -21599,7 +21703,12 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                profile?: { __typename?: "Profile"; id: string; name: string } | null;
+                profile?: {
+                  __typename?: "Profile";
+                  id: string;
+                  name: string;
+                  status: ProfileStatus;
+                } | null;
               }
             | {
                 __typename?: "RecipientSignedEvent";
@@ -21956,6 +22065,7 @@ export type PetitionActivity_updatePetitionMutation = {
           __typename?: "Profile";
           id: string;
           name: string;
+          status: ProfileStatus;
           createdAt: string;
           profileType: {
             __typename?: "ProfileType";
@@ -22606,7 +22716,12 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                profile?: { __typename?: "Profile"; id: string; name: string } | null;
+                profile?: {
+                  __typename?: "Profile";
+                  id: string;
+                  name: string;
+                  status: ProfileStatus;
+                } | null;
               }
             | {
                 __typename?: "ProfileDisassociatedEvent";
@@ -22618,7 +22733,12 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                profile?: { __typename?: "Profile"; id: string; name: string } | null;
+                profile?: {
+                  __typename?: "Profile";
+                  id: string;
+                  name: string;
+                  status: ProfileStatus;
+                } | null;
               }
             | {
                 __typename?: "RecipientSignedEvent";
@@ -22975,6 +23095,7 @@ export type PetitionActivity_petitionQuery = {
           __typename?: "Profile";
           id: string;
           name: string;
+          status: ProfileStatus;
           createdAt: string;
           profileType: {
             __typename?: "ProfileType";
@@ -28761,6 +28882,8 @@ export type ProfileDetail_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   name: string;
+  status: ProfileStatus;
+  permanentDeletionAt?: string | null;
   subscribers: Array<{
     __typename?: "ProfileSubscription";
     id: string;
@@ -28872,6 +28995,8 @@ export type ProfileDetail_profileQuery = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
     subscribers: Array<{
       __typename?: "ProfileSubscription";
       id: string;
@@ -28938,6 +29063,8 @@ export type ProfileDetail_subscribeToProfileMutation = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
     subscribers: Array<{
       __typename?: "ProfileSubscription";
       id: string;
@@ -29004,6 +29131,8 @@ export type ProfileDetail_unsubscribeFromProfileMutation = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
     subscribers: Array<{
       __typename?: "ProfileSubscription";
       id: string;
@@ -29070,6 +29199,7 @@ export type Profiles_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   name: string;
+  status: ProfileStatus;
   createdAt: string;
   profileType: {
     __typename?: "ProfileType";
@@ -29097,6 +29227,7 @@ export type Profiles_ProfilePaginationFragment = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
     createdAt: string;
     profileType: {
       __typename?: "ProfileType";
@@ -29206,6 +29337,7 @@ export type Profiles_profilesQuery = {
       __typename?: "Profile";
       id: string;
       name: string;
+      status: ProfileStatus;
       createdAt: string;
       profileType: {
         __typename?: "ProfileType";
@@ -29237,6 +29369,7 @@ export type Profiles_createProfileMutation = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
     createdAt: string;
     profileType: {
       __typename?: "ProfileType";
@@ -29268,6 +29401,7 @@ export type Profiles_updateProfileFieldValueMutation = {
     __typename?: "Profile";
     id: string;
     name: string;
+    status: ProfileStatus;
     createdAt: string;
     profileType: {
       __typename?: "ProfileType";
@@ -31473,6 +31607,14 @@ export type useClonePetitions_clonePetitionsMutation = {
   >;
 };
 
+export type useCloseProfile_closeProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type useCloseProfile_closeProfileMutation = {
+  closeProfile: Array<{ __typename?: "Profile"; id: string; status: ProfileStatus }>;
+};
+
 export type useCreateContact_createContactMutationVariables = Exact<{
   data: CreateContactInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -31590,12 +31732,13 @@ export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
 
 export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Success };
 
-export type useDeleteProfile_deleteProfileMutationVariables = Exact<{
+export type useDeleteProfile_scheduleProfileForDeletionMutationVariables = Exact<{
   profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  force?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
-export type useDeleteProfile_deleteProfileMutation = { deleteProfile: Success };
+export type useDeleteProfile_scheduleProfileForDeletionMutation = {
+  scheduleProfileForDeletion: Array<{ __typename?: "Profile"; id: string; status: ProfileStatus }>;
+};
 
 export type useDeleteProfileType_ProfileTypeFragment = {
   __typename?: "ProfileType";
@@ -31623,6 +31766,37 @@ export type useDeleteTag_deleteTagMutationVariables = Exact<{
 }>;
 
 export type useDeleteTag_deleteTagMutation = { deleteTag: Result };
+
+export type usePermanentlyDeleteProfile_deleteProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type usePermanentlyDeleteProfile_deleteProfileMutation = { deleteProfile: Success };
+
+export type useRecoverProfile_closeProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type useRecoverProfile_closeProfileMutation = {
+  closeProfile: Array<{ __typename?: "Profile"; id: string; status: ProfileStatus }>;
+};
+
+export type useRecoverProfile_reopenProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type useRecoverProfile_reopenProfileMutation = {
+  reopenProfile: Array<{ __typename?: "Profile"; id: string; status: ProfileStatus }>;
+};
+
+export type useReopenProfile_reopenProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type useReopenProfile_reopenProfileMutation = {
+  reopenProfile: Array<{ __typename?: "Profile"; id: string; status: ProfileStatus }>;
+};
 
 export type useUnarchiveProfileType_ProfileTypeFragment = {
   __typename?: "ProfileType";
@@ -33803,6 +33977,7 @@ export const ProfilePetitionsTable_ProfileFragmentDoc = gql`
   fragment ProfilePetitionsTable_Profile on Profile {
     id
     name
+    status
   }
 ` as unknown as DocumentNode<ProfilePetitionsTable_ProfileFragment, unknown>;
 export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
@@ -35404,6 +35579,7 @@ export const ProfileLink_ProfileFragmentDoc = gql`
   fragment ProfileLink_Profile on Profile {
     id
     name
+    status
   }
 ` as unknown as DocumentNode<ProfileLink_ProfileFragment, unknown>;
 export const TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc = gql`
@@ -35804,6 +35980,7 @@ export const PetitionProfilesTable_ProfileFragmentDoc = gql`
   fragment PetitionProfilesTable_Profile on Profile {
     id
     name
+    status
     profileType {
       id
       name
@@ -37779,6 +37956,7 @@ export const ProfileForm_ProfileFragmentDoc = gql`
   fragment ProfileForm_Profile on Profile {
     id
     name
+    status
     profileType {
       id
       name
@@ -37789,6 +37967,7 @@ export const ProfileForm_ProfileFragmentDoc = gql`
     petitions {
       totalCount
     }
+    permanentDeletionAt
   }
   ${ProfileForm_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFragment, unknown>;
@@ -37815,6 +37994,8 @@ export const ProfileDetail_ProfileSubscriptionFragmentDoc = gql`
 export const ProfileDetail_ProfileFragmentDoc = gql`
   fragment ProfileDetail_Profile on Profile {
     id
+    name
+    status
     ...ProfileForm_Profile
     subscribers {
       ...ProfileDetail_ProfileSubscription
@@ -37833,6 +38014,7 @@ export const Profiles_ProfileFragmentDoc = gql`
   fragment Profiles_Profile on Profile {
     id
     name
+    status
     profileType {
       id
       name
@@ -40431,10 +40613,11 @@ export const ProfilePetitionsTable_associateProfileToPetitionDocument = gql`
   mutation ProfilePetitionsTable_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
     associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
       profile {
-        id
+        ...ProfilePetitionsTable_Profile
       }
     }
   }
+  ${ProfilePetitionsTable_ProfileFragmentDoc}
 ` as unknown as DocumentNode<
   ProfilePetitionsTable_associateProfileToPetitionMutation,
   ProfilePetitionsTable_associateProfileToPetitionMutationVariables
@@ -40455,6 +40638,7 @@ export const ProfilePetitionsTable_petitionsDocument = gql`
     profile(profileId: $profileId) {
       id
       name
+      status
       petitions(offset: $offset, limit: $limit) {
         items {
           ...ProfilePetitionsTable_Petition
@@ -43569,6 +43753,17 @@ export const useClonePetitions_clonePetitionsDocument = gql`
   useClonePetitions_clonePetitionsMutation,
   useClonePetitions_clonePetitionsMutationVariables
 >;
+export const useCloseProfile_closeProfileDocument = gql`
+  mutation useCloseProfile_closeProfile($profileIds: [GID!]!) {
+    closeProfile(profileIds: $profileIds) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  useCloseProfile_closeProfileMutation,
+  useCloseProfile_closeProfileMutationVariables
+>;
 export const useCreateContact_createContactDocument = gql`
   mutation useCreateContact_createContact($data: CreateContactInput!, $force: Boolean) {
     createContact(data: $data, force: $force) {
@@ -43639,13 +43834,16 @@ export const useDeletePetitions_deletePetitionsDocument = gql`
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables
 >;
-export const useDeleteProfile_deleteProfileDocument = gql`
-  mutation useDeleteProfile_deleteProfile($profileIds: [GID!]!, $force: Boolean) {
-    deleteProfile(profileIds: $profileIds, force: $force)
+export const useDeleteProfile_scheduleProfileForDeletionDocument = gql`
+  mutation useDeleteProfile_scheduleProfileForDeletion($profileIds: [GID!]!) {
+    scheduleProfileForDeletion(profileIds: $profileIds) {
+      id
+      status
+    }
   }
 ` as unknown as DocumentNode<
-  useDeleteProfile_deleteProfileMutation,
-  useDeleteProfile_deleteProfileMutationVariables
+  useDeleteProfile_scheduleProfileForDeletionMutation,
+  useDeleteProfile_scheduleProfileForDeletionMutationVariables
 >;
 export const useDeleteProfileType_profilesDocument = gql`
   query useDeleteProfileType_profiles($filter: ProfileFilter) {
@@ -43672,6 +43870,47 @@ export const useDeleteTag_deleteTagDocument = gql`
 ` as unknown as DocumentNode<
   useDeleteTag_deleteTagMutation,
   useDeleteTag_deleteTagMutationVariables
+>;
+export const usePermanentlyDeleteProfile_deleteProfileDocument = gql`
+  mutation usePermanentlyDeleteProfile_deleteProfile($profileIds: [GID!]!, $force: Boolean) {
+    deleteProfile(profileIds: $profileIds, force: $force)
+  }
+` as unknown as DocumentNode<
+  usePermanentlyDeleteProfile_deleteProfileMutation,
+  usePermanentlyDeleteProfile_deleteProfileMutationVariables
+>;
+export const useRecoverProfile_closeProfileDocument = gql`
+  mutation useRecoverProfile_closeProfile($profileIds: [GID!]!) {
+    closeProfile(profileIds: $profileIds) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  useRecoverProfile_closeProfileMutation,
+  useRecoverProfile_closeProfileMutationVariables
+>;
+export const useRecoverProfile_reopenProfileDocument = gql`
+  mutation useRecoverProfile_reopenProfile($profileIds: [GID!]!) {
+    reopenProfile(profileIds: $profileIds) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  useRecoverProfile_reopenProfileMutation,
+  useRecoverProfile_reopenProfileMutationVariables
+>;
+export const useReopenProfile_reopenProfileDocument = gql`
+  mutation useReopenProfile_reopenProfile($profileIds: [GID!]!) {
+    reopenProfile(profileIds: $profileIds) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  useReopenProfile_reopenProfileMutation,
+  useReopenProfile_reopenProfileMutationVariables
 >;
 export const useUnarchiveProfileType_unarchiveProfileTypeDocument = gql`
   mutation useUnarchiveProfileType_unarchiveProfileType($profileTypeIds: [GID!]!) {

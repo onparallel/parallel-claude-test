@@ -13,9 +13,14 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { BellIcon, ChevronDownIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
+import {
+  ArchiveIcon,
+  BellIcon,
+  ChevronDownIcon,
+  DeleteIcon,
+  RepeatIcon,
+} from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
   LocalizableUserTextRender,
@@ -23,14 +28,17 @@ import {
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SearchInput } from "@parallel/components/common/SearchInput";
+import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
+import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   RedirectError,
-  withApolloData,
   WithApolloDataContext,
+  withApolloData,
 } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
@@ -38,11 +46,12 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
-  Profiles_createProfileDocument,
+  ProfileStatus,
   Profiles_ProfileFragment,
-  Profiles_profilesDocument,
+  Profiles_createProfileDocument,
   Profiles_profileTypeDocument,
   Profiles_profileTypesDocument,
+  Profiles_profilesDocument,
   Profiles_updateProfileFieldValueDocument,
   Profiles_userDocument,
   UserLocale,
@@ -51,24 +60,29 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useCloseProfile } from "@parallel/utils/mutations/useCloseProfile";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
+import { usePermanentlyDeleteProfile } from "@parallel/utils/mutations/usePermanentlyDeleteProfile";
+import { useRecoverProfile } from "@parallel/utils/mutations/useRecoverProfile";
+import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { withError } from "@parallel/utils/promises/withError";
 import {
-  integer,
-  parseQuery,
   QueryStateFrom,
   QueryStateOf,
   SetQueryState,
+  integer,
+  parseQuery,
   sorting,
   string,
   useQueryState,
+  useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
@@ -83,20 +97,27 @@ const QUERY_STATE = {
     direction: "DESC",
   }),
   type: string().list(),
+  status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"]).orDefault("OPEN"),
 };
 type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
+interface ProfilesTableContext {
+  status: ProfileStatus;
+  setStatus: (status: ProfileStatus) => void;
+}
 function Profiles() {
   const intl = useIntl();
   const {
     data: { me, realMe },
   } = useAssertQuery(Profiles_userDocument);
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
-
+  const [status, setStatus] = useQueryStateSlice(queryState, setQueryState, "status");
   const navigate = useHandleNavigation();
 
   const userCanSubscribeProfiles = useHasPermission("PROFILES:SUBSCRIBE_PROFILES");
   const userCanDeleteProfiles = useHasPermission("PROFILES:DELETE_PROFILES");
+  const userCanCloseOpenProfiles = useHasPermission("PROFILES:CLOSE_PROFILES");
+  const userCanDeletePermanently = useHasPermission("PROFILES:DELETE_PERMANENTLY_PROFILES");
 
   const { data, loading, refetch } = useQueryOrPreviousData(Profiles_profilesDocument, {
     variables: {
@@ -105,7 +126,8 @@ function Profiles() {
       search: queryState.search,
       sortBy: [`${queryState.sort.field}_${queryState.sort.direction}` as const],
       filter: {
-        profileTypeId: queryState.type ? queryState.type : undefined,
+        profileTypeId: queryState.type || undefined,
+        status: [queryState.status],
       },
     },
     fetchPolicy: "cache-and-network",
@@ -136,7 +158,7 @@ function Profiles() {
 
   const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
-  const columns = useProfileTableColumns();
+  const columns = useProfileTableColumns(status);
 
   const [createProfile] = useMutation(Profiles_createProfileDocument);
   const [updateProfileFieldValue] = useMutation(Profiles_updateProfileFieldValueDocument);
@@ -163,11 +185,20 @@ function Profiles() {
   };
 
   const deleteProfile = useDeleteProfile();
+  const permanentlyDeleteProfile = usePermanentlyDeleteProfile();
   const handleDeleteClick = async () => {
     try {
-      await deleteProfile({
-        profileIds: selectedIds,
-      });
+      if (status === "DELETION_SCHEDULED") {
+        await permanentlyDeleteProfile({
+          profileIds: selectedIds,
+          profileName: selectedRows[0].name,
+        });
+      } else {
+        await deleteProfile({
+          profileIds: selectedIds,
+        });
+      }
+
       refetch();
     } catch {}
   };
@@ -175,8 +206,6 @@ function Profiles() {
   const handleRowClick = useCallback((row: Profiles_ProfileFragment, event: MouseEvent) => {
     navigate(`/app/profiles/${row.id}`, event);
   }, []);
-
-  const context = useMemo(() => ({ user: me! }), [me]);
 
   const hasMultipleProfileTypes = isDefined(queryState.type) && queryState.type.length > 1;
 
@@ -211,10 +240,52 @@ function Profiles() {
     } catch {}
   }, [selectedRows, selectedIds.join(",")]);
 
+  const context = useMemo<ProfilesTableContext>(() => ({ status, setStatus }), [status, setStatus]);
+
+  const reopenProfile = useReopenProfile();
+  const handleReopenClick = async () => {
+    try {
+      await reopenProfile({
+        profileIds: selectedIds,
+        profileName: selectedRows[0].name,
+      });
+      refetch();
+    } catch {}
+  };
+
+  const recoverProfile = useRecoverProfile();
+  const handleRecoverClick = async () => {
+    try {
+      await recoverProfile({
+        profileIds: selectedIds,
+        profileName: selectedRows[0].name,
+      });
+      refetch();
+    } catch {}
+  };
+
+  const closeProfile = useCloseProfile();
+  const handleCloseClick = async () => {
+    try {
+      await closeProfile({
+        profileIds: selectedIds,
+        profileName: selectedRows[0].name,
+      });
+      refetch();
+    } catch {}
+  };
+
   const actions = useProfileListActions({
     canDelete: userCanDeleteProfiles,
+    canCloseOpen: userCanCloseOpenProfiles,
+    canDeletePermanently: userCanDeletePermanently,
     onDeleteClick: handleDeleteClick,
     onSubscribeClick: handleSubscribeClick,
+    onCloseClick: handleCloseClick,
+    onReopenClick: handleReopenClick,
+    onRecoverClick: handleRecoverClick,
+    status,
+    selectedCount: selectedIds.length,
   });
 
   return (
@@ -341,7 +412,7 @@ function Profiles() {
                       />
                     </Text>
                   </Flex>
-                ) : (
+                ) : queryState.status === "OPEN" ? (
                   <Flex flex="1" alignItems="center" justifyContent="center">
                     <Text fontSize="lg">
                       <FormattedMessage
@@ -350,9 +421,28 @@ function Profiles() {
                       />
                     </Text>
                   </Flex>
-                )
+                ) : queryState.status === "CLOSED" ? (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="page.profiles.no-closed-profiles"
+                        defaultMessage="There is no closed profile"
+                      />
+                    </Text>
+                  </Flex>
+                ) : queryState.status === "DELETION_SCHEDULED" ? (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="page.profiles.no-deleted-profiles"
+                        defaultMessage="No profile in the bin"
+                      />
+                    </Text>
+                  </Flex>
+                ) : null
               ) : null
             }
+            Footer={CustomFooter}
           />
         </Box>
       </Stack>
@@ -360,29 +450,141 @@ function Profiles() {
   );
 }
 
+function CustomFooter({ status, setStatus, children }: PropsWithChildren<ProfilesTableContext>) {
+  const options = useSimpleSelectOptions<ProfileStatus>(
+    (intl) => [
+      {
+        label: intl.formatMessage({ id: "page.profiles.open", defaultMessage: "Open" }),
+        value: "OPEN",
+      },
+      {
+        label: intl.formatMessage({
+          id: "page.profiles.closed",
+          defaultMessage: "Closed",
+        }),
+        value: "CLOSED",
+      },
+
+      {
+        label: intl.formatMessage({
+          id: "page.profiles.bin",
+          defaultMessage: "Bin",
+        }),
+        value: "DELETION_SCHEDULED",
+      },
+    ],
+    [],
+  );
+  return (
+    <>
+      <SimpleMenuSelect
+        options={options}
+        value={status}
+        onChange={setStatus as any}
+        size="sm"
+        variant="ghost"
+      />
+      {children}
+    </>
+  );
+}
+
 function useProfileListActions({
   onDeleteClick,
   onSubscribeClick,
+  onCloseClick,
+  onReopenClick,
+  onRecoverClick,
   canDelete,
+  canCloseOpen,
+  canDeletePermanently,
+  status,
+  selectedCount,
 }: {
   onDeleteClick: () => void;
   onSubscribeClick: () => void;
+  onCloseClick: () => void;
+  onReopenClick: () => void;
+  onRecoverClick: () => void;
   canDelete: boolean;
+  canCloseOpen: boolean;
+  canDeletePermanently: boolean;
+  status: ProfileStatus;
+  selectedCount: number;
 }) {
   return [
-    {
-      key: "subscribe",
-      onClick: onSubscribeClick,
-      leftIcon: <BellIcon />,
-      children: <FormattedMessage id="generic.subscribe" defaultMessage="Subscribe" />,
-    },
+    ...(status === "OPEN"
+      ? [
+          {
+            key: "subscribe",
+            onClick: onSubscribeClick,
+            leftIcon: <BellIcon />,
+            children: <FormattedMessage id="generic.subscribe" defaultMessage="Subscribe" />,
+          },
+          {
+            key: "close",
+            onClick: onCloseClick,
+            leftIcon: <ArchiveIcon />,
+            children: (
+              <FormattedMessage
+                id="page.profiles.close-profile"
+                defaultMessage="Close {count, plural, =1 {profile} other {profiles}}"
+                values={{ count: selectedCount }}
+              />
+            ),
+            isDisabled: !canCloseOpen,
+          },
+        ]
+      : []),
+    ...(status === "CLOSED"
+      ? [
+          {
+            key: "reopen",
+            onClick: onReopenClick,
+            leftIcon: <ArchiveIcon />,
+            children: (
+              <FormattedMessage
+                id="page.profiles.reopen-profile"
+                defaultMessage="Reopen {count, plural, =1 {profile} other {profiles}}"
+                values={{ count: selectedCount }}
+              />
+            ),
+            isDisabled: !canCloseOpen,
+          },
+        ]
+      : []),
+    ...(status === "DELETION_SCHEDULED"
+      ? [
+          {
+            key: "recover",
+            onClick: onRecoverClick,
+            leftIcon: <ArchiveIcon />,
+            children: (
+              <FormattedMessage
+                id="page.profiles.recover-profile"
+                defaultMessage="Recover {count, plural, =1 {profile} other {profiles}}"
+                values={{ count: selectedCount }}
+              />
+            ),
+            isDisabled: !canDelete,
+          },
+        ]
+      : []),
     {
       key: "delete",
       onClick: onDeleteClick,
       leftIcon: <DeleteIcon />,
-      children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+      children:
+        status === "DELETION_SCHEDULED" ? (
+          <FormattedMessage
+            id="page.profiles.delete-permanently"
+            defaultMessage="Delete permanently"
+          />
+        ) : (
+          <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+        ),
       colorScheme: "red",
-      isDisabled: !canDelete,
+      isDisabled: !canDelete || (status === "DELETION_SCHEDULED" && !canDeletePermanently),
     },
   ];
 }
@@ -437,8 +639,12 @@ function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesL
   );
 }
 
-export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
+export function useProfileTableColumns(
+  status: ProfileStatus,
+): TableColumn<Profiles_ProfileFragment, ProfilesTableContext>[] {
   const intl = useIntl();
+  const showSubscribers = status === "OPEN";
+
   return useMemo(
     () => [
       {
@@ -448,9 +654,11 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
           id: "generic.name",
           defaultMessage: "Name",
         }),
+        headerProps: {
+          minWidth: "240px",
+        },
         cellProps: {
           maxWidth: 0,
-          width: "30%",
           minWidth: "240px",
         },
         CellContent: ({ row }) => {
@@ -471,9 +679,11 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
           id: "component.profile-table-columns.type",
           defaultMessage: "Type",
         }),
+        headerProps: {
+          minWidth: "240px",
+        },
         cellProps: {
           maxWidth: 0,
-          width: "30%",
           minWidth: "240px",
         },
         CellContent: ({
@@ -495,27 +705,32 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
           );
         },
       },
-      {
-        key: "subscribed",
-        label: intl.formatMessage({
-          id: "component.profile-table-columns.subscribed",
-          defaultMessage: "Subscribed",
-        }),
-        align: "left",
-        cellProps: { width: "20%", minWidth: "132px" },
-        CellContent: ({ row, column }) => {
-          const { subscribers } = row;
+      ...(showSubscribers
+        ? ([
+            {
+              key: "subscribed",
+              header: intl.formatMessage({
+                id: "component.profile-table-columns.subscribed",
+                defaultMessage: "Subscribed",
+              }),
+              align: "left",
+              headerProps: { minWidth: "132px" },
+              cellProps: { minWidth: "132px" },
+              CellContent: ({ row, column }) => {
+                const { subscribers } = row;
 
-          if (!subscribers?.length) {
-            return <></>;
-          }
-          return (
-            <Flex justifyContent={column.align}>
-              <UserAvatarList usersOrGroups={subscribers?.map((s) => s.user)} />
-            </Flex>
-          );
-        },
-      },
+                if (!subscribers?.length) {
+                  return <></>;
+                }
+                return (
+                  <Flex justifyContent={column.align}>
+                    <UserAvatarList usersOrGroups={subscribers?.map((s) => s.user)} />
+                  </Flex>
+                );
+              },
+            },
+          ] as TableColumn<Profiles_ProfileFragment, ProfilesTableContext>[])
+        : ([] as TableColumn<Profiles_ProfileFragment, ProfilesTableContext>[])),
       {
         key: "createdAt",
         isSortable: true,
@@ -523,8 +738,10 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),
+        headerProps: {
+          minWidth: "160px",
+        },
         cellProps: {
-          width: "20%",
           minWidth: "160px",
         },
         CellContent: ({ row: { createdAt } }) => (
@@ -532,7 +749,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
         ),
       },
     ],
-    [intl.locale],
+    [intl.locale, showSubscribers],
   );
 }
 
@@ -550,6 +767,7 @@ const _fragments = {
       fragment Profiles_Profile on Profile {
         id
         name
+        status
         profileType {
           id
           name

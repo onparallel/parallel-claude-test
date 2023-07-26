@@ -18,6 +18,7 @@ import {
   ProfileEvent,
   ProfileFieldFile,
   ProfileFieldValue,
+  ProfileStatus,
   ProfileType,
   ProfileTypeFieldPermission,
   ProfileTypeFieldPermissionType,
@@ -34,6 +35,7 @@ import {
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
 import { SortBy, escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
@@ -488,34 +490,43 @@ export class ProfileRepository extends BaseRepository {
   );
 
   readonly loadProfileFieldFileById = this.buildLoadBy("profile_field_file", "id", (q) =>
-    q.whereNull("removed_at").whereNull("deleted_at"),
+    q.whereNull("removed_at").whereNull("deleted_at").whereNotNull("file_upload_id"),
   );
 
   readonly loadProfileFieldFilesByProfileId = this.buildLoadMultipleBy(
     "profile_field_file",
     "profile_id",
-    (q) => q.whereNull("removed_at").whereNull("deleted_at"),
+    (q) => q.whereNull("removed_at").whereNull("deleted_at").whereNotNull("file_upload_id"),
   );
 
   async deleteProfileFieldFiles(profileFieldFileId: MaybeArray<number>, userId: number) {
     const ids = unMaybeArray(profileFieldFileId);
     if (ids.length === 0) {
-      return;
+      return [];
     }
 
-    await this.from("profile_field_file").whereIn("id", ids).where({ removed_at: null }).update({
-      removed_at: this.now(),
-      removed_by_user_id: userId,
-    });
+    return await this.from("profile_field_file")
+      .whereIn("id", ids)
+      .where({ removed_at: null })
+      .update(
+        {
+          removed_at: this.now(),
+          removed_by_user_id: userId,
+        },
+        "*",
+      );
   }
 
   async deleteProfileFieldFilesByProfileTypeFieldId(profileTypeFieldId: number, userId: number) {
-    await this.from("profile_field_file")
+    return await this.from("profile_field_file")
       .where({ removed_at: null, profile_type_field_id: profileTypeFieldId })
-      .update({
-        removed_at: this.now(),
-        removed_by_user_id: userId,
-      });
+      .update(
+        {
+          removed_at: this.now(),
+          removed_by_user_id: userId,
+        },
+        "*",
+      );
   }
 
   getPaginatedProfileForOrg(
@@ -525,6 +536,7 @@ export class ProfileRepository extends BaseRepository {
       filter?: {
         profileId?: number[] | null;
         profileTypeId?: number[] | null;
+        status?: ProfileStatus[] | null;
       } | null;
       sortBy?: SortBy<"created_at" | "name">[];
     } & PageOpts,
@@ -543,6 +555,9 @@ export class ProfileRepository extends BaseRepository {
           }
           if (isDefined(filter?.profileTypeId)) {
             q.whereIn("profile_type_id", filter!.profileTypeId);
+          }
+          if (isDefined(filter?.status) && filter!.status.length > 0) {
+            q.whereIn("status", filter!.status);
           }
           if (isDefined(sortBy)) {
             q.orderBy(
@@ -584,12 +599,37 @@ export class ProfileRepository extends BaseRepository {
     });
   }
 
-  async updateProfile(profileId: number, data: Partial<CreateProfile>, updatedBy: string) {
-    const [profile] = await this.from("profile")
-      .where("id", profileId)
-      .update({ ...data, updated_at: this.now(), updated_by: updatedBy }, "*");
-
-    return profile;
+  async updateProfileStatus(profileIds: number[], status: ProfileStatus, updatedBy: string) {
+    if (profileIds.length === 0) {
+      return [];
+    }
+    return await this.raw<Profile>(
+      /* sql */ `
+      update "profile"
+      set
+        status = ?,
+        closed_at = (
+          case 
+            when ? = 'OPEN' then null
+            when ? = 'CLOSED' then coalesce(closed_at, now())
+            else closed_at
+          end
+        ),
+        deletion_scheduled_at = (
+          case
+            when ? = 'DELETION_SCHEDULED' then now()
+            else null
+          end
+        ),
+        updated_by = ?,
+        updated_at = now()
+      where id in ?
+      and deleted_at is null
+      and status != ?
+      returning *;
+    `,
+      [status, status, status, status, updatedBy, this.sqlIn(profileIds), status],
+    );
   }
 
   async countProfilesWithValuesOrFilesByProfileTypeFieldId(profileTypeFieldIds: number[]) {
@@ -673,6 +713,22 @@ export class ProfileRepository extends BaseRepository {
     }
 
     await this.from("petition_profile", t).whereIn("profile_id", ids).delete();
+
+    await this.from("profile_field_value")
+      .whereIn("profile_id", ids)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+
+    await this.from("profile_field_file")
+      .whereIn("profile_id", ids)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
 
     await this.from("profile", t).whereIn("id", ids).whereNull("deleted_at").update({
       deleted_at: this.now(),
@@ -1032,6 +1088,7 @@ export class ProfileRepository extends BaseRepository {
       .join(this.knex.ref("profile_field_value").as("pfx"), "p.id", "pfx.profile_id")
       .join(this.knex.ref("profile_type_field").as("ptf"), "ptf.id", "pfx.profile_type_field_id")
       .where("p.org_id", orgId)
+      .where("status", "OPEN")
       .whereNull("p.deleted_at")
       .whereNotNull("pfx.expiry_date")
       .whereNull("pfx.removed_at")
@@ -1043,6 +1100,7 @@ export class ProfileRepository extends BaseRepository {
       .join(this.knex.ref("profile_field_file").as("pfx"), "p.id", "pfx.profile_id")
       .join(this.knex.ref("profile_type_field").as("ptf"), "ptf.id", "pfx.profile_type_field_id")
       .where("p.org_id", orgId)
+      .where("status", "OPEN")
       .whereNull("p.deleted_at")
       .whereNotNull("pfx.expiry_date")
       .whereNull("pfx.removed_at")
@@ -1199,6 +1257,7 @@ export class ProfileRepository extends BaseRepository {
         .join("petition_profile", "profile.id", "petition_profile.profile_id")
         .whereIn("petition_profile.petition_id", petitionIds)
         .whereNull("profile.deleted_at")
+        .whereIn("profile.status", ["OPEN", "CLOSED"])
         .select<Array<Profile & { petition_id: number; pp_created_at: Date }>>(
           "profile.*",
           "petition_profile.petition_id",
@@ -1444,4 +1503,174 @@ export class ProfileRepository extends BaseRepository {
     "profile_type_field_id",
     (q) => q.whereNull("deleted_at"),
   );
+
+  async getDeletedProfilesToAnonymize(daysAfterDeletion: number) {
+    const profiles = await this.from("profile")
+      .whereNotNull("deleted_at")
+      .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .select("id");
+
+    return profiles.map((p) => p.id);
+  }
+
+  async getDeletedProfileFieldValuesToAnonymize(daysAfterDeletion: number) {
+    const profileFieldValues = await this.from("profile_field_value")
+      .whereNotNull("deleted_at")
+      .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .select("id");
+
+    return profileFieldValues.map((p) => p.id);
+  }
+
+  async getDeletedProfileFieldFilesToAnonymize(daysAfterDeletion: number) {
+    const profileFieldFiles = await this.from("profile_field_file")
+      .whereNotNull("deleted_at")
+      .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .select("id");
+
+    return profileFieldFiles.map((p) => p.id);
+  }
+
+  async deleteRemovedProfileFieldFiles(daysAfterRemoval: number, deletedBy: string) {
+    return await this.from("profile_field_file")
+      .whereNull("deleted_at")
+      .whereNotNull("removed_at")
+      .whereRaw(/* sql */ `"removed_at" < NOW() - make_interval(days => ?)`, [daysAfterRemoval])
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
+  async deleteRemovedProfileFieldValues(daysAfterRemoval: number, deletedBy: string) {
+    return await this.from("profile_field_value")
+      .whereNull("deleted_at")
+      .whereNotNull("removed_at")
+      .whereRaw(/* sql */ `"removed_at" < NOW() - make_interval(days => ?)`, [daysAfterRemoval])
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
+  async anonymizeProfile(profileIds: number[], t?: Knex.Transaction) {
+    if (profileIds.length === 0) {
+      return [];
+    }
+
+    const profiles = await this.from("profile", t)
+      .whereIn("id", profileIds)
+      .whereNotNull("deleted_at")
+      .whereNull("anonymized_at")
+      .update({ anonymized_at: this.now() })
+      .returning(["id", "org_id"]);
+
+    const [values, files] = await Promise.all([
+      this.from("profile_field_value", t)
+        .whereIn(
+          "profile_id",
+          profiles.map((p) => p.id),
+        )
+        .whereNull("anonymized_at")
+        .select("id"),
+      this.from("profile_field_file", t)
+        .whereIn(
+          "profile_id",
+          profiles.map((p) => p.id),
+        )
+        .whereNull("anonymized_at")
+        .select("id"),
+    ]);
+
+    await this.anonymizeProfileFieldValues(
+      values.map((v) => v.id),
+      t,
+    );
+    const fileIdsToDelete = await this.anonymizeProfileFieldFiles(
+      files.map((f) => f.id),
+      t,
+    );
+
+    await this.createEvent(
+      profiles.map((p) => ({
+        type: "PROFILE_ANONYMIZED",
+        profile_id: p.id,
+        org_id: p.org_id,
+        data: {},
+      })),
+      t,
+    );
+
+    return fileIdsToDelete;
+  }
+
+  async anonymizeProfileFieldValues(ids: number[], t?: Knex.Transaction) {
+    if (ids.length === 0) {
+      return;
+    }
+    await this.withTransaction(async (t) => {
+      await pMapChunk(
+        ids,
+        async (idsChunk) => {
+          await this.from("profile_field_value", t)
+            .whereIn("id", idsChunk)
+            .whereNull("anonymized_at")
+            .update({
+              anonymized_at: this.now(),
+              content: this.knex.raw(/* sql */ `
+            content || jsonb_build_object('value', null)
+          `),
+            });
+        },
+        { chunkSize: 200, concurrency: 5 },
+      );
+    }, t);
+  }
+
+  async anonymizeProfileFieldFiles(ids: number[], t?: Knex.Transaction) {
+    if (ids.length === 0) {
+      return [];
+    }
+    const files = await this.withTransaction(async (t) => {
+      return await pMapChunk(
+        ids,
+        async (idsChunk) => {
+          return await this.raw<{ old_file_upload_id: number }>(
+            /* sql */ `
+            update profile_field_file pff
+            set 
+              anonymized_at = now(),
+              file_upload_id = null
+            from profile_field_file pff2
+            where pff.id = pff2.id
+            and pff.id in ?
+            and pff.anonymized_at is null
+            returning pff2.file_upload_id as old_file_upload_id;
+          `,
+            [this.sqlIn(idsChunk)],
+            t,
+          );
+        },
+        { chunkSize: 200, concurrency: 5 },
+      );
+    }, t);
+
+    return files.map((f) => f.old_file_upload_id);
+  }
+
+  async getProfileIdsReadyForDeletion(daysAfterDeletion: number) {
+    const profiles = await this.from("profile")
+      .whereNull("deleted_at")
+      .whereNull("anonymized_at")
+      .where("status", "DELETION_SCHEDULED")
+      .whereRaw(/* sql */ `"deletion_scheduled_at" + make_interval(days => ?) < NOW()`, [
+        daysAfterDeletion,
+      ])
+      .select("id");
+
+    return profiles.map((p) => p.id);
+  }
 }

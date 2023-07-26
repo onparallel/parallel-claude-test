@@ -8,6 +8,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
 import {
   ProfilePetitionsTable_PetitionFragment,
+  ProfilePetitionsTable_ProfileFragment,
   ProfilePetitionsTable_associateProfileToPetitionDocument,
   ProfilePetitionsTable_disassociatePetitionFromProfileDocument,
   ProfilePetitionsTable_petitionsDocument,
@@ -105,6 +106,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   }, []);
 
   const actions = useProfilePetitionsActions({
+    profile,
     onRemoveClick: () => handleRemovePetition(),
   });
 
@@ -113,7 +115,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       flex="1 1 auto"
       minHeight={0}
       rowKeyProp="id"
-      isSelectable
+      isSelectable={profile?.status !== "DELETION_SCHEDULED"}
       isHighlightable
       loading={loading}
       columns={columns}
@@ -133,7 +135,12 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
             <FormattedMessage id="generic.root-petitions" defaultMessage="Parallels" />
           </Heading>
           <Spacer />
-          <Button leftIcon={<AddIcon />} colorScheme="primary" onClick={handleAddPetition}>
+          <Button
+            leftIcon={<AddIcon />}
+            colorScheme="primary"
+            onClick={handleAddPetition}
+            isDisabled={profile?.status === "DELETION_SCHEDULED"}
+          >
             <FormattedMessage
               id="component.profile-petitions-table.add-petition"
               defaultMessage="Add parallel"
@@ -152,12 +159,14 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
                 />
               </Text>
               <Text>
-                <NormalLink onClick={handleAddPetition}>
-                  <FormattedMessage
-                    id="component.profile-petitions-table.add-petition"
-                    defaultMessage="Add parallel"
-                  />
-                </NormalLink>
+                {profile?.status !== "DELETION_SCHEDULED" ? (
+                  <NormalLink onClick={handleAddPetition}>
+                    <FormattedMessage
+                      id="component.profile-petitions-table.add-petition"
+                      defaultMessage="Add parallel"
+                    />
+                  </NormalLink>
+                ) : null}
               </Text>
             </Stack>
           </Center>
@@ -167,11 +176,18 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
   );
 }
 
-function useProfilePetitionsActions({ onRemoveClick }: { onRemoveClick: () => void }) {
+function useProfilePetitionsActions({
+  profile,
+  onRemoveClick,
+}: {
+  profile?: ProfilePetitionsTable_ProfileFragment;
+  onRemoveClick: () => void;
+}) {
   return [
     {
       key: "remove",
       onClick: onRemoveClick,
+      isDisabled: profile?.status === "DELETION_SCHEDULED",
       leftIcon: <CloseIconSmall />,
       children: (
         <FormattedMessage
@@ -306,6 +322,7 @@ const _fragments = {
     fragment ProfilePetitionsTable_Profile on Profile {
       id
       name
+      status
     }
   `,
   Petition: gql`
@@ -344,10 +361,11 @@ const _mutations = [
     mutation ProfilePetitionsTable_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
       associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
         profile {
-          id
+          ...ProfilePetitionsTable_Profile
         }
       }
     }
+    ${_fragments.Profile}
   `,
   gql`
     mutation ProfilePetitionsTable_disassociatePetitionFromProfile(
@@ -365,6 +383,7 @@ const _queries = [
       profile(profileId: $profileId) {
         id
         name
+        status
         petitions(offset: $offset, limit: $limit) {
           items {
             ...ProfilePetitionsTable_Petition

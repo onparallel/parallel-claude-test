@@ -2,6 +2,8 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
+  AlertIcon,
+  Badge,
   Box,
   Button,
   Flex,
@@ -46,6 +48,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { FORMATS } from "@parallel/utils/dates";
 
 export interface ProfileFormData {
   fields: ({ type: ProfileTypeFieldType } & UpdateProfileFieldValueInput)[];
@@ -57,6 +60,7 @@ interface ProfileFormProps {
   overlapsIntercomBadge?: boolean;
   petitionFields?: ProfileForm_PetitionFieldFragment[];
   petitionId?: string;
+  onRecover?: () => void;
 }
 
 function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragment[]) {
@@ -89,7 +93,7 @@ function normalize(alias: string) {
 
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
-    { profile, refetch, overlapsIntercomBadge, petitionFields, petitionId, ...props },
+    { profile, refetch, overlapsIntercomBadge, petitionFields, petitionId, onRecover, ...props },
     ref,
   ) {
     const intl = useIntl();
@@ -100,6 +104,8 @@ export const ProfileForm = Object.assign(
       () => partition(profile.properties, (property) => property.field.myPermission !== "HIDDEN"),
       [profile.properties],
     );
+
+    const status = profile.status;
 
     const {
       register,
@@ -340,18 +346,35 @@ export const ProfileForm = Object.assign(
           minHeight="65px"
           justifyContent="center"
         >
-          <OverflownText
-            as="h2"
-            fontSize="xl"
-            fontWeight={400}
-            textStyle={profile.name ? undefined : "hint"}
-          >
-            {profile.name ||
-              intl.formatMessage({
-                id: "generic.unnamed-profile",
-                defaultMessage: "Unnamed profile",
-              })}
-          </OverflownText>
+          <HStack>
+            <OverflownText
+              as="h2"
+              fontSize="xl"
+              fontWeight={400}
+              textStyle={profile.name ? undefined : "hint"}
+            >
+              {profile.name ||
+                intl.formatMessage({
+                  id: "generic.unnamed-profile",
+                  defaultMessage: "Unnamed profile",
+                })}
+            </OverflownText>
+            {profile.status === "CLOSED" ? (
+              <Badge>
+                <FormattedMessage
+                  id="component.profile-form.closed-status"
+                  defaultMessage="Closed"
+                />
+              </Badge>
+            ) : profile.status === "DELETION_SCHEDULED" ? (
+              <Badge colorScheme={"red"}>
+                <FormattedMessage
+                  id="component.profile-form.deleted-status"
+                  defaultMessage="Deleted"
+                />
+              </Badge>
+            ) : null}
+          </HStack>
           <HStack
             divider={<Divider isVertical height={3.5} color="gray.500" />}
             fontSize="sm"
@@ -376,6 +399,12 @@ export const ProfileForm = Object.assign(
             </Box>
           </HStack>
         </Stack>
+        {profile.status === "DELETION_SCHEDULED" ? (
+          <ProfileDeletedAlert
+            onRecoverClick={onRecover}
+            permanentDeletionAt={profile.permanentDeletionAt!}
+          />
+        ) : null}
         {editedFieldsCount ? (
           <EditedFieldsAlert
             editedFieldsCount={editedFieldsCount}
@@ -408,7 +437,7 @@ export const ProfileForm = Object.assign(
                   setError={setError}
                   clearErrors={clearErrors}
                   fieldsWithIndices={suggestedFields}
-                  isDisabled={field.myPermission === "READ"}
+                  isDisabled={field.myPermission === "READ" || status !== "OPEN"}
                 />
               );
             })}
@@ -516,6 +545,7 @@ export const ProfileForm = Object.assign(
           fragment ProfileForm_Profile on Profile {
             id
             name
+            status
             profileType {
               id
               name
@@ -526,6 +556,7 @@ export const ProfileForm = Object.assign(
             petitions {
               totalCount
             }
+            permanentDeletionAt
           }
           ${this.ProfileFieldProperty}
         `;
@@ -543,6 +574,47 @@ export const ProfileForm = Object.assign(
     },
   },
 );
+
+function ProfileDeletedAlert({
+  permanentDeletionAt,
+  onRecoverClick,
+}: {
+  permanentDeletionAt: string;
+  onRecoverClick?: () => void;
+}) {
+  const intl = useIntl();
+  return (
+    <Alert overflow="visible" status="error">
+      <AlertIcon />
+      <AlertDescription
+        flex="1"
+        fontSize="sm"
+        display="flex"
+        position="sticky"
+        top={0}
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+        gap={2}
+      >
+        <Text>
+          <FormattedMessage
+            id="component.profile-form.recover-profile-alert"
+            defaultMessage="This profile will be permanently deleted on {date}."
+            values={{
+              date: intl.formatDate(permanentDeletionAt, FORMATS.LL),
+            }}
+          />
+        </Text>
+        <Box>
+          <Button backgroundColor="white" onClick={onRecoverClick} fontWeight={500}>
+            <FormattedMessage id="component.profile-form.recover-button" defaultMessage="Recover" />
+          </Button>
+        </Box>
+      </AlertDescription>
+    </Alert>
+  );
+}
 
 function EditedFieldsAlert({
   isSubmitting,

@@ -2547,7 +2547,7 @@ const _Profile = {
   title: "Profile",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "profileType", "createdAt"],
+  required: ["id", "name", "status", "profileType", "createdAt"],
   properties: {
     id: {
       type: "string",
@@ -2558,6 +2558,12 @@ const _Profile = {
       type: "string",
       description: "The name of the profile",
       example: "Parallel Solutions",
+    },
+    status: {
+      type: "string",
+      description: "The status of the profile",
+      enum: ["OPEN", "CLOSED", "DELETION_SCHEDULED"],
+      example: "OPEN",
     },
     profileType: {
       title: "ProfileType",

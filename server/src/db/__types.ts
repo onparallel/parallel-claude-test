@@ -325,7 +325,11 @@ export type ProfileEventType =
   | "PROFILE_FIELD_FILE_REMOVED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PETITION_ASSOCIATED"
-  | "PETITION_DISASSOCIATED";
+  | "PETITION_DISASSOCIATED"
+  | "PROFILE_CLOSED"
+  | "PROFILE_SCHEDULED_FOR_DELETION"
+  | "PROFILE_REOPENED"
+  | "PROFILE_ANONYMIZED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
@@ -335,7 +339,15 @@ export const ProfileEventTypeValues = [
   "PROFILE_FIELD_EXPIRY_UPDATED",
   "PETITION_ASSOCIATED",
   "PETITION_DISASSOCIATED",
+  "PROFILE_CLOSED",
+  "PROFILE_SCHEDULED_FOR_DELETION",
+  "PROFILE_REOPENED",
+  "PROFILE_ANONYMIZED",
 ] as ProfileEventType[];
+
+export type ProfileStatus = "OPEN" | "CLOSED" | "DELETION_SCHEDULED";
+
+export const ProfileStatusValues = ["OPEN", "CLOSED", "DELETION_SCHEDULED"] as ProfileStatus[];
 
 export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
@@ -1445,11 +1457,24 @@ export interface Profile {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  status: ProfileStatus; // profile_status
+  closed_at: Maybe<Date>; // timestamptz
+  deletion_scheduled_at: Maybe<Date>; // timestamptz
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateProfile = PartialProps<
   Omit<Profile, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "status"
+  | "closed_at"
+  | "deletion_scheduled_at"
+  | "anonymized_at"
 >;
 
 export interface ProfileEvent {
@@ -1472,7 +1497,7 @@ export interface ProfileFieldFile {
   profile_id: number; // int4
   profile_type_field_id: number; // int4
   type: ProfileTypeFieldType; // profile_type_field_type
-  file_upload_id: number; // int4
+  file_upload_id: Maybe<number>; // int4
   expiry_date: Maybe<string>; // date
   created_at: Date; // timestamptz
   created_by_user_id: number; // int4
@@ -1485,6 +1510,7 @@ export interface ProfileFieldFile {
 
 export type CreateProfileFieldFile = PartialProps<
   Omit<ProfileFieldFile, "id">,
+  | "file_upload_id"
   | "expiry_date"
   | "created_at"
   | "removed_at"

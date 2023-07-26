@@ -127,6 +127,7 @@ export const ProfileSelect = Object.assign(
             limit: 100,
             filter: {
               profileTypeId,
+              status: ["OPEN", "CLOSED"],
             },
             search,
             sortBy: "name_ASC",

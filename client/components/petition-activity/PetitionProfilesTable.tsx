@@ -50,7 +50,11 @@ export function PetitionProfilesTable({
         />
       ),
       colorScheme: "red",
-      isDisabled: myEffectivePermission === "READ",
+      isDisabled:
+        myEffectivePermission === "READ" ||
+        selectedIds.some(
+          (id) => profiles.find((p) => p.id === id)?.status === "DELETION_SCHEDULED",
+        ),
     },
   ];
 
@@ -218,6 +222,7 @@ PetitionProfilesTable.fragments = {
       fragment PetitionProfilesTable_Profile on Profile {
         id
         name
+        status
         profileType {
           id
           name

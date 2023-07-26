@@ -2,16 +2,18 @@ import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, uniq } from "remeda";
 import {
+  Profile,
+  ProfileStatus,
   ProfileType,
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
+import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
-import { isAtLeast } from "../../util/profileTypeFieldPermission";
 
 function createProfileTypeAuthorizer<TRest extends any[] = []>(
   predicate: (profileType: ProfileType, ...rest: TRest) => boolean,
@@ -30,7 +32,24 @@ function createProfileTypeAuthorizer<TRest extends any[] = []>(
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
 
+function createProfileAuthorizer<TRest extends any[] = []>(
+  predicate: (profile: Profile, ...rest: TRest) => boolean,
+) {
+  return ((argName, ...rest: TRest) => {
+    return async (_, args, ctx) => {
+      const profileIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      if (profileIds.length === 0) {
+        return true;
+      }
+      const profiles = await ctx.profiles.loadProfile(profileIds);
+      return profiles.every((profile) => isDefined(profile) && predicate(profile, ...rest));
+    };
+  }) as ArgAuthorizer<MaybeArray<number>, TRest>;
+}
+
 export const profileTypeIsArchived = createProfileTypeAuthorizer((p) => isDefined(p.archived_at));
+
+export const profileIsNotAnonymized = createProfileAuthorizer((p) => !isDefined(p.anonymized_at));
 
 export function profileIsAssociatedToPetition<
   TypeName extends string,
@@ -253,5 +272,22 @@ export function userHasPermissionOnProfileTypeField<
       ids.map((id) => ({ profileTypeFieldId: id, userId: ctx.user!.id })),
     );
     return myPermissions.every((p) => isAtLeast(p, permission));
+  };
+}
+
+export function profileHasStatus<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  profileIdArg: TArg,
+  status: MaybeArray<ProfileStatus>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileIds = unMaybeArray(args[profileIdArg] as unknown as MaybeArray<number>);
+    const validStatuses = unMaybeArray(status);
+
+    const profiles = await ctx.profiles.loadProfile(profileIds);
+    return profiles.every((p) => isDefined(p) && validStatuses.includes(p.status));
   };
 }

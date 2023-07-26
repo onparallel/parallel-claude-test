@@ -342,7 +342,7 @@ export function ProfileField(props: ProfileFieldProps) {
           </HStack>
         ) : null}
       </FormControl>
-      {(showSuggestions || !fieldHasValue) && suggestions.length ? (
+      {(showSuggestions || !fieldHasValue) && suggestions.length && !props.isDisabled ? (
         <HStack wrap="wrap" paddingX={2}>
           {suggestions}
         </HStack>

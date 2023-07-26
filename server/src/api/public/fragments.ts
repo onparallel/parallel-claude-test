@@ -285,6 +285,7 @@ export const ProfileFragment = gql`
   fragment Profile on Profile {
     id
     name
+    status
     profileType {
       ...ProfileType
     }

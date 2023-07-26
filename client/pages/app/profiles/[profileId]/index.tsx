@@ -1,6 +1,12 @@
 import { gql, useMutation } from "@apollo/client";
 import { Flex, HStack, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
-import { BellIcon, BellOnIcon, BellSettingsIcon, DeleteIcon } from "@parallel/chakra/icons";
+import {
+  ArchiveIcon,
+  BellIcon,
+  BellOnIcon,
+  BellSettingsIcon,
+  DeleteIcon,
+} from "@parallel/chakra/icons";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { WhenPermission } from "@parallel/components/common/WhenPermission";
@@ -22,7 +28,11 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useCloseProfile } from "@parallel/utils/mutations/useCloseProfile";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
+import { usePermanentlyDeleteProfile } from "@parallel/utils/mutations/usePermanentlyDeleteProfile";
+import { useRecoverProfile } from "@parallel/utils/mutations/useRecoverProfile";
+import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
@@ -47,21 +57,36 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
     },
   });
 
+  const status = profile.status;
   const userCanSubscribeProfiles = useHasPermission("PROFILES:SUBSCRIBE_PROFILES");
   const userCanDeleteProfiles = useHasPermission("PROFILES:DELETE_PROFILES");
+  const userCanCloseOpenProfiles = useHasPermission("PROFILES:CLOSE_PROFILES");
+  const userCanDeletePermanently = useHasPermission("PROFILES:DELETE_PERMANENTLY_PROFILES");
 
   const navigate = useHandleNavigation();
   const deleteProfile = useDeleteProfile();
+  const permanentlyDeleteProfile = usePermanentlyDeleteProfile();
+
   const handleDeleteProfile = async () => {
     try {
-      await deleteProfile({ profileIds: [profile.id] });
-      navigate("/app/profiles");
+      if (profile.status === "DELETION_SCHEDULED") {
+        await permanentlyDeleteProfile({
+          profileIds: [profile.id],
+          profileName: profile.name,
+        });
+        navigate("/app/profiles");
+      } else {
+        await deleteProfile({
+          profileIds: [profile.id],
+        });
+      }
     } catch {}
   };
 
   const [subscribeToProfile] = useMutation(ProfileDetail_subscribeToProfileDocument);
   const [unsubscribeFromProfile] = useMutation(ProfileDetail_unsubscribeFromProfileDocument);
-  const iAmSubscribed = profile.subscribers.some(({ user }) => user.isMe);
+  const iAmSubscribed =
+    status !== "OPEN" ? false : profile.subscribers.some(({ user }) => user.isMe);
 
   const handleMySubscription = async () => {
     if (iAmSubscribed) {
@@ -94,6 +119,27 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
     } catch {}
   };
 
+  const closeProfile = useCloseProfile();
+  const handleCloseProfileClick = async () => {
+    try {
+      await closeProfile({ profileIds: [profile.id], profileName: profile.name });
+    } catch {}
+  };
+
+  const reopenProfile = useReopenProfile();
+  const handleReopenProfileClick = async () => {
+    try {
+      await reopenProfile({ profileIds: [profile.id], profileName: profile.name });
+    } catch {}
+  };
+
+  const recoverProfile = useRecoverProfile();
+  const handleRecoverProfileClick = async () => {
+    try {
+      await recoverProfile({ profileIds: [profile.id], profileName: profile.name });
+    } catch {}
+  };
+
   return (
     <AppLayout
       title={intl.formatMessage({
@@ -112,6 +158,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           borderColor="gray.200"
           maxWidth="container.xs"
           minWidth="container.3xs"
+          onRecover={handleRecoverProfileClick}
         />
         <Flex
           direction="column"
@@ -131,7 +178,9 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             borderBottom="1px solid"
             borderColor="gray.200"
           >
-            <ProfileSubscribers users={profile.subscribers.map(({ user }) => user)} />
+            <ProfileSubscribers
+              users={status === "OPEN" ? profile.subscribers.map(({ user }) => user) : []}
+            />
             <ResponsiveButtonIcon
               icon={iAmSubscribed ? <BellOnIcon boxSize={5} /> : <BellIcon boxSize={5} />}
               colorScheme={iAmSubscribed ? undefined : "primary"}
@@ -147,6 +196,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                     })
               }
               onClick={handleMySubscription}
+              isDisabled={status !== "OPEN"}
             />
             <WhenPermission
               permission={["PROFILES:SUBSCRIBE_PROFILES", "PROFILES:DELETE_PROFILES"]}
@@ -156,27 +206,73 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                 variant="outline"
                 options={
                   <MenuList width="fit-content" minWidth="200px">
-                    <MenuItem
-                      icon={<BellSettingsIcon display="block" boxSize={4} />}
-                      isDisabled={!userCanSubscribeProfiles}
-                      onClick={handleSubscribersClick}
-                    >
-                      <FormattedMessage
-                        id="component.more-options-menu-profile.manage-profile-subscriptions"
-                        defaultMessage="Manage subscriptions"
-                      />
-                    </MenuItem>
+                    {status === "OPEN" ? (
+                      <>
+                        <MenuItem
+                          icon={<BellSettingsIcon display="block" boxSize={4} />}
+                          isDisabled={!userCanSubscribeProfiles}
+                          onClick={handleSubscribersClick}
+                        >
+                          <FormattedMessage
+                            id="component.more-options-menu-profile.manage-profile-subscriptions"
+                            defaultMessage="Manage subscriptions"
+                          />
+                        </MenuItem>
+                        <MenuItem
+                          icon={<ArchiveIcon display="block" boxSize={4} />}
+                          onClick={handleCloseProfileClick}
+                          isDisabled={!userCanCloseOpenProfiles}
+                        >
+                          <FormattedMessage
+                            id="component.more-options-menu-profile.close-profile"
+                            defaultMessage="Close profile"
+                          />
+                        </MenuItem>
+                      </>
+                    ) : status === "CLOSED" ? (
+                      <MenuItem
+                        icon={<ArchiveIcon display="block" boxSize={4} />}
+                        onClick={handleReopenProfileClick}
+                        isDisabled={!userCanCloseOpenProfiles}
+                      >
+                        <FormattedMessage
+                          id="component.more-options-menu-profile.reopen-profile"
+                          defaultMessage="Reopen profile"
+                        />
+                      </MenuItem>
+                    ) : status === "DELETION_SCHEDULED" ? (
+                      <MenuItem
+                        icon={<ArchiveIcon display="block" boxSize={4} />}
+                        onClick={handleRecoverProfileClick}
+                        isDisabled={!userCanDeleteProfiles}
+                      >
+                        <FormattedMessage
+                          id="component.more-options-menu-profile.recover-profile"
+                          defaultMessage="Recover profile"
+                        />
+                      </MenuItem>
+                    ) : null}
                     <MenuDivider />
                     <MenuItem
                       color="red.500"
                       icon={<DeleteIcon display="block" boxSize={4} />}
                       onClick={handleDeleteProfile}
-                      isDisabled={!userCanDeleteProfiles}
+                      isDisabled={
+                        !userCanDeleteProfiles ||
+                        (status === "DELETION_SCHEDULED" && !userCanDeletePermanently)
+                      }
                     >
-                      <FormattedMessage
-                        id="component.more-options-menu-profile.delete-profile"
-                        defaultMessage="Delete profile"
-                      />
+                      {status === "DELETION_SCHEDULED" ? (
+                        <FormattedMessage
+                          id="component.more-options-menu-profile.delete-permanently"
+                          defaultMessage="Delete permanently"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="component.more-options-menu-profile.delete-profile"
+                          defaultMessage="Delete profile"
+                        />
+                      )}
                     </MenuItem>
                   </MenuList>
                 }
@@ -218,6 +314,8 @@ const _fragments = {
     return gql`
       fragment ProfileDetail_Profile on Profile {
         id
+        name
+        status
         ...ProfileForm_Profile
         subscribers {
           ...ProfileDetail_ProfileSubscription

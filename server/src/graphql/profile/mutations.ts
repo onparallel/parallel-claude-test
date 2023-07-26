@@ -57,7 +57,9 @@ import {
   fileUploadCanBeAttachedToProfileTypeField,
   profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
+  profileHasStatus,
   profileIsAssociatedToPetition,
+  profileIsNotAnonymized,
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
@@ -556,11 +558,14 @@ export const createProfile = mutationField("createProfile", {
 });
 
 export const deleteProfile = mutationField("deleteProfile", {
+  description: "Permanently deletes the profile",
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    contextUserHasPermission("PROFILES:DELETE_PROFILES"),
+    contextUserHasPermission("PROFILES:DELETE_PERMANENTLY_PROFILES"),
     userHasAccessToProfile("profileIds"),
+    profileHasStatus("profileIds", ["CLOSED", "DELETION_SCHEDULED"]),
+    profileIsNotAnonymized("profileIds"),
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
@@ -586,6 +591,8 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
+    profileIsNotAnonymized("profileId"),
+    profileHasStatus("profileId", "OPEN"),
     userHasPermissionOnProfileTypeField(
       (args) => args.fields.map((f) => f.profileTypeFieldId),
       "WRITE",
@@ -692,6 +699,8 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", "OPEN"),
+    profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
@@ -781,6 +790,8 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", "OPEN"),
+    profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     userHasPermissionOnProfileTypeField((args) => [args.profileTypeFieldId], "WRITE"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
@@ -804,7 +815,7 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
       throw new ForbiddenError("Not authorized");
     }
     const fileUploads = await ctx.files.loadFileUpload(
-      (profileFieldFiles as ProfileFieldFile[]).map((pff) => pff.file_upload_id),
+      (profileFieldFiles as ProfileFieldFile[]).map((pff) => pff.file_upload_id!),
     );
 
     await pMap(fileUploads, async (fu) => {
@@ -826,6 +837,8 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", "OPEN"),
+    profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     ifArgDefined(
       "profileFieldFileIds",
@@ -839,16 +852,34 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
     profileFieldFileIds: list(nonNull(globalIdArg("ProfileFieldFile"))),
   },
-  resolve: async (_, { profileFieldFileIds, profileTypeFieldId }, ctx) => {
+  resolve: async (_, { profileId, profileFieldFileIds, profileTypeFieldId }, ctx) => {
     try {
+      let deletedProfileFieldFiles: ProfileFieldFile[] = [];
       if (isDefined(profileFieldFileIds)) {
-        await ctx.profiles.deleteProfileFieldFiles(profileFieldFileIds, ctx.user!.id);
+        deletedProfileFieldFiles = await ctx.profiles.deleteProfileFieldFiles(
+          profileFieldFileIds,
+          ctx.user!.id,
+        );
       } else {
-        await ctx.profiles.deleteProfileFieldFilesByProfileTypeFieldId(
+        deletedProfileFieldFiles = await ctx.profiles.deleteProfileFieldFilesByProfileTypeFieldId(
           profileTypeFieldId,
           ctx.user!.id,
         );
       }
+
+      await ctx.profiles.createEvent(
+        deletedProfileFieldFiles.map((f) => ({
+          type: "PROFILE_FIELD_FILE_REMOVED",
+          profile_id: profileId,
+          org_id: ctx.user!.org_id,
+          data: {
+            user_id: ctx.user!.id,
+            profile_type_field_id: profileTypeFieldId,
+            profile_field_file_id: f.id,
+          },
+        })),
+      );
+
       return RESULT.SUCCESS;
     } catch {
       return RESULT.FAILURE;
@@ -861,6 +892,8 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", "OPEN"),
+    profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     userHasAccessToPetitions("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -902,6 +935,7 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
+    profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
     profileFieldFileHasProfileTypeFieldId("profileFieldFileId", "profileTypeFieldId"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
@@ -921,7 +955,7 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
         args.profileFieldFileId,
       ))!;
 
-      const file = await ctx.files.loadFileUpload(profileFieldFile.file_upload_id);
+      const file = await ctx.files.loadFileUpload(profileFieldFile.file_upload_id!);
       if (!file) {
         throw new Error(`FileUpload:${profileFieldFile.file_upload_id} not found`);
       }
@@ -953,7 +987,9 @@ export const subscribeToProfile = mutationField("subscribeToProfile", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileIds"),
+    profileIsNotAnonymized("profileIds"),
     contextUserCanSubscribeUsersToProfile("userIds"),
+    profileHasStatus("profileIds", ["OPEN", "CLOSED"]),
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
@@ -974,7 +1010,9 @@ export const unsubscribeFromProfile = mutationField("unsubscribeFromProfile", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileIds"),
+    profileIsNotAnonymized("profileIds"),
     contextUserCanSubscribeUsersToProfile("userIds"),
+    profileHasStatus("profileIds", ["OPEN", "CLOSED"]),
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
@@ -997,8 +1035,10 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileId"),
+    profileIsNotAnonymized("profileId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
+    profileHasStatus("profileId", ["OPEN", "CLOSED"]),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1054,8 +1094,10 @@ export const disassociateProfileFromPetition = mutationField("disassociateProfil
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileIds"),
+    profileIsNotAnonymized("profileIds"),
     petitionIsNotAnonymized("petitionId"),
     profileIsAssociatedToPetition("profileIds", "petitionId"),
+    profileHasStatus("profileIds", ["OPEN", "CLOSED"]),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1098,8 +1140,10 @@ export const disassociatePetitionFromProfile = mutationField("disassociatePetiti
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     userHasAccessToProfile("profileId"),
+    profileIsNotAnonymized("profileId"),
     petitionIsNotAnonymized("petitionIds"),
     profileIsAssociatedToPetition("profileId", "petitionIds"),
+    profileHasStatus("profileId", ["OPEN", "CLOSED"]),
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -1132,5 +1176,110 @@ export const disassociatePetitionFromProfile = mutationField("disassociatePetiti
     );
 
     return RESULT.SUCCESS;
+  },
+});
+
+export const reopenProfile = mutationField("reopenProfile", {
+  type: list("Profile"),
+  description: "Reopens a profile that is in CLOSED or DELETION_SCHEDULED status",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileIds"),
+    profileIsNotAnonymized("profileIds"),
+    contextUserHasPermission("PROFILES:CLOSE_PROFILES"),
+    profileHasStatus("profileIds", ["CLOSED", "DELETION_SCHEDULED"]),
+  ),
+  args: {
+    profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
+  },
+  resolve: async (_, { profileIds }, ctx) => {
+    const profiles = await ctx.profiles.updateProfileStatus(
+      profileIds,
+      "OPEN",
+      `User:${ctx.user!.id}`,
+    );
+
+    await ctx.profiles.createEvent(
+      profiles.map((p) => ({
+        type: "PROFILE_REOPENED",
+        profile_id: p.id,
+        org_id: ctx.user!.org_id,
+        data: {
+          user_id: ctx.user!.id,
+        },
+      })),
+    );
+
+    return profiles;
+  },
+});
+
+export const closeProfile = mutationField("closeProfile", {
+  type: list("Profile"),
+  description: "Closes a profile that is in OPEN or DELETION_SCHEDULED status",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileIds"),
+    profileIsNotAnonymized("profileIds"),
+    contextUserHasPermission("PROFILES:CLOSE_PROFILES"),
+    profileHasStatus("profileIds", ["OPEN", "DELETION_SCHEDULED"]),
+  ),
+  args: {
+    profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
+  },
+  resolve: async (_, { profileIds }, ctx) => {
+    const profiles = await ctx.profiles.updateProfileStatus(
+      profileIds,
+      "CLOSED",
+      `User:${ctx.user!.id}`,
+    );
+
+    await ctx.profiles.createEvent(
+      profiles.map((p) => ({
+        type: "PROFILE_CLOSED",
+        profile_id: p.id,
+        org_id: ctx.user!.org_id,
+        data: {
+          user_id: ctx.user!.id,
+        },
+      })),
+    );
+
+    return profiles;
+  },
+});
+
+export const scheduleProfileForDeletion = mutationField("scheduleProfileForDeletion", {
+  type: list("Profile"),
+  description: "Moves a profile to DELETION_SCHEDULED status",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileIds"),
+    profileIsNotAnonymized("profileIds"),
+    contextUserHasPermission("PROFILES:DELETE_PROFILES"),
+    profileHasStatus("profileIds", ["OPEN", "CLOSED"]),
+  ),
+  args: {
+    profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
+  },
+  resolve: async (_, { profileIds }, ctx) => {
+    const profiles = await ctx.profiles.updateProfileStatus(
+      profileIds,
+      "DELETION_SCHEDULED",
+      `User:${ctx.user!.id}`,
+    );
+
+    await ctx.profiles.createEvent(
+      profiles.map((p) => ({
+        type: "PROFILE_SCHEDULED_FOR_DELETION",
+        profile_id: p.id,
+        org_id: ctx.user!.org_id,
+        data: {
+          user_id: ctx.user!.id,
+        },
+      })),
+    );
+
+    return profiles;
   },
 });

@@ -34,6 +34,16 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     user_id: number;
     petition_id: number;
   };
+  PROFILE_CLOSED: {
+    user_id: number;
+  };
+  PROFILE_SCHEDULED_FOR_DELETION: {
+    user_id: number;
+  };
+  PROFILE_REOPENED: {
+    user_id: number;
+  };
+  PROFILE_ANONYMIZED: {};
 }[TType];
 
 export type GenericProfileEvent<
@@ -72,6 +82,20 @@ export type PetitionDisassociatedEvent<IsCreate extends boolean = false> = Gener
   "PETITION_DISASSOCIATED",
   IsCreate
 >;
+export type ProfileClosedEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PROFILE_CLOSED",
+  IsCreate
+>;
+export type ProfileScheduledForDeletionEvent<IsCreate extends boolean = false> =
+  GenericProfileEvent<"PROFILE_SCHEDULED_FOR_DELETION", IsCreate>;
+export type ProfileReopenedEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PROFILE_REOPENED",
+  IsCreate
+>;
+export type ProfileAnonymizedEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PROFILE_ANONYMIZED",
+  IsCreate
+>;
 
 export type ProfileEvent<IsCreate extends boolean = false> =
   | ProfileCreatedEvent<IsCreate>
@@ -80,6 +104,10 @@ export type ProfileEvent<IsCreate extends boolean = false> =
   | ProfileFieldFileRemovedEvent<IsCreate>
   | ProfileFieldExpiryUpdatedEvent<IsCreate>
   | PetitionAssociatedEvent<IsCreate>
-  | PetitionDisassociatedEvent<IsCreate>;
+  | PetitionDisassociatedEvent<IsCreate>
+  | ProfileClosedEvent<IsCreate>
+  | ProfileScheduledForDeletionEvent<IsCreate>
+  | ProfileReopenedEvent<IsCreate>
+  | ProfileAnonymizedEvent<IsCreate>;
 
 export type CreateProfileEvent = ProfileEvent<true>;

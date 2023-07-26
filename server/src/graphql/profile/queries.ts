@@ -83,6 +83,7 @@ export const profiles = queryField((t) => {
         definition(t) {
           t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
           t.nullable.list.nonNull.globalId("profileId", { prefixName: "Profile" });
+          t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
         },
       }),
     },

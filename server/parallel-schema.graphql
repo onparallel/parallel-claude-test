@@ -791,6 +791,11 @@ type Mutation {
   closePetition(petitionId: GID!): Petition!
 
   """
+  Closes a profile that is in OPEN or DELETION_SCHEDULED status
+  """
+  closeProfile(profileIds: [GID!]!): [Profile!]!
+
+  """
   Marks a petition as COMPLETED.
   If the petition has a signature configured and does not require a review, starts the signing process.
   """
@@ -1180,6 +1185,10 @@ type Mutation {
     force: Boolean = false
     ids: [GID!]
   ): Success!
+
+  """
+  Permanently deletes the profile
+  """
   deleteProfile(
     """
     pass force=true to delete profiles with replies
@@ -1668,6 +1677,11 @@ type Mutation {
   reopenPetition(petitionId: GID!): Petition!
 
   """
+  Reopens a profile that is in CLOSED or DELETION_SCHEDULED status
+  """
+  reopenProfile(profileIds: [GID!]!): [Profile!]!
+
+  """
   Reorders the positions of attachments in the petition
   """
   reorderPetitionAttachments(
@@ -1706,6 +1720,11 @@ type Mutation {
   Soft-deletes a given auth token, making it permanently unusable.
   """
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!
+
+  """
+  Moves a profile to DELETION_SCHEDULED status
+  """
+  scheduleProfileForDeletion(profileIds: [GID!]!): [Profile!]!
 
   """
   Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages
@@ -4522,6 +4541,7 @@ type Profile implements Timestamps {
   ): ProfileEventPagination!
   id: GID!
   name: String!
+  permanentDeletionAt: DateTime
   petitions(
     """
     Number of elements to take from the list.
@@ -4535,12 +4555,20 @@ type Profile implements Timestamps {
   ): PetitionPagination!
   profileType: ProfileType!
   properties: [ProfileFieldProperty!]!
+  status: ProfileStatus!
   subscribers: [ProfileSubscription!]!
 
   """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type ProfileAnonymizedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
 }
 
 type ProfileAssociatedEvent implements PetitionEvent {
@@ -4550,6 +4578,14 @@ type ProfileAssociatedEvent implements PetitionEvent {
   petition: Petition
   profile: Profile
   type: PetitionEventType!
+  user: User
+}
+
+type ProfileClosedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
   user: User
 }
 
@@ -4593,11 +4629,15 @@ type ProfileEventPagination {
 enum ProfileEventType {
   PETITION_ASSOCIATED
   PETITION_DISASSOCIATED
+  PROFILE_ANONYMIZED
+  PROFILE_CLOSED
   PROFILE_CREATED
   PROFILE_FIELD_EXPIRY_UPDATED
   PROFILE_FIELD_FILE_ADDED
   PROFILE_FIELD_FILE_REMOVED
   PROFILE_FIELD_VALUE_UPDATED
+  PROFILE_REOPENED
+  PROFILE_SCHEDULED_FOR_DELETION
 }
 
 type ProfileFieldExpiryUpdatedEvent implements ProfileEvent {
@@ -4749,6 +4789,7 @@ type ProfileFieldValueUpdatedEvent implements ProfileEvent {
 input ProfileFilter {
   profileId: [GID!]
   profileTypeId: [GID!]
+  status: [ProfileStatus!]
 }
 
 type ProfilePagination {
@@ -4766,6 +4807,28 @@ type ProfilePagination {
 input ProfilePropertyFilter {
   profileTypeFieldId: [GID!]
   profileTypeId: [GID!]
+}
+
+type ProfileReopenedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
+}
+
+type ProfileScheduledForDeletionEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
+}
+
+enum ProfileStatus {
+  CLOSED
+  DELETION_SCHEDULED
+  OPEN
 }
 
 type ProfileSubscription {

@@ -1,8 +1,13 @@
 import { zonedTimeToUtc } from "date-fns-tz";
 import { enumType, interfaceType, nonNull, objectType } from "nexus";
 import { sortBy } from "remeda";
-import { ProfileTypeFieldPermissionTypeValues, ProfileTypeFieldTypeValues } from "../../db/__types";
+import {
+  ProfileStatusValues,
+  ProfileTypeFieldPermissionTypeValues,
+  ProfileTypeFieldTypeValues,
+} from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
+import { addDays } from "date-fns";
 
 export const ProfileType = objectType({
   name: "ProfileType",
@@ -166,6 +171,21 @@ export const Profile = objectType({
         }) as any;
       },
     });
+    t.field("status", {
+      type: enumType({
+        name: "ProfileStatus",
+        members: ProfileStatusValues,
+      }),
+    });
+    t.nullable.datetime("permanentDeletionAt", {
+      resolve: (o, _, ctx) =>
+        o.deletion_scheduled_at
+          ? addDays(
+              o.deletion_scheduled_at,
+              ctx.config.cronWorkers.anonymizer.deleteScheduledProfilesAfterDays,
+            )
+          : null,
+    });
     t.implements("Timestamps");
   },
 });
@@ -313,7 +333,8 @@ export const ProfileFieldFile = objectType({
     t.implements("ProfileFieldResponse");
     t.nullable.field("file", {
       type: "FileUpload",
-      resolve: async (o, _, ctx) => await ctx.files.loadFileUpload(o.file_upload_id),
+      resolve: async (o, _, ctx) =>
+        o.file_upload_id ? await ctx.files.loadFileUpload(o.file_upload_id) : null,
     });
   },
 });
