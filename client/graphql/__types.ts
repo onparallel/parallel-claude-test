@@ -2633,6 +2633,8 @@ export interface PetitionBaseMini {
   __typename?: "PetitionBaseMini";
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
+  /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]["output"]>;
 }
@@ -3038,8 +3040,21 @@ export interface PetitionListView {
   user: User;
 }
 
+export type PetitionListViewColumn =
+  | "createdAt"
+  | "name"
+  | "recipients"
+  | "reminders"
+  | "sentAt"
+  | "sharedWith"
+  | "signature"
+  | "status"
+  | "tags"
+  | "template";
+
 export interface PetitionListViewData {
   __typename?: "PetitionListViewData";
+  columns?: Maybe<Array<PetitionListViewColumn>>;
   fromTemplateId?: Maybe<Array<Scalars["GID"]["output"]>>;
   path: Scalars["String"]["output"];
   search?: Maybe<Scalars["String"]["output"]>;
@@ -3054,6 +3069,7 @@ export interface PetitionListViewData {
 }
 
 export interface PetitionListViewDataInput {
+  columns?: InputMaybe<Array<PetitionListViewColumn>>;
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   path?: InputMaybe<Scalars["String"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
@@ -13043,6 +13059,7 @@ export type PetitionListHeader_PetitionListViewFragment = {
     search?: string | null;
     searchIn: PetitionListViewSearchIn;
     path: string;
+    columns?: Array<PetitionListViewColumn> | null;
     sharedWith?: {
       __typename?: "PetitionListViewDataSharedWith";
       operator: FilterSharedWithLogicalOperator;
@@ -13093,6 +13110,7 @@ export type PetitionListHeader_createPetitionListViewMutation = {
       search?: string | null;
       searchIn: PetitionListViewSearchIn;
       path: string;
+      columns?: Array<PetitionListViewColumn> | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -13145,6 +13163,7 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
       search?: string | null;
       searchIn: PetitionListViewSearchIn;
       path: string;
+      columns?: Array<PetitionListViewColumn> | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -13180,6 +13199,7 @@ export type ViewTabs_PetitionListViewDataFragment = {
   search?: string | null;
   searchIn: PetitionListViewSearchIn;
   path: string;
+  columns?: Array<PetitionListViewColumn> | null;
   sharedWith?: {
     __typename?: "PetitionListViewDataSharedWith";
     operator: FilterSharedWithLogicalOperator;
@@ -13218,6 +13238,7 @@ export type ViewTabs_PetitionListViewFragment = {
     search?: string | null;
     searchIn: PetitionListViewSearchIn;
     path: string;
+    columns?: Array<PetitionListViewColumn> | null;
     sharedWith?: {
       __typename?: "PetitionListViewDataSharedWith";
       operator: FilterSharedWithLogicalOperator;
@@ -13298,6 +13319,7 @@ export type ViewTabs_createPetitionListViewMutation = {
       search?: string | null;
       searchIn: PetitionListViewSearchIn;
       path: string;
+      columns?: Array<PetitionListViewColumn> | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -13350,6 +13372,7 @@ export type ViewTabs_updatePetitionListViewMutation = {
       search?: string | null;
       searchIn: PetitionListViewSearchIn;
       path: string;
+      columns?: Array<PetitionListViewColumn> | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -27837,6 +27860,7 @@ export type Petitions_UserFragment = {
       search?: string | null;
       searchIn: PetitionListViewSearchIn;
       path: string;
+      columns?: Array<PetitionListViewColumn> | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -27866,17 +27890,17 @@ export type Petitions_UserFragment = {
 
 export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   __typename?: "Petition";
+  name?: string | null;
+  status: PetitionStatus;
   sentAt?: string | null;
   id: string;
-  name?: string | null;
-  createdAt: string;
-  status: PetitionStatus;
+  createdAt?: string;
   path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
   } | null;
-  accesses: Array<{
+  accesses?: Array<{
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
@@ -27884,7 +27908,16 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
-  permissions: Array<
+  fromTemplate?: {
+    __typename?: "PetitionBaseMini";
+    id: string;
+    name?: string | null;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      permissionType: PetitionPermissionType;
+    } | null;
+  } | null;
+  permissions?: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
@@ -27947,10 +27980,10 @@ export type Petitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
 
 export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  name?: string | null;
   isPublic: boolean;
   id: string;
-  name?: string | null;
-  createdAt: string;
+  createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
   anonymizeAfterMonths?: number | null;
@@ -27959,7 +27992,7 @@ export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
   } | null;
-  permissions: Array<
+  permissions?: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
@@ -28074,6 +28107,7 @@ export type Petitions_userQuery = {
         search?: string | null;
         searchIn: PetitionListViewSearchIn;
         path: string;
+        columns?: Array<PetitionListViewColumn> | null;
         sharedWith?: {
           __typename?: "PetitionListViewDataSharedWith";
           operator: FilterSharedWithLogicalOperator;
@@ -28116,6 +28150,15 @@ export type Petitions_petitionsQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   filters?: InputMaybe<PetitionFilter>;
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeTemplate: Scalars["Boolean"]["input"];
+  includeStatus: Scalars["Boolean"]["input"];
+  includeSignature: Scalars["Boolean"]["input"];
+  includeSharedWith: Scalars["Boolean"]["input"];
+  includeSentAt: Scalars["Boolean"]["input"];
+  includeCreatedAt: Scalars["Boolean"]["input"];
+  includeReminders: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
 }>;
 
 export type Petitions_petitionsQuery = {
@@ -28125,17 +28168,17 @@ export type Petitions_petitionsQuery = {
     items: Array<
       | {
           __typename?: "Petition";
+          name?: string | null;
+          status: PetitionStatus;
           sentAt?: string | null;
           id: string;
-          name?: string | null;
-          createdAt: string;
-          status: PetitionStatus;
+          createdAt?: string;
           path: string;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             permissionType: PetitionPermissionType;
           } | null;
-          accesses: Array<{
+          accesses?: Array<{
             __typename?: "PetitionAccess";
             id: string;
             status: PetitionAccessStatus;
@@ -28148,7 +28191,16 @@ export type Petitions_petitionsQuery = {
             } | null;
             reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
           }>;
-          permissions: Array<
+          fromTemplate?: {
+            __typename?: "PetitionBaseMini";
+            id: string;
+            name?: string | null;
+            myEffectivePermission?: {
+              __typename?: "EffectivePetitionUserPermission";
+              permissionType: PetitionPermissionType;
+            } | null;
+          } | null;
+          permissions?: Array<
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
@@ -28209,10 +28261,10 @@ export type Petitions_petitionsQuery = {
         }
       | {
           __typename?: "PetitionTemplate";
+          name?: string | null;
           isPublic: boolean;
           id: string;
-          name?: string | null;
-          createdAt: string;
+          createdAt?: string;
           locale: PetitionLocale;
           isRestricted: boolean;
           anonymizeAfterMonths?: number | null;
@@ -28221,7 +28273,7 @@ export type Petitions_petitionsQuery = {
             __typename?: "EffectivePetitionUserPermission";
             permissionType: PetitionPermissionType;
           } | null;
-          permissions: Array<
+          permissions?: Array<
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
@@ -32256,9 +32308,9 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   sentAt?: string | null;
   id: string;
   name?: string | null;
-  createdAt: string;
+  createdAt?: string;
   status: PetitionStatus;
-  accesses: Array<{
+  accesses?: Array<{
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
@@ -32266,7 +32318,16 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
-  permissions: Array<
+  fromTemplate?: {
+    __typename?: "PetitionBaseMini";
+    id: string;
+    name?: string | null;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      permissionType: PetitionPermissionType;
+    } | null;
+  } | null;
+  permissions?: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
@@ -32322,12 +32383,12 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-  createdAt: string;
+  createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
   anonymizeAfterMonths?: number | null;
-  permissions: Array<
+  permissions?: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
@@ -37345,6 +37406,7 @@ export const ViewTabs_PetitionListViewDataFragmentDoc = gql`
       field
       direction
     }
+    columns
   }
 ` as unknown as DocumentNode<ViewTabs_PetitionListViewDataFragment, unknown>;
 export const ViewTabs_PetitionListViewFragmentDoc = gql`
@@ -37387,6 +37449,7 @@ export const PetitionListHeader_PetitionListViewFragmentDoc = gql`
         field
         direction
       }
+      columns
     }
     isDefault
   }
@@ -37451,8 +37514,8 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
     id
     name
-    createdAt
-    permissions {
+    createdAt @include(if: $includeCreatedAt)
+    permissions @include(if: $includeSharedWith) {
       permissionType
       ... on PetitionUserPermission {
         user {
@@ -37465,22 +37528,32 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
         }
       }
     }
-    ...PetitionTagListCellContent_PetitionBase
+    ...PetitionTagListCellContent_PetitionBase @include(if: $includeTags)
     ... on Petition {
-      accesses {
+      accesses @include(if: $includeRecipients) {
         id
         status
         contact {
           ...ContactReference_Contact
         }
+      }
+      accesses @include(if: $includeReminders) {
+        id
         nextReminderAt
         reminders {
           createdAt
         }
       }
-      sentAt
-      ...PetitionStatusCellContent_Petition
-      ...PetitionSignatureCellContent_Petition
+      sentAt @include(if: $includeSentAt)
+      fromTemplate @include(if: $includeTemplate) {
+        id
+        name
+        myEffectivePermission {
+          permissionType
+        }
+      }
+      ...PetitionStatusCellContent_Petition @include(if: $includeStatus)
+      ...PetitionSignatureCellContent_Petition @include(if: $includeSignature)
     }
     ... on PetitionTemplate {
       ...TemplateActiveSettingsIcons_PetitionTemplate
@@ -37504,10 +37577,14 @@ export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
   fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
     ...useDeletePetitions_PetitionBaseOrFolder
     ... on PetitionBase {
+      name
       ...usePetitionsTableColumns_PetitionBase
       myEffectivePermission {
         permissionType
       }
+    }
+    ... on Petition {
+      status
     }
     ... on PetitionTemplate {
       isPublic
@@ -42554,6 +42631,15 @@ export const Petitions_petitionsDocument = gql`
     $search: String
     $sortBy: [QueryPetitions_OrderBy!]
     $filters: PetitionFilter
+    $includeRecipients: Boolean!
+    $includeTemplate: Boolean!
+    $includeStatus: Boolean!
+    $includeSignature: Boolean!
+    $includeSharedWith: Boolean!
+    $includeSentAt: Boolean!
+    $includeCreatedAt: Boolean!
+    $includeReminders: Boolean!
+    $includeTags: Boolean!
   ) {
     petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
       items {

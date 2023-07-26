@@ -74,7 +74,7 @@ interface TimeStatistic {
 }
 
 const QUERY_STATE = {
-  range: date().list(2),
+  range: date().list({ maxItems: 2 }),
   template: string(),
 };
 

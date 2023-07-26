@@ -2545,3 +2545,19 @@ export const SparklesIcon = createIcon({
     </g>
   ),
 });
+
+export const ColumnsIcon = createIcon({
+  displayName: "ColumnsIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m12 3h7c.5304 0 1.0391.21071 1.4142.58579.3751.37507.5858.88378.5858 1.41421v14c0 .5304-.2107 1.0391-.5858 1.4142s-.8838.5858-1.4142.5858h-7m0-18h-7c-.53043 0-1.03914.21071-1.41421.58579-.37508.37507-.58579.88378-.58579 1.41421v14c0 .5304.21071 1.0391.58579 1.4142.37507.3751.88378.5858 1.41421.5858h7m0-18v18" />
+    </g>
+  ),
+});

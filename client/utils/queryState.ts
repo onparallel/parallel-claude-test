@@ -28,7 +28,7 @@ export class QueryItem<T> {
 
   orDefault(value: T) {
     this.defaultValue = value;
-    return this as unknown as QueryItem<NonNullable<T>>;
+    return this as unknown as QueryItem<Exclude<T, null>>;
   }
 
   isDefault(value: NonNullable<T>) {
@@ -55,15 +55,18 @@ export class QueryItem<T> {
     }
   }
 
-  list(maxItems?: number) {
-    return new QueryItem<NonNullable<T>[] | null>(
+  list({ maxItems, allowEmpty }: { maxItems?: number; allowEmpty?: boolean } = {}) {
+    return new QueryItem<Exclude<T, null>[] | null>(
       (value) => {
+        if (value === "" && allowEmpty) {
+          return [];
+        }
         if (value) {
           const parsed = (value as string)
             .split(",")
             .slice(0, maxItems)
             .map((v) => this.parseValue(v));
-          return parsed.includes(null) ? null : (parsed as NonNullable<T>[]);
+          return parsed.includes(null) ? null : (parsed as Exclude<T, null>[]);
         } else {
           return null;
         }

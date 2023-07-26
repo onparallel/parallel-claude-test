@@ -15,11 +15,11 @@ export const PasswordInput = chakraForwardRef<"input", InputProps>(
 
     const labels = {
       hide: intl.formatMessage({
-        id: "component.password-input.hide",
+        id: "generic.hide",
         defaultMessage: "Hide",
       }),
       show: intl.formatMessage({
-        id: "component.password-input.show",
+        id: "generic.show",
         defaultMessage: "Show",
       }),
     };

@@ -187,7 +187,7 @@ function useOrganizationColumns() {
     () => [
       {
         key: "id",
-        header: "ID",
+        label: "ID",
         cellProps: {
           width: "1px",
         },
@@ -198,7 +198,7 @@ function useOrganizationColumns() {
       {
         key: "name",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "organizations.header.organization-name",
           defaultMessage: "Organization name",
         }),
@@ -206,7 +206,7 @@ function useOrganizationColumns() {
       },
       {
         key: "status",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "organizations.header.status",
           defaultMessage: "Status",
         }),
@@ -233,7 +233,7 @@ function useOrganizationColumns() {
       },
       {
         key: "activeUserCount",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "organizations.header.user-count",
           defaultMessage: "Users",
         }),
@@ -250,7 +250,7 @@ function useOrganizationColumns() {
       },
       {
         key: "petitionsUsage",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "organizations.header.parallels-used",
           defaultMessage: "Parallels used",
         }),
@@ -268,7 +268,7 @@ function useOrganizationColumns() {
       {
         key: "createdAt",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),

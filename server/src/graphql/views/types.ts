@@ -78,7 +78,7 @@ export const PetitionListViewData = objectType({
           t.nonNull.field("field", {
             type: enumType({
               name: "PetitionListViewSortField",
-              members: ["sentAt", "name"],
+              members: ["sentAt", "name", "createdAt"],
             }),
           });
           t.nonNull.field("direction", {
@@ -88,6 +88,23 @@ export const PetitionListViewData = objectType({
             }),
           });
         },
+      }),
+    });
+    t.nullable.list.nonNull.field("columns", {
+      type: enumType({
+        name: "PetitionListViewColumn",
+        members: [
+          "name",
+          "recipients",
+          "template",
+          "status",
+          "signature",
+          "sharedWith",
+          "sentAt",
+          "createdAt",
+          "reminders",
+          "tags",
+        ],
       }),
     });
   },
@@ -119,5 +136,6 @@ export const PetitionListViewDataInput = inputObjectType({
         },
       }),
     });
+    t.nullable.list.nonNull.field("columns", { type: "PetitionListViewColumn" });
   },
 });

@@ -13,6 +13,7 @@ import { PetitionTagListCellContent } from "@parallel/components/common/Petition
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { WithIntl } from "@parallel/components/common/WithIntl";
 import { withProps } from "@parallel/components/common/withProps";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
 import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
@@ -28,7 +29,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isDefined, maxBy, minBy } from "remeda";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
@@ -41,430 +42,67 @@ type Petition = usePetitionsTableColumns_PetitionBase_Petition_Fragment;
 type Template = usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 type PetitionFolder = usePetitionsTableColumns_PetitionFolderFragment;
 
-type PetitionsTableColumns_PetitionBaseOrFolder = TableColumn<PetitionBase | PetitionFolder, any>;
-type PetitionsTableColumns_PetitionOrFolder = TableColumn<Petition | PetitionFolder, any>;
-type PetitionsTableColumns_PetitionTemplateOrFolder = TableColumn<Template | PetitionFolder, any>;
+export type PetitionsTableColumn =
+  | "name"
+  | "recipients"
+  | "template"
+  | "status"
+  | "signature"
+  | "sharedWith"
+  | "sentAt"
+  | "createdAt"
+  | "reminders"
+  | "tags";
 
-export function usePetitionsTableColumns(type: PetitionBaseType) {
-  const intl = useIntl();
+export const DEFAULT_PETITON_COLUMN_SELECTION: PetitionsTableColumn[] = [
+  "recipients",
+  "status",
+  "signature",
+  "sharedWith",
+  "sentAt",
+  "reminders",
+  "tags",
+];
 
-  return useMemo(
-    () =>
-      [
-        {
-          key: "name",
-          isSortable: true,
-          header: intl.formatMessage({
-            id: "petitions.header.name",
-            defaultMessage: "Name",
-          }),
-          cellProps: {
-            maxWidth: 0,
-            width: "30%",
-            minWidth: "240px",
-          },
-          CellContent: ({ row }) =>
-            row.__typename === "PetitionFolder" ? (
-              <HStack>
-                <Flex>
-                  <VisuallyHidden>
-                    <FormattedMessage id="generic.folder" defaultMessage="Folder" />
-                  </VisuallyHidden>
-                  <FolderIcon role="presentation" />
-                </Flex>
-                <OverflownText>{row.folderName}</OverflownText>
-              </HStack>
-            ) : row.__typename === "Petition" ? (
-              <OverflownText textStyle={row.name ? undefined : "hint"}>
-                {row.name ||
-                  intl.formatMessage({
-                    id: "generic.unnamed-parallel",
-                    defaultMessage: "Unnamed parallel",
-                  })}
-              </OverflownText>
-            ) : row.__typename === "PetitionTemplate" ? (
-              <OverflownText textStyle={row.name ? undefined : "hint"}>
-                {row.name ||
-                  intl.formatMessage({
-                    id: "generic.unnamed-template",
-                    defaultMessage: "Unnamed template",
-                  })}
-              </OverflownText>
-            ) : null,
-        },
-        ...(type === "PETITION"
-          ? ([
-              {
-                key: "recipient",
-                header: intl.formatMessage({
-                  id: "petitions.header.recipient",
-                  defaultMessage: "Recipient",
-                }),
-                cellProps: {
-                  minWidth: "200px",
-                  whiteSpace: "nowrap",
-                },
-                CellContent: ({ row }) => {
-                  if (row.__typename === "Petition") {
-                    const recipients = row.accesses
-                      .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
-                      .map((a) => a.contact!);
-                    if (recipients.length === 0) {
-                      return null;
-                    }
-                    const goToContact = useGoToContact();
+type PetitionsTableColumns_PetitionBaseOrFolder = TableColumn<
+  PetitionBase | PetitionFolder,
+  any,
+  any
+>;
+type PetitionsTableColumns_PetitionOrFolder = TableColumn<Petition | PetitionFolder, any, any>;
+type PetitionsTableColumns_PetitionTemplateOrFolder = TableColumn<
+  Template | PetitionFolder,
+  any,
+  any
+>;
 
-                    return (
-                      <EnumerateList
-                        values={recipients}
-                        maxItems={1}
-                        renderItem={({ value }, index) => (
-                          <ContactReference
-                            key={index}
-                            contact={value}
-                            onClick={(e: MouseEvent) => e.stopPropagation()}
-                          />
-                        )}
-                        renderOther={({ children, remaining }) => (
-                          <ContactListPopover
-                            key="other"
-                            contacts={remaining}
-                            onContactClick={goToContact}
-                          >
-                            <Link
-                              href={`/app/petitions/${row.id}/activity`}
-                              onClick={(e: MouseEvent) => e.stopPropagation()}
-                            >
-                              {children}
-                            </Link>
-                          </ContactListPopover>
-                        )}
-                      />
-                    );
-                  } else {
-                    return null;
-                  }
-                },
-              },
-              {
-                key: "status",
-                header: intl.formatMessage({
-                  id: "petitions.header.status",
-                  defaultMessage: "Status",
-                }),
-                isFilterable: true,
-                Filter: PetitionListStatusFilter,
-                align: "center",
-                cellProps: (row) =>
-                  row.__typename === "Petition"
-                    ? {
-                        minWidth: "180px",
-                        "data-section": "petition-progress",
-                        "data-petition-status": row.status,
-                      }
-                    : {},
-                CellContent: ({ row }) =>
-                  row.__typename === "Petition" ? (
-                    <PetitionStatusCellContent petition={row} />
-                  ) : (
-                    <></>
-                  ),
-              },
-              {
-                key: "signature",
-                header: (
-                  <Tooltip
-                    label={intl.formatMessage({
-                      id: "petitions.header.signature",
-                      defaultMessage: "eSignature status",
-                    })}
-                  >
-                    <SignatureIcon />
-                  </Tooltip>
-                ),
-                isFilterable: true,
-                align: "left",
-                Filter: PetitionListSignatureStatusFilter,
-                headerProps: { padding: 0 },
-                cellProps: { padding: 0, minWidth: "72px" },
-                CellContent: ({ row }) =>
-                  row.__typename === "Petition" ? (
-                    <Flex alignItems="center" paddingRight="2">
-                      <PetitionSignatureCellContent petition={row} />
-                    </Flex>
-                  ) : (
-                    <></>
-                  ),
-              },
-            ] as PetitionsTableColumns_PetitionOrFolder[])
-          : ([
-              {
-                key: "settings",
-                header: intl.formatMessage({
-                  id: "petitions.header.settings",
-                  defaultMessage: "Settings",
-                }),
-                align: "left",
-                cellProps: {
-                  minWidth: "205px",
-                },
-                CellContent: ({ row }) =>
-                  row.__typename === "PetitionTemplate" ? (
-                    <TemplateActiveSettingsIcons template={row} spacing={4} />
-                  ) : (
-                    <></>
-                  ),
-              },
-            ] as PetitionsTableColumns_PetitionTemplateOrFolder[])),
-        {
-          key: "sharedWith",
-          header: intl.formatMessage({
-            id: "petitions.header.shared",
-            defaultMessage: "Shared",
-          }),
-          isFilterable: true,
-          Filter: PetitionListSharedWithFilter,
-          align: "left",
-          cellProps: { minWidth: "132px" },
-          CellContent: ({ row, column }) => {
-            if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
-              const { permissions } = row;
-              return (
-                <Flex justifyContent={column.align}>
-                  <UserAvatarList
-                    usersOrGroups={permissions.map((p) =>
-                      p.__typename === "PetitionUserPermission"
-                        ? p.user
-                        : p.__typename === "PetitionUserGroupPermission"
-                        ? p.group
-                        : (null as never),
-                    )}
-                  />
-                </Flex>
-              );
-            } else {
-              return null;
-            }
-          },
-        },
-        ...(type === "PETITION"
-          ? ([
-              {
-                key: "sentAt",
-                isSortable: true,
-                header: intl.formatMessage({
-                  id: "generic.sent-at",
-                  defaultMessage: "Sent at",
-                }),
-                cellProps: { width: "1%", minWidth: "160px" },
-                CellContent: ({ row }) => {
-                  if (row.__typename === "Petition") {
-                    const { sentAt } = row;
-                    return sentAt ? (
-                      <DateTime
-                        value={sentAt}
-                        format={FORMATS.LLL}
-                        useRelativeTime
-                        whiteSpace="nowrap"
-                      />
-                    ) : (
-                      <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                        <FormattedMessage id="generic.not-sent" defaultMessage="Not sent" />
-                      </Text>
-                    );
-                  } else {
-                    return null;
-                  }
-                },
-              },
-              {
-                key: "reminders",
-                isSortable: false,
-                header: intl.formatMessage({
-                  id: "petitions.header.reminders",
-                  defaultMessage: "Reminders",
-                }),
-
-                CellContent: ({ row }) => {
-                  if (row.__typename === "Petition") {
-                    const lastReminderDate = maxBy(
-                      row.accesses.map((a) => a.reminders[0]?.createdAt),
-                      (date) => new Date(date).valueOf(),
-                    );
-
-                    const nextReminderAt = minBy(
-                      row.accesses.filter((a) => !!a.nextReminderAt),
-                      (a) => new Date(a.nextReminderAt!).valueOf(),
-                    )?.nextReminderAt;
-
-                    const redirect = useGoToPetition();
-
-                    return (
-                      <Flex
-                        alignItems="center"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          redirect(row.id, row.status === "DRAFT" ? "compose" : "activity");
-                        }}
-                        whiteSpace="nowrap"
-                      >
-                        {lastReminderDate ? (
-                          <DateTime
-                            value={lastReminderDate}
-                            format={FORMATS.MMMdd}
-                            whiteSpace="nowrap"
-                          />
-                        ) : (
-                          <Text as="span" textStyle="hint">
-                            <FormattedMessage
-                              id="petitions.header.reminders-disabled"
-                              defaultMessage="No reminders"
-                            />
-                          </Text>
-                        )}
-                        {nextReminderAt ? (
-                          <SmallPopover
-                            content={
-                              <Text color="gray.800" fontSize="sm">
-                                <FormattedMessage
-                                  id="petitions.header.reminders-next-reminder-at.popover"
-                                  defaultMessage="Next reminder configured for {date}"
-                                  values={{
-                                    date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
-                                  }}
-                                />
-                              </Text>
-                            }
-                            placement="bottom-end"
-                          >
-                            <IconButton
-                              marginLeft={1}
-                              variant="ghost"
-                              aria-label={intl.formatMessage({
-                                id: "petitions.header.reminders-next-reminder-at",
-                                defaultMessage: "Next reminder configured",
-                              })}
-                              size="xs"
-                              icon={<BellSettingsIcon fontSize="16px" color="gray.500" />}
-                            />
-                          </SmallPopover>
-                        ) : null}
-                      </Flex>
-                    );
-                  } else {
-                    return null;
-                  }
-                },
-              },
-            ] as PetitionsTableColumns_PetitionOrFolder[])
-          : ([
-              {
-                key: "createdAt",
-                isSortable: true,
-                header: intl.formatMessage({
-                  id: "generic.created-at",
-                  defaultMessage: "Created at",
-                }),
-                cellProps: { width: "1%" },
-                CellContent: ({ row }) => {
-                  if (row.__typename === "PetitionTemplate") {
-                    const { createdAt } = row;
-                    return (
-                      <DateTime
-                        value={createdAt}
-                        format={FORMATS.LLL}
-                        useRelativeTime
-                        whiteSpace="nowrap"
-                      />
-                    );
-                  } else {
-                    return null;
-                  }
-                },
-              },
-            ] as PetitionsTableColumns_PetitionTemplateOrFolder[])),
-        {
-          key: "tagsFilters",
-          header: intl.formatMessage({
-            id: "petitions.header.tags",
-            defaultMessage: "Tags",
-          }),
-          cellProps: {
-            width: "30%",
-            minWidth: "300px",
-            padding: 0,
-            _last: { paddingRight: 0 },
-          },
-          isFilterable: true,
-          Filter: PetitionListTagFilter,
-          CellContent: ({ row }) => {
-            if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
-              return <PetitionTagListCellContent petition={row} />;
-            } else {
-              return null;
-            }
-          },
-        },
-      ] as PetitionsTableColumns_PetitionBaseOrFolder[],
-    [intl.locale, type],
-  );
+export function getPetitionsTableIncludes(columns?: PetitionsTableColumn[]) {
+  return {
+    includeRecipients: columns ? columns.includes("recipients") : true,
+    includeTemplate: columns ? columns.includes("template") : true,
+    includeStatus: columns ? columns.includes("status") : true,
+    includeSignature: columns ? columns.includes("signature") : true,
+    includeSharedWith: columns ? columns.includes("sharedWith") : true,
+    includeCreatedAt: columns ? columns.includes("createdAt") : true,
+    includeSentAt: columns ? columns.includes("sentAt") : true,
+    includeReminders: columns ? columns.includes("reminders") : true,
+    includeTags: columns ? columns.includes("tags") : true,
+  };
 }
 
-usePetitionsTableColumns.fragments = {
-  PetitionFolder: gql`
-    fragment usePetitionsTableColumns_PetitionFolder on PetitionFolder {
-      folderId: id
-      folderName: name
-    }
-  `,
-  PetitionBase: gql`
-    fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
-      id
-      name
-      createdAt
-      permissions {
-        permissionType
-        ... on PetitionUserPermission {
-          user {
-            ...UserAvatarList_User
-          }
-        }
-        ... on PetitionUserGroupPermission {
-          group {
-            ...UserAvatarList_UserGroup
-          }
-        }
-      }
-      ...PetitionTagListCellContent_PetitionBase
-      ... on Petition {
-        accesses {
-          id
-          status
-          contact {
-            ...ContactReference_Contact
-          }
-          nextReminderAt
-          reminders {
-            createdAt
-          }
-        }
-        sentAt
-        ...PetitionStatusCellContent_Petition
-        ...PetitionSignatureCellContent_Petition
-      }
-      ... on PetitionTemplate {
-        ...TemplateActiveSettingsIcons_PetitionTemplate
-      }
-    }
-    ${UserAvatarList.fragments.User}
-    ${UserAvatarList.fragments.UserGroup}
-    ${PetitionTagListCellContent.fragments.PetitionBase}
-    ${ContactReference.fragments.Contact}
-    ${PetitionStatusCellContent.fragments.Petition}
-    ${PetitionSignatureCellContent.fragments.Petition}
-    ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
-  `,
-};
+export function getTemplatesTableIncludes() {
+  return {
+    includeRecipients: false,
+    includeTemplate: false,
+    includeStatus: false,
+    includeSignature: false,
+    includeSharedWith: true,
+    includeCreatedAt: true,
+    includeSentAt: false,
+    includeReminders: false,
+    includeTags: true,
+  };
+}
 
 const PetitionListStatusFilter = withProps(CheckboxTableFilter<PetitionStatus>, () => {
   const statuses = usePetitionStatusLabels();
@@ -493,3 +131,492 @@ const PetitionListSignatureStatusFilter = withProps(
     };
   },
 );
+
+export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
+  {
+    key: "name",
+    isSortable: true,
+    isFixed: true,
+    label: (intl) => intl.formatMessage({ id: "petitions.header.name", defaultMessage: "Name" }),
+    cellProps: {
+      maxWidth: 0,
+      minWidth: "240px",
+    },
+    CellContent: ({ row }) =>
+      row.__typename === "PetitionFolder" ? (
+        <HStack>
+          <Flex>
+            <VisuallyHidden>
+              <FormattedMessage id="generic.folder" defaultMessage="Folder" />
+            </VisuallyHidden>
+            <FolderIcon role="presentation" />
+          </Flex>
+          <OverflownText>{row.folderName}</OverflownText>
+        </HStack>
+      ) : row.__typename === "Petition" ? (
+        <OverflownText textStyle={row.name ? undefined : "hint"}>
+          {row.name || (
+            <FormattedMessage id="generic.unnamed-parallel" defaultMessage="Unnamed parallel" />
+          )}
+        </OverflownText>
+      ) : null,
+  },
+  {
+    key: "recipients",
+    label: (intl) =>
+      intl.formatMessage({ id: "petitions.header.recipient", defaultMessage: "Recipient" }),
+    cellProps: {
+      minWidth: "200px",
+      whiteSpace: "nowrap",
+    },
+    CellContent: ({ row }) => {
+      if (row.__typename === "Petition") {
+        const recipients = (row.accesses ?? [])
+          .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+          .map((a) => a.contact!);
+        if (recipients.length === 0) {
+          return null;
+        }
+        const goToContact = useGoToContact();
+
+        return (
+          <EnumerateList
+            values={recipients}
+            maxItems={1}
+            renderItem={({ value }, index) => (
+              <ContactReference
+                key={index}
+                contact={value}
+                onClick={(e: MouseEvent) => e.stopPropagation()}
+              />
+            )}
+            renderOther={({ children, remaining }) => (
+              <ContactListPopover key="other" contacts={remaining} onContactClick={goToContact}>
+                <Link
+                  href={`/app/petitions/${row.id}/activity`}
+                  onClick={(e: MouseEvent) => e.stopPropagation()}
+                >
+                  {children}
+                </Link>
+              </ContactListPopover>
+            )}
+          />
+        );
+      } else {
+        return null;
+      }
+    },
+  },
+  {
+    key: "template",
+    label: (intl) =>
+      intl.formatMessage({ id: "petitions.header.template", defaultMessage: "Template" }),
+    cellProps: {
+      maxWidth: 0,
+      minWidth: "200px",
+      whiteSpace: "nowrap",
+    },
+    CellContent: ({ row }) => {
+      if (row.__typename === "Petition") {
+        return isDefined(row.fromTemplate) ? (
+          isDefined(row.fromTemplate.myEffectivePermission) ? (
+            <OverflownText
+              display="block"
+              as={Link}
+              href={`/app/petitions/${row.fromTemplate.id}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {row.fromTemplate.name ? (
+                row.fromTemplate.name
+              ) : (
+                <Text as="span" fontStyle="italic">
+                  <FormattedMessage
+                    id="generic.unnamed-template"
+                    defaultMessage="Unnamed template"
+                  />
+                </Text>
+              )}
+            </OverflownText>
+          ) : row.fromTemplate.name ? (
+            row.fromTemplate.name
+          ) : (
+            <Text as="span" textStyle="hint">
+              <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
+            </Text>
+          )
+        ) : null;
+      } else {
+        return null;
+      }
+    },
+  },
+  {
+    key: "status",
+    label: (intl) =>
+      intl.formatMessage({ id: "petitions.header.status", defaultMessage: "Status" }),
+    isFilterable: true,
+    Filter: PetitionListStatusFilter,
+    align: "center",
+    cellProps: (row) =>
+      row.__typename === "Petition"
+        ? {
+            minWidth: "180px",
+            "data-section": "petition-progress",
+            "data-petition-status": row.status,
+          }
+        : {},
+    CellContent: ({ row }) =>
+      row.__typename === "Petition" && isDefined(row.progress) ? (
+        <PetitionStatusCellContent petition={row} />
+      ) : null,
+  },
+  {
+    key: "signature",
+    header: (
+      <Tooltip
+        label={
+          <FormattedMessage id="petitions.header.signature" defaultMessage="eSignature status" />
+        }
+      >
+        <SignatureIcon />
+      </Tooltip>
+    ),
+    label: (intl) =>
+      intl.formatMessage({
+        id: "petitions.header.signature",
+        defaultMessage: "eSignature status",
+      }),
+    isFilterable: true,
+    align: "left",
+    Filter: PetitionListSignatureStatusFilter,
+    headerProps: { padding: 0 },
+    cellProps: { padding: 0, minWidth: "72px" },
+    CellContent: ({ row }) =>
+      row.__typename === "Petition" ? (
+        <Flex alignItems="center" paddingRight="2">
+          <PetitionSignatureCellContent petition={row} />
+        </Flex>
+      ) : (
+        <></>
+      ),
+  },
+  {
+    key: "sharedWith",
+    label: (intl) =>
+      intl.formatMessage({ id: "petitions.header.shared", defaultMessage: "Shared" }),
+    isFilterable: true,
+    Filter: PetitionListSharedWithFilter,
+    align: "left",
+    cellProps: { minWidth: "132px" },
+    CellContent: ({ row, column }) =>
+      row.__typename === "Petition" && isDefined(row.permissions) ? (
+        <Flex justifyContent={column.align}>
+          <UserAvatarList
+            usersOrGroups={row.permissions.map((p) =>
+              p.__typename === "PetitionUserPermission"
+                ? p.user
+                : p.__typename === "PetitionUserGroupPermission"
+                ? p.group
+                : (null as never),
+            )}
+          />
+        </Flex>
+      ) : null,
+  },
+  {
+    key: "sentAt",
+    isSortable: true,
+    label: (intl) => intl.formatMessage({ id: "generic.sent-at", defaultMessage: "Sent at" }),
+    cellProps: { minWidth: "160px" },
+    CellContent: ({ row }) =>
+      row.__typename === "Petition" ? (
+        row.sentAt ? (
+          <DateTime value={row.sentAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
+        ) : (
+          <Text as="span" textStyle="hint" whiteSpace="nowrap">
+            <FormattedMessage id="generic.not-sent" defaultMessage="Not sent" />
+          </Text>
+        )
+      ) : null,
+  },
+  {
+    key: "createdAt",
+    isSortable: true,
+    label: (intl) => intl.formatMessage({ id: "generic.created-at", defaultMessage: "Created at" }),
+    cellProps: { minWidth: "160px" },
+    CellContent: ({ row }) => {
+      return row.__typename === "Petition" && isDefined(row.createdAt) ? (
+        <DateTime value={row.createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
+      ) : null;
+    },
+  },
+  {
+    key: "reminders",
+    label: (intl) =>
+      intl.formatMessage({ id: "petitions.header.reminders", defaultMessage: "Reminders" }),
+    CellContent: ({ row }) => {
+      if (row.__typename === "Petition" && isDefined(row.accesses)) {
+        const lastReminderDate = maxBy(
+          row.accesses.map((a) => a.reminders[0]?.createdAt),
+          (date) => new Date(date).valueOf(),
+        );
+
+        const nextReminderAt = minBy(
+          row.accesses.filter((a) => !!a.nextReminderAt),
+          (a) => new Date(a.nextReminderAt!).valueOf(),
+        )?.nextReminderAt;
+
+        const redirect = useGoToPetition();
+
+        return (
+          <Flex
+            alignItems="center"
+            onClick={(e) => {
+              e.stopPropagation();
+              redirect(row.id, row.status === "DRAFT" ? "compose" : "activity");
+            }}
+            whiteSpace="nowrap"
+          >
+            {lastReminderDate ? (
+              <DateTime value={lastReminderDate} format={FORMATS.MMMdd} whiteSpace="nowrap" />
+            ) : (
+              <Text as="span" textStyle="hint">
+                <FormattedMessage
+                  id="petitions.header.reminders-disabled"
+                  defaultMessage="No reminders"
+                />
+              </Text>
+            )}
+            {nextReminderAt ? (
+              <SmallPopover
+                content={
+                  <Text color="gray.800" fontSize="sm">
+                    <FormattedMessage
+                      id="petitions.header.reminders-next-reminder-at.popover"
+                      defaultMessage="Next reminder configured for {date}"
+                      values={{
+                        date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
+                      }}
+                    />
+                  </Text>
+                }
+                placement="bottom-end"
+              >
+                <WithIntl>
+                  {(intl) => (
+                    <IconButton
+                      marginLeft={1}
+                      variant="ghost"
+                      aria-label={intl.formatMessage({
+                        id: "petitions.header.reminders-next-reminder-at",
+                        defaultMessage: "Next reminder configured",
+                      })}
+                      size="xs"
+                      icon={<BellSettingsIcon fontSize="16px" color="gray.500" />}
+                    />
+                  )}
+                </WithIntl>
+              </SmallPopover>
+            ) : null}
+          </Flex>
+        );
+      } else {
+        return null;
+      }
+    },
+  },
+  {
+    key: "tags",
+    label: (intl) => intl.formatMessage({ id: "petitions.header.tags", defaultMessage: "Tags" }),
+    cellProps: {
+      minWidth: "300px",
+      padding: 0,
+      _last: { paddingRight: 0 },
+    },
+    isFilterable: true,
+    Filter: PetitionListTagFilter,
+    CellContent: ({ row }) =>
+      row.__typename === "Petition" && isDefined(row.tags) ? (
+        <PetitionTagListCellContent petition={row} />
+      ) : null,
+  },
+];
+
+export const TEMPLATES_COLUMNS = (
+  intl: IntlShape,
+): PetitionsTableColumns_PetitionTemplateOrFolder[] => [
+  {
+    key: "name",
+    isSortable: true,
+    label: (intl) => intl.formatMessage({ id: "petitions.header.name", defaultMessage: "Name" }),
+    cellProps: {
+      maxWidth: 0,
+      width: "30%",
+      minWidth: "240px",
+    },
+    CellContent: ({ row }) =>
+      row.__typename === "PetitionFolder" ? (
+        <HStack>
+          <Flex>
+            <VisuallyHidden>
+              <FormattedMessage id="generic.folder" defaultMessage="Folder" />
+            </VisuallyHidden>
+            <FolderIcon role="presentation" />
+          </Flex>
+          <OverflownText>{row.folderName}</OverflownText>
+        </HStack>
+      ) : row.__typename === "PetitionTemplate" ? (
+        <OverflownText textStyle={row.name ? undefined : "hint"}>
+          {row.name || (
+            <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
+          )}
+        </OverflownText>
+      ) : null,
+  },
+  {
+    key: "settings",
+    label: (intl) =>
+      intl.formatMessage({ id: "petitions.header.settings", defaultMessage: "Settings" }),
+    align: "left",
+    cellProps: {
+      minWidth: "205px",
+    },
+    CellContent: ({ row }) =>
+      row.__typename === "PetitionTemplate" ? (
+        <TemplateActiveSettingsIcons template={row} spacing={4} />
+      ) : (
+        <></>
+      ),
+  },
+  {
+    key: "sharedWith",
+    label: (intl) =>
+      intl.formatMessage({ id: "petitions.header.shared", defaultMessage: "Shared" }),
+    isFilterable: true,
+    Filter: PetitionListSharedWithFilter,
+    align: "left",
+    cellProps: { minWidth: "132px" },
+    CellContent: ({ row, column }) =>
+      row.__typename === "PetitionTemplate" && isDefined(row.permissions) ? (
+        <Flex justifyContent={column.align}>
+          <UserAvatarList
+            usersOrGroups={row.permissions.map((p) =>
+              p.__typename === "PetitionUserPermission"
+                ? p.user
+                : p.__typename === "PetitionUserGroupPermission"
+                ? p.group
+                : (null as never),
+            )}
+          />
+        </Flex>
+      ) : null,
+  },
+  {
+    key: "createdAt",
+    isSortable: true,
+    label: (intl) => intl.formatMessage({ id: "generic.created-at", defaultMessage: "Created at" }),
+    cellProps: { width: "1%" },
+    CellContent: ({ row }) =>
+      row.__typename === "PetitionTemplate" && isDefined(row.createdAt) ? (
+        <DateTime value={row.createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
+      ) : null,
+  },
+  {
+    key: "tags",
+    label: (intl) => intl.formatMessage({ id: "petitions.header.tags", defaultMessage: "Tags" }),
+    cellProps: {
+      width: "30%",
+      minWidth: "300px",
+      padding: 0,
+      _last: { paddingRight: 0 },
+    },
+    isFilterable: true,
+    Filter: PetitionListTagFilter,
+    CellContent: ({ row }) =>
+      row.__typename === "PetitionTemplate" && isDefined(row.tags) ? (
+        <PetitionTagListCellContent petition={row} />
+      ) : null,
+  },
+];
+
+export function usePetitionsTableColumns(
+  type: PetitionBaseType,
+  columnSelection?: PetitionsTableColumn[],
+): PetitionsTableColumns_PetitionBaseOrFolder[] {
+  const intl = useIntl();
+  return useMemo(() => {
+    if (type === "TEMPLATE") {
+      return TEMPLATES_COLUMNS(intl);
+    } else {
+      return ["name", ...(columnSelection ?? [])].map(
+        (key) => PETITIONS_COLUMNS.find((d) => d.key === key)!,
+      );
+    }
+  }, [intl.locale, columnSelection?.join(",")]) as any;
+}
+
+usePetitionsTableColumns.fragments = {
+  PetitionFolder: gql`
+    fragment usePetitionsTableColumns_PetitionFolder on PetitionFolder {
+      folderId: id
+      folderName: name
+    }
+  `,
+  PetitionBase: gql`
+    fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
+      id
+      name
+      createdAt @include(if: $includeCreatedAt)
+      permissions @include(if: $includeSharedWith) {
+        permissionType
+        ... on PetitionUserPermission {
+          user {
+            ...UserAvatarList_User
+          }
+        }
+        ... on PetitionUserGroupPermission {
+          group {
+            ...UserAvatarList_UserGroup
+          }
+        }
+      }
+      ...PetitionTagListCellContent_PetitionBase @include(if: $includeTags)
+      ... on Petition {
+        accesses @include(if: $includeRecipients) {
+          id
+          status
+          contact {
+            ...ContactReference_Contact
+          }
+        }
+        accesses @include(if: $includeReminders) {
+          id
+          nextReminderAt
+          reminders {
+            createdAt
+          }
+        }
+        sentAt @include(if: $includeSentAt)
+        fromTemplate @include(if: $includeTemplate) {
+          id
+          name
+          myEffectivePermission {
+            permissionType
+          }
+        }
+        ...PetitionStatusCellContent_Petition @include(if: $includeStatus)
+        ...PetitionSignatureCellContent_Petition @include(if: $includeSignature)
+      }
+      ... on PetitionTemplate {
+        ...TemplateActiveSettingsIcons_PetitionTemplate
+      }
+    }
+    ${UserAvatarList.fragments.User}
+    ${UserAvatarList.fragments.UserGroup}
+    ${PetitionTagListCellContent.fragments.PetitionBase}
+    ${ContactReference.fragments.Contact}
+    ${PetitionStatusCellContent.fragments.Petition}
+    ${PetitionSignatureCellContent.fragments.Petition}
+    ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
+  `,
+};

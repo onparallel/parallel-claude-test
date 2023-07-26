@@ -77,7 +77,7 @@ function useProfileRelationshipsTableColumns(): TableColumn<ProfileRelationship>
       {
         key: "name",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.name",
           defaultMessage: "Name",
         }),
@@ -99,7 +99,7 @@ function useProfileRelationshipsTableColumns(): TableColumn<ProfileRelationship>
       },
       {
         key: "relationship",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.profile-table-columns.relationship",
           defaultMessage: "Relationship",
         }),
@@ -113,7 +113,7 @@ function useProfileRelationshipsTableColumns(): TableColumn<ProfileRelationship>
       },
       {
         key: "type",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.profile-table-columns.profile-type",
           defaultMessage: "Profile type",
         }),

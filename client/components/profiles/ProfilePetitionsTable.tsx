@@ -191,7 +191,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
     () => [
       {
         key: "name",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.parallel-name",
           defaultMessage: "Parallel name",
         }),
@@ -212,7 +212,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
       },
       {
         key: "recipient",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "petitions.header.recipient",
           defaultMessage: "Recipient",
         }),
@@ -255,7 +255,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
       },
       {
         key: "status",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "petitions.header.status",
           defaultMessage: "Status",
         }),
@@ -267,7 +267,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
       },
       {
         key: "signature",
-        header: "",
+        label: "",
         align: "center",
         headerProps: { padding: 0, width: 8 },
         cellProps: { padding: 0 },
@@ -279,7 +279,7 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
       },
       {
         key: "sentAt",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.sent-at",
           defaultMessage: "Sent at",
         }),

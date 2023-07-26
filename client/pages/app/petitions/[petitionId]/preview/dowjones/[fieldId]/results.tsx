@@ -252,7 +252,7 @@ function useDowJonesKycDataColumns() {
     () => [
       {
         key: "tags",
-        header: "",
+        label: "",
         CellContent: ({ row: { iconHints } }) => {
           return (
             <Flex gap={2} flexWrap="wrap">
@@ -263,7 +263,7 @@ function useDowJonesKycDataColumns() {
       },
       {
         key: "name",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-search-result.name",
           defaultMessage: "Name",
         }),
@@ -273,7 +273,7 @@ function useDowJonesKycDataColumns() {
       },
       {
         key: "gender",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-search-result.gender",
           defaultMessage: "Gender",
         }),
@@ -287,7 +287,7 @@ function useDowJonesKycDataColumns() {
       },
       {
         key: "dateOfBirth",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-search-result.date-of-birth",
           defaultMessage: "Date of birth",
         }),
@@ -310,7 +310,7 @@ function useDowJonesKycDataColumns() {
       },
       {
         key: "country",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-search-result.country-territory",
           defaultMessage: "Country/Territory",
         }),
@@ -320,7 +320,7 @@ function useDowJonesKycDataColumns() {
       },
       {
         key: "subsidiary",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-search-result.subsidiary",
           defaultMessage: "Subsidiary",
         }),
@@ -341,7 +341,7 @@ function useDowJonesKycDataColumns() {
       },
       {
         key: "actions",
-        header: "",
+        label: "",
         CellContent: ({ row, context }) => {
           const profileReply = context.replies.find(
             (r) => r.content.entity.profileId === row.profileId,

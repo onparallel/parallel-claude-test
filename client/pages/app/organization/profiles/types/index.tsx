@@ -298,7 +298,7 @@ function useProfileTypesTableColumns(): TableColumn<
       {
         key: "name",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.name",
           defaultMessage: "Name",
         }),
@@ -321,7 +321,7 @@ function useProfileTypesTableColumns(): TableColumn<
       {
         key: "createdAt",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),

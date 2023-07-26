@@ -86,7 +86,14 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
-import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
+import {
+  DEFAULT_PETITON_COLUMN_SELECTION,
+  PETITIONS_COLUMNS,
+  PetitionsTableColumn,
+  getPetitionsTableIncludes,
+  getTemplatesTableIncludes,
+  usePetitionsTableColumns,
+} from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
@@ -118,6 +125,9 @@ const QUERY_STATE = {
     "COMPLETED",
     "CANCELLED",
   ]).list(),
+  columns: values(
+    PETITIONS_COLUMNS.filter((c) => !c.isFixed).map((c) => c.key as PetitionsTableColumn),
+  ).list({ allowEmpty: true }),
 };
 
 export type PetitionsQueryState = QueryStateFrom<typeof QUERY_STATE>;
@@ -156,6 +166,9 @@ function Petitions() {
           fromTemplateId: state.fromTemplateId,
         },
         sortBy: [`${sort.field}_${sort.direction}`],
+        ...(state.type === "PETITION"
+          ? getPetitionsTableIncludes(state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION)
+          : getTemplatesTableIncludes()),
       },
       fetchPolicy: "cache-and-network",
     },
@@ -394,7 +407,10 @@ function Petitions() {
     } catch {}
   }, []);
 
-  const columns = usePetitionsTableColumns(state.type);
+  const columns = usePetitionsTableColumns(
+    state.type,
+    state.type === "PETITION" ? state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION : undefined,
+  );
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
@@ -680,10 +696,14 @@ Petitions.fragments = {
       fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
         ...useDeletePetitions_PetitionBaseOrFolder
         ... on PetitionBase {
+          name
           ...usePetitionsTableColumns_PetitionBase
           myEffectivePermission {
             permissionType
           }
+        }
+        ... on Petition {
+          status
         }
         ... on PetitionTemplate {
           isPublic
@@ -719,6 +739,15 @@ const _queries = [
       $search: String
       $sortBy: [QueryPetitions_OrderBy!]
       $filters: PetitionFilter
+      $includeRecipients: Boolean!
+      $includeTemplate: Boolean!
+      $includeStatus: Boolean!
+      $includeSignature: Boolean!
+      $includeSharedWith: Boolean!
+      $includeSentAt: Boolean!
+      $includeCreatedAt: Boolean!
+      $includeReminders: Boolean!
+      $includeTags: Boolean!
     ) {
       petitions(
         offset: $offset

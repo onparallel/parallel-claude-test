@@ -202,7 +202,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
       {
         key: "firstName",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "contacts.header.first-name",
           defaultMessage: "First name",
         }),
@@ -224,7 +224,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
       {
         key: "lastName",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "contacts.header.last-name",
           defaultMessage: "Last name",
         }),
@@ -245,7 +245,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
       {
         key: "email",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "contacts.header.email",
           defaultMessage: "Email",
         }),
@@ -258,7 +258,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
       {
         key: "createdAt",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),

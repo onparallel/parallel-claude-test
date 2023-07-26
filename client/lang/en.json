@@ -545,6 +545,36 @@
     "context": "When finishing, the parallel will remain closed. You can come back anytime to review the information."
   },
   {
+    "term": "component.column-visibility-dialog.all-columns-visible",
+    "definition": "All columns are visible",
+    "context": "All columns are visible"
+  },
+  {
+    "term": "component.column-visibility-dialog.header",
+    "definition": "Choose the columns you want to see",
+    "context": "Choose the columns you want to see"
+  },
+  {
+    "term": "component.column-visibility-dialog.hidden-columns",
+    "definition": "Hidden columns",
+    "context": "Hidden columns"
+  },
+  {
+    "term": "component.column-visibility-dialog.hide-all",
+    "definition": "Hide all",
+    "context": "Hide all"
+  },
+  {
+    "term": "component.column-visibility-dialog.show-all",
+    "definition": "Show all",
+    "context": "Show all"
+  },
+  {
+    "term": "component.column-visibility-dialog.visible-columns",
+    "definition": "Visible columns",
+    "context": "Visible columns"
+  },
+  {
     "term": "component.completing-message-dialog.go-to-pending-processes-button",
     "definition": "Go to my pending processes",
     "context": "Go to my pending processes"
@@ -3125,16 +3155,6 @@
     "context": "Overwrite documentation"
   },
   {
-    "term": "component.password-input.hide",
-    "definition": "Hide",
-    "context": "Hide"
-  },
-  {
-    "term": "component.password-input.show",
-    "definition": "Show",
-    "context": "Show"
-  },
-  {
     "term": "component.password-restrict-petition.body",
     "definition": "This parallel is protected. Enter the password to unlock it.",
     "context": "This parallel is protected. Enter the password to unlock it."
@@ -3923,6 +3943,21 @@
     "term": "component.petition-link-dialog.body-2",
     "definition": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab.",
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
+  },
+  {
+    "term": "component.petition-list-header.hidden-filters-button-label",
+    "definition": "{count, plural, =1{# hidden filter} other{# hidden filters}}",
+    "context": "{count, plural, =1{# hidden filter} other{# hidden filters}}"
+  },
+  {
+    "term": "component.petition-list-header.hidden-filters-title",
+    "definition": "Filters",
+    "context": "Filters"
+  },
+  {
+    "term": "component.petition-list-header.remove-filter",
+    "definition": "Remove filter",
+    "context": "Remove filter"
   },
   {
     "term": "component.petition-list-header.save-as-new-view",
@@ -7970,6 +8005,11 @@
     "context": "Edit"
   },
   {
+    "term": "generic.edit-columns",
+    "definition": "Edit columns",
+    "context": "Edit columns"
+  },
+  {
     "term": "generic.edit-name",
     "definition": "Edit name",
     "context": "Edit name"
@@ -8268,6 +8308,11 @@
     "term": "generic.help-question",
     "definition": "Help?",
     "context": "Help?"
+  },
+  {
+    "term": "generic.hide",
+    "definition": "Hide",
+    "context": "Hide"
   },
   {
     "term": "generic.i-understand",
@@ -8653,6 +8698,11 @@
     "term": "generic.share-by-link",
     "definition": "Share by link",
     "context": "Share by link"
+  },
+  {
+    "term": "generic.show",
+    "definition": "Show",
+    "context": "Show"
   },
   {
     "term": "generic.show-more-less",
@@ -11133,6 +11183,11 @@
     "term": "petitions.header.tags",
     "definition": "Tags",
     "context": "Tags"
+  },
+  {
+    "term": "petitions.header.template",
+    "definition": "Template",
+    "context": "Template"
   },
   {
     "term": "petitions.no-parallels",

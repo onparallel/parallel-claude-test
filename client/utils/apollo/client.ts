@@ -159,6 +159,11 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             effectivePermissions: { merge: mergeArraysBy(["user", "id"]) },
           },
         },
+        PetitionBaseMini: {
+          fields: {
+            myEffectivePermission: { merge: true },
+          },
+        },
         PetitionTemplate: {
           fields: {
             defaultPermissions: { merge: false },

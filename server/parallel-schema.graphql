@@ -3069,6 +3069,11 @@ type PetitionBaseMini {
   id: GID!
 
   """
+  The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
+  """
+  myEffectivePermission: EffectivePetitionUserPermission
+
+  """
   The name of the petition.
   """
   name: String
@@ -3686,7 +3691,21 @@ type PetitionListView {
   user: User!
 }
 
+enum PetitionListViewColumn {
+  createdAt
+  name
+  recipients
+  reminders
+  sentAt
+  sharedWith
+  signature
+  status
+  tags
+  template
+}
+
 type PetitionListViewData {
+  columns: [PetitionListViewColumn!]
   fromTemplateId: [GID!]
   path: String!
   search: String
@@ -3700,6 +3719,7 @@ type PetitionListViewData {
 }
 
 input PetitionListViewDataInput {
+  columns: [PetitionListViewColumn!]
   fromTemplateId: [GID!]
   path: String
   search: String
@@ -3748,6 +3768,7 @@ enum PetitionListViewSortDirection {
 }
 
 enum PetitionListViewSortField {
+  createdAt
   name
   sentAt
 }

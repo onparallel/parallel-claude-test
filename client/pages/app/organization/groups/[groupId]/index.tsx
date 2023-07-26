@@ -330,7 +330,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
       {
         key: "fullName",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.name",
           defaultMessage: "Name",
         }),
@@ -345,7 +345,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
       {
         key: "email",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.email",
           defaultMessage: "Email",
         }),
@@ -358,7 +358,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
       {
         key: "addedAt",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.added-at",
           defaultMessage: "Added at",
         }),

@@ -288,7 +288,7 @@ function useSignatureTokensTableColumns() {
       [
         {
           key: "name",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "generic.integration-name",
             defaultMessage: "Name",
           }),
@@ -334,7 +334,7 @@ function useSignatureTokensTableColumns() {
         },
         {
           key: "provider",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "generic.integration-provider",
             defaultMessage: "Provider",
           }),
@@ -355,7 +355,7 @@ function useSignatureTokensTableColumns() {
         },
         {
           key: "environment",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "generic.signature-environment",
             defaultMessage: "Environment",
           }),
@@ -376,7 +376,7 @@ function useSignatureTokensTableColumns() {
         },
         {
           key: "actions",
-          header: "",
+          label: "",
           cellProps: {
             width: "1px",
           },

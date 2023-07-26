@@ -141,7 +141,7 @@ function useApiTokensColumns(): TableColumn<Tokens_UserAuthenticationTokenFragme
     () => [
       {
         key: "tokenName",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.tokens.header.token-name",
           defaultMessage: "Name",
         }),
@@ -154,7 +154,7 @@ function useApiTokensColumns(): TableColumn<Tokens_UserAuthenticationTokenFragme
       },
       {
         key: "hint",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.tokens.header.hint",
           defaultMessage: "Token",
         }),
@@ -176,7 +176,7 @@ function useApiTokensColumns(): TableColumn<Tokens_UserAuthenticationTokenFragme
       },
       {
         key: "lastUsedAt",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.last-used-at",
           defaultMessage: "Last used at",
         }),
@@ -201,7 +201,7 @@ function useApiTokensColumns(): TableColumn<Tokens_UserAuthenticationTokenFragme
       },
       {
         key: "createdAt",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),

@@ -678,7 +678,7 @@ function useOrganizationUsersTableColumns() {
       {
         key: "fullName",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "organization-users.header.name",
           defaultMessage: "Name",
         }),
@@ -737,7 +737,7 @@ function useOrganizationUsersTableColumns() {
       {
         key: "email",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "organization-users.header.user-email",
           defaultMessage: "Email",
         }),
@@ -751,7 +751,7 @@ function useOrganizationUsersTableColumns() {
       },
       {
         key: "role",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "organization-role.header.user",
           defaultMessage: "Role",
         }),
@@ -778,7 +778,7 @@ function useOrganizationUsersTableColumns() {
         ? ([
             {
               key: "lastActiveAt",
-              header: intl.formatMessage({
+              label: intl.formatMessage({
                 id: "generic.last-active-at",
                 defaultMessage: "Last active at",
               }),
@@ -806,7 +806,7 @@ function useOrganizationUsersTableColumns() {
       {
         key: "createdAt",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),

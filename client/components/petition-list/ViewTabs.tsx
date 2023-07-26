@@ -333,6 +333,7 @@ export const ViewTabs = Object.assign(
               field
               direction
             }
+            columns
           }
         `;
       },

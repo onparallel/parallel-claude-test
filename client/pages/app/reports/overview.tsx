@@ -66,7 +66,7 @@ interface TemplateStats {
 }
 
 export const QUERY_STATE = {
-  range: date().list(2),
+  range: date().list({ maxItems: 2 }),
 };
 
 type OverviewTableSorting =
@@ -527,7 +527,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
         {
           key: "template_name",
           isSortable: true,
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "generic.template",
             defaultMessage: "Template",
           }),
@@ -567,7 +567,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "status.all",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.total",
                   defaultMessage: "Total",
                 }),
@@ -580,7 +580,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "status.completed",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.completed",
                   defaultMessage: "Completed",
                 }),
@@ -593,7 +593,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "status.signed",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.signed",
                   defaultMessage: "Signed",
                 }),
@@ -606,7 +606,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "status.closed",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.closed",
                   defaultMessage: "Closed",
                 }),
@@ -621,7 +621,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "times.total",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.total",
                   defaultMessage: "Total",
                 }),
@@ -678,7 +678,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "times.pending_to_complete",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.time-to-complete",
                   defaultMessage: "Time to complete",
                 }),
@@ -721,7 +721,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "times.signature_completed",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.time-to-sign",
                   defaultMessage: "Time to sign",
                 }),
@@ -750,7 +750,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
               {
                 key: "times.complete_to_close",
                 isSortable: true,
-                header: intl.formatMessage({
+                label: intl.formatMessage({
                   id: "page.reports-overview.time-to-close",
                   defaultMessage: "Time to close",
                 }),

@@ -444,7 +444,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
       {
         key: "name",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.name",
           defaultMessage: "Name",
         }),
@@ -467,7 +467,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
       },
       {
         key: "type",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.profile-table-columns.type",
           defaultMessage: "Type",
         }),
@@ -497,7 +497,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
       },
       {
         key: "subscribed",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.profile-table-columns.subscribed",
           defaultMessage: "Subscribed",
         }),
@@ -519,7 +519,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
       {
         key: "createdAt",
         isSortable: true,
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),

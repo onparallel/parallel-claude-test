@@ -215,7 +215,7 @@ function usePetitionAccessesColumns(): TableColumn<
     () => [
       {
         key: "contact",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.petition-accesses-table.contact-header",
           defaultMessage: "Contact",
         }),
@@ -255,7 +255,7 @@ function usePetitionAccessesColumns(): TableColumn<
       },
       {
         key: "status",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.petition-accesses-table.status-header",
           defaultMessage: "Status",
         }),
@@ -281,7 +281,7 @@ function usePetitionAccessesColumns(): TableColumn<
       },
       {
         key: "next-reminder",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.petition-accesses-table.next-reminder-header",
           defaultMessage: "Next reminder",
         }),
@@ -304,7 +304,7 @@ function usePetitionAccessesColumns(): TableColumn<
       },
       {
         key: "reminders-sent",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.petition-accesses-table.reminders-sent-header",
           defaultMessage: "Reminders sent",
         }),
@@ -323,7 +323,7 @@ function usePetitionAccessesColumns(): TableColumn<
       },
       {
         key: "createdAt",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),
@@ -333,7 +333,7 @@ function usePetitionAccessesColumns(): TableColumn<
       },
       {
         key: "actions",
-        header: "",
+        label: "",
         cellProps: {
           paddingY: 1,
           width: "1px",

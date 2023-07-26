@@ -2569,6 +2569,8 @@ export type PetitionBase = {
 export type PetitionBaseMini = {
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
+  /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]["output"]>;
 };
@@ -2950,7 +2952,20 @@ export type PetitionListView = {
   user: User;
 };
 
+export type PetitionListViewColumn =
+  | "createdAt"
+  | "name"
+  | "recipients"
+  | "reminders"
+  | "sentAt"
+  | "sharedWith"
+  | "signature"
+  | "status"
+  | "tags"
+  | "template";
+
 export type PetitionListViewData = {
+  columns: Maybe<Array<PetitionListViewColumn>>;
   fromTemplateId: Maybe<Array<Scalars["GID"]["output"]>>;
   path: Scalars["String"]["output"];
   search: Maybe<Scalars["String"]["output"]>;
@@ -2965,6 +2980,7 @@ export type PetitionListViewData = {
 };
 
 export type PetitionListViewDataInput = {
+  columns?: InputMaybe<Array<PetitionListViewColumn>>;
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   path?: InputMaybe<Scalars["String"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;

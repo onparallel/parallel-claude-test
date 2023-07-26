@@ -434,7 +434,7 @@ export function OrganizationUsagePeriodsTable({
       [
         {
           key: "periodBadge",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "component.organization-usage-periods-table.period-badge.header",
             defaultMessage: "Period",
           }),
@@ -457,7 +457,7 @@ export function OrganizationUsagePeriodsTable({
         },
         {
           key: "used",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "component.organization-usage-periods-table.used.header",
             defaultMessage: "Used",
           }),
@@ -465,7 +465,7 @@ export function OrganizationUsagePeriodsTable({
         },
         {
           key: "limit",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "component.organization-usage-periods-table.limit.header",
             defaultMessage: "Limit",
           }),
@@ -473,7 +473,7 @@ export function OrganizationUsagePeriodsTable({
         },
         {
           key: "period",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "component.organization-usage-periods-table.period.header",
             defaultMessage: "Period",
           }),
@@ -481,7 +481,7 @@ export function OrganizationUsagePeriodsTable({
         },
         {
           key: "periodStartDate",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "component.organization-usage-periods-table.period-start-date.header",
             defaultMessage: "Start date",
           }),
@@ -491,7 +491,7 @@ export function OrganizationUsagePeriodsTable({
         },
         {
           key: "periodEndDate",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "component.organization-usage-periods-table.period-end-date.header",
             defaultMessage: "Period end date",
           }),

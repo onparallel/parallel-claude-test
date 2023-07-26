@@ -202,7 +202,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
     () => [
       {
         key: "status",
-        header: "",
+        label: "",
         CellContent: ({ row }) => {
           const expiryDate = row.value?.expiryDate ?? row.files![0].expiryDate!;
           const expiresAt = row.value?.expiresAt ?? row.files![0].expiresAt!;
@@ -251,7 +251,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
       },
       {
         key: "profile",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.alerts-table-columns.profile",
           defaultMessage: "Profile",
         }),
@@ -270,7 +270,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
       },
       {
         key: "property",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.alerts-table-columns.property",
           defaultMessage: "Property",
         }),
@@ -299,7 +299,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
       },
       {
         key: "expirationDate",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.alerts-table-columns.expiration-date",
           defaultMessage: "Expiration date",
         }),
@@ -322,7 +322,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
       },
       {
         key: "subscribers",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.alerts-table-columns.subscribers",
           defaultMessage: "Subscribers",
         }),
@@ -340,7 +340,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
       },
       {
         key: "profileType",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.alerts-table-columns.profile-type",
           defaultMessage: "Profile Type",
         }),

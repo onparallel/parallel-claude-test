@@ -211,6 +211,7 @@ export interface NexusGenInputs {
   };
   PetitionListViewDataInput: {
     // input type
+    columns?: NexusGenEnums["PetitionListViewColumn"][] | null; // [PetitionListViewColumn!]
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
     path?: string | null; // String
     search?: string | null; // String
@@ -410,9 +411,20 @@ export interface NexusGenEnums {
   PetitionEventType: db.PetitionEventType;
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
   PetitionFieldType: db.PetitionFieldType;
+  PetitionListViewColumn:
+    | "createdAt"
+    | "name"
+    | "recipients"
+    | "reminders"
+    | "sentAt"
+    | "sharedWith"
+    | "signature"
+    | "status"
+    | "tags"
+    | "template";
   PetitionListViewSearchIn: "CURRENT_FOLDER" | "EVERYWHERE";
   PetitionListViewSortDirection: "ASC" | "DESC";
-  PetitionListViewSortField: "name" | "sentAt";
+  PetitionListViewSortField: "createdAt" | "name" | "sentAt";
   PetitionLocale: db.ContactLocale;
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionPermissionType: db.PetitionPermissionType;
@@ -759,6 +771,7 @@ export interface NexusGenObjects {
   PetitionListView: db.PetitionListView;
   PetitionListViewData: {
     // root type
+    columns?: NexusGenEnums["PetitionListViewColumn"][] | null; // [PetitionListViewColumn!]
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
     path: string; // String!
     search?: string | null; // String
@@ -1838,6 +1851,7 @@ export interface NexusGenFieldTypes {
   PetitionBaseMini: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
   };
   PetitionBaseOrFolderPagination: {
@@ -2043,6 +2057,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionListViewData: {
     // field return type
+    columns: NexusGenEnums["PetitionListViewColumn"][] | null; // [PetitionListViewColumn!]
     fromTemplateId: NexusGenScalars["GID"][] | null; // [GID!]
     path: string; // String!
     search: string | null; // String
@@ -3910,6 +3925,7 @@ export interface NexusGenFieldTypeNames {
   PetitionBaseMini: {
     // field return type name
     id: "GID";
+    myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
   };
   PetitionBaseOrFolderPagination: {
@@ -4115,6 +4131,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionListViewData: {
     // field return type name
+    columns: "PetitionListViewColumn";
     fromTemplateId: "GID";
     path: "String";
     search: "String";

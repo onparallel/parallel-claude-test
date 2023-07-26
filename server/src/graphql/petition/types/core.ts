@@ -342,6 +342,15 @@ export const PetitionBaseMini = objectType({
     t.nullable.string("name", {
       description: "The name of the petition.",
     });
+    t.nullable.field("myEffectivePermission", {
+      type: "EffectivePetitionUserPermission",
+      description:
+        "The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).",
+      resolve: async (root, _, ctx) => {
+        const permissions = await ctx.petitions.loadEffectivePermissions(root.id);
+        return permissions.find((p) => p.user_id === ctx.user!.id) ?? null;
+      },
+    });
   },
 });
 

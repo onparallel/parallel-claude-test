@@ -274,7 +274,7 @@ function useContactPetitionAccessesColumns() {
       [
         {
           key: "name",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "generic.parallel-name",
             defaultMessage: "Parallel name",
           }),
@@ -298,7 +298,7 @@ function useContactPetitionAccessesColumns() {
         },
         {
           key: "status",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "petitions.header.status",
             defaultMessage: "Status",
           }),
@@ -320,7 +320,7 @@ function useContactPetitionAccessesColumns() {
         },
         {
           key: "shared",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "petitions.header.shared",
             defaultMessage: "Shared",
           }),
@@ -342,7 +342,7 @@ function useContactPetitionAccessesColumns() {
         },
         {
           key: "sentAt",
-          header: intl.formatMessage({
+          label: intl.formatMessage({
             id: "generic.sent-at",
             defaultMessage: "Sent at",
           }),

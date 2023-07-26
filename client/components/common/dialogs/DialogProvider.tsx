@@ -1,3 +1,4 @@
+import { Prettify } from "@parallel/utils/types";
 import { NextComponentType } from "next";
 import {
   cloneElement,
@@ -27,7 +28,7 @@ interface UseDialogReturn<TProps = {}, TResult = void> {
   (
     ...args: [keyof Omit<TProps, keyof DialogCallbacks>] extends [never]
       ? []
-      : [props: Omit<TProps, keyof DialogCallbacks>]
+      : [props: Prettify<Omit<TProps, keyof DialogCallbacks>>]
   ): Promise<TResult>;
 }
 

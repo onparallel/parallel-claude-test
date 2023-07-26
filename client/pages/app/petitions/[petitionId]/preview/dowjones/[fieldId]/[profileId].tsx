@@ -590,7 +590,7 @@ function useDowJonesKycSanctionsColumns() {
     () => [
       {
         key: "name",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-search-result.name",
           defaultMessage: "Name",
         }),
@@ -600,7 +600,7 @@ function useDowJonesKycSanctionsColumns() {
       },
       {
         key: "from",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-profile-details.from",
           defaultMessage: "From",
         }),
@@ -630,7 +630,7 @@ function useDowJonesKycRelationshipsColumns() {
     () => [
       {
         key: "tags",
-        header: "",
+        label: "",
         CellContent: ({ row: { iconHints } }) => {
           return (
             <Flex gap={2} flexWrap="wrap">
@@ -641,7 +641,7 @@ function useDowJonesKycRelationshipsColumns() {
       },
       {
         key: "name",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-search-result.name",
           defaultMessage: "Name",
         }),
@@ -651,7 +651,7 @@ function useDowJonesKycRelationshipsColumns() {
       },
       {
         key: "type",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-profile-details.type",
           defaultMessage: "Type",
         }),
@@ -685,7 +685,7 @@ function useDowJonesKycRelationshipsColumns() {
       },
       {
         key: "connectionType",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.dow-jones-profile-details.relation",
           defaultMessage: "Relation",
         }),

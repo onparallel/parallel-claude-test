@@ -50,7 +50,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { identity, isDefined, noop, pick } from "remeda";
 import { Card } from "./Card";
 import { HelpPopover } from "./HelpPopover";
@@ -115,9 +115,12 @@ export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   key: string;
   align?: BoxProps["textAlign"];
   isSortable?: true;
+  isFixed?: true;
   isFilterable?: true;
   Filter?: ComponentType<TableColumnFilterProps<TFilter, TContext>>;
-  header: string;
+  label: string | ((intl: IntlShape) => string);
+  /** overrides label */
+  header?: ReactNode;
   headerHelp?: string | ReactNode;
   Header?: ComponentType<TableHeaderProps<TRow, TContext, TFilter>>;
   headerProps?: MaybeFunction<HTMLChakraProps<"th">, [TContext]>;
@@ -127,6 +130,10 @@ export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
 
 export interface TableColumnFilterProps<TFilter, TContext = unknown> extends ValueProps<TFilter> {
   context: TContext;
+}
+
+function unIntl(value: string | ((intl: IntlShape) => string), intl: IntlShape) {
+  return typeof value === "string" ? value : value(intl);
 }
 
 function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
@@ -187,7 +194,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         ? ([
             {
               ...pick(columns[0], ["key", "CellContent", "cellProps"]),
-              header: "",
+              label: "",
               Header: ({ context }) => (
                 <Box as="th" colSpan={columns.length} fontWeight="normal">
                   <HStack height="38px" paddingX={3} position="relative" top="1px">
@@ -229,7 +236,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     if (isExpandable) {
       updated.unshift({
         key: "expand-toggle",
-        header: "",
+        label: "",
         Header: () => <Box as="th" width="1px" />,
         cellProps: {
           paddingY: 0,
@@ -280,11 +287,11 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     if (isSelectable) {
       updated.unshift({
         key: "selection-checkbox",
-        header: "",
+        label: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
           <Box
             as="th"
-            width="1px"
+            width="40px"
             padding={0}
             userSelect="none"
             position="relative"
@@ -652,7 +659,7 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
         justifyContent={toFlexAlignment(column.align) ?? "flex-start"}
       >
         <Text as="div" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-          {column.header}
+          {column.header ?? unIntl(column.label, intl)}
         </Text>
         {column.headerHelp ? <HelpPopover>{column.headerHelp}</HelpPopover> : null}
 
@@ -672,7 +679,7 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
                 id: "component.table.filter",
                 defaultMessage: 'Filter "{column}"',
               },
-              { column: column.header },
+              { column: unIntl(column.label, intl) },
             )}
             {...getFilterButtonProps()}
             onClick={onToggleFilter}
@@ -706,14 +713,16 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
                       id: "component.table.change-sorting",
                       defaultMessage: 'Change sorting for "{column}"',
                     },
-                    { column: column.header },
+                    { column: unIntl(column.label, intl) },
                   )
                 : intl.formatMessage(
                     {
                       id: "component.table.sort-by",
                       defaultMessage: 'Sort by "{column}"',
                     },
-                    { column: column.header },
+                    {
+                      column: unIntl(column.label, intl),
+                    },
                   )
             }
           />

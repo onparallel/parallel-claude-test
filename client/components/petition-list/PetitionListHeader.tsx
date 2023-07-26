@@ -2,24 +2,35 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
-  chakra,
   Circle,
-  Flex,
   HStack,
+  Heading,
   Menu,
   MenuItem,
   MenuList,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   Portal,
   Stack,
   Tooltip,
+  chakra,
   useBreakpointValue,
   useMenuButton,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, RepeatIcon, SaveIcon } from "@parallel/chakra/icons";
+import {
+  ChevronDownIcon,
+  CloseIcon,
+  ColumnsIcon,
+  FilterIcon,
+  RepeatIcon,
+  SaveIcon,
+} from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  PetitionListHeader_createPetitionListViewDocument,
   PetitionListHeader_PetitionListViewFragment,
+  PetitionListHeader_createPetitionListViewDocument,
   PetitionListHeader_updatePetitionListViewDocument,
   PetitionListViewData,
   PetitionListViewDataInput,
@@ -28,14 +39,21 @@ import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import {
+  DEFAULT_PETITON_COLUMN_SELECTION,
+  PETITIONS_COLUMNS,
+  PetitionsTableColumn,
+} from "@parallel/utils/usePetitionsTableColumns";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { equals, isDefined, omit, pick } from "remeda";
-import { isDialogError } from "../common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
+import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
+import { useColumnVisibilityDialog } from "../common/dialogs/ColumnVisibilityDialog";
+import { isDialogError } from "../common/dialogs/DialogProvider";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
 import { removeInvalidSharedWithFilterLines } from "./filters/shared-with/PetitionListSharedWithFilter";
 import { removeInvalidTagFilterLines } from "./filters/tags/PetitionListTagFilter";
@@ -110,6 +128,7 @@ export function PetitionListHeader({
             searchIn: "EVERYWHERE",
             path: "/",
             sort: null,
+            columns: null,
           }
         : currentView!.data,
       pick(state, [
@@ -122,6 +141,7 @@ export function PetitionListHeader({
         "path",
         "searchIn",
         "sort",
+        "columns",
       ]) as Omit<PetitionListViewData, "__typename">,
     );
   }, [state, views]);
@@ -160,6 +180,7 @@ export function PetitionListHeader({
               "searchIn",
               "path",
               "sort",
+              "columns",
             ]),
           } as PetitionListViewDataInput,
         },
@@ -201,6 +222,7 @@ export function PetitionListHeader({
               "searchIn",
               "path",
               "sort",
+              "columns",
             ]),
           } as PetitionListViewDataInput,
         },
@@ -209,6 +231,26 @@ export function PetitionListHeader({
       showGenericErrorToast(error);
     }
   };
+
+  const showColumnVisibilityDialog = useColumnVisibilityDialog();
+  const handleEditColumns = async () => {
+    try {
+      const columns = await showColumnVisibilityDialog({
+        columns: PETITIONS_COLUMNS,
+        selection: state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION,
+      });
+      onStateChange((current) => ({ ...current, columns }));
+    } catch {}
+  };
+
+  const selection = state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION;
+  const notVisibleFilters = PETITIONS_COLUMNS.filter(
+    (c) =>
+      !c.isFixed &&
+      !selection.includes(c.key as PetitionsTableColumn) &&
+      c.isFilterable &&
+      Object.entries(state).some(([key, value]) => isDefined(value) && key === c.key),
+  );
 
   return (
     <Stack padding={2}>
@@ -226,33 +268,98 @@ export function PetitionListHeader({
         <Box flex="0 1 400px">
           <SearchInput value={search ?? ""} onChange={handleSearchChange} />
         </Box>
+        {notVisibleFilters.length ? (
+          <Box>
+            <Popover placement="bottom-start">
+              <PopoverTrigger>
+                <ResponsiveButtonIcon
+                  icon={<FilterIcon />}
+                  variant="ghost"
+                  colorScheme="purple"
+                  breakpoint="lg"
+                  label={intl.formatMessage(
+                    {
+                      id: "component.petition-list-header.hidden-filters-button-label",
+                      defaultMessage:
+                        "{count, plural, =1{# hidden filter} other{# hidden filters}}",
+                    },
+                    { count: notVisibleFilters.length },
+                  )}
+                />
+              </PopoverTrigger>
+              <Portal>
+                <PopoverContent width="auto" minWidth="160px">
+                  <PopoverBody as={Stack}>
+                    <Heading textTransform="uppercase" fontSize="sm" color="gray.600">
+                      <FormattedMessage
+                        id="component.petition-list-header.hidden-filters-title"
+                        defaultMessage="Filters"
+                      />
+                    </Heading>
+                    <Stack as="ul">
+                      {notVisibleFilters.map((column) => {
+                        return (
+                          <HStack as="li" key={column.key}>
+                            <Box flex="1">
+                              {typeof column.label === "string" ? column.label : column.label(intl)}
+                            </Box>
+                            <IconButtonWithTooltip
+                              variant="ghost"
+                              label={intl.formatMessage({
+                                id: "component.petition-list-header.remove-filter",
+                                defaultMessage: "Remove filter",
+                              })}
+                              size="xs"
+                              icon={<CloseIcon />}
+                              onClick={() => {
+                                onStateChange((current) => ({
+                                  ...omit(current, [column.key as any]),
+                                  page: 1,
+                                }));
+                              }}
+                            />
+                          </HStack>
+                        );
+                      })}
+                    </Stack>
+                  </PopoverBody>
+                </PopoverContent>
+              </Portal>
+            </Popover>
+          </Box>
+        ) : null}
+
         {state.type === "PETITION" ? (
-          <Flex flex={1} justifyContent="flex-end">
-            <Box>
-              <Menu placement="bottom-end">
-                <SaveViewMenuButton isDirty={isViewDirty} />
-                <Portal>
-                  <MenuList minWidth="160px">
-                    <MenuItem
-                      isDisabled={state.view === "ALL"}
-                      onClick={handleSaveCurrentViewClick}
-                    >
-                      <FormattedMessage
-                        id="component.petition-list-header.save-current-view"
-                        defaultMessage="Save current view"
-                      />
-                    </MenuItem>
-                    <MenuItem onClick={handleSaveAsNewViewClick}>
-                      <FormattedMessage
-                        id="component.petition-list-header.save-as-new-view"
-                        defaultMessage="Save as new view"
-                      />
-                    </MenuItem>
-                  </MenuList>
-                </Portal>
-              </Menu>
-            </Box>
-          </Flex>
+          <HStack flex={1} justifyContent="flex-end">
+            <ResponsiveButtonIcon
+              icon={<ColumnsIcon />}
+              variant="outline"
+              onClick={handleEditColumns}
+              label={intl.formatMessage({
+                id: "generic.edit-columns",
+                defaultMessage: "Edit columns",
+              })}
+            />
+            <Menu placement="bottom-end">
+              <SaveViewMenuButton isDirty={isViewDirty} />
+              <Portal>
+                <MenuList minWidth="160px">
+                  <MenuItem isDisabled={state.view === "ALL"} onClick={handleSaveCurrentViewClick}>
+                    <FormattedMessage
+                      id="component.petition-list-header.save-current-view"
+                      defaultMessage="Save current view"
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={handleSaveAsNewViewClick}>
+                    <FormattedMessage
+                      id="component.petition-list-header.save-as-new-view"
+                      defaultMessage="Save as new view"
+                    />
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          </HStack>
         ) : null}
       </HStack>
       {state.search ? (
@@ -354,6 +461,7 @@ PetitionListHeader.fragments = {
           field
           direction
         }
+        columns
       }
       isDefault
     }

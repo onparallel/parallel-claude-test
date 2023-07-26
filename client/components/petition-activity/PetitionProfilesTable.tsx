@@ -139,7 +139,7 @@ function usePetitionProfilesColumns(): TableColumn<
     () => [
       {
         key: "name",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.petition-profiles-table.name-header",
           defaultMessage: "Name",
         }),
@@ -158,7 +158,7 @@ function usePetitionProfilesColumns(): TableColumn<
       },
       {
         key: "type",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.petition-profiles-table.profile-type-header",
           defaultMessage: "Type",
         }),
@@ -176,7 +176,7 @@ function usePetitionProfilesColumns(): TableColumn<
       },
       {
         key: "subscribed",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "component.petition-profiles-table.subscribers-header",
           defaultMessage: "Subscribers",
         }),
@@ -199,7 +199,7 @@ function usePetitionProfilesColumns(): TableColumn<
       },
       {
         key: "createdAt",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),

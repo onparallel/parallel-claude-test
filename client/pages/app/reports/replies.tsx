@@ -27,7 +27,7 @@ import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const QUERY_STATE = {
-  range: date().list(2),
+  range: date().list({ maxItems: 2 }),
   template: string(),
 };
 

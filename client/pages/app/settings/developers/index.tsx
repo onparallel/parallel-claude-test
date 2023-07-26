@@ -283,7 +283,7 @@ function useSubscriptionsColumns(): TableColumn<
     () => [
       {
         key: "name",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.subscriptions.header.name",
           defaultMessage: "Name",
         }),
@@ -316,7 +316,7 @@ function useSubscriptionsColumns(): TableColumn<
       },
       {
         key: "eventsUrl",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.subscriptions.header.events-url",
           defaultMessage: "Events URL",
         }),
@@ -332,7 +332,7 @@ function useSubscriptionsColumns(): TableColumn<
       },
       {
         key: "fromTemplate",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.subscriptions.header.from-template",
           defaultMessage: "From template",
         }),
@@ -370,7 +370,7 @@ function useSubscriptionsColumns(): TableColumn<
       },
       {
         key: "eventTypes",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.subscriptions.header.event-types",
           defaultMessage: "Event types",
         }),
@@ -410,7 +410,7 @@ function useSubscriptionsColumns(): TableColumn<
       },
       {
         key: "signatureKeys",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.subscriptions.header.signature-keys",
           defaultMessage: "Keys",
         }),
@@ -436,7 +436,7 @@ function useSubscriptionsColumns(): TableColumn<
       },
       {
         key: "isEnabled",
-        header: intl.formatMessage({
+        label: intl.formatMessage({
           id: "page.subscriptions.header.is-enabled",
           defaultMessage: "Enabled",
         }),
