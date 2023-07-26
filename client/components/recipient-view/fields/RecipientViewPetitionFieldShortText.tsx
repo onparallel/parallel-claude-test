@@ -50,8 +50,8 @@ export interface RecipientViewPetitionFieldShortTextProps
   > {
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
-  onUpdateReply: (replyId: string, value: string) => void;
-  onCreateReply: (value: string) => Promise<string | undefined>;
+  onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
+  onCreateReply: (content: { value: string }) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldShortText({
@@ -98,7 +98,7 @@ export function RecipientViewPetitionFieldShortText({
   const replyProps = useMemoFactory(
     (replyId: string) => ({
       onUpdate: async (value: string) => {
-        await onUpdateReply(replyId, value);
+        await onUpdateReply(replyId, { value });
       },
       onDelete: async (focusPrev?: boolean) => {
         if (isDeletingReplyRef.current[replyId]) {
@@ -146,7 +146,7 @@ export function RecipientViewPetitionFieldShortText({
       }
       setIsSaving(true);
       try {
-        const replyId = await onCreateReply(value);
+        const replyId = await onCreateReply({ value });
         if (replyId) {
           const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue("");

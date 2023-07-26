@@ -1,9 +1,6 @@
 import { serialize as serializeCookie } from "cookie";
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
-import { ContactRepository } from "../../db/repositories/ContactRepository";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
   OrganizationUsageLimit,
@@ -12,9 +9,12 @@ import {
   PetitionFieldReply,
   Task,
 } from "../../db/__types";
+import { KNEX } from "../../db/knex";
+import { ContactRepository } from "../../db/repositories/ContactRepository";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 function setCookieHeader(testClient: TestClient, contactId: number, cookieValue: string) {
   testClient.setNextReq({
@@ -529,7 +529,7 @@ describe("GraphQL/Public", () => {
       });
     });
 
-    describe("publicCreatePetitionFieldReply", () => {
+    describe("publicCreatePetitionFieldReplies", () => {
       describe("TEXT, SHORT_TEXT", () => {
         let textField: PetitionField;
         let shortTextField: PetitionField;
@@ -555,12 +555,8 @@ describe("GraphQL/Public", () => {
         it("sends error when trying to create a reply on an internal field", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -568,8 +564,12 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", internalField.id),
-              reply: "my text reply",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", internalField.id),
+                  content: { value: "my text reply" },
+                },
+              ],
             },
           );
           expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -584,12 +584,8 @@ describe("GraphQL/Public", () => {
 
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   content
                   field {
                     id
@@ -604,33 +600,35 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", textField.id),
-              reply: "my reply",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", textField.id),
+                  content: { value: "my reply" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            content: { value: "my reply" },
-            field: {
-              id: toGlobalId("PetitionField", textField.id),
-              type: "TEXT",
-              petition: {
-                id: toGlobalId("Petition", access.petition_id),
-                status: "PENDING",
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              content: { value: "my reply" },
+              field: {
+                id: toGlobalId("PetitionField", textField.id),
+                type: "TEXT",
+                petition: {
+                  id: toGlobalId("Petition", access.petition_id),
+                  status: "PENDING",
+                },
               },
             },
-          });
+          ]);
         });
 
         it("creates a reply of type TEXT", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -638,34 +636,40 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", textField.id),
-              reply: "my text reply",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", textField.id),
+                  content: { value: "my text reply" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: "my text reply" },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: "my text reply" },
+            },
+          ]);
         });
 
         it("sends error when creating a reply that exceeds field's maxLength", async () => {
           const { data, errors } = await testClient.execute(
             gql`
-              mutation ($fieldId: GID!, $keycode: ID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   id
                 }
               }
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", shortTextField.id),
-              reply: "A".repeat(11),
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", shortTextField.id),
+                  content: { value: "A".repeat(11) },
+                },
+              ],
             },
           );
 
@@ -676,12 +680,8 @@ describe("GraphQL/Public", () => {
         it("creates a reply of type SHORT_TEXT", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -689,34 +689,40 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", shortTextField.id),
-              reply: "x".repeat(10),
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", shortTextField.id),
+                  content: { value: "x".repeat(10) },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: "x".repeat(10) },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: "x".repeat(10) },
+            },
+          ]);
         });
 
         it("sends error if trying to create a reply on a single-reply field with a previously submitted reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   id
                 }
               }
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", shortTextField.id),
-              reply: "a",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", shortTextField.id),
+                  content: { value: "a" },
+                },
+              ],
             },
           );
           expect(errors).toContainGraphQLError("FIELD_ALREADY_REPLIED_ERROR");
@@ -730,26 +736,26 @@ describe("GraphQL/Public", () => {
           }));
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   id
                 }
               }
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", newField.id),
-              reply: "reply on new field",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", newField.id),
+                  content: { value: "reply on new field" },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
           const replyId = fromGlobalId(
-            data!.publicCreatePetitionFieldReply.id,
+            data!.publicCreatePetitionFieldReplies[0].id,
             "PetitionFieldReply",
           ).id;
 
@@ -773,23 +779,23 @@ describe("GraphQL/Public", () => {
         });
 
         it("sends error when trying to create a TEXT reply with invalid values", async () => {
-          for (const reply of [10, ["Hello!"], true, { reply: "this is the reply" }]) {
+          for (const value of [10, ["Hello!"], true, { reply: "this is the reply" }]) {
             const { data, errors } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                  publicCreatePetitionFieldReply(
-                    keycode: $keycode
-                    fieldId: $fieldId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                  publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                fieldId: toGlobalId("PetitionField", textField.id),
-                reply,
+                fields: [
+                  {
+                    id: toGlobalId("PetitionField", textField.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -815,12 +821,8 @@ describe("GraphQL/Public", () => {
         it("creates a reply of type SELECT", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -828,35 +830,41 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", selectField.id),
-              reply: "a",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", selectField.id),
+                  content: { value: "a" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: "a" },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: "a" },
+            },
+          ]);
         });
 
         it("sends error when trying to create a SELECT reply with invalid values", async () => {
-          for (const reply of ["invalid option", ["Hello!"], true, 10]) {
+          for (const value of ["invalid option", ["Hello!"], true, 10]) {
             const { data, errors } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                  publicCreatePetitionFieldReply(
-                    keycode: $keycode
-                    fieldId: $fieldId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                  publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                fieldId: toGlobalId("PetitionField", selectField.id),
-                reply,
+                fields: [
+                  {
+                    id: toGlobalId("PetitionField", selectField.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -881,12 +889,8 @@ describe("GraphQL/Public", () => {
         it("creates a reply of type DATE", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -894,19 +898,25 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", dateField.id),
-              reply: "2012-12-24",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", dateField.id),
+                  content: { value: "2012-12-24" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: "2012-12-24" },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: "2012-12-24" },
+            },
+          ]);
         });
 
         it("sends error when creating a DATE reply with invalid values", async () => {
-          for (const reply of [
+          for (const value of [
             "2022.02.24",
             "2021-21-24",
             "2022/01/01",
@@ -917,20 +927,20 @@ describe("GraphQL/Public", () => {
           ]) {
             const { data, errors } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                  publicCreatePetitionFieldReply(
-                    keycode: $keycode
-                    fieldId: $fieldId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                  publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                fieldId: toGlobalId("PetitionField", dateField.id),
-                reply,
+                fields: [
+                  {
+                    id: toGlobalId("PetitionField", dateField.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -975,12 +985,8 @@ describe("GraphQL/Public", () => {
         it("creates a reply of type NUMBER", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -988,27 +994,29 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", numberField.id),
-              reply: 288,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", numberField.id),
+                  content: { value: 288 },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: 288 },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: 288 },
+            },
+          ]);
         });
 
         it("creates a reply of type NUMBER with float value", async () => {
           const randomFloat = Math.random();
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -1016,35 +1024,41 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", numberField.id),
-              reply: randomFloat,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", numberField.id),
+                  content: { value: randomFloat },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: randomFloat },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: randomFloat },
+            },
+          ]);
         });
 
         it("sends error when creating a NUMBER reply with invalid values", async () => {
-          for (const reply of ["hello", true, { a: 1 }, -11, 201]) {
+          for (const value of ["hello", true, { a: 1 }, -11, 201]) {
             const { data, errors } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                  publicCreatePetitionFieldReply(
-                    keycode: $keycode
-                    fieldId: $fieldId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                  publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                fieldId: toGlobalId("PetitionField", limitedNumberField.id),
-                reply,
+                fields: [
+                  {
+                    id: toGlobalId("PetitionField", limitedNumberField.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -1072,12 +1086,8 @@ describe("GraphQL/Public", () => {
         it("creates a checkbox reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   id
                   content
                 }
@@ -1085,27 +1095,29 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", checkboxField.id),
-              reply: ["Option 1"],
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", checkboxField.id),
+                  content: { value: ["Option 1"] },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            id: data?.publicCreatePetitionFieldReply.id,
-            content: { value: ["Option 1"] },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              id: expect.any(String),
+              content: { value: ["Option 1"] },
+            },
+          ]);
         });
 
         it("creates a checkbox reply with more than 1 option", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   id
                   content
                 }
@@ -1113,36 +1125,42 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", checkboxField.id),
-              reply: ["Option 1", "Option 3"],
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", checkboxField.id),
+                  content: { value: ["Option 1", "Option 3"] },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            id: data?.publicCreatePetitionFieldReply.id,
-            content: { value: ["Option 1", "Option 3"] },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              id: expect.any(String),
+              content: { value: ["Option 1", "Option 3"] },
+            },
+          ]);
         });
 
         it("sends error when creating a CHECKBOX reply with invalid values", async () => {
-          for (const reply of [[], true, ["Option 1", "Option 2", "Option 3"], 1]) {
+          for (const value of [[], true, ["Option 1", "Option 2", "Option 3"], 1]) {
             const { data, errors } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                  publicCreatePetitionFieldReply(
-                    keycode: $keycode
-                    fieldId: $fieldId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                  publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                fieldId: toGlobalId("PetitionField", checkboxField.id),
-                reply,
+                fields: [
+                  {
+                    id: toGlobalId("PetitionField", checkboxField.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -1180,12 +1198,8 @@ describe("GraphQL/Public", () => {
         it("creates a reply of type DYNAMIC_SELECT", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   content
                   status
                 }
@@ -1193,34 +1207,38 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
-              reply: [
-                ["Comunidad autónoma", "Cataluña"],
-                ["Provincia", "Barcelona"],
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", dynamicSelectField.id),
+                  content: {
+                    value: [
+                      ["Comunidad autónoma", "Cataluña"],
+                      ["Provincia", "Barcelona"],
+                    ],
+                  },
+                },
               ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: {
-              value: [
-                ["Comunidad autónoma", "Cataluña"],
-                ["Provincia", "Barcelona"],
-              ],
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: {
+                value: [
+                  ["Comunidad autónoma", "Cataluña"],
+                  ["Provincia", "Barcelona"],
+                ],
+              },
             },
-          });
+          ]);
         });
 
         it("creates a reply of type DYNAMIC_SELECT with incomplete selection", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   content
                   status
                 }
@@ -1228,34 +1246,38 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
-              reply: [
-                ["Comunidad autónoma", "Galicia"],
-                ["Provincia", null],
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", dynamicSelectField.id),
+                  content: {
+                    value: [
+                      ["Comunidad autónoma", "Galicia"],
+                      ["Provincia", null],
+                    ],
+                  },
+                },
               ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: {
-              value: [
-                ["Comunidad autónoma", "Galicia"],
-                ["Provincia", null],
-              ],
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: {
+                value: [
+                  ["Comunidad autónoma", "Galicia"],
+                  ["Provincia", null],
+                ],
+              },
             },
-          });
+          ]);
         });
 
         it("sends error if passing an incomplete list of values", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   content
                   status
                 }
@@ -1263,8 +1285,12 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
-              reply: [["Comunidad autónoma", "Cataluña"]],
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", dynamicSelectField.id),
+                  content: { value: [["Comunidad autónoma", "Cataluña"]] },
+                },
+              ],
             },
           );
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -1272,7 +1298,7 @@ describe("GraphQL/Public", () => {
         });
 
         it("sends error when creating a DYNAMIC_SELECT reply with invalid values", async () => {
-          for (const reply of [
+          for (const value of [
             [["Comunidad autónoma", "Cataluña"]],
             [["Ciudad", "Cataluña"]],
             true,
@@ -1281,20 +1307,20 @@ describe("GraphQL/Public", () => {
           ]) {
             const { data, errors } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                  publicCreatePetitionFieldReply(
-                    keycode: $keycode
-                    fieldId: $fieldId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                  publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
-                reply,
+                fields: [
+                  {
+                    id: toGlobalId("PetitionField", dynamicSelectField.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -1320,12 +1346,8 @@ describe("GraphQL/Public", () => {
         it("creates a reply of type PHONE with spanish number", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -1333,26 +1355,28 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", phoneField.id),
-              reply: "+34 672 62 55 77",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", phoneField.id),
+                  content: { value: "+34 672 62 55 77" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: "+34 672 62 55 77" },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: "+34 672 62 55 77" },
+            },
+          ]);
         });
 
         it("creates a reply of type PHONE with russian number", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                publicCreatePetitionFieldReply(
-                  keycode: $keycode
-                  fieldId: $fieldId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                   status
                   content
                 }
@@ -1360,19 +1384,25 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              fieldId: toGlobalId("PetitionField", phoneField.id),
-              reply: "+7 (958) 822 25 34",
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", phoneField.id),
+                  content: { value: "+7 (958) 822 25 34" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicCreatePetitionFieldReply).toEqual({
-            status: "PENDING",
-            content: { value: "+7 (958) 822 25 34" },
-          });
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              status: "PENDING",
+              content: { value: "+7 (958) 822 25 34" },
+            },
+          ]);
         });
 
         it("sends error when creating a PHONE reply with invalid values", async () => {
-          for (const reply of [
+          for (const value of [
             "+34 672 622 553 774",
             "1234",
             "+5465251237",
@@ -1382,20 +1412,20 @@ describe("GraphQL/Public", () => {
           ]) {
             const { data, errors } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
-                  publicCreatePetitionFieldReply(
-                    keycode: $keycode
-                    fieldId: $fieldId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                  publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                fieldId: toGlobalId("PetitionField", phoneField.id),
-                reply,
+                fields: [
+                  {
+                    id: toGlobalId("PetitionField", phoneField.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -1407,7 +1437,7 @@ describe("GraphQL/Public", () => {
       });
     });
 
-    describe("publicUpdatePetitionFieldReply", () => {
+    describe("publicUpdatePetitionFieldReplies", () => {
       let textField: PetitionField;
       let shortTextField: PetitionField;
       let internalField: PetitionField;
@@ -1452,12 +1482,8 @@ describe("GraphQL/Public", () => {
         it("sends error when trying to update a reply on an internal field", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   status
                   content
                 }
@@ -1465,8 +1491,12 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", internalFieldReply.id),
-              reply: "updated reply",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", internalFieldReply.id),
+                  content: { value: "updated reply" },
+                },
+              ],
             },
           );
           expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1481,12 +1511,8 @@ describe("GraphQL/Public", () => {
 
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   content
                   field {
                     petition {
@@ -1499,31 +1525,33 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", textReply.id),
-              reply: "updated reply",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", textReply.id),
+                  content: { value: "updated reply" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            content: { value: "updated reply" },
-            field: {
-              petition: {
-                id: toGlobalId("Petition", access.petition_id),
-                status: "PENDING",
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              content: { value: "updated reply" },
+              field: {
+                petition: {
+                  id: toGlobalId("Petition", access.petition_id),
+                  status: "PENDING",
+                },
               },
             },
-          });
+          ]);
         });
 
         it("updates a TEXT reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -1532,36 +1560,42 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", textReply.id),
-              reply: "updated reply",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", textReply.id),
+                  content: { value: "updated reply" },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", textReply.id),
-            status: "PENDING",
-            content: { value: "updated reply" },
-          });
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", textReply.id),
+              status: "PENDING",
+              content: { value: "updated reply" },
+            },
+          ]);
         });
 
         it("sends error when trying to update an approved reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                 }
               }
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", approvedReply.id),
-              reply: "updated reply",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", approvedReply.id),
+                  content: { value: "updated reply" },
+                },
+              ],
             },
           );
           expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
@@ -1576,12 +1610,8 @@ describe("GraphQL/Public", () => {
 
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -1590,16 +1620,22 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", textReply.id),
-              reply: "new reply",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", textReply.id),
+                  content: { value: "new reply" },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", textReply.id),
-            status: "PENDING",
-            content: { value: "new reply" },
-          });
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", textReply.id),
+              status: "PENDING",
+              content: { value: "new reply" },
+            },
+          ]);
         });
 
         it("sends error if trying to update a reply with more chars than allowed on the field", async () => {
@@ -1614,20 +1650,20 @@ describe("GraphQL/Public", () => {
 
           const { data, errors } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                 }
               }
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", reply.id),
-              reply: "this reply is too long for this field!!!",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", reply.id),
+                  content: { value: "this reply is too long for this field!!!" },
+                },
+              ],
             },
           );
 
@@ -1658,12 +1694,8 @@ describe("GraphQL/Public", () => {
         it("updates a reply of type SELECT", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -1672,28 +1704,30 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", selectReply.id),
-              reply: "D",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", selectReply.id),
+                  content: { value: "D" },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", selectReply.id),
-            status: "PENDING",
-            content: { value: "D" },
-          });
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", selectReply.id),
+              status: "PENDING",
+              content: { value: "D" },
+            },
+          ]);
         });
 
         it("sends error when trying to update the reply of a SELECT field with an invalid option", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -1702,8 +1736,12 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", selectReply.id),
-              reply: "invalid option",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", selectReply.id),
+                  content: { value: "invalid option" },
+                },
+              ],
             },
           );
 
@@ -1727,12 +1765,8 @@ describe("GraphQL/Public", () => {
         it("updates a DATE reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -1741,37 +1775,43 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", dateReply.id),
-              reply: "2077-02-12",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", dateReply.id),
+                  content: { value: "2077-02-12" },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", dateReply.id),
-            status: "PENDING",
-            content: { value: "2077-02-12" },
-          });
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", dateReply.id),
+              status: "PENDING",
+              content: { value: "2077-02-12" },
+            },
+          ]);
         });
 
         it("sends error trying to update a DATE reply with invalid value", async () => {
-          for (const reply of ["2077-55-52", "12-12-2022", "2012.01.12", "hello", 123]) {
+          for (const value of ["2077-55-52", "12-12-2022", "2012.01.12", "hello", 123]) {
             const { errors, data } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                  publicUpdatePetitionFieldReply(
-                    keycode: $keycode
-                    replyId: $replyId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                  publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                replyId: toGlobalId("PetitionFieldReply", dateReply.id),
-                reply,
+                replies: [
+                  {
+                    id: toGlobalId("PetitionFieldReply", dateReply.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -1795,18 +1835,14 @@ describe("GraphQL/Public", () => {
             }),
           );
 
-          [datetimeReply] = await mocks.createRandomDateReply(datetimeField.id, access.id, 1);
+          [datetimeReply] = await mocks.createRandomDatetimeReply(datetimeField.id, access.id, 1);
         });
 
         it("updates a DATE_TIME reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -1815,47 +1851,53 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
-              reply: {
-                datetime: "2023-03-03T03:00",
-                timezone: "Europe/Madrid",
-              },
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", datetimeReply.id),
+                  content: {
+                    datetime: "2023-03-03T03:00",
+                    timezone: "Europe/Madrid",
+                  },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", datetimeReply.id),
-            status: "PENDING",
-            content: {
-              value: "2023-03-03T02:00:00.000Z",
-              datetime: "2023-03-03T03:00",
-              timezone: "Europe/Madrid",
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", datetimeReply.id),
+              status: "PENDING",
+              content: {
+                value: "2023-03-03T02:00:00.000Z",
+                datetime: "2023-03-03T03:00",
+                timezone: "Europe/Madrid",
+              },
             },
-          });
+          ]);
         });
 
         it("sends error when updating a DATE_TIME reply with invalid timezone or datetime", async () => {
-          for (const reply of [
+          for (const content of [
             { datetime: "2023.03.03 10:30", timezone: "Europe/Madrid" },
             { datetime: "2023-03-03T00:10", timezone: "Madrid" },
           ]) {
             const { errors, data } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                  publicUpdatePetitionFieldReply(
-                    keycode: $keycode
-                    replyId: $replyId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                  publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
-                reply,
+                replies: [
+                  {
+                    id: toGlobalId("PetitionFieldReply", datetimeReply.id),
+                    content,
+                  },
+                ],
               },
             );
 
@@ -1866,7 +1908,7 @@ describe("GraphQL/Public", () => {
         });
 
         it("sends error trying to update a DATE_TIME reply with invalid value", async () => {
-          for (const reply of [
+          for (const content of [
             { datetime: "2023-03-03", timezone: "Europe/Madrid" },
             { datetime: "2023-03-03T00:10", timezone: "Madrid" },
             { datetime: "2023.03.03 10:30", timezone: "UTC" },
@@ -1878,20 +1920,20 @@ describe("GraphQL/Public", () => {
           ]) {
             const { errors, data } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                  publicUpdatePetitionFieldReply(
-                    keycode: $keycode
-                    replyId: $replyId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                  publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                     id
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
-                reply,
+                replies: [
+                  {
+                    id: toGlobalId("PetitionFieldReply", datetimeReply.id),
+                    content,
+                  },
+                ],
               },
             );
 
@@ -1962,12 +2004,8 @@ describe("GraphQL/Public", () => {
         it("updates a NUMBER reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -1976,29 +2014,31 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", numberReply.id),
-              reply: 30,
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", numberReply.id),
+                  content: { value: 30 },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", numberReply.id),
-            status: "PENDING",
-            content: { value: 30 },
-          });
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", numberReply.id),
+              status: "PENDING",
+              content: { value: 30 },
+            },
+          ]);
         });
 
         it("sends error when trying to update the reply of a NUMBER field with an invalid value", async () => {
-          for (const reply of [99, 201, "hello", true]) {
+          for (const value of [99, 201, "hello", true]) {
             const { errors, data } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                  publicUpdatePetitionFieldReply(
-                    keycode: $keycode
-                    replyId: $replyId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                  publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                     id
                     status
                     content
@@ -2007,8 +2047,12 @@ describe("GraphQL/Public", () => {
               `,
               {
                 keycode: access.keycode,
-                replyId: toGlobalId("PetitionFieldReply", limitedNumberReply.id),
-                reply,
+                replies: [
+                  {
+                    id: toGlobalId("PetitionFieldReply", limitedNumberReply.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -2051,46 +2095,48 @@ describe("GraphQL/Public", () => {
         it("updates a checkbox reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   content
                 }
               }
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", checkboxReply.id),
-              reply: ["1"],
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", checkboxReply.id),
+                  content: { value: ["1"] },
+                },
+              ],
             },
           );
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            content: { value: ["1"] },
-          });
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              content: { value: ["1"] },
+            },
+          ]);
         });
 
         it("sends error if trying to update wrong option on reply", async () => {
-          for (const reply of [["1", "2"], [], "aaaa", ["unknown"], 10, {}]) {
+          for (const value of [["1", "2"], [], "aaaa", ["unknown"], 10, {}]) {
             const { errors, data } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                  publicUpdatePetitionFieldReply(
-                    keycode: $keycode
-                    replyId: $replyId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                  publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                     content
                   }
                 }
               `,
               {
                 keycode: access.keycode,
-                replyId: toGlobalId("PetitionFieldReply", checkboxReply.id),
-                reply,
+                replies: [
+                  {
+                    id: toGlobalId("PetitionFieldReply", checkboxReply.id),
+                    content: { value },
+                  },
+                ],
               },
             );
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
@@ -2142,12 +2188,8 @@ describe("GraphQL/Public", () => {
         it("updates a DYNAMIC_SELECT reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   content
                   status
@@ -2156,29 +2198,37 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
-              reply: [
-                ["Comunidad autónoma", "Aragón"],
-                ["Provincia", "Zaragoza"],
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
+                  content: {
+                    value: [
+                      ["Comunidad autónoma", "Aragón"],
+                      ["Provincia", "Zaragoza"],
+                    ],
+                  },
+                },
               ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
-            content: {
-              value: [
-                ["Comunidad autónoma", "Aragón"],
-                ["Provincia", "Zaragoza"],
-              ],
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
+              content: {
+                value: [
+                  ["Comunidad autónoma", "Aragón"],
+                  ["Provincia", "Zaragoza"],
+                ],
+              },
+              status: "PENDING",
             },
-            status: "PENDING",
-          });
+          ]);
         });
 
         it("sends error when trying to update the reply of a DYNAMIC_SELECT field with an invalid option", async () => {
-          for (const reply of [
+          for (const value of [
             [
               ["Comunidad autónoma", "Aragón"],
               ["Provincia", "Barcelona"],
@@ -2193,12 +2243,8 @@ describe("GraphQL/Public", () => {
           ]) {
             const { errors, data } = await testClient.execute(
               gql`
-                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                  publicUpdatePetitionFieldReply(
-                    keycode: $keycode
-                    replyId: $replyId
-                    reply: $reply
-                  ) {
+                mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                  publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                     id
                     content
                     status
@@ -2207,8 +2253,12 @@ describe("GraphQL/Public", () => {
               `,
               {
                 keycode: access.keycode,
-                replyId: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
-                reply,
+                replies: [
+                  {
+                    id: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
+                    content: { value },
+                  },
+                ],
               },
             );
 
@@ -2241,12 +2291,8 @@ describe("GraphQL/Public", () => {
         it("updates a PHONE reply", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -2255,28 +2301,30 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
-              reply: "+34 674 15 15 36",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", phoneReply.id),
+                  content: { value: "+34 674 15 15 36" },
+                },
+              ],
             },
           );
 
           expect(errors).toBeUndefined();
-          expect(data?.publicUpdatePetitionFieldReply).toEqual({
-            id: toGlobalId("PetitionFieldReply", phoneReply.id),
-            status: "PENDING",
-            content: { value: "+34 674 15 15 36" },
-          });
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", phoneReply.id),
+              status: "PENDING",
+              content: { value: "+34 674 15 15 36" },
+            },
+          ]);
         });
 
         it("sends error trying to update a PHONE reply with a invalid phone", async () => {
           const { errors, data } = await testClient.execute(
             gql`
-              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
-                publicUpdatePetitionFieldReply(
-                  keycode: $keycode
-                  replyId: $replyId
-                  reply: $reply
-                ) {
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
                   id
                   status
                   content
@@ -2285,8 +2333,12 @@ describe("GraphQL/Public", () => {
             `,
             {
               keycode: access.keycode,
-              replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
-              reply: "tel: +34 674 15 15 36",
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", phoneReply.id),
+                  content: { value: "tel: +34 674 15 15 36" },
+                },
+              ],
             },
           );
 

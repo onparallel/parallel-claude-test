@@ -6,8 +6,11 @@ import {
 } from "./fragments";
 
 gql`
-  mutation SubmitReply_createPetitionFieldReply($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {
-    createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+  mutation SubmitReply_createPetitionFieldReplies(
+    $petitionId: GID!
+    $fields: [CreatePetitionFieldReplyInput!]!
+  ) {
+    createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
       ...PetitionFieldReply
     }
   }
@@ -63,8 +66,11 @@ gql`
   ${PetitionFieldReplyFragment}
 `;
 gql`
-  mutation UpdateReply_updatePetitionFieldReply($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
-    updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+  mutation UpdateReply_updatePetitionFieldReplies(
+    $petitionId: GID!
+    $replies: [UpdatePetitionFieldReplyInput!]!
+  ) {
+    updatePetitionFieldReplies(petitionId: $petitionId, replies: $replies) {
       ...PetitionFieldReply
       field {
         id

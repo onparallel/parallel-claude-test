@@ -1,5 +1,4 @@
 import { differenceInSeconds, isSameMonth, isThisMonth, subMonths } from "date-fns";
-import { zonedTimeToUtc } from "date-fns-tz";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
@@ -24,6 +23,7 @@ import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
+import { fieldReplyContent } from "../../util/fieldReplyContent";
 import { PetitionFieldVisibility, evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -42,8 +42,8 @@ import {
 import { SlateNode } from "../../util/slate/render";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
-import { validateReplyValue } from "../../util/validateReplyValue";
 import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
+import { validateReplyContent } from "../../util/validateReplyContent";
 import {
   Contact,
   ContactLocale,
@@ -1933,6 +1933,7 @@ export class PetitionRepository extends BaseRepository {
     return replies;
   }
 
+  /** @deprecated */
   async updatePetitionFieldReply(
     replyId: number,
     data: Partial<PetitionFieldReply>,
@@ -1992,6 +1993,94 @@ export class PetitionRepository extends BaseRepository {
     }
 
     return reply;
+  }
+
+  async updatePetitionFieldRepliesContent(
+    petitionId: number,
+    data: { id: number; content?: any }[],
+    updater: User | PetitionAccess,
+    t?: Knex.Transaction,
+  ) {
+    const replyIds = uniq(data.map((d) => d.id));
+
+    const [fields, oldReplies] = await Promise.all([
+      this.loadFieldForReply(replyIds),
+      this.loadFieldReply(replyIds),
+    ]);
+
+    const isContact = "keycode" in updater;
+    const updatedBy = isContact ? `Contact:${updater.contact_id}` : `User:${updater.id}`;
+
+    const replies = await this.raw<PetitionFieldReply>(
+      /* sql */ `
+      with input_data as (
+        select * from (?) as t(reply_id, content)
+      )
+      update petition_field_reply pfr
+      set
+        content = id.content,
+        status = 'PENDING',
+        updated_at = NOW(),
+        updated_by = ?,
+        user_id = ?,
+        petition_access_id = ?
+      from input_data id
+      where pfr.id = id.reply_id
+      and pfr.deleted_at is null
+      returning pfr.*;
+  `,
+      [
+        this.sqlValues(
+          data.map((d) => [d.id, d.content]),
+          ["int", "jsonb"],
+        ),
+        updatedBy,
+        isContact ? null : updater.id,
+        isContact ? updater.id : null,
+      ],
+      t,
+    );
+
+    if (fields.some((f) => !f!.is_internal)) {
+      await this.updatePetition(
+        petitionId,
+        {
+          status: "PENDING",
+          closed_at: null,
+        },
+        updatedBy,
+        t,
+      );
+      // clear cache to make sure petition status is updated in next graphql calls
+      this.loadPetition.dataloader.clear(petitionId);
+    }
+
+    const petitionAccessIdOrUserId = isContact
+      ? { petition_access_id: updater.id }
+      : { user_id: updater.id };
+
+    await this.createOrUpdateReplyEvents(petitionId, replies, petitionAccessIdOrUserId, t);
+
+    const events: ReplyStatusChangedEvent<true>[] = [];
+    for (const reply of replies) {
+      const oldReply = oldReplies.find((r) => r?.id === reply.id);
+      if (oldReply && oldReply.status !== "PENDING") {
+        events.push({
+          type: "REPLY_STATUS_CHANGED",
+          petition_id: petitionId,
+          data: {
+            status: "PENDING",
+            petition_field_id: reply.petition_field_id,
+            petition_field_reply_id: reply.id,
+            ...petitionAccessIdOrUserId,
+          },
+        });
+      }
+    }
+
+    await this.createEvent(events, t);
+
+    return replies;
   }
 
   async updatePetitionMetadata(petitionId: number, metadata: any) {
@@ -2933,14 +3022,18 @@ export class PetitionRepository extends BaseRepository {
     return petitionEvents;
   }
 
-  async createEventWithDelay(events: MaybeArray<CreatePetitionEvent>, notifyAfter: number) {
+  async createEventWithDelay(
+    events: MaybeArray<CreatePetitionEvent>,
+    notifyAfter: number,
+    t?: Knex.Transaction,
+  ) {
     const eventsArray = unMaybeArray(events);
     if (eventsArray.length === 0) {
       return [];
     }
 
-    const petitionEvents = await this.insert("petition_event", eventsArray);
-    await this.queues.enqueueEvents(petitionEvents, "petition_event", notifyAfter);
+    const petitionEvents = await this.insert("petition_event", eventsArray, t);
+    await this.queues.enqueueEvents(petitionEvents, "petition_event", notifyAfter, t);
 
     return petitionEvents;
   }
@@ -2956,9 +3049,49 @@ export class PetitionRepository extends BaseRepository {
     return event;
   }
 
+  private async createOrUpdateReplyEvents(
+    petitionId: number,
+    replies: Pick<PetitionFieldReply, "id" | "petition_field_id">[],
+    updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">,
+    t?: Knex.Transaction,
+  ) {
+    const latestEvent = await this.getLatestEventForPetitionId(petitionId);
+    if (
+      latestEvent &&
+      (latestEvent.type === "REPLY_CREATED" || latestEvent.type === "REPLY_UPDATED") &&
+      replies.find((r) => r.id === latestEvent.data.petition_field_reply_id) &&
+      ((isDefined(updater.user_id) && latestEvent.data.user_id === updater.user_id) ||
+        (isDefined(updater.petition_access_id) &&
+          latestEvent.data.petition_access_id === updater.petition_access_id)) &&
+      differenceInSeconds(new Date(), latestEvent.created_at) < this.REPLY_EVENTS_DELAY_SECONDS
+    ) {
+      await this.updateEvent(
+        latestEvent.id,
+        { created_at: new Date() },
+        this.REPLY_EVENTS_DELAY_SECONDS,
+        t,
+      );
+    } else {
+      await this.createEventWithDelay(
+        replies.map((r) => ({
+          type: "REPLY_UPDATED",
+          petition_id: petitionId,
+          data: {
+            petition_field_id: r.petition_field_id,
+            petition_field_reply_id: r.id,
+            ...updater,
+          },
+        })),
+        this.REPLY_EVENTS_DELAY_SECONDS,
+        t,
+      );
+    }
+  }
+
+  /** @deprecated */
   private async createOrUpdateReplyEvent(
     petitionId: number,
-    reply: PetitionFieldReply,
+    reply: Pick<PetitionFieldReply, "id" | "petition_field_id">,
     updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">,
   ) {
     const latestEvent = await this.getLatestEventForPetitionId(petitionId);
@@ -2995,9 +3128,14 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
-  async updateEvent(eventId: number, data: Partial<PetitionEvent>, notifyAfter?: number) {
-    const [event] = await this.from("petition_event").where("id", eventId).update(data, "*");
-    await this.queues.enqueueEvents(event, "petition_event", notifyAfter);
+  async updateEvent(
+    eventId: number,
+    data: Partial<PetitionEvent>,
+    notifyAfter?: number,
+    t?: Knex.Transaction,
+  ) {
+    const [event] = await this.from("petition_event", t).where("id", eventId).update(data, "*");
+    await this.queues.enqueueEvents(event, "petition_event", notifyAfter, t);
 
     return event;
   }
@@ -6131,30 +6269,20 @@ export class PetitionRepository extends BaseRepository {
   async prefillPetition(petitionId: number, prefill: Record<string, any>, owner: User) {
     const fields = await this.loadFieldsForPetition(petitionId, { refresh: true });
     const replies = await this.parsePrefillReplies(prefill, fields);
-    await pMap(
-      replies,
-      async ({ fieldId, fieldType, reply }) => {
-        const content =
-          fieldType === "DATE_TIME"
-            ? {
-                ...reply,
-                value: zonedTimeToUtc(reply.datetime, reply.timezone).toISOString(),
-              }
-            : { value: reply };
 
-        await this.createPetitionFieldReply(
-          petitionId,
-          {
-            user_id: owner.id,
-            petition_field_id: fieldId,
-            content,
-            type: fieldType,
-          },
-          `User:${owner.id}`,
-        );
-      },
-      { concurrency: 1 },
-    );
+    if (replies.length > 0) {
+      await this.createPetitionFieldReply(
+        petitionId,
+        replies.map((reply) => ({
+          user_id: owner.id,
+          petition_field_id: reply.fieldId,
+          content: fieldReplyContent(reply.fieldType, reply.content),
+          type: reply.fieldType,
+        })),
+        `User:${owner.id}`,
+      );
+    }
+
     return (await this.loadPetition(petitionId))!;
   }
 
@@ -6163,7 +6291,7 @@ export class PetitionRepository extends BaseRepository {
     const result: {
       fieldId: number;
       fieldType: PetitionFieldType;
-      reply: any;
+      content: any;
     }[] = [];
 
     for (let i = 0; i < entries.length; i++) {
@@ -6179,30 +6307,34 @@ export class PetitionRepository extends BaseRepository {
       if (field.type === "CHECKBOX") {
         // for CHECKBOX fields, a single reply can contain more than 1 option, so each reply is a string[]
         if (fieldReplies.every((r) => typeof r === "string")) {
-          singleReplies.push(uniq(fieldReplies));
+          singleReplies.push({ value: uniq(fieldReplies) });
         } else if (fieldReplies.every((r) => Array.isArray(r))) {
-          singleReplies.push(...fieldReplies.map((r) => uniq(r)));
+          singleReplies.push(...fieldReplies.map((r) => ({ value: uniq(r) })));
         }
       } else if (field.type === "DYNAMIC_SELECT") {
         // for DYNAMIC_SELECT field, a single reply is like ["Cataluña", "Barcelona"]. each element on the array is a selection of that level.
         // here we need to add the label for sending it to the backend with correct format. e.g.: [["Comunidad Autónoma", "Cataluña"], ["Provincia", "Barcelona"]]
         if (fieldReplies.every((r) => typeof r === "string")) {
-          singleReplies.push(fieldReplies.map((value, i) => [field.options.labels[i], value]));
+          singleReplies.push({
+            value: fieldReplies.map((value, i) => [field.options.labels[i], value]),
+          });
         } else if (fieldReplies.every((r) => Array.isArray(r))) {
           singleReplies.push(
-            ...fieldReplies.map((reply: string[]) =>
-              reply.map((value, i) => [field.options.labels[i], value]),
-            ),
+            ...fieldReplies.map((reply: string[]) => ({
+              value: reply.map((value, i) => [field.options.labels[i], value]),
+            })),
           );
         }
+      } else if (field.type === "DATE_TIME") {
+        singleReplies.push(...fieldReplies); // DATE_TIME replies already are objects with { datetime, timezone } format
       } else {
-        singleReplies.push(...fieldReplies);
+        singleReplies.push(...fieldReplies.map((value) => ({ value })));
       }
 
-      for (const reply of singleReplies) {
+      for (const content of singleReplies) {
         try {
-          validateReplyValue(field, reply);
-          result.push({ fieldId: field.id, fieldType: field.type, reply });
+          validateReplyContent(field, content);
+          result.push({ fieldId: field.id, fieldType: field.type, content });
         } catch {}
       }
     }

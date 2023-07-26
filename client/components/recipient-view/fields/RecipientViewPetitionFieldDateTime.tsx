@@ -42,8 +42,8 @@ export interface RecipientViewPetitionFieldDateTimeProps
   > {
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
-  onUpdateReply: (replyId: string, value: FieldDateTimeReply) => void;
-  onCreateReply: (value: FieldDateTimeReply) => Promise<string | undefined>;
+  onUpdateReply: (replyId: string, content: FieldDateTimeReply) => Promise<void>;
+  onCreateReply: (content: FieldDateTimeReply) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldDateTime({
@@ -86,8 +86,8 @@ export function RecipientViewPetitionFieldDateTime({
   }
 
   const handleUpdate = useMemoFactory(
-    (replyId: string) => async (value: FieldDateTimeReply) => {
-      await onUpdateReply(replyId, value);
+    (replyId: string) => async (content: FieldDateTimeReply) => {
+      await onUpdateReply(replyId, content);
     },
     [onUpdateReply],
   );

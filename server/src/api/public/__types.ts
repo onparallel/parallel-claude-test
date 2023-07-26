@@ -776,7 +776,12 @@ export type Mutation = {
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Creates a reply on a petition field as recipient. */
+  /** Creates replies on a petition field as recipient. */
+  publicCreatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field as recipient.
+   * @deprecated use publicCreatePetitionFieldReplies
+   */
   publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
@@ -807,7 +812,12 @@ export type Mutation = {
   publicStartAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Creates a reply on a petition field as recipient. */
+  /** Updates replies on a petition field as recipient. */
+  publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field as recipient.
+   * @deprecated use publicUpdatePetitionFieldReplies
+   */
   publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
@@ -910,9 +920,14 @@ export type Mutation = {
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
+  /** Updates multiple replies for a petition at once */
+  updatePetitionFieldReplies: Array<PetitionFieldReply>;
   /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
-  /** Updates a reply on a petition field */
+  /**
+   * Updates a reply on a petition field
+   * @deprecated use updatePetitionFieldReplies
+   */
   updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
@@ -1534,6 +1549,11 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationpublicCreatePetitionFieldRepliesArgs = {
+  fields: Array<CreatePetitionFieldReplyInput>;
+  keycode: Scalars["ID"]["input"];
+};
+
 export type MutationpublicCreatePetitionFieldReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
@@ -1626,6 +1646,11 @@ export type MutationpublicUpdatePetitionFieldCommentArgs = {
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
+};
+
+export type MutationpublicUpdatePetitionFieldRepliesArgs = {
+  keycode: Scalars["ID"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput>;
 };
 
 export type MutationpublicUpdatePetitionFieldReplyArgs = {
@@ -1936,6 +1961,11 @@ export type MutationupdatePetitionFieldCommentArgs = {
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
   sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type MutationupdatePetitionFieldRepliesArgs = {
+  petitionId: Scalars["GID"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput>;
 };
 
 export type MutationupdatePetitionFieldRepliesStatusArgs = {
@@ -4691,6 +4721,11 @@ export type UpdatePetitionFieldInput = {
   showInPdf?: InputMaybe<Scalars["Boolean"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
+};
+
+export type UpdatePetitionFieldReplyInput = {
+  content?: InputMaybe<Scalars["JSON"]["input"]>;
+  id: Scalars["GID"]["input"];
 };
 
 export type UpdatePetitionInput = {
@@ -7919,21 +7954,20 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
   }>;
 };
 
-export type SubmitReply_createPetitionFieldReplyMutationVariables = Exact<{
+export type SubmitReply_createPetitionFieldRepliesMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  fieldId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
+  fields: Array<CreatePetitionFieldReplyInput> | CreatePetitionFieldReplyInput;
 }>;
 
-export type SubmitReply_createPetitionFieldReplyMutation = {
-  createPetitionFieldReply: {
+export type SubmitReply_createPetitionFieldRepliesMutation = {
+  createPetitionFieldReplies: Array<{
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
     metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
-  };
+  }>;
 };
 
 export type SubmitReply_createFileUploadReplyMutationVariables = Exact<{
@@ -7993,14 +8027,13 @@ export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation = {
   };
 };
 
-export type UpdateReply_updatePetitionFieldReplyMutationVariables = Exact<{
+export type UpdateReply_updatePetitionFieldRepliesMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  replyId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput> | UpdatePetitionFieldReplyInput;
 }>;
 
-export type UpdateReply_updatePetitionFieldReplyMutation = {
-  updatePetitionFieldReply: {
+export type UpdateReply_updatePetitionFieldRepliesMutation = {
+  updatePetitionFieldReplies: Array<{
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
@@ -8008,7 +8041,7 @@ export type UpdateReply_updatePetitionFieldReplyMutation = {
     createdAt: string;
     updatedAt: string;
     field: { id: string } | null;
-  };
+  }>;
 };
 
 export type UpdateReply_updateFileUploadReplyMutationVariables = Exact<{
@@ -9644,16 +9677,19 @@ export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
   UnsubscribeFromProfile_unsubscribeFromProfileMutation,
   UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables
 >;
-export const SubmitReply_createPetitionFieldReplyDocument = gql`
-  mutation SubmitReply_createPetitionFieldReply($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {
-    createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+export const SubmitReply_createPetitionFieldRepliesDocument = gql`
+  mutation SubmitReply_createPetitionFieldReplies(
+    $petitionId: GID!
+    $fields: [CreatePetitionFieldReplyInput!]!
+  ) {
+    createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
       ...PetitionFieldReply
     }
   }
   ${PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  SubmitReply_createPetitionFieldReplyMutation,
-  SubmitReply_createPetitionFieldReplyMutationVariables
+  SubmitReply_createPetitionFieldRepliesMutation,
+  SubmitReply_createPetitionFieldRepliesMutationVariables
 >;
 export const SubmitReply_createFileUploadReplyDocument = gql`
   mutation SubmitReply_createFileUploadReply(
@@ -9713,9 +9749,12 @@ export const UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument = gql`
   UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation,
   UpdateReplyStatus_updatePetitionFieldRepliesStatusMutationVariables
 >;
-export const UpdateReply_updatePetitionFieldReplyDocument = gql`
-  mutation UpdateReply_updatePetitionFieldReply($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
-    updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+export const UpdateReply_updatePetitionFieldRepliesDocument = gql`
+  mutation UpdateReply_updatePetitionFieldReplies(
+    $petitionId: GID!
+    $replies: [UpdatePetitionFieldReplyInput!]!
+  ) {
+    updatePetitionFieldReplies(petitionId: $petitionId, replies: $replies) {
       ...PetitionFieldReply
       field {
         id
@@ -9724,8 +9763,8 @@ export const UpdateReply_updatePetitionFieldReplyDocument = gql`
   }
   ${PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  UpdateReply_updatePetitionFieldReplyMutation,
-  UpdateReply_updatePetitionFieldReplyMutationVariables
+  UpdateReply_updatePetitionFieldRepliesMutation,
+  UpdateReply_updatePetitionFieldRepliesMutationVariables
 >;
 export const UpdateReply_updateFileUploadReplyDocument = gql`
   mutation UpdateReply_updateFileUploadReply(

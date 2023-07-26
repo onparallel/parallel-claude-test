@@ -35,8 +35,8 @@ export interface RecipientViewPetitionFieldDateProps
   > {
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
-  onUpdateReply: (replyId: string, value: string) => void;
-  onCreateReply: (value: string) => Promise<string | undefined>;
+  onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
+  onCreateReply: (content: { value: string }) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldDate({
@@ -79,7 +79,7 @@ export function RecipientViewPetitionFieldDate({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
-      await onUpdateReply(replyId, value);
+      await onUpdateReply(replyId, { value });
     },
     [onUpdateReply],
   );
@@ -117,7 +117,7 @@ export function RecipientViewPetitionFieldDate({
       }
       setIsSaving(true);
       try {
-        const replyId = await onCreateReply(value);
+        const replyId = await onCreateReply({ value });
         if (replyId) {
           setValue("");
           if (focusCreatedReply) {

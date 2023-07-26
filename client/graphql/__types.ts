@@ -821,7 +821,12 @@ export interface Mutation {
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Creates a reply on a petition field as recipient. */
+  /** Creates replies on a petition field as recipient. */
+  publicCreatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field as recipient.
+   * @deprecated use publicCreatePetitionFieldReplies
+   */
   publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
@@ -852,7 +857,12 @@ export interface Mutation {
   publicStartAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Creates a reply on a petition field as recipient. */
+  /** Updates replies on a petition field as recipient. */
+  publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field as recipient.
+   * @deprecated use publicUpdatePetitionFieldReplies
+   */
   publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
@@ -955,9 +965,14 @@ export interface Mutation {
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
+  /** Updates multiple replies for a petition at once */
+  updatePetitionFieldReplies: Array<PetitionFieldReply>;
   /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
-  /** Updates a reply on a petition field */
+  /**
+   * Updates a reply on a petition field
+   * @deprecated use updatePetitionFieldReplies
+   */
   updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
@@ -1579,6 +1594,11 @@ export interface MutationpublicCreatePetitionFieldCommentArgs {
   petitionFieldId: Scalars["GID"]["input"];
 }
 
+export interface MutationpublicCreatePetitionFieldRepliesArgs {
+  fields: Array<CreatePetitionFieldReplyInput>;
+  keycode: Scalars["ID"]["input"];
+}
+
 export interface MutationpublicCreatePetitionFieldReplyArgs {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
@@ -1671,6 +1691,11 @@ export interface MutationpublicUpdatePetitionFieldCommentArgs {
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
+}
+
+export interface MutationpublicUpdatePetitionFieldRepliesArgs {
+  keycode: Scalars["ID"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput>;
 }
 
 export interface MutationpublicUpdatePetitionFieldReplyArgs {
@@ -1981,6 +2006,11 @@ export interface MutationupdatePetitionFieldCommentArgs {
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
   sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+}
+
+export interface MutationupdatePetitionFieldRepliesArgs {
+  petitionId: Scalars["GID"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput>;
 }
 
 export interface MutationupdatePetitionFieldRepliesStatusArgs {
@@ -4864,6 +4894,11 @@ export interface UpdatePetitionFieldInput {
   showInPdf?: InputMaybe<Scalars["Boolean"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
+}
+
+export interface UpdatePetitionFieldReplyInput {
+  content?: InputMaybe<Scalars["JSON"]["input"]>;
+  id: Scalars["GID"]["input"];
 }
 
 export interface UpdatePetitionInput {
@@ -13992,14 +14027,13 @@ export type PreviewPetitionFieldMutations_deletePetitionReplyMutation = {
   };
 };
 
-export type PreviewPetitionFieldMutations_updatePetitionFieldReplyMutationVariables = Exact<{
+export type PreviewPetitionFieldMutations_updatePetitionFieldRepliesMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  replyId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput> | UpdatePetitionFieldReplyInput;
 }>;
 
-export type PreviewPetitionFieldMutations_updatePetitionFieldReplyMutation = {
-  updatePetitionFieldReply: {
+export type PreviewPetitionFieldMutations_updatePetitionFieldRepliesMutation = {
+  updatePetitionFieldReplies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
@@ -14012,7 +14046,7 @@ export type PreviewPetitionFieldMutations_updatePetitionFieldReplyMutation = {
         | { __typename?: "Petition"; status: PetitionStatus; id: string }
         | { __typename?: "PetitionTemplate"; id: string };
     } | null;
-  };
+  }>;
 };
 
 export type useCreatePetitionFieldReply_PetitionFieldFragment = {
@@ -14021,14 +14055,13 @@ export type useCreatePetitionFieldReply_PetitionFieldFragment = {
   type: PetitionFieldType;
 };
 
-export type PreviewPetitionFieldMutations_createPetitionFieldReplyMutationVariables = Exact<{
+export type PreviewPetitionFieldMutations_createPetitionFieldRepliesMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  fieldId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
+  fields: Array<CreatePetitionFieldReplyInput> | CreatePetitionFieldReplyInput;
 }>;
 
-export type PreviewPetitionFieldMutations_createPetitionFieldReplyMutation = {
-  createPetitionFieldReply: {
+export type PreviewPetitionFieldMutations_createPetitionFieldRepliesMutation = {
+  createPetitionFieldReplies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
@@ -14044,7 +14077,7 @@ export type PreviewPetitionFieldMutations_createPetitionFieldReplyMutation = {
         | { __typename?: "PetitionTemplate"; id: string };
       replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
     } | null;
-  };
+  }>;
 };
 
 export type PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables = Exact<{
@@ -16823,14 +16856,13 @@ export type RecipientViewPetitionField_publicDeletePetitionFieldReplyMutation = 
   };
 };
 
-export type RecipientViewPetitionField_publicCreatePetitionFieldReplyMutationVariables = Exact<{
+export type RecipientViewPetitionField_publicCreatePetitionFieldRepliesMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
-  fieldId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
+  fields: Array<CreatePetitionFieldReplyInput> | CreatePetitionFieldReplyInput;
 }>;
 
-export type RecipientViewPetitionField_publicCreatePetitionFieldReplyMutation = {
-  publicCreatePetitionFieldReply: {
+export type RecipientViewPetitionField_publicCreatePetitionFieldRepliesMutation = {
+  publicCreatePetitionFieldReplies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
@@ -16844,17 +16876,16 @@ export type RecipientViewPetitionField_publicCreatePetitionFieldReplyMutation = 
       petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
       replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
     };
-  };
+  }>;
 };
 
-export type RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutationVariables = Exact<{
+export type RecipientViewPetitionField_publicUpdatePetitionFieldRepliesMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
-  replyId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput> | UpdatePetitionFieldReplyInput;
 }>;
 
-export type RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutation = {
-  publicUpdatePetitionFieldReply: {
+export type RecipientViewPetitionField_publicUpdatePetitionFieldRepliesMutation = {
+  publicUpdatePetitionFieldReplies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
@@ -16867,7 +16898,7 @@ export type RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutation = 
       id: string;
       petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
     };
-  };
+  }>;
 };
 
 export type RecipientViewPetitionField_publicStartAsyncFieldCompletionMutationVariables = Exact<{
@@ -40012,13 +40043,12 @@ export const PreviewPetitionFieldMutations_deletePetitionReplyDocument = gql`
   PreviewPetitionFieldMutations_deletePetitionReplyMutation,
   PreviewPetitionFieldMutations_deletePetitionReplyMutationVariables
 >;
-export const PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument = gql`
-  mutation PreviewPetitionFieldMutations_updatePetitionFieldReply(
+export const PreviewPetitionFieldMutations_updatePetitionFieldRepliesDocument = gql`
+  mutation PreviewPetitionFieldMutations_updatePetitionFieldReplies(
     $petitionId: GID!
-    $replyId: GID!
-    $reply: JSON!
+    $replies: [UpdatePetitionFieldReplyInput!]!
   ) {
-    updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+    updatePetitionFieldReplies(petitionId: $petitionId, replies: $replies) {
       id
       content
       status
@@ -40035,16 +40065,15 @@ export const PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument = gq
     }
   }
 ` as unknown as DocumentNode<
-  PreviewPetitionFieldMutations_updatePetitionFieldReplyMutation,
-  PreviewPetitionFieldMutations_updatePetitionFieldReplyMutationVariables
+  PreviewPetitionFieldMutations_updatePetitionFieldRepliesMutation,
+  PreviewPetitionFieldMutations_updatePetitionFieldRepliesMutationVariables
 >;
-export const PreviewPetitionFieldMutations_createPetitionFieldReplyDocument = gql`
-  mutation PreviewPetitionFieldMutations_createPetitionFieldReply(
+export const PreviewPetitionFieldMutations_createPetitionFieldRepliesDocument = gql`
+  mutation PreviewPetitionFieldMutations_createPetitionFieldReplies(
     $petitionId: GID!
-    $fieldId: GID!
-    $reply: JSON!
+    $fields: [CreatePetitionFieldReplyInput!]!
   ) {
-    createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+    createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
       field {
         id
@@ -40062,8 +40091,8 @@ export const PreviewPetitionFieldMutations_createPetitionFieldReplyDocument = gq
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  PreviewPetitionFieldMutations_createPetitionFieldReplyMutation,
-  PreviewPetitionFieldMutations_createPetitionFieldReplyMutationVariables
+  PreviewPetitionFieldMutations_createPetitionFieldRepliesMutation,
+  PreviewPetitionFieldMutations_createPetitionFieldRepliesMutationVariables
 >;
 export const PreviewPetitionFieldMutations_createFileUploadReplyDocument = gql`
   mutation PreviewPetitionFieldMutations_createFileUploadReply(
@@ -40766,13 +40795,12 @@ export const RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument =
   RecipientViewPetitionField_publicDeletePetitionFieldReplyMutation,
   RecipientViewPetitionField_publicDeletePetitionFieldReplyMutationVariables
 >;
-export const RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicCreatePetitionFieldReply(
+export const RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument = gql`
+  mutation RecipientViewPetitionField_publicCreatePetitionFieldReplies(
     $keycode: ID!
-    $fieldId: GID!
-    $reply: JSON!
+    $fields: [CreatePetitionFieldReplyInput!]!
   ) {
-    publicCreatePetitionFieldReply(keycode: $keycode, fieldId: $fieldId, reply: $reply) {
+    publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
       field {
         id
@@ -40788,16 +40816,15 @@ export const RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument =
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicCreatePetitionFieldReplyMutation,
-  RecipientViewPetitionField_publicCreatePetitionFieldReplyMutationVariables
+  RecipientViewPetitionField_publicCreatePetitionFieldRepliesMutation,
+  RecipientViewPetitionField_publicCreatePetitionFieldRepliesMutationVariables
 >;
-export const RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicUpdatePetitionFieldReply(
+export const RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument = gql`
+  mutation RecipientViewPetitionField_publicUpdatePetitionFieldReplies(
     $keycode: ID!
-    $replyId: GID!
-    $reply: JSON!
+    $replies: [UpdatePetitionFieldReplyInput!]!
   ) {
-    publicUpdatePetitionFieldReply(keycode: $keycode, replyId: $replyId, reply: $reply) {
+    publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
       field {
         id
@@ -40810,8 +40837,8 @@ export const RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument =
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutation,
-  RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutationVariables
+  RecipientViewPetitionField_publicUpdatePetitionFieldRepliesMutation,
+  RecipientViewPetitionField_publicUpdatePetitionFieldRepliesMutationVariables
 >;
 export const RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument = gql`
   mutation RecipientViewPetitionField_publicStartAsyncFieldCompletion(

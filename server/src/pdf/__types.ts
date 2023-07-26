@@ -776,7 +776,12 @@ export type Mutation = {
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Creates a reply on a petition field as recipient. */
+  /** Creates replies on a petition field as recipient. */
+  publicCreatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field as recipient.
+   * @deprecated use publicCreatePetitionFieldReplies
+   */
   publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
@@ -807,7 +812,12 @@ export type Mutation = {
   publicStartAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Creates a reply on a petition field as recipient. */
+  /** Updates replies on a petition field as recipient. */
+  publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field as recipient.
+   * @deprecated use publicUpdatePetitionFieldReplies
+   */
   publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
@@ -910,9 +920,14 @@ export type Mutation = {
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
+  /** Updates multiple replies for a petition at once */
+  updatePetitionFieldReplies: Array<PetitionFieldReply>;
   /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
-  /** Updates a reply on a petition field */
+  /**
+   * Updates a reply on a petition field
+   * @deprecated use updatePetitionFieldReplies
+   */
   updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
@@ -1534,6 +1549,11 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationpublicCreatePetitionFieldRepliesArgs = {
+  fields: Array<CreatePetitionFieldReplyInput>;
+  keycode: Scalars["ID"]["input"];
+};
+
 export type MutationpublicCreatePetitionFieldReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
@@ -1626,6 +1646,11 @@ export type MutationpublicUpdatePetitionFieldCommentArgs = {
   keycode: Scalars["ID"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
+};
+
+export type MutationpublicUpdatePetitionFieldRepliesArgs = {
+  keycode: Scalars["ID"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput>;
 };
 
 export type MutationpublicUpdatePetitionFieldReplyArgs = {
@@ -1936,6 +1961,11 @@ export type MutationupdatePetitionFieldCommentArgs = {
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
   sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type MutationupdatePetitionFieldRepliesArgs = {
+  petitionId: Scalars["GID"]["input"];
+  replies: Array<UpdatePetitionFieldReplyInput>;
 };
 
 export type MutationupdatePetitionFieldRepliesStatusArgs = {
@@ -4691,6 +4721,11 @@ export type UpdatePetitionFieldInput = {
   showInPdf?: InputMaybe<Scalars["Boolean"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
+};
+
+export type UpdatePetitionFieldReplyInput = {
+  content?: InputMaybe<Scalars["JSON"]["input"]>;
+  id: Scalars["GID"]["input"];
 };
 
 export type UpdatePetitionInput = {

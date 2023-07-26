@@ -6,6 +6,7 @@ import pMap from "p-map";
 import { isDefined, omit, pick, uniq, zip } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi, RestParameter } from "../rest/core";
 import {
@@ -78,7 +79,6 @@ import {
   GetTags_tagsDocument,
   GetTemplate_templateDocument,
   GetTemplates_templatesDocument,
-  Maybe,
   OrganizationFragmentDoc,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_repliesDocument,
@@ -95,7 +95,7 @@ import {
   SubmitReplies_bulkCreatePetitionRepliesDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
   SubmitReply_createFileUploadReplyDocument,
-  SubmitReply_createPetitionFieldReplyDocument,
+  SubmitReply_createPetitionFieldRepliesDocument,
   SubmitReply_petitionDocument,
   SubscribeToProfile_subscribeToProfileDocument,
   TagFragmentDoc,
@@ -119,7 +119,7 @@ import {
   UpdateReply_petitionDocument,
   UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
-  UpdateReply_updatePetitionFieldReplyDocument,
+  UpdateReply_updatePetitionFieldRepliesDocument,
   UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
   UserFragmentDoc,
 } from "./__types";
@@ -141,6 +141,7 @@ import {
 } from "./fragments";
 import {
   bodyMessageToRTE,
+  buildSubmittedReplyContent,
   buildTagsFilter,
   containsGraphQLError,
   getTags,
@@ -1659,7 +1660,7 @@ api
       description: outdent`
         Submits a reply on a given field of the parallel.
       `,
-      body: Body([FormDataBodyContent(SubmitFileReply), JsonBodyContent(SubmitReply)], {
+      body: Body([JsonBodyContent(SubmitReply), FormDataBodyContent(SubmitFileReply)], {
         description: replyBodyDescription,
       }),
       responses: {
@@ -1677,80 +1678,50 @@ api
         petitionId: params.petitionId,
       });
       const field = petition?.fields.find((f) => f.id === params.fieldId);
+
       try {
         const fieldType = field?.type;
         let newReply;
-        let replyValue: any = body.reply;
-        if (fieldType === "DYNAMIC_SELECT") {
-          const labels = petition?.fields.find((f) => f.id === params.fieldId)?.options
-            ?.labels as string[];
-          const replies = body.reply as Maybe<string>[];
-          if (replies.length === 0) {
-            throw new BadRequestError(`Reply must be an array of strings`);
-          }
-          replyValue = labels.map((label, i) => [label, replies[i]]);
-        }
-        switch (fieldType) {
-          case "TEXT":
-          case "SHORT_TEXT":
-          case "SELECT":
-          case "DATE":
-          case "PHONE":
-          case "NUMBER":
-          case "CHECKBOX":
-          case "DYNAMIC_SELECT":
-            ({ createPetitionFieldReply: newReply } = await client.request(
-              SubmitReply_createPetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                fieldId: params.fieldId,
-                reply: replyValue,
-              },
-            ));
-            break;
-          case "DATE_TIME":
-            if (typeof body.reply !== "object") {
-              throw new BadRequestError(`Reply for ${fieldType} field must be a valid object.`);
-            }
-            ({ createPetitionFieldReply: newReply } = await client.request(
-              SubmitReply_createPetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                fieldId: params.fieldId,
-                reply: replyValue,
-              },
-            ));
-            break;
-          case "FILE_UPLOAD":
-            const file = files["reply"]?.[0];
-            if (!file) {
-              throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
-            }
-            const {
-              createFileUploadReply: { presignedPostData, reply },
-            } = await client.request(SubmitReply_createFileUploadReplyDocument, {
-              petitionId: params.petitionId,
-              fieldId: params.fieldId,
-              file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
-            });
 
-            const uploadResponse = await uploadFile(file, presignedPostData);
-            if (uploadResponse.ok) {
-              await unlink(file.path);
-              const { createFileUploadReplyComplete } = await client.request(
-                SubmitReply_createFileUploadReplyCompleteDocument,
-                {
-                  petitionId: params.petitionId,
-                  replyId: reply.id,
-                },
-              );
-              newReply = createFileUploadReplyComplete;
-            } else {
-              throw new BadRequestError(uploadResponse.statusText);
-            }
-            break;
-          default:
-            throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
+        if (isDefined(fieldType) && isFileTypeField(fieldType)) {
+          const file = files["reply"]?.[0];
+          if (!file) {
+            throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
+          }
+          const {
+            createFileUploadReply: { presignedPostData, reply },
+          } = await client.request(SubmitReply_createFileUploadReplyDocument, {
+            petitionId: params.petitionId,
+            fieldId: params.fieldId,
+            file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
+          });
+
+          const uploadResponse = await uploadFile(file, presignedPostData);
+          if (uploadResponse.ok) {
+            await unlink(file.path);
+            const { createFileUploadReplyComplete } = await client.request(
+              SubmitReply_createFileUploadReplyCompleteDocument,
+              {
+                petitionId: params.petitionId,
+                replyId: reply.id,
+              },
+            );
+            newReply = createFileUploadReplyComplete;
+          } else {
+            throw new BadRequestError(uploadResponse.statusText);
+          }
+        } else {
+          ({
+            createPetitionFieldReplies: [newReply],
+          } = await client.request(SubmitReply_createPetitionFieldRepliesDocument, {
+            petitionId: params.petitionId,
+            fields: [
+              {
+                id: params.fieldId,
+                content: buildSubmittedReplyContent(petition, params.fieldId, body),
+              },
+            ],
+          }));
         }
 
         if (isDefined(body.status)) {
@@ -1806,7 +1777,7 @@ api
         409: ErrorResponse({ description: "The reply cannot be updated." }),
       },
       tags: ["Parallel replies"],
-      body: Body([FormDataBodyContent(SubmitFileReply), JsonBodyContent(SubmitReply)], {
+      body: Body([JsonBodyContent(SubmitReply), FormDataBodyContent(SubmitFileReply)], {
         description: replyBodyDescription,
       }),
     },
@@ -1817,123 +1788,52 @@ api
 
       const field = petition?.fields.find((f) => f.replies.some((r) => r.id === params.replyId));
 
-      const fieldType = field?.type;
       try {
+        const fieldType = field?.type;
         let updatedReply;
-        switch (fieldType) {
-          case "TEXT":
-          case "SHORT_TEXT":
-          case "SELECT":
-          case "DATE":
-          case "PHONE":
-            if (typeof body.reply !== "string") {
-              throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
-            }
-            ({ updatePetitionFieldReply: updatedReply } = await client.request(
-              UpdateReply_updatePetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                replyId: params.replyId,
-                reply: body.reply,
-              },
-            ));
-            break;
-          case "DATE_TIME":
-            if (typeof body.reply !== "object") {
-              throw new BadRequestError(`Reply for ${fieldType} field must be a valid object.`);
-            }
-            ({ updatePetitionFieldReply: updatedReply } = await client.request(
-              UpdateReply_updatePetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                replyId: params.replyId,
-                reply: body.reply,
-              },
-            ));
-            break;
-          case "NUMBER": {
-            if (typeof body.reply !== "number") {
-              throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
-            }
-            ({ updatePetitionFieldReply: updatedReply } = await client.request(
-              UpdateReply_updatePetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                replyId: params.replyId,
-                reply: body.reply,
-              },
-            ));
 
-            break;
+        if (isDefined(fieldType) && isFileTypeField(fieldType)) {
+          const file = files["reply"]?.[0];
+          if (!file) {
+            throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
           }
-          case "CHECKBOX":
-            if (!Array.isArray(body.reply)) {
-              throw new BadRequestError(
-                `Reply for ${fieldType} field must be an array with the chosen options.`,
-              );
-            }
-            ({ updatePetitionFieldReply: updatedReply } = await client.request(
-              UpdateReply_updatePetitionFieldReplyDocument,
+          const {
+            updateFileUploadReply: { presignedPostData, reply },
+          } = await client.request(UpdateReply_updateFileUploadReplyDocument, {
+            petitionId: params.petitionId,
+            replyId: params.replyId,
+            file: { contentType: file.mimetype, filename: file.originalname, size: file.size },
+          });
+
+          const uploadResponse = await uploadFile(file, presignedPostData);
+          if (uploadResponse.ok) {
+            await unlink(file.path);
+            const { updateFileUploadReplyComplete } = await client.request(
+              UpdateReply_updateFileUploadReplyCompleteDocument,
               {
                 petitionId: params.petitionId,
-                replyId: params.replyId,
-                reply: body.reply,
+                replyId: reply.id,
               },
-            ));
+            );
 
-            break;
-          case "DYNAMIC_SELECT":
-            if (!Array.isArray(body.reply)) {
-              throw new BadRequestError(
-                `Reply for ${fieldType} field must be an array with the chosen options.`,
-              );
-            }
-            const labels = field?.options?.labels as string[];
-            const replies = body.reply as Maybe<string>[];
-
-            ({ updatePetitionFieldReply: updatedReply } = await client.request(
-              UpdateReply_updatePetitionFieldReplyDocument,
+            updatedReply = updateFileUploadReplyComplete;
+          } else {
+            throw new BadRequestError(uploadResponse.statusText);
+          }
+        } else {
+          ({
+            updatePetitionFieldReplies: [updatedReply],
+          } = await client.request(UpdateReply_updatePetitionFieldRepliesDocument, {
+            petitionId: params.petitionId,
+            replies: [
               {
-                petitionId: params.petitionId,
-                replyId: params.replyId,
-                reply: labels.map((label, i) => [label, replies[i]]),
+                id: params.replyId,
+                content: buildSubmittedReplyContent(petition, params.fieldId, body),
               },
-            ));
-
-            break;
-
-          case "FILE_UPLOAD":
-            const file = files["reply"]?.[0];
-            if (!file) {
-              throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
-            }
-            const {
-              updateFileUploadReply: { presignedPostData, reply },
-            } = await client.request(UpdateReply_updateFileUploadReplyDocument, {
-              petitionId: params.petitionId,
-              replyId: params.replyId,
-              file: { contentType: file.mimetype, filename: file.originalname, size: file.size },
-            });
-
-            const uploadResponse = await uploadFile(file, presignedPostData);
-            if (uploadResponse.ok) {
-              await unlink(file.path);
-              const { updateFileUploadReplyComplete } = await client.request(
-                UpdateReply_updateFileUploadReplyCompleteDocument,
-                {
-                  petitionId: params.petitionId,
-                  replyId: reply.id,
-                },
-              );
-
-              updatedReply = updateFileUploadReplyComplete;
-            } else {
-              throw new BadRequestError(uploadResponse.statusText);
-            }
-            break;
-          default:
-            throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
+            ],
+          }));
         }
+
         return Ok(mapReplyResponse(updatedReply));
       } catch (error) {
         if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {

@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
-import { groupBy, uniq } from "remeda";
+import { groupBy, isDefined, uniq } from "remeda";
 import { validateReplyValue } from "../../util/validateReplyValue";
 import { Arg } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
@@ -108,7 +108,7 @@ export function validateFieldReplyValue<TypeName extends string, FieldName exten
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
-export function validateFieldReplyContent<TypeName extends string, FieldName extends string>(
+export function validateCreateReplyContent<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => { id: number; content?: any }[],
   argName: string,
 ) {
@@ -141,10 +141,12 @@ export function validateFieldReplyContent<TypeName extends string, FieldName ext
               );
             }
 
-            const hasAccess = await ctx.petitions.userhasAccessToPetitionFieldReply(
-              petitionFieldReply.id,
-              ctx.user!.id,
-            );
+            const hasAccess =
+              isDefined(ctx.user) &&
+              (await ctx.petitions.userhasAccessToPetitionFieldReply(
+                petitionFieldReply.id,
+                ctx.user.id,
+              ));
 
             if (!hasAccess) {
               throw new Error(
@@ -162,6 +164,7 @@ export function validateFieldReplyContent<TypeName extends string, FieldName ext
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
+/** @deprecated */
 export function validateReplyUpdate<
   TypeName extends string,
   FieldName extends string,
@@ -179,6 +182,40 @@ export function validateReplyUpdate<
       throw new InvalidReplyError(info, argName, error.message, {
         subcode: error.code,
       });
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateUpdateReplyContent<TypeName extends string, FieldName extends string>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => { id: number; content?: any }[],
+  argName: string,
+) {
+  return (async (_, args, ctx, info) => {
+    const replyContents = prop(args);
+    const replyIds = uniq(replyContents.map((r) => r.id));
+    const [fields, replies] = await Promise.all([
+      ctx.petitions.loadFieldForReply(replyIds),
+      ctx.petitions.loadFieldReply(replyIds),
+    ]);
+
+    const byReplyId = groupBy(replyContents, (r) => r.id);
+    for (const [replyId, fieldReplies] of Object.entries(byReplyId)) {
+      try {
+        const reply = replies.find((r) => r!.id === parseInt(replyId));
+        const field = fields.find((f) => f!.id === reply!.petition_field_id)!;
+
+        if (!field.multiple && fieldReplies.length > 1) {
+          throw new Error(`Can't submit more than one reply on a single reply field`);
+        }
+
+        for (const reply of fieldReplies) {
+          validateReplyContent(field, reply.content);
+        }
+      } catch (error: any) {
+        throw new InvalidReplyError(info, argName, error.message, {
+          subcode: error.code,
+        });
+      }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

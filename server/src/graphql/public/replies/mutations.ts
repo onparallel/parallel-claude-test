@@ -1,11 +1,16 @@
 import { zonedTimeToUtc } from "date-fns-tz";
-import { booleanArg, idArg, mutationField, nonNull, objectType } from "nexus";
+import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nexus";
+import { uniq } from "remeda";
+import { CreatePetitionFieldReply } from "../../../db/__types";
+import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
 import { RESULT } from "../../helpers/Result";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { validateAnd } from "../../helpers/validateArgs";
+import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,
@@ -13,7 +18,12 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../../petition/authorizers";
-import { validateFieldReplyValue, validateReplyUpdate } from "../../petition/validations";
+import {
+  validateCreateReplyContent,
+  validateFieldReplyValue,
+  validateReplyUpdate,
+  validateUpdateReplyContent,
+} from "../../petition/validations";
 import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
@@ -22,7 +32,9 @@ import {
   replyBelongsToExternalField,
 } from "../authorizers";
 
+/** @deprecated */
 export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitionFieldReply", {
+  deprecation: "use publicCreatePetitionFieldReplies",
   description: "Creates a reply on a petition field as recipient.",
   type: "PublicPetitionFieldReply",
   args: {
@@ -79,7 +91,63 @@ export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitio
   },
 });
 
+export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetitionFieldReplies", {
+  description: "Creates replies on a petition field as recipient.",
+  type: list("PublicPetitionFieldReply"),
+  args: {
+    keycode: nonNull(idArg()),
+    fields: nonNull(list(nonNull("CreatePetitionFieldReplyInput"))),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      fieldBelongsToAccess((args) => args.fields.map((f) => f.id)),
+      fieldIsExternal((args) => args.fields.map((f) => f.id)),
+      fieldHasType(
+        (args) => args.fields.map((f) => f.id),
+        [
+          "TEXT",
+          "SHORT_TEXT",
+          "SELECT",
+          "PHONE",
+          "NUMBER",
+          "DYNAMIC_SELECT",
+          "DATE",
+          "DATE_TIME",
+          "CHECKBOX",
+        ],
+      ),
+      fieldCanBeReplied((args) => args.fields.map((f) => f.id)),
+    ),
+  ),
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.fields, "fields"),
+    validateCreateReplyContent((args) => args.fields, "fields"),
+  ),
+  resolve: async (_, args, ctx) => {
+    const fields = await ctx.petitions.loadField(uniq(args.fields.map((field) => field.id)));
+
+    const data: CreatePetitionFieldReply[] = args.fields.map((fieldReply) => {
+      const field = fields.find((f) => f!.id === fieldReply.id)!;
+      return {
+        content: fieldReplyContent(field.type, fieldReply.content),
+        petition_field_id: fieldReply.id,
+        type: field.type,
+        petition_access_id: ctx.access!.id,
+      };
+    });
+
+    return await ctx.petitions.createPetitionFieldReply(
+      ctx.access!.petition_id,
+      data,
+      `Contact:${ctx.contact!.id}`,
+    );
+  },
+});
+
+/** @deprecated */
 export const publicUpdatePetitionFieldReply = mutationField("publicUpdatePetitionFieldReply", {
+  deprecation: "use publicUpdatePetitionFieldReplies",
   description: "Creates a reply on a petition field as recipient.",
   type: "PublicPetitionFieldReply",
   args: {
@@ -125,6 +193,62 @@ export const publicUpdatePetitionFieldReply = mutationField("publicUpdatePetitio
         content,
         status: "PENDING",
       },
+      ctx.access!,
+    );
+  },
+});
+
+export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetitionFieldReplies", {
+  description: "Updates replies on a petition field as recipient.",
+  type: list("PublicPetitionFieldReply"),
+  args: {
+    keycode: nonNull(idArg()),
+    replies: nonNull(list(nonNull("UpdatePetitionFieldReplyInput"))),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      replyBelongsToAccess((args) => args.replies.map((r) => r.id)),
+      replyBelongsToExternalField((args) => args.replies.map((r) => r.id)),
+      replyIsForFieldOfType(
+        (args) => args.replies.map((r) => r.id),
+        [
+          "TEXT",
+          "SHORT_TEXT",
+          "SELECT",
+          "PHONE",
+          "NUMBER",
+          "DYNAMIC_SELECT",
+          "DATE",
+          "DATE_TIME",
+          "CHECKBOX",
+        ],
+      ),
+      replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
+    ),
+  ),
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.replies, "replies"),
+    validateUpdateReplyContent((args) => args.replies, "replies"),
+  ),
+  resolve: async (_, args, ctx) => {
+    const replyIds = uniq(args.replies.map((r) => r.id));
+    const replies = await ctx.petitions.loadFieldReply(replyIds);
+
+    const repliesInput = args.replies.map((replyData) => {
+      const reply = replies.find((r) => r!.id === replyData.id)!;
+      return {
+        ...replyData,
+        type: reply.type,
+      };
+    });
+
+    return await ctx.petitions.updatePetitionFieldRepliesContent(
+      ctx.access!.petition_id,
+      repliesInput.map((replyData) => ({
+        id: replyData.id,
+        content: fieldReplyContent(replyData.type, replyData.content),
+      })),
       ctx.access!,
     );
   },

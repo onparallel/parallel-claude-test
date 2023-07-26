@@ -1033,7 +1033,6 @@ const _DynamicSelectReplySubmitContent = {
 const _DateTimeReplySubmitContent = {
   title: "DateTimeReplySubmitContent",
   type: "object",
-  required: ["datetime", "timezone"],
   additionalProperties: false,
   properties: {
     datetime: {

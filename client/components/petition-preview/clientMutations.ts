@@ -2,10 +2,10 @@ import { DataProxy, gql, useApolloClient, useMutation } from "@apollo/client";
 import {
   PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyDocument,
-  PreviewPetitionFieldMutations_createPetitionFieldReplyDocument,
+  PreviewPetitionFieldMutations_createPetitionFieldRepliesDocument,
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
   PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument,
-  PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument,
+  PreviewPetitionFieldMutations_updatePetitionFieldRepliesDocument,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
@@ -72,13 +72,12 @@ export function useDeletePetitionReply() {
   );
 }
 
-const _updatePetitionFieldReply = gql`
-  mutation PreviewPetitionFieldMutations_updatePetitionFieldReply(
+const _updatePetitionFieldReplies = gql`
+  mutation PreviewPetitionFieldMutations_updatePetitionFieldReplies(
     $petitionId: GID!
-    $replyId: GID!
-    $reply: JSON!
+    $replies: [UpdatePetitionFieldReplyInput!]!
   ) {
-    updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+    updatePetitionFieldReplies(petitionId: $petitionId, replies: $replies) {
       id
       content
       status
@@ -98,64 +97,68 @@ const _updatePetitionFieldReply = gql`
 
 export function useUpdatePetitionFieldReply() {
   const client = useApolloClient();
-  const [updatePetitionFieldReply] = useMutation(
-    PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument,
+  const [updatePetitionFieldReplies] = useMutation(
+    PreviewPetitionFieldMutations_updatePetitionFieldRepliesDocument,
   );
   return useCallback(
-    async function _updatePetitionFieldReply({
+    async function _updatePetitionFieldReplies({
       petitionId,
       fieldId,
       replyId,
-      reply,
+      content,
       isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       replyId: string;
-      reply: any;
+      content: any;
       isCacheOnly?: boolean;
     }) {
+      const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
+        fragment: gql`
+          fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
+            id
+            type
+          }
+        `,
+        id: fieldId,
+      });
+
       if (isCacheOnly) {
-        const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
-          fragment: gql`
-            fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
-              id
-              type
-            }
-          `,
-          id: fieldId,
-        });
         const { zonedTimeToUtc } = await import("date-fns-tz");
-        updateReplyContent(client, replyId, (content) => ({
-          ...content,
+        updateReplyContent(client, replyId, (oldContent) => ({
+          ...oldContent,
           ...(field?.type === "DATE_TIME"
             ? {
-                ...reply,
-                value: zonedTimeToUtc(reply.datetime, reply.timezone).toISOString(),
+                ...content,
+                value: zonedTimeToUtc(content.datetime, content.timezone).toISOString(),
               }
-            : { value: reply }),
+            : content),
         }));
       } else {
-        await updatePetitionFieldReply({
+        await updatePetitionFieldReplies({
           variables: {
             petitionId,
-            replyId,
-            reply,
+            replies: [
+              {
+                id: replyId,
+                content,
+              },
+            ],
           },
         });
       }
     },
-    [updatePetitionFieldReply],
+    [updatePetitionFieldReplies],
   );
 }
 
-const _createPetitionFieldReply = gql`
-  mutation PreviewPetitionFieldMutations_createPetitionFieldReply(
+const _createPetitionFieldReplies = gql`
+  mutation PreviewPetitionFieldMutations_createPetitionFieldReplies(
     $petitionId: GID!
-    $fieldId: GID!
-    $reply: JSON!
+    $fields: [CreatePetitionFieldReplyInput!]!
   ) {
-    createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+    createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
       field {
         id
@@ -177,47 +180,48 @@ const _createPetitionFieldReply = gql`
 export function useCreatePetitionFieldReply() {
   const client = useApolloClient();
 
-  const [createPetitionFieldReply] = useMutation(
-    PreviewPetitionFieldMutations_createPetitionFieldReplyDocument,
+  const [createPetitionFieldReplies] = useMutation(
+    PreviewPetitionFieldMutations_createPetitionFieldRepliesDocument,
   );
   return useCallback(
-    async function _createPetitionFieldReply({
+    async function _createPetitionFieldReplies({
       petitionId,
       fieldId,
-      reply,
+      content,
       isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
-      reply: any;
+      content: any;
       isCacheOnly?: boolean;
     }) {
+      const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
+        fragment: gql`
+          fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
+            id
+            type
+          }
+        `,
+        id: fieldId,
+      });
+
       if (isCacheOnly) {
-        const id = `${fieldId}-${getRandomId()}`;
-        const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
-          fragment: gql`
-            fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
-              id
-              type
-            }
-          `,
-          id: fieldId,
-        });
         const { zonedTimeToUtc } = await import("date-fns-tz");
-        const content =
-          field?.type === "DATE_TIME"
-            ? {
-                ...reply,
-                value: zonedTimeToUtc(reply.datetime, reply.timezone).toISOString(),
-              }
-            : { value: reply };
+
+        const id = `${fieldId}-${getRandomId()}`;
         updatePreviewFieldReplies(client, fieldId, (replies) => [
           ...(replies ?? []),
           {
             id,
             __typename: "PetitionFieldReply",
             status: "PENDING",
-            content,
+            content:
+              field?.type === "DATE_TIME"
+                ? {
+                    ...content,
+                    value: zonedTimeToUtc(content.datetime, content.timezone).toISOString(),
+                  }
+                : content,
             isAnonymized: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -225,17 +229,16 @@ export function useCreatePetitionFieldReply() {
         ]);
         return { id, __typename: "PetitionFieldReply" };
       } else {
-        const { data } = await createPetitionFieldReply({
+        const { data } = await createPetitionFieldReplies({
           variables: {
             petitionId,
-            fieldId,
-            reply,
+            fields: [{ id: fieldId, content }],
           },
         });
-        return data?.createPetitionFieldReply;
+        return data?.createPetitionFieldReplies?.[0];
       }
     },
-    [createPetitionFieldReply],
+    [createPetitionFieldReplies],
   );
 }
 

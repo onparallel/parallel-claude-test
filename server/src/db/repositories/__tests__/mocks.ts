@@ -390,7 +390,7 @@ export class Mocks {
 
   async createRandomNumberReply(
     numberFieldId: number,
-    accessId: number,
+    accessId?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
     min?: number,
@@ -441,7 +441,7 @@ export class Mocks {
 
   async createRandomDatetimeReply(
     dateFieldId: number,
-    accessId: number,
+    accessId?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {

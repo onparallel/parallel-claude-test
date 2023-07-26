@@ -5,23 +5,22 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
-  RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument,
-  RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument,
-  RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionFieldDocument,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
+  RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument,
+  RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument,
+  RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument,
-  RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument,
+  RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useCallback, useRef } from "react";
+import { useLastSaved } from "../LastSavedProvider";
 import {
   RecipientViewPetitionFieldCommentsDialog,
   usePetitionFieldCommentsDialog,
 } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
-import { useLastSaved } from "../LastSavedProvider";
-import { useCreateFileUploadReply } from "./clientMutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -38,6 +37,7 @@ import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSe
 import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFieldShortText";
 import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
+import { useCreateFileUploadReply } from "./clientMutations";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
@@ -109,45 +109,53 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [publicDeletePetitionFieldReply, updateLastSaved],
   );
 
-  const [publicUpdatePetitionFieldReply] = useMutation(
-    RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument,
+  const [publicUpdatePetitionFieldReplies] = useMutation(
+    RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument,
   );
   const handleUpdatePetitionFieldReply = useCallback(
-    async (replyId: string, reply: any) => {
+    async (replyId: string, content: any) => {
       try {
-        await publicUpdatePetitionFieldReply({
+        await publicUpdatePetitionFieldReplies({
           variables: {
-            replyId,
             keycode: props.keycode,
-            reply,
+            replies: [
+              {
+                id: replyId,
+                content,
+              },
+            ],
           },
         });
         updateLastSaved();
       } catch {}
     },
-    [publicUpdatePetitionFieldReply, updateLastSaved],
+    [publicUpdatePetitionFieldReplies, updateLastSaved],
   );
 
-  const [publicCreatePetitionFieldReply] = useMutation(
-    RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument,
+  const [publicCreatePetitionFieldReplies] = useMutation(
+    RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument,
   );
   const handleCreatePetitionFieldReply = useCallback(
-    async (reply: any) => {
+    async (content: any) => {
       try {
-        const { data } = await publicCreatePetitionFieldReply({
+        const { data } = await publicCreatePetitionFieldReplies({
           variables: {
-            reply,
-            fieldId: props.field.id,
             keycode: props.keycode,
+            fields: [
+              {
+                id: props.field.id,
+                content,
+              },
+            ],
           },
         });
         updateLastSaved();
-        return data?.publicCreatePetitionFieldReply?.id;
+        return data?.publicCreatePetitionFieldReplies?.[0]?.id;
       } catch {}
 
       return;
     },
-    [publicCreatePetitionFieldReply, updateLastSaved],
+    [publicCreatePetitionFieldReplies, updateLastSaved],
   );
 
   const createFileUploadReply = useCreateFileUploadReply();
@@ -330,12 +338,11 @@ RecipientViewPetitionField.mutations = [
     }
   `,
   gql`
-    mutation RecipientViewPetitionField_publicCreatePetitionFieldReply(
+    mutation RecipientViewPetitionField_publicCreatePetitionFieldReplies(
       $keycode: ID!
-      $fieldId: GID!
-      $reply: JSON!
+      $fields: [CreatePetitionFieldReplyInput!]!
     ) {
-      publicCreatePetitionFieldReply(keycode: $keycode, fieldId: $fieldId, reply: $reply) {
+      publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
         ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         field {
           id
@@ -352,12 +359,11 @@ RecipientViewPetitionField.mutations = [
     ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
   `,
   gql`
-    mutation RecipientViewPetitionField_publicUpdatePetitionFieldReply(
+    mutation RecipientViewPetitionField_publicUpdatePetitionFieldReplies(
       $keycode: ID!
-      $replyId: GID!
-      $reply: JSON!
+      $replies: [UpdatePetitionFieldReplyInput!]!
     ) {
-      publicUpdatePetitionFieldReply(keycode: $keycode, replyId: $replyId, reply: $reply) {
+      publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
         ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         field {
           id

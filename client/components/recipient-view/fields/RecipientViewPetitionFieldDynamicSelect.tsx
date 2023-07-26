@@ -29,8 +29,8 @@ export interface RecipientViewPetitionFieldDynamicSelectProps
   > {
   isDisabled: boolean;
   onDeleteReply: (reply: string) => void;
-  onUpdateReply: (replyId: string, value: DynamicSelectValue) => void;
-  onCreateReply: (value: DynamicSelectValue) => Promise<string | undefined>;
+  onUpdateReply: (replyId: string, content: { value: DynamicSelectValue }) => Promise<void>;
+  onCreateReply: (content: { value: DynamicSelectValue }) => Promise<string | undefined>;
 }
 
 type SelectInstance = _SelectInstance<{ label: string; value: string }, false, never>;
@@ -53,7 +53,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: DynamicSelectValue) => {
-      await onUpdateReply(replyId, value);
+      await onUpdateReply(replyId, { value });
     },
     [onUpdateReply],
   );
@@ -75,7 +75,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
       label,
       i === 0 ? value : null,
     ]) as DynamicSelectValue;
-    const replyId = await onCreateReply(_value);
+    const replyId = await onCreateReply({ value: _value });
     if (replyId) {
       setShowNewReply(false);
       setTimeout(() => {

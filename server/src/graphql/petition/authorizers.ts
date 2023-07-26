@@ -229,17 +229,25 @@ export function fieldHasType<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, number>,
 >(
-  argFieldId: TArg,
+  argFieldId: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldId = args[argFieldId] as unknown as number;
-    const field = (await ctx.petitions.loadField(fieldId))!;
+    const fieldIds = uniq(
+      unMaybeArray(
+        (typeof argFieldId === "function"
+          ? (argFieldId as any)(args)
+          : (args as any)[argFieldId]) as MaybeArray<number>,
+      ),
+    );
+    const fields = await ctx.petitions.loadField(fieldIds);
     const validFieldTypes = unMaybeArray(fieldType);
 
-    if (!validFieldTypes.includes(field.type)) {
+    const invalidField = fields.find((field) => !validFieldTypes.includes(field!.type));
+
+    if (isDefined(invalidField)) {
       throw new ApolloError(
-        `Expected ${validFieldTypes.join(" or ")}, got ${field.type}`,
+        `Expected ${validFieldTypes.join(" or ")}, got ${invalidField.type}`,
         "INVALID_FIELD_TYPE_ERROR",
       );
     }
@@ -253,11 +261,18 @@ export function replyIsForFieldOfType<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
-  argReplyId: TArg,
+  argReplyId: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyIds = unMaybeArray(args[argReplyId] as unknown as MaybeArray<number>);
+    const replyIds = uniq(
+      unMaybeArray(
+        (typeof argReplyId === "function"
+          ? (argReplyId as any)(args)
+          : (args as any)[argReplyId]) as MaybeArray<number>,
+      ),
+    );
+
     const fields = await ctx.petitions.loadFieldForReply(replyIds);
     const validFieldTypes = unMaybeArray(fieldType);
 
@@ -347,13 +362,22 @@ export function repliesBelongsToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>,
->(argNamePetitionId: TArg1, argNameReplyIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argNamePetitionId: TArg1,
+  argNameReplyIds: TArg2 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      return await ctx.petitions.repliesBelongsToPetition(
-        args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>),
+      const petitionId = args[argNamePetitionId] as unknown as number;
+      const replyIds = uniq(
+        unMaybeArray(
+          (typeof argNameReplyIds === "function"
+            ? (argNameReplyIds as any)(args)
+            : (args as any)[argNameReplyIds]) as MaybeArray<number>,
+        ),
       );
+
+      return await ctx.petitions.repliesBelongsToPetition(petitionId, replyIds);
     } catch {}
     return false;
   };
@@ -559,17 +583,25 @@ export function replyCanBeUpdated<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
->(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const replyId = args[argReplyId] as unknown as number;
+    const replyIds = uniq(
+      unMaybeArray(
+        (typeof argReplyId === "function"
+          ? (argReplyId as any)(args)
+          : (args as any)[argReplyId]) as MaybeArray<number>,
+      ),
+    );
 
-    const reply = await ctx.petitions.loadFieldReply(replyId);
-    if (!reply) {
+    const replies = await ctx.petitions.loadFieldReply(replyIds);
+    if (replies.some((r) => !isDefined(r))) {
       // field or reply could be already deleted, throw FORBIDDEN error
       return false;
     }
 
-    if (reply.status === "APPROVED" || reply.anonymized_at !== null) {
+    if (replies.some((r) => r!.status === "APPROVED" || r!.anonymized_at !== null)) {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR",

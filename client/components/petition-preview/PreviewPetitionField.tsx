@@ -120,13 +120,13 @@ export function PreviewPetitionField({
 
   const updatePetitionFieldReply = useUpdatePetitionFieldReply();
   const handleUpdatePetitionFieldReply = useCallback(
-    async (replyId: string, reply: any) => {
+    async (replyId: string, content: any) => {
       try {
         await updatePetitionFieldReply({
           petitionId,
           fieldId,
           replyId,
-          reply,
+          content,
           isCacheOnly,
         });
       } catch {}
@@ -136,12 +136,12 @@ export function PreviewPetitionField({
 
   const createPetitionFieldReply = useCreatePetitionFieldReply();
   const handleCreatePetitionFieldReply = useCallback(
-    async (reply: any) => {
+    async (content: any) => {
       try {
         const res = await createPetitionFieldReply({
           petitionId,
           fieldId,
-          reply,
+          content,
           isCacheOnly,
         });
         return res?.id;

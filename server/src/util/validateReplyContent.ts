@@ -32,7 +32,7 @@ export function validateReplyContent(field: PetitionField, content: any) {
       if (!options?.includes(content.value)) {
         throw {
           code: "UNKNOWN_OPTION_ERROR",
-          message: `Reply must be one of [${(options ?? []).map((opt) => `"${opt}"`).join(", ")}].`,
+          message: `Reply must be one of [${(options ?? []).map((opt) => `'${opt}'`).join(", ")}].`,
         };
       }
       break;
@@ -53,18 +53,24 @@ export function validateReplyContent(field: PetitionField, content: any) {
       if (typeof content !== "object") {
         throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type object." };
       }
+      if (!("datetime" in content)) {
+        throw { code: "INVALID_TYPE_ERROR", message: 'Reply is missing a "datetime" key.' };
+      }
+      if (!("timezone" in content)) {
+        throw { code: "INVALID_TYPE_ERROR", message: 'Reply is missing a "timezone" key.' };
+      }
 
       if (!isValidDatetime(content.datetime)) {
         throw {
           code: "INVALID_VALUE_ERROR",
-          message: "Reply has not a valid date with YYYY-MM-DDTHH:mm format.",
+          message: `${content.datetime} is not a valid date with YYYY-MM-DDTHH:mm format.`,
         };
       }
 
       if (!isValidTimezone(content.timezone)) {
         throw {
           code: "INVALID_VALUE_ERROR",
-          message: "Reply has not a valid timezone.",
+          message: `${content.timezone} is not have a valid timezone.`,
         };
       }
       break;
@@ -78,7 +84,7 @@ export function validateReplyContent(field: PetitionField, content: any) {
       if (content.value.length > maxLength) {
         throw {
           code: "MAX_LENGTH_EXCEEDED_ERROR",
-          message: "Reply exceeds max length allowed of ${maxLength} chars.",
+          message: `Reply exceeds max length allowed of ${maxLength} chars.`,
         };
       }
       break;
@@ -90,7 +96,7 @@ export function validateReplyContent(field: PetitionField, content: any) {
       if (!isPossiblePhoneNumber(content.value)) {
         throw {
           code: "INVALID_PHONE_NUMBER",
-          message: "Reply must be a valid phone number in e164 format",
+          message: `${content.value} is not a valid phone number in e164 format`,
         };
       }
       break;
@@ -109,7 +115,7 @@ export function validateReplyContent(field: PetitionField, content: any) {
       }
 
       const { type: subtype, min, max } = field.options.limit;
-      if (subtype === "RADIO" && content.value.length > 1) {
+      if (subtype === "RADIO" && content.value.length !== 1) {
         throw { code: "INVALID_VALUE_ERROR", message: "Reply must contain exactly 1 choice." };
       } else if (
         subtype === "EXACT" &&

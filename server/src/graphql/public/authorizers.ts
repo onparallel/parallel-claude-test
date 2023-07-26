@@ -2,7 +2,7 @@ import Ajv from "ajv";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, partition } from "remeda";
+import { isDefined, partition, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
@@ -10,6 +10,7 @@ import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
+import { core } from "nexus";
 
 export function authenticatePublicAccess<
   TypeName extends string,
@@ -90,12 +91,19 @@ export function fieldBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
->(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      return await ctx.petitions.fieldsBelongToPetition(ctx.access!.petition_id, [
-        args[argFieldId] as unknown as number,
-      ]);
+      const fieldIds = uniq(
+        unMaybeArray(
+          (typeof argFieldId === "function"
+            ? (argFieldId as any)(args)
+            : (args as any)[argFieldId]) as MaybeArray<number>,
+        ),
+      );
+      return await ctx.petitions.fieldsBelongToPetition(ctx.access!.petition_id, fieldIds);
     } catch {}
     return false;
   };
@@ -105,12 +113,21 @@ export function fieldIsExternal<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
->(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argFieldId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const fieldId = args[argFieldId] as unknown as number;
-      const field = await ctx.petitions.loadField(fieldId);
-      return field?.is_internal === false;
+      const fieldIds = uniq(
+        unMaybeArray(
+          (typeof argFieldId === "function"
+            ? (argFieldId as any)(args)
+            : (args as any)[argFieldId]) as MaybeArray<number>,
+        ),
+      );
+
+      const fields = await ctx.petitions.loadField(fieldIds);
+      return fields.every((field) => field?.is_internal === false);
     } catch {}
     return false;
   };
@@ -120,12 +137,19 @@ export function replyBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
->(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      return await ctx.petitions.repliesBelongsToPetition(ctx.access!.petition_id, [
-        args[argReplyId] as unknown as number,
-      ]);
+      const replyIds = uniq(
+        unMaybeArray(
+          (typeof argReplyId === "function"
+            ? (argReplyId as any)(args)
+            : (args as any)[argReplyId]) as MaybeArray<number>,
+        ),
+      );
+      return await ctx.petitions.repliesBelongsToPetition(ctx.access!.petition_id, replyIds);
     } catch {}
     return false;
   };
@@ -135,12 +159,20 @@ export function replyBelongsToExternalField<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
->(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argReplyId: TArg1 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const replyId = args[argReplyId] as unknown as number;
-      const field = await ctx.petitions.loadFieldForReply(replyId);
-      return field?.is_internal === false;
+      const replyIds = uniq(
+        unMaybeArray(
+          (typeof argReplyId === "function"
+            ? (argReplyId as any)(args)
+            : (args as any)[argReplyId]) as MaybeArray<number>,
+        ),
+      );
+      const fields = await ctx.petitions.loadFieldForReply(replyIds);
+      return fields.every((f) => f?.is_internal === false);
     } catch {}
     return false;
   };

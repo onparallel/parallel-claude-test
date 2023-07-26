@@ -9,8 +9,6 @@ import {
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
-export type CheckboxValue = string[];
-
 export interface RecipientViewPetitionFieldCheckboxProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
@@ -18,8 +16,8 @@ export interface RecipientViewPetitionFieldCheckboxProps
   > {
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
-  onUpdateReply: (replyId: string, value: CheckboxValue) => void;
-  onCreateReply: (value: CheckboxValue) => void;
+  onUpdateReply: (replyId: string, content: { value: string[] }) => Promise<void>;
+  onCreateReply: (content: { value: string[] }) => Promise<string | undefined>;
 }
 
 const haveChanges = ({
@@ -67,13 +65,13 @@ export function RecipientViewPetitionFieldCheckbox({
 
   const handleUpdate = async (value: string[]) => {
     setIsSaving(true);
-    await onUpdateReply(reply!.id, value);
+    await onUpdateReply(reply!.id, { value });
     setIsSaving(false);
   };
 
   const handleCreate = async (value: string[]) => {
     setIsSaving(true);
-    await onCreateReply(value);
+    await onCreateReply({ value });
     setIsSaving(false);
   };
 

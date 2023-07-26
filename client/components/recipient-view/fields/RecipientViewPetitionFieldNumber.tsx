@@ -26,8 +26,8 @@ export interface RecipientViewPetitionFieldNumberProps
   > {
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
-  onUpdateReply: (replyId: string, value: number) => void;
-  onCreateReply: (value: number) => Promise<string | undefined>;
+  onUpdateReply: (replyId: string, content: { value: number }) => Promise<void>;
+  onCreateReply: (content: { value: number }) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldNumber({
@@ -88,7 +88,7 @@ export function RecipientViewPetitionFieldNumber({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: number) => {
-      await onUpdateReply(replyId, value);
+      await onUpdateReply(replyId, { value });
     },
     [onUpdateReply],
   );
@@ -127,7 +127,7 @@ export function RecipientViewPetitionFieldNumber({
       setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
       setIsSaving(true);
       try {
-        const replyId = await onCreateReply(value);
+        const replyId = await onCreateReply({ value });
         if (replyId) {
           setValue(undefined);
           if (focusCreatedReply) {

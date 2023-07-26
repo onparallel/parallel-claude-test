@@ -1469,13 +1469,21 @@ type Mutation {
   ): PublicPetitionFieldComment!
 
   """
+  Creates replies on a petition field as recipient.
+  """
+  publicCreatePetitionFieldReplies(
+    fields: [CreatePetitionFieldReplyInput!]!
+    keycode: ID!
+  ): [PublicPetitionFieldReply!]!
+
+  """
   Creates a reply on a petition field as recipient.
   """
   publicCreatePetitionFieldReply(
     fieldId: GID!
     keycode: ID!
     reply: JSON!
-  ): PublicPetitionFieldReply!
+  ): PublicPetitionFieldReply! @deprecated(reason: "use publicCreatePetitionFieldReplies")
 
   """
   Starts an export pdf task in a recipient context
@@ -1597,13 +1605,21 @@ type Mutation {
   ): PublicPetitionFieldComment!
 
   """
+  Updates replies on a petition field as recipient.
+  """
+  publicUpdatePetitionFieldReplies(
+    keycode: ID!
+    replies: [UpdatePetitionFieldReplyInput!]!
+  ): [PublicPetitionFieldReply!]!
+
+  """
   Creates a reply on a petition field as recipient.
   """
   publicUpdatePetitionFieldReply(
     keycode: ID!
     reply: JSON!
     replyId: GID!
-  ): PublicPetitionFieldReply!
+  ): PublicPetitionFieldReply! @deprecated(reason: "use publicUpdatePetitionFieldReplies")
 
   """
   Reactivates the specified inactive petition accesses.
@@ -2059,6 +2075,14 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
+  Updates multiple replies for a petition at once
+  """
+  updatePetitionFieldReplies(
+    petitionId: GID!
+    replies: [UpdatePetitionFieldReplyInput!]!
+  ): [PetitionFieldReply!]!
+
+  """
   Updates the status of a petition field reply.
   """
   updatePetitionFieldRepliesStatus(
@@ -2072,6 +2096,7 @@ type Mutation {
   Updates a reply on a petition field
   """
   updatePetitionFieldReply(petitionId: GID!, reply: JSON!, replyId: GID!): PetitionFieldReply!
+    @deprecated(reason: "use updatePetitionFieldReplies")
 
   """
   Updates the metadata of the specified petition field reply
@@ -6335,6 +6360,11 @@ input UpdatePetitionFieldInput {
   showInPdf: Boolean
   title: String
   visibility: JSONObject
+}
+
+input UpdatePetitionFieldReplyInput {
+  content: JSON
+  id: GID!
 }
 
 input UpdatePetitionInput {

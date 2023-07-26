@@ -112,8 +112,8 @@ export class RecipientView {
   private async waithForCreateReply() {
     await waitForGraphQL(this.page, (o) => {
       return (
-        o.operationName === "RecipientViewPetitionField_publicCreatePetitionFieldReply" ||
-        o.operationName === "RecipientViewPetitionField_publicUpdatePetitionFieldReply"
+        o.operationName === "RecipientViewPetitionField_publicCreatePetitionFieldReplies" ||
+        o.operationName === "RecipientViewPetitionField_publicUpdatePetitionFieldReplies"
       );
     });
   }

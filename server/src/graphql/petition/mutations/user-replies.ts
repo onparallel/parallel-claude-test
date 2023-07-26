@@ -32,13 +32,15 @@ import {
   userHasFeatureFlag,
 } from "../authorizers";
 import {
-  validateFieldReplyContent,
+  validateCreateReplyContent,
   validateFieldReplyValue,
   validateReplyUpdate,
+  validateUpdateReplyContent,
 } from "../validations";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import pMap from "p-map";
+import { fieldReplyContent } from "../../../util/fieldReplyContent";
 
 /** @deprecated */
 export const createPetitionFieldReply = mutationField("createPetitionFieldReply", {
@@ -108,7 +110,9 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
   },
 });
 
+/** @deprecated */
 export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply", {
+  deprecation: "use updatePetitionFieldReplies",
   description: "Updates a reply on a petition field",
   type: "PetitionFieldReply",
   args: {
@@ -293,19 +297,19 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
       `User:${ctx.user!.id}`,
     );
 
-    const [presignedPostData, reply] = await Promise.all([
+    const [presignedPostData, [reply]] = await Promise.all([
       ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
-      ctx.petitions.updatePetitionFieldReply(
-        args.replyId,
-        {
-          petition_access_id: null,
-          user_id: ctx.user!.id,
-          content: {
-            file_upload_id: newFile.id,
-            old_file_upload_id: oldReply.content["file_upload_id"], // old file_upload_id will be removed and the file deleted once updatefileUploadReplyComplete has been called
+      ctx.petitions.updatePetitionFieldRepliesContent(
+        args.petitionId,
+        [
+          {
+            id: args.replyId,
+            content: {
+              file_upload_id: newFile.id,
+              old_file_upload_id: oldReply.content["file_upload_id"], // old file_upload_id will be removed and the file deleted once updatefileUploadReplyComplete has been called
+            },
           },
-          status: "PENDING",
-        },
+        ],
         ctx.user!,
       ),
     ]);
@@ -344,15 +348,17 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     ]);
 
     ctx.files.loadFileUpload.dataloader.clear(file!.id);
-    return await ctx.petitions.updatePetitionFieldReply(
-      args.replyId,
-      {
-        petition_access_id: null,
-        user_id: ctx.user!.id,
-        content: { file_upload_id: reply.content["file_upload_id"] }, // rewrite content to remove old_file_upload_id reference
-      },
+    const [updatedReply] = await ctx.petitions.updatePetitionFieldRepliesContent(
+      args.petitionId,
+      [
+        {
+          id: args.replyId,
+          content: { file_upload_id: reply.content["file_upload_id"] }, // rewrite content to remove old_file_upload_id reference
+        },
+      ],
       ctx.user!,
     );
+    return updatedReply;
   },
 });
 
@@ -529,7 +535,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.fields, "fields"),
-    validateFieldReplyContent((args) => args.fields, "fields"),
+    validateCreateReplyContent((args) => args.fields, "fields"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -593,16 +599,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
             };
           } else {
             return {
-              content:
-                field.type === "DATE_TIME"
-                  ? {
-                      ...fieldReply.content,
-                      value: zonedTimeToUtc(
-                        fieldReply.content.datetime,
-                        fieldReply.content.timezone,
-                      ).toISOString(),
-                    }
-                  : fieldReply.content,
+              content: fieldReplyContent(field.type, fieldReply.content),
               petition_field_id: field.id,
               type: field.type,
               user_id: ctx.user!.id,
@@ -629,5 +626,71 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
       }
       throw error;
     }
+  },
+});
+
+export const updatePetitionFieldReplies = mutationField("updatePetitionFieldReplies", {
+  description: "Updates multiple replies for a petition at once",
+  type: list("PetitionFieldReply"),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    repliesBelongsToPetition("petitionId", (args) => args.replies.map((r) => r.id)),
+    replyIsForFieldOfType(
+      (args) => args.replies.map((r) => r.id),
+      [
+        "TEXT",
+        "SHORT_TEXT",
+        "SELECT",
+        "PHONE",
+        "NUMBER",
+        "DYNAMIC_SELECT",
+        "DATE",
+        "DATE_TIME",
+        "CHECKBOX",
+      ],
+    ),
+    replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
+    petitionIsNotAnonymized("petitionId"),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replies: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "UpdatePetitionFieldReplyInput",
+            definition(t) {
+              t.nonNull.globalId("id", { prefixName: "PetitionFieldReply" });
+              t.nullable.json("content");
+            },
+          }),
+        ),
+      ),
+    ),
+  },
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.replies, "replies"),
+    validateUpdateReplyContent((args) => args.replies, "replies"),
+  ),
+  resolve: async (_, args, ctx) => {
+    const replyIds = uniq(args.replies.map((r) => r.id));
+    const replies = await ctx.petitions.loadFieldReply(replyIds);
+
+    const replyInput = args.replies.map((replyData) => {
+      const reply = replies.find((r) => r!.id === replyData.id)!;
+      return {
+        ...replyData,
+        type: reply.type,
+      };
+    });
+
+    return await ctx.petitions.updatePetitionFieldRepliesContent(
+      args.petitionId,
+      replyInput.map((replyData) => ({
+        id: replyData.id,
+        content: fieldReplyContent(replyData.type, replyData.content),
+      })),
+      ctx.user!,
+    );
   },
 });

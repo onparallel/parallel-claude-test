@@ -31,6 +31,7 @@ import {
   PetitionFragment,
   PetitionTagFilter,
   ProfileFragment,
+  SubmitReply_petitionQuery,
   SubscriptionFragment,
   TagFragmentDoc,
   TaskFragment as TaskType,
@@ -442,4 +443,43 @@ export function mapProfile<T extends Pick<ProfileFragment, "properties" | "prope
   profile: T,
 ) {
   return pipe(profile, mapProfileProperties);
+}
+
+export function buildSubmittedReplyContent(
+  petition: SubmitReply_petitionQuery["petition"],
+  fieldId: string,
+  body: any,
+) {
+  const field = petition?.fields.find((f) => f.id === fieldId);
+  if (!field) {
+    // let backend manage errors
+    return {};
+  }
+
+  let replyContent: any = {};
+  switch (field.type) {
+    case "TEXT":
+    case "SHORT_TEXT":
+    case "SELECT":
+    case "DATE":
+    case "PHONE":
+    case "NUMBER":
+    case "CHECKBOX":
+      replyContent = { value: body.reply };
+      break;
+    case "DYNAMIC_SELECT": {
+      const labels = (petition?.fields.find((f) => f.id === fieldId)?.options?.labels ??
+        []) as string[];
+      const replies = body.reply as Maybe<string>[];
+      replyContent = { value: labels.map((label, i) => [label, replies[i]]) };
+      break;
+    }
+    case "DATE_TIME":
+      replyContent = body.reply;
+      break;
+    default:
+      throw new Error(`Can't submit a reply for a field of type ${field?.type}`);
+  }
+
+  return replyContent;
 }
