@@ -999,11 +999,6 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     force: booleanArg({ default: false }),
   },
   resolve: async (_, args, ctx) => {
-    const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
-    if (!args.force && replies.length > 0) {
-      throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
-    }
-
     const petitionFields = await ctx.petitions.loadFieldsForPetition.raw(args.petitionId);
     if (
       petitionFields.some(
@@ -1014,6 +1009,11 @@ export const deletePetitionField = mutationField("deletePetitionField", {
         "The petition field is being referenced in another field.",
         "FIELD_IS_REFERENCED_ERROR",
       );
+    }
+
+    const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
+    if (!args.force && replies.length > 0) {
+      throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
     }
 
     return await ctx.petitions.deletePetitionField(args.petitionId, args.fieldId, ctx.user!);

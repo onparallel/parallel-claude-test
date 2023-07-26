@@ -39,9 +39,8 @@ import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { indexBy, intersection, pick, zip } from "remeda";
+import { indexBy, intersection, pick } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-import { useReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
@@ -144,8 +143,6 @@ export const PetitionComposeFieldList = Object.assign(
       [onUpdateFieldPositions],
     );
 
-    const showReferencedFieldDialog = useReferencedFieldDialog();
-
     // Memoize field callbacks
     const fieldsDataRef = useUpdatingRef({ fields, indices, active });
     const fieldProps = useMemoFactory(
@@ -168,38 +165,7 @@ export const PetitionComposeFieldList = Object.assign(
         onCloneField: () => onCloneField(fieldId),
         onSettingsClick: () => onFieldSettingsClick(fieldId),
         onTypeIndicatorClick: () => onFieldTypeIndicatorClick(fieldId),
-        onDeleteClick: async () => {
-          const { fields } = fieldsDataRef.current!;
-          // if this field is being referenced by any other field ask the user
-          // if they want to remove the conflicting conditions
-          const referencing = zip(fields, indices).filter(
-            ([f]) =>
-              (f.visibility as PetitionFieldVisibility)?.conditions.some(
-                (c) => c.fieldId === fieldId,
-              ),
-          );
-          if (referencing.length > 0) {
-            try {
-              await showReferencedFieldDialog({
-                type: "DELETING_FIELD",
-                fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
-                  field,
-                  fieldIndex,
-                })),
-              });
-              for (const [field] of referencing) {
-                const visibility = field.visibility! as PetitionFieldVisibility;
-                const conditions = visibility.conditions.filter((c) => c.fieldId !== fieldId);
-                await onFieldEdit(field.id, {
-                  visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
-                });
-              }
-            } catch {
-              return;
-            }
-          }
-          await onDeleteField(fieldId);
-        },
+        onDeleteClick: async () => onDeleteField(fieldId),
         onFieldEdit: async (data) => {
           const { fields } = fieldsDataRef.current!;
           const field = fields.find((f) => f.id === fieldId)!;

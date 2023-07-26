@@ -2,32 +2,26 @@ import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Box, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { Link } from "@parallel/components/common/Link";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   FieldErrorDialog,
   useFieldErrorDialog,
 } from "@parallel/components/common/dialogs/FieldErrorDialog";
-import { Link } from "@parallel/components/common/Link";
-import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
-import { ToneProvider } from "@parallel/components/common/ToneProvider";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
+import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
-import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
-import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
-import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
-import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
-import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
-import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
 import {
   PetitionComposeField,
@@ -37,15 +31,21 @@ import { PetitionComposeFieldList } from "@parallel/components/petition-compose/
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
+import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
+import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
+import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
+import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
+import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
+import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { cleanPreviewFieldReplies } from "@parallel/components/petition-preview/clientMutations";
 import {
+  PetitionCompose_PetitionFieldFragment,
   PetitionCompose_changePetitionFieldTypeDocument,
   PetitionCompose_clonePetitionFieldDocument,
   PetitionCompose_createPetitionFieldDocument,
   PetitionCompose_deletePetitionFieldDocument,
   PetitionCompose_petitionDocument,
-  PetitionCompose_PetitionFieldFragment,
   PetitionCompose_updateFieldPositionsDocument,
   PetitionCompose_updatePetitionDocument,
   PetitionCompose_updatePetitionFieldDocument,
@@ -160,6 +160,48 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   }, []);
 
+  const fieldsDataRef = useUpdatingRef({ fields: petition.fields, indices, active: activeField });
+  const handleReferencedFieldError = async (fieldId: string) => {
+    const { fields } = fieldsDataRef.current!;
+    // if this field is being referenced by any other field ask the user
+    // if they want to remove the conflicting conditions
+    const referencing = zip(fields, indices).filter(
+      ([f]) =>
+        (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId),
+    );
+    if (referencing.length > 0) {
+      try {
+        await showReferencedFieldDialog({
+          type: "DELETING_FIELD",
+          fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
+            field,
+            fieldIndex,
+          })),
+        });
+        for (const [field] of referencing) {
+          const visibility = field.visibility! as PetitionFieldVisibility;
+          const conditions = visibility.conditions.filter((c) => c.fieldId !== fieldId);
+          await _handleFieldEdit(field.id, {
+            visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
+          });
+        }
+      } catch {
+        return;
+      }
+    }
+    await handleDeleteField(fieldId);
+  };
+
+  const confirmDelete = useConfirmDeleteFieldDialog();
+  const handleFieldWithRepliesError = async (fieldId: string) => {
+    try {
+      await confirmDelete();
+    } catch {
+      return;
+    }
+    await handleDeleteField(fieldId, true);
+  };
+
   const [updatePetition] = useMutation(PetitionCompose_updatePetitionDocument);
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
@@ -195,22 +237,24 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
-  const confirmDelete = useConfirmDeleteFieldDialog();
   const handleDeleteField = useCallback(
-    wrapper(async function (fieldId: string) {
+    wrapper(async function (fieldId: string, force?: boolean) {
       setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : activeFieldId));
       try {
         await deletePetitionField({
-          variables: { petitionId, fieldId },
+          variables: { petitionId, fieldId, force: force ?? false },
         });
         return;
-      } catch {}
-      try {
-        await confirmDelete();
-        await deletePetitionField({
-          variables: { petitionId, fieldId, force: true },
-        });
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "FIELD_IS_REFERENCED_ERROR")) {
+          await handleReferencedFieldError(fieldId);
+        } else if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
+          await handleFieldWithRepliesError(fieldId);
+        } else {
+          // throw error to show compose generic error dialog
+          throw e;
+        }
+      }
     }),
     [petitionId],
   );
@@ -271,7 +315,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               referencing.map(async ([field]) => {
                 const visibility = field.visibility! as PetitionFieldVisibility;
                 const conditions = visibility.conditions.filter(validCondition);
-                await _handleFieldEdit(field.id, {
+                await handleFieldEdit(field.id, {
                   visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
                 });
               }),
