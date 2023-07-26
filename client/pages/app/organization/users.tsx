@@ -683,7 +683,7 @@ function useOrganizationUsersTableColumns() {
           defaultMessage: "Name",
         }),
         cellProps: {
-          width: userCanEdit ? "30%" : "46%",
+          width: "25%",
           minWidth: "220px",
         },
         CellContent: ({ row }) => {
@@ -742,7 +742,7 @@ function useOrganizationUsersTableColumns() {
           defaultMessage: "Email",
         }),
         cellProps: {
-          width: "30%",
+          width: "25%",
           minWidth: "220px",
         },
         CellContent: ({ row }) => (
@@ -756,7 +756,6 @@ function useOrganizationUsersTableColumns() {
           defaultMessage: "Role",
         }),
         cellProps: {
-          width: "10%",
           minWidth: "200px",
         },
         CellContent: ({ row }) => (
@@ -785,7 +784,6 @@ function useOrganizationUsersTableColumns() {
               }),
               isSortable: true,
               cellProps: {
-                width: "16%",
                 minWidth: "220px",
               },
               CellContent: ({ row }) =>
@@ -813,7 +811,7 @@ function useOrganizationUsersTableColumns() {
           defaultMessage: "Created at",
         }),
         cellProps: {
-          width: "14%",
+          width: "15%",
           minWidth: "220px",
         },
         CellContent: ({ row }) => (

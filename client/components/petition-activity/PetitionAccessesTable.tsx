@@ -347,7 +347,6 @@ function usePetitionAccessesColumns(): TableColumn<
             onReactivateAccess,
           } = context!;
           const { id, status, contact, remindersOptOut, isContactless, recipientUrl } = row;
-          const intl = useIntl();
 
           const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 

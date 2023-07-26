@@ -186,7 +186,7 @@ function useProfilePetitionsActions({ onRemoveClick }: { onRemoveClick: () => vo
 
 function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_PetitionFragment>[] {
   const intl = useIntl();
-
+  const goToContact = useGoToContact();
   return useMemo(
     () => [
       {
@@ -227,7 +227,6 @@ function useProfilePetitionsTableColumns(): TableColumn<ProfilePetitionsTable_Pe
           if (recipients.length === 0) {
             return null;
           }
-          const goToContact = useGoToContact();
 
           return (
             <EnumerateList
