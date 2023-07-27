@@ -2,8 +2,9 @@ import fetch from "node-fetch";
 import { run } from "../utils/run";
 
 const API_KEY = process.env.API_KEY;
-// Plantillas de Saldados
-const TEMPLATE_IDS = ["zas25KHxAByKWmEJE2u", "zas25KHxAByKX3pkmhr"];
+
+const TEMPLATE_IDS = ["4exV9AsWJrjj7okeL"];
+const TAGS = ["A", "B"];
 
 async function request(
   path: string,
@@ -34,17 +35,15 @@ async function main() {
     query: new URLSearchParams({
       fromTemplateId: TEMPLATE_IDS.join(","),
       limit: "1000",
-      include: "recipients",
+      tags: "",
     }),
   });
-
+  let i = 0;
   for (const petition of petitions.items as any[]) {
-    const recipient = petition.recipients?.[0]?.contact.fullName;
+    const tag = TAGS[i++ % TAGS.length];
 
-    if (!recipient || petition.name !== "Saldados - Expediente") continue;
-    const name = `Formulario - ${recipient}`;
-    console.log(`Renaming petition ${petition.id} as: '${name}'`);
-    await request(`/petitions/${petition.id}`, { method: "PUT", body: { name } });
+    console.log(`Tagging petition ${petition.id} with ${tag} (${i}/${petitions.totalCount})`);
+    await request(`/petitions/${petition.id}/tags`, { method: "POST", body: { name: tag } });
   }
 }
 

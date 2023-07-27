@@ -1,9 +1,13 @@
 import fetch from "node-fetch";
 import { run } from "../utils/run";
 
+/**
+ * This script closes all petitions coming from the same template
+ */
+
 const API_KEY = process.env.API_KEY;
-// Plantillas de Saldados
-const TEMPLATE_IDS = ["zas25KHxAByKWmEJE2u", "zas25KHxAByKX3pkmhr"];
+
+const TEMPLATE_IDS = ["zas25KHxAByKWu6SFLA"];
 
 async function request(
   path: string,
@@ -34,17 +38,14 @@ async function main() {
     query: new URLSearchParams({
       fromTemplateId: TEMPLATE_IDS.join(","),
       limit: "1000",
-      include: "recipients",
     }),
   });
-
+  let i = 0;
   for (const petition of petitions.items as any[]) {
-    const recipient = petition.recipients?.[0]?.contact.fullName;
-
-    if (!recipient || petition.name !== "Saldados - Expediente") continue;
-    const name = `Formulario - ${recipient}`;
-    console.log(`Renaming petition ${petition.id} as: '${name}'`);
-    await request(`/petitions/${petition.id}`, { method: "PUT", body: { name } });
+    if (petition.status !== "CLOSED") {
+      console.log(`Closing petition ${petition.id} (${++i}/${petitions.totalCount}))`);
+      await request(`/petitions/${petition.id}/close`, { method: "POST" });
+    }
   }
 }
 
