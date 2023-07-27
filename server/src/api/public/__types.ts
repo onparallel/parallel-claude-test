@@ -5792,6 +5792,92 @@ export type DeletePetition_deletePetitionsMutationVariables = Exact<{
 
 export type DeletePetition_deletePetitionsMutation = { deletePetitions: Success };
 
+export type ClosePetition_closePetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
+  includeSigners: Scalars["Boolean"]["input"];
+}>;
+
+export type ClosePetition_closePetitionMutation = {
+  closePetition: {
+    id: string;
+    name: string | null;
+    status: PetitionStatus;
+    deadline: string | null;
+    locale: PetitionLocale;
+    createdAt: string;
+    customProperties: { [key: string]: any };
+    fromTemplate: { id: string } | null;
+    recipients: Array<{
+      recipientUrl: string | null;
+      id: string;
+      status: PetitionAccessStatus;
+      reminderCount: number;
+      remindersLeft: number;
+      remindersActive: boolean;
+      nextReminderAt: string | null;
+      createdAt: string;
+      contact: {
+        id: string;
+        email: string;
+        fullName: string;
+        firstName: string;
+        lastName: string | null;
+        createdAt: string;
+        updatedAt: string;
+      } | null;
+      granter: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      } | null;
+    }>;
+    fields?: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      multiple: boolean;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }>;
+    replies: Array<{
+      id: string;
+      alias: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        metadata: { [key: string]: any };
+      }>;
+    }>;
+    tags?: Array<{ id: string; name: string }>;
+    signatureConfig?: {
+      signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+    } | null;
+    progress?: {
+      external: { approved: number; replied: number; optional: number; total: number };
+      internal: { approved: number; replied: number; optional: number; total: number };
+    };
+  };
+};
+
 export type ReopenPetition_reopenPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   includeRecipients: Scalars["Boolean"]["input"];
@@ -8738,6 +8824,26 @@ export const DeletePetition_deletePetitionsDocument = gql`
 ` as unknown as DocumentNode<
   DeletePetition_deletePetitionsMutation,
   DeletePetition_deletePetitionsMutationVariables
+>;
+export const ClosePetition_closePetitionDocument = gql`
+  mutation ClosePetition_closePetition(
+    $petitionId: GID!
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
+    $includeProgress: Boolean!
+    $includeSigners: Boolean!
+  ) {
+    closePetition(petitionId: $petitionId) {
+      ...Petition
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  ClosePetition_closePetitionMutation,
+  ClosePetition_closePetitionMutationVariables
 >;
 export const ReopenPetition_reopenPetitionDocument = gql`
   mutation ReopenPetition_reopenPetition(

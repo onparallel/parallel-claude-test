@@ -29,6 +29,7 @@ import {
 import {
   ActivatePetitionRecipient_reactivateAccessesDocument,
   AssociatePetitionToProfile_associateProfileToPetitionDocument,
+  ClosePetition_closePetitionDocument,
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetition_petitionDocument,
@@ -850,6 +851,49 @@ api
       }
     },
   );
+
+api.path("/petitions/:petitionId/close", { params: { petitionId } }).post(
+  {
+    operationId: "ClosePetition",
+    summary: "Closes a parallel",
+    description: "Close a parallel",
+    query: {
+      ...petitionIncludeParam(),
+    },
+    responses: {
+      200: SuccessResponse(Petition),
+      403: ErrorResponse({ description: "You don't have access to this resource" }),
+    },
+    tags: ["Parallels"],
+  },
+  async ({ client, params, query }) => {
+    const _mutation = gql`
+      mutation ClosePetition_closePetition(
+        $petitionId: GID!
+        $includeRecipients: Boolean!
+        $includeFields: Boolean!
+        $includeTags: Boolean!
+        $includeRecipientUrl: Boolean!
+        $includeReplies: Boolean!
+        $includeProgress: Boolean!
+        $includeSigners: Boolean!
+      ) {
+        closePetition(petitionId: $petitionId) {
+          ...Petition
+        }
+      }
+      ${PetitionFragment}
+    `;
+
+    const result = await client.request(ClosePetition_closePetitionDocument, {
+      petitionId: params.petitionId,
+      ...getPetitionIncludesFromQuery(query),
+    });
+
+    assert("id" in result.closePetition!);
+    return Ok(mapPetition(result.closePetition!));
+  },
+);
 
 api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
   {
