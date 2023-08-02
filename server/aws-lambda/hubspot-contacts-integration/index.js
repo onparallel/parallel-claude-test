@@ -8,28 +8,34 @@ const {
   updateContact,
 } = require("./helpers");
 
-exports.handler = async (request, context, callback) => {
+function response(statusCode, body) {
+  return {
+    statusCode,
+    isBase64Encoded: false,
+    headers: {},
+    body: JSON.stringify(body),
+  };
+}
+
+exports.handler = async (request) => {
   try {
     const verified = verifyRequestSignature(request);
     if (!verified) {
       console.log("request signature not verified");
-      callback(null, request);
-      return;
+      return response(200, { error: "request signature not verified" });
     }
 
     const body = JSON.parse(request.body);
     if (!body.petitionId) {
       console.log("petitionId not defined on request body");
-      callback(null, request);
-      return;
+      return response(200, { error: "petitionId not defined on request body" });
     }
 
     const petition = await fetchPetition(body.petitionId);
 
     if (petition.recipients?.[0]?.contact?.email === undefined) {
       console.log("no recipient defined on petition");
-      callback(null, request);
-      return;
+      return response(200, { error: "no recipient defined on petition" });
     }
 
     const contactEmail = petition.recipients[0].contact.email;
@@ -49,9 +55,9 @@ exports.handler = async (request, context, callback) => {
         await updateContact(contact.id, properties);
       }
     }
-    callback(null, request);
+    return response(200, { success: true });
   } catch (e) {
     console.error(e);
-    callback(e);
+    return response(200, { success: false });
   }
 };
