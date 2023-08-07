@@ -8,8 +8,8 @@ import { isDefined } from "remeda";
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   decimals?: number;
   onlyPositive?: boolean;
-  onChange: (value: number | undefined) => void;
-  value: number | undefined;
+  onChange?: (value: number | undefined) => void;
+  value?: number;
   prefix?: string;
   suffix?: string;
 }
@@ -62,7 +62,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
     // Source tells whether the reason for this function being triggered was an 'event' or due to a 'prop' change
     const { event, source } = sourceInfo;
     if (source === "event" && (event!.type === "change" || event!.type === "keydown")) {
-      onChange(floatValue);
+      onChange?.(floatValue);
       assignRef(valueRef, value);
     }
   };

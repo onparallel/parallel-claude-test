@@ -62,14 +62,8 @@ export interface ProfileFieldProps {
 export function ProfileField(props: ProfileFieldProps) {
   const intl = useIntl();
   const { index, field, files, control, setValue, fieldsWithIndices } = props;
-  const { dirtyFields, errors } = useFormState({
-    control,
-  });
-
-  const fieldValue = useWatch({
-    control,
-    name: `fields.${index}`,
-  });
+  const { dirtyFields, errors } = useFormState({ control });
+  const fieldValue = useWatch({ control, name: `fields.${index}` });
 
   const expiryDate = fieldValue?.expiryDate;
   const content = fieldValue?.content;
@@ -179,7 +173,7 @@ export function ProfileField(props: ProfileFieldProps) {
         } else {
           /**
            * hay que tener en cuenta varias cosas
-           * - NUMBER y DATE tienen representaciones visuales, si se important a campos que no son
+           * - NUMBER y DATE tienen representaciones visuales, si se importan a campos que no son
            *   del mismo tipo hay que importar la representacion visual
            * - DATE_TIME tiene representacion visual que es la que se importa siempre (no hay campo
            *   de perfiles de tipo DATE_TIME)

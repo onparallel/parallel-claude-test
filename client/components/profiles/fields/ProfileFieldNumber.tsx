@@ -33,8 +33,8 @@ export function ProfileFieldNumber({
             <NumeralInput
               name={name}
               borderColor="transparent"
-              value={value || undefined}
-              onChange={onChange}
+              value={value ?? undefined}
+              onChange={(value) => onChange(value ?? null)}
               onBlur={() => {
                 if (value) {
                   return showExpiryDateDialog({});

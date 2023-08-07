@@ -49,6 +49,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { FORMATS } from "@parallel/utils/dates";
+import { MaybePromise } from "@parallel/utils/types";
 
 export interface ProfileFormData {
   fields: ({ type: ProfileTypeFieldType } & UpdateProfileFieldValueInput)[];
@@ -56,11 +57,11 @@ export interface ProfileFormData {
 
 interface ProfileFormProps {
   profile: ProfileForm_ProfileFragment;
-  refetch: () => void;
   overlapsIntercomBadge?: boolean;
   petitionFields?: ProfileForm_PetitionFieldFragment[];
   petitionId?: string;
   onRecover?: () => void;
+  onRefetch: () => MaybePromise<void>;
 }
 
 function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragment[]) {
@@ -69,7 +70,7 @@ function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragm
       return {
         type,
         profileTypeFieldId: id,
-        content: type === "FILE" ? { value: [] } : value?.content ?? { value: undefined },
+        content: type === "FILE" ? { value: [] } : value?.content ?? { value: null },
         expiryDate: isExpirable
           ? (type === "FILE" ? files?.[0]?.expiryDate : value?.expiryDate) ?? null
           : null,
@@ -93,7 +94,7 @@ function normalize(alias: string) {
 
 export const ProfileForm = Object.assign(
   chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
-    { profile, refetch, overlapsIntercomBadge, petitionFields, petitionId, onRecover, ...props },
+    { profile, onRefetch, overlapsIntercomBadge, petitionFields, petitionId, onRecover, ...props },
     ref,
   ) {
     const intl = useIntl();
@@ -319,7 +320,7 @@ export const ProfileForm = Object.assign(
               },
             );
 
-            await refetch();
+            await onRefetch();
           } catch (e) {
             if (isApolloError(e, "MAX_FILES_EXCEEDED")) {
               await withError(

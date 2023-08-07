@@ -153,7 +153,9 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
       <Flex minHeight="100%" direction="row">
         <ProfileForm
           profile={profile}
-          refetch={() => refetch()}
+          onRefetch={async () => {
+            await refetch();
+          }}
           borderRight="1px solid"
           borderColor="gray.200"
           maxWidth="container.xs"

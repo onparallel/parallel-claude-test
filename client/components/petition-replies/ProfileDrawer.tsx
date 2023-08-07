@@ -94,7 +94,7 @@ export const ProfileDrawer = Object.assign(
           <ProfileForm
             overlapsIntercomBadge
             profile={profileData!.profile}
-            refetch={handleRefetchProfile}
+            onRefetch={handleRefetchProfile}
             flex={1}
             minHeight={0}
             petitionFields={petitionFields}
