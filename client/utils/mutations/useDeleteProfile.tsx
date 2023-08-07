@@ -32,6 +32,7 @@ useDeleteProfile.mutations = [
       scheduleProfileForDeletion(profileIds: $profileIds) {
         id
         status
+        permanentDeletionAt
       }
     }
   `,

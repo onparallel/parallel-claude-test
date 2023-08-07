@@ -32291,7 +32291,12 @@ export type useDeleteProfile_scheduleProfileForDeletionMutationVariables = Exact
 }>;
 
 export type useDeleteProfile_scheduleProfileForDeletionMutation = {
-  scheduleProfileForDeletion: Array<{ __typename?: "Profile"; id: string; status: ProfileStatus }>;
+  scheduleProfileForDeletion: Array<{
+    __typename?: "Profile";
+    id: string;
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
+  }>;
 };
 
 export type useDeleteProfileType_ProfileTypeFragment = {
@@ -44458,6 +44463,7 @@ export const useDeleteProfile_scheduleProfileForDeletionDocument = gql`
     scheduleProfileForDeletion(profileIds: $profileIds) {
       id
       status
+      permanentDeletionAt
     }
   }
 ` as unknown as DocumentNode<
