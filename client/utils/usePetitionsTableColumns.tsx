@@ -219,7 +219,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     CellContent: ({ row }) => {
       if (row.__typename === "Petition") {
         return isDefined(row.fromTemplate) ? (
-          isDefined(row.fromTemplate.myEffectivePermission || row.fromTemplate.isPublicTemplate) ? (
+          isDefined(row.fromTemplate.myEffectivePermission) || row.fromTemplate.isPublicTemplate ? (
             <OverflownText
               display="block"
               as={Link}
