@@ -3113,6 +3113,11 @@ type PetitionBaseMini {
   id: GID!
 
   """
+  Whether the template is publicly available or not
+  """
+  isPublicTemplate: Boolean
+
+  """
   The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
   """
   myEffectivePermission: EffectivePetitionUserPermission

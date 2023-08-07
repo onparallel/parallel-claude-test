@@ -1869,6 +1869,7 @@ export interface NexusGenFieldTypes {
   PetitionBaseMini: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    isPublicTemplate: boolean | null; // Boolean
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
   };
@@ -3984,6 +3985,7 @@ export interface NexusGenFieldTypeNames {
   PetitionBaseMini: {
     // field return type name
     id: "GID";
+    isPublicTemplate: "Boolean";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
   };

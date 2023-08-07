@@ -2682,6 +2682,8 @@ export interface PetitionBaseMini {
   __typename?: "PetitionBaseMini";
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
+  /** Whether the template is publicly available or not */
+  isPublicTemplate?: Maybe<Scalars["Boolean"]["output"]>;
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -28523,6 +28525,7 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
     __typename?: "PetitionBaseMini";
     id: string;
     name?: string | null;
+    isPublicTemplate?: boolean | null;
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
       permissionType: PetitionPermissionType;
@@ -28827,6 +28830,7 @@ export type Petitions_petitionsQuery = {
             __typename?: "PetitionBaseMini";
             id: string;
             name?: string | null;
+            isPublicTemplate?: boolean | null;
             myEffectivePermission?: {
               __typename?: "EffectivePetitionUserPermission";
               permissionType: PetitionPermissionType;
@@ -33092,6 +33096,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionBaseMini";
     id: string;
     name?: string | null;
+    isPublicTemplate?: boolean | null;
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
       permissionType: PetitionPermissionType;
@@ -38378,6 +38383,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       fromTemplate @include(if: $includeTemplate) {
         id
         name
+        isPublicTemplate
         myEffectivePermission {
           permissionType
         }

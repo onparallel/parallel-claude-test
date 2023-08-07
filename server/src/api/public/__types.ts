@@ -2618,6 +2618,8 @@ export type PetitionBase = {
 export type PetitionBaseMini = {
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
+  /** Whether the template is publicly available or not */
+  isPublicTemplate: Maybe<Scalars["Boolean"]["output"]>;
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */

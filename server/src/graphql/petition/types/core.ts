@@ -342,6 +342,10 @@ export const PetitionBaseMini = objectType({
     t.nullable.string("name", {
       description: "The name of the petition.",
     });
+    t.nullable.boolean("isPublicTemplate", {
+      description: "Whether the template is publicly available or not",
+      resolve: (o) => o.is_template && o.template_public,
+    });
     t.nullable.field("myEffectivePermission", {
       type: "EffectivePetitionUserPermission",
       description:

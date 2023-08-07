@@ -219,11 +219,17 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     CellContent: ({ row }) => {
       if (row.__typename === "Petition") {
         return isDefined(row.fromTemplate) ? (
-          isDefined(row.fromTemplate.myEffectivePermission) ? (
+          isDefined(row.fromTemplate.myEffectivePermission || row.fromTemplate.isPublicTemplate) ? (
             <OverflownText
               display="block"
               as={Link}
-              href={`/app/petitions/${row.fromTemplate.id}`}
+              href={`/app/petitions/new?${new URLSearchParams({
+                template: row.fromTemplate.id,
+                ...(row.fromTemplate.isPublicTemplate &&
+                row.fromTemplate.myEffectivePermission === null
+                  ? { public: "true" }
+                  : {}),
+              })}`}
               onClick={(e) => e.stopPropagation()}
             >
               {row.fromTemplate.name ? (
@@ -600,6 +606,7 @@ usePetitionsTableColumns.fragments = {
         fromTemplate @include(if: $includeTemplate) {
           id
           name
+          isPublicTemplate
           myEffectivePermission {
             permissionType
           }

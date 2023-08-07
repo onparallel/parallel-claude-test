@@ -103,7 +103,13 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
     link: from([authLink, authErrorHandler, terminalLink]),
     ssrMode: typeof window === "undefined",
     cache: new InMemoryCache({
-      dataIdFromObject: (o) => o.id as string,
+      dataIdFromObject: (o) => {
+        // we don't want PetitionBaseMini to clash with Petition and PetitionTemplate objects in the Apollo cache
+        if (o.__typename === "PetitionBaseMini") {
+          return `_${o.id}`;
+        }
+        return o.id as string;
+      },
       possibleTypes: fragmentMatcher.possibleTypes,
       typePolicies: {
         Query: {
