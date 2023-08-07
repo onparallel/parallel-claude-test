@@ -347,7 +347,7 @@ export const ProfileForm = Object.assign(
           minHeight="65px"
           justifyContent="center"
         >
-          <HStack>
+          <HStack alignItems="baseline">
             <OverflownText
               as="h2"
               fontSize="xl"
