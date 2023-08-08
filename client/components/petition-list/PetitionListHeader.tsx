@@ -334,6 +334,7 @@ export function PetitionListHeader({
             <ResponsiveButtonIcon
               icon={<ColumnsIcon />}
               variant="outline"
+              data-action="edit-columns"
               onClick={handleEditColumns}
               label={intl.formatMessage({
                 id: "generic.edit-columns",
