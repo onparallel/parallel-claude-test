@@ -46,9 +46,9 @@ async function main() {
 
   console.log("Getting the secrets 🤫");
   // move environment specific values into .env.production.local file (used on staging and production)
-  execSync(`cp ${buildDir}/client/.env.${env} ${buildDir}/client/.env.production.local`);
+  execSync(`cp ${buildDir}/client/.env.${env}_ ${buildDir}/client/.env.production.local`);
   // remove temporary production and staging env variables files, as those are already into .env.production.local
-  execSync(`rm ${buildDir}/client/.env.production ${buildDir}/client/.env.staging`);
+  execSync(`rm ${buildDir}/client/.env.production_ ${buildDir}/client/.env.staging_`);
 
   // Generate tokens
   const CLIENT_SERVER_TOKEN = token(32);

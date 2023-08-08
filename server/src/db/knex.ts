@@ -37,7 +37,8 @@ export function createKnex(mode: keyof Config["db"]) {
     const connection = config.db[mode];
     const instance = knex({
       client: "pg",
-      connection,
+      // https://github.com/knex/knex/issues/5648
+      connection: { ...connection },
       asyncStackTraces: process.env.NODE_ENV !== "production",
       pool: {
         min: 5,

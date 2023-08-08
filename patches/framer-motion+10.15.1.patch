@@ -1,0 +1,112 @@
+diff --git a/node_modules/framer-motion/dist/cjs/index.js b/node_modules/framer-motion/dist/cjs/index.js
+index b9540fb..3f7eac9 100644
+--- a/node_modules/framer-motion/dist/cjs/index.js
++++ b/node_modules/framer-motion/dist/cjs/index.js
+@@ -5042,14 +5042,15 @@ function ReorderGroup({ children, as = "ul", axis = "y", onReorder, values, ...p
+     const context = {
+         axis,
+         registerItem: (value, layout) => {
+-            /**
+-             * Ensure entries can't add themselves more than once
+-             */
+-            if (layout &&
+-                order.findIndex((entry) => value === entry.value) === -1) {
+-                order.push({ value, layout: layout[axis] });
+-                order.sort(compareMin);
+-            }
++          if (!layout) return;
++          // If the entry was already added, update it rather than adding it again
++          const idx = order.findIndex((entry) => value === entry.value)
++          if (idx !== -1) {
++              order[idx].layout = layout[axis]
++          } else {
++              order.push({ value: value, layout: layout[axis] })
++          }
++          order.sort(compareMin)
+         },
+         updateOrder: (id, offset, velocity) => {
+             if (isReordering.current)
+@@ -5172,20 +5173,14 @@ function ReorderItem({ children, style = {}, value, as = "li", onDrag, layout =
+         y: useDefaultMotionValue(style.y),
+     };
+     const zIndex = useTransform([point.x, point.y], ([latestX, latestY]) => latestX || latestY ? 1 : "unset");
+-    const measuredLayout = React.useRef(null);
+     indexLegacy.invariant(Boolean(context), "Reorder.Item must be a child of Reorder.Group");
+     const { axis, registerItem, updateOrder } = context;
+-    React.useEffect(() => {
+-        registerItem(value, measuredLayout.current);
+-    }, [context]);
+     return (React__namespace.createElement(Component, { drag: axis, ...props, dragSnapToOrigin: true, style: { ...style, x: point.x, y: point.y, zIndex }, layout: layout, onDrag: (event, gesturePoint) => {
+             const { velocity } = gesturePoint;
+             velocity[axis] &&
+                 updateOrder(value, point[axis].get(), velocity[axis]);
+             onDrag && onDrag(event, gesturePoint);
+-        }, onLayoutMeasure: (measured) => {
+-            measuredLayout.current = measured;
+-        }, ref: externalRef, ignoreStrict: true }, children));
++        }, onLayoutMeasure: (measured) => registerItem(value, measured), ref: externalRef, ignoreStrict: true }, children));
+ }
+ const Item = React.forwardRef(ReorderItem);
+ 
+diff --git a/node_modules/framer-motion/dist/es/components/Reorder/Group.mjs b/node_modules/framer-motion/dist/es/components/Reorder/Group.mjs
+index da9dac2..8fdecc3 100644
+--- a/node_modules/framer-motion/dist/es/components/Reorder/Group.mjs
++++ b/node_modules/framer-motion/dist/es/components/Reorder/Group.mjs
+@@ -14,14 +14,15 @@ function ReorderGroup({ children, as = "ul", axis = "y", onReorder, values, ...p
+     const context = {
+         axis,
+         registerItem: (value, layout) => {
+-            /**
+-             * Ensure entries can't add themselves more than once
+-             */
+-            if (layout &&
+-                order.findIndex((entry) => value === entry.value) === -1) {
+-                order.push({ value, layout: layout[axis] });
+-                order.sort(compareMin);
+-            }
++          if (!layout) return;
++          // If the entry was already added, update it rather than adding it again
++          const idx = order.findIndex((entry) => value === entry.value)
++          if (idx !== -1) {
++              order[idx].layout = layout[axis]
++          } else {
++              order.push({ value: value, layout: layout[axis] })
++          }
++          order.sort(compareMin)
+         },
+         updateOrder: (id, offset, velocity) => {
+             if (isReordering.current)
+diff --git a/node_modules/framer-motion/dist/es/components/Reorder/Item.mjs b/node_modules/framer-motion/dist/es/components/Reorder/Item.mjs
+index 02e8140..3398a54 100644
+--- a/node_modules/framer-motion/dist/es/components/Reorder/Item.mjs
++++ b/node_modules/framer-motion/dist/es/components/Reorder/Item.mjs
+@@ -1,6 +1,6 @@
+ import { invariant } from '../../utils/errors.mjs';
+ import * as React from 'react';
+-import { forwardRef, useContext, useRef, useEffect } from 'react';
++import { forwardRef, useContext } from 'react';
+ import { ReorderContext } from '../../context/ReorderContext.mjs';
+ import { motion } from '../../render/dom/motion.mjs';
+ import { useConstant } from '../../utils/use-constant.mjs';
+@@ -19,20 +19,14 @@ function ReorderItem({ children, style = {}, value, as = "li", onDrag, layout =
+         y: useDefaultMotionValue(style.y),
+     };
+     const zIndex = useTransform([point.x, point.y], ([latestX, latestY]) => latestX || latestY ? 1 : "unset");
+-    const measuredLayout = useRef(null);
+     invariant(Boolean(context), "Reorder.Item must be a child of Reorder.Group");
+     const { axis, registerItem, updateOrder } = context;
+-    useEffect(() => {
+-        registerItem(value, measuredLayout.current);
+-    }, [context]);
+     return (React.createElement(Component, { drag: axis, ...props, dragSnapToOrigin: true, style: { ...style, x: point.x, y: point.y, zIndex }, layout: layout, onDrag: (event, gesturePoint) => {
+             const { velocity } = gesturePoint;
+             velocity[axis] &&
+                 updateOrder(value, point[axis].get(), velocity[axis]);
+             onDrag && onDrag(event, gesturePoint);
+-        }, onLayoutMeasure: (measured) => {
+-            measuredLayout.current = measured;
+-        }, ref: externalRef, ignoreStrict: true }, children));
++        }, onLayoutMeasure: (measured) => registerItem(value, measured), ref: externalRef, ignoreStrict: true }, children));
+ }
+ const Item = forwardRef(ReorderItem);
+ 

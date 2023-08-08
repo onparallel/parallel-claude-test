@@ -716,7 +716,7 @@ export function PetitionSharingDialog({
   );
 }
 
-const fragments = {
+const _fragments = {
   get PetitionBase() {
     return gql`
       fragment PetitionSharingModal_PetitionBase on PetitionBase {
@@ -822,7 +822,7 @@ const _mutations = [
         ...PetitionSharingModal_PetitionBase
       }
     }
-    ${fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
   gql`
     mutation PetitionSharingModal_removePetitionPermission(
@@ -838,7 +838,7 @@ const _mutations = [
         ...PetitionSharingModal_PetitionBase
       }
     }
-    ${fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
   gql`
     mutation PetitionSharingModal_editPetitionPermission(
@@ -856,7 +856,7 @@ const _mutations = [
         ...PetitionSharingModal_PetitionBase
       }
     }
-    ${fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
   gql`
     mutation PetitionSharingModal_transferPetitionOwnership($petitionId: GID!, $userId: GID!) {
@@ -864,7 +864,7 @@ const _mutations = [
         ...PetitionSharingModal_PetitionBase
       }
     }
-    ${fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
 ];
 
@@ -875,7 +875,7 @@ const _queries = [
         ...PetitionSharingModal_PetitionBase
       }
     }
-    ${fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
 ];
 

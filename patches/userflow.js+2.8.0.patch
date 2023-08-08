@@ -1,0 +1,12 @@
+diff --git a/node_modules/userflow.js/dist/userflow.es.js b/node_modules/userflow.js/dist/userflow.es.js
+index ec1edb2..31eb6e7 100644
+--- a/node_modules/userflow.js/dist/userflow.es.js
++++ b/node_modules/userflow.js/dist/userflow.es.js
+@@ -101,7 +101,6 @@ if (!userflow) {
+                         document.head.removeChild(script);
+                         loadPromise = null;
+                         var e = new Error('Could not load Userflow.js');
+-                        console.error(e.message);
+                         reject(e);
+                     };
+                     document.head.appendChild(script);
