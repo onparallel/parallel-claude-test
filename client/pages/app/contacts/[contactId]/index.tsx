@@ -11,8 +11,9 @@ import {
   Stack,
   Text,
   ThemingProps,
+  Tooltip,
 } from "@chakra-ui/react";
-import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
+import { DeleteIcon, EditIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -269,95 +270,109 @@ type PetitionAccessSelection = Contact_PetitionAccessFragment;
 function useContactPetitionAccessesColumns() {
   const intl = useIntl();
 
-  return useMemo(
-    () =>
-      [
-        {
-          key: "name",
-          label: intl.formatMessage({
-            id: "generic.parallel-name",
-            defaultMessage: "Parallel name",
-          }),
-          headerProps: {
-            width: "30%",
-            minWidth: "240px",
-          },
-          cellProps: {
-            maxWidth: 0,
-          },
-          CellContent: ({ row }) => (
-            <OverflownText textStyle={row.petition?.name ? undefined : "hint"}>
-              {row.petition?.name
-                ? row.petition.name
-                : intl.formatMessage({
-                    id: "generic.unnamed-parallel",
-                    defaultMessage: "Unnamed parallel",
-                  })}
-            </OverflownText>
-          ),
+  return useMemo<TableColumn<PetitionAccessSelection>[]>(
+    () => [
+      {
+        key: "name",
+        label: intl.formatMessage({
+          id: "generic.parallel-name",
+          defaultMessage: "Parallel name",
+        }),
+        headerProps: {
+          width: "30%",
+          minWidth: "240px",
         },
-        {
-          key: "status",
-          label: intl.formatMessage({
-            id: "petitions.header.status",
-            defaultMessage: "Status",
-          }),
-          align: "center",
-          CellContent: ({ row: { petition } }) => (
-            <PetitionStatusCellContent petition={petition!} />
-          ),
+        cellProps: {
+          maxWidth: 0,
         },
-        {
-          key: "signature",
-          align: "center",
-          headerProps: { padding: 0, width: 8 },
-          cellProps: { padding: 0 },
-          CellContent: ({ row: { petition } }) => (
-            <Flex alignItems="center" paddingRight="2">
-              <PetitionSignatureCellContent petition={petition!} />
-            </Flex>
-          ),
-        },
-        {
-          key: "shared",
-          label: intl.formatMessage({
-            id: "petitions.header.shared",
-            defaultMessage: "Shared",
-          }),
-          align: "left",
-          cellProps: { width: "1%" },
-          CellContent: ({ row: { petition }, column }) => (
-            <Flex justifyContent={column.align}>
-              <UserAvatarList
-                usersOrGroups={petition!.permissions.map((p) =>
-                  p.__typename === "PetitionUserPermission"
-                    ? p.user
-                    : p.__typename === "PetitionUserGroupPermission"
-                    ? p.group
-                    : (null as never),
-                )}
+        CellContent: ({ row }) => (
+          <OverflownText textStyle={row.petition?.name ? undefined : "hint"}>
+            {row.petition?.name
+              ? row.petition.name
+              : intl.formatMessage({
+                  id: "generic.unnamed-parallel",
+                  defaultMessage: "Unnamed parallel",
+                })}
+          </OverflownText>
+        ),
+      },
+      {
+        key: "status",
+        label: intl.formatMessage({
+          id: "petitions.header.status",
+          defaultMessage: "Status",
+        }),
+        align: "center",
+        CellContent: ({ row: { petition } }) => <PetitionStatusCellContent petition={petition!} />,
+      },
+      {
+        key: "signature",
+        header: (
+          <Tooltip
+            label={
+              <FormattedMessage
+                id="petitions.header.signature"
+                defaultMessage="eSignature status"
               />
-            </Flex>
-          ),
-        },
-        {
-          key: "sentAt",
-          label: intl.formatMessage({
-            id: "generic.sent-at",
-            defaultMessage: "Sent at",
+            }
+          >
+            <SignatureIcon />
+          </Tooltip>
+        ),
+        label: (intl) =>
+          intl.formatMessage({
+            id: "petitions.header.signature",
+            defaultMessage: "eSignature status",
           }),
-          cellProps: { width: "1%" },
-          CellContent: ({ row: { petition } }) => (
-            <DateTime
-              fontSize="sm"
-              value={petition!.sentAt!}
-              format={FORMATS.LLL}
-              useRelativeTime
-              whiteSpace="nowrap"
+        align: "center",
+        headerProps: { paddingLeft: 0 },
+        cellProps: { paddingLeft: 0, width: "1%" },
+        CellContent: ({ row: { petition } }) => (
+          <Flex alignItems="center">
+            <PetitionSignatureCellContent petition={petition!} />
+          </Flex>
+        ),
+      },
+      {
+        key: "shared",
+        label: intl.formatMessage({
+          id: "petitions.header.shared",
+          defaultMessage: "Shared",
+        }),
+        align: "left",
+        cellProps: { width: "1%" },
+        CellContent: ({ row: { petition }, column }) => (
+          <Flex justifyContent={column.align}>
+            <UserAvatarList
+              usersOrGroups={petition!.permissions.map((p) =>
+                p.__typename === "PetitionUserPermission"
+                  ? p.user
+                  : p.__typename === "PetitionUserGroupPermission"
+                  ? p.group
+                  : (null as never),
+              )}
             />
-          ),
-        },
-      ] as TableColumn<PetitionAccessSelection>[],
+          </Flex>
+        ),
+      },
+      {
+        key: "sentAt",
+        label: intl.formatMessage({
+          id: "generic.sent-at",
+          defaultMessage: "Sent at",
+        }),
+        cellProps: { width: "1%" },
+        CellContent: ({ row: { petition } }) => (
+          <DateTime
+            fontSize="sm"
+            value={petition!.sentAt!}
+            format={FORMATS.LLL}
+            useRelativeTime
+            whiteSpace="nowrap"
+          />
+        ),
+      },
+    ],
     [intl.locale],
   );
 }
