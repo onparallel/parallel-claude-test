@@ -3100,7 +3100,7 @@ export type PetitionListViewColumn =
   | "sharedWith"
   | "signature"
   | "status"
-  | "tags"
+  | "tagsFilters"
   | "template";
 
 export interface PetitionListViewData {

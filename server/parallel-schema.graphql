@@ -3749,7 +3749,7 @@ enum PetitionListViewColumn {
   sharedWith
   signature
   status
-  tags
+  tagsFilters
   template
 }
 

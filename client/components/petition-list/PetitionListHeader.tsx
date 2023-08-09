@@ -40,7 +40,7 @@ import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/q
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import {
-  DEFAULT_PETITON_COLUMN_SELECTION,
+  DEFAULT_PETITION_COLUMN_SELECTION,
   PETITIONS_COLUMNS,
   PetitionsTableColumn,
 } from "@parallel/utils/usePetitionsTableColumns";
@@ -237,13 +237,13 @@ export function PetitionListHeader({
     try {
       const columns = await showColumnVisibilityDialog({
         columns: PETITIONS_COLUMNS,
-        selection: state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION,
+        selection: state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION,
       });
       onStateChange((current) => ({ ...current, columns }));
     } catch {}
   };
 
-  const selection = state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION;
+  const selection = state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION;
   const notVisibleFilters = PETITIONS_COLUMNS.filter(
     (c) =>
       !c.isFixed &&

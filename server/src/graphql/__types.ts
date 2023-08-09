@@ -426,7 +426,7 @@ export interface NexusGenEnums {
     | "sharedWith"
     | "signature"
     | "status"
-    | "tags"
+    | "tagsFilters"
     | "template";
   PetitionListViewSearchIn: "CURRENT_FOLDER" | "EVERYWHERE";
   PetitionListViewSortDirection: "ASC" | "DESC";

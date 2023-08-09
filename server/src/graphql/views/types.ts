@@ -103,7 +103,7 @@ export const PetitionListViewData = objectType({
           "sentAt",
           "createdAt",
           "reminders",
-          "tags",
+          "tagsFilters",
         ],
       }),
     });

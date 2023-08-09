@@ -20,6 +20,7 @@ import { PetitionListTagFilter } from "@parallel/components/petition-list/filter
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
   PetitionBaseType,
+  PetitionListViewColumn,
   PetitionSignatureStatusFilter,
   PetitionStatus,
   usePetitionsTableColumns_PetitionBaseFragment,
@@ -42,26 +43,16 @@ type Petition = usePetitionsTableColumns_PetitionBase_Petition_Fragment;
 type Template = usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 type PetitionFolder = usePetitionsTableColumns_PetitionFolderFragment;
 
-export type PetitionsTableColumn =
-  | "name"
-  | "recipients"
-  | "template"
-  | "status"
-  | "signature"
-  | "sharedWith"
-  | "sentAt"
-  | "createdAt"
-  | "reminders"
-  | "tags";
+export type PetitionsTableColumn = PetitionListViewColumn;
 
-export const DEFAULT_PETITON_COLUMN_SELECTION: PetitionsTableColumn[] = [
+export const DEFAULT_PETITION_COLUMN_SELECTION: PetitionsTableColumn[] = [
   "recipients",
   "status",
   "signature",
   "sharedWith",
   "sentAt",
   "reminders",
-  "tags",
+  "tagsFilters",
 ];
 
 type PetitionsTableColumns_PetitionBaseOrFolder = TableColumn<
@@ -86,7 +77,7 @@ export function getPetitionsTableIncludes(columns?: PetitionsTableColumn[]) {
     includeCreatedAt: columns ? columns.includes("createdAt") : true,
     includeSentAt: columns ? columns.includes("sentAt") : true,
     includeReminders: columns ? columns.includes("reminders") : true,
-    includeTags: columns ? columns.includes("tags") : true,
+    includeTags: columns ? columns.includes("tagsFilters") : true,
   };
 }
 
@@ -432,7 +423,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     },
   },
   {
-    key: "tags",
+    key: "tagsFilters",
     label: (intl) => intl.formatMessage({ id: "petitions.header.tags", defaultMessage: "Tags" }),
     cellProps: {
       minWidth: "300px",
@@ -528,7 +519,7 @@ export const TEMPLATES_COLUMNS = (
       ) : null,
   },
   {
-    key: "tags",
+    key: "tagsFilters",
     label: (intl) => intl.formatMessage({ id: "petitions.header.tags", defaultMessage: "Tags" }),
     cellProps: {
       width: "30%",

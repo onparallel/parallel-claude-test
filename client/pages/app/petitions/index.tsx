@@ -87,7 +87,7 @@ import {
 } from "@parallel/utils/queryState";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import {
-  DEFAULT_PETITON_COLUMN_SELECTION,
+  DEFAULT_PETITION_COLUMN_SELECTION,
   PETITIONS_COLUMNS,
   PetitionsTableColumn,
   getPetitionsTableIncludes,
@@ -167,7 +167,7 @@ function Petitions() {
         },
         sortBy: [`${sort.field}_${sort.direction}`],
         ...(state.type === "PETITION"
-          ? getPetitionsTableIncludes(state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION)
+          ? getPetitionsTableIncludes(state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION)
           : getTemplatesTableIncludes()),
       },
       fetchPolicy: "cache-and-network",
@@ -409,7 +409,7 @@ function Petitions() {
 
   const columns = usePetitionsTableColumns(
     state.type,
-    state.type === "PETITION" ? state.columns ?? DEFAULT_PETITON_COLUMN_SELECTION : undefined,
+    state.type === "PETITION" ? state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION : undefined,
   );
 
   const context = useMemo(() => ({ user: me! }), [me]);
