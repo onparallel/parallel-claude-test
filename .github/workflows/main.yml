@@ -65,7 +65,10 @@ jobs:
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
-
+      - name: Show eslint version
+        run: yarn eslint -v
+      - name: Show prettier version
+        run: yarn prettier -v
       - name: Run linter
         run: yarn lint
 
