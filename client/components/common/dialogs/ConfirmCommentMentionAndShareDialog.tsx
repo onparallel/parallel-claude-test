@@ -53,13 +53,16 @@ function ConfirmCommentMentionAndShareDialog({
   ConfirmCommentMentionAndShareDialogResult
 >) {
   const confirmRef = useRef<HTMLButtonElement>(null);
-  const { data } = useFragment({
+  const { data, complete } = useFragment({
     fragment: ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc,
     from: {
       __typename: "Petition",
       id: petitionId,
     },
   });
+  if (!complete) {
+    throw new Error("Data should be cached");
+  }
   const { permissionType, isSubscribed } = data!.myEffectivePermission!;
   const { control, register, handleSubmit } = useForm({
     defaultValues: {

@@ -36,7 +36,7 @@ export function GeneratePrefilledPublicLinkDialog({
   petitionId,
   ...props
 }: DialogProps<{ petitionId: string }, void>) {
-  const { data } = useFragment({
+  const { data, complete } = useFragment({
     fragment: GeneratePrefilledPublicLinkDialog_PetitionTemplateFragmentDoc,
     fragmentName: "GeneratePrefilledPublicLinkDialog_PetitionTemplate",
     from: {
@@ -44,6 +44,9 @@ export function GeneratePrefilledPublicLinkDialog({
       id: petitionId,
     },
   });
+  if (!complete) {
+    throw new Error("Data should be cached");
+  }
   const [link, setLink] = useState<string | null>(null);
   const [path, setPath] = useState(data!.defaultPath);
   const cancelRef = useRef<HTMLButtonElement>(null);
