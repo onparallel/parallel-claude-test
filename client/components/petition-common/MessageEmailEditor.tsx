@@ -35,12 +35,10 @@ export function MessageEmailEditor({
     <>
       <FormControl isInvalid={showErrors && !subject} isDisabled={isReadOnly} id={`${id}-subject`}>
         <FormLabel paddingBottom={0} {...labelProps}>
-          {
-            <FormattedMessage
-              id="component.message-email-editor.subject-label"
-              defaultMessage="Subject"
-            />
-          }
+          <FormattedMessage
+            id="component.message-email-editor.subject-label"
+            defaultMessage="Subject"
+          />
         </FormLabel>
         <PlaceholderInput
           data-testid="petition-email-subject-input"

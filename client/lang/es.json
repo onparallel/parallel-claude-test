@@ -6525,6 +6525,56 @@
     "context": "Title of the page"
   },
   {
+    "term": "component.settings-public-link-dialog.petition-name-alert",
+    "definition": "Los parallels se crearán sin nombre",
+    "context": "The parallels created will not have a name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-label",
+    "definition": "Nombre del parallel",
+    "context": "Parallel name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-placeholder",
+    "definition": "Nombre de los parallel creados",
+    "context": "Enter a name for the created parallels"
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-popover",
+    "definition": "Especifica el nombre de los parallels creados a partir de este enlace.",
+    "context": "Set the name of the parallels created from this link."
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-restore-defaults",
+    "definition": "Restaurar predeterminado",
+    "context": "Restore defaults"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-email",
+    "definition": "Correo electrónico de contacto",
+    "context": "Contact email"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-full-name",
+    "definition": "Nombre completo del contacto",
+    "context": "Contact full name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-last-name",
+    "definition": "Apellidos del contacto",
+    "context": "Contact last name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-name",
+    "definition": "Nombre de contacto",
+    "context": "Contact name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-template-name",
+    "definition": "Nombre de la plantilla",
+    "context": "Template name"
+  },
+  {
     "term": "component.settings-public-link-dialog.prefill-secret-label",
     "definition": "Secreto de autorrellenado",
     "context": "Prefill secret"

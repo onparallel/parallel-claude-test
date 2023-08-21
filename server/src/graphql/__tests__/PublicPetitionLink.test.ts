@@ -56,6 +56,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       slug: "public-link-slug",
       is_active: true,
       allow_multiple_petitions: true,
+      petition_name_pattern: "{{ petition-title }}-{{ contact-email }}",
     }));
   });
 
@@ -470,6 +471,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       const [petition] = await knex.from("petition").where({ id: petitionId });
       expect(petition).toMatchObject({
         is_template: false,
+        name: `${templates[0].name}-${contacts[0].email}`,
         from_public_petition_link_id: publicPetitionLink.id,
         org_id: organization.id,
         reminders_config: {

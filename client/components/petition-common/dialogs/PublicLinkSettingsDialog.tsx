@@ -7,6 +7,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   Input,
   InputGroup,
   InputLeftAddon,
@@ -16,11 +17,12 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
+import { AlertCircleIcon, CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { PlaceholderInput } from "@parallel/components/common/slate/PlaceholderInput";
 import {
   PublicLinkSettingsDialog_getSlugDocument,
   PublicLinkSettingsDialog_isValidSlugDocument,
@@ -33,7 +35,7 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { Maybe } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -44,6 +46,7 @@ interface PublicLinkSettingsData {
   slug: string;
   prefillSecret: Maybe<string>;
   allowMultiplePetitions: boolean;
+  petitionNamePattern: Maybe<string>;
 }
 
 interface PublicLinkSettingsDialogProps {
@@ -60,7 +63,9 @@ export function PublicLinkSettingsDialog({
   const apollo = useApolloClient();
   const intl = useIntl();
 
-  const { handleSubmit, register, control, setValue, formState } =
+  const defaultPetitionNamePattern = "{{ petition-title }}";
+
+  const { handleSubmit, register, control, setValue, formState, watch } =
     useForm<PublicLinkSettingsDialog_PublicPetitionLinkFragment>({
       mode: "onChange",
       defaultValues: {
@@ -69,9 +74,11 @@ export function PublicLinkSettingsDialog({
         slug: publicLink?.slug ?? "",
         prefillSecret: publicLink?.prefillSecret ?? "",
         allowMultiplePetitions: publicLink?.allowMultiplePetitions ?? false,
+        petitionNamePattern: publicLink?.petitionNamePattern ?? defaultPetitionNamePattern,
       },
     });
   const { errors, dirtyFields, isValidating } = formState;
+  const pattern = watch("petitionNamePattern");
 
   useAsyncEffect(async (isMounted) => {
     if (!publicLink) {
@@ -92,6 +99,13 @@ export function PublicLinkSettingsDialog({
   const titleRegisterProps = useRegisterWithRef(titleRef, register, "title", {
     required: true,
   });
+
+  const [counter, setCounter] = useState(0);
+
+  const handleRestorePetitionNamePattern = () => {
+    setValue("petitionNamePattern", defaultPetitionNamePattern, { shouldDirty: true });
+    setCounter(counter + 1);
+  };
 
   const debouncedIsValidSlug = useDebouncedAsync(
     async (slug: string) => {
@@ -124,10 +138,52 @@ export function PublicLinkSettingsDialog({
     }
   };
 
+  const placeholders = useMemo(() => {
+    return [
+      {
+        key: "petition-title",
+        text: intl.formatMessage({
+          id: "component.settings-public-link-dialog.placeholder-template-name",
+          defaultMessage: "Template name",
+        }),
+      },
+      {
+        key: "contact-full-name",
+        text: intl.formatMessage({
+          id: "component.settings-public-link-dialog.placeholder-contact-full-name",
+          defaultMessage: "Contact full name",
+        }),
+      },
+      {
+        key: "contact-first-name",
+        text: intl.formatMessage({
+          id: "component.settings-public-link-dialog.placeholder-contact-name",
+          defaultMessage: "Contact name",
+        }),
+      },
+      {
+        key: "contact-last-name",
+        text: intl.formatMessage({
+          id: "component.settings-public-link-dialog.placeholder-contact-last-name",
+          defaultMessage: "Contact last name",
+        }),
+      },
+      {
+        key: "contact-email",
+        text: intl.formatMessage({
+          id: "component.settings-public-link-dialog.placeholder-contact-email",
+          defaultMessage: "Contact email",
+        }),
+      },
+    ];
+  }, [intl.locale]);
+
   const { customHost } = template.organization;
   const parallelUrl = customHost
     ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
     : process.env.NEXT_PUBLIC_PARALLEL_URL;
+
+  const patternIsEmpty = pattern !== null && pattern?.trim().length === 0;
 
   return (
     <ConfirmDialog
@@ -138,6 +194,7 @@ export function PublicLinkSettingsDialog({
         onSubmit: handleSubmit((data) => {
           props.onResolve({
             ...pick(data, ["title", "description", "slug", "allowMultiplePetitions"]),
+            petitionNamePattern: data.petitionNamePattern ?? null,
             prefillSecret: data.prefillSecret || null,
           });
         }),
@@ -298,6 +355,78 @@ export function PublicLinkSettingsDialog({
               </Stack>
             </FormErrorMessage>
           </FormControl>
+          <FormControl>
+            <FormLabel alignItems="center" display="flex">
+              <Text as="span">
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.petition-name-label"
+                  defaultMessage="Parallel name"
+                />
+              </Text>
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.petition-name-popover"
+                  defaultMessage="Set the name of the parallels created from this link."
+                />
+              </HelpPopover>
+            </FormLabel>
+            <Controller
+              name="petitionNamePattern"
+              control={control}
+              render={({ field: { onChange, value, ...props } }) => (
+                <PlaceholderInput
+                  key={counter}
+                  value={value ?? ""}
+                  onChange={onChange}
+                  placeholder={intl.formatMessage({
+                    id: "component.settings-public-link-dialog.petition-name-placeholder",
+                    defaultMessage: "Enter a name for the created parallels",
+                  })}
+                  placeholders={placeholders}
+                  {...props}
+                />
+              )}
+            />
+            <HStack
+              justify={patternIsEmpty ? "space-between" : "flex-end"}
+              align="center"
+              wrap="wrap-reverse"
+              paddingTop={2}
+              spacing={1}
+              fontSize="sm"
+              minHeight="29px"
+            >
+              {patternIsEmpty ? (
+                <HStack>
+                  <AlertCircleIcon />
+                  <Text>
+                    <FormattedMessage
+                      id="component.settings-public-link-dialog.petition-name-alert"
+                      defaultMessage="The parallels created will not have a name"
+                    />
+                  </Text>
+                </HStack>
+              ) : null}
+
+              <Button
+                variant="link"
+                size="sm"
+                onClick={handleRestorePetitionNamePattern}
+                isDisabled={(pattern?.trim() ?? "") === defaultPetitionNamePattern}
+              >
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.petition-name-restore-defaults"
+                  defaultMessage="Restore defaults"
+                />
+              </Button>
+            </HStack>
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.field-required-error"
+                defaultMessage="This field is required"
+              />
+            </FormErrorMessage>
+          </FormControl>
           <FormControl id="allowMultiplePetitions" alignItems="center" display="flex">
             <Checkbox {...register("allowMultiplePetitions")}>
               <Text>
@@ -390,6 +519,7 @@ PublicLinkSettingsDialog.fragments = {
       url
       prefillSecret
       allowMultiplePetitions
+      petitionNamePattern
     }
   `,
 };

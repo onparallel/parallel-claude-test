@@ -1253,6 +1253,7 @@ export type MutationcreateProfileTypeFieldArgs = {
 export type MutationcreatePublicPetitionLinkArgs = {
   allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
+  petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
   prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
   templateId: Scalars["GID"]["input"];
@@ -2070,6 +2071,7 @@ export type MutationupdatePublicPetitionLinkArgs = {
   allowMultiplePetitions?: InputMaybe<Scalars["Boolean"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
   isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
   prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
@@ -3967,6 +3969,7 @@ export type PublicPetitionLink = {
   id: Scalars["GID"]["output"];
   isActive: Scalars["Boolean"]["output"];
   owner: User;
+  petitionNamePattern: Maybe<Scalars["String"]["output"]>;
   prefillSecret: Maybe<Scalars["String"]["output"]>;
   slug: Scalars["String"]["output"];
   template: PetitionTemplate;

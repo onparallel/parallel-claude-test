@@ -2631,6 +2631,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isActive: boolean; // Boolean!
     owner: NexusGenRootTypes["User"]; // User!
+    petitionNamePattern: string | null; // String
     prefillSecret: string | null; // String
     slug: string; // String!
     template: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
@@ -4747,6 +4748,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isActive: "Boolean";
     owner: "User";
+    petitionNamePattern: "String";
     prefillSecret: "String";
     slug: "String";
     template: "PetitionTemplate";
@@ -5631,6 +5633,7 @@ export interface NexusGenArgTypes {
       // args
       allowMultiplePetitions: boolean; // Boolean!
       description: string; // String!
+      petitionNamePattern?: string | null; // String
       prefillSecret?: string | null; // String
       slug?: string | null; // String
       templateId: NexusGenScalars["GID"]; // GID!
@@ -6448,6 +6451,7 @@ export interface NexusGenArgTypes {
       allowMultiplePetitions?: boolean | null; // Boolean
       description?: string | null; // String
       isActive?: boolean | null; // Boolean
+      petitionNamePattern?: string | null; // String
       prefillSecret?: string | null; // String
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
       slug?: string | null; // String

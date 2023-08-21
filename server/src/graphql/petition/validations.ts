@@ -10,7 +10,7 @@ import { fromGlobalId } from "../../util/globalId";
 import { validateReplyContent } from "../../util/validateReplyContent";
 
 export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(
-  slugArg: (args: ArgsValue<TypeName, FieldName>) => string,
+  slugArg: (args: ArgsValue<TypeName, FieldName>) => string | null | undefined,
   argName: string,
   publicPetitionLinkIdArg?: (args: ArgsValue<TypeName, FieldName>) => number,
 ) {
@@ -19,6 +19,10 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
 
   return (async (_, args, ctx, info) => {
     const slug = slugArg(args);
+    if (!slug) {
+      return;
+    }
+
     const publicPetitionLinkId = publicPetitionLinkIdArg?.(args);
 
     if (slug.length < MIN_SLUG_LENGTH) {

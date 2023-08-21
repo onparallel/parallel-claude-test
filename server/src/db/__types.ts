@@ -1689,6 +1689,7 @@ export interface PublicPetitionLink {
   updated_by: Maybe<string>; // varchar
   prefill_secret: Maybe<string>; // varchar
   allow_multiple_petitions: boolean; // bool
+  petition_name_pattern: Maybe<string>; // varchar
 }
 
 export type CreatePublicPetitionLink = PartialProps<
@@ -1700,6 +1701,7 @@ export type CreatePublicPetitionLink = PartialProps<
   | "updated_by"
   | "prefill_secret"
   | "allow_multiple_petitions"
+  | "petition_name_pattern"
 >;
 
 export interface PublicPetitionLinkPrefillData {

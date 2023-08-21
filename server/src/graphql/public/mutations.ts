@@ -809,10 +809,15 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           ? interpolatePlaceholdersInSlate(JSON.parse(petition.email_body), getValues)
           : null;
 
+        const petitionName =
+          typeof link.petition_name_pattern === "string"
+            ? renderTextWithPlaceholders(link.petition_name_pattern, getValues)
+            : petition.name;
+
         await ctx.petitions.updatePetition(
           petition.id,
           {
-            name: (petition.name ?? messageSubject).slice(0, 255),
+            name: (petitionName ?? messageSubject).slice(0, 255),
             status: "PENDING",
             closed_at: null,
           },

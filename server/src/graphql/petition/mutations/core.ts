@@ -71,7 +71,10 @@ import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
-import { validTextWithPlaceholders } from "../../helpers/validators/validTextWithPlaceholders";
+import {
+  validPetitionSubject,
+  validPublicPetitionLinkPetitionNamePattern,
+} from "../../helpers/validators/validTextWithPlaceholders";
 import { validateFile } from "../../helpers/validators/validateFile";
 import { validateRegex } from "../../helpers/validators/validateRegex";
 import { userHasAccessToOrganizationTheme } from "../../organization/authorizers";
@@ -787,7 +790,7 @@ export const updatePetition = mutationField("updatePetition", {
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 1000),
     maxLength((args) => args.data.completingMessageSubject, "data.completingMessageSubject", 255),
     maxLength((args) => args.data.description, "data.description", 1000),
-    validTextWithPlaceholders(
+    validPetitionSubject(
       (args) => args.data.emailSubject,
       (args) => args.petitionId,
       "data.emailSubject",
@@ -1514,7 +1517,7 @@ export const sendPetition = mutationField("sendPetition", {
     notEmptyArray((args) => args.contactIdGroups, "contactIdGroups"),
     maxLength((args) => args.subject, "subject", 1000),
     notEmptyString((args) => args.subject, "subject"),
-    validTextWithPlaceholders(
+    validPetitionSubject(
       (args) => args.subject,
       (args) => args.petitionId,
       "subject",
@@ -2096,14 +2099,26 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     slug: nullable(stringArg()),
     prefillSecret: nullable(stringArg()),
     allowMultiplePetitions: nonNull(booleanArg()),
+    petitionNamePattern: nullable(stringArg()),
   },
-  validateArgs: validateIfDefined(
-    (args) => args.slug,
-    validatePublicPetitionLinkSlug((args) => args.slug!, "slug"),
+  validateArgs: validateAnd(
+    validatePublicPetitionLinkSlug((args) => args.slug, "slug"),
+    validPublicPetitionLinkPetitionNamePattern(
+      (args) => args.petitionNamePattern,
+      "petitionNamePattern",
+    ),
   ),
   resolve: async (
     _,
-    { templateId, title, description, slug, prefillSecret, allowMultiplePetitions },
+    {
+      templateId,
+      title,
+      description,
+      slug,
+      prefillSecret,
+      allowMultiplePetitions,
+      petitionNamePattern,
+    },
     ctx,
   ) => {
     return await ctx.petitions.createPublicPetitionLink(
@@ -2115,6 +2130,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
         is_active: true,
         prefill_secret: prefillSecret || null,
         allow_multiple_petitions: allowMultiplePetitions,
+        petition_name_pattern: petitionNamePattern,
       },
       `User:${ctx.user!.id}`,
     );
@@ -2135,13 +2151,17 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     slug: stringArg(),
     prefillSecret: stringArg(),
     allowMultiplePetitions: booleanArg(),
+    petitionNamePattern: stringArg(),
   },
-  validateArgs: validateIf(
-    (args) => isDefined(args.slug),
+  validateArgs: validateAnd(
     validatePublicPetitionLinkSlug(
-      (args) => args.slug!,
+      (args) => args.slug,
       "slug",
       (args) => args.publicPetitionLinkId,
+    ),
+    validPublicPetitionLinkPetitionNamePattern(
+      (args) => args.petitionNamePattern,
+      "petitionNamePattern",
     ),
   ),
   resolve: async (_, args, ctx) => {
@@ -2165,6 +2185,10 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
 
     if (isDefined(args.allowMultiplePetitions)) {
       publicPetitionLinkData.allow_multiple_petitions = args.allowMultiplePetitions;
+    }
+
+    if (args.petitionNamePattern !== undefined) {
+      publicPetitionLinkData.petition_name_pattern = args.petitionNamePattern;
     }
 
     return await ctx.petitions.updatePublicPetitionLink(

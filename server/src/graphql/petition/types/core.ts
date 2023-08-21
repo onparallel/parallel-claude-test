@@ -1151,6 +1151,9 @@ export const PublicPetitionLink = objectType({
     t.nonNull.boolean("allowMultiplePetitions", {
       resolve: (o) => o.allow_multiple_petitions,
     });
+    t.nullable.string("petitionNamePattern", {
+      resolve: (o) => o.petition_name_pattern,
+    });
   },
 });
 

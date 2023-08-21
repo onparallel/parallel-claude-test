@@ -545,36 +545,6 @@
     "context": "When finishing, the parallel will remain closed. You can come back anytime to review the information."
   },
   {
-    "term": "component.column-visibility-dialog.all-columns-visible",
-    "definition": "All columns are visible",
-    "context": "All columns are visible"
-  },
-  {
-    "term": "component.column-visibility-dialog.header",
-    "definition": "Choose the columns you want to see",
-    "context": "Choose the columns you want to see"
-  },
-  {
-    "term": "component.column-visibility-dialog.hidden-columns",
-    "definition": "Hidden columns",
-    "context": "Hidden columns"
-  },
-  {
-    "term": "component.column-visibility-dialog.hide-all",
-    "definition": "Hide all",
-    "context": "Hide all"
-  },
-  {
-    "term": "component.column-visibility-dialog.show-all",
-    "definition": "Show all",
-    "context": "Show all"
-  },
-  {
-    "term": "component.column-visibility-dialog.visible-columns",
-    "definition": "Visible columns",
-    "context": "Visible columns"
-  },
-  {
     "term": "component.close-profile-dialog.alert-description",
     "definition": "If a profile has alerts, they will be disabled upon closing it.",
     "context": "If a profile has alerts, they will be disabled upon closing it."
@@ -603,6 +573,36 @@
     "term": "component.close-profile-dialog.header",
     "definition": "Close {count, plural, =1 {profile} other {# profiles}}",
     "context": "Close {count, plural, =1 {profile} other {# profiles}}"
+  },
+  {
+    "term": "component.column-visibility-dialog.all-columns-visible",
+    "definition": "All columns are visible",
+    "context": "All columns are visible"
+  },
+  {
+    "term": "component.column-visibility-dialog.header",
+    "definition": "Choose the columns you want to see",
+    "context": "Choose the columns you want to see"
+  },
+  {
+    "term": "component.column-visibility-dialog.hidden-columns",
+    "definition": "Hidden columns",
+    "context": "Hidden columns"
+  },
+  {
+    "term": "component.column-visibility-dialog.hide-all",
+    "definition": "Hide all",
+    "context": "Hide all"
+  },
+  {
+    "term": "component.column-visibility-dialog.show-all",
+    "definition": "Show all",
+    "context": "Show all"
+  },
+  {
+    "term": "component.column-visibility-dialog.visible-columns",
+    "definition": "Visible columns",
+    "context": "Visible columns"
   },
   {
     "term": "component.completing-message-dialog.go-to-pending-processes-button",
@@ -6523,6 +6523,56 @@
     "term": "component.settings-public-link-dialog.page-title-label",
     "definition": "Title of the page",
     "context": "Title of the page"
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-alert",
+    "definition": "The parallels created will not have a name",
+    "context": "The parallels created will not have a name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-label",
+    "definition": "Parallel name",
+    "context": "Parallel name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-placeholder",
+    "definition": "Enter a name for the created parallels",
+    "context": "Enter a name for the created parallels"
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-popover",
+    "definition": "Set the name of the parallels created from this link.",
+    "context": "Set the name of the parallels created from this link."
+  },
+  {
+    "term": "component.settings-public-link-dialog.petition-name-restore-defaults",
+    "definition": "Restore defaults",
+    "context": "Restore defaults"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-email",
+    "definition": "Contact email",
+    "context": "Contact email"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-full-name",
+    "definition": "Contact full name",
+    "context": "Contact full name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-last-name",
+    "definition": "Contact last name",
+    "context": "Contact last name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-contact-name",
+    "definition": "Contact name",
+    "context": "Contact name"
+  },
+  {
+    "term": "component.settings-public-link-dialog.placeholder-template-name",
+    "definition": "Template name",
+    "context": "Template name"
   },
   {
     "term": "component.settings-public-link-dialog.prefill-secret-label",

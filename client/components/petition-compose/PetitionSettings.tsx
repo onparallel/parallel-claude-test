@@ -974,6 +974,7 @@ const mutations = [
       $description: String!
       $slug: String
       $allowMultiplePetitions: Boolean!
+      $petitionNamePattern: String
     ) {
       createPublicPetitionLink(
         templateId: $templateId
@@ -981,6 +982,7 @@ const mutations = [
         description: $description
         slug: $slug
         allowMultiplePetitions: $allowMultiplePetitions
+        petitionNamePattern: $petitionNamePattern
       ) {
         ...PublicLinkSettingsDialog_PublicPetitionLink
         template {
@@ -1002,6 +1004,7 @@ const mutations = [
       $slug: String
       $prefillSecret: String
       $allowMultiplePetitions: Boolean
+      $petitionNamePattern: String
     ) {
       updatePublicPetitionLink(
         publicPetitionLinkId: $publicPetitionLinkId
@@ -1011,6 +1014,7 @@ const mutations = [
         slug: $slug
         prefillSecret: $prefillSecret
         allowMultiplePetitions: $allowMultiplePetitions
+        petitionNamePattern: $petitionNamePattern
       ) {
         ...PublicLinkSettingsDialog_PublicPetitionLink
         template {

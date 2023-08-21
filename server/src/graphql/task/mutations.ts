@@ -16,6 +16,7 @@ import {
 } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
+import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   description: "Creates a task for printing a PDF of the petition and sends it to the queue",
@@ -56,6 +57,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
     petitionId: nonNull(globalIdArg("Petition")),
     pattern: nullable("String"),
   },
+  validateArgs: validExportFileRenamePattern((props) => props.pattern, "pattern"),
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(
       {

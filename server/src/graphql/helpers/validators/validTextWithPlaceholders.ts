@@ -1,60 +1,109 @@
+import { GraphQLResolveInfo } from "graphql";
 import { core } from "nexus";
+import pMap from "p-map";
 import { isDefined, uniq } from "remeda";
 import { discriminator } from "../../../util/discriminator";
-import { fromGlobalId, isGlobalId } from "../../../util/globalId";
+import { fromGlobalId } from "../../../util/globalId";
 import { parseTextWithPlaceholders } from "../../../util/slate/placeholders";
+import { MaybePromise } from "../../../util/types";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
-export function validTextWithPlaceholders<TypeName extends string, FieldName extends string>(
-  props: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number | undefined,
+export function validPetitionSubject<TypeName extends string, FieldName extends string>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
+  petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
   argName: string,
 ) {
-  return (async (_, args, ctx, info) => {
-    const value = props(args);
+  return validTextWithPlaceholders(prop, argName, async (placeholder, args, ctx, info) => {
+    if (
+      [
+        "petition-title",
+        "contact-first-name",
+        "contact-last-name",
+        "contact-full-name",
+        "contact-email",
+        "user-first-name",
+        "user-last-name",
+        "user-full-name",
+      ].includes(placeholder)
+    ) {
+      return true;
+    }
+    try {
+      const field = await ctx.petitions.loadField(fromGlobalId(placeholder, "PetitionField").id);
+      const petitionId = petitionIdProp(args);
+      if (isDefined(field) && field.petition_id !== petitionId) {
+        throw new ArgValidationError(info, argName, `PetitionField does not belong to Petition`);
+      }
+      return true;
+    } catch (e) {
+      if (e instanceof ArgValidationError) {
+        throw e;
+      }
+      throw new ArgValidationError(info, argName, `Expected ${placeholder} to be a PetitionField`);
+    }
+  });
+}
+
+export function validPublicPetitionLinkPetitionNamePattern<
+  TypeName extends string,
+  FieldName extends string,
+>(prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined, argName: string) {
+  return validTextWithPlaceholders(prop, argName, (placeholder) =>
+    [
+      "petition-title",
+      "contact-full-name",
+      "contact-first-name",
+      "contact-last-name",
+      "contact-email",
+    ].includes(placeholder),
+  );
+}
+
+export function validExportFileRenamePattern<TypeName extends string, FieldName extends string>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
+  argName: string,
+) {
+  return validTextWithPlaceholders(prop, argName, (placeholder) =>
+    ["field-number", "field-title", "file-name"].includes(placeholder),
+  );
+}
+
+export function validTextWithPlaceholders<TypeName extends string, FieldName extends string>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
+  argName: string,
+  validPlaceholder: (
+    placeholder: string,
+    args: core.ArgsValue<TypeName, FieldName>,
+    context: core.GetGen<"context">,
+    info: GraphQLResolveInfo,
+  ) => MaybePromise<boolean>,
+) {
+  return (async (_, args, context, info) => {
+    const value = prop(args);
     if (!value) {
       return;
     }
 
-    const globalIds = uniq(
-      parseTextWithPlaceholders(value)
-        .filter(discriminator("type", "placeholder" as const))
-        .filter((p) => isGlobalId(p.value))
-        .map((p) => p.value),
+    const placeholders = uniq(
+      parseTextWithPlaceholders(value).filter(discriminator("type", "placeholder" as const)),
     );
-
-    const petitionId = petitionIdProp?.(args);
-
-    if (globalIds.length > 0 && !isDefined(petitionId)) {
+    const invalid = (
+      await pMap(
+        placeholders,
+        async (placeholder) =>
+          [
+            placeholder.value,
+            await validPlaceholder(placeholder.value, args, context, info),
+          ] as const,
+      )
+    ).filter(([, valid]) => !valid);
+    if (invalid.length) {
       throw new ArgValidationError(
         info,
         argName,
-        `Missing petitionId prop for globalId validation`,
+        `Invalid placeholders used: ${invalid.map(([x]) => x).join(", ")}`,
       );
-    }
-
-    if (globalIds.some((globalId) => !isGlobalId(globalId, "PetitionField"))) {
-      throw new ArgValidationError(
-        info,
-        argName,
-        `Expected all ${globalIds} to be a PetitionField`,
-      );
-    }
-
-    const fields = await ctx.petitions.loadField(
-      globalIds.map((globalId) => fromGlobalId(globalId).id),
-    );
-
-    for (const field of fields) {
-      // deleted fields are OK
-      if (isDefined(field) && field.petition_id !== petitionId) {
-        throw new ArgValidationError(
-          info,
-          argName,
-          `Expected PetitionField:${field.id} to belong to Petition:${petitionId}`,
-        );
-      }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
