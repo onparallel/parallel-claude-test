@@ -1,4 +1,4 @@
-import { gql, useFragment_experimental } from "@apollo/client";
+import { gql, useFragment } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -53,7 +53,7 @@ function ConfirmCommentMentionAndShareDialog({
   ConfirmCommentMentionAndShareDialogResult
 >) {
   const confirmRef = useRef<HTMLButtonElement>(null);
-  const { data } = useFragment_experimental({
+  const { data } = useFragment({
     fragment: ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc,
     from: {
       __typename: "Petition",

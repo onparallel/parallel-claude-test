@@ -1,4 +1,4 @@
-import { gql, useFragment_experimental, useMutation } from "@apollo/client";
+import { gql, useFragment, useMutation } from "@apollo/client";
 import {
   Button,
   Center,
@@ -36,7 +36,7 @@ export function GeneratePrefilledPublicLinkDialog({
   petitionId,
   ...props
 }: DialogProps<{ petitionId: string }, void>) {
-  const { data } = useFragment_experimental({
+  const { data } = useFragment({
     fragment: GeneratePrefilledPublicLinkDialog_PetitionTemplateFragmentDoc,
     fragmentName: "GeneratePrefilledPublicLinkDialog_PetitionTemplate",
     from: {
