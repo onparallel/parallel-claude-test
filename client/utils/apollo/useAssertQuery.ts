@@ -13,7 +13,9 @@ export function useAssertQuery<
   const { data, ...rest } = useQuery(query, options);
   if (!data) {
     try {
+      // eslint-disable-next-line no-console
       console.log((rest as any).diff);
+      // eslint-disable-next-line no-console
       console.log(rest.error);
     } catch {}
     throw new Error(`Expected data to be present on the Apollo cache`);
@@ -35,7 +37,9 @@ export function useAssertQueryOrPreviousData<
   const { data, ...rest } = useQuery(query, options);
   if (!data) {
     if (!previous.current) {
+      // eslint-disable-next-line no-console
       console.log((rest as any).diff?.missing);
+      // eslint-disable-next-line no-console
       console.log(rest.error);
       throw new Error("Expected data to be present on the Apollo cache");
     } else {
