@@ -190,9 +190,8 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
 
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
     const inputStyles = {
-      ...omit(inputStyleConfig as any, ["px", "h", "_focus", "_invalid"]),
+      ...omit(inputStyleConfig as any, ["px", "height", "_focusVisible"]),
       _focusWithin: (inputStyleConfig as any)._focusVisible,
-      _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
     const editableProps = {
@@ -224,9 +223,9 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             "aria-readonly",
             "aria-describedby",
           ]) as any)}
-          {...inputStyles}
           {...props}
           sx={{
+            ...inputStyles,
             "[data-slate-editor]": {
               outline: "none",
               minHeight: "120px !important",

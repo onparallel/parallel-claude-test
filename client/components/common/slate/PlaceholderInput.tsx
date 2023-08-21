@@ -140,10 +140,9 @@ export const PlaceholderInput = chakraForwardRef<
 
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
     const inputStyles = {
-      ...omit(inputStyleConfig as any, ["px", "_focus", "_invalid", "bg"]),
+      ...omit(inputStyleConfig as any, ["px", "_focusVisible", "bg"]),
       backgroundColor: "white",
       _focusWithin: (inputStyleConfig as any)._focusVisible,
-      _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
     const editableProps = {
@@ -172,9 +171,9 @@ export const PlaceholderInput = chakraForwardRef<
             "aria-readonly",
             "aria-describedby",
           ]) as any)}
-          {...inputStyles}
           display="flex"
           sx={{
+            ...inputStyles,
             "[data-slate-placeholder]": {
               top: "unset !important",
               width: "auto !important",
