@@ -270,9 +270,8 @@ export const deactivateUser = mutationField("deactivateUser", {
     includeDrafts: booleanArg(),
   },
   resolve: async (_, { userIds, transferToUserId, tagIds, includeDrafts }, ctx) => {
-    const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
-      userIds,
-    );
+    const permissions =
+      await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(userIds);
 
     return await ctx.petitions.withTransaction(async (t) => {
       await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);

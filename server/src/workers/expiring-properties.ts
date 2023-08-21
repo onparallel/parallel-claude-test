@@ -8,9 +8,8 @@ createCronWorker("expiring-properties", async (context) => {
   const nearestMonday7am = startOfWeek(addDays(Date.now(), 1), { weekStartsOn: 1 });
   nearestMonday7am.setHours(7, 0, 0, 0);
 
-  const organizations = await context.profiles.getOrganizationsForProfileAlertsDigest(
-    nearestMonday7am,
-  );
+  const organizations =
+    await context.profiles.getOrganizationsForProfileAlertsDigest(nearestMonday7am);
 
   await pMap(
     organizations,

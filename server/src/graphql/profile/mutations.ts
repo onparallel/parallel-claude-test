@@ -474,9 +474,8 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
         "FIELD_USED_IN_PATTERN",
       );
     }
-    const profileCount = await ctx.profiles.countProfilesWithValuesOrFilesByProfileTypeFieldId(
-      profileTypeFieldIds,
-    );
+    const profileCount =
+      await ctx.profiles.countProfilesWithValuesOrFilesByProfileTypeFieldId(profileTypeFieldIds);
 
     if (Number(profileCount) > 0 && !force) {
       throw new ApolloError(

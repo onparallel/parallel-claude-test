@@ -45,9 +45,8 @@ export async function* getPetitionFiles(
     (f) => f!.id,
   );
 
-  const latestPetitionSignature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
-    petitionId,
-  );
+  const latestPetitionSignature =
+    await ctx.petitions.loadLatestPetitionSignatureByPetitionId(petitionId);
 
   const totalFiles = options.xlsxOnly
     ? 1

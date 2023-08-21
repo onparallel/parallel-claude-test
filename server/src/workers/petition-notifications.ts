@@ -23,9 +23,8 @@ async function processCommentCreatedUserNotifications(
   context: WorkerContext,
   config: Config["cronWorkers"]["petition-notifications"],
 ) {
-  const notifications = await context.petitions.loadUnprocessedUserNotificationsOfType(
-    "COMMENT_CREATED",
-  );
+  const notifications =
+    await context.petitions.loadUnprocessedUserNotificationsOfType("COMMENT_CREATED");
 
   if (notifications.length > 0) {
     const groupedUserNotifications = groupBy(notifications, (n) => `${n.petition_id},${n.user_id}`);
@@ -57,9 +56,8 @@ async function processCommentCreatedContactNotifications(
   context: WorkerContext,
   config: Config["cronWorkers"]["petition-notifications"],
 ) {
-  const notifications = await context.petitions.loadUnprocessedContactNotificationsOfType(
-    "COMMENT_CREATED",
-  );
+  const notifications =
+    await context.petitions.loadUnprocessedContactNotificationsOfType("COMMENT_CREATED");
 
   if (notifications.length > 0) {
     const groupedContactNotifications = groupBy(
@@ -91,9 +89,8 @@ async function processCommentCreatedContactNotifications(
  * The rest of reasons will be marked as processed and no action will be taken.
  */
 async function processSignatureCancelledUserNotifications(context: WorkerContext) {
-  const notifications = await context.petitions.loadUnprocessedUserNotificationsOfType(
-    "SIGNATURE_CANCELLED",
-  );
+  const notifications =
+    await context.petitions.loadUnprocessedUserNotificationsOfType("SIGNATURE_CANCELLED");
 
   const emailBouncedNotificationIds = await processSignatureCancelledEmailBouncedUserNotifications(
     notifications,

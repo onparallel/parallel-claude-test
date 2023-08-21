@@ -144,9 +144,8 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
           petition_access_id: ctx.access!.id,
         },
       });
-      const { cookieValue, contactAuthentication } = await ctx.contacts.createContactAuthentication(
-        contactId,
-      );
+      const { cookieValue, contactAuthentication } =
+        await ctx.contacts.createContactAuthentication(contactId);
       await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, logEntry);
       return {
         isAllowed: true,

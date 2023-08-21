@@ -238,9 +238,8 @@ export function validPublicPetitionLinkPrefillDataKeycode<
   return async (_, args, ctx) => {
     try {
       const keycode = args[argKeycode] as unknown as string;
-      const publicPrefillData = await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(
-        keycode,
-      );
+      const publicPrefillData =
+        await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(keycode);
       if (!publicPrefillData) {
         return false;
       }
