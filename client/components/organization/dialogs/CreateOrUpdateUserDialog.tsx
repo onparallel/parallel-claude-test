@@ -51,22 +51,21 @@ function CreateOrUpdateUserDialog({
       lastName: user?.lastName ?? "",
       email: user?.email ?? "",
       role: user?.role ?? "NORMAL",
-      userGroups: user?.userGroups ?? [],
+      userGroups: (user?.userGroups ?? []).filter((ug) => ug.type === "NORMAL"),
     },
   });
 
   const { errors } = formState;
 
-  const groupsToExclude = [] as string[];
-
   const _handleSearchUserGroups = useSearchUserGroups();
   const handleSearchUserGroups = useCallback(
     async (search: string, excludeUserGroups: string[]) => {
       return await _handleSearchUserGroups(search, {
-        excludeUserGroups: [...excludeUserGroups, ...groupsToExclude],
+        excludeUserGroups,
+        type: ["NORMAL"],
       });
     },
-    [_handleSearchUserGroups, groupsToExclude.join(",")],
+    [_handleSearchUserGroups],
   );
 
   const roles = useOrganizationRoles();

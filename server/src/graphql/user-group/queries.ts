@@ -47,10 +47,12 @@ export const searchUserGroups = queryField("searchUserGroups", {
   args: {
     search: nonNull(stringArg()),
     excludeUserGroups: list(nonNull(globalIdArg("UserGroup"))),
+    type: list(nonNull("UserGroupType")),
   },
-  resolve: async (_, { search, excludeUserGroups }, ctx) => {
+  resolve: async (_, { search, excludeUserGroups, type }, ctx) => {
     return await ctx.userGroups.searchUserGroups(ctx.user!.org_id, search, {
       excludeUserGroups: excludeUserGroups ?? [],
+      type,
     });
   },
 });

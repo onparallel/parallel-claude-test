@@ -4462,6 +4462,7 @@ export interface QueryremindersOptOutArgs {
 export interface QuerysearchUserGroupsArgs {
   excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   search: Scalars["String"]["input"];
+  type?: InputMaybe<Array<UserGroupType>>;
 }
 
 export interface QuerysearchUsersArgs {
@@ -6011,6 +6012,7 @@ export type UserGroupMembersPopover_getMembersQuery = {
 export type useSearchUserGroups_searchUserGroupsQueryVariables = Exact<{
   search: Scalars["String"]["input"];
   excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  type?: InputMaybe<Array<UserGroupType> | UserGroupType>;
 }>;
 
 export type useSearchUserGroups_searchUserGroupsQuery = {
@@ -39614,8 +39616,12 @@ export const UserGroupMembersPopover_getMembersDocument = gql`
   UserGroupMembersPopover_getMembersQueryVariables
 >;
 export const useSearchUserGroups_searchUserGroupsDocument = gql`
-  query useSearchUserGroups_searchUserGroups($search: String!, $excludeUserGroups: [GID!]) {
-    searchUserGroups(search: $search, excludeUserGroups: $excludeUserGroups) {
+  query useSearchUserGroups_searchUserGroups(
+    $search: String!
+    $excludeUserGroups: [GID!]
+    $type: [UserGroupType!]
+  ) {
+    searchUserGroups(search: $search, excludeUserGroups: $excludeUserGroups, type: $type) {
       ...UserSelect_UserGroup
     }
   }

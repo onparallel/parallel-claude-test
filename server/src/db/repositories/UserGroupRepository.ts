@@ -3,7 +3,7 @@ import { Knex } from "knex";
 import { groupBy, omit, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
-import { CreateUserGroup, User, UserGroup } from "../__types";
+import { CreateUserGroup, User, UserGroup, UserGroupType } from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { SortBy, escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -287,6 +287,7 @@ export class UserGroupRepository extends BaseRepository {
     search: string,
     opts: {
       excludeUserGroups: number[];
+      type?: UserGroupType[] | null;
     },
   ) {
     return await this.from("user_group")
@@ -297,6 +298,9 @@ export class UserGroupRepository extends BaseRepository {
       .mmodify((q) => {
         if (opts.excludeUserGroups.length > 0) {
           q.whereNotIn("id", opts.excludeUserGroups);
+        }
+        if (opts.type) {
+          q.whereIn("type", opts.type);
         }
       })
       .where((q) => {

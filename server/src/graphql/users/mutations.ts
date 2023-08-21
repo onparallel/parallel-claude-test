@@ -41,7 +41,7 @@ import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { argUserHasStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToTags } from "../tag/authorizers";
-import { userHasAccessToUserGroups } from "../user-group/authorizers";
+import { userGroupHasType, userHasAccessToUserGroups } from "../user-group/authorizers";
 import {
   contextUserHasPermission,
   contextUserIsNotSso,
@@ -119,6 +119,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
         orgCanCreateNewUser(),
         contextUserHasPermission("USERS:CRUD_USERS"),
         userHasAccessToUserGroups("userGroupIds"),
+        userGroupHasType("userGroupIds", "NORMAL"),
       ),
     ),
     emailIsNotRegisteredInTargetOrg("email", "orgId" as never),
@@ -354,6 +355,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
     contextUserHasPermission("USERS:CRUD_USERS"),
     userHasAccessToUsers("userId"),
     userHasAccessToUserGroups("userGroupIds"),
+    userGroupHasType("userGroupIds", "NORMAL"),
   ),
   args: {
     userId: nonNull(globalIdArg("User")),
@@ -386,7 +388,9 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
 
       if (userGroupIds) {
         const userGroups = await ctx.userGroups.loadUserGroupsByUserId(userId);
-        const actualUserGroupsIds = userGroups.map((userGroup) => userGroup.id);
+        const actualUserGroupsIds = userGroups
+          .filter((ug) => ug.type === "NORMAL") // avoid removing ALL_USERS group
+          .map((userGroup) => userGroup.id);
 
         const userGroupsIdsToDelete = difference(actualUserGroupsIds, userGroupIds);
         const userGroupsIdsToAdd = difference(userGroupIds, actualUserGroupsIds);

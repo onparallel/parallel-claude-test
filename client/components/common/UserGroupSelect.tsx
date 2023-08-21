@@ -1,6 +1,7 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { Image, Stack, Text } from "@chakra-ui/react";
 import {
+  UserGroupType,
   UserSelect_UserGroupFragment,
   useSearchUserGroups_searchUserGroupsDocument,
 } from "@parallel/graphql/__types";
@@ -72,14 +73,16 @@ export function useSearchUserGroups() {
       search: string,
       options: {
         excludeUserGroups?: string[];
+        type?: UserGroupType[];
       } = {},
     ) => {
-      const { excludeUserGroups } = options;
+      const { excludeUserGroups, type } = options;
       const { data } = await client.query({
         query: useSearchUserGroups_searchUserGroupsDocument,
         variables: {
           search,
           excludeUserGroups,
+          type,
         },
         fetchPolicy: "no-cache",
       });
@@ -89,10 +92,14 @@ export function useSearchUserGroups() {
   );
 }
 
-useSearchUserGroups.queries = [
+const _queries = [
   gql`
-    query useSearchUserGroups_searchUserGroups($search: String!, $excludeUserGroups: [GID!]) {
-      searchUserGroups(search: $search, excludeUserGroups: $excludeUserGroups) {
+    query useSearchUserGroups_searchUserGroups(
+      $search: String!
+      $excludeUserGroups: [GID!]
+      $type: [UserGroupType!]
+    ) {
+      searchUserGroups(search: $search, excludeUserGroups: $excludeUserGroups, type: $type) {
         ...UserSelect_UserGroup
       }
     }

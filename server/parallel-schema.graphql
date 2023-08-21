@@ -5721,7 +5721,11 @@ type Query {
   """
   Search user groups
   """
-  searchUserGroups(excludeUserGroups: [GID!], search: String!): [UserGroup!]!
+  searchUserGroups(
+    excludeUserGroups: [GID!]
+    search: String!
+    type: [UserGroupType!]
+  ): [UserGroup!]!
 
   """
   Search users and user groups

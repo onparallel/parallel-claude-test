@@ -38,9 +38,12 @@ export function userHasAccessToUserGroups<
 export function userGroupHasType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg, types: MaybeArray<UserGroupType>): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
+    if (!isDefined(args[argName])) {
+      return true;
+    }
     const userGroupIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
     const userGroups = await ctx.userGroups.loadUserGroup(userGroupIds);
     const allowedTypes = unMaybeArray(types);

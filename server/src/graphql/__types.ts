@@ -6793,6 +6793,7 @@ export interface NexusGenArgTypes {
       // args
       excludeUserGroups?: NexusGenScalars["GID"][] | null; // [GID!]
       search: string; // String!
+      type?: NexusGenEnums["UserGroupType"][] | null; // [UserGroupType!]
     };
     searchUsers: {
       // args
