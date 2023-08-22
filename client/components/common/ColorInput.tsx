@@ -12,7 +12,7 @@ import { cx } from "@chakra-ui/utils";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { IMaskInput } from "react-imask";
-import { noop } from "remeda";
+import { noop, omit } from "remeda";
 
 interface ColorInputProps extends ThemingProps<"Input">, FormControlOptions {
   value: string;
@@ -50,7 +50,11 @@ export const ColorInput = chakraForwardRef<"input", ColorInputProps, HTMLInputEl
             backgroundColor={value}
             value={value}
             onChange={(e) => handleChange?.(e.target.value)}
-            __css={{ ...styles.field, px: 0, w: styles.field.h, borderRadius: "full" }}
+            __css={{
+              ...omit(styles.field, ["px", "bg"]),
+              width: styles.field.height as any,
+              borderRadius: "full",
+            }}
             sx={{
               "::-webkit-color-swatch": { opacity: 0 },
               "::-moz-color-swatch": { opacity: 0 },
