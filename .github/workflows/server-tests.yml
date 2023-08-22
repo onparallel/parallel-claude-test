@@ -1,21 +1,18 @@
-name: Code linting
+name: Server tests
 
 on:
   push:
     branches: [master]
-    paths-ignore:
-      - "docs/**"
-      - "ops/**"
-
+    paths:
+      - "server/**"
   pull_request:
     branches: [master]
-    paths-ignore:
-      - "docs/**"
-      - "ops/**"
+    paths:
+      - "server/**"
 
 jobs:
-  linting:
-    name: Code linting
+  tests:
+    name: Server tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -33,17 +30,12 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
-      - name: Run linter
-        run: yarn lint
-      - name: Check translations
-        run: |
-          echo "Checking server translations..."
-          yarn workspace @parallel/server extract-i18n-terms
-          yarn workspace @parallel/server generate-i18n-files
-          echo "Checking client translations..."
-          yarn workspace @parallel/client extract-i18n-terms
-          yarn workspace @parallel/client generate-i18n-files
+      - name: Run server test suite
+        timeout-minutes: 15
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn --cwd server/ test --silent --coverage
 
 concurrency:
-  group: ${{ github.ref }}-main
+  group: ${{ github.ref }}-server-tests
   cancel-in-progress: true
