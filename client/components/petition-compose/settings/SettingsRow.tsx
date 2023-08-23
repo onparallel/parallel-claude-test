@@ -21,7 +21,13 @@ export function SettingsRow({
   ...props
 }: SettingsRowProps) {
   return (
-    <FormControl display="flex" alignItems="center" id={controlId} {...props}>
+    <FormControl
+      display="flex"
+      alignItems="center"
+      id={controlId}
+      data-active-setting={isActive}
+      {...props}
+    >
       <FormLabel
         flex="1"
         alignSelf="flex-start"
