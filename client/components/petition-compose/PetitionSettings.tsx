@@ -402,6 +402,7 @@ function _PetitionSettings({
       isChecked={petition.isRestricted}
       onChange={handleRestrictPetition}
       controlId="restrict-editing"
+      data-section="restrict-editing"
     />
   );
 
