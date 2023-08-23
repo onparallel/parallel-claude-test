@@ -243,7 +243,7 @@ function RenderPlaceholderOption({ item, search }: ComboboxItemProps<ComboboxIte
     );
   }
   return (
-    <HighlightText as="div" whiteSpace="nowrap" search={search ?? ""} textTransform="capitalize">
+    <HighlightText as="div" whiteSpace="nowrap" search={search ?? ""}>
       {item.text}
     </HighlightText>
   );
