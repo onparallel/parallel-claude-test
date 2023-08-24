@@ -112,12 +112,12 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             name: "PETITIONS:SEND_ON_BEHALF",
             title: intl.formatMessage({
               id: "page.permissions-group.petitions-send-on-behalf",
-              defaultMessage: "Send on behalf",
+              defaultMessage: "Send on behalf of anyone",
             }),
             description: intl.formatMessage({
               id: "page.permissions-group.petitions-send-on-behalf-description",
               defaultMessage:
-                "Grants users in this team permissions to send parallels on behalf of any other user in their organization.",
+                "Grants users in this team permissions to send parallels on behalf of any other user in their organization without explicit delegation.",
             }),
           },
           {

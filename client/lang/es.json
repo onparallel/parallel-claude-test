@@ -9926,13 +9926,13 @@
   },
   {
     "term": "page.permissions-group.petitions-send-on-behalf",
-    "definition": "Enviar en nombre de",
-    "context": "Send on behalf"
+    "definition": "Enviar en nombre de cualquiera",
+    "context": "Send on behalf of anyone"
   },
   {
     "term": "page.permissions-group.petitions-send-on-behalf-description",
-    "definition": "Concede a los usuarios en este equipo permisos para enviar parallels en nombre de cualquier otro usuario en la organización.",
-    "context": "Grants users in this team permissions to send parallels on behalf of any other user in their organization."
+    "definition": "Concede a los usuarios en este equipo permisos para enviar parallels en nombre de cualquier otro usuario en la organización sin delegación explícita.",
+    "context": "Grants users in this team permissions to send parallels on behalf of any other user in their organization without explicit delegation."
   },
   {
     "term": "page.permissions-group.profile-alerts-list",
