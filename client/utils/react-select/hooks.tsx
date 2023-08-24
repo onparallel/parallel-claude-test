@@ -1,25 +1,24 @@
 import { CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
+  CSSObjectWithLabel,
   ClearIndicatorProps,
-  components,
   ContainerProps,
   ControlProps,
-  CSSObjectWithLabel,
   DropdownIndicatorProps,
   GroupBase,
-  mergeStyles,
   MultiValueProps,
   OptionProps,
   PlaceholderProps,
   Props as SelectProps,
   Theme,
+  components,
+  mergeStyles,
 } from "react-select";
 import { isDefined, omit } from "remeda";
-import { useMemoizedCallback } from "../useMemoizedCallback";
 import { OptionBase } from "./types";
 
 export const SIZES = {
@@ -97,8 +96,7 @@ export function useReactSelectProps<
     readOnly: isReadOnly,
   } = useFormControl(props);
 
-  // Until this is fixed https://github.com/JedWatson/react-select/issues/5471
-  const theme = useMemoizedCallback(
+  const theme = useCallback(
     (theme: Theme) => {
       return {
         spacing: SIZES[size].spacing,
