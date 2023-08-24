@@ -226,7 +226,6 @@ UserMenu.fragments = {
       me {
         id
         isSuperAdmin
-        role
         email
         ...UserAvatar_User
       }

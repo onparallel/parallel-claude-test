@@ -120,7 +120,7 @@ export const AppLayout = Object.assign(
         firstName: me.firstName,
         lastName: me.lastName,
         createdAt: me.createdAt,
-        orgRole: me.role,
+        isOrgOwner: me.isOrgOwner,
         name: me.fullName!,
         lastActiveAt: me.lastActiveAt,
         company: {
@@ -300,7 +300,7 @@ export const AppLayout = Object.assign(
             email
             createdAt
             permissions
-            role
+            isOrgOwner
             lastActiveAt
             organization {
               id

@@ -683,7 +683,6 @@ Petitions.fragments = {
     return gql`
       fragment Petitions_User on User {
         id
-        role
         petitionListViews {
           ...ViewTabs_PetitionListView
           ...PetitionListHeader_PetitionListView
