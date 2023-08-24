@@ -1,6 +1,20 @@
 import { enumType, objectType } from "nexus";
-import { UserGroupTypeValues } from "../../db/__types";
+import { UserGroupPermissionEffectValues, UserGroupTypeValues } from "../../db/__types";
 import { getInitials } from "../../util/initials";
+
+export const UserGroupPermission = objectType({
+  name: "UserGroupPermission",
+  definition(t) {
+    t.globalId("id", { prefixName: "UserGroupPermission" });
+    t.string("name");
+    t.field("effect", {
+      type: enumType({
+        name: "UserGroupPermissionEffect",
+        members: UserGroupPermissionEffectValues,
+      }),
+    });
+  },
+});
 
 export const UserGroup = objectType({
   name: "UserGroup",
@@ -38,6 +52,12 @@ export const UserGroup = objectType({
         name: "UserGroupType",
         members: UserGroupTypeValues,
       }),
+    });
+    t.nonNull.list.nonNull.field("permissions", {
+      type: "UserGroupPermission",
+      resolve: async (o, _, ctx) => {
+        return await ctx.userGroups.loadUserGroupPermissionsByUserGroupId(o.id);
+      },
     });
     t.implements("Timestamps");
   },

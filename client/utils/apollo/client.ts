@@ -293,6 +293,11 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             petitionListViews: { merge: false },
           },
         },
+        UserGroup: {
+          fields: {
+            permissions: { merge: false },
+          },
+        },
         Profile: {
           fields: {
             petitions: { merge: false },

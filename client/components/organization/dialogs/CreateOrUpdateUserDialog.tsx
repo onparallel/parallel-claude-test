@@ -1,25 +1,15 @@
 import { gql } from "@apollo/client";
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Select,
-  Stack,
-} from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserGroupSelect, useSearchUserGroups } from "@parallel/components/common/UserGroupSelect";
 import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
-  OrganizationRole,
   useCreateOrUpdateUserDialog_UserFragment,
   UserSelect_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
-import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -34,7 +24,6 @@ interface CreateOrUpdateUserDialogData {
   firstName: string;
   lastName: string;
   email: string;
-  role: OrganizationRole;
   userGroups: UserSelect_UserGroupFragment[];
 }
 
@@ -50,7 +39,6 @@ function CreateOrUpdateUserDialog({
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
       email: user?.email ?? "",
-      role: user?.role ?? "NORMAL",
       userGroups: (user?.userGroups ?? []).filter((ug) => ug.type === "NORMAL"),
     },
   });
@@ -67,8 +55,6 @@ function CreateOrUpdateUserDialog({
     },
     [_handleSearchUserGroups],
   );
-
-  const roles = useOrganizationRoles();
 
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
@@ -160,27 +146,6 @@ function CreateOrUpdateUserDialog({
               </FormErrorMessage>
             </FormControl>
           </Stack>
-          <FormControl
-            id="create-user-role"
-            isInvalid={!!errors.role}
-            isDisabled={user?.isMe || user?.role === "OWNER" || user?.status === "INACTIVE"}
-          >
-            <FormLabel>
-              <FormattedMessage
-                id="generic.forms.organization-role-label"
-                defaultMessage="Organization role"
-              />
-            </FormLabel>
-            <Select {...register("role", { required: true })}>
-              {(user?.role === "OWNER" ? roles : roles.filter((r) => r.role !== "OWNER")).map(
-                (r) => (
-                  <option key={r.role} value={r.role}>
-                    {r.label}
-                  </option>
-                ),
-              )}
-            </Select>
-          </FormControl>
           <FormControl id="create-user-groups" isDisabled={user?.status === "INACTIVE"}>
             <FormLabel>
               {isUpdate ? (
@@ -249,7 +214,6 @@ useCreateOrUpdateUserDialog.fragments = {
         firstName
         lastName
         email
-        role
         status
         isMe
         userGroups {

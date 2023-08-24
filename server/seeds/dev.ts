@@ -2,12 +2,48 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { Knex } from "knex";
 import pMap from "p-map";
-import { User, UserData } from "../src/db/__types";
+import { User, UserData, UserGroupPermissionName } from "../src/db/__types";
 import { EncryptionService } from "../src/services/EncryptionService";
 import { defaultBrandTheme } from "../src/util/BrandTheme";
-import { deleteAllData } from "../src/util/knexUtils";
 import { defaultPdfDocumentTheme } from "../src/util/PdfDocumentTheme";
+import { deleteAllData } from "../src/util/knexUtils";
 import { loadEnv } from "../src/util/loadEnv";
+
+const PERMISSIONS = {
+  ADMIN: [
+    "REPORTS:OVERVIEW",
+    "REPORTS:TEMPLATE_STATISTICS",
+    "REPORTS:TEMPLATE_REPLIES",
+    "TAGS:CRUD_TAGS",
+    "PROFILES:DELETE_PROFILES",
+    "PROFILES:DELETE_PERMANENTLY_PROFILES",
+    "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+    "INTEGRATIONS:CRUD_INTEGRATIONS",
+    "USERS:CRUD_USERS",
+    "USERS:GHOST_LOGIN",
+    "TEAMS:CRUD_TEAMS",
+    "TEAMS:CRUD_PERMISSIONS",
+    "ORG_SETTINGS",
+    "CONTACTS:DELETE_CONTACTS",
+    "PETITIONS:SEND_ON_BEHALF",
+  ],
+  NORMAL: [
+    "PETITIONS:CHANGE_PATH",
+    "PETITIONS:CREATE_TEMPLATES",
+    "INTEGRATIONS:CRUD_API",
+    "PROFILES:SUBSCRIBE_PROFILES",
+  ],
+  COLLABORATOR: [
+    "PETITIONS:CREATE_PETITIONS",
+    "PROFILES:CREATE_PROFILES",
+    "PROFILES:CLOSE_PROFILES",
+    "PROFILES:LIST_PROFILES",
+    "PROFILE_ALERTS:LIST_ALERTS",
+    "CONTACTS:LIST_CONTACTS",
+    "USERS:LIST_USERS",
+    "TEAMS:LIST_TEAMS",
+  ],
+};
 
 export async function seed(knex: Knex): Promise<any> {
   await loadEnv();
@@ -65,7 +101,7 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[0],
       cognito_id: "123e4567-e89b-12d3-a456-426655440000",
       email: "harvey@onparallel.com",
-      organization_role: "OWNER",
+      is_org_owner: true,
       first_name: "Harvey",
       last_name: "Specter",
       preferred_locale: "en",
@@ -74,7 +110,7 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[0],
       cognito_id: "f3a469da-cd92-46de-84d1-cc09b4e57788",
       email: "mike@onparallel.com",
-      organization_role: "NORMAL",
+      is_org_owner: false,
       first_name: "Mike",
       last_name: "Ross",
       preferred_locale: "en",
@@ -83,7 +119,7 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[0],
       cognito_id: "bd82c5a1-5622-41a5-9116-1686a44cf3fa",
       email: "santialbo@gmail.com",
-      organization_role: "ADMIN",
+      is_org_owner: false,
       first_name: "Santi",
       last_name: "Albo",
       preferred_locale: "en",
@@ -92,7 +128,7 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[0],
       cognito_id: "8dd56de4-3b39-4d4b-850c-82be0aba21aa",
       email: "mariano@onparallel.com",
-      organization_role: "ADMIN",
+      is_org_owner: false,
       first_name: "Mariano",
       last_name: "Rodriguez",
       preferred_locale: "en",
@@ -101,7 +137,7 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[0],
       cognito_id: "013f5bce-5459-4e7c-bc64-773a4ffcd084",
       email: "konstantin@onparallel.com",
-      organization_role: "ADMIN",
+      is_org_owner: false,
       first_name: "Konstantin",
       last_name: "Klykov",
       preferred_locale: "en",
@@ -110,7 +146,7 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[1],
       cognito_id: "f962bef6-e1f5-4937-ad37-472e8dd96927",
       email: "parallele2euser1+user1@gmail.com",
-      organization_role: "OWNER",
+      is_org_owner: true,
       first_name: "User",
       last_name: "1",
       preferred_locale: "en",
@@ -119,7 +155,7 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[1],
       cognito_id: "fd1ab908-4270-42a8-ad32-a8e67f71f6e4",
       email: "parallele2euser1+user2@gmail.com",
-      organization_role: "ADMIN",
+      is_org_owner: false,
       first_name: "User",
       last_name: "2",
       preferred_locale: "en",
@@ -137,24 +173,38 @@ export async function seed(knex: Knex): Promise<any> {
     "*",
   );
 
-  const users = await knex("user").insert(
-    usersData.map((ud) => {
-      const user = usersInfo.find(({ email }) => email === ud.email)!;
-      return {
-        user_data_id: ud.id,
-        org_id: user.org_id,
-        organization_role: user.organization_role,
-      };
-    }),
-    ["id", "org_id", "organization_role"],
-  );
+  const users = (
+    await knex("user").insert(
+      usersData.map((ud) => {
+        const user = usersInfo.find(({ email }) => email === ud.email)!;
+        return {
+          user_data_id: ud.id,
+          org_id: user.org_id,
+          is_org_owner: user.is_org_owner,
+        };
+      }),
+      ["id", "org_id", "is_org_owner", "user_data_id"],
+    )
+  ).map((u) => ({
+    ...u,
+    role: [
+      "santialbo@gmail.com",
+      "mariano@onparallel.com",
+      "konstantin@onparallel.com",
+      "parallele2euser1+user2@gmail.com",
+    ].includes(usersData.find((ud) => ud.id === u.user_data_id)!.email)
+      ? "ADMIN"
+      : u.is_org_owner
+      ? "OWNER"
+      : "NORMAL",
+  }));
 
   const orgUsers = orgIds.map((id) => [id, users.filter((u) => u.org_id === id)] as const);
 
   await pMap(
     orgUsers,
     async ([orgId, users], i) => {
-      const ownerId = users.find((u) => u.organization_role === "OWNER")!.id;
+      const ownerId = users.find((u) => u.is_org_owner)!.id;
       await knex("organization")
         .where("id", orgId)
         .update({
@@ -197,17 +247,25 @@ export async function seed(knex: Knex): Promise<any> {
         },
       ]);
 
-      const groups = await knex("user_group").insert(
+      const [allUsersGroup, adminsGroup] = await knex("user_group").insert(
         [
           {
-            org_id: orgIds[0],
+            org_id: orgId,
+            name: "",
             localizable_name: { es: "Todos los usuarios", en: "All users" },
             type: "ALL_USERS",
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
           },
           {
-            org_id: orgIds[0],
+            org_id: orgId,
+            name: "Admins",
+            type: "NORMAL",
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+          },
+          {
+            org_id: orgId,
             name: "Empty",
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
@@ -216,11 +274,45 @@ export async function seed(knex: Knex): Promise<any> {
         "id",
       );
 
+      // ALL_USERS members
       await knex("user_group_member").insert(
         users.map((u) => ({
-          user_group_id: groups[0].id,
+          user_group_id: allUsersGroup.id,
           user_id: u.id,
-          created_by: `User:${u.id}`,
+          created_by: `User:${ownerId}`,
+        })),
+      );
+
+      // ALL_USERS permissions
+      await knex("user_group_permission").insert(
+        [...PERMISSIONS.NORMAL, ...PERMISSIONS.COLLABORATOR].map((name) => ({
+          user_group_id: allUsersGroup.id,
+          effect: "ALLOW",
+          name: name as UserGroupPermissionName,
+          created_by: `User:${ownerId}`,
+          updated_by: `User:${ownerId}`,
+        })),
+      );
+
+      // Admins members
+      await knex("user_group_member").insert(
+        users
+          .filter((u) => u.role === "ADMIN")
+          .map((u) => ({
+            user_group_id: adminsGroup.id,
+            user_id: u.id,
+            created_by: `User:${ownerId}`,
+          })),
+      );
+
+      // Admins permissions
+      await knex("user_group_permission").insert(
+        [...PERMISSIONS.ADMIN, ...PERMISSIONS.NORMAL, ...PERMISSIONS.COLLABORATOR].map((name) => ({
+          user_group_id: adminsGroup.id,
+          effect: "ALLOW",
+          name: name as UserGroupPermissionName,
+          created_by: `User:${ownerId}`,
+          updated_by: `User:${ownerId}`,
         })),
       );
 
@@ -318,7 +410,7 @@ export async function seed(knex: Knex): Promise<any> {
             user_id: u.id,
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
-            type: u.organization_role === "OWNER" ? "OWNER" : "WRITE",
+            type: u.role === "OWNER" ? "OWNER" : "WRITE",
             is_subscribed: true,
           })),
         ),

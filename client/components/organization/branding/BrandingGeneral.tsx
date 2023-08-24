@@ -27,7 +27,7 @@ import { Divider } from "@parallel/components/common/Divider";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
+import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   BrandingGeneral_UserFragment,
@@ -153,7 +153,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
       noValidate
     >
       <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
-        {!userCanEditBranding ? <OnlyAdminsAlert /> : null}
+        {!userCanEditBranding ? <RestrictedFeatureAlert /> : null}
         <Stack spacing={4}>
           <Stack>
             <Heading as="h4" size="md" fontWeight="semibold">

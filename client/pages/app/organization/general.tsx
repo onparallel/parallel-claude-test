@@ -20,7 +20,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { Logo } from "@parallel/components/common/Logo";
-import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
+import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
@@ -92,7 +92,7 @@ function OrganizationGeneral() {
         paddingBottom={16}
       >
         <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.xs" }} width="100%">
-          {!userCanEditOrganization ? <OnlyAdminsAlert /> : null}
+          {!userCanEditOrganization ? <RestrictedFeatureAlert /> : null}
           <Stack spacing={4}>
             <Stack>
               <Text>

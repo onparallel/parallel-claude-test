@@ -778,7 +778,10 @@ export class Auth implements IAuth {
             if (isDefined(asUserId) && asUserId !== user.id) {
               const userPermissions = await this.users.loadUserPermissions(user.id);
               // make sure user can ghost login
-              if (!userPermissions.includes("USERS:GHOST_LOGIN")) {
+              if (
+                !userPermissions.includes("USERS:GHOST_LOGIN") &&
+                !userPermissions.includes("SUPERADMIN")
+              ) {
                 return null;
               }
               const org = (await this.orgs.loadOrg(user.org_id))!;

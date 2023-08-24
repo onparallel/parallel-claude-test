@@ -4,7 +4,7 @@ import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { hash } from "../../util/token";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
-import { supportMethodAccess } from "./authorizers";
+import { superAdminAccess } from "./authorizers";
 import { outdent } from "outdent";
 
 export const globalIdDecode = queryField("globalIdDecode", {
@@ -13,7 +13,7 @@ export const globalIdDecode = queryField("globalIdDecode", {
   args: {
     id: nonNull(idArg({ description: "Global ID to decode" })),
   },
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   resolve: (_, args) => {
     try {
       const { id, type } = fromGlobalId(args.id);
@@ -31,7 +31,7 @@ export const globalIdEncode = queryField("globalIdEncode", {
     id: nonNull(stringArg({ description: "ID to encode" })),
     type: nonNull(stringArg({ description: "ID type" })),
   },
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   resolve: (_, args) => {
     try {
       return {
@@ -50,7 +50,7 @@ export const getApiTokenOwner = queryField("getApiTokenOwner", {
   args: {
     token: nonNull(stringArg()),
   },
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   resolve: async (_, { token }, ctx) => {
     try {
       const tokenHash = await hash(token, "");
@@ -80,7 +80,7 @@ export const getApiTokenOwner = queryField("getApiTokenOwner", {
 export const exportPetitionToJson = queryField("exportPetitionToJson", {
   description: "Exports basic petition + fields configuration as JSON object",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
   },
@@ -102,7 +102,7 @@ export const petitionInformation = queryField("petitionInformation", {
   description:
     "Returns information about a petition: The name of the organization and emails of users with access to the petition",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
   },

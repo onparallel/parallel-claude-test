@@ -879,7 +879,7 @@ export type Mutation = {
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
   tagPetition: PetitionBase;
-  /** Transfers the ownership of an organization to a given user. Old owner will get ADMIN role */
+  /** Transfers the ownership of an organization to a given user. */
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
@@ -915,7 +915,10 @@ export type Mutation = {
   updateOrganizationTier: SupportMethodResponse;
   /** Updates the usage_details of a given organization. Will impact the limits of coming usage periods. */
   updateOrganizationUsageDetails: Organization;
-  /** Updates the role of another user in the organization. */
+  /**
+   * Updates the role of another user in the organization.
+   * @deprecated use updateUserGroupMembership
+   */
   updateOrganizationUser: User;
   /** Updates the user limit for a organization */
   updateOrganizationUserLimit: Organization;
@@ -974,6 +977,10 @@ export type Mutation = {
   updateUser: User;
   /** Updates the name of a given user group */
   updateUserGroup: UserGroup;
+  /** Inserts the user into all provided user groups. */
+  updateUserGroupMembership: User;
+  /** Updates the permissions of a user group */
+  updateUserGroupPermissions: UserGroup;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   updateUserPreferredLocale: User;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
@@ -1455,7 +1462,7 @@ export type MutationinviteUserToOrganizationArgs = {
   lastName: Scalars["String"]["input"];
   locale: UserLocale;
   orgId?: InputMaybe<Scalars["GID"]["input"]>;
-  role: OrganizationRole;
+  role?: InputMaybe<OrganizationRole>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
@@ -2111,6 +2118,16 @@ export type MutationupdateUserArgs = {
 export type MutationupdateUserGroupArgs = {
   data: UpdateUserGroupInput;
   id: Scalars["GID"]["input"];
+};
+
+export type MutationupdateUserGroupMembershipArgs = {
+  userGroupIds: Array<Scalars["GID"]["input"]>;
+  userId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateUserGroupPermissionsArgs = {
+  permissions: Array<UpdateUserGroupPermissionsInput>;
+  userGroupId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateUserPreferredLocaleArgs = {
@@ -4842,6 +4859,13 @@ export type UpdateUserGroupInput = {
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type UpdateUserGroupPermissionsInput = {
+  effect: UpdateUserGroupPermissionsInputEffect;
+  name: Scalars["String"]["input"];
+};
+
+export type UpdateUserGroupPermissionsInputEffect = "ALLOW" | "DENY" | "NONE";
+
 /** A user in the system. */
 export type User = Timestamps & {
   /** URL to the user avatar */
@@ -4865,6 +4889,7 @@ export type User = Timestamps & {
   /** The initials of the user. */
   initials: Maybe<Scalars["String"]["output"]>;
   isMe: Scalars["Boolean"]["output"];
+  isOrgOwner: Scalars["Boolean"]["output"];
   isSsoUser: Scalars["Boolean"]["output"];
   isSuperAdmin: Scalars["Boolean"]["output"];
   lastActiveAt: Maybe<Scalars["DateTime"]["output"]>;
@@ -4879,7 +4904,8 @@ export type User = Timestamps & {
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
   preferredLocale: UserLocale;
-  role: OrganizationRole;
+  /** @deprecated not used anymore */
+  role: Maybe<OrganizationRole>;
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
@@ -4929,6 +4955,7 @@ export type UserGroup = Timestamps & {
   memberCount: Scalars["Int"]["output"];
   members: Array<UserGroupMember>;
   name: Scalars["String"]["output"];
+  permissions: Array<UserGroupPermission>;
   type: UserGroupType;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
@@ -4947,6 +4974,14 @@ export type UserGroupPagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
 };
+
+export type UserGroupPermission = {
+  effect: UserGroupPermissionEffect;
+  id: Scalars["GID"]["output"];
+  name: Scalars["String"]["output"];
+};
+
+export type UserGroupPermissionEffect = "ALLOW" | "DENY";
 
 export type UserGroupType = "ALL_USERS" | "NORMAL";
 

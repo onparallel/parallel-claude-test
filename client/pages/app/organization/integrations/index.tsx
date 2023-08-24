@@ -14,7 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
-import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
+import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -48,6 +48,7 @@ function OrganizationIntegrations() {
   } = useAssertQuery(OrganizationIntegrations_userDocument);
 
   const userCanEditIntegrations = useHasPermission("INTEGRATIONS:CRUD_INTEGRATIONS");
+  const userHasApiAccess = useHasPermission("INTEGRATIONS:CRUD_API");
 
   const hasDownJones = me.organization.hasDowJones;
   const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
@@ -204,7 +205,10 @@ function OrganizationIntegrations() {
       isChecked: hasDownJones,
     },
     {
-      isDisabled: !me.hasDeveloperAccess || !userCanEditIntegrations,
+      isDisabled:
+        !me.hasDeveloperAccess ||
+        (!userCanEditIntegrations && !userHasApiAccess) ||
+        !userHasApiAccess,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
@@ -296,7 +300,7 @@ function OrganizationIntegrations() {
             );
           }
         })}
-        {!userCanEditIntegrations ? <OnlyAdminsAlert /> : null}
+        {!userCanEditIntegrations ? <RestrictedFeatureAlert /> : null}
       </Stack>
     </OrganizationSettingsLayout>
   );

@@ -179,6 +179,7 @@ function Petitions() {
 
   const userCanChangePath = useHasPermission("PETITIONS:CHANGE_PATH");
   const userCanCreateTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
+  const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
 
   const { selectedIdsRef, selectedRows, selectedRowsRef, onChangeSelectedIds } = useSelection(
     petitions?.items,
@@ -431,6 +432,7 @@ function Petitions() {
   const actions = usePetitionListActions({
     userCanChangePath,
     userCanCreateTemplate,
+    userCanCreatePetition,
     type: state.type,
     selectedCount: selectedRows.length,
     hasSelectedFolders: selectedRows.some((c) => c.__typename === "PetitionFolder"),
@@ -802,6 +804,7 @@ const _mutations = [
 function usePetitionListActions({
   userCanChangePath,
   userCanCreateTemplate,
+  userCanCreatePetition,
   type,
   selectedCount,
   hasSelectedFolders,
@@ -816,6 +819,7 @@ function usePetitionListActions({
 }: {
   userCanChangePath: boolean;
   userCanCreateTemplate: boolean;
+  userCanCreatePetition: boolean;
   type: PetitionBaseType;
   selectedCount: number;
   hasSelectedFolders: boolean;
@@ -833,6 +837,11 @@ function usePetitionListActions({
   );
   const restrictWhenCantCreateTemplate = (button: ReactNode) => (
     <RestrictedFeaturePopover isRestricted={!userCanCreateTemplate}>
+      {button}
+    </RestrictedFeaturePopover>
+  );
+  const restrictWhenCantCreatePetition = (button: ReactNode) => (
+    <RestrictedFeaturePopover isRestricted={!userCanCreatePetition}>
       {button}
     </RestrictedFeaturePopover>
   );
@@ -887,11 +896,12 @@ function usePetitionListActions({
       : {
           key: "useTemplate",
           onClick: onUseTemplateClick,
-          isDisabled: selectedCount !== 1 || hasSelectedFolders,
+          isDisabled: selectedCount !== 1 || hasSelectedFolders || !userCanCreatePetition,
           leftIcon: <PaperPlaneIcon />,
           children: (
             <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
           ),
+          wrap: restrictWhenCantCreatePetition,
         },
     {
       key: "delete",

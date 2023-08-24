@@ -15,7 +15,6 @@ import {
   AdminOrganizationsMembers_organizationDocument,
   AdminOrganizationsMembers_OrganizationUserFragment,
   AdminOrganizationsMembers_queryDocument,
-  OrganizationRole,
   OrganizationUsers_OrderBy,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -28,7 +27,6 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
-import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -246,7 +244,6 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
 
 function useOrganizationMembersTableColumns() {
   const intl = useIntl();
-  const roles = useOrganizationRoles();
   return useMemo<TableColumn<AdminOrganizationsMembers_OrganizationUserFragment>[]>(
     () => [
       {
@@ -297,6 +294,11 @@ function useOrganizationMembersTableColumns() {
                   />
                 </Tooltip>
               ) : null}
+              {row.isOrgOwner ? (
+                <Badge marginLeft={2} colorScheme="primary" position="relative" top="1.5px">
+                  <FormattedMessage id="generic.organization-owner" defaultMessage="Owner" />
+                </Badge>
+              ) : null}
             </Text>
           );
         },
@@ -313,31 +315,6 @@ function useOrganizationMembersTableColumns() {
           minWidth: "200px",
         },
         CellContent: ({ row }) => <>{row.email}</>,
-      },
-      {
-        key: "role",
-        label: intl.formatMessage({
-          id: "organization-role.header.user",
-          defaultMessage: "Role",
-        }),
-        cellProps: {
-          width: "10%",
-          minWidth: "130px",
-        },
-        CellContent: ({ row }) => (
-          <Badge
-            colorScheme={
-              (
-                {
-                  OWNER: "primary",
-                  ADMIN: "green",
-                } as Record<OrganizationRole, string>
-              )[row.role] ?? "gray"
-            }
-          >
-            {roles.find((r) => r.role === row.role)?.label ?? (null as never)}
-          </Badge>
-        ),
       },
       {
         key: "lastActiveAt",
@@ -395,10 +372,10 @@ AdminOrganizationsMembers.fragments = {
       id
       fullName
       email
-      role
       createdAt
       lastActiveAt
       status
+      isOrgOwner
     }
   `,
   Organization: gql`
@@ -451,7 +428,6 @@ const _mutations = [
       $firstName: String!
       $lastName: String!
       $email: String!
-      $role: OrganizationRole!
       $locale: UserLocale!
       $orgId: GID
     ) {
@@ -459,7 +435,6 @@ const _mutations = [
         email: $email
         firstName: $firstName
         lastName: $lastName
-        role: $role
         locale: $locale
         orgId: $orgId
       ) {

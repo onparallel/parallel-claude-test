@@ -23,30 +23,30 @@ export async function transferParallels(
 
   const userData = (await context.users.loadUserData(user.user_data_id))!;
 
-  const admins = await context.organizations.loadOwnerAndAdmins(orgId);
+  const emailRecipients = await context.users.getUsersWithPermission(orgId, "USERS:CRUD_USERS");
 
-  const adminDatas = (await context.users.loadUserData(admins.map((a) => a.user_data_id))).filter(
-    isDefined,
-  );
+  const emailRecipientDatas = (
+    await context.users.loadUserData(emailRecipients.map((a) => a.user_data_id))
+  ).filter(isDefined);
 
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
   const emails: EmailLog[] = [];
 
-  for (const adminData of adminDatas) {
+  for (const recipientData of emailRecipientDatas) {
     const { html, text, subject, from } = await buildEmail(
       TransferParallelsEmail,
       {
-        name: adminData.first_name ?? adminData.last_name ?? "",
+        name: recipientData.first_name ?? recipientData.last_name ?? "",
         userEmail: userData.email,
         userFullName: fullName(userData.first_name, userData.last_name),
         ...layoutProps,
       },
-      { locale: adminData.preferred_locale },
+      { locale: recipientData.preferred_locale },
     );
 
     const email = await context.emailLogs.createEmail({
       from: buildFrom(from, emailFrom),
-      to: adminData.email,
+      to: recipientData.email,
       subject,
       text,
       html,

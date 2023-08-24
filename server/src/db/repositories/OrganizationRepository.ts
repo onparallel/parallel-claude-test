@@ -3,15 +3,12 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, isDefined, uniq } from "remeda";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
-import { unMaybeArray } from "../../util/arrays";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
+import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
+import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { keyBuilder } from "../../util/keyBuilder";
-import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { Maybe, MaybeArray } from "../../util/types";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike, SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
 import {
   CreateOrganization,
   CreateOrganizationTheme,
@@ -25,6 +22,9 @@ import {
   User,
   UserStatus,
 } from "../__types";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { SortBy, escapeLike } from "../helpers/utils";
+import { KNEX } from "../knex";
 import { SystemRepository } from "./SystemRepository";
 
 interface TUsageDetail {
@@ -53,14 +53,11 @@ export class OrganizationRepository extends BaseRepository {
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadOrgOwner = this.buildLoadBy("user", "org_id", (q) =>
-    q.whereNull("deleted_at").where("organization_role", "OWNER").where("status", "ACTIVE"),
-  );
-
-  readonly loadOwnerAndAdmins = this.buildLoadMultipleBy("user", "org_id", (q) =>
-    q
-      .whereNull("deleted_at")
-      .whereIn("organization_role", ["OWNER", "ADMIN"])
-      .where("status", "ACTIVE"),
+    q.where({
+      deleted_at: null,
+      is_org_owner: true,
+      status: "ACTIVE",
+    }),
   );
 
   async getOrganizationsByUserEmail(email: string) {
@@ -293,7 +290,7 @@ export class OrganizationRepository extends BaseRepository {
       .where({
         deleted_at: null,
         org_id: orgId,
-        organization_role: "OWNER",
+        is_org_owner: true,
       })
       .select("*");
 

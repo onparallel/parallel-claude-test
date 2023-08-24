@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { SmallPopover } from "./SmallPopover";
 import { FormattedMessage } from "react-intl";
 import { Link } from "./Link";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 
 export type RestrictedFeaturePopoverProps = {
   children: ReactNode;
@@ -27,6 +28,7 @@ export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeatur
     },
     ref,
   ) {
+    const userCanListOrgUsers = useHasPermission("USERS:LIST_USERS");
     return (
       <SmallPopover
         content={
@@ -41,10 +43,15 @@ export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeatur
                 </Text>
                 <Text>
                   <FormattedMessage
-                    id="component.restricted-feature-popover.contact-and-admin"
-                    defaultMessage="<a>Contact an admin</a> if you need to change these permissions."
+                    id="component.restricted-feature-popover.contact-org-owner"
+                    defaultMessage="<a>Contact the owner</a> of your organization if you need to change these permissions."
                     values={{
-                      a: (chunks: any) => <Link href={`/app/organization/users`}>{chunks}</Link>,
+                      a: (chunks: any) =>
+                        userCanListOrgUsers ? (
+                          <Link href={`/app/organization/users`}>{chunks}</Link>
+                        ) : (
+                          chunks
+                        ),
                     }}
                   />
                 </Text>

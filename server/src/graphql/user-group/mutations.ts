@@ -1,6 +1,11 @@
-import { inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
+import { enumType, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { CreateUserGroup, UserGroup } from "../../db/__types";
+import {
+  CreateUserGroup,
+  UserGroup,
+  UserGroupPermissionEffectValues,
+  UserGroupPermissionName,
+} from "../../db/__types";
 import { RESULT } from "../helpers/Result";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -10,6 +15,8 @@ import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { userGroupHasType, userHasAccessToUserGroups } from "./authorizers";
+import { validUserGroupPermissionsInput } from "./validations";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 
 export const createUserGroup = mutationField("createUserGroup", {
   description: "Creates a group in the user's organization",
@@ -167,5 +174,55 @@ export const cloneUserGroups = mutationField("cloneUserGroups", {
         ctx.user!,
       ),
     );
+  },
+});
+
+export const updateUserGroupPermissions = mutationField("updateUserGroupPermissions", {
+  description: "Updates the permissions of a user group",
+  type: "UserGroup",
+  authorize: authenticateAnd(
+    contextUserHasPermission("TEAMS:CRUD_PERMISSIONS"),
+    userHasAccessToUserGroups("userGroupId"),
+  ),
+  args: {
+    userGroupId: nonNull(globalIdArg("UserGroup")),
+    permissions: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "UpdateUserGroupPermissionsInput",
+            definition(t) {
+              t.nonNull.string("name");
+              t.nonNull.field("effect", {
+                type: enumType({
+                  name: "UpdateUserGroupPermissionsInputEffect",
+                  members: [...UserGroupPermissionEffectValues, "NONE"],
+                }),
+              });
+            },
+          }).asArg(),
+        ),
+      ),
+    ),
+  },
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.permissions, "permissions"),
+    validUserGroupPermissionsInput(
+      (args) => args.userGroupId,
+      (args) => args.permissions,
+      "permissions",
+    ),
+  ),
+  resolve: async (_, args, ctx) => {
+    await ctx.userGroups.upsertUserGroupPermissions(
+      args.userGroupId,
+      args.permissions.map((p) => ({
+        name: p.name as UserGroupPermissionName,
+        effect: p.effect,
+      })),
+      `User:${ctx.user!.id}`,
+    );
+
+    return (await ctx.userGroups.loadUserGroup(args.userGroupId))!;
   },
 });

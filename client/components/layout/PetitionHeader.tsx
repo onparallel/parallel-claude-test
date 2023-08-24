@@ -75,6 +75,7 @@ import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/Conf
 import { HeaderNameEditable, HeaderNameEditableInstance } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
 import { PetitionSection } from "./PetitionLayout";
+import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   petition: PetitionHeader_PetitionBaseFragment;
@@ -101,9 +102,8 @@ export const PetitionHeader = Object.assign(
       usePetitionShouldConfirmNavigation();
     const userCanDownloadResults = useHasPermission("REPORTS:TEMPLATE_REPLIES");
     const userCanChangePath = useHasPermission("PETITIONS:CHANGE_PATH");
-    const userCanSaveAsTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
-    const userCanCloneTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
-    const userCanClonePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
+    const userCanCreateTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
+    const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
 
     const isPetition = petition.__typename === "Petition";
 
@@ -539,9 +539,16 @@ export const PetitionHeader = Object.assign(
         </GridItem>
         <GridItem area="b" as={HStack} justifyContent="flex-end">
           {!isPetition ? (
-            <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
-              <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
-            </Button>
+            <RestrictedFeaturePopover isRestricted={!userCanCreatePetition}>
+              <Button
+                flexShrink={0}
+                onClick={handleUseTemplate}
+                data-action="use-template"
+                isDisabled={!userCanCreatePetition}
+              >
+                <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
+              </Button>
+            </RestrictedFeaturePopover>
           ) : (
             actions ?? null
           )}
@@ -619,7 +626,7 @@ export const PetitionHeader = Object.assign(
                   <MenuItem
                     onClick={handleCloneClick}
                     icon={<CopyIcon display="block" boxSize={4} />}
-                    isDisabled={isPetition ? !userCanClonePetition : !userCanCloneTemplate}
+                    isDisabled={isPetition ? !userCanCreatePetition : !userCanCreateTemplate}
                   >
                     {isPetition ? (
                       <FormattedMessage
@@ -638,7 +645,7 @@ export const PetitionHeader = Object.assign(
                     <MenuItem
                       onClick={handleSaveAsTemplate}
                       icon={<CopyIcon display="block" boxSize={4} />}
-                      isDisabled={!userCanSaveAsTemplate}
+                      isDisabled={!userCanCreateTemplate}
                     >
                       <FormattedMessage
                         id="component.petition-header.save-as-template-button"

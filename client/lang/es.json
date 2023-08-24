@@ -3110,11 +3110,6 @@
     "context": "Unread"
   },
   {
-    "term": "component.only-admins-alert.body",
-    "definition": "Solo los administradores pueden modificar estos ajustes. Por favor, pregúntales a ellos para cualquier cambio que necesites.",
-    "context": "Only admins can edit these settings. Please ask them if you need any changes on this page."
-  },
-  {
     "term": "component.organization-memebers-list-table-headr.sso-provider",
     "definition": "Proveedor SSO",
     "context": "SSO provider"
@@ -6325,9 +6320,19 @@
     "context": "Restrict editing"
   },
   {
-    "term": "component.restricted-feature-popover.contact-and-admin",
-    "definition": "<a>Contacta con tu administrador</a> si necesitas cambiar tus permisos.",
-    "context": "<a>Contact an admin</a> if you need to change these permissions."
+    "term": "component.restricted-feature-alert.contact-org-owner",
+    "definition": "<a>Contacta con el propietario</a> de tu organización si necesitas cambiar estos permisos.",
+    "context": "<a>Contact the owner</a> of your organization if you need to change these permissions."
+  },
+  {
+    "term": "component.restricted-feature-alert.restricted",
+    "definition": "Está funcionalidad está limitada.",
+    "context": "This feature is restricted."
+  },
+  {
+    "term": "component.restricted-feature-popover.contact-org-owner",
+    "definition": "<a>Contacta con el propietario</a> de tu organización si necesitas cambiar estos permisos.",
+    "context": "<a>Contact the owner</a> of your organization if you need to change these permissions."
   },
   {
     "term": "component.restricted-feature-popover.restricted",
@@ -7411,8 +7416,8 @@
   },
   {
     "term": "component.user-dropdown-empty.no-options-contact-admin",
-    "definition": "Contacta con <a>el propietario o un administrador</a> de tu organización para crearle una cuenta.",
-    "context": "Contact with <a>the owner or an admin</a> of your organization to create them an account."
+    "definition": "Contacta con <a>el propietario</a> de tu organización para crearle una cuenta.",
+    "context": "Contact with <a>the owner</a> of your organization to create them an account."
   },
   {
     "term": "component.user-dropdown-empty.search-hint",
@@ -7423,6 +7428,16 @@
     "term": "component.user-dropdown-empty.search-hint-include-groups",
     "definition": "Busca usuarios y equipos existentes",
     "context": "Search for existing users and teams"
+  },
+  {
+    "term": "component.user-group-layout.permissions",
+    "definition": "Permisos",
+    "context": "Permissions"
+  },
+  {
+    "term": "component.user-group-layout.users",
+    "definition": "Usuarios",
+    "context": "Users"
   },
   {
     "term": "component.user-group-members-popover.members-of",
@@ -8395,11 +8410,6 @@
     "context": "Old password"
   },
   {
-    "term": "generic.forms.organization-role-label",
-    "definition": "Rol en la organización",
-    "context": "Organization role"
-  },
-  {
     "term": "generic.forms.password-label",
     "definition": "Contraseña",
     "context": "Password"
@@ -8693,6 +8703,11 @@
     "term": "generic.options",
     "definition": "Opciones...",
     "context": "Options..."
+  },
+  {
+    "term": "generic.organization-owner",
+    "definition": "Propietario",
+    "context": "Owner"
   },
   {
     "term": "generic.page-break",
@@ -9208,31 +9223,6 @@
     "term": "organization-groups.remove-from-group",
     "definition": "Quitar del equipo",
     "context": "Remove from team"
-  },
-  {
-    "term": "organization-role.admin",
-    "definition": "Administrador",
-    "context": "Admin"
-  },
-  {
-    "term": "organization-role.collaborator",
-    "definition": "Colaborador",
-    "context": "Collaborator"
-  },
-  {
-    "term": "organization-role.header.user",
-    "definition": "Rol",
-    "context": "Role"
-  },
-  {
-    "term": "organization-role.normal",
-    "definition": "Miembro",
-    "context": "Member"
-  },
-  {
-    "term": "organization-role.owner",
-    "definition": "Propietario",
-    "context": "Owner"
   },
   {
     "term": "organization-usage.visually-hidden.out-of",
@@ -9788,6 +9778,351 @@
     "term": "page.organizations.features-active",
     "definition": "Funcionalidades activadas",
     "context": "Enabled features"
+  },
+  {
+    "term": "page.permissions-group.category-contacts",
+    "definition": "Contactos",
+    "context": "Contacts"
+  },
+  {
+    "term": "page.permissions-group.category-integrations",
+    "definition": "Integraciones",
+    "context": "Integrations"
+  },
+  {
+    "term": "page.permissions-group.category-organization",
+    "definition": "Organización",
+    "context": "Organization"
+  },
+  {
+    "term": "page.permissions-group.category-petitions",
+    "definition": "Parallels",
+    "context": "Parallels"
+  },
+  {
+    "term": "page.permissions-group.category-profiles",
+    "definition": "Perfiles",
+    "context": "Profiles"
+  },
+  {
+    "term": "page.permissions-group.category-reports",
+    "definition": "Reportes",
+    "context": "Reports"
+  },
+  {
+    "term": "page.permissions-group.category-superadmin",
+    "definition": "SuperAdmin",
+    "context": "SuperAdmin"
+  },
+  {
+    "term": "page.permissions-group.category-tags",
+    "definition": "Etiquetas",
+    "context": "Tags"
+  },
+  {
+    "term": "page.permissions-group.category-teams",
+    "definition": "Equipos",
+    "context": "Teams"
+  },
+  {
+    "term": "page.permissions-group.category-users",
+    "definition": "Usuarios",
+    "context": "Users"
+  },
+  {
+    "term": "page.permissions-group.contacts-list",
+    "definition": "Ver contactos",
+    "context": "View contacts"
+  },
+  {
+    "term": "page.permissions-group.contacts-list-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al listado completo de contactos de la organización.",
+    "context": "Grants users in this team permissions to view the list of contacts on the organization"
+  },
+  {
+    "term": "page.permissions-group.delete-contacts",
+    "definition": "Eliminar contactos",
+    "context": "Delete contacts"
+  },
+  {
+    "term": "page.permissions-group.delete-contacts-description",
+    "definition": "Concede a los usuarios en este equipo permisos para eliminar contactos de la organización.",
+    "context": "Grants users in this team permissions to delete contacts on the organization"
+  },
+  {
+    "term": "page.permissions-group.effects-allow",
+    "definition": "Permitir",
+    "context": "Allow"
+  },
+  {
+    "term": "page.permissions-group.effects-deny",
+    "definition": "Denegar",
+    "context": "Deny"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud",
+    "definition": "Editar integraciones",
+    "context": "Edit integrations"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud-api",
+    "definition": "Panel de Desarrolladores",
+    "context": "Developers panel"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud-api-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al panel de Desarrolladores para gestionar suscripciones y tokens de nuestra API",
+    "context": "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud-description",
+    "definition": "Concede a los usuarios en este equipo permisos para gestionar las distintas integraciones en la organización",
+    "context": "Grants users in this team permissions to manage the different integrations of the organization"
+  },
+  {
+    "term": "page.permissions-group.org-settings",
+    "definition": "Configuración de la organización",
+    "context": "Edit organization settings"
+  },
+  {
+    "term": "page.permissions-group.org-settings-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder y modificar la configuración general de la organización.",
+    "context": "Grants users in this team permissions to access and edit the general settings of the organization."
+  },
+  {
+    "term": "page.permissions-group.permissions-group",
+    "definition": "Permisos de equipos",
+    "context": "Team permissions"
+  },
+  {
+    "term": "page.permissions-group.petitions-change-path",
+    "definition": "Mover plantillas y parallels",
+    "context": "Move templates and parallels"
+  },
+  {
+    "term": "page.permissions-group.petitions-change-path-description",
+    "definition": "Concede a los usuarios en este equipo permisos para crear y administrar carpetas de plantillas y parallels.",
+    "context": "Grants users in this team permissions to create and manage folders of templates and parallels"
+  },
+  {
+    "term": "page.permissions-group.petitions-create",
+    "definition": "Crear parallels",
+    "context": "Create petitions"
+  },
+  {
+    "term": "page.permissions-group.petitions-create-description",
+    "definition": "Concede a los usuarios en este equipo permisos para crear parallels en la organización.",
+    "context": "Grants users in this team permissions to create parallels on the organization."
+  },
+  {
+    "term": "page.permissions-group.petitions-create-templates",
+    "definition": "Crear plantillas",
+    "context": "Create templates"
+  },
+  {
+    "term": "page.permissions-group.petitions-create-templates-description",
+    "definition": "Concede a los usuarios en este equipo permisos para crear plantillas en la organización.",
+    "context": "Grants users in this team permissions to create templates on the organization."
+  },
+  {
+    "term": "page.permissions-group.petitions-send-on-behalf",
+    "definition": "Enviar en nombre de",
+    "context": "Send on behalf"
+  },
+  {
+    "term": "page.permissions-group.petitions-send-on-behalf-description",
+    "definition": "Concede a los usuarios en este equipo permisos para enviar parallels en nombre de cualquier otro usuario en la organización.",
+    "context": "Grants users in this team permissions to send parallels on behalf of any other user in their organization."
+  },
+  {
+    "term": "page.permissions-group.profile-alerts-list",
+    "definition": "Ver alertas de perfiles",
+    "context": "View alerts"
+  },
+  {
+    "term": "page.permissions-group.profile-alerts-list-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al listado de alertas de vencimiento de propiedades en los perfiles",
+    "context": "Grants users in this team permissions to view the list of property expiration alerts of the profiles"
+  },
+  {
+    "term": "page.permissions-group.profile-delete-profiles",
+    "definition": "Eliminar perfiles",
+    "context": "Delete profiles"
+  },
+  {
+    "term": "page.permissions-group.profile-delete-profiles-description",
+    "definition": "Concede a los usuarios en este equipo permisos para enviar perfiles a la papelera.",
+    "context": "Grants users in this team permissions to send profiles to the thrash bin."
+  },
+  {
+    "term": "page.permissions-group.profile-types-crud",
+    "definition": "Editar tipos de perfiles",
+    "context": "Edit profile types"
+  },
+  {
+    "term": "page.permissions-group.profile-types-crud-description",
+    "definition": "Concede a los usuarios en este equipo permisos para configurar y crear tipos de perfiles en la organización",
+    "context": "Grants users in this team permissions to configure and create profile types on the organization."
+  },
+  {
+    "term": "page.permissions-group.profiles-close",
+    "definition": "Cerrar perfiles",
+    "context": "Close profiles"
+  },
+  {
+    "term": "page.permissions-group.profiles-close-description",
+    "definition": "Concede a los usuarios en este equipo permisos para cerrar y reabrir perfiles en la organización.",
+    "context": "Grants users in this team permissions to close and reopen profiles on the organization"
+  },
+  {
+    "term": "page.permissions-group.profiles-create",
+    "definition": "Crear perfiles",
+    "context": "Create profiles"
+  },
+  {
+    "term": "page.permissions-group.profiles-create-description",
+    "definition": "Concede a los usuarios en este equipo permisos para crear y gestionar perfiles en la organización.",
+    "context": "Grants users in this team permissions to create and manage profiles on the organization"
+  },
+  {
+    "term": "page.permissions-group.profiles-delete-permanently-profiles",
+    "definition": "Eliminar perfiles permanentemente",
+    "context": "Delete profiles permanently"
+  },
+  {
+    "term": "page.permissions-group.profiles-delete-permanently-profiles-description",
+    "definition": "Concede a los usuarios en este equipo permisos para eliminar perfiles de forma permanente.",
+    "context": "Grants users in this team permissions to permanently delete profiles."
+  },
+  {
+    "term": "page.permissions-group.profiles-list",
+    "definition": "Ver perfiles",
+    "context": "List profiles"
+  },
+  {
+    "term": "page.permissions-group.profiles-list-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al listado de perfiles creados en la organización.",
+    "context": "Grants users in this team permissions to view the list of profiles created on the organization"
+  },
+  {
+    "term": "page.permissions-group.profiles-subscribe",
+    "definition": "Suscripción a perfiles",
+    "context": "Profiles subscribe"
+  },
+  {
+    "term": "page.permissions-group.profiles-subscribe-description",
+    "definition": "Concede a los usuarios en este equipo permisos para gestionar las suscripciones a alertas de los perfiles en la organización.",
+    "context": "Grants users in this team permissions to manage profile alerts subscriptions"
+  },
+  {
+    "term": "page.permissions-group.reports-overview",
+    "definition": "Reporte general",
+    "context": "Reports overview"
+  },
+  {
+    "term": "page.permissions-group.reports-overview-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al reporte general de uso de la organización.",
+    "context": "Grants users in this team permissions to view the general usage report of the organization"
+  },
+  {
+    "term": "page.permissions-group.reports-template-replies",
+    "definition": "Respuestas de plantillas",
+    "context": "Template replies"
+  },
+  {
+    "term": "page.permissions-group.reports-template-replies-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al reporte de respuestas de plantillas de la organización.",
+    "context": "Grants users in this team permissions to view the template replies report of the organization"
+  },
+  {
+    "term": "page.permissions-group.reports-template-statistics",
+    "definition": "Estadísticas de plantillas",
+    "context": "Template statistics"
+  },
+  {
+    "term": "page.permissions-group.reports-template-statistics-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al reporte de estadísitcas de plantillas de la organización.",
+    "context": "Grants users in this team permissions to view the template statistics report of the organization"
+  },
+  {
+    "term": "page.permissions-group.superadmin",
+    "definition": "SuperAdmin",
+    "context": "SuperAdmin"
+  },
+  {
+    "term": "page.permissions-group.superadmin-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al panel de administración (sólo para la org de Parallel)",
+    "context": "Grants users in this team permissions to access the Admin Panel. (only for Parallel org)"
+  },
+  {
+    "term": "page.permissions-group.tags-crud-tags",
+    "definition": "Editar etiquetas",
+    "context": "Edit tags"
+  },
+  {
+    "term": "page.permissions-group.tags-crud-tags-description",
+    "definition": "Concede a los usuarios en este equipo permisos para crear, modificar y eliminar etiquetas para las plantillas y parallels de la organización.",
+    "context": "Grants users in this team permissions to create, edit and delete tags for the templates and parallels on the organization"
+  },
+  {
+    "term": "page.permissions-group.teams-crud",
+    "definition": "Editar equipos",
+    "context": "Edit teams"
+  },
+  {
+    "term": "page.permissions-group.teams-crud-description",
+    "definition": "Concede a los usuarios en este equipo permisos para gestionar los equipos en la organización.",
+    "context": "Grants users in this team permissions to manage the teams on the organization"
+  },
+  {
+    "term": "page.permissions-group.teams-edit-permissions",
+    "definition": "Editar permisos de equipo",
+    "context": "Edit team permissions"
+  },
+  {
+    "term": "page.permissions-group.teams-edit-permissions-description",
+    "definition": "Concede a los usuarios en este equipo permisos para gestionar el listado de permisos de cada equipo en la organización.",
+    "context": "Grants users in this team permissions to manage the permissions of each team on the organization"
+  },
+  {
+    "term": "page.permissions-group.teams-list",
+    "definition": "Ver equipos",
+    "context": "View teams"
+  },
+  {
+    "term": "page.permissions-group.teams-list-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al listado completo de equipos de la organización.",
+    "context": "Grants users in this team permissions to view the list of teams on the organization"
+  },
+  {
+    "term": "page.permissions-group.users-crud",
+    "definition": "Editar usuarios",
+    "context": "Edit users"
+  },
+  {
+    "term": "page.permissions-group.users-crud-description",
+    "definition": "Concede a los usuarios en este equipo permisos para gestionar los usuarios en la organización.",
+    "context": "Grants users in this team permissions to manage the users on the organization"
+  },
+  {
+    "term": "page.permissions-group.users-ghost-login",
+    "definition": "Acceder como...",
+    "context": "Ghost login"
+  },
+  {
+    "term": "page.permissions-group.users-ghost-login-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder a la cuenta de cualquier usuario en la organización, incluyendo el propietario.",
+    "context": "Grants users in this team permissions to access the account of any user on the organization, including the owner."
+  },
+  {
+    "term": "page.permissions-group.users-list",
+    "definition": "Ver usuarios",
+    "context": "View users"
+  },
+  {
+    "term": "page.permissions-group.users-list-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder al listado completo de usuarios de la organización.",
+    "context": "Grants users in this team permissions to view the list of users on the organization"
   },
   {
     "term": "page.petition-replies.export-pdf",

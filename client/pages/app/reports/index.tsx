@@ -26,6 +26,7 @@ import { Reports_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -35,10 +36,15 @@ export function Reports() {
     data: { me, realMe },
   } = useAssertQuery(Reports_userDocument);
 
+  const hasOverviewAccess = useHasPermission("REPORTS:OVERVIEW");
+  const hasTemplateStatisticsAccess = useHasPermission("REPORTS:TEMPLATE_STATISTICS");
+  const hasTemplateRepliesAccess = useHasPermission("REPORTS:TEMPLATE_REPLIES");
+
   const navigate = useHandleNavigation();
-  const reports = useMemo(
-    () => [
-      {
+  const reports = useMemo(() => {
+    const withAccess = [];
+    if (hasOverviewAccess) {
+      withAccess.push({
         imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_overview.png`,
         title: intl.formatMessage({ id: "page.reports.overview", defaultMessage: "Overview" }),
         description: intl.formatMessage({
@@ -46,8 +52,11 @@ export function Reports() {
           defaultMessage: "Get an overview of the volume and status of all the parallels.",
         }),
         href: "/app/reports/overview",
-      },
-      {
+      });
+    }
+
+    if (hasTemplateStatisticsAccess) {
+      withAccess.push({
         imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_templates.png`,
         title: intl.formatMessage({
           id: "page.reports.statistics",
@@ -58,8 +67,11 @@ export function Reports() {
           defaultMessage: "Analyze the statistics obtained from the parallels of a template.",
         }),
         href: "/app/reports/statistics",
-      },
-      {
+      });
+    }
+
+    if (hasTemplateRepliesAccess) {
+      withAccess.push({
         imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_replies.png`,
         title: intl.formatMessage({ id: "page.reports.replies", defaultMessage: "Replies" }),
         description: intl.formatMessage({
@@ -67,10 +79,10 @@ export function Reports() {
           defaultMessage: "Analyze the answers obtained in the parallels.",
         }),
         href: "/app/reports/replies",
-      },
-    ],
-    [navigate, intl.locale],
-  );
+      });
+    }
+    return withAccess;
+  }, [navigate, intl.locale]);
 
   return (
     <AppLayout

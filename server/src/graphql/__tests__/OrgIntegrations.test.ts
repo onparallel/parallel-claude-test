@@ -2,8 +2,6 @@ import { addDays } from "date-fns";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { omit } from "remeda";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
   OrgIntegration,
@@ -11,6 +9,8 @@ import {
   PetitionSignatureRequest,
   User,
 } from "../../db/__types";
+import { KNEX } from "../../db/knex";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -31,11 +31,9 @@ describe("GraphQL/OrgIntegrations", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
-    const [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      organization_role: "NORMAL",
-    }));
+    const [normalUser] = await mocks.createRandomUsers(organization.id);
     ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken("normal-token", normalUser.id));
 
     integrations = await mocks.createOrgIntegration([

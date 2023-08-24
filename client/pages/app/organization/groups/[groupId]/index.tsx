@@ -1,49 +1,34 @@
 import { gql, useMutation } from "@apollo/client";
-import { Flex, MenuDivider, MenuItem, MenuList, Text, useToast } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon, UserXIcon } from "@parallel/chakra/icons";
+import { Flex, Text, useToast } from "@chakra-ui/react";
+import { UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { EditableHeading } from "@parallel/components/common/EditableHeading";
-import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { WhenPermission } from "@parallel/components/common/WhenPermission";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
-import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/dialogs/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/dialogs/ConfirmRemoveMemberDialog";
 import {
-  UserGroupReference,
-  userGroupReferenceText,
-} from "@parallel/components/petition-activity/UserGroupReference";
-import {
   OrganizationGroup_UserGroupMemberFragment,
   OrganizationGroup_addUsersToUserGroupDocument,
-  OrganizationGroup_cloneUserGroupsDocument,
-  OrganizationGroup_deleteUserGroupDocument,
   OrganizationGroup_removeUsersFromGroupDocument,
-  OrganizationGroup_updateUserGroupDocument,
   OrganizationGroup_userDocument,
   OrganizationGroup_userGroupDocument,
-  UserLocale,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { asSupportedUserLocale } from "@parallel/utils/locales";
-import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort, sortBy } from "remeda";
-import { useConfirmDeleteGroupsDialog } from "..";
 
 const SORTING = ["fullName", "email", "addedAt"] as const;
 
@@ -62,7 +47,7 @@ type OrganizationGroupProps = UnwrapPromise<ReturnType<typeof OrganizationGroup.
 function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const intl = useIntl();
   const toast = useToast();
-  const router = useRouter();
+
   const [state, setQueryState] = useQueryState(QUERY_STATE);
 
   const {
@@ -111,11 +96,6 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const { selectedRows, onChangeSelectedIds } = useSelection(userList, "id");
 
   const [search, setSearch] = useState(state.search);
-  const [name, setName] = useState(userGroupReferenceText(userGroup!, intl.locale as UserLocale));
-
-  useEffect(() => {
-    setName(userGroupReferenceText(userGroup!, intl.locale as UserLocale));
-  }, [userGroup]);
 
   const columns = useOrganizationGroupTableColumns();
 
@@ -138,41 +118,6 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     },
     [debouncedOnSearchChange],
   );
-
-  const [updateUserGroup] = useMutation(OrganizationGroup_updateUserGroupDocument);
-  const handleChangeGroupName = async (newName: string) => {
-    if (newName.trim() && name.trim() !== newName.trim()) {
-      await updateUserGroup({
-        variables: {
-          id: groupId,
-          data: {
-            name: newName,
-          },
-        },
-      });
-    }
-  };
-
-  const [deleteUserGroup] = useMutation(OrganizationGroup_deleteUserGroupDocument);
-  const confirmDelete = useConfirmDeleteGroupsDialog();
-  const handleDeleteGroup = async () => {
-    const [error] = await withError(confirmDelete({ name }));
-    if (!error) {
-      await deleteUserGroup({ variables: { ids: [groupId] } });
-      router.push("/app/organization/groups");
-    }
-  };
-
-  const [cloneUserGroups] = useMutation(OrganizationGroup_cloneUserGroupsDocument);
-
-  const handleCloneGroup = async () => {
-    const { data } = await cloneUserGroups({
-      variables: { ids: [groupId], locale: asSupportedUserLocale(intl.locale) },
-    });
-    const cloneUserGroupId = data?.cloneUserGroups[0].id || "";
-
-    router.push(`/app/organization/groups/${cloneUserGroupId}`);
-  };
 
   const [addUsersToUserGroup] = useMutation(OrganizationGroup_addUsersToUserGroupDocument);
   const showAddMemberDialog = useAddMemberGroupDialog();
@@ -217,53 +162,12 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   };
 
   return (
-    <OrganizationSettingsLayout
-      title={name}
-      basePath="/app/organization/groups"
+    <UserGroupLayout
+      groupId={groupId}
+      currentTabKey="users"
       me={me}
       realMe={realMe}
-      header={
-        <Flex width="100%" justifyContent="space-between" alignItems="center">
-          <EditableHeading
-            maxLength={100}
-            isDisabled={!canEdit}
-            value={name}
-            onChange={handleChangeGroupName}
-          />
-          <WhenPermission permission="TEAMS:CRUD_TEAMS">
-            <MoreOptionsMenuButton
-              variant="outline"
-              options={
-                <MenuList>
-                  <MenuItem
-                    onClick={handleCloneGroup}
-                    isDisabled={!canEdit}
-                    icon={<CopyIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="component.group-header.clone-label"
-                      defaultMessage="Clone team"
-                    />
-                  </MenuItem>
-                  <MenuDivider />
-                  <MenuItem
-                    color="red.500"
-                    onClick={handleDeleteGroup}
-                    isDisabled={!canEdit}
-                    icon={<DeleteIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="component.group-header.delete-label"
-                      defaultMessage="Delete team"
-                    />
-                  </MenuItem>
-                </MenuList>
-              }
-            />
-          </WhenPermission>
-        </Flex>
-      }
-      showBackButton={true}
+      userGroup={userGroup}
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={24}>
         <TablePage
@@ -332,7 +236,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           }
         />
       </Flex>
-    </OrganizationSettingsLayout>
+    </UserGroupLayout>
   );
 }
 
@@ -399,10 +303,10 @@ const _fragments = {
           ...OrganizationGroup_UserGroupMember
         }
         type
-        ...UserGroupReference_UserGroup
+        ...UserGroupLayout_UserGroup
       }
       ${this.UserGroupMember}
-      ${UserGroupReference.fragments.UserGroup}
+      ${UserGroupLayout.fragments.UserGroup}
     `;
   },
   get UserGroupMember() {
@@ -422,14 +326,6 @@ const _fragments = {
 
 const _mutations = [
   gql`
-    mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
-      updateUserGroup(id: $id, data: $data) {
-        ...OrganizationGroup_UserGroup
-      }
-    }
-    ${_fragments.UserGroup}
-  `,
-  gql`
     mutation OrganizationGroup_addUsersToUserGroup($userGroupId: GID!, $userIds: [GID!]!) {
       addUsersToUserGroup(userGroupId: $userGroupId, userIds: $userIds) {
         ...OrganizationGroup_UserGroup
@@ -440,19 +336,6 @@ const _mutations = [
   gql`
     mutation OrganizationGroup_removeUsersFromGroup($userGroupId: GID!, $userIds: [GID!]!) {
       removeUsersFromGroup(userGroupId: $userGroupId, userIds: $userIds) {
-        ...OrganizationGroup_UserGroup
-      }
-    }
-    ${_fragments.UserGroup}
-  `,
-  gql`
-    mutation OrganizationGroup_deleteUserGroup($ids: [GID!]!) {
-      deleteUserGroup(ids: $ids)
-    }
-  `,
-  gql`
-    mutation OrganizationGroup_cloneUserGroups($ids: [GID!]!, $locale: UserLocale!) {
-      cloneUserGroups(userGroupIds: $ids, locale: $locale) {
         ...OrganizationGroup_UserGroup
       }
     }
@@ -471,9 +354,9 @@ const _queries = [
   `,
   gql`
     query OrganizationGroup_user {
-      ...OrganizationSettingsLayout_Query
+      ...UserGroupLayout_Query
     }
-    ${OrganizationSettingsLayout.fragments.Query}
+    ${UserGroupLayout.fragments.Query}
   `,
 ];
 

@@ -1315,7 +1315,7 @@ type Mutation {
     lastName: String!
     locale: UserLocale!
     orgId: GID
-    role: OrganizationRole!
+    role: OrganizationRole
     userGroupIds: [GID!]
   ): User!
   loginAs(userId: GID!): Result!
@@ -1856,7 +1856,7 @@ type Mutation {
   tagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
 
   """
-  Transfers the ownership of an organization to a given user. Old owner will get ADMIN role
+  Transfers the ownership of an organization to a given user.
   """
   transferOrganizationOwnership(
     """
@@ -2028,6 +2028,7 @@ type Mutation {
   Updates the role of another user in the organization.
   """
   updateOrganizationUser(role: OrganizationRole!, userGroupIds: [GID!], userId: GID!): User!
+    @deprecated(reason: "use updateUserGroupMembership")
 
   """
   Updates the user limit for a organization
@@ -2253,6 +2254,19 @@ type Mutation {
   Updates the name of a given user group
   """
   updateUserGroup(data: UpdateUserGroupInput!, id: GID!): UserGroup!
+
+  """
+  Inserts the user into all provided user groups.
+  """
+  updateUserGroupMembership(userGroupIds: [GID!]!, userId: GID!): User!
+
+  """
+  Updates the permissions of a user group
+  """
+  updateUserGroupPermissions(
+    permissions: [UpdateUserGroupPermissionsInput!]!
+    userGroupId: GID!
+  ): UserGroup!
 
   """
   Sets the locale passed as arg as the preferred language of the user to see the page
@@ -6492,6 +6506,17 @@ input UpdateUserGroupInput {
   name: String
 }
 
+input UpdateUserGroupPermissionsInput {
+  effect: UpdateUserGroupPermissionsInputEffect!
+  name: String!
+}
+
+enum UpdateUserGroupPermissionsInputEffect {
+  ALLOW
+  DENY
+  NONE
+}
+
 """
 The `Upload` scalar type represents a file upload.
 """
@@ -6548,6 +6573,7 @@ type User implements Timestamps {
   """
   initials: String
   isMe: Boolean!
+  isOrgOwner: Boolean!
   isSsoUser: Boolean!
   isSuperAdmin: Boolean!
   lastActiveAt: DateTime
@@ -6585,7 +6611,7 @@ type User implements Timestamps {
   """
   petitionListViews: [PetitionListView!]!
   preferredLocale: UserLocale!
-  role: OrganizationRole!
+  role: OrganizationRole @deprecated(reason: "not used anymore")
   status: UserStatus!
 
   """
@@ -6628,6 +6654,7 @@ type UserGroup implements Timestamps {
   memberCount: Int!
   members: [UserGroupMember!]!
   name: String!
+  permissions: [UserGroupPermission!]!
   type: UserGroupType!
 
   """
@@ -6655,6 +6682,17 @@ type UserGroupPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type UserGroupPermission {
+  effect: UserGroupPermissionEffect!
+  id: GID!
+  name: String!
+}
+
+enum UserGroupPermissionEffect {
+  ALLOW
+  DENY
 }
 
 enum UserGroupType {

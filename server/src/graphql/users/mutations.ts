@@ -5,7 +5,16 @@ import {
   NotAuthorizedException,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { differenceInMinutes } from "date-fns";
-import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
+import {
+  arg,
+  booleanArg,
+  enumType,
+  list,
+  mutationField,
+  nonNull,
+  nullable,
+  stringArg,
+} from "nexus";
 import pMap from "p-map";
 import { difference, isDefined, partition, uniq, zip } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
@@ -46,6 +55,7 @@ import {
   contextUserHasPermission,
   contextUserIsNotSso,
   emailIsNotRegisteredInTargetOrg,
+  userHasStatus,
   userIsNotContextUser,
   userIsNotOrgOwner,
   userIsNotSSO,
@@ -128,13 +138,15 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
     email: nonNull(stringArg()),
     firstName: nonNull(stringArg()),
     lastName: nonNull(stringArg()),
-    role: nonNull(arg({ type: "OrganizationRole" })),
+    /** @deprecated remove this argument */
+    role: nullable(arg({ type: "OrganizationRole" })),
     locale: nonNull("UserLocale"),
     userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
     orgId: globalIdArg("Organization"),
   },
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
+    /** @deprecated remove this validation */
     (_, { role }, ctx, info) => {
       if (role === "OWNER") {
         throw new ArgValidationError(info, "role", "Can't create a new user with OWNER role.");
@@ -169,7 +181,8 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
       ctx.users.createUser(
         {
           org_id: orgId,
-          organization_role: args.role,
+          /** @deprecated */
+          organization_role: args.role ?? null,
         },
         {
           cognito_id: cognitoId!,
@@ -190,7 +203,6 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
           email,
           first_name: firstName,
           last_name: lastName,
-          role: args.role,
         },
       }),
     ]);
@@ -347,7 +359,46 @@ export const deactivateUser = mutationField("deactivateUser", {
   },
 });
 
+export const updateUserGroupMembership = mutationField("updateUserGroupMembership", {
+  description: "Inserts the user into all provided user groups.",
+  type: "User",
+  authorize: authenticateAnd(
+    contextUserHasPermission("USERS:CRUD_USERS"),
+    userHasAccessToUsers("userId"),
+    userHasAccessToUserGroups("userGroupIds"),
+    userHasStatus("userId", ["ACTIVE", "ON_HOLD"]),
+  ),
+  args: {
+    userId: nonNull(globalIdArg("User")),
+    userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
+  },
+  resolve: async (_, { userId, userGroupIds }, ctx) => {
+    return await ctx.petitions.withTransaction(async (t) => {
+      const userGroups = await ctx.userGroups.loadUserGroupsByUserId(userId);
+      const actualUserGroupsIds = userGroups.map((userGroup) => userGroup.id);
+
+      const userGroupsIdsToDelete = difference(actualUserGroupsIds, userGroupIds);
+      const userGroupsIdsToAdd = difference(userGroupIds, actualUserGroupsIds);
+
+      await ctx.userGroups.addUsersToGroups(userGroupsIdsToAdd, userId, `User:${ctx.user!.id}`, t);
+
+      await ctx.userGroups.removeUsersFromGroups(
+        userId,
+        userGroupsIdsToDelete,
+        `User:${ctx.user!.id}`,
+        t,
+      );
+
+      ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(userId);
+
+      return (await ctx.users.loadUser(userId))!;
+    });
+  },
+});
+
+/** @deprecated */
 export const updateOrganizationUser = mutationField("updateOrganizationUser", {
+  deprecation: "use updateUserGroupMembership",
   description: "Updates the role of another user in the organization.",
   type: "User",
   authorize: authenticateAnd(

@@ -1,9 +1,16 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, omit, uniq } from "remeda";
+import { groupBy, omit, partition, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
-import { CreateUserGroup, User, UserGroup, UserGroupType } from "../__types";
+import {
+  CreateUserGroup,
+  User,
+  UserGroup,
+  UserGroupPermissionEffect,
+  UserGroupPermissionName,
+  UserGroupType,
+} from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { SortBy, escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -353,4 +360,58 @@ export class UserGroupRepository extends BaseRepository {
   readonly loadAllUsersGroupsByOrgId = this.buildLoadMultipleBy("user_group", "org_id", (q) =>
     q.where("type", "ALL_USERS").whereNull("deleted_at"),
   );
+
+  readonly loadUserGroupPermissionsByUserGroupId = this.buildLoadMultipleBy(
+    "user_group_permission",
+    "user_group_id",
+    (q) =>
+      q.whereNull("deleted_at").orderBy([
+        { column: "created_at", order: "asc" },
+        { column: "id", order: "asc" },
+      ]),
+  );
+
+  async upsertUserGroupPermissions(
+    userGroupId: number,
+    permissions: { name: UserGroupPermissionName; effect: UserGroupPermissionEffect | "NONE" }[],
+    createdBy: string,
+  ) {
+    if (permissions.length === 0) {
+      return;
+    }
+
+    const [remove, upsert] = partition(permissions, (p) => p.effect === "NONE");
+
+    if (remove.length > 0) {
+      await this.from("user_group_permission")
+        .where("user_group_id", userGroupId)
+        .whereNull("deleted_at")
+        .whereIn(
+          "name",
+          remove.map((p) => p.name),
+        )
+        .update({
+          deleted_at: this.now(),
+          deleted_by: createdBy,
+        });
+    }
+
+    if (upsert.length > 0) {
+      await this.raw(
+        /* sql */ `
+          insert into user_group_permission ("user_group_id", "name", "effect", "created_by") ? 
+            on conflict ("user_group_id", "name") where deleted_at is null do update
+          set
+            effect = EXCLUDED.effect,
+            updated_by = ?,
+            updated_at = now()
+          returning *;
+        `,
+        [
+          this.sqlValues(upsert.map(({ effect, name }) => [userGroupId, name, effect, createdBy])),
+          createdBy,
+        ],
+      );
+    }
+  }
 }

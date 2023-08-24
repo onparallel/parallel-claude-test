@@ -111,7 +111,7 @@ describe("GraphQL/Profiles", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
     await knex
       .from("organization")
       .update({ default_timezone: "Europe/Madrid" })
@@ -119,9 +119,7 @@ describe("GraphQL/Profiles", () => {
 
     await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
 
-    const [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      organization_role: "NORMAL",
-    }));
+    const [normalUser] = await mocks.createRandomUsers(organization.id);
     const { apiKey } = await mocks.createUserAuthToken("normal-token", normalUser.id);
     normalUserApiKey = apiKey;
   });
@@ -914,9 +912,7 @@ describe("GraphQL/Profiles", () => {
     });
 
     it("returns right permission when field has overrides", async () => {
-      const [otherUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-        organization_role: "NORMAL",
-      }));
+      const [otherUser] = await mocks.createRandomUsers(organization.id);
 
       await mocks.knex
         .from("profile_type_field")
@@ -4264,14 +4260,17 @@ describe("GraphQL/Profiles", () => {
 
     beforeEach(async () => {
       profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
-      users = await mocks.createRandomUsers(organization.id, 3, (i) => ({
-        organization_role: i === 0 ? "COLLABORATOR" : "NORMAL",
-      }));
+      users = await mocks.createRandomUsers(organization.id, 3);
 
       ({ apiKey: collaboratorApiKey } = await mocks.createUserAuthToken(
         "collaborator-apikey",
         users[0].id,
       ));
+
+      const [collaboratorGroup] = await mocks.createUserGroups(1, organization.id, [
+        { effect: "DENY", name: "PROFILES:SUBSCRIBE_PROFILES" },
+      ]);
+      await mocks.insertUserGroupMembers(collaboratorGroup.id, [users[0].id]);
     });
 
     it("subscribes to a profile", async () => {

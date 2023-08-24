@@ -1,9 +1,9 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
+import { UserGroupPermissionName, UserStatus } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { Maybe, MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
-import { PermissionName } from "./permissions";
 
 export function rootIsContextUser<FieldName extends string>(): FieldAuthorizeResolver<
   "User",
@@ -53,7 +53,7 @@ export function userIsNotOrgOwner<
   return async (_, args, ctx) => {
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
     const users = await ctx.users.loadUser(userIds);
-    return users.every((u) => u && u.organization_role !== "OWNER");
+    return users.every((u) => u && !u.is_org_owner);
   };
 }
 
@@ -87,10 +87,25 @@ export function emailIsNotRegisteredInTargetOrg<
 }
 
 export function contextUserHasPermission<TypeName extends string, FieldName extends string>(
-  permission: MaybeArray<PermissionName>,
+  permission: MaybeArray<UserGroupPermissionName>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
     const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
     return unMaybeArray(permission).every((p) => userPermissions.includes(p));
+  };
+}
+
+export function userHasStatus<
+  TypeName extends string,
+  FieldName extends string,
+  TUserIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  userIdArg: TUserIdArg,
+  validStatus: MaybeArray<UserStatus>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const userId = args[userIdArg] as unknown as number;
+    const user = await ctx.users.loadUser(userId);
+    return (user && unMaybeArray(validStatus).includes(user.status)) ?? false;
   };
 }

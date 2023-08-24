@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, Button, Grid, HStack, Heading, Stack } from "@chakra-ui/react";
 import { EditIcon, SaveIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
+import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -229,7 +229,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
         </Button>
       </Box>
       <Stack spacing={8} gridArea="c">
-        {!userHasPermission ? <OnlyAdminsAlert /> : null}
+        {!userHasPermission ? <RestrictedFeatureAlert /> : null}
         <FormProvider {...form}>
           <DocumentThemeEditor
             themeId={selectedTheme.id}

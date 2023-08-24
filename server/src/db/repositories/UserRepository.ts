@@ -1,12 +1,11 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, omit, uniq } from "remeda";
-import { PERMISSIONS, PermissionName, PermissionNameValues } from "../../graphql/users/permissions";
+import { groupBy, indexBy, omit, uniq } from "remeda";
 import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray } from "../../util/types";
-import { CreateUser, CreateUserData, User, UserData, UserOrganizationRoleValues } from "../__types";
+import { CreateUser, CreateUserData, User, UserData, UserGroupPermissionName } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -42,19 +41,82 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUserData = this.buildLoadBy("user_data", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadUserPermissions = this.buildLoader<number, PermissionName[]>(async (userIds, t) => {
-    const users = await this.loadUser.raw(userIds, t);
-    return users.map((user) => {
-      return isDefined(user)
-        ? user.organization_role === "OWNER"
-          ? PermissionNameValues
-          : UserOrganizationRoleValues.slice(
-              0,
-              UserOrganizationRoleValues.indexOf(user.organization_role) + 1,
-            ).flatMap((role) => PERMISSIONS[role])
-        : [];
-    });
-  });
+  async getUsersWithPermission(
+    orgId: number,
+    permission: UserGroupPermissionName,
+  ): Promise<User[]> {
+    return await this.raw<User>(
+      /* sql */ `
+      with "owner" as (
+        select u.* from "user" u
+        join organization o on u.org_id = o.id
+        where u.is_org_owner and org_id = ? and (case when ? = 'SUPERADMIN' then o.status = 'ROOT' else true end)
+      ),
+      user_with_permission as (
+        select distinct u.*
+          from user_group ug 
+          join user_group_permission ugp on ugp.user_group_id = ug.id
+          join user_group_member ugm on ug.id = ugm.user_group_id
+          join "user" u on u.id = ugm.user_id
+        where ug.org_id = ? and ug.deleted_at is null
+          and ugp.name = ? and ugp.deleted_at is null
+          and ugm.deleted_at is null 
+        group by u.id, ugp.name
+        having every(ugp.effect = 'ALLOW')  
+      )
+      select * from "owner"
+      union distinct
+      select * from user_with_permission;
+    `,
+      [orgId, permission, orgId, permission],
+    );
+  }
+
+  readonly loadUserPermissions = this.buildLoader<number, UserGroupPermissionName[]>(
+    async (userIds, t) => {
+      const results = await this.raw<{ user_id: number; permissions: UserGroupPermissionName[] }>(
+        /* sql */ `
+          with user_group_permission_name as (
+            select unnest(enum_range(NULL::user_group_permission_name)) as name
+          ),
+          superadmin_permission as (
+            select
+              u.id as user_id,
+              ugpn.name
+            from "user" u
+            join organization o on u.org_id = o.id
+            cross join user_group_permission_name ugpn
+            where u.id in ?
+              and u.is_org_owner = true
+              -- SUPERADMIN only in ROOT organizations
+              and (case when ugpn.name = 'SUPERADMIN' then o.status = 'ROOT' else true end)
+          ),
+          db_permission as (
+            select ugm.user_id, ugp.name
+              from user_group_member ugm
+              join user_group ug on ug.id = ugm.user_group_id
+              join user_group_permission ugp on ugp.user_group_id = ugm.user_group_id
+            where ugm.user_id in ?
+            and ug.deleted_at is null and ugm.deleted_at is null and ugp.deleted_at is null
+            group by ugm.user_id, ugp.name
+            having every(ugp.effect = 'ALLOW')
+          ),
+          all_permission as (
+            select * from superadmin_permission
+            union distinct
+            select * from db_permission
+            order by user_id, name
+          )
+          select user_id, json_agg(name) as permissions
+          from all_permission
+          group by user_id
+        `,
+        [this.sqlIn(userIds), this.sqlIn(userIds)],
+      );
+      const byUserId = indexBy(results, (r) => r.user_id);
+      return userIds.map((userId) => byUserId[userId]?.permissions ?? []);
+    },
+  );
 
   readonly loadUserDelegatesByUserId = this.buildLoader<number, User[]>(async (userIds, t) => {
     const users = await this.raw<User & { user_id: number }>(

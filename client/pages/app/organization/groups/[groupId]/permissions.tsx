@@ -1,0 +1,704 @@
+import { gql, useMutation } from "@apollo/client";
+import {
+  Badge,
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  HStack,
+  Select,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { Card, CardHeader } from "@parallel/components/common/Card";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { HighlightText } from "@parallel/components/common/HighlightText";
+import { SearchInput } from "@parallel/components/common/SearchInput";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
+import { withPermission } from "@parallel/components/common/withPermission";
+import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
+import {
+  PermissionsGroup_updateUserGroupPermissionsDocument,
+  PermissionsGroup_userDocument,
+  PermissionsGroup_userGroupDocument,
+  UpdateUserGroupPermissionsInputEffect,
+} from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { compose } from "@parallel/utils/compose";
+import { UnwrapPromise } from "@parallel/utils/types";
+import { useMemo, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
+import { zip } from "remeda";
+
+type PermissionsGroupProps = UnwrapPromise<ReturnType<typeof PermissionsGroup.getInitialProps>>;
+
+interface PermissionsFormData {
+  permissions: {
+    name: string;
+    effect: UpdateUserGroupPermissionsInputEffect;
+  }[];
+}
+
+export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
+  const intl = useIntl();
+  const {
+    data: { me, realMe },
+  } = useAssertQuery(PermissionsGroup_userDocument);
+
+  const {
+    data: { userGroup },
+  } = useAssertQuery(PermissionsGroup_userGroupDocument, {
+    variables: {
+      id: groupId,
+    },
+  });
+
+  const permissionsCategories = useMemo(
+    () => [
+      ...(me.organization.status === "ROOT"
+        ? [
+            {
+              category: intl.formatMessage({
+                id: "page.permissions-group.category-superadmin",
+                defaultMessage: "SuperAdmin",
+              }),
+              permissions: [
+                {
+                  name: "SUPERADMIN",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.superadmin",
+                    defaultMessage: "SuperAdmin",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.superadmin-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to access the Admin Panel. (only for Parallel org)",
+                  }),
+                },
+              ],
+            },
+          ]
+        : []),
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-organization",
+          defaultMessage: "Organization",
+        }),
+        permissions: [
+          {
+            name: "ORG_SETTINGS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.org-settings",
+              defaultMessage: "Edit organization settings",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.org-settings-description",
+              defaultMessage:
+                "Grants users in this team permissions to access and edit the general settings of the organization.",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-petitions",
+          defaultMessage: "Parallels",
+        }),
+        permissions: [
+          {
+            name: "PETITIONS:SEND_ON_BEHALF",
+            title: intl.formatMessage({
+              id: "page.permissions-group.petitions-send-on-behalf",
+              defaultMessage: "Send on behalf",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.petitions-send-on-behalf-description",
+              defaultMessage:
+                "Grants users in this team permissions to send parallels on behalf of any other user in their organization.",
+            }),
+          },
+          {
+            name: "PETITIONS:CHANGE_PATH",
+            title: intl.formatMessage({
+              id: "page.permissions-group.petitions-change-path",
+              defaultMessage: "Move templates and parallels",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.petitions-change-path-description",
+              defaultMessage:
+                "Grants users in this team permissions to create and manage folders of templates and parallels",
+            }),
+          },
+          {
+            name: "PETITIONS:CREATE_TEMPLATES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.petitions-create-templates",
+              defaultMessage: "Create templates",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.petitions-create-templates-description",
+              defaultMessage:
+                "Grants users in this team permissions to create templates on the organization.",
+            }),
+          },
+          {
+            name: "PETITIONS:CREATE_PETITIONS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.petitions-create",
+              defaultMessage: "Create petitions",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.petitions-create-description",
+              defaultMessage:
+                "Grants users in this team permissions to create parallels on the organization.",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-reports",
+          defaultMessage: "Reports",
+        }),
+        permissions: [
+          {
+            name: "REPORTS:OVERVIEW",
+            title: intl.formatMessage({
+              id: "page.permissions-group.reports-overview",
+              defaultMessage: "Reports overview",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.reports-overview-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the general usage report of the organization",
+            }),
+          },
+          {
+            name: "REPORTS:TEMPLATE_STATISTICS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.reports-template-statistics",
+              defaultMessage: "Template statistics",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.reports-template-statistics-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the template statistics report of the organization",
+            }),
+          },
+          {
+            name: "REPORTS:TEMPLATE_REPLIES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.reports-template-replies",
+              defaultMessage: "Template replies",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.reports-template-replies-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the template replies report of the organization",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-profiles",
+          defaultMessage: "Profiles",
+        }),
+        permissions: [
+          {
+            name: "PROFILES:DELETE_PROFILES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profile-delete-profiles",
+              defaultMessage: "Delete profiles",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profile-delete-profiles-description",
+              defaultMessage:
+                "Grants users in this team permissions to send profiles to the thrash bin.",
+            }),
+          },
+          {
+            name: "PROFILES:DELETE_PERMANENTLY_PROFILES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profiles-delete-permanently-profiles",
+              defaultMessage: "Delete profiles permanently",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profiles-delete-permanently-profiles-description",
+              defaultMessage:
+                "Grants users in this team permissions to permanently delete profiles.",
+            }),
+          },
+          {
+            name: "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profile-types-crud",
+              defaultMessage: "Edit profile types",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profile-types-crud-description",
+              defaultMessage:
+                "Grants users in this team permissions to configure and create profile types on the organization.",
+            }),
+          },
+          {
+            name: "PROFILES:CREATE_PROFILES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profiles-create",
+              defaultMessage: "Create profiles",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profiles-create-description",
+              defaultMessage:
+                "Grants users in this team permissions to create and manage profiles on the organization",
+            }),
+          },
+          {
+            name: "PROFILES:CLOSE_PROFILES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profiles-close",
+              defaultMessage: "Close profiles",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profiles-close-description",
+              defaultMessage:
+                "Grants users in this team permissions to close and reopen profiles on the organization",
+            }),
+          },
+          {
+            name: "PROFILES:LIST_PROFILES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profiles-list",
+              defaultMessage: "List profiles",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profiles-list-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the list of profiles created on the organization",
+            }),
+          },
+          {
+            name: "PROFILE_ALERTS:LIST_ALERTS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profile-alerts-list",
+              defaultMessage: "View alerts",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profile-alerts-list-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the list of property expiration alerts of the profiles",
+            }),
+          },
+          {
+            name: "PROFILES:SUBSCRIBE_PROFILES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.profiles-subscribe",
+              defaultMessage: "Profiles subscribe",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.profiles-subscribe-description",
+              defaultMessage:
+                "Grants users in this team permissions to manage profile alerts subscriptions",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-integrations",
+          defaultMessage: "Integrations",
+        }),
+        permissions: [
+          {
+            name: "INTEGRATIONS:CRUD_INTEGRATIONS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud",
+              defaultMessage: "Edit integrations",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud-description",
+              defaultMessage:
+                "Grants users in this team permissions to manage the different integrations of the organization",
+            }),
+          },
+          {
+            name: "INTEGRATIONS:CRUD_API",
+            title: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud-api",
+              defaultMessage: "Developers panel",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud-api-description",
+              defaultMessage:
+                "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-users",
+          defaultMessage: "Users",
+        }),
+        permissions: [
+          {
+            name: "USERS:LIST_USERS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.users-list",
+              defaultMessage: "View users",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.users-list-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the list of users on the organization",
+            }),
+          },
+
+          {
+            name: "USERS:CRUD_USERS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.users-crud",
+              defaultMessage: "Edit users",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.users-crud-description",
+              defaultMessage:
+                "Grants users in this team permissions to manage the users on the organization",
+            }),
+          },
+          {
+            name: "USERS:GHOST_LOGIN",
+            title: intl.formatMessage({
+              id: "page.permissions-group.users-ghost-login",
+              defaultMessage: "Ghost login",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.users-ghost-login-description",
+              defaultMessage:
+                "Grants users in this team permissions to access the account of any user on the organization, including the owner.",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-teams",
+          defaultMessage: "Teams",
+        }),
+        permissions: [
+          {
+            name: "TEAMS:LIST_TEAMS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.teams-list",
+              defaultMessage: "View teams",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.teams-list-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the list of teams on the organization",
+            }),
+          },
+          {
+            name: "TEAMS:CRUD_TEAMS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.teams-crud",
+              defaultMessage: "Edit teams",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.teams-crud-description",
+              defaultMessage:
+                "Grants users in this team permissions to manage the teams on the organization",
+            }),
+          },
+          {
+            name: "TEAMS:CRUD_PERMISSIONS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.teams-edit-permissions",
+              defaultMessage: "Edit team permissions",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.teams-edit-permissions-description",
+              defaultMessage:
+                "Grants users in this team permissions to manage the permissions of each team on the organization",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-contacts",
+          defaultMessage: "Contacts",
+        }),
+        permissions: [
+          {
+            name: "CONTACTS:LIST_CONTACTS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.contacts-list",
+              defaultMessage: "View contacts",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.contacts-list-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the list of contacts on the organization",
+            }),
+          },
+          {
+            name: "CONTACTS:DELETE_CONTACTS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.delete-contacts",
+              defaultMessage: "Delete contacts",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.delete-contacts-description",
+              defaultMessage:
+                "Grants users in this team permissions to delete contacts on the organization",
+            }),
+          },
+        ],
+      },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-tags",
+          defaultMessage: "Tags",
+        }),
+        permissions: [
+          {
+            name: "TAGS:CRUD_TAGS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.tags-crud-tags",
+              defaultMessage: "Edit tags",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.tags-crud-tags-description",
+              defaultMessage:
+                "Grants users in this team permissions to create, edit and delete tags for the templates and parallels on the organization",
+            }),
+          },
+        ],
+      },
+    ],
+    [intl.locale],
+  );
+
+  const permissionEffects = useMemo<
+    { value: UpdateUserGroupPermissionsInputEffect; label: string }[]
+  >(
+    () => [
+      { value: "NONE", label: "-" },
+      {
+        value: "ALLOW",
+        label: intl.formatMessage({
+          id: "page.permissions-group.effects-allow",
+          defaultMessage: "Allow",
+        }),
+      },
+      {
+        value: "DENY",
+        label: intl.formatMessage({
+          id: "page.permissions-group.effects-deny",
+          defaultMessage: "Deny",
+        }),
+      },
+    ],
+    [],
+  );
+
+  const { register, control, handleSubmit, reset, formState } = useForm<PermissionsFormData>({
+    defaultValues: {
+      permissions: permissionsCategories.flatMap((category) =>
+        category.permissions.flatMap((p) => {
+          const permission = userGroup!.permissions.find((ugp) => ugp.name === p.name);
+          return { name: p.name, effect: permission?.effect ?? "NONE" };
+        }),
+      ),
+    },
+  });
+
+  const [search, setSearch] = useState("");
+
+  const { fields } = useFieldArray({ name: "permissions", control });
+
+  const [updateUserGroupPermissions, { loading: isSubmitting }] = useMutation(
+    PermissionsGroup_updateUserGroupPermissionsDocument,
+  );
+
+  async function handleSubmitPermissionsGroup(data: PermissionsFormData) {
+    const dirtyPermissions = zip(data.permissions, formState.dirtyFields.permissions ?? [])
+      .filter(([, dirty]) => dirty?.effect ?? false)
+      .map(([permission]) => permission);
+
+    await updateUserGroupPermissions({
+      variables: {
+        userGroupId: groupId,
+        permissions: dirtyPermissions,
+      },
+    });
+    reset({
+      permissions: data.permissions,
+    });
+  }
+
+  return (
+    <UserGroupLayout
+      groupId={groupId}
+      currentTabKey="permissions"
+      me={me}
+      realMe={realMe}
+      userGroup={userGroup}
+    >
+      <Box padding={4}>
+        <Card
+          maxWidth="container.sm"
+          as="form"
+          onSubmit={handleSubmit(handleSubmitPermissionsGroup)}
+        >
+          <CardHeader>
+            <FormattedMessage
+              id="page.permissions-group.permissions-group"
+              defaultMessage="Team permissions"
+            />
+          </CardHeader>
+          <Stack paddingX={6} paddingY={4} spacing={4}>
+            <SearchInput value={search ?? ""} onChange={(e) => setSearch(e.target.value)} />
+            {permissionsCategories
+              .filter(({ permissions }) => {
+                const _search = search.toLowerCase().trim();
+                return permissions.some(
+                  ({ name, title }) =>
+                    name.toLowerCase().includes(_search) || title.toLowerCase().includes(_search),
+                );
+              })
+              .map(({ category, permissions }) => {
+                return (
+                  <Stack key={category}>
+                    <Text fontWeight={500}>{category}</Text>
+                    {permissions.map(({ name, title, description }) => {
+                      const index = fields.findIndex((f) => f.name === name)!;
+                      return (
+                        <FormControl key={fields[index].id} as={HStack} alignItems="center">
+                          <Flex flex={1} alignItems="center">
+                            <FormLabel margin={0} fontWeight={400} marginLeft={2}>
+                              <HighlightText as="span" search={search}>
+                                {title}
+                              </HighlightText>
+                            </FormLabel>
+                            <HelpPopover popoverWidth="xs">
+                              <Text fontSize="sm">{description}</Text>
+                            </HelpPopover>
+                          </Flex>
+                          <HStack alignItems="center">
+                            {formState.dirtyFields?.permissions?.[index]?.effect ? (
+                              <Badge colorScheme="yellow">
+                                <FormattedMessage
+                                  id="generic.edited-indicator"
+                                  defaultMessage="Edited"
+                                />
+                              </Badge>
+                            ) : null}
+                            <Select {...register(`permissions.${index}.effect`)}>
+                              {permissionEffects.map(({ value, label }) => (
+                                <option key={value} value={value}>
+                                  {label}
+                                </option>
+                              ))}
+                            </Select>
+                          </HStack>
+                        </FormControl>
+                      );
+                    })}
+                  </Stack>
+                );
+              })}
+
+            <HStack paddingTop={6} alignSelf="flex-end">
+              <Button onClick={() => reset()} isDisabled={!formState.isDirty}>
+                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+              </Button>
+              <Button
+                colorScheme="primary"
+                type="submit"
+                isDisabled={!formState.isDirty}
+                isLoading={isSubmitting}
+              >
+                <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
+              </Button>
+            </HStack>
+          </Stack>
+        </Card>
+      </Box>
+    </UserGroupLayout>
+  );
+}
+
+const _fragments = {
+  get UserGroup() {
+    return gql`
+      fragment PermissionsGroup_UserGroup on UserGroup {
+        id
+        ...UserGroupLayout_UserGroup
+        permissions {
+          id
+          name
+          effect
+        }
+      }
+
+      ${UserGroupLayout.fragments.UserGroup}
+    `;
+  },
+};
+
+const _queries = [
+  gql`
+    query PermissionsGroup_userGroup($id: GID!) {
+      userGroup(id: $id) {
+        ...PermissionsGroup_UserGroup
+      }
+    }
+    ${_fragments.UserGroup}
+  `,
+  gql`
+    query PermissionsGroup_user {
+      ...UserGroupLayout_Query
+      me {
+        organization {
+          id
+          status
+        }
+      }
+    }
+    ${UserGroupLayout.fragments.Query}
+  `,
+];
+
+const _mutations = [
+  gql`
+    mutation PermissionsGroup_updateUserGroupPermissions(
+      $userGroupId: GID!
+      $permissions: [UpdateUserGroupPermissionsInput!]!
+    ) {
+      updateUserGroupPermissions(userGroupId: $userGroupId, permissions: $permissions) {
+        ...PermissionsGroup_UserGroup
+      }
+    }
+    ${_fragments.UserGroup}
+  `,
+];
+
+PermissionsGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  const groupId = query.groupId as string;
+  await Promise.all([
+    fetchQuery(PermissionsGroup_userGroupDocument, { variables: { id: groupId } }),
+    fetchQuery(PermissionsGroup_userDocument),
+  ]);
+  return { groupId };
+};
+
+export default compose(
+  withDialogs,
+  withPermission("TEAMS:CRUD_PERMISSIONS", { orPath: "/app/organization" }),
+  withApolloData,
+)(PermissionsGroup);

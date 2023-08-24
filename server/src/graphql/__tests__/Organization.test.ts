@@ -21,7 +21,7 @@ describe("GraphQL/Organization", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user } = await mocks.createSessionUserAndOrganization("ADMIN", () => ({
+    ({ organization, user } = await mocks.createSessionUserAndOrganization(() => ({
       created_at: subDays(new Date(), 4),
     })));
 
@@ -95,9 +95,7 @@ describe("GraphQL/Organization", () => {
     let normalUser: User;
     let normalUserApiKey: string;
     beforeAll(async () => {
-      [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-        organization_role: "NORMAL",
-      }));
+      [normalUser] = await mocks.createRandomUsers(organization.id);
       ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
         "normal-token",
         normalUser.id,
@@ -128,7 +126,7 @@ describe("GraphQL/Organization", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if user is not admin", async () => {
+    it("sends error if user is not owner", async () => {
       const { errors, data } = await testClient.withApiKey(normalUserApiKey).execute(
         gql`
           mutation ($months: Int) {

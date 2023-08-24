@@ -3,11 +3,11 @@ import { Knex } from "knex";
 import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
+import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { unMaybeArray } from "../../../util/arrays";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { generateEDKeyPair } from "../../../util/keyPairs";
-import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { titleize } from "../../../util/strings";
@@ -22,9 +22,9 @@ import {
   CreateFeatureFlag,
   CreateFeatureFlagOverride,
   CreateFileUpload,
+  CreateOrgIntegration,
   CreateOrganization,
   CreateOrganizationTheme,
-  CreateOrgIntegration,
   CreatePetition,
   CreatePetitionAccess,
   CreatePetitionAttachment,
@@ -36,15 +36,16 @@ import {
   CreateUser,
   CreateUserData,
   CreateUserGroup,
+  CreateUserGroupPermission,
   EmailLog,
   EventSubscriptionSignatureKey,
   FeatureFlagName,
   FileUpload,
+  OrgIntegration,
   Organization,
   OrganizationTheme,
   OrganizationUsageLimit,
   OrganizationUsageLimitName,
-  OrgIntegration,
   Petition,
   PetitionAccess,
   PetitionAttachment,
@@ -80,9 +81,9 @@ import {
   UserData,
   UserGroup,
   UserGroupMember,
+  UserGroupPermissionName,
   UserLocale,
   UserLocaleValues,
-  UserOrganizationRole,
   UserPetitionEventLog,
 } from "../../__types";
 import { Task } from "../TaskRepository";
@@ -119,10 +120,7 @@ export class Mocks {
     return data;
   }
 
-  async createSessionUserAndOrganization(
-    orgRole?: UserOrganizationRole,
-    orgBuilder?: () => Partial<Organization>,
-  ) {
+  async createSessionUserAndOrganization(orgBuilder?: () => Partial<Organization>) {
     const [organization] = await this.createRandomOrganizations(1, () => ({
       name: "Parallel",
       status: "DEV",
@@ -132,7 +130,7 @@ export class Mocks {
       organization.id,
       1,
       () => ({
-        organization_role: orgRole,
+        is_org_owner: true,
       }),
       () => ({ cognito_id: USER_COGNITO_ID, first_name: "Harvey", last_name: "Specter" }),
     );
@@ -170,6 +168,41 @@ export class Mocks {
           };
         }),
       );
+
+      const userGroups = await this.knex("user_group").insert(
+        range(0, orgs.length).map<CreateUserGroup>((index) => ({
+          org_id: orgs[index].id,
+          name: "",
+          localizable_name: { en: "All users", es: "Todos los usuarios" },
+          type: "ALL_USERS",
+        })),
+        "*",
+      );
+
+      if (userGroups.length > 0) {
+        await this.knex("user_group_permission").insert(
+          [
+            "PETITIONS:CHANGE_PATH",
+            "PETITIONS:CREATE_TEMPLATES",
+            "INTEGRATIONS:CRUD_API",
+            "PROFILES:SUBSCRIBE_PROFILES",
+            "PETITIONS:CREATE_PETITIONS",
+            "PROFILES:CREATE_PROFILES",
+            "PROFILES:CLOSE_PROFILES",
+            "PROFILES:LIST_PROFILES",
+            "PROFILE_ALERTS:LIST_ALERTS",
+            "CONTACTS:LIST_CONTACTS",
+            "USERS:LIST_USERS",
+            "TEAMS:LIST_TEAMS",
+          ].flatMap((name) =>
+            userGroups.map((userGroup) => ({
+              user_group_id: userGroup.id,
+              effect: "ALLOW",
+              name: name as UserGroupPermissionName,
+            })),
+          ),
+        );
+      }
     }
 
     return orgs;
@@ -177,12 +210,12 @@ export class Mocks {
 
   async createRandomUsers(
     orgId: number,
-    amount: number,
+    amount?: number,
     userBuilder?: (index: number) => Partial<User>,
     userDataBuilder?: (index: number) => Partial<UserData>,
   ) {
     const userDatas = await this.knex<UserData>("user_data").insert(
-      range(0, amount).map<CreateUserData>((index) => {
+      range(0, amount || 1).map<CreateUserData>((index) => {
         const firstName = faker.person.firstName();
         const lastName = faker.person.lastName();
         return {
@@ -197,9 +230,9 @@ export class Mocks {
       "*",
     );
 
-    return await this.knex<User>("user")
+    const users = await this.knex<User>("user")
       .insert(
-        range(0, amount).map<CreateUser>((index) => {
+        range(0, amount || 1).map<CreateUser>((index) => {
           const userData = userDatas[index];
           return {
             user_data_id: userData.id,
@@ -209,6 +242,25 @@ export class Mocks {
         }),
       )
       .returning("*");
+
+    const [allUsersGroup] = await this.knex
+      .from<UserGroup>("user_group")
+      .where({ type: "ALL_USERS", org_id: orgId })
+      .select("*");
+
+    if (!allUsersGroup) {
+      throw new Error(`Organization:${orgId} does not have an ALL_USERS group`);
+    }
+
+    if (users.length > 0) {
+      await this.knex.from("user_group_member").insert(
+        users.map((user) => ({
+          user_id: user.id,
+          user_group_id: allUsersGroup.id,
+        })),
+      );
+    }
+    return users;
   }
 
   async createFeatureFlags(featureFlags: CreateFeatureFlag[]) {
@@ -705,9 +757,10 @@ export class Mocks {
   async createUserGroups(
     amount: number,
     orgId: number,
+    permissions: MaybeArray<Omit<CreateUserGroupPermission, "user_group_id">> = [],
     builder?: (i: number) => Partial<UserGroup>,
   ) {
-    return await this.knex<UserGroup>("user_group").insert(
+    const groups = await this.knex<UserGroup>("user_group").insert(
       range(0, amount).map<CreateUserGroup>((index) => ({
         name: faker.person.jobArea(),
         org_id: orgId,
@@ -715,6 +768,16 @@ export class Mocks {
       })),
       "*",
     );
+
+    if (unMaybeArray(permissions).length > 0 && groups.length > 0) {
+      await this.knex("user_group_permission").insert(
+        unMaybeArray(permissions).flatMap((permission) =>
+          groups.map((group) => ({ ...permission, user_group_id: group.id })),
+        ),
+      );
+    }
+
+    return groups;
   }
 
   async insertUserGroupMembers(userGroupId: number, userIds: number[]) {

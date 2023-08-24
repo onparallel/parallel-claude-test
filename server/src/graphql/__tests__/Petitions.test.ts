@@ -18,6 +18,7 @@ import {
   User,
   UserData,
   UserGroup,
+  UserGroupPermissionName,
 } from "../../db/__types";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
 import { KNEX } from "../../db/knex";
@@ -104,18 +105,28 @@ describe("GraphQL/Petitions", () => {
     // secondary org
     [otherOrg] = await mocks.createRandomOrganizations(1);
 
-    [collaboratorUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      organization_role: "COLLABORATOR",
-    }));
+    [collaboratorUser, sameOrgUser] = await mocks.createRandomUsers(organization.id, 2);
 
     [{ apiKey: collaboratorApiKey }] = await Promise.all([
       mocks.createUserAuthToken("collaborator-token", collaboratorUser.id),
     ]);
 
-    // user from the same organization as logged
-    [sameOrgUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      organization_role: "NORMAL",
-    }));
+    const [collaborators] = await mocks.createUserGroups(
+      1,
+      organization.id,
+      [
+        "PETITIONS:CREATE_PETITIONS",
+        "PROFILES:CREATE_PROFILES",
+        "PROFILES:CLOSE_PROFILES",
+        "PROFILES:LIST_PROFILES",
+        "PROFILE_ALERTS:LIST_ALERTS",
+        "CONTACTS:LIST_CONTACTS",
+        "USERS:LIST_USERS",
+        "TEAMS:LIST_TEAMS",
+      ].map((permission) => ({ effect: "ALLOW", name: permission as UserGroupPermissionName })),
+    );
+
+    await mocks.insertUserGroupMembers(collaborators.id, [collaboratorUser.id]);
 
     // user from other organization
     [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
@@ -3189,6 +3200,7 @@ describe("GraphQL/Petitions", () => {
     });
     beforeEach(async () => {
       [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      await mocks.sharePetitions([petition.id], collaboratorUser.id, "WRITE");
       [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "TEXT",
         title: "Text reply",
@@ -3425,8 +3437,8 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("should not be able to send a petition as other user without on behalf of permissions", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).execute(
+        gql`
           mutation (
             $petitionId: GID!
             $contactIdGroups: [[GID!]!]!
@@ -3445,14 +3457,14 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           contactIdGroups: [[toGlobalId("Contact", contacts[1].id)]],
           subject: "petition send subject",
           body: [],
           senderId: toGlobalId("User", sameOrgUser.id),
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("SEND_AS_ERROR");
       expect(data).toBeNull();

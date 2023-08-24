@@ -924,7 +924,7 @@ export interface Mutation {
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
   tagPetition: PetitionBase;
-  /** Transfers the ownership of an organization to a given user. Old owner will get ADMIN role */
+  /** Transfers the ownership of an organization to a given user. */
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
@@ -960,7 +960,10 @@ export interface Mutation {
   updateOrganizationTier: SupportMethodResponse;
   /** Updates the usage_details of a given organization. Will impact the limits of coming usage periods. */
   updateOrganizationUsageDetails: Organization;
-  /** Updates the role of another user in the organization. */
+  /**
+   * Updates the role of another user in the organization.
+   * @deprecated use updateUserGroupMembership
+   */
   updateOrganizationUser: User;
   /** Updates the user limit for a organization */
   updateOrganizationUserLimit: Organization;
@@ -1019,6 +1022,10 @@ export interface Mutation {
   updateUser: User;
   /** Updates the name of a given user group */
   updateUserGroup: UserGroup;
+  /** Inserts the user into all provided user groups. */
+  updateUserGroupMembership: User;
+  /** Updates the permissions of a user group */
+  updateUserGroupPermissions: UserGroup;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   updateUserPreferredLocale: User;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
@@ -1500,7 +1507,7 @@ export interface MutationinviteUserToOrganizationArgs {
   lastName: Scalars["String"]["input"];
   locale: UserLocale;
   orgId?: InputMaybe<Scalars["GID"]["input"]>;
-  role: OrganizationRole;
+  role?: InputMaybe<OrganizationRole>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
 
@@ -2156,6 +2163,16 @@ export interface MutationupdateUserArgs {
 export interface MutationupdateUserGroupArgs {
   data: UpdateUserGroupInput;
   id: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateUserGroupMembershipArgs {
+  userGroupIds: Array<Scalars["GID"]["input"]>;
+  userId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateUserGroupPermissionsArgs {
+  permissions: Array<UpdateUserGroupPermissionsInput>;
+  userGroupId: Scalars["GID"]["input"];
 }
 
 export interface MutationupdateUserPreferredLocaleArgs {
@@ -5020,6 +5037,13 @@ export interface UpdateUserGroupInput {
   name?: InputMaybe<Scalars["String"]["input"]>;
 }
 
+export interface UpdateUserGroupPermissionsInput {
+  effect: UpdateUserGroupPermissionsInputEffect;
+  name: Scalars["String"]["input"];
+}
+
+export type UpdateUserGroupPermissionsInputEffect = "ALLOW" | "DENY" | "NONE";
+
 /** A user in the system. */
 export interface User extends Timestamps {
   __typename?: "User";
@@ -5044,6 +5068,7 @@ export interface User extends Timestamps {
   /** The initials of the user. */
   initials?: Maybe<Scalars["String"]["output"]>;
   isMe: Scalars["Boolean"]["output"];
+  isOrgOwner: Scalars["Boolean"]["output"];
   isSsoUser: Scalars["Boolean"]["output"];
   isSuperAdmin: Scalars["Boolean"]["output"];
   lastActiveAt?: Maybe<Scalars["DateTime"]["output"]>;
@@ -5058,7 +5083,8 @@ export interface User extends Timestamps {
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
   preferredLocale: UserLocale;
-  role: OrganizationRole;
+  /** @deprecated not used anymore */
+  role?: Maybe<OrganizationRole>;
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
@@ -5110,6 +5136,7 @@ export interface UserGroup extends Timestamps {
   memberCount: Scalars["Int"]["output"];
   members: Array<UserGroupMember>;
   name: Scalars["String"]["output"];
+  permissions: Array<UserGroupPermission>;
   type: UserGroupType;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
@@ -5130,6 +5157,15 @@ export interface UserGroupPagination {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
 }
+
+export interface UserGroupPermission {
+  __typename?: "UserGroupPermission";
+  effect: UserGroupPermissionEffect;
+  id: Scalars["GID"]["output"];
+  name: Scalars["String"]["output"];
+}
+
+export type UserGroupPermissionEffect = "ALLOW" | "DENY";
 
 export type UserGroupType = "ALL_USERS" | "NORMAL";
 
@@ -5230,7 +5266,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6185,7 +6221,7 @@ export type AdminSettingsLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6225,7 +6261,7 @@ export type AppLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6268,7 +6304,7 @@ export type AppLayoutNavbar_QueryFragment = {
     __typename?: "User";
     id: string;
     isSuperAdmin: boolean;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     email: string;
     fullName?: string | null;
     avatarUrl?: string | null;
@@ -6299,7 +6335,7 @@ export type DevelopersLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6367,7 +6403,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6594,7 +6630,7 @@ export type PetitionLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6635,7 +6671,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6675,7 +6711,7 @@ export type SidebarLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -6705,12 +6741,96 @@ export type SidebarLayout_QueryFragment = {
   };
 };
 
+export type UserGroupLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    permissions: Array<string>;
+    role?: OrganizationRole | null;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type UserGroupLayout_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  type: UserGroupType;
+  localizableName: { [locale in UserLocale]?: string };
+};
+
+export type UserGroupLayout_updateUserGroupMutationVariables = Exact<{
+  id: Scalars["GID"]["input"];
+  data: UpdateUserGroupInput;
+}>;
+
+export type UserGroupLayout_updateUserGroupMutation = {
+  updateUserGroup: {
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
+  };
+};
+
+export type UserGroupLayout_deleteUserGroupMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type UserGroupLayout_deleteUserGroupMutation = { deleteUserGroup: Result };
+
+export type UserGroupLayout_cloneUserGroupsMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  locale: UserLocale;
+}>;
+
+export type UserGroupLayout_cloneUserGroupsMutation = {
+  cloneUserGroups: Array<{
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
+  }>;
+};
+
 export type UserMenu_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
     isSuperAdmin: boolean;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     email: string;
     fullName?: string | null;
     avatarUrl?: string | null;
@@ -6735,7 +6855,7 @@ export type UserSettingsLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -7715,7 +7835,6 @@ export type useCreateOrUpdateUserDialog_UserFragment = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
-  role: OrganizationRole;
   status: UserStatus;
   isMe: boolean;
   userGroups: Array<{
@@ -7763,7 +7882,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -17616,7 +17735,7 @@ export type Admin_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -17675,7 +17794,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -17808,7 +17927,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18020,10 +18139,10 @@ export type AdminOrganizationsMembers_OrganizationUserFragment = {
   id: string;
   fullName?: string | null;
   email: string;
-  role: OrganizationRole;
   createdAt: string;
   lastActiveAt?: string | null;
   status: UserStatus;
+  isOrgOwner: boolean;
 };
 
 export type AdminOrganizationsMembers_OrganizationFragment = {
@@ -18055,7 +18174,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18106,10 +18225,10 @@ export type AdminOrganizationsMembers_organizationQuery = {
         id: string;
         fullName?: string | null;
         email: string;
-        role: OrganizationRole;
         createdAt: string;
         lastActiveAt?: string | null;
         status: UserStatus;
+        isOrgOwner: boolean;
       }>;
     };
   } | null;
@@ -18119,7 +18238,6 @@ export type AdminOrganizationsMembers_inviteUserToOrganizationMutationVariables 
   firstName: Scalars["String"]["input"];
   lastName: Scalars["String"]["input"];
   email: Scalars["String"]["input"];
-  role: OrganizationRole;
   locale: UserLocale;
   orgId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
@@ -18130,10 +18248,10 @@ export type AdminOrganizationsMembers_inviteUserToOrganizationMutation = {
     id: string;
     fullName?: string | null;
     email: string;
-    role: OrganizationRole;
     createdAt: string;
     lastActiveAt?: string | null;
     status: UserStatus;
+    isOrgOwner: boolean;
   };
 };
 
@@ -18195,7 +18313,7 @@ export type AdminOrganizations_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18264,7 +18382,7 @@ export type AdminSupportMethods_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18350,7 +18468,7 @@ export type Alerts_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18685,7 +18803,7 @@ export type Contact_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18849,7 +18967,7 @@ export type Contacts_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -18926,7 +19044,7 @@ export type OrganizationBranding_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19001,7 +19119,7 @@ export type OrganizationCompliance_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19059,7 +19177,7 @@ export type OrganizationGeneral_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19114,28 +19232,6 @@ export type OrganizationGroup_UserGroupMemberFragment = {
   user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
 };
 
-export type OrganizationGroup_updateUserGroupMutationVariables = Exact<{
-  id: Scalars["GID"]["input"];
-  data: UpdateUserGroupInput;
-}>;
-
-export type OrganizationGroup_updateUserGroupMutation = {
-  updateUserGroup: {
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    type: UserGroupType;
-    localizableName: { [locale in UserLocale]?: string };
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-    }>;
-  };
-};
-
 export type OrganizationGroup_addUsersToUserGroupMutationVariables = Exact<{
   userGroupId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
@@ -19180,34 +19276,6 @@ export type OrganizationGroup_removeUsersFromGroupMutation = {
   };
 };
 
-export type OrganizationGroup_deleteUserGroupMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-}>;
-
-export type OrganizationGroup_deleteUserGroupMutation = { deleteUserGroup: Result };
-
-export type OrganizationGroup_cloneUserGroupsMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  locale: UserLocale;
-}>;
-
-export type OrganizationGroup_cloneUserGroupsMutation = {
-  cloneUserGroups: Array<{
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    type: UserGroupType;
-    localizableName: { [locale in UserLocale]?: string };
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-    }>;
-  }>;
-};
-
 export type OrganizationGroup_userGroupQueryVariables = Exact<{
   id: Scalars["GID"]["input"];
 }>;
@@ -19241,7 +19309,7 @@ export type OrganizationGroup_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19268,6 +19336,104 @@ export type OrganizationGroup_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type PermissionsGroup_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  type: UserGroupType;
+  localizableName: { [locale in UserLocale]?: string };
+  permissions: Array<{
+    __typename?: "UserGroupPermission";
+    id: string;
+    name: string;
+    effect: UserGroupPermissionEffect;
+  }>;
+};
+
+export type PermissionsGroup_userGroupQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type PermissionsGroup_userGroupQuery = {
+  userGroup?: {
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
+    permissions: Array<{
+      __typename?: "UserGroupPermission";
+      id: string;
+      name: string;
+      effect: UserGroupPermissionEffect;
+    }>;
+  } | null;
+};
+
+export type PermissionsGroup_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PermissionsGroup_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    permissions: Array<string>;
+    role?: OrganizationRole | null;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      status: OrganizationStatus;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type PermissionsGroup_updateUserGroupPermissionsMutationVariables = Exact<{
+  userGroupId: Scalars["GID"]["input"];
+  permissions: Array<UpdateUserGroupPermissionsInput> | UpdateUserGroupPermissionsInput;
+}>;
+
+export type PermissionsGroup_updateUserGroupPermissionsMutation = {
+  updateUserGroupPermissions: {
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    type: UserGroupType;
+    localizableName: { [locale in UserLocale]?: string };
+    permissions: Array<{
+      __typename?: "UserGroupPermission";
+      id: string;
+      name: string;
+      effect: UserGroupPermissionEffect;
+    }>;
   };
 };
 
@@ -19415,7 +19581,7 @@ export type OrganizationGroups_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19457,7 +19623,7 @@ export type OrganizationSettings_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19499,7 +19665,7 @@ export type OrganizationIntegrations_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19613,7 +19779,7 @@ export type IntegrationsSignature_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -19804,7 +19970,7 @@ export type OrganizationProfileType_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -20181,7 +20347,7 @@ export type OrganizationProfileTypes_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -20288,7 +20454,7 @@ export type OrganizationUsage_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -20345,7 +20511,7 @@ export type OrganizationUsers_UserFragment = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
-  role: OrganizationRole;
+  isOrgOwner: boolean;
   createdAt: string;
   lastActiveAt?: string | null;
   status: UserStatus;
@@ -20365,7 +20531,6 @@ export type OrganizationUsers_inviteUserToOrganizationMutationVariables = Exact<
   firstName: Scalars["String"]["input"];
   lastName: Scalars["String"]["input"];
   email: Scalars["String"]["input"];
-  role: OrganizationRole;
   locale: UserLocale;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
@@ -20378,7 +20543,7 @@ export type OrganizationUsers_inviteUserToOrganizationMutation = {
     firstName?: string | null;
     lastName?: string | null;
     email: string;
-    role: OrganizationRole;
+    isOrgOwner: boolean;
     createdAt: string;
     lastActiveAt?: string | null;
     status: UserStatus;
@@ -20395,21 +20560,20 @@ export type OrganizationUsers_inviteUserToOrganizationMutation = {
   };
 };
 
-export type OrganizationUsers_updateOrganizationUserMutationVariables = Exact<{
+export type OrganizationUsers_updateUserGroupMembershipMutationVariables = Exact<{
   userId: Scalars["GID"]["input"];
-  role: OrganizationRole;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  userGroupIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
-export type OrganizationUsers_updateOrganizationUserMutation = {
-  updateOrganizationUser: {
+export type OrganizationUsers_updateUserGroupMembershipMutation = {
+  updateUserGroupMembership: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
-    role: OrganizationRole;
+    isOrgOwner: boolean;
     createdAt: string;
     lastActiveAt?: string | null;
     status: UserStatus;
@@ -20464,7 +20628,7 @@ export type OrganizationUsers_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -20524,7 +20688,7 @@ export type OrganizationUsers_orgUsersQuery = {
           firstName?: string | null;
           lastName?: string | null;
           email: string;
-          role: OrganizationRole;
+          isOrgOwner: boolean;
           createdAt: string;
           lastActiveAt?: string | null;
           status: UserStatus;
@@ -21470,7 +21634,7 @@ export type PetitionActivity_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
@@ -23550,7 +23714,7 @@ export type PetitionActivity_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
@@ -23944,7 +24108,7 @@ export type PetitionCompose_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
@@ -24556,7 +24720,7 @@ export type PetitionCompose_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
@@ -25037,7 +25201,7 @@ export type PetitionMessages_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -25081,7 +25245,7 @@ export type PetitionMessages_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -26044,7 +26208,7 @@ export type PetitionPreview_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -27000,7 +27164,7 @@ export type PetitionPreview_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -27429,7 +27593,7 @@ export type PetitionReplies_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
@@ -28155,7 +28319,7 @@ export type PetitionReplies_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
@@ -28473,7 +28637,7 @@ export type PetitionReplies_petitionQuery = {
 export type Petitions_UserFragment = {
   __typename?: "User";
   id: string;
-  role: OrganizationRole;
+  role?: OrganizationRole | null;
   petitionListViews: Array<{
     __typename?: "PetitionListView";
     id: string;
@@ -28724,7 +28888,7 @@ export type Petitions_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -29276,7 +29440,7 @@ export type NewPetition_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -29512,7 +29676,7 @@ export type ProfileDetail_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -29822,7 +29986,7 @@ export type Profiles_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -29996,7 +30160,7 @@ export type Reports_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -30044,7 +30208,7 @@ export type Overview_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -30110,7 +30274,7 @@ export type ReportsReplies_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -30176,7 +30340,7 @@ export type ReportsTemplates_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -30216,7 +30380,7 @@ export type Account_QueryFragment = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     isSsoUser: boolean;
@@ -30300,7 +30464,7 @@ export type Account_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     isSsoUser: boolean;
@@ -30467,7 +30631,7 @@ export type Subscriptions_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -30542,7 +30706,7 @@ export type Tokens_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -30585,7 +30749,7 @@ export type Settings_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -30636,7 +30800,7 @@ export type Security_userQuery = {
     email: string;
     createdAt: string;
     permissions: Array<string>;
-    role: OrganizationRole;
+    role?: OrganizationRole | null;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -33684,6 +33848,28 @@ export const ReportsSidebarLayout_QueryFragmentDoc = gql`
   }
   ${SidebarLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ReportsSidebarLayout_QueryFragment, unknown>;
+export const useOrganizationSections_UserFragmentDoc = gql`
+  fragment useOrganizationSections_User on User {
+    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+  }
+` as unknown as DocumentNode<useOrganizationSections_UserFragment, unknown>;
+export const OrganizationSettingsLayout_QueryFragmentDoc = gql`
+  fragment OrganizationSettingsLayout_Query on Query {
+    ...SidebarLayout_Query
+    me {
+      id
+      ...useOrganizationSections_User
+    }
+  }
+  ${SidebarLayout_QueryFragmentDoc}
+  ${useOrganizationSections_UserFragmentDoc}
+` as unknown as DocumentNode<OrganizationSettingsLayout_QueryFragment, unknown>;
+export const UserGroupLayout_QueryFragmentDoc = gql`
+  fragment UserGroupLayout_Query on Query {
+    ...OrganizationSettingsLayout_Query
+  }
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<UserGroupLayout_QueryFragment, unknown>;
 export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`
   fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
     id
@@ -34016,22 +34202,6 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
-export const useOrganizationSections_UserFragmentDoc = gql`
-  fragment useOrganizationSections_User on User {
-    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-  }
-` as unknown as DocumentNode<useOrganizationSections_UserFragment, unknown>;
-export const OrganizationSettingsLayout_QueryFragmentDoc = gql`
-  fragment OrganizationSettingsLayout_Query on Query {
-    ...SidebarLayout_Query
-    me {
-      id
-      ...useOrganizationSections_User
-    }
-  }
-  ${SidebarLayout_QueryFragmentDoc}
-  ${useOrganizationSections_UserFragmentDoc}
-` as unknown as DocumentNode<OrganizationSettingsLayout_QueryFragment, unknown>;
 export const OrganizationProfilesLayout_QueryFragmentDoc = gql`
   fragment OrganizationProfilesLayout_Query on Query {
     ...OrganizationSettingsLayout_Query
@@ -34917,10 +35087,10 @@ export const AdminOrganizationsMembers_OrganizationUserFragmentDoc = gql`
     id
     fullName
     email
-    role
     createdAt
     lastActiveAt
     status
+    isOrgOwner
   }
 ` as unknown as DocumentNode<AdminOrganizationsMembers_OrganizationUserFragment, unknown>;
 export const AdminOrganizationsMembers_OrganizationFragmentDoc = gql`
@@ -35088,6 +35258,15 @@ export const OrganizationGroup_UserGroupMemberFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<OrganizationGroup_UserGroupMemberFragment, unknown>;
+export const UserGroupLayout_UserGroupFragmentDoc = gql`
+  fragment UserGroupLayout_UserGroup on UserGroup {
+    id
+    name
+    type
+    ...UserGroupReference_UserGroup
+  }
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<UserGroupLayout_UserGroupFragment, unknown>;
 export const OrganizationGroup_UserGroupFragmentDoc = gql`
   fragment OrganizationGroup_UserGroup on UserGroup {
     id
@@ -35097,11 +35276,23 @@ export const OrganizationGroup_UserGroupFragmentDoc = gql`
       ...OrganizationGroup_UserGroupMember
     }
     type
-    ...UserGroupReference_UserGroup
+    ...UserGroupLayout_UserGroup
   }
   ${OrganizationGroup_UserGroupMemberFragmentDoc}
-  ${UserGroupReference_UserGroupFragmentDoc}
+  ${UserGroupLayout_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroup_UserGroupFragment, unknown>;
+export const PermissionsGroup_UserGroupFragmentDoc = gql`
+  fragment PermissionsGroup_UserGroup on UserGroup {
+    id
+    ...UserGroupLayout_UserGroup
+    permissions {
+      id
+      name
+      effect
+    }
+  }
+  ${UserGroupLayout_UserGroupFragmentDoc}
+` as unknown as DocumentNode<PermissionsGroup_UserGroupFragment, unknown>;
 export const OrganizationGroups_UserGroupFragmentDoc = gql`
   fragment OrganizationGroups_UserGroup on UserGroup {
     id
@@ -35319,7 +35510,6 @@ export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
     firstName
     lastName
     email
-    role
     status
     isMe
     userGroups {
@@ -35343,7 +35533,7 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     firstName
     lastName
     email
-    role
+    isOrgOwner
     createdAt
     lastActiveAt
     status
@@ -39783,6 +39973,36 @@ export const PetitionsHeader_associateProfileToPetitionDocument = gql`
   PetitionsHeader_associateProfileToPetitionMutation,
   PetitionsHeader_associateProfileToPetitionMutationVariables
 >;
+export const UserGroupLayout_updateUserGroupDocument = gql`
+  mutation UserGroupLayout_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
+    updateUserGroup(id: $id, data: $data) {
+      ...UserGroupLayout_UserGroup
+    }
+  }
+  ${UserGroupLayout_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  UserGroupLayout_updateUserGroupMutation,
+  UserGroupLayout_updateUserGroupMutationVariables
+>;
+export const UserGroupLayout_deleteUserGroupDocument = gql`
+  mutation UserGroupLayout_deleteUserGroup($ids: [GID!]!) {
+    deleteUserGroup(ids: $ids)
+  }
+` as unknown as DocumentNode<
+  UserGroupLayout_deleteUserGroupMutation,
+  UserGroupLayout_deleteUserGroupMutationVariables
+>;
+export const UserGroupLayout_cloneUserGroupsDocument = gql`
+  mutation UserGroupLayout_cloneUserGroups($ids: [GID!]!, $locale: UserLocale!) {
+    cloneUserGroups(userGroupIds: $ids, locale: $locale) {
+      ...UserGroupLayout_UserGroup
+    }
+  }
+  ${UserGroupLayout_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  UserGroupLayout_cloneUserGroupsMutation,
+  UserGroupLayout_cloneUserGroupsMutationVariables
+>;
 export const Notifications_UnreadPetitionUserNotificationIdsDocument = gql`
   query Notifications_UnreadPetitionUserNotificationIds {
     me {
@@ -42016,7 +42236,6 @@ export const AdminOrganizationsMembers_inviteUserToOrganizationDocument = gql`
     $firstName: String!
     $lastName: String!
     $email: String!
-    $role: OrganizationRole!
     $locale: UserLocale!
     $orgId: GID
   ) {
@@ -42024,7 +42243,6 @@ export const AdminOrganizationsMembers_inviteUserToOrganizationDocument = gql`
       email: $email
       firstName: $firstName
       lastName: $lastName
-      role: $role
       locale: $locale
       orgId: $orgId
     ) {
@@ -42263,17 +42481,6 @@ export const OrganizationGeneral_userDocument = gql`
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGeneral_userQuery, OrganizationGeneral_userQueryVariables>;
-export const OrganizationGroup_updateUserGroupDocument = gql`
-  mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
-    updateUserGroup(id: $id, data: $data) {
-      ...OrganizationGroup_UserGroup
-    }
-  }
-  ${OrganizationGroup_UserGroupFragmentDoc}
-` as unknown as DocumentNode<
-  OrganizationGroup_updateUserGroupMutation,
-  OrganizationGroup_updateUserGroupMutationVariables
->;
 export const OrganizationGroup_addUsersToUserGroupDocument = gql`
   mutation OrganizationGroup_addUsersToUserGroup($userGroupId: GID!, $userIds: [GID!]!) {
     addUsersToUserGroup(userGroupId: $userGroupId, userIds: $userIds) {
@@ -42296,25 +42503,6 @@ export const OrganizationGroup_removeUsersFromGroupDocument = gql`
   OrganizationGroup_removeUsersFromGroupMutation,
   OrganizationGroup_removeUsersFromGroupMutationVariables
 >;
-export const OrganizationGroup_deleteUserGroupDocument = gql`
-  mutation OrganizationGroup_deleteUserGroup($ids: [GID!]!) {
-    deleteUserGroup(ids: $ids)
-  }
-` as unknown as DocumentNode<
-  OrganizationGroup_deleteUserGroupMutation,
-  OrganizationGroup_deleteUserGroupMutationVariables
->;
-export const OrganizationGroup_cloneUserGroupsDocument = gql`
-  mutation OrganizationGroup_cloneUserGroups($ids: [GID!]!, $locale: UserLocale!) {
-    cloneUserGroups(userGroupIds: $ids, locale: $locale) {
-      ...OrganizationGroup_UserGroup
-    }
-  }
-  ${OrganizationGroup_UserGroupFragmentDoc}
-` as unknown as DocumentNode<
-  OrganizationGroup_cloneUserGroupsMutation,
-  OrganizationGroup_cloneUserGroupsMutationVariables
->;
 export const OrganizationGroup_userGroupDocument = gql`
   query OrganizationGroup_userGroup($id: GID!) {
     userGroup(id: $id) {
@@ -42328,10 +42516,47 @@ export const OrganizationGroup_userGroupDocument = gql`
 >;
 export const OrganizationGroup_userDocument = gql`
   query OrganizationGroup_user {
-    ...OrganizationSettingsLayout_Query
+    ...UserGroupLayout_Query
   }
-  ${OrganizationSettingsLayout_QueryFragmentDoc}
+  ${UserGroupLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroup_userQuery, OrganizationGroup_userQueryVariables>;
+export const PermissionsGroup_userGroupDocument = gql`
+  query PermissionsGroup_userGroup($id: GID!) {
+    userGroup(id: $id) {
+      ...PermissionsGroup_UserGroup
+    }
+  }
+  ${PermissionsGroup_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  PermissionsGroup_userGroupQuery,
+  PermissionsGroup_userGroupQueryVariables
+>;
+export const PermissionsGroup_userDocument = gql`
+  query PermissionsGroup_user {
+    ...UserGroupLayout_Query
+    me {
+      organization {
+        id
+        status
+      }
+    }
+  }
+  ${UserGroupLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<PermissionsGroup_userQuery, PermissionsGroup_userQueryVariables>;
+export const PermissionsGroup_updateUserGroupPermissionsDocument = gql`
+  mutation PermissionsGroup_updateUserGroupPermissions(
+    $userGroupId: GID!
+    $permissions: [UpdateUserGroupPermissionsInput!]!
+  ) {
+    updateUserGroupPermissions(userGroupId: $userGroupId, permissions: $permissions) {
+      ...PermissionsGroup_UserGroup
+    }
+  }
+  ${PermissionsGroup_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  PermissionsGroup_updateUserGroupPermissionsMutation,
+  PermissionsGroup_updateUserGroupPermissionsMutationVariables
+>;
 export const OrganizationGroups_createUserGroupDocument = gql`
   mutation OrganizationGroups_createUserGroup($name: String!, $userIds: [GID!]!) {
     createUserGroup(name: $name, userIds: $userIds) {
@@ -42708,7 +42933,6 @@ export const OrganizationUsers_inviteUserToOrganizationDocument = gql`
     $firstName: String!
     $lastName: String!
     $email: String!
-    $role: OrganizationRole!
     $locale: UserLocale!
     $userGroupIds: [GID!]
   ) {
@@ -42716,7 +42940,6 @@ export const OrganizationUsers_inviteUserToOrganizationDocument = gql`
       email: $email
       firstName: $firstName
       lastName: $lastName
-      role: $role
       locale: $locale
       userGroupIds: $userGroupIds
     ) {
@@ -42728,20 +42951,16 @@ export const OrganizationUsers_inviteUserToOrganizationDocument = gql`
   OrganizationUsers_inviteUserToOrganizationMutation,
   OrganizationUsers_inviteUserToOrganizationMutationVariables
 >;
-export const OrganizationUsers_updateOrganizationUserDocument = gql`
-  mutation OrganizationUsers_updateOrganizationUser(
-    $userId: GID!
-    $role: OrganizationRole!
-    $userGroupIds: [GID!]
-  ) {
-    updateOrganizationUser(userId: $userId, role: $role, userGroupIds: $userGroupIds) {
+export const OrganizationUsers_updateUserGroupMembershipDocument = gql`
+  mutation OrganizationUsers_updateUserGroupMembership($userId: GID!, $userGroupIds: [GID!]!) {
+    updateUserGroupMembership(userId: $userId, userGroupIds: $userGroupIds) {
       ...OrganizationUsers_User
     }
   }
   ${OrganizationUsers_UserFragmentDoc}
 ` as unknown as DocumentNode<
-  OrganizationUsers_updateOrganizationUserMutation,
-  OrganizationUsers_updateOrganizationUserMutationVariables
+  OrganizationUsers_updateUserGroupMembershipMutation,
+  OrganizationUsers_updateUserGroupMembershipMutationVariables
 >;
 export const OrganizationUsers_activateUserDocument = gql`
   mutation OrganizationUsers_activateUser($userIds: [GID!]!) {

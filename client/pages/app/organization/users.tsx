@@ -25,7 +25,6 @@ import { useConfirmDeactivateUserDialog } from "@parallel/components/organizatio
 import { useConfirmResendInvitationDialog } from "@parallel/components/organization/dialogs/ConfirmResendInvitationDialog";
 import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateUserDialog";
 import {
-  OrganizationRole,
   OrganizationUsers_OrderBy,
   OrganizationUsers_UserFragment,
   OrganizationUsers_activateUserDocument,
@@ -33,7 +32,7 @@ import {
   OrganizationUsers_inviteUserToOrganizationDocument,
   OrganizationUsers_orgUsersDocument,
   OrganizationUsers_resetTempPasswordDocument,
-  OrganizationUsers_updateOrganizationUserDocument,
+  OrganizationUsers_updateUserGroupMembershipDocument,
   OrganizationUsers_userDocument,
   UserStatus,
 } from "@parallel/graphql/__types";
@@ -56,7 +55,6 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
-import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -237,7 +235,9 @@ function OrganizationUsers() {
   };
 
   const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
-  const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
+  const [updateUserGroupMembership] = useMutation(
+    OrganizationUsers_updateUserGroupMembershipDocument,
+  );
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
       if (user.status === "ON_HOLD") {
@@ -266,12 +266,11 @@ function OrganizationUsers() {
           isClosable: true,
         });
       } else {
-        const { role, userGroups } = await showCreateOrUpdateUserDialog({ user });
+        const { userGroups } = await showCreateOrUpdateUserDialog({ user });
 
-        await updateOrganizationUser({
+        await updateUserGroupMembership({
           variables: {
             userId: user.id,
-            role,
             userGroupIds: userGroups.map((userGroup) => userGroup.id),
           },
         });
@@ -440,7 +439,7 @@ function OrganizationUsers() {
 
   const showErrorDialog = useErrorDialog();
   const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
-    if (selectedRows.some((u) => u.role === "OWNER")) {
+    if (selectedRows.some((u) => u.isOrgOwner)) {
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
@@ -502,7 +501,7 @@ function OrganizationUsers() {
         <TablePage
           flex="0 1 auto"
           minHeight={0}
-          isSelectable={userCanEditUsers}
+          isSelectable={userCanEditUsers || userCanGhostLogin}
           isHighlightable
           context={context}
           columns={columns}
@@ -526,7 +525,7 @@ function OrganizationUsers() {
                   {
                     key: "activate",
                     onClick: () => handleUpdateSelectedUsersStatus("ACTIVE"),
-                    isDisabled: isActivateUserButtonDisabled,
+                    isDisabled: isActivateUserButtonDisabled || !userCanEditUsers,
                     leftIcon: <UserCheckIcon />,
                     children: (
                       <FormattedMessage
@@ -540,6 +539,7 @@ function OrganizationUsers() {
               : [
                   {
                     key: "deactivate",
+                    isDisabled: !userCanEditUsers,
                     onClick: () => handleUpdateSelectedUsersStatus("INACTIVE"),
                     leftIcon: <UserXIcon />,
                     children: (
@@ -672,7 +672,6 @@ function CustomFooter({
 function useOrganizationUsersTableColumns() {
   const userCanEdit = useHasPermission("USERS:CRUD_USERS");
   const intl = useIntl();
-  const roles = useOrganizationRoles();
   return useMemo<TableColumn<OrganizationUsers_UserFragment, OrganizationUserTableContext>[]>(
     () => [
       {
@@ -730,6 +729,11 @@ function useOrganizationUsersTableColumns() {
                   />
                 </Tooltip>
               ) : null}
+              {row.isOrgOwner ? (
+                <Badge marginLeft={2} colorScheme="primary" position="relative" top="1.5px">
+                  <FormattedMessage id="generic.organization-owner" defaultMessage="Owner" />
+                </Badge>
+              ) : null}
             </Text>
           );
         },
@@ -747,31 +751,6 @@ function useOrganizationUsersTableColumns() {
         },
         CellContent: ({ row }) => (
           <Text opacity={row.status === "INACTIVE" ? 0.5 : 1}>{row.email}</Text>
-        ),
-      },
-      {
-        key: "role",
-        label: intl.formatMessage({
-          id: "organization-role.header.user",
-          defaultMessage: "Role",
-        }),
-        cellProps: {
-          minWidth: "200px",
-        },
-        CellContent: ({ row }) => (
-          <Badge
-            opacity={row.status === "INACTIVE" ? 0.5 : 1}
-            colorScheme={
-              (
-                {
-                  OWNER: "primary",
-                  ADMIN: "green",
-                } as Record<OrganizationRole, string>
-              )[row.role] ?? "gray"
-            }
-          >
-            {roles.find((r) => r.role === row.role)?.label ?? (null as never)}
-          </Badge>
         ),
       },
       ...(userCanEdit
@@ -838,7 +817,7 @@ OrganizationUsers.fragments = {
         firstName
         lastName
         email
-        role
+        isOrgOwner
         createdAt
         lastActiveAt
         status
@@ -858,7 +837,6 @@ const _mutations = [
       $firstName: String!
       $lastName: String!
       $email: String!
-      $role: OrganizationRole!
       $locale: UserLocale!
       $userGroupIds: [GID!]
     ) {
@@ -866,7 +844,6 @@ const _mutations = [
         email: $email
         firstName: $firstName
         lastName: $lastName
-        role: $role
         locale: $locale
         userGroupIds: $userGroupIds
       ) {
@@ -876,12 +853,8 @@ const _mutations = [
     ${OrganizationUsers.fragments.User}
   `,
   gql`
-    mutation OrganizationUsers_updateOrganizationUser(
-      $userId: GID!
-      $role: OrganizationRole!
-      $userGroupIds: [GID!]
-    ) {
-      updateOrganizationUser(userId: $userId, role: $role, userGroupIds: $userGroupIds) {
+    mutation OrganizationUsers_updateUserGroupMembership($userId: GID!, $userGroupIds: [GID!]!) {
+      updateUserGroupMembership(userId: $userId, userGroupIds: $userGroupIds) {
         ...OrganizationUsers_User
       }
     }

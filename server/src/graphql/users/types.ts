@@ -8,7 +8,6 @@ import {
 } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { getInitials } from "../../util/initials";
-import { userHasRole } from "../../util/userHasRole";
 import { datetimeArg } from "../helpers/scalars/DateTime";
 import { rootIsContextRealUser, rootIsContextUser } from "./authorizers";
 
@@ -19,6 +18,7 @@ export const UserLocale = enumType({
   sourceType: "db.UserLocale",
 });
 
+/** @deprecated */
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
   members: UserOrganizationRoleValues,
@@ -57,7 +57,9 @@ export const User = objectType({
     t.boolean("isMe", {
       resolve: (o, _, ctx) => o.id === ctx.user!.id,
     });
-    t.field("role", {
+    /** @deprecated */
+    t.nullable.field("role", {
+      deprecation: "not used anymore",
       type: "OrganizationRole",
       resolve: (o) => o.organization_role,
     });
@@ -69,8 +71,12 @@ export const User = objectType({
     });
     t.boolean("isSuperAdmin", {
       resolve: async (o, _, ctx) => {
-        const org = await ctx.organizations.loadOrg(o.org_id);
-        return org?.status === "ROOT" && userHasRole(o, "ADMIN");
+        const [org, permissions] = await Promise.all([
+          ctx.organizations.loadOrg(o.org_id),
+          ctx.users.loadUserPermissions(o.id),
+        ]);
+
+        return org?.status === "ROOT" && permissions.includes("SUPERADMIN");
       },
     });
     t.boolean("canCreateUsers", {
@@ -246,6 +252,9 @@ export const User = objectType({
       resolve: async (root, _, ctx) => {
         return await ctx.views.loadPetitionListViewsByUserId(root.id);
       },
+    });
+    t.boolean("isOrgOwner", {
+      resolve: (o) => o.is_org_owner,
     });
   },
 });

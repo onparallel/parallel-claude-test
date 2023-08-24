@@ -363,7 +363,6 @@ async function trackInviteSentEvent(event: InviteSentSystemEvent, ctx: WorkerCon
       invitee_email: event.data.email,
       invitee_first_name: event.data.first_name,
       invitee_last_name: event.data.last_name,
-      invitee_role: event.data.role,
     },
   });
 }

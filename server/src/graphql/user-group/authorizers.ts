@@ -7,15 +7,12 @@ import { Arg } from "../helpers/authorize";
 import { UserGroupType } from "../../db/__types";
 
 export async function contextUserHasAccessToUserGroups(userGroupIds: number[], ctx: ApiContext) {
-  try {
-    if (userGroupIds.length === 0) {
-      return true;
-    }
-    return (await ctx.userGroups.loadUserGroup(userGroupIds)).every(
-      (ug) => isDefined(ug) && ug.org_id === ctx.user!.org_id,
-    );
-  } catch {}
-  return false;
+  if (userGroupIds.length === 0) {
+    return true;
+  }
+  return (await ctx.userGroups.loadUserGroup(userGroupIds)).every(
+    (ug) => isDefined(ug) && ug.org_id === ctx.user!.org_id,
+  );
 }
 
 export function userHasAccessToUserGroups<
@@ -24,14 +21,11 @@ export function userHasAccessToUserGroups<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    try {
-      if (!isDefined(args[argName])) {
-        return true;
-      }
-      const userGroupIds = unMaybeArray(args[argName]) as unknown as number[];
-      return await contextUserHasAccessToUserGroups(userGroupIds, ctx);
-    } catch {}
-    return false;
+    if (!isDefined(args[argName])) {
+      return true;
+    }
+    const userGroupIds = unMaybeArray(args[argName]) as unknown as number[];
+    return await contextUserHasAccessToUserGroups(userGroupIds, ctx);
   };
 }
 

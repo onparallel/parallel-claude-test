@@ -368,6 +368,11 @@ export interface NexusGenInputs {
     // input type
     name?: string | null; // String
   };
+  UpdateUserGroupPermissionsInput: {
+    // input type
+    effect: NexusGenEnums["UpdateUserGroupPermissionsInputEffect"]; // UpdateUserGroupPermissionsInputEffect!
+    name: string; // String!
+  };
   UserFilter: {
     // input type
     status?: NexusGenEnums["UserStatus"][] | null; // [UserStatus!]
@@ -491,6 +496,8 @@ export interface NexusGenEnums {
   TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
   Tone: "FORMAL" | "INFORMAL";
+  UpdateUserGroupPermissionsInputEffect: "ALLOW" | "DENY" | "NONE";
+  UserGroupPermissionEffect: db.UserGroupPermissionEffect;
   UserGroupType: db.UserGroupType;
   UserLocale: db.UserLocale;
   UserStatus: db.UserStatus;
@@ -1031,6 +1038,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
   };
+  UserGroupPermission: db.UserGroupPermission;
   UserNotifications_Pagination: {
     // root type
     hasMore: boolean; // Boolean!
@@ -1669,6 +1677,8 @@ export interface NexusGenFieldTypes {
     updateTemplateDocumentTheme: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    updateUserGroupMembership: NexusGenRootTypes["User"]; // User!
+    updateUserGroupPermissions: NexusGenRootTypes["UserGroup"]; // UserGroup!
     updateUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2991,6 +3001,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     initials: string | null; // String
     isMe: boolean; // Boolean!
+    isOrgOwner: boolean; // Boolean!
     isSsoUser: boolean; // Boolean!
     isSuperAdmin: boolean; // Boolean!
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -3001,7 +3012,7 @@ export interface NexusGenFieldTypes {
     permissions: string[]; // [String!]!
     petitionListViews: NexusGenRootTypes["PetitionListView"][]; // [PetitionListView!]!
     preferredLocale: NexusGenEnums["UserLocale"]; // UserLocale!
-    role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+    role: NexusGenEnums["OrganizationRole"] | null; // OrganizationRole
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
     unreadNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -3026,6 +3037,7 @@ export interface NexusGenFieldTypes {
     memberCount: number; // Int!
     members: NexusGenRootTypes["UserGroupMember"][]; // [UserGroupMember!]!
     name: string; // String!
+    permissions: NexusGenRootTypes["UserGroupPermission"][]; // [UserGroupPermission!]!
     type: NexusGenEnums["UserGroupType"]; // UserGroupType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -3039,6 +3051,12 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
+  };
+  UserGroupPermission: {
+    // field return type
+    effect: NexusGenEnums["UserGroupPermissionEffect"]; // UserGroupPermissionEffect!
+    id: NexusGenScalars["GID"]; // GID!
+    name: string; // String!
   };
   UserNotifications_Pagination: {
     // field return type
@@ -3786,6 +3804,8 @@ export interface NexusGenFieldTypeNames {
     updateTemplateDocumentTheme: "PetitionBase";
     updateUser: "User";
     updateUserGroup: "UserGroup";
+    updateUserGroupMembership: "User";
+    updateUserGroupPermissions: "UserGroup";
     updateUserPreferredLocale: "User";
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
@@ -5108,6 +5128,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     initials: "String";
     isMe: "Boolean";
+    isOrgOwner: "Boolean";
     isSsoUser: "Boolean";
     isSuperAdmin: "Boolean";
     lastActiveAt: "DateTime";
@@ -5143,6 +5164,7 @@ export interface NexusGenFieldTypeNames {
     memberCount: "Int";
     members: "UserGroupMember";
     name: "String";
+    permissions: "UserGroupPermission";
     type: "UserGroupType";
     updatedAt: "DateTime";
   };
@@ -5156,6 +5178,12 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "UserGroup";
     totalCount: "Int";
+  };
+  UserGroupPermission: {
+    // field return type name
+    effect: "UserGroupPermissionEffect";
+    id: "GID";
+    name: "String";
   };
   UserNotifications_Pagination: {
     // field return type name
@@ -5835,7 +5863,7 @@ export interface NexusGenArgTypes {
       lastName: string; // String!
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
       orgId?: NexusGenScalars["GID"] | null; // GID
-      role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+      role?: NexusGenEnums["OrganizationRole"] | null; // OrganizationRole
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     loginAs: {
@@ -6491,6 +6519,16 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateUserGroupInput"]; // UpdateUserGroupInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateUserGroupMembership: {
+      // args
+      userGroupIds: NexusGenScalars["GID"][]; // [GID!]!
+      userId: NexusGenScalars["GID"]; // GID!
+    };
+    updateUserGroupPermissions: {
+      // args
+      permissions: NexusGenInputs["UpdateUserGroupPermissionsInput"][]; // [UpdateUserGroupPermissionsInput!]!
+      userGroupId: NexusGenScalars["GID"]; // GID!
     };
     updateUserPreferredLocale: {
       // args

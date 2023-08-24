@@ -12,7 +12,7 @@ import { validateFile } from "../helpers/validators/validateFile";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validateHexColor } from "../tag/validators";
-import { supportMethodAccess } from "./authorizers";
+import { superAdminAccess } from "./authorizers";
 import { validatePublicTemplateCategories } from "./validators";
 
 export const forceUpdateSignatureOrganizationBrandings = mutationField(
@@ -24,7 +24,7 @@ export const forceUpdateSignatureOrganizationBrandings = mutationField(
     args: {
       orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the Organization" })),
     },
-    authorize: supportMethodAccess(),
+    authorize: superAdminAccess(),
     resolve: async (_, { orgId }, ctx) => {
       try {
         const org = await ctx.organizations.loadOrg(orgId);
@@ -54,7 +54,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
     email: nonNull(stringArg()),
     locale: nonNull("UserLocale"),
   },
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   validateArgs: validEmail((args) => args.email, "email"),
   resolve: async (_, { email, locale }, ctx) => {
     try {
@@ -92,14 +92,13 @@ export const resetUserPassword = mutationField("resetUserPassword", {
 });
 
 export const transferOrganizationOwnership = mutationField("transferOrganizationOwnership", {
-  description:
-    "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
+  description: "Transfers the ownership of an organization to a given user.",
   type: "SupportMethodResponse",
   args: {
     orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the Organization" })),
     userId: nonNull(globalIdArg("User", { description: "Global ID of the new owner" })),
   },
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   resolve: async (_, { orgId, userId }, ctx) => {
     const newOwner = await ctx.users.loadUser(userId);
     if (!newOwner) {
@@ -117,20 +116,12 @@ export const transferOrganizationOwnership = mutationField("transferOrganization
 
     const currentOwner = await ctx.organizations.getOrganizationOwner(orgId);
 
-    await ctx.users.withTransaction(async (t) => {
-      await ctx.users.updateUserById(
-        currentOwner.id,
-        { organization_role: "ADMIN" },
-        `User:${ctx.user!.id}`,
-        t,
-      );
-      await ctx.users.updateUserById(
-        userId,
-        { organization_role: "OWNER" },
-        `User:${ctx.user!.id}`,
-        t,
-      );
-    });
+    await ctx.users.updateUserById(
+      currentOwner.id,
+      { is_org_owner: false },
+      `User:${ctx.user!.id}`,
+    );
+    await ctx.users.updateUserById(userId, { is_org_owner: true }, `User:${ctx.user!.id}`);
 
     return {
       result: RESULT.SUCCESS,
@@ -167,7 +158,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       ),
     ),
   ),
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   resolve: async (_, args, ctx, info) => {
     try {
       const template = await ctx.petitions.loadPetition(args.templateId);
@@ -241,7 +232,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
 export const uploadUserAvatar = mutationField("uploadUserAvatar", {
   description: "Uploads a user avatar image",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     userId: nonNull(globalIdArg("User", { description: "Global ID of the user" })),
     image: nonNull(uploadArg()),
@@ -301,7 +292,7 @@ export const updatePublicTemplateVisibility = mutationField("updatePublicTemplat
     templateId: nonNull(globalIdArg({ description: "global ID of the template" })),
     isPublic: nonNull(booleanArg({ description: "Public visiblity of template" })),
   },
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   resolve: async (_, { templateId, isPublic }, ctx, info) => {
     try {
       const template = await ctx.petitions.loadPetition(templateId);
@@ -328,7 +319,7 @@ export const updatePublicTemplateVisibility = mutationField("updatePublicTemplat
 export const updateOrganizationTier = mutationField("updateOrganizationTier", {
   description: "Applies a given tier to the organization",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the Organization" })),
     tier: nonNull(stringArg({ description: "e.g.: FREE, APPSUMO1, APPSUMO2, APPSUMO3..." })),
@@ -357,7 +348,7 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
 export const restoreDeletedPetition = mutationField("restoreDeletedPetition", {
   description: "Restores a deleted petition if it's not already anonymized.",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
   },
@@ -373,7 +364,7 @@ export const restoreDeletedPetition = mutationField("restoreDeletedPetition", {
 export const anonymizePetition = mutationField("anonymizePetition", {
   description: "Anonymizes a petition",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
   },
@@ -391,7 +382,7 @@ export const anonymizePetition = mutationField("anonymizePetition", {
 export const importPetitionFromJson = mutationField("importPetitionFromJson", {
   description: "Imports a petition from a JSON file",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     json: nonNull(
       stringArg({ description: "Petition to import in json format @form:type=textarea" }),
@@ -423,7 +414,7 @@ export const signaturitIntegrationShowSecurityStamp = mutationField(
   {
     description: "Enables/disables security stamp on documents for Signaturit integrations.",
     type: "SupportMethodResponse",
-    authorize: supportMethodAccess(),
+    authorize: superAdminAccess(),
     args: {
       integrationId: nonNull(intArg({ description: "Numeric ID of the integration" })),
       showCsv: nonNull(booleanArg({ description: "Enable CSV stamp" })),
@@ -467,7 +458,7 @@ export const signaturitIntegrationShowSecurityStamp = mutationField(
 export const removePetitionPassword = mutationField("removePetitionPassword", {
   description: "Removes the password on a petition or template",
   type: "SupportMethodResponse",
-  authorize: supportMethodAccess(),
+  authorize: superAdminAccess(),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
   },

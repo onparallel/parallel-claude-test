@@ -137,7 +137,6 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     invitee_email: string;
     invitee_first_name: string;
     invitee_last_name: string;
-    invitee_role: string;
   };
   REMINDER_OPTED_OUT: {
     reason: string;
@@ -267,7 +266,7 @@ export class AnalyticsService implements IAnalyticsService {
           id: toGlobalId("Organization", org.id),
           name: org.name,
         },
-        orgRole: user.organization_role,
+        isOrgOwner: user.is_org_owner,
         ...extraTraits,
       },
     });

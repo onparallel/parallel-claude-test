@@ -5,7 +5,6 @@ import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 import { KeysOfType } from "../../util/types";
-import { userHasRole } from "../../util/userHasRole";
 import { AuthenticationError } from "./errors";
 
 export type ArgAuthorizer<TArg, TRest extends any[] = []> = <
@@ -177,9 +176,12 @@ export function userIsSuperAdmin<
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const user = ctx.user!;
-      const org = await ctx.organizations.loadOrg(user.org_id);
-      return org?.status === "ROOT" && userHasRole(user, "ADMIN");
+      const [org, permissions] = await Promise.all([
+        ctx.organizations.loadOrg(ctx.user!.org_id),
+        ctx.users.loadUserPermissions(ctx.user!.id),
+      ]);
+
+      return org?.status === "ROOT" && permissions.includes("SUPERADMIN");
     } catch {}
     return false;
   };

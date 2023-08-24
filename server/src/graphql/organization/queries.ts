@@ -3,6 +3,7 @@ import { authenticateAnd, or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { contextUserBelongsToOrg } from "./authorizers";
+import { superAdminAccess } from "../support/authorizers";
 
 export const organizationQueries = queryField((t) => {
   t.nullable.field("organization", {
@@ -19,7 +20,7 @@ export const organizationQueries = queryField((t) => {
   t.paginationField("organizations", {
     type: "Organization",
     description: "The organizations registered in Parallel.",
-    authorize: authenticateAnd(userIsSuperAdmin()),
+    authorize: superAdminAccess(),
     searchable: true,
     sortableBy: ["name", "createdAt"],
     extendArgs: {

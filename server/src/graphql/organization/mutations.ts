@@ -38,6 +38,7 @@ import {
   userHasAccessToOrganizationTheme,
 } from "./authorizers";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
+import { superAdminAccess } from "../support/authorizers";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   description: "Updates the logo of an organization",
@@ -285,7 +286,7 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
     ),
     orgId: nonNull(globalIdArg("Organization")),
   },
-  authorize: authenticateAnd(userIsSuperAdmin()),
+  authorize: superAdminAccess(),
   resolve: async (_, { featureFlags, orgId }, ctx) => {
     const needRemoveBranding = featureFlags.some((f) => f.name === "REMOVE_PARALLEL_BRANDING");
 
@@ -310,7 +311,7 @@ export const createOrganization = mutationField("createOrganization", {
     email: nonNull(stringArg({ description: "Email of the organization owner" })),
     locale: nonNull("UserLocale"),
   },
-  authorize: authenticateAnd(userIsSuperAdmin()),
+  authorize: superAdminAccess(),
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
     (_, { status }, ctx, info) => {
@@ -365,7 +366,7 @@ export const updateOrganizationUserLimit = mutationField("updateOrganizationUser
     orgId: nonNull(globalIdArg("Organization")),
     limit: nonNull(intArg({ description: "How many users allow the org to create" })),
   },
-  authorize: authenticateAnd(userIsSuperAdmin()),
+  authorize: superAdminAccess(),
   resolve: async (_, { orgId, limit }, ctx) => {
     return await ctx.organizations.updateOrganizationUsageDetails(
       orgId,
@@ -390,7 +391,7 @@ export const updateOrganization = mutationField("updateOrganization", {
       }).asArg(),
     ),
   },
-  authorize: authenticateAnd(userIsSuperAdmin()),
+  authorize: superAdminAccess(),
   validateArgs: validateAnd(
     (_, args, ctx, info) => {
       if (args.data.status === "ROOT") {
@@ -421,7 +422,7 @@ export const updateOrganizationUsageDetails = mutationField("updateOrganizationU
   type: "Organization",
   description:
     "Updates the usage_details of a given organization. Will impact the limits of coming usage periods.",
-  authorize: authenticateAnd(userIsSuperAdmin()),
+  authorize: superAdminAccess(),
   args: {
     orgId: nonNull(globalIdArg("Organization")),
     limitName: nonNull("OrganizationUsageLimitName"),
@@ -499,7 +500,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
     ),
     duration: nonNull("Duration"),
   },
-  authorize: authenticateAnd(userIsSuperAdmin()),
+  authorize: superAdminAccess(),
   resolve: async (_, { orgId, duration, limit }, ctx) => {
     const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
       orgId,

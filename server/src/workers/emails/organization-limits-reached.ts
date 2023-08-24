@@ -8,9 +8,9 @@ export async function organizationLimitsReached(
   payload: { org_id: number; limit_name: OrganizationUsageLimitName },
   context: WorkerContext,
 ) {
-  const [usageLimit, ownerAndAdmins, parallelOrg, organization] = await Promise.all([
+  const [usageLimit, users, parallelOrg, organization] = await Promise.all([
     context.organizations.loadCurrentOrganizationUsageLimit(payload.org_id, payload.limit_name),
-    context.organizations.loadOwnerAndAdmins(payload.org_id),
+    context.users.getUsersWithPermission(payload.org_id, "ORG_SETTINGS"),
     context.organizations.loadRootOrganization(),
     context.organizations.loadOrg(payload.org_id),
   ]);
@@ -28,7 +28,7 @@ export async function organizationLimitsReached(
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(parallelOrg.id);
 
   const emails = [];
-  for (const user of ownerAndAdmins) {
+  for (const user of users) {
     const userData = await context.users.loadUserData(user.user_data_id);
     if (!userData) {
       throw new Error(`UserData:${user.user_data_id} not found for User:${user.id}`);

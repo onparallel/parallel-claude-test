@@ -410,6 +410,71 @@ export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 export const TaskStatusValues = ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"] as TaskStatus[];
 
+export type UserGroupPermissionEffect = "ALLOW" | "DENY";
+
+export const UserGroupPermissionEffectValues = ["ALLOW", "DENY"] as UserGroupPermissionEffect[];
+
+export type UserGroupPermissionName =
+  | "SUPERADMIN"
+  | "REPORTS:OVERVIEW"
+  | "REPORTS:TEMPLATE_STATISTICS"
+  | "REPORTS:TEMPLATE_REPLIES"
+  | "TAGS:CRUD_TAGS"
+  | "PROFILES:DELETE_PROFILES"
+  | "PROFILES:DELETE_PERMANENTLY_PROFILES"
+  | "PROFILE_TYPES:CRUD_PROFILE_TYPES"
+  | "INTEGRATIONS:CRUD_INTEGRATIONS"
+  | "USERS:CRUD_USERS"
+  | "USERS:GHOST_LOGIN"
+  | "TEAMS:CRUD_TEAMS"
+  | "TEAMS:CRUD_PERMISSIONS"
+  | "ORG_SETTINGS"
+  | "CONTACTS:DELETE_CONTACTS"
+  | "PETITIONS:SEND_ON_BEHALF"
+  | "PETITIONS:CHANGE_PATH"
+  | "PETITIONS:CREATE_TEMPLATES"
+  | "INTEGRATIONS:CRUD_API"
+  | "PROFILES:SUBSCRIBE_PROFILES"
+  | "PETITIONS:CREATE_PETITIONS"
+  | "PROFILES:CREATE_PROFILES"
+  | "PROFILES:CLOSE_PROFILES"
+  | "PROFILES:LIST_PROFILES"
+  | "PROFILE_ALERTS:LIST_ALERTS"
+  | "CONTACTS:LIST_CONTACTS"
+  | "USERS:LIST_USERS"
+  | "TEAMS:LIST_TEAMS";
+
+export const UserGroupPermissionNameValues = [
+  "SUPERADMIN",
+  "REPORTS:OVERVIEW",
+  "REPORTS:TEMPLATE_STATISTICS",
+  "REPORTS:TEMPLATE_REPLIES",
+  "TAGS:CRUD_TAGS",
+  "PROFILES:DELETE_PROFILES",
+  "PROFILES:DELETE_PERMANENTLY_PROFILES",
+  "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+  "INTEGRATIONS:CRUD_INTEGRATIONS",
+  "USERS:CRUD_USERS",
+  "USERS:GHOST_LOGIN",
+  "TEAMS:CRUD_TEAMS",
+  "TEAMS:CRUD_PERMISSIONS",
+  "ORG_SETTINGS",
+  "CONTACTS:DELETE_CONTACTS",
+  "PETITIONS:SEND_ON_BEHALF",
+  "PETITIONS:CHANGE_PATH",
+  "PETITIONS:CREATE_TEMPLATES",
+  "INTEGRATIONS:CRUD_API",
+  "PROFILES:SUBSCRIBE_PROFILES",
+  "PETITIONS:CREATE_PETITIONS",
+  "PROFILES:CREATE_PROFILES",
+  "PROFILES:CLOSE_PROFILES",
+  "PROFILES:LIST_PROFILES",
+  "PROFILE_ALERTS:LIST_ALERTS",
+  "CONTACTS:LIST_CONTACTS",
+  "USERS:LIST_USERS",
+  "TEAMS:LIST_TEAMS",
+] as UserGroupPermissionName[];
+
 export type UserGroupType = "NORMAL" | "ALL_USERS";
 
 export const UserGroupTypeValues = ["NORMAL", "ALL_USERS"] as UserGroupType[];
@@ -487,6 +552,7 @@ export interface TableTypes {
   user_delegate: UserDelegate;
   user_group: UserGroup;
   user_group_member: UserGroupMember;
+  user_group_permission: UserGroupPermission;
   user_petition_event_log: UserPetitionEventLog;
 }
 
@@ -546,6 +612,7 @@ export interface TableCreateTypes {
   user_delegate: CreateUserDelegate;
   user_group: CreateUserGroup;
   user_group_member: CreateUserGroupMember;
+  user_group_permission: CreateUserGroupPermission;
   user_petition_event_log: CreateUserPetitionEventLog;
 }
 
@@ -605,6 +672,7 @@ export interface TablePrimaryKeys {
   user_delegate: "id";
   user_group: "id";
   user_group_member: "id";
+  user_group_permission: "id";
   user_petition_event_log: "id";
 }
 
@@ -1843,7 +1911,10 @@ export type CreateTemporaryFile = PartialProps<
 export interface User {
   id: number; // int4
   org_id: number; // int4
-  organization_role: UserOrganizationRole; // user_organization_role
+  /**
+   * @deprecated
+   */
+  organization_role: Maybe<UserOrganizationRole>; // user_organization_role
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -1854,6 +1925,7 @@ export interface User {
   status: UserStatus; // user_status
   external_id: Maybe<string>; // varchar
   user_data_id: number; // int4
+  is_org_owner: boolean; // bool
 }
 
 export type CreateUser = PartialProps<
@@ -1868,6 +1940,7 @@ export type CreateUser = PartialProps<
   | "last_active_at"
   | "status"
   | "external_id"
+  | "is_org_owner"
 >;
 
 export interface UserAuthenticationToken {
@@ -1975,6 +2048,24 @@ export interface UserGroupMember {
 export type CreateUserGroupMember = PartialProps<
   Omit<UserGroupMember, "id">,
   "created_at" | "created_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface UserGroupPermission {
+  id: number; // int4
+  user_group_id: number; // int4
+  name: UserGroupPermissionName; // user_group_permission_name
+  effect: UserGroupPermissionEffect; // user_group_permission_effect
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateUserGroupPermission = PartialProps<
+  Omit<UserGroupPermission, "id">,
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface UserPetitionEventLog {

@@ -4,8 +4,8 @@ import { Knex } from "knex";
 import { pick } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
-import { KNEX } from "../../knex";
 import { Organization, User } from "../../__types";
+import { KNEX } from "../../knex";
 import { OrganizationRepository } from "../OrganizationRepository";
 import { Mocks } from "./mocks";
 
@@ -138,7 +138,7 @@ describe("repositories/OrganizationRepository", () => {
         {
           user_data_id: userData.id,
           org_id: org2.id,
-          organization_role: "NORMAL",
+          is_org_owner: false,
         },
       ]);
     });
@@ -159,7 +159,7 @@ describe("repositories/OrganizationRepository", () => {
         {
           user_data_id: userData.id,
           org_id: org2.id,
-          organization_role: "NORMAL",
+          is_org_owner: false,
         },
       ]);
     });
@@ -180,12 +180,12 @@ describe("repositories/OrganizationRepository", () => {
         {
           user_data_id: userData.find((ud) => ud.email === "joffrey@kingslanding.com")!.id,
           org_id: org2.id,
-          organization_role: "NORMAL",
+          is_org_owner: false,
         },
         {
           user_data_id: userData.find((ud) => ud.email === "robert.the.king@kingslanding.com")!.id,
           org_id: org2.id,
-          organization_role: "NORMAL",
+          is_org_owner: false,
         },
       ]);
     });

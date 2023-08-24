@@ -3110,11 +3110,6 @@
     "context": "Unread"
   },
   {
-    "term": "component.only-admins-alert.body",
-    "definition": "Only admins can edit these settings. Please ask them if you need any changes on this page.",
-    "context": "Only admins can edit these settings. Please ask them if you need any changes on this page."
-  },
-  {
     "term": "component.organization-memebers-list-table-headr.sso-provider",
     "definition": "SSO provider",
     "context": "SSO provider"
@@ -6325,9 +6320,19 @@
     "context": "Restrict editing"
   },
   {
-    "term": "component.restricted-feature-popover.contact-and-admin",
-    "definition": "<a>Contact an admin</a> if you need to change these permissions.",
-    "context": "<a>Contact an admin</a> if you need to change these permissions."
+    "term": "component.restricted-feature-alert.contact-org-owner",
+    "definition": "<a>Contact the owner</a> of your organization if you need to change these permissions.",
+    "context": "<a>Contact the owner</a> of your organization if you need to change these permissions."
+  },
+  {
+    "term": "component.restricted-feature-alert.restricted",
+    "definition": "This feature is restricted.",
+    "context": "This feature is restricted."
+  },
+  {
+    "term": "component.restricted-feature-popover.contact-org-owner",
+    "definition": "<a>Contact the owner</a> of your organization if you need to change these permissions.",
+    "context": "<a>Contact the owner</a> of your organization if you need to change these permissions."
   },
   {
     "term": "component.restricted-feature-popover.restricted",
@@ -7411,8 +7416,8 @@
   },
   {
     "term": "component.user-dropdown-empty.no-options-contact-admin",
-    "definition": "Contact with <a>the owner or an admin</a> of your organization to create them an account.",
-    "context": "Contact with <a>the owner or an admin</a> of your organization to create them an account."
+    "definition": "Contact with <a>the owner</a> of your organization to create them an account.",
+    "context": "Contact with <a>the owner</a> of your organization to create them an account."
   },
   {
     "term": "component.user-dropdown-empty.search-hint",
@@ -7423,6 +7428,16 @@
     "term": "component.user-dropdown-empty.search-hint-include-groups",
     "definition": "Search for existing users and teams",
     "context": "Search for existing users and teams"
+  },
+  {
+    "term": "component.user-group-layout.permissions",
+    "definition": "Permissions",
+    "context": "Permissions"
+  },
+  {
+    "term": "component.user-group-layout.users",
+    "definition": "Users",
+    "context": "Users"
   },
   {
     "term": "component.user-group-members-popover.members-of",
@@ -8395,11 +8410,6 @@
     "context": "Old password"
   },
   {
-    "term": "generic.forms.organization-role-label",
-    "definition": "Organization role",
-    "context": "Organization role"
-  },
-  {
     "term": "generic.forms.password-label",
     "definition": "Password",
     "context": "Password"
@@ -8693,6 +8703,11 @@
     "term": "generic.options",
     "definition": "Options...",
     "context": "Options..."
+  },
+  {
+    "term": "generic.organization-owner",
+    "definition": "Owner",
+    "context": "Owner"
   },
   {
     "term": "generic.page-break",
@@ -9208,31 +9223,6 @@
     "term": "organization-groups.remove-from-group",
     "definition": "Remove from team",
     "context": "Remove from team"
-  },
-  {
-    "term": "organization-role.admin",
-    "definition": "Admin",
-    "context": "Admin"
-  },
-  {
-    "term": "organization-role.collaborator",
-    "definition": "Collaborator",
-    "context": "Collaborator"
-  },
-  {
-    "term": "organization-role.header.user",
-    "definition": "Role",
-    "context": "Role"
-  },
-  {
-    "term": "organization-role.normal",
-    "definition": "Member",
-    "context": "Member"
-  },
-  {
-    "term": "organization-role.owner",
-    "definition": "Owner",
-    "context": "Owner"
   },
   {
     "term": "organization-usage.visually-hidden.out-of",
@@ -9788,6 +9778,351 @@
     "term": "page.organizations.features-active",
     "definition": "Enabled features",
     "context": "Enabled features"
+  },
+  {
+    "term": "page.permissions-group.category-contacts",
+    "definition": "Contacts",
+    "context": "Contacts"
+  },
+  {
+    "term": "page.permissions-group.category-integrations",
+    "definition": "Integrations",
+    "context": "Integrations"
+  },
+  {
+    "term": "page.permissions-group.category-organization",
+    "definition": "Organization",
+    "context": "Organization"
+  },
+  {
+    "term": "page.permissions-group.category-petitions",
+    "definition": "Parallels",
+    "context": "Parallels"
+  },
+  {
+    "term": "page.permissions-group.category-profiles",
+    "definition": "Profiles",
+    "context": "Profiles"
+  },
+  {
+    "term": "page.permissions-group.category-reports",
+    "definition": "Reports",
+    "context": "Reports"
+  },
+  {
+    "term": "page.permissions-group.category-superadmin",
+    "definition": "SuperAdmin",
+    "context": "SuperAdmin"
+  },
+  {
+    "term": "page.permissions-group.category-tags",
+    "definition": "Tags",
+    "context": "Tags"
+  },
+  {
+    "term": "page.permissions-group.category-teams",
+    "definition": "Teams",
+    "context": "Teams"
+  },
+  {
+    "term": "page.permissions-group.category-users",
+    "definition": "Users",
+    "context": "Users"
+  },
+  {
+    "term": "page.permissions-group.contacts-list",
+    "definition": "View contacts",
+    "context": "View contacts"
+  },
+  {
+    "term": "page.permissions-group.contacts-list-description",
+    "definition": "Grants users in this team permissions to view the list of contacts on the organization",
+    "context": "Grants users in this team permissions to view the list of contacts on the organization"
+  },
+  {
+    "term": "page.permissions-group.delete-contacts",
+    "definition": "Delete contacts",
+    "context": "Delete contacts"
+  },
+  {
+    "term": "page.permissions-group.delete-contacts-description",
+    "definition": "Grants users in this team permissions to delete contacts on the organization",
+    "context": "Grants users in this team permissions to delete contacts on the organization"
+  },
+  {
+    "term": "page.permissions-group.effects-allow",
+    "definition": "Allow",
+    "context": "Allow"
+  },
+  {
+    "term": "page.permissions-group.effects-deny",
+    "definition": "Deny",
+    "context": "Deny"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud",
+    "definition": "Edit integrations",
+    "context": "Edit integrations"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud-api",
+    "definition": "Developers panel",
+    "context": "Developers panel"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud-api-description",
+    "definition": "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens",
+    "context": "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens"
+  },
+  {
+    "term": "page.permissions-group.integrations-crud-description",
+    "definition": "Grants users in this team permissions to manage the different integrations of the organization",
+    "context": "Grants users in this team permissions to manage the different integrations of the organization"
+  },
+  {
+    "term": "page.permissions-group.org-settings",
+    "definition": "Edit organization settings",
+    "context": "Edit organization settings"
+  },
+  {
+    "term": "page.permissions-group.org-settings-description",
+    "definition": "Grants users in this team permissions to access and edit the general settings of the organization.",
+    "context": "Grants users in this team permissions to access and edit the general settings of the organization."
+  },
+  {
+    "term": "page.permissions-group.permissions-group",
+    "definition": "Team permissions",
+    "context": "Team permissions"
+  },
+  {
+    "term": "page.permissions-group.petitions-change-path",
+    "definition": "Move templates and parallels",
+    "context": "Move templates and parallels"
+  },
+  {
+    "term": "page.permissions-group.petitions-change-path-description",
+    "definition": "Grants users in this team permissions to create and manage folders of templates and parallels",
+    "context": "Grants users in this team permissions to create and manage folders of templates and parallels"
+  },
+  {
+    "term": "page.permissions-group.petitions-create",
+    "definition": "Create petitions",
+    "context": "Create petitions"
+  },
+  {
+    "term": "page.permissions-group.petitions-create-description",
+    "definition": "Grants users in this team permissions to create parallels on the organization.",
+    "context": "Grants users in this team permissions to create parallels on the organization."
+  },
+  {
+    "term": "page.permissions-group.petitions-create-templates",
+    "definition": "Create templates",
+    "context": "Create templates"
+  },
+  {
+    "term": "page.permissions-group.petitions-create-templates-description",
+    "definition": "Grants users in this team permissions to create templates on the organization.",
+    "context": "Grants users in this team permissions to create templates on the organization."
+  },
+  {
+    "term": "page.permissions-group.petitions-send-on-behalf",
+    "definition": "Send on behalf",
+    "context": "Send on behalf"
+  },
+  {
+    "term": "page.permissions-group.petitions-send-on-behalf-description",
+    "definition": "Grants users in this team permissions to send parallels on behalf of any other user in their organization.",
+    "context": "Grants users in this team permissions to send parallels on behalf of any other user in their organization."
+  },
+  {
+    "term": "page.permissions-group.profile-alerts-list",
+    "definition": "View alerts",
+    "context": "View alerts"
+  },
+  {
+    "term": "page.permissions-group.profile-alerts-list-description",
+    "definition": "Grants users in this team permissions to view the list of property expiration alerts of the profiles",
+    "context": "Grants users in this team permissions to view the list of property expiration alerts of the profiles"
+  },
+  {
+    "term": "page.permissions-group.profile-delete-profiles",
+    "definition": "Delete profiles",
+    "context": "Delete profiles"
+  },
+  {
+    "term": "page.permissions-group.profile-delete-profiles-description",
+    "definition": "Grants users in this team permissions to send profiles to the thrash bin.",
+    "context": "Grants users in this team permissions to send profiles to the thrash bin."
+  },
+  {
+    "term": "page.permissions-group.profile-types-crud",
+    "definition": "Edit profile types",
+    "context": "Edit profile types"
+  },
+  {
+    "term": "page.permissions-group.profile-types-crud-description",
+    "definition": "Grants users in this team permissions to configure and create profile types on the organization.",
+    "context": "Grants users in this team permissions to configure and create profile types on the organization."
+  },
+  {
+    "term": "page.permissions-group.profiles-close",
+    "definition": "Close profiles",
+    "context": "Close profiles"
+  },
+  {
+    "term": "page.permissions-group.profiles-close-description",
+    "definition": "Grants users in this team permissions to close and reopen profiles on the organization",
+    "context": "Grants users in this team permissions to close and reopen profiles on the organization"
+  },
+  {
+    "term": "page.permissions-group.profiles-create",
+    "definition": "Create profiles",
+    "context": "Create profiles"
+  },
+  {
+    "term": "page.permissions-group.profiles-create-description",
+    "definition": "Grants users in this team permissions to create and manage profiles on the organization",
+    "context": "Grants users in this team permissions to create and manage profiles on the organization"
+  },
+  {
+    "term": "page.permissions-group.profiles-delete-permanently-profiles",
+    "definition": "Delete profiles permanently",
+    "context": "Delete profiles permanently"
+  },
+  {
+    "term": "page.permissions-group.profiles-delete-permanently-profiles-description",
+    "definition": "Grants users in this team permissions to permanently delete profiles.",
+    "context": "Grants users in this team permissions to permanently delete profiles."
+  },
+  {
+    "term": "page.permissions-group.profiles-list",
+    "definition": "List profiles",
+    "context": "List profiles"
+  },
+  {
+    "term": "page.permissions-group.profiles-list-description",
+    "definition": "Grants users in this team permissions to view the list of profiles created on the organization",
+    "context": "Grants users in this team permissions to view the list of profiles created on the organization"
+  },
+  {
+    "term": "page.permissions-group.profiles-subscribe",
+    "definition": "Profiles subscribe",
+    "context": "Profiles subscribe"
+  },
+  {
+    "term": "page.permissions-group.profiles-subscribe-description",
+    "definition": "Grants users in this team permissions to manage profile alerts subscriptions",
+    "context": "Grants users in this team permissions to manage profile alerts subscriptions"
+  },
+  {
+    "term": "page.permissions-group.reports-overview",
+    "definition": "Reports overview",
+    "context": "Reports overview"
+  },
+  {
+    "term": "page.permissions-group.reports-overview-description",
+    "definition": "Grants users in this team permissions to view the general usage report of the organization",
+    "context": "Grants users in this team permissions to view the general usage report of the organization"
+  },
+  {
+    "term": "page.permissions-group.reports-template-replies",
+    "definition": "Template replies",
+    "context": "Template replies"
+  },
+  {
+    "term": "page.permissions-group.reports-template-replies-description",
+    "definition": "Grants users in this team permissions to view the template replies report of the organization",
+    "context": "Grants users in this team permissions to view the template replies report of the organization"
+  },
+  {
+    "term": "page.permissions-group.reports-template-statistics",
+    "definition": "Template statistics",
+    "context": "Template statistics"
+  },
+  {
+    "term": "page.permissions-group.reports-template-statistics-description",
+    "definition": "Grants users in this team permissions to view the template statistics report of the organization",
+    "context": "Grants users in this team permissions to view the template statistics report of the organization"
+  },
+  {
+    "term": "page.permissions-group.superadmin",
+    "definition": "SuperAdmin",
+    "context": "SuperAdmin"
+  },
+  {
+    "term": "page.permissions-group.superadmin-description",
+    "definition": "Grants users in this team permissions to access the Admin Panel. (only for Parallel org)",
+    "context": "Grants users in this team permissions to access the Admin Panel. (only for Parallel org)"
+  },
+  {
+    "term": "page.permissions-group.tags-crud-tags",
+    "definition": "Edit tags",
+    "context": "Edit tags"
+  },
+  {
+    "term": "page.permissions-group.tags-crud-tags-description",
+    "definition": "Grants users in this team permissions to create, edit and delete tags for the templates and parallels on the organization",
+    "context": "Grants users in this team permissions to create, edit and delete tags for the templates and parallels on the organization"
+  },
+  {
+    "term": "page.permissions-group.teams-crud",
+    "definition": "Edit teams",
+    "context": "Edit teams"
+  },
+  {
+    "term": "page.permissions-group.teams-crud-description",
+    "definition": "Grants users in this team permissions to manage the teams on the organization",
+    "context": "Grants users in this team permissions to manage the teams on the organization"
+  },
+  {
+    "term": "page.permissions-group.teams-edit-permissions",
+    "definition": "Edit team permissions",
+    "context": "Edit team permissions"
+  },
+  {
+    "term": "page.permissions-group.teams-edit-permissions-description",
+    "definition": "Grants users in this team permissions to manage the permissions of each team on the organization",
+    "context": "Grants users in this team permissions to manage the permissions of each team on the organization"
+  },
+  {
+    "term": "page.permissions-group.teams-list",
+    "definition": "View teams",
+    "context": "View teams"
+  },
+  {
+    "term": "page.permissions-group.teams-list-description",
+    "definition": "Grants users in this team permissions to view the list of teams on the organization",
+    "context": "Grants users in this team permissions to view the list of teams on the organization"
+  },
+  {
+    "term": "page.permissions-group.users-crud",
+    "definition": "Edit users",
+    "context": "Edit users"
+  },
+  {
+    "term": "page.permissions-group.users-crud-description",
+    "definition": "Grants users in this team permissions to manage the users on the organization",
+    "context": "Grants users in this team permissions to manage the users on the organization"
+  },
+  {
+    "term": "page.permissions-group.users-ghost-login",
+    "definition": "Ghost login",
+    "context": "Ghost login"
+  },
+  {
+    "term": "page.permissions-group.users-ghost-login-description",
+    "definition": "Grants users in this team permissions to access the account of any user on the organization, including the owner.",
+    "context": "Grants users in this team permissions to access the account of any user on the organization, including the owner."
+  },
+  {
+    "term": "page.permissions-group.users-list",
+    "definition": "View users",
+    "context": "View users"
+  },
+  {
+    "term": "page.permissions-group.users-list-description",
+    "definition": "Grants users in this team permissions to view the list of users on the organization",
+    "context": "Grants users in this team permissions to view the list of users on the organization"
   },
   {
     "term": "page.petition-replies.export-pdf",

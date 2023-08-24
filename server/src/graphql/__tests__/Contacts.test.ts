@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker";
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { Contact, Organization, PetitionMessage, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Contact, Organization, PetitionMessage, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/Contacts", () => {
   let testClient: TestClient;
@@ -22,7 +22,7 @@ describe("GraphQL/Contacts", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ user, organization } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    ({ user, organization } = await mocks.createSessionUserAndOrganization());
 
     userContacts = await mocks.createRandomContacts(organization.id, 5, (n) => ({
       email: n === 4 ? "email.search@onparallel.com" : faker.internet.email().toLowerCase(),
@@ -364,10 +364,8 @@ describe("GraphQL/Contacts", () => {
     expect(data).toBeNull();
   });
 
-  it("sends error when trying to delete a contact as normal user", async () => {
-    const [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      organization_role: "NORMAL",
-    }));
+  it("sends error when trying to delete a contact without CONTACTS:DELETE_CONTACTS permission", async () => {
+    const [normalUser] = await mocks.createRandomUsers(organization.id);
     const { apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
       "normal-token",
       normalUser.id,

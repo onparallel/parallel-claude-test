@@ -11,9 +11,8 @@ import {
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { OrganizationRole, UserLocale } from "@parallel/graphql/__types";
+import { UserLocale } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
@@ -25,7 +24,6 @@ interface InviteUserDialogData {
   firstName: string;
   lastName: string;
   locale: UserLocale;
-  role: OrganizationRole;
 }
 
 export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogData>) {
@@ -41,7 +39,6 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
       firstName: "",
       lastName: "",
       locale: asSupportedUserLocale(intl.locale),
-      role: "NORMAL",
     },
   });
 
@@ -52,7 +49,6 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
   });
 
   const locales = useSupportedUserLocales();
-  const roles = useOrganizationRoles();
 
   return (
     <ConfirmDialog
@@ -123,21 +119,6 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
               {locales.map((locale) => (
                 <option key={locale.key} value={locale.key}>
                   {locale.localizedLabel}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl id="role" isInvalid={!!errors.role}>
-            <FormLabel>
-              <FormattedMessage
-                id="generic.forms.organization-role-label"
-                defaultMessage="Organization role"
-              />
-            </FormLabel>
-            <Select {...register("role", { required: true })}>
-              {roles.map((rol) => (
-                <option key={rol.role} value={rol.role}>
-                  {rol.label}
                 </option>
               ))}
             </Select>

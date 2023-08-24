@@ -21,7 +21,6 @@ export type SystemEventPayload<TType extends SystemEventType> = {
     email: string;
     first_name: string;
     last_name: string;
-    role: string;
   };
   EMAIL_OPENED: {
     type: "petition-message" | "petition-reminder";

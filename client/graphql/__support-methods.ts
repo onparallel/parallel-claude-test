@@ -394,8 +394,7 @@ export const supportMethods: {
   {
     field: {
       name: "transferOrganizationOwnership",
-      description:
-        "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
+      description: "Transfers the ownership of an organization to a given user.",
       args: [
         {
           name: "orgId",

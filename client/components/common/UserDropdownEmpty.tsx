@@ -1,6 +1,7 @@
 import { Button, Image, Stack, Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { Link, NakedLink } from "./Link";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 
 interface UserDropdownEmptyProps {
   search: string;
@@ -13,6 +14,7 @@ export function UserDropdownEmpty({
   canCreateUsers,
   includeGroups,
 }: UserDropdownEmptyProps) {
+  const userCanListOrgUsers = useHasPermission("USERS:LIST_USERS");
   return (
     <Stack alignItems="center" textAlign="center" padding={4} spacing={4} fontSize="sm">
       {search ? (
@@ -42,9 +44,14 @@ export function UserDropdownEmpty({
             <Text>
               <FormattedMessage
                 id="component.user-dropdown-empty.no-options-contact-admin"
-                defaultMessage="Contact with <a>the owner or an admin</a> of your organization to create them an account."
+                defaultMessage="Contact with <a>the owner</a> of your organization to create them an account."
                 values={{
-                  a: (chunks: any) => <Link href={`/app/organization/users`}>{chunks}</Link>,
+                  a: (chunks: any) =>
+                    userCanListOrgUsers ? (
+                      <Link href={`/app/organization/users`}>{chunks}</Link>
+                    ) : (
+                      chunks
+                    ),
                 }}
               />
             </Text>

@@ -1,12 +1,11 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { sortBy } from "remeda";
-import { USER_COGNITO_ID } from "../../../test/mocks";
+import { Organization, Petition, Tag, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, Tag } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/Tags", () => {
   let mocks: Mocks;
@@ -25,22 +24,13 @@ describe("GraphQL/Tags", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
+    let user: User;
+    ({ user, organization } = await mocks.createSessionUserAndOrganization(() => ({
       name: "Parallel",
       status: "DEV",
-    }));
+    })));
 
     [otherOrg] = await mocks.createRandomOrganizations(1);
-
-    const [user] = await mocks.createRandomUsers(
-      organization.id,
-      1,
-      () => ({
-        org_id: organization.id,
-        organization_role: "ADMIN",
-      }),
-      () => ({ cognito_id: USER_COGNITO_ID, first_name: "Harvey", last_name: "Specter" }),
-    );
 
     const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 2);
 

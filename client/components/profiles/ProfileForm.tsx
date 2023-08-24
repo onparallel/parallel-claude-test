@@ -36,11 +36,14 @@ import {
   UpdateProfileFieldValueInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { FORMATS } from "@parallel/utils/dates";
 import { discriminator } from "@parallel/utils/discriminator";
 import { useFieldWithIndices } from "@parallel/utils/fieldIndices";
 import { withError } from "@parallel/utils/promises/withError";
+import { MaybePromise } from "@parallel/utils/types";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import pMap from "p-map";
 import { useMemo } from "react";
@@ -48,8 +51,6 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-import { FORMATS } from "@parallel/utils/dates";
-import { MaybePromise } from "@parallel/utils/types";
 
 export interface ProfileFormData {
   fields: ({ type: ProfileTypeFieldType } & UpdateProfileFieldValueInput)[];
@@ -584,6 +585,8 @@ function ProfileDeletedAlert({
   onRecoverClick?: () => void;
 }) {
   const intl = useIntl();
+
+  const userCanRecoverProfile = useHasPermission("PROFILES:CLOSE_PROFILES");
   return (
     <Alert overflow="visible" status="error">
       <AlertIcon />
@@ -607,11 +610,16 @@ function ProfileDeletedAlert({
             }}
           />
         </Text>
-        <Box>
-          <Button backgroundColor="white" onClick={onRecoverClick} fontWeight={500}>
-            <FormattedMessage id="component.profile-form.recover-button" defaultMessage="Recover" />
-          </Button>
-        </Box>
+        {userCanRecoverProfile ? (
+          <Box>
+            <Button backgroundColor="white" onClick={onRecoverClick} fontWeight={500}>
+              <FormattedMessage
+                id="component.profile-form.recover-button"
+                defaultMessage="Recover"
+              />
+            </Button>
+          </Box>
+        ) : null}
       </AlertDescription>
     </Alert>
   );

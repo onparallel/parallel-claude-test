@@ -201,7 +201,12 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               isDisabled={status !== "OPEN"}
             />
             <WhenPermission
-              permission={["PROFILES:SUBSCRIBE_PROFILES", "PROFILES:DELETE_PROFILES"]}
+              permission={[
+                "PROFILES:SUBSCRIBE_PROFILES",
+                "PROFILES:CLOSE_PROFILES",
+                "PROFILES:DELETE_PROFILES",
+                "PROFILES:DELETE_PERMANENTLY_PROFILES",
+              ]}
               operator="OR"
             >
               <MoreOptionsMenuButton
@@ -246,7 +251,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                       <MenuItem
                         icon={<ArchiveIcon display="block" boxSize={4} />}
                         onClick={handleRecoverProfileClick}
-                        isDisabled={!userCanDeleteProfiles}
+                        isDisabled={!userCanCloseOpenProfiles}
                       >
                         <FormattedMessage
                           id="component.more-options-menu-profile.recover-profile"
@@ -260,7 +265,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                       icon={<DeleteIcon display="block" boxSize={4} />}
                       onClick={handleDeleteProfile}
                       isDisabled={
-                        !userCanDeleteProfiles ||
+                        (status !== "DELETION_SCHEDULED" && !userCanDeleteProfiles) ||
                         (status === "DELETION_SCHEDULED" && !userCanDeletePermanently)
                       }
                     >

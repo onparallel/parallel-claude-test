@@ -47,6 +47,7 @@ import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { usePetitionSharingDialog } from "./PetitionSharingDialog";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 
 export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> {
   template: TemplateDetailsModal_PetitionTemplateFragment;
@@ -73,6 +74,7 @@ export function TemplateDetailsModal({
 
   const myId = useGetMyId();
   const userCanClone = useHasPermission("PETITIONS:CREATE_TEMPLATES");
+  const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
 
   const onCopyPublicLink = useClipboardWithToast({
     text: intl.formatMessage({
@@ -191,18 +193,21 @@ export function TemplateDetailsModal({
             <Flex marginY={6} flexDirection={{ base: "column-reverse", md: "row" }} gridGap={3}>
               <Box flex="1">
                 {template.isPublic ? (
-                  <Button
-                    width="100%"
-                    data-testid="create-parallel-button"
-                    data-action="use-template"
-                    leftIcon={<PaperPlaneIcon />}
-                    onClick={handleCreatePetition}
-                  >
-                    <FormattedMessage
-                      id="generic.create-petition"
-                      defaultMessage="Create parallel"
-                    />
-                  </Button>
+                  <RestrictedFeaturePopover width="100%" isRestricted={!userCanCreatePetition}>
+                    <Button
+                      width="100%"
+                      data-testid="create-parallel-button"
+                      data-action="use-template"
+                      leftIcon={<PaperPlaneIcon />}
+                      isDisabled={!userCanCreatePetition}
+                      onClick={handleCreatePetition}
+                    >
+                      <FormattedMessage
+                        id="generic.create-petition"
+                        defaultMessage="Create parallel"
+                      />
+                    </Button>
+                  </RestrictedFeaturePopover>
                 ) : (
                   <Button width="100%" leftIcon={<EyeIcon />} onClick={handlePreviewTemplate}>
                     <FormattedMessage
@@ -214,18 +219,20 @@ export function TemplateDetailsModal({
               </Box>
               <HStack flex="1" spacing={3}>
                 {template.isPublic ? (
-                  <Button
-                    width="100%"
-                    colorScheme="primary"
-                    isDisabled={!userCanClone}
-                    onClick={handleCloneTemplate}
-                    leftIcon={<CopyIcon />}
-                  >
-                    <FormattedMessage
-                      id="component.template-details-modal.save-to-edit"
-                      defaultMessage="Save to edit"
-                    />
-                  </Button>
+                  <RestrictedFeaturePopover width="100%" isRestricted={!userCanClone}>
+                    <Button
+                      width="100%"
+                      colorScheme="primary"
+                      isDisabled={!userCanClone}
+                      onClick={handleCloneTemplate}
+                      leftIcon={<CopyIcon />}
+                    >
+                      <FormattedMessage
+                        id="component.template-details-modal.save-to-edit"
+                        defaultMessage="Save to edit"
+                      />
+                    </Button>
+                  </RestrictedFeaturePopover>
                 ) : template.publicLink?.isActive ? (
                   <Button
                     width="100%"
@@ -236,19 +243,22 @@ export function TemplateDetailsModal({
                     <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                   </Button>
                 ) : (
-                  <Button
-                    width="100%"
-                    data-testid="create-parallel-button"
-                    data-action="use-template"
-                    colorScheme="primary"
-                    leftIcon={<PaperPlaneIcon />}
-                    onClick={handleCreatePetition}
-                  >
-                    <FormattedMessage
-                      id="generic.create-petition"
-                      defaultMessage="Create parallel"
-                    />
-                  </Button>
+                  <RestrictedFeaturePopover width="100%" isRestricted={!userCanCreatePetition}>
+                    <Button
+                      width="100%"
+                      data-testid="create-parallel-button"
+                      data-action="use-template"
+                      colorScheme="primary"
+                      leftIcon={<PaperPlaneIcon />}
+                      isDisabled={!userCanCreatePetition}
+                      onClick={handleCreatePetition}
+                    >
+                      <FormattedMessage
+                        id="generic.create-petition"
+                        defaultMessage="Create parallel"
+                      />
+                    </Button>
+                  </RestrictedFeaturePopover>
                 )}
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
                   <MoreOptionsMenuButton
@@ -261,6 +271,7 @@ export function TemplateDetailsModal({
                             onClick={handleCreatePetition}
                             data-testid="create-parallel-button"
                             icon={<PaperPlaneIcon display="block" boxSize={4} />}
+                            isDisabled={!userCanCreatePetition}
                           >
                             <FormattedMessage
                               id="generic.create-petition"

@@ -1,6 +1,12 @@
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "../config";
-import { CreateOrganization, CreateUserData, Organization, User } from "../db/__types";
+import {
+  CreateOrganization,
+  CreateUserData,
+  Organization,
+  User,
+  UserGroupPermissionName,
+} from "../db/__types";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { UserGroupRepository } from "../db/repositories/UserGroupRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
@@ -60,7 +66,9 @@ export class AccountSetupService implements IAccountSetupService {
 
     const user = await this.users.createUser(
       {
+        /** @deprecated */
         organization_role: "OWNER",
+        is_org_owner: true,
         org_id: organization.id,
         status: "ACTIVE",
       },
@@ -81,6 +89,29 @@ export class AccountSetupService implements IAccountSetupService {
       createdBy,
     );
     await this.userGroups.addUsersToGroups(userGroup.id, user.id, createdBy);
+    await this.userGroups.upsertUserGroupPermissions(
+      userGroup.id,
+      (
+        [
+          "PETITIONS:CHANGE_PATH",
+          "PETITIONS:CREATE_TEMPLATES",
+          "INTEGRATIONS:CRUD_API",
+          "PROFILES:SUBSCRIBE_PROFILES",
+          "PETITIONS:CREATE_PETITIONS",
+          "PROFILES:CREATE_PROFILES",
+          "PROFILES:CLOSE_PROFILES",
+          "PROFILES:LIST_PROFILES",
+          "PROFILE_ALERTS:LIST_ALERTS",
+          "CONTACTS:LIST_CONTACTS",
+          "USERS:LIST_USERS",
+          "TEAMS:LIST_TEAMS",
+        ] as UserGroupPermissionName[]
+      ).map((name) => ({
+        effect: "ALLOW",
+        name,
+      })),
+      createdBy,
+    );
 
     return {
       // load org to get updated usage_details

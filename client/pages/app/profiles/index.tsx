@@ -114,6 +114,7 @@ function Profiles() {
   const [status, setStatus] = useQueryStateSlice(queryState, setQueryState, "status");
   const navigate = useHandleNavigation();
 
+  const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
   const userCanSubscribeProfiles = useHasPermission("PROFILES:SUBSCRIBE_PROFILES");
   const userCanDeleteProfiles = useHasPermission("PROFILES:DELETE_PROFILES");
   const userCanCloseOpenProfiles = useHasPermission("PROFILES:CLOSE_PROFILES");
@@ -279,6 +280,7 @@ function Profiles() {
     canDelete: userCanDeleteProfiles,
     canCloseOpen: userCanCloseOpenProfiles,
     canDeletePermanently: userCanDeletePermanently,
+    canSubscribeUsers: userCanSubscribeProfiles,
     onDeleteClick: handleDeleteClick,
     onSubscribeClick: handleSubscribeClick,
     onCloseClick: handleCloseClick,
@@ -366,7 +368,11 @@ function Profiles() {
           </Flex>
           <Spacer minW={4} />
           <Box>
-            <Button colorScheme="primary" onClick={handleCreateProfile}>
+            <Button
+              colorScheme="primary"
+              onClick={handleCreateProfile}
+              isDisabled={!userCanCreateProfiles}
+            >
               <FormattedMessage id="page.profiles.create-profile" defaultMessage="Create profile" />
             </Button>
           </Box>
@@ -378,7 +384,7 @@ function Profiles() {
             rows={profiles?.items}
             rowKeyProp="id"
             context={context}
-            isSelectable={userCanSubscribeProfiles}
+            isSelectable
             isHighlightable
             loading={loading}
             onRowClick={handleRowClick}
@@ -495,6 +501,7 @@ function useProfileListActions({
   onCloseClick,
   onReopenClick,
   onRecoverClick,
+  canSubscribeUsers,
   canDelete,
   canCloseOpen,
   canDeletePermanently,
@@ -506,6 +513,7 @@ function useProfileListActions({
   onCloseClick: () => void;
   onReopenClick: () => void;
   onRecoverClick: () => void;
+  canSubscribeUsers: boolean;
   canDelete: boolean;
   canCloseOpen: boolean;
   canDeletePermanently: boolean;
@@ -520,6 +528,7 @@ function useProfileListActions({
             onClick: onSubscribeClick,
             leftIcon: <BellIcon />,
             children: <FormattedMessage id="generic.subscribe" defaultMessage="Subscribe" />,
+            isDisabled: !canSubscribeUsers,
           },
           {
             key: "close",
@@ -533,6 +542,14 @@ function useProfileListActions({
               />
             ),
             isDisabled: !canCloseOpen,
+          },
+          {
+            key: "delete",
+            onClick: onDeleteClick,
+            leftIcon: <DeleteIcon />,
+            children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+            colorScheme: "red",
+            isDisabled: !canDelete,
           },
         ]
       : []),
@@ -551,6 +568,14 @@ function useProfileListActions({
             ),
             isDisabled: !canCloseOpen,
           },
+          {
+            key: "delete",
+            onClick: onDeleteClick,
+            leftIcon: <DeleteIcon />,
+            children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+            colorScheme: "red",
+            isDisabled: !canDelete,
+          },
         ]
       : []),
     ...(status === "DELETION_SCHEDULED"
@@ -566,26 +591,23 @@ function useProfileListActions({
                 values={{ count: selectedCount }}
               />
             ),
-            isDisabled: !canDelete,
+            isDisabled: !canCloseOpen,
+          },
+          {
+            key: "delete",
+            onClick: onDeleteClick,
+            leftIcon: <DeleteIcon />,
+            children: (
+              <FormattedMessage
+                id="page.profiles.delete-permanently"
+                defaultMessage="Delete permanently"
+              />
+            ),
+            colorScheme: "red",
+            isDisabled: !canDeletePermanently,
           },
         ]
       : []),
-    {
-      key: "delete",
-      onClick: onDeleteClick,
-      leftIcon: <DeleteIcon />,
-      children:
-        status === "DELETION_SCHEDULED" ? (
-          <FormattedMessage
-            id="page.profiles.delete-permanently"
-            defaultMessage="Delete permanently"
-          />
-        ) : (
-          <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-        ),
-      colorScheme: "red",
-      isDisabled: !canDelete || (status === "DELETION_SCHEDULED" && !canDeletePermanently),
-    },
   ];
 }
 

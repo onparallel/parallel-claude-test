@@ -2,9 +2,6 @@ import { faker } from "@faker-js/faker";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { omit } from "remeda";
-import { KNEX } from "../../db/knex";
-import { UserRepository } from "../../db/repositories/UserRepository";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
   Petition,
@@ -14,9 +11,12 @@ import {
   UserData,
   UserGroup,
 } from "../../db/__types";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { KNEX } from "../../db/knex";
+import { UserRepository } from "../../db/repositories/UserRepository";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
-import { initServer, TestClient } from "./server";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/Users", () => {
   let mocks: Mocks;
@@ -33,7 +33,7 @@ describe("GraphQL/Users", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     userRepo = testClient.container.get<UserRepository>(UserRepository);
     mocks = new Mocks(knex);
-    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
     sessionUserData = await mocks.loadUserData(sessionUser.user_data_id);
 
     sessionUserGID = toGlobalId("User", sessionUser.id);
@@ -58,7 +58,7 @@ describe("GraphQL/Users", () => {
         }),
       );
 
-      userGroups = await mocks.createUserGroups(2, organization.id, (i) => ({
+      userGroups = await mocks.createUserGroups(2, organization.id, [], (i) => ({
         name: i === 0 ? "onparallel" : faker.word.noun(),
       }));
       await mocks.insertUserGroupMembers(
@@ -68,8 +68,31 @@ describe("GraphQL/Users", () => {
     });
 
     afterAll(async () => {
-      await mocks.knex.from("user_group_member").delete();
-      await mocks.knex.from("user_group").delete();
+      const allUsersGroup = await mocks.knex
+        .from("user_group")
+        .where("type", "ALL_USERS")
+        .select("*");
+      await mocks.knex
+        .from("user_group_member")
+        .whereIn(
+          "user_id",
+          users.map((u) => u.id),
+        )
+        .delete();
+      await mocks.knex
+        .from("user_group_permission")
+        .whereNotIn(
+          "user_group_id",
+          allUsersGroup.map((g) => g.id),
+        )
+        .delete();
+      await mocks.knex
+        .from("user_group")
+        .whereNotIn(
+          "id",
+          allUsersGroup.map((g) => g.id),
+        )
+        .delete();
       await mocks.knex
         .from("user")
         .whereIn(
@@ -233,7 +256,6 @@ describe("GraphQL/Users", () => {
                 id
                 email
                 isSsoUser
-                role
               }
             }
           }
@@ -247,7 +269,6 @@ describe("GraphQL/Users", () => {
           id: toGlobalId("User", users[2].id),
           email: "user2@onparallel.com",
           isSsoUser: false,
-          role: "NORMAL",
         },
       ]);
 
@@ -265,7 +286,6 @@ describe("GraphQL/Users", () => {
                 id
                 email
                 isSsoUser
-                role
               }
             }
           }
@@ -279,7 +299,6 @@ describe("GraphQL/Users", () => {
           id: toGlobalId("User", users[2].id),
           email: "newemail@gmail.com",
           isSsoUser: true,
-          role: "NORMAL",
         },
       ]);
     });
@@ -364,7 +383,7 @@ describe("GraphQL/Users", () => {
       await mocks.knex
         .from("organization")
         .where("id", organization.id)
-        .update({ usage_details: { USER_LIMIT: 9 } });
+        .update({ usage_details: { USER_LIMIT: 100 } });
     });
 
     beforeEach(async () => {
@@ -511,7 +530,7 @@ describe("GraphQL/Users", () => {
       expect(defaultPermission).toHaveLength(0);
     });
 
-    it("updates user status to active without specifying transferToUserId argument", async () => {
+    it("updates user status to active", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($userIds: [GID!]!) {
@@ -603,6 +622,16 @@ describe("GraphQL/Users", () => {
     });
 
     it("sends error when trying to update status to active when reached the user limit", async () => {
+      const activeUsers = await mocks.knex
+        .from("user")
+        .where({ status: "ACTIVE", org_id: organization.id })
+        .select("*");
+
+      await mocks.knex
+        .from("organization")
+        .where("id", organization.id)
+        .update({ usage_details: { USER_LIMIT: activeUsers.length } });
+
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($userIds: [GID!]!) {
@@ -619,6 +648,11 @@ describe("GraphQL/Users", () => {
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
+
+      await mocks.knex
+        .from("organization")
+        .where("id", organization.id)
+        .update({ usage_details: { USER_LIMIT: 100 } });
     });
 
     it("sends error when trying to update status of a user in another organization", async () => {
@@ -680,7 +714,7 @@ describe("GraphQL/Users", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to set own status", async () => {
+    it("sends error when trying to deactivate organization owner", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
@@ -694,6 +728,32 @@ describe("GraphQL/Users", () => {
           transferToUserId: toGlobalId("User", activeUsers[0].id),
         },
       });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to deactivate myself (not owner)", async () => {
+      const [admin] = await mocks.createRandomUsers(organization.id);
+      const [adminGroup] = await mocks.createUserGroups(1, organization.id, {
+        effect: "ALLOW",
+        name: "USERS:CRUD_USERS",
+      });
+      await mocks.insertUserGroupMembers(adminGroup.id, [admin.id]);
+      const { apiKey } = await mocks.createUserAuthToken("admin", admin.id);
+      const { errors, data } = await testClient.withApiKey(apiKey).execute(
+        gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+              id
+            }
+          }
+        `,
+        {
+          userIds: [toGlobalId("User", admin.id)],
+          transferToUserId: toGlobalId("User", activeUsers[0].id),
+        },
+      );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
@@ -716,185 +776,6 @@ describe("GraphQL/Users", () => {
       });
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-  });
-
-  describe("updateOrganizationUser", () => {
-    let orgOwner: User;
-    let adminUser: User;
-    let normalUser: User;
-
-    let ownerApiKey: string;
-    let adminApiKey: string;
-    let normalApiKey: string;
-
-    beforeEach(async () => {
-      [orgOwner, adminUser, normalUser] = await mocks.createRandomUsers(
-        organization.id,
-        3,
-        (i) => ({
-          organization_role: i === 0 ? "OWNER" : i === 1 ? "ADMIN" : "NORMAL",
-        }),
-      );
-
-      [{ apiKey: ownerApiKey }, { apiKey: adminApiKey }, { apiKey: normalApiKey }] =
-        await Promise.all([
-          mocks.createUserAuthToken("owner-token", orgOwner.id),
-          mocks.createUserAuthToken("admin-token", adminUser.id),
-          mocks.createUserAuthToken("normal-token", normalUser.id),
-        ]);
-    });
-
-    afterEach(async () => {
-      await mocks.knex
-        .from("user")
-        .where("organization_role", "OWNER")
-        .update("deleted_at", new Date());
-    });
-
-    it("organization owner should be able to change the role of any user in the same org", async () => {
-      const { errors, data } = await testClient.withApiKey(ownerApiKey).mutate({
-        mutation: gql`
-          mutation ($userId: GID!, $role: OrganizationRole!) {
-            updateOrganizationUser(userId: $userId, role: $role) {
-              id
-
-              role
-            }
-          }
-        `,
-        variables: {
-          userId: toGlobalId("User", adminUser.id),
-          role: "NORMAL",
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.updateOrganizationUser).toEqual({
-        id: toGlobalId("User", adminUser.id),
-        role: "NORMAL",
-      });
-    });
-
-    it("organization owner should not be able to update their own role", async () => {
-      const { errors, data } = await testClient.withApiKey(ownerApiKey).mutate({
-        mutation: gql`
-          mutation ($userId: GID!, $role: OrganizationRole!) {
-            updateOrganizationUser(userId: $userId, role: $role) {
-              id
-            }
-          }
-        `,
-        variables: {
-          userId: toGlobalId("User", orgOwner.id),
-          role: "ADMIN",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("admin should not be able to update their own role", async () => {
-      const { errors, data } = await testClient.withApiKey(adminApiKey).mutate({
-        mutation: gql`
-          mutation ($userId: GID!, $role: OrganizationRole!) {
-            updateOrganizationUser(userId: $userId, role: $role) {
-              id
-            }
-          }
-        `,
-        variables: {
-          userId: toGlobalId("User", adminUser.id),
-          role: "NORMAL",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("org admins should be able to change the role of another admin", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($userId: GID!, $role: OrganizationRole!) {
-            updateOrganizationUser(userId: $userId, role: $role) {
-              id
-              role
-            }
-          }
-        `,
-        variables: {
-          userId: toGlobalId("User", adminUser.id),
-          role: "NORMAL",
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.updateOrganizationUser).toEqual({
-        id: toGlobalId("User", adminUser.id),
-        role: "NORMAL",
-      });
-    });
-
-    it("org admins should not be able to update the role of an owner", async () => {
-      const { errors, data } = await testClient.withApiKey(adminApiKey).mutate({
-        mutation: gql`
-          mutation ($userId: GID!, $role: OrganizationRole!) {
-            updateOrganizationUser(userId: $userId, role: $role) {
-              id
-            }
-          }
-        `,
-        variables: {
-          userId: toGlobalId("User", orgOwner.id),
-          role: "NORMAL",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("admins should not be able to update the role of a user in another organization", async () => {
-      const [otherOrg] = await mocks.createRandomOrganizations(1);
-      const [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($userId: GID!, $role: OrganizationRole!) {
-            updateOrganizationUser(userId: $userId, role: $role) {
-              id
-            }
-          }
-        `,
-        variables: {
-          userId: toGlobalId("User", otherOrgUser.id),
-          role: "NORMAL",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("normal users should not be able to update info of any other user", async () => {
-      const { errors, data } = await testClient.withApiKey(normalApiKey).mutate({
-        mutation: gql`
-          mutation ($userId: GID!, $role: OrganizationRole!) {
-            updateOrganizationUser(userId: $userId, role: $role) {
-              id
-            }
-          }
-        `,
-        variables: {
-          userId: toGlobalId("User", adminUser.id),
-          role: "NORMAL",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -931,14 +812,12 @@ describe("GraphQL/Users", () => {
             $email: String!
             $firstName: String!
             $lastName: String!
-            $role: OrganizationRole!
             $locale: UserLocale!
           ) {
             inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
-              role: $role
               locale: $locale
             ) {
               id
@@ -949,7 +828,6 @@ describe("GraphQL/Users", () => {
           email: "dwight-schrute@dundermifflin.com",
           firstName: "Dwight",
           lastName: "Schrute",
-          role: "NORMAL",
           locale: "en",
         },
       });
@@ -964,18 +842,15 @@ describe("GraphQL/Users", () => {
             $email: String!
             $firstName: String!
             $lastName: String!
-            $role: OrganizationRole!
             $locale: UserLocale!
           ) {
             inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
-              role: $role
               locale: $locale
             ) {
               fullName
-              role
             }
           }
         `,
@@ -983,7 +858,6 @@ describe("GraphQL/Users", () => {
           email: sessionUserData.email,
           firstName: "Michael",
           lastName: "Scott",
-          role: "ADMIN",
           locale: "en",
         },
       });
@@ -1008,18 +882,16 @@ describe("GraphQL/Users", () => {
             $email: String!
             $firstName: String!
             $lastName: String!
-            $role: OrganizationRole!
             $locale: UserLocale!
           ) {
             inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
-              role: $role
+
               locale: $locale
             ) {
               fullName
-              role
             }
           }
         `,
@@ -1045,18 +917,15 @@ describe("GraphQL/Users", () => {
             $email: String!
             $firstName: String!
             $lastName: String!
-            $role: OrganizationRole!
             $locale: UserLocale!
           ) {
             inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
-              role: $role
               locale: $locale
             ) {
               fullName
-              role
             }
           }
         `,
@@ -1064,13 +933,12 @@ describe("GraphQL/Users", () => {
           email: "michael.scott@test.com",
           firstName: "Michael",
           lastName: "Scott",
-          role: "ADMIN",
           locale: "en",
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.inviteUserToOrganization).toEqual({ fullName: "Michael Scott", role: "ADMIN" });
+      expect(data?.inviteUserToOrganization).toEqual({ fullName: "Michael Scott" });
     });
 
     it("should not create a user if the organization reached the max limit of users", async () => {
@@ -1080,14 +948,12 @@ describe("GraphQL/Users", () => {
             $email: String!
             $firstName: String!
             $lastName: String!
-            $role: OrganizationRole!
             $locale: UserLocale!
           ) {
             inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
-              role: $role
               locale: $locale
             ) {
               id
@@ -1098,7 +964,6 @@ describe("GraphQL/Users", () => {
           email: "jim.halpert@test.com",
           firstName: "Jim",
           lastName: "Halpert",
-          role: "NORMAL",
           locale: "en",
         },
       });
@@ -1158,6 +1023,21 @@ describe("GraphQL/Users", () => {
               id
               fullName
               preferredLocale
+              permissions
+              userGroups {
+                id
+                type
+                memberCount
+                members {
+                  user {
+                    id
+                  }
+                }
+                permissions {
+                  effect
+                  name
+                }
+              }
               organization {
                 name
                 integrations(limit: 10, offset: 0) {
@@ -1203,6 +1083,57 @@ describe("GraphQL/Users", () => {
           id: data!.signUp.id,
           fullName: "Test User",
           preferredLocale: "en",
+          permissions: [
+            "REPORTS:OVERVIEW",
+            "REPORTS:TEMPLATE_STATISTICS",
+            "REPORTS:TEMPLATE_REPLIES",
+            "TAGS:CRUD_TAGS",
+            "PROFILES:DELETE_PROFILES",
+            "PROFILES:DELETE_PERMANENTLY_PROFILES",
+            "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+            "INTEGRATIONS:CRUD_INTEGRATIONS",
+            "USERS:CRUD_USERS",
+            "USERS:GHOST_LOGIN",
+            "TEAMS:CRUD_TEAMS",
+            "TEAMS:CRUD_PERMISSIONS",
+            "ORG_SETTINGS",
+            "CONTACTS:DELETE_CONTACTS",
+            "PETITIONS:SEND_ON_BEHALF",
+            "PETITIONS:CHANGE_PATH",
+            "PETITIONS:CREATE_TEMPLATES",
+            "INTEGRATIONS:CRUD_API",
+            "PROFILES:SUBSCRIBE_PROFILES",
+            "PETITIONS:CREATE_PETITIONS",
+            "PROFILES:CREATE_PROFILES",
+            "PROFILES:CLOSE_PROFILES",
+            "PROFILES:LIST_PROFILES",
+            "PROFILE_ALERTS:LIST_ALERTS",
+            "CONTACTS:LIST_CONTACTS",
+            "USERS:LIST_USERS",
+            "TEAMS:LIST_TEAMS",
+          ],
+          userGroups: [
+            {
+              id: expect.any(String),
+              type: "ALL_USERS",
+              memberCount: 1,
+              members: [{ user: { id: data!.signUp.id } }],
+              permissions: [
+                "PETITIONS:CHANGE_PATH",
+                "PETITIONS:CREATE_TEMPLATES",
+                "INTEGRATIONS:CRUD_API",
+                "PROFILES:SUBSCRIBE_PROFILES",
+                "PETITIONS:CREATE_PETITIONS",
+                "PROFILES:CREATE_PROFILES",
+                "PROFILES:CLOSE_PROFILES",
+                "PROFILES:LIST_PROFILES",
+                "PROFILE_ALERTS:LIST_ALERTS",
+                "CONTACTS:LIST_CONTACTS",
+                "USERS:LIST_USERS",
+                "TEAMS:LIST_TEAMS",
+              ].map((name) => ({ effect: "ALLOW", name })),
+            },
+          ],
           organization: {
             name: "MyOrganization",
             integrations: {
