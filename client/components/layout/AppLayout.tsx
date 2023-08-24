@@ -171,6 +171,11 @@ export const AppLayout = Object.assign(
       });
     }
 
+    useEffect(() => {
+      // eslint-disable-next-line no-console
+      console.log(me.permissions);
+    }, []);
+
     return (
       <>
         <Head>
