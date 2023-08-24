@@ -487,7 +487,13 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
     { value: UpdateUserGroupPermissionsInputEffect; label: string }[]
   >(
     () => [
-      { value: "NONE", label: "-" },
+      {
+        value: "NONE",
+        label: intl.formatMessage({
+          id: "generic.not-specified",
+          defaultMessage: "Not specified",
+        }),
+      },
       {
         value: "ALLOW",
         label: intl.formatMessage({
