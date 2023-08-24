@@ -703,14 +703,14 @@ describe("GraphQL/UserGroups", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.updateUserGroupPermissions).toEqual({
+      expect(data?.updateUserGroupPermissions).toMatchObject({
         id: toGlobalId("UserGroup", allUsersGroup.id),
-        permissions: [
+        permissions: expect.toIncludeSameMembers([
           { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
           { effect: "ALLOW", name: "PETITIONS:CREATE_PETITIONS" },
           { effect: "ALLOW", name: "PETITIONS:CREATE_TEMPLATES" },
           { effect: "ALLOW", name: "TAGS:CRUD_TAGS" },
-        ],
+        ]),
       });
     });
 
@@ -741,12 +741,12 @@ describe("GraphQL/UserGroups", () => {
       expect(errors).toBeUndefined();
       expect(data?.updateUserGroupPermissions).toEqual({
         id: toGlobalId("UserGroup", allUsersGroup.id),
-        permissions: [
+        permissions: expect.toIncludeSameMembers([
           { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
           { effect: "ALLOW", name: "PETITIONS:CREATE_PETITIONS" },
           { effect: "ALLOW", name: "PETITIONS:CREATE_TEMPLATES" },
           { effect: "DENY", name: "USERS:GHOST_LOGIN" },
-        ],
+        ]),
       });
     });
 
@@ -812,12 +812,12 @@ describe("GraphQL/UserGroups", () => {
       expect(errors).toBeUndefined();
       expect(data?.updateUserGroupPermissions).toEqual({
         id: toGlobalId("UserGroup", allUsersGroup.id),
-        permissions: [
+        permissions: expect.toIncludeSameMembers([
           { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
           { effect: "DENY", name: "PETITIONS:CREATE_PETITIONS" },
           { effect: "ALLOW", name: "TAGS:CRUD_TAGS" },
           { effect: "ALLOW", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
-        ],
+        ]),
       });
     });
   });

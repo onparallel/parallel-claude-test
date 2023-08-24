@@ -1,4 +1,5 @@
 import { GraphQLFormattedError } from "graphql";
+import * as matchers from "jest-extended";
 import { outdent } from "outdent";
 import { equals } from "remeda";
 
@@ -11,6 +12,7 @@ declare global {
   }
 }
 
+expect.extend(matchers);
 expect.extend({
   toContainGraphQLError(
     errors: GraphQLFormattedError[] | undefined,
