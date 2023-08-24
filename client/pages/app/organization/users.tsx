@@ -670,7 +670,6 @@ function CustomFooter({
 }
 
 function useOrganizationUsersTableColumns() {
-  const userCanEdit = useHasPermission("USERS:CRUD_USERS");
   const intl = useIntl();
   return useMemo<TableColumn<OrganizationUsers_UserFragment, OrganizationUserTableContext>[]>(
     () => [
@@ -753,35 +752,31 @@ function useOrganizationUsersTableColumns() {
           <Text opacity={row.status === "INACTIVE" ? 0.5 : 1}>{row.email}</Text>
         ),
       },
-      ...(userCanEdit
-        ? ([
-            {
-              key: "lastActiveAt",
-              label: intl.formatMessage({
-                id: "generic.last-active-at",
-                defaultMessage: "Last active at",
-              }),
-              isSortable: true,
-              cellProps: {
-                minWidth: "220px",
-              },
-              CellContent: ({ row }) =>
-                row.lastActiveAt ? (
-                  <DateTime
-                    value={row.lastActiveAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime
-                    whiteSpace="nowrap"
-                    opacity={row.status === "INACTIVE" ? 0.5 : 1}
-                  />
-                ) : (
-                  <Text textStyle="hint">
-                    <FormattedMessage id="generic.never-active" defaultMessage="Never active" />
-                  </Text>
-                ),
-            },
-          ] as TableColumn<OrganizationUsers_UserFragment, OrganizationUserTableContext>[])
-        : []),
+      {
+        key: "lastActiveAt",
+        label: intl.formatMessage({
+          id: "generic.last-active-at",
+          defaultMessage: "Last active at",
+        }),
+        isSortable: true,
+        cellProps: {
+          minWidth: "220px",
+        },
+        CellContent: ({ row }) =>
+          row.lastActiveAt ? (
+            <DateTime
+              value={row.lastActiveAt}
+              format={FORMATS.LLL}
+              useRelativeTime
+              whiteSpace="nowrap"
+              opacity={row.status === "INACTIVE" ? 0.5 : 1}
+            />
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage id="generic.never-active" defaultMessage="Never active" />
+            </Text>
+          ),
+      },
       {
         key: "createdAt",
         isSortable: true,
