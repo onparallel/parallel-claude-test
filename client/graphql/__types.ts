@@ -5129,6 +5129,7 @@ export interface UserGroup extends Timestamps {
   __typename?: "UserGroup";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  hasPermissions: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
   imMember: Scalars["Boolean"]["output"];
   initials: Scalars["String"]["output"];
@@ -19443,6 +19444,7 @@ export type OrganizationGroups_UserGroupPaginationFragment = {
     id: string;
     name: string;
     createdAt: string;
+    hasPermissions: boolean;
     type: UserGroupType;
     localizableName: { [locale in UserLocale]?: string };
     members: Array<{
@@ -19463,6 +19465,7 @@ export type OrganizationGroups_UserGroupFragment = {
   id: string;
   name: string;
   createdAt: string;
+  hasPermissions: boolean;
   type: UserGroupType;
   localizableName: { [locale in UserLocale]?: string };
   members: Array<{
@@ -19488,6 +19491,7 @@ export type OrganizationGroups_createUserGroupMutation = {
     id: string;
     name: string;
     createdAt: string;
+    hasPermissions: boolean;
     type: UserGroupType;
     localizableName: { [locale in UserLocale]?: string };
     members: Array<{
@@ -19520,6 +19524,7 @@ export type OrganizationGroups_cloneUserGroupsMutation = {
     id: string;
     name: string;
     createdAt: string;
+    hasPermissions: boolean;
     type: UserGroupType;
     localizableName: { [locale in UserLocale]?: string };
     members: Array<{
@@ -19551,6 +19556,7 @@ export type OrganizationGroups_userGroupsQuery = {
       id: string;
       name: string;
       createdAt: string;
+      hasPermissions: boolean;
       type: UserGroupType;
       localizableName: { [locale in UserLocale]?: string };
       members: Array<{
@@ -35299,6 +35305,7 @@ export const OrganizationGroups_UserGroupFragmentDoc = gql`
         ...UserAvatarList_User
       }
     }
+    hasPermissions
     type
     ...UserGroupReference_UserGroup
   }

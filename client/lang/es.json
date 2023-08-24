@@ -13400,6 +13400,11 @@
     "context": "{count, plural, =1{Team} other{Teams}} deleted successfully."
   },
   {
+    "term": "view.groups.group-has-permission",
+    "definition": "Este equipo tiene permisos establecidos.",
+    "context": "This team has permissions established."
+  },
+  {
     "term": "view.groups.no-groups",
     "definition": "Aún no tienes equipos",
     "context": "You have no teams yet"

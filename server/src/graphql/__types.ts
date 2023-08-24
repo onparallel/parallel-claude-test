@@ -3030,6 +3030,7 @@ export interface NexusGenFieldTypes {
   UserGroup: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    hasPermissions: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     imMember: boolean; // Boolean!
     initials: string; // String!
@@ -5157,6 +5158,7 @@ export interface NexusGenFieldTypeNames {
   UserGroup: {
     // field return type name
     createdAt: "DateTime";
+    hasPermissions: "Boolean";
     id: "GID";
     imMember: "Boolean";
     initials: "String";

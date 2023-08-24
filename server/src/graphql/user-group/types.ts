@@ -59,6 +59,11 @@ export const UserGroup = objectType({
         return await ctx.userGroups.loadUserGroupPermissionsByUserGroupId(o.id);
       },
     });
+    t.nonNull.boolean("hasPermissions", {
+      resolve: async (o, _, ctx) => {
+        return await ctx.userGroups.loadHasUserGroupPermissionsByUserGroupId(o.id);
+      },
+    });
     t.implements("Timestamps");
   },
 });

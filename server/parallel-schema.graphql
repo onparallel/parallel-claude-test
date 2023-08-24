@@ -6647,6 +6647,7 @@ type UserGroup implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  hasPermissions: Boolean!
   id: GID!
   imMember: Boolean!
   initials: String!

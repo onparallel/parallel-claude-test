@@ -1,8 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
-import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
+import { Button, Flex, Heading, Popover, Text, useToast } from "@chakra-ui/react";
+import { CopyIcon, DeleteIcon, KeyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
@@ -338,6 +339,23 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           return (
             <OverflownText>
               <UserGroupReference userGroup={row} />
+              {row.hasPermissions ? (
+                <Text as="span">
+                  &nbsp;
+                  <SmallPopover
+                    content={
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="view.groups.group-has-permission"
+                          defaultMessage="This team has permissions established."
+                        />
+                      </Text>
+                    }
+                  >
+                    <KeyIcon marginBottom={0.5} />
+                  </SmallPopover>
+                </Text>
+              ) : null}
             </OverflownText>
           );
         },
@@ -462,6 +480,7 @@ OrganizationGroups.fragments = {
             ...UserAvatarList_User
           }
         }
+        hasPermissions
         type
         ...UserGroupReference_UserGroup
       }

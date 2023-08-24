@@ -371,6 +371,12 @@ export class UserGroupRepository extends BaseRepository {
       ]),
   );
 
+  readonly loadHasUserGroupPermissionsByUserGroupId = this.buildLoadExistsBy(
+    "user_group_permission",
+    "user_group_id",
+    (q) => q.whereNull("deleted_at"),
+  );
+
   async upsertUserGroupPermissions(
     userGroupId: number,
     permissions: { name: UserGroupPermissionName; effect: UserGroupPermissionEffect | "NONE" }[],

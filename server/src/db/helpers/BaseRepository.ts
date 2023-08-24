@@ -235,6 +235,22 @@ export class BaseRepository {
     });
   }
 
+  protected buildLoadExistsBy<
+    TName extends TableNames,
+    TColumn extends KeysOfType<TableTypes[TName], number | string | null>,
+  >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
+    return this.buildLoader<TableTypes[TName][TColumn], boolean>(async (values, t) => {
+      const rows: {
+        column: number | string;
+      }[] = await this.from(tableName, t)
+        .whereIn(column as any, values as any)
+        .modify((q) => builder?.(q as any))
+        .distinct(this.knex.raw(`?? as column`, [column as string]));
+      const set = new Set(rows.map((r) => r.column));
+      return values.map((value) => set.has(value));
+    });
+  }
+
   protected getPagination<T>(
     query: Knex.QueryBuilder<any, T[]>,
     { offset, limit }: PageOpts,
