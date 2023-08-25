@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Button, Flex, Heading, Popover, Text, useToast } from "@chakra-ui/react";
+import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, KeyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { OverflownText } from "@parallel/components/common/OverflownText";

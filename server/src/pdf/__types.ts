@@ -4331,6 +4331,7 @@ export type QueryremindersOptOutArgs = {
 export type QuerysearchUserGroupsArgs = {
   excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   search: Scalars["String"]["input"];
+  type?: InputMaybe<Array<UserGroupType>>;
 };
 
 export type QuerysearchUsersArgs = {
@@ -4948,6 +4949,7 @@ export type UserFilter = {
 export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  hasPermissions: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
   imMember: Scalars["Boolean"]["output"];
   initials: Scalars["String"]["output"];
