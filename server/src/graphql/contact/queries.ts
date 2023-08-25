@@ -6,14 +6,13 @@ import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validEmail } from "../helpers/validators/validEmail";
-import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToContacts } from "./authorizers";
 
 export const contactQueries = queryField((t) => {
   t.paginationField("contacts", {
     type: "Contact",
     description: "The contacts of the user",
-    authorize: authenticateAnd(contextUserHasPermission("CONTACTS:LIST_CONTACTS")),
+    authorize: authenticate(),
     searchable: true,
     extendArgs: {
       exclude: list(nonNull(globalIdArg("Contact"))),
