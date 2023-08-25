@@ -15,6 +15,7 @@ import { Card, CardHeader } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { SearchInput } from "@parallel/components/common/SearchInput";
+import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
@@ -486,22 +487,20 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
     [intl.locale],
   );
 
-  const permissionEffects = useMemo<
-    { value: UpdateUserGroupPermissionsInputEffect; label: string }[]
-  >(
-    () => [
-      {
-        value: "NONE",
-        label: intl.formatMessage({
-          id: "page.permissions-group.effects-do-not-grant",
-          defaultMessage: "Do not grant",
-        }),
-      },
+  const permissionEffects = useSimpleSelectOptions<UpdateUserGroupPermissionsInputEffect>(
+    (intl) => [
       {
         value: "GRANT",
         label: intl.formatMessage({
           id: "page.permissions-group.effects-grant",
           defaultMessage: "Grant",
+        }),
+      },
+      {
+        value: "NONE",
+        label: intl.formatMessage({
+          id: "page.permissions-group.effects-do-not-grant",
+          defaultMessage: "Do not grant",
         }),
       },
       {
