@@ -107,7 +107,7 @@ export class AccountSetupService implements IAccountSetupService {
           "TEAMS:LIST_TEAMS",
         ] as UserGroupPermissionName[]
       ).map((name) => ({
-        effect: "ALLOW",
+        effect: "GRANT",
         name,
       })),
       createdBy,

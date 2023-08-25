@@ -287,7 +287,7 @@ export async function seed(knex: Knex): Promise<any> {
       await knex("user_group_permission").insert(
         [...PERMISSIONS.NORMAL, ...PERMISSIONS.COLLABORATOR].map((name) => ({
           user_group_id: allUsersGroup.id,
-          effect: "ALLOW",
+          effect: "GRANT",
           name: name as UserGroupPermissionName,
           created_by: `User:${ownerId}`,
           updated_by: `User:${ownerId}`,
@@ -309,7 +309,7 @@ export async function seed(knex: Knex): Promise<any> {
       await knex("user_group_permission").insert(
         [...PERMISSIONS.ADMIN, ...PERMISSIONS.NORMAL, ...PERMISSIONS.COLLABORATOR].map((name) => ({
           user_group_id: adminsGroup.id,
-          effect: "ALLOW",
+          effect: "GRANT",
           name: name as UserGroupPermissionName,
           created_by: `User:${ownerId}`,
           updated_by: `User:${ownerId}`,

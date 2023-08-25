@@ -5043,7 +5043,7 @@ export interface UpdateUserGroupPermissionsInput {
   name: Scalars["String"]["input"];
 }
 
-export type UpdateUserGroupPermissionsInputEffect = "ALLOW" | "DENY" | "NONE";
+export type UpdateUserGroupPermissionsInputEffect = "DENY" | "GRANT" | "NONE";
 
 /** A user in the system. */
 export interface User extends Timestamps {
@@ -5167,7 +5167,7 @@ export interface UserGroupPermission {
   name: Scalars["String"]["output"];
 }
 
-export type UserGroupPermissionEffect = "ALLOW" | "DENY";
+export type UserGroupPermissionEffect = "DENY" | "GRANT";
 
 export type UserGroupType = "ALL_USERS" | "INITIAL" | "NORMAL";
 

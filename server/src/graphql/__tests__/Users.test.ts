@@ -736,7 +736,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to deactivate myself (not owner)", async () => {
       const [admin] = await mocks.createRandomUsers(organization.id);
       const [adminGroup] = await mocks.createUserGroups(1, organization.id, {
-        effect: "ALLOW",
+        effect: "GRANT",
         name: "USERS:CRUD_USERS",
       });
       await mocks.insertUserGroupMembers(adminGroup.id, [admin.id]);
@@ -1131,7 +1131,7 @@ describe("GraphQL/Users", () => {
                 "CONTACTS:LIST_CONTACTS",
                 "USERS:LIST_USERS",
                 "TEAMS:LIST_TEAMS",
-              ].map((name) => ({ effect: "ALLOW", name })),
+              ].map((name) => ({ effect: "GRANT", name })),
             },
           ],
           organization: {

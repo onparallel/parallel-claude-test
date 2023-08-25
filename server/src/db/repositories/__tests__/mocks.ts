@@ -197,7 +197,7 @@ export class Mocks {
           ].flatMap((name) =>
             userGroups.map((userGroup) => ({
               user_group_id: userGroup.id,
-              effect: "ALLOW",
+              effect: "GRANT",
               name: name as UserGroupPermissionName,
             })),
           ),

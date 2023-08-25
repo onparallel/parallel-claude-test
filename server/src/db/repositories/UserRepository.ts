@@ -62,7 +62,7 @@ export class UserRepository extends BaseRepository {
           and ugp.name = ? and ugp.deleted_at is null
           and ugm.deleted_at is null 
         group by u.id, ugp.name
-        having every(ugp.effect = 'ALLOW')  
+        having every(ugp.effect = 'GRANT')  
       )
       select * from "owner"
       union distinct
@@ -99,7 +99,7 @@ export class UserRepository extends BaseRepository {
             where ugm.user_id in ?
             and ug.deleted_at is null and ugm.deleted_at is null and ugp.deleted_at is null
             group by ugm.user_id, ugp.name
-            having every(ugp.effect = 'ALLOW')
+            having every(ugp.effect = 'GRANT')
           ),
           all_permission as (
             select * from superadmin_permission

@@ -61,7 +61,7 @@ export async function up(knex: Knex): Promise<void> {
         enumName: "user_group_permission_name",
       },
     ).notNullable();
-    t.enum("effect", ["ALLOW", "DENY"], {
+    t.enum("effect", ["GRANT", "DENY"], {
       useNative: true,
       enumName: "user_group_permission_effect",
     }).notNullable();
@@ -82,7 +82,7 @@ export async function up(knex: Knex): Promise<void> {
         create unique index user__is_org_owner on "user" (org_id) where is_org_owner = true and deleted_at is null;
     `);
 
-  // "ALL_USERS" user group permissions: ALLOW on everything except ADMIN permissions
+  // "ALL_USERS" user group permissions: GRANT on everything except ADMIN permissions
   await knex.raw(
     /* sql */ `
     with permissions as (
@@ -92,7 +92,7 @@ export async function up(knex: Knex): Promise<void> {
     select
       ug.id,
       p.permission_name,
-      'ALLOW',
+      'GRANT',
       ug.created_by,
       ug.updated_by
     from user_group ug cross join permissions p
@@ -131,7 +131,7 @@ export async function up(knex: Knex): Promise<void> {
       select
         ug.id,
         p.permission_name,
-        'ALLOW',
+        'GRANT',
         ug.created_by,
         ug.updated_by
       from admin_user_group ug cross join admin_permission p
@@ -235,7 +235,7 @@ export async function up(knex: Knex): Promise<void> {
       select
         ug.id,
         p.permission_name,
-        'ALLOW',
+        'GRANT',
         ug.created_by,
         ug.updated_by
       from superadmin_user_group ug cross join superadmin_permission p

@@ -360,6 +360,7 @@ export type FeatureFlag =
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
+  | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_SIGNATURE"
   | "PROFILES"
@@ -4865,7 +4866,7 @@ export type UpdateUserGroupPermissionsInput = {
   name: Scalars["String"]["input"];
 };
 
-export type UpdateUserGroupPermissionsInputEffect = "ALLOW" | "DENY" | "NONE";
+export type UpdateUserGroupPermissionsInputEffect = "DENY" | "GRANT" | "NONE";
 
 /** A user in the system. */
 export type User = Timestamps & {
@@ -4983,9 +4984,9 @@ export type UserGroupPermission = {
   name: Scalars["String"]["output"];
 };
 
-export type UserGroupPermissionEffect = "ALLOW" | "DENY";
+export type UserGroupPermissionEffect = "DENY" | "GRANT";
 
-export type UserGroupType = "ALL_USERS" | "NORMAL";
+export type UserGroupType = "ALL_USERS" | "INITIAL" | "NORMAL";
 
 /** The preferred locale for the user */
 export type UserLocale = "en" | "es";

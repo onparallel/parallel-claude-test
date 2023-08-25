@@ -496,7 +496,7 @@ export interface NexusGenEnums {
   TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
   Tone: "FORMAL" | "INFORMAL";
-  UpdateUserGroupPermissionsInputEffect: "ALLOW" | "DENY" | "NONE";
+  UpdateUserGroupPermissionsInputEffect: "DENY" | "GRANT" | "NONE";
   UserGroupPermissionEffect: db.UserGroupPermissionEffect;
   UserGroupType: db.UserGroupType;
   UserLocale: db.UserLocale;

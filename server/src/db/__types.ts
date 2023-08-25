@@ -412,9 +412,9 @@ export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 export const TaskStatusValues = ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"] as TaskStatus[];
 
-export type UserGroupPermissionEffect = "ALLOW" | "DENY";
+export type UserGroupPermissionEffect = "GRANT" | "DENY";
 
-export const UserGroupPermissionEffectValues = ["ALLOW", "DENY"] as UserGroupPermissionEffect[];
+export const UserGroupPermissionEffectValues = ["GRANT", "DENY"] as UserGroupPermissionEffect[];
 
 export type UserGroupPermissionName =
   | "SUPERADMIN"

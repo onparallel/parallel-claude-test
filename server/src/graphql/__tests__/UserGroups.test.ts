@@ -50,9 +50,9 @@ describe("GraphQL/UserGroups", () => {
       1,
       organization.id,
       [
-        { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
-        { effect: "ALLOW", name: "PETITIONS:CREATE_PETITIONS" },
-        { effect: "ALLOW", name: "PETITIONS:CREATE_TEMPLATES" },
+        { effect: "GRANT", name: "PETITIONS:CHANGE_PATH" },
+        { effect: "GRANT", name: "PETITIONS:CREATE_PETITIONS" },
+        { effect: "GRANT", name: "PETITIONS:CREATE_TEMPLATES" },
       ],
       () => ({
         type: "ALL_USERS",
@@ -608,7 +608,7 @@ describe("GraphQL/UserGroups", () => {
           userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
           permissions: [
             {
-              effect: "ALLOW",
+              effect: "GRANT",
               name: "TAGS:CRUD_TAGS",
             },
           ],
@@ -625,7 +625,7 @@ describe("GraphQL/UserGroups", () => {
       const [org] = await mocks.createRandomOrganizations(1, () => ({ status: "DEV" }));
       const [user] = await mocks.createRandomUsers(org.id, 1, () => ({ is_org_owner: true }));
       const [userGroup] = await mocks.createUserGroups(1, org.id, [
-        { name: "TEAMS:CRUD_PERMISSIONS", effect: "ALLOW" },
+        { name: "TEAMS:CRUD_PERMISSIONS", effect: "GRANT" },
       ]);
       await mocks.insertUserGroupMembers(userGroup.id, [user.id]);
       const { apiKey } = await mocks.createUserAuthToken("token", user.id);
@@ -642,7 +642,7 @@ describe("GraphQL/UserGroups", () => {
           userGroupId: toGlobalId("UserGroup", userGroup.id),
           permissions: [
             {
-              effect: "ALLOW",
+              effect: "GRANT",
               name: "SUPERADMIN",
             },
           ],
@@ -669,7 +669,7 @@ describe("GraphQL/UserGroups", () => {
           userGroupId: toGlobalId("UserGroup", userGroups[0].id),
           permissions: [
             {
-              effect: "ALLOW",
+              effect: "GRANT",
               name: "ORG_SETTINGS",
             },
           ],
@@ -693,7 +693,7 @@ describe("GraphQL/UserGroups", () => {
           userGroupId: toGlobalId("UserGroup", userGroups[0].id),
           permissions: [
             {
-              effect: "ALLOW",
+              effect: "GRANT",
               name: "UNKNOWN_PERMISSION",
             },
           ],
@@ -720,7 +720,7 @@ describe("GraphQL/UserGroups", () => {
         {
           userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
           permissions: [
-            { effect: "ALLOW", name: "TAGS:CRUD_TAGS" },
+            { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
             { effect: "DENY", name: "TAGS:CRUD_TAGS" },
           ],
         },
@@ -747,7 +747,7 @@ describe("GraphQL/UserGroups", () => {
           userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
           permissions: [
             {
-              effect: "ALLOW",
+              effect: "GRANT",
               name: "TAGS:CRUD_TAGS",
             },
           ],
@@ -758,10 +758,10 @@ describe("GraphQL/UserGroups", () => {
       expect(data?.updateUserGroupPermissions).toMatchObject({
         id: toGlobalId("UserGroup", allUsersGroup.id),
         permissions: expect.toIncludeSameMembers([
-          { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
-          { effect: "ALLOW", name: "PETITIONS:CREATE_PETITIONS" },
-          { effect: "ALLOW", name: "PETITIONS:CREATE_TEMPLATES" },
-          { effect: "ALLOW", name: "TAGS:CRUD_TAGS" },
+          { effect: "GRANT", name: "PETITIONS:CHANGE_PATH" },
+          { effect: "GRANT", name: "PETITIONS:CREATE_PETITIONS" },
+          { effect: "GRANT", name: "PETITIONS:CREATE_TEMPLATES" },
+          { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
         ]),
       });
     });
@@ -794,9 +794,9 @@ describe("GraphQL/UserGroups", () => {
       expect(data?.updateUserGroupPermissions).toEqual({
         id: toGlobalId("UserGroup", allUsersGroup.id),
         permissions: expect.toIncludeSameMembers([
-          { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
-          { effect: "ALLOW", name: "PETITIONS:CREATE_PETITIONS" },
-          { effect: "ALLOW", name: "PETITIONS:CREATE_TEMPLATES" },
+          { effect: "GRANT", name: "PETITIONS:CHANGE_PATH" },
+          { effect: "GRANT", name: "PETITIONS:CREATE_PETITIONS" },
+          { effect: "GRANT", name: "PETITIONS:CREATE_TEMPLATES" },
           { effect: "DENY", name: "USERS:GHOST_LOGIN" },
         ]),
       });
@@ -830,8 +830,8 @@ describe("GraphQL/UserGroups", () => {
       expect(data?.updateUserGroupPermissions).toEqual({
         id: toGlobalId("UserGroup", allUsersGroup.id),
         permissions: [
-          { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
-          { effect: "ALLOW", name: "PETITIONS:CREATE_TEMPLATES" },
+          { effect: "GRANT", name: "PETITIONS:CHANGE_PATH" },
+          { effect: "GRANT", name: "PETITIONS:CREATE_TEMPLATES" },
         ],
       });
     });
@@ -852,11 +852,11 @@ describe("GraphQL/UserGroups", () => {
         {
           userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
           permissions: [
-            { effect: "ALLOW", name: "TAGS:CRUD_TAGS" },
+            { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
             { effect: "DENY", name: "PETITIONS:CREATE_PETITIONS" },
             { effect: "NONE", name: "PETITIONS:CREATE_TEMPLATES" },
             { effect: "NONE", name: "REPORTS:OVERVIEW" }, // this does nothing
-            { effect: "ALLOW", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
+            { effect: "GRANT", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
           ],
         },
       );
@@ -865,10 +865,10 @@ describe("GraphQL/UserGroups", () => {
       expect(data?.updateUserGroupPermissions).toEqual({
         id: toGlobalId("UserGroup", allUsersGroup.id),
         permissions: expect.toIncludeSameMembers([
-          { effect: "ALLOW", name: "PETITIONS:CHANGE_PATH" },
+          { effect: "GRANT", name: "PETITIONS:CHANGE_PATH" },
           { effect: "DENY", name: "PETITIONS:CREATE_PETITIONS" },
-          { effect: "ALLOW", name: "TAGS:CRUD_TAGS" },
-          { effect: "ALLOW", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
+          { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
+          { effect: "GRANT", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
         ]),
       });
     });

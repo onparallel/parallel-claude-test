@@ -123,7 +123,7 @@ describe("GraphQL/Petitions", () => {
         "CONTACTS:LIST_CONTACTS",
         "USERS:LIST_USERS",
         "TEAMS:LIST_TEAMS",
-      ].map((permission) => ({ effect: "ALLOW", name: permission as UserGroupPermissionName })),
+      ].map((permission) => ({ effect: "GRANT", name: permission as UserGroupPermissionName })),
     );
 
     await mocks.insertUserGroupMembers(collaborators.id, [collaboratorUser.id]);

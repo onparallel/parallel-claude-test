@@ -493,15 +493,15 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
       {
         value: "NONE",
         label: intl.formatMessage({
-          id: "generic.not-specified",
-          defaultMessage: "Not specified",
+          id: "page.permissions-group.effects-do-not-grant",
+          defaultMessage: "Do not grant",
         }),
       },
       {
-        value: "ALLOW",
+        value: "GRANT",
         label: intl.formatMessage({
-          id: "page.permissions-group.effects-allow",
-          defaultMessage: "Allow",
+          id: "page.permissions-group.effects-grant",
+          defaultMessage: "Grant",
         }),
       },
       {

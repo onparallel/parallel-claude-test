@@ -9870,14 +9870,19 @@
     "context": "Grants users in this team permissions to delete contacts on the organization"
   },
   {
-    "term": "page.permissions-group.effects-allow",
-    "definition": "Allow",
-    "context": "Allow"
-  },
-  {
     "term": "page.permissions-group.effects-deny",
     "definition": "Deny",
     "context": "Deny"
+  },
+  {
+    "term": "page.permissions-group.effects-do-not-grant",
+    "definition": "Do not grant",
+    "context": "Do not grant"
+  },
+  {
+    "term": "page.permissions-group.effects-grant",
+    "definition": "Grant",
+    "context": "Grant"
   },
   {
     "term": "page.permissions-group.integrations-crud",

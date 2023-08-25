@@ -119,13 +119,13 @@ describe("UserRepository", () => {
       ]);
     });
 
-    it("DENY effect should take precedence over ALLOW", async () => {
+    it("DENY effect should take precedence over GRANT", async () => {
       const [denyGroup] = await mocks.createUserGroups(1, organization.id, {
         effect: "DENY",
         name: "ORG_SETTINGS",
       });
       const [allowGroup] = await mocks.createUserGroups(1, organization.id, {
-        effect: "ALLOW",
+        effect: "GRANT",
         name: "ORG_SETTINGS",
       });
       await mocks.insertUserGroupMembers(denyGroup.id, [user.id]);
