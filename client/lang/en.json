@@ -8590,6 +8590,11 @@
     "context": "Learn more"
   },
   {
+    "term": "generic.legend",
+    "definition": "Legend",
+    "context": "Legend"
+  },
+  {
     "term": "generic.more-options",
     "definition": "More options...",
     "context": "More options..."
@@ -9875,14 +9880,29 @@
     "context": "Deny"
   },
   {
+    "term": "page.permissions-group.effects-deny-description",
+    "definition": "It denies access to the feature, even if it was allowed in a different group.",
+    "context": "It denies access to the feature, even if it was allowed in a different group."
+  },
+  {
     "term": "page.permissions-group.effects-do-not-grant",
-    "definition": "Do not grant",
-    "context": "Do not grant"
+    "definition": "Don't grant",
+    "context": "Don't grant"
+  },
+  {
+    "term": "page.permissions-group.effects-do-not-grant-description",
+    "definition": "It neither grants nor denies the access to the feature. It's a neutral state.",
+    "context": "It neither grants nor denies the access to the feature. It's a neutral state."
   },
   {
     "term": "page.permissions-group.effects-grant",
     "definition": "Grant",
     "context": "Grant"
+  },
+  {
+    "term": "page.permissions-group.effects-grant-description",
+    "definition": "Grants access to the feature, unless there's a specific denial in another group the user is a part of.",
+    "context": "Grants access to the feature, unless there's a specific denial in another group the user is a part of."
   },
   {
     "term": "page.permissions-group.integrations-crud",

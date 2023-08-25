@@ -474,6 +474,22 @@ export const XCircleIcon = createIcon({
   ),
 });
 
+export const DashIcon = createIcon({
+  displayName: "DashIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 12H20" />
+    </g>
+  ),
+});
+
 export const UserIcon = createIcon({
   displayName: "UserIcon",
   viewBox: "0 0 24 24",

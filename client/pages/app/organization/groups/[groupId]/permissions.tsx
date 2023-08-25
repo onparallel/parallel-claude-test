@@ -3,19 +3,24 @@ import {
   Badge,
   Box,
   Button,
+  Center,
   Flex,
   FormControl,
   FormLabel,
+  Grid,
   HStack,
-  Select,
+  ListItem,
   Stack,
   Text,
+  UnorderedList,
 } from "@chakra-ui/react";
+import { CircleCheckIcon, DashIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
+import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { SearchInput } from "@parallel/components/common/SearchInput";
-import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
@@ -32,8 +37,9 @@ import { compose } from "@parallel/utils/compose";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useEffect, useMemo, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { OptionProps, SingleValueProps, components } from "react-select";
 import { zip } from "remeda";
 
 type PermissionsGroupProps = UnwrapPromise<ReturnType<typeof PermissionsGroup.getInitialProps>>;
@@ -503,34 +509,50 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
     [intl.locale],
   );
 
-  const permissionEffects = useSimpleSelectOptions<UpdateUserGroupPermissionsInputEffect>(
-    (intl) => [
-      {
-        value: "GRANT",
-        label: intl.formatMessage({
-          id: "page.permissions-group.effects-grant",
-          defaultMessage: "Grant",
-        }),
-      },
-      {
-        value: "NONE",
-        label: intl.formatMessage({
-          id: "page.permissions-group.effects-do-not-grant",
-          defaultMessage: "Do not grant",
-        }),
-      },
-      {
-        value: "DENY",
-        label: intl.formatMessage({
-          id: "page.permissions-group.effects-deny",
-          defaultMessage: "Deny",
-        }),
-      },
-    ],
-    [],
+  const permissionEffects = useMemo(
+    () =>
+      [
+        {
+          value: "GRANT",
+          label: intl.formatMessage({
+            id: "page.permissions-group.effects-grant",
+            defaultMessage: "Grant",
+          }),
+          description: intl.formatMessage({
+            id: "page.permissions-group.effects-grant-description",
+            defaultMessage:
+              "Grants access to the feature, unless there's a specific denial in another group the user is a part of.",
+          }),
+        },
+        {
+          value: "NONE",
+          label: intl.formatMessage({
+            id: "page.permissions-group.effects-do-not-grant",
+            defaultMessage: "Don't grant",
+          }),
+          description: intl.formatMessage({
+            id: "page.permissions-group.effects-do-not-grant-description",
+            defaultMessage:
+              "It neither grants nor denies the access to the feature. It's a neutral state.",
+          }),
+        },
+        {
+          value: "DENY",
+          label: intl.formatMessage({
+            id: "page.permissions-group.effects-deny",
+            defaultMessage: "Deny",
+          }),
+          description: intl.formatMessage({
+            id: "page.permissions-group.effects-deny-description",
+            defaultMessage:
+              "It denies access to the feature, even if it was allowed in a different group.",
+          }),
+        },
+      ] as (SimpleOption<UpdateUserGroupPermissionsInputEffect> & { description: string })[],
+    [intl.locale],
   );
 
-  const { register, control, handleSubmit, reset, formState } = useForm<PermissionsFormData>({
+  const { control, handleSubmit, reset, formState } = useForm<PermissionsFormData>({
     defaultValues: {
       permissions: permissionsCategories.flatMap((category) =>
         category.permissions.flatMap((p) => {
@@ -582,8 +604,9 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
       realMe={realMe}
       userGroup={userGroup}
     >
-      <Box padding={4}>
+      <HStack padding={4} alignItems="start">
         <Card
+          flex={2}
           maxWidth="container.sm"
           as="form"
           onSubmit={handleSubmit(handleSubmitPermissionsGroup)}
@@ -606,43 +629,58 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
               })
               .map(({ category, permissions }) => {
                 return (
-                  <Stack key={category}>
-                    <Text fontWeight={500}>{category}</Text>
-                    {permissions.map(({ name, title, description }) => {
-                      const index = fields.findIndex((f) => f.name === name)!;
-                      return (
-                        <FormControl key={fields[index].id} as={HStack} alignItems="center">
-                          <Flex flex={1} alignItems="center">
-                            <FormLabel margin={0} fontWeight={400} marginLeft={2}>
-                              <HighlightText as="span" search={search}>
-                                {title}
-                              </HighlightText>
-                            </FormLabel>
-                            <HelpPopover popoverWidth="xs">
-                              <Text fontSize="sm">{description}</Text>
-                            </HelpPopover>
-                          </Flex>
-                          <HStack alignItems="center">
-                            {formState.dirtyFields?.permissions?.[index]?.effect ? (
-                              <Badge colorScheme="yellow">
-                                <FormattedMessage
-                                  id="generic.edited-indicator"
-                                  defaultMessage="Edited"
+                  <UnorderedList key={category} listStyleType="none" marginInlineStart={0}>
+                    <ListItem fontWeight={500}>{category}</ListItem>
+                    <UnorderedList listStyleType="none" marginInlineStart={2} spacing={2}>
+                      {permissions.map(({ name, title, description }) => {
+                        const index = fields.findIndex((f) => f.name === name)!;
+                        return (
+                          <FormControl
+                            key={fields[index].id}
+                            as={ListItem}
+                            display="flex"
+                            alignItems="center"
+                          >
+                            <Flex flex={1} alignItems="center">
+                              <FormLabel margin={0} fontWeight={400}>
+                                <HighlightText as="span" search={search}>
+                                  {title}
+                                </HighlightText>
+                              </FormLabel>
+                              <HelpPopover popoverWidth="xs">
+                                <Text fontSize="sm">{description}</Text>
+                              </HelpPopover>
+                            </Flex>
+                            <HStack alignItems="center">
+                              {formState.dirtyFields?.permissions?.[index]?.effect ? (
+                                <Badge colorScheme="yellow">
+                                  <FormattedMessage
+                                    id="generic.edited-indicator"
+                                    defaultMessage="Edited"
+                                  />
+                                </Badge>
+                              ) : null}
+                              <Box width="165px">
+                                <Controller
+                                  control={control}
+                                  name={`permissions.${index}.effect`}
+                                  render={({ field: { onChange, value } }) => (
+                                    <SimpleSelect
+                                      isSearchable={false}
+                                      value={value}
+                                      options={permissionEffects}
+                                      onChange={onChange}
+                                      components={{ SingleValue, Option }}
+                                    />
+                                  )}
                                 />
-                              </Badge>
-                            ) : null}
-                            <Select {...register(`permissions.${index}.effect`)}>
-                              {permissionEffects.map(({ value, label }) => (
-                                <option key={value} value={value}>
-                                  {label}
-                                </option>
-                              ))}
-                            </Select>
-                          </HStack>
-                        </FormControl>
-                      );
-                    })}
-                  </Stack>
+                              </Box>
+                            </HStack>
+                          </FormControl>
+                        );
+                      })}
+                    </UnorderedList>
+                  </UnorderedList>
                 );
               })}
 
@@ -661,7 +699,28 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             </HStack>
           </Stack>
         </Card>
-      </Box>
+        <Card flex={1} maxWidth="container.sm" position="sticky" top={4}>
+          <CardHeader
+            rightAction={
+              <HelpCenterLink articleId={5935983}>
+                <FormattedMessage id="generic.help" defaultMessage="Help" />
+              </HelpCenterLink>
+            }
+          >
+            <FormattedMessage id="generic.legend" defaultMessage="Legend" />
+          </CardHeader>
+          <Grid as="dl" templateColumns="auto 1fr" padding={4} gap={4}>
+            {permissionEffects.map((permission) => (
+              <>
+                <Box as="dt">
+                  <PermissionOption option={permission} />
+                </Box>
+                <Box as="dd">{permission.description}</Box>
+              </>
+            ))}
+          </Grid>
+        </Card>
+      </HStack>
     </UserGroupLayout>
   );
 }
@@ -725,6 +784,60 @@ const _mutations = [
     ${_fragments.UserGroup}
   `,
 ];
+
+function PermissionOption({
+  option: { label, value },
+  color,
+}: {
+  color?: string;
+  option: SimpleOption<UpdateUserGroupPermissionsInputEffect>;
+}) {
+  return (
+    <HStack
+      display="inline-flex"
+      color={color ?? (value === "DENY" ? "red.600" : value === "GRANT" ? "green.600" : "gray.500")}
+    >
+      <Center boxSize={4}>
+        {value === "DENY" ? (
+          <ForbiddenIcon />
+        ) : value === "GRANT" ? (
+          <CircleCheckIcon />
+        ) : (
+          <DashIcon />
+        )}
+      </Center>
+      <Box whiteSpace="nowrap">{label}</Box>
+    </HStack>
+  );
+}
+
+function SingleValue(
+  props: SingleValueProps<
+    SimpleOption<UpdateUserGroupPermissionsInputEffect> & { description: string }
+  >,
+) {
+  return (
+    <components.SingleValue {...props}>
+      <PermissionOption option={props.data} />
+    </components.SingleValue>
+  );
+}
+
+function Option({
+  children,
+  ...props
+}: OptionProps<SimpleOption<UpdateUserGroupPermissionsInputEffect> & { description: string }>) {
+  return (
+    <components.Option
+      {...props}
+      innerProps={{
+        ...props.innerProps,
+      }}
+    >
+      <PermissionOption option={props.data} color={props.isSelected ? "white" : undefined} />
+    </components.Option>
+  );
+}
 
 PermissionsGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const groupId = query.groupId as string;

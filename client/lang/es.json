@@ -8590,6 +8590,11 @@
     "context": "Learn more"
   },
   {
+    "term": "generic.legend",
+    "definition": "Leyenda",
+    "context": "Legend"
+  },
+  {
     "term": "generic.more-options",
     "definition": "Más opciones...",
     "context": "More options..."
@@ -9875,14 +9880,29 @@
     "context": "Deny"
   },
   {
+    "term": "page.permissions-group.effects-deny-description",
+    "definition": "Deniega el acceso a la funcionalidad, aunque este haya sido otorgado en otro grupo.",
+    "context": "It denies access to the feature, even if it was allowed in a different group."
+  },
+  {
     "term": "page.permissions-group.effects-do-not-grant",
     "definition": "No otorgar",
-    "context": "Do not grant"
+    "context": "Don't grant"
+  },
+  {
+    "term": "page.permissions-group.effects-do-not-grant-description",
+    "definition": "Ni otorga ni deniega el acceso a la funcionalidad. Es un estado neutral.",
+    "context": "It neither grants nor denies the access to the feature. It's a neutral state."
   },
   {
     "term": "page.permissions-group.effects-grant",
     "definition": "Otorgar",
     "context": "Grant"
+  },
+  {
+    "term": "page.permissions-group.effects-grant-description",
+    "definition": "Otorga acceso a la funcionalidad, a menos que se haya denegado de forma explícita en otro grupo del que el usuario forme parte.",
+    "context": "Grants access to the feature, unless there's a specific denial in another group the user is a part of."
   },
   {
     "term": "page.permissions-group.integrations-crud",
