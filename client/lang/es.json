@@ -9906,13 +9906,13 @@
   },
   {
     "term": "page.permissions-group.integrations-crud",
-    "definition": "Editar integraciones",
-    "context": "Edit integrations"
+    "definition": "Crear y gestionar integraciones",
+    "context": "Create and manage integrations"
   },
   {
     "term": "page.permissions-group.integrations-crud-api",
-    "definition": "Panel de Desarrolladores",
-    "context": "Developers panel"
+    "definition": "Acceso de Desarrolladores",
+    "context": "Developer access"
   },
   {
     "term": "page.permissions-group.integrations-crud-api-description",
@@ -10001,8 +10001,8 @@
   },
   {
     "term": "page.permissions-group.profile-types-crud",
-    "definition": "Editar tipos de perfiles",
-    "context": "Edit profile types"
+    "definition": "Crear y gestionar tipos de perfiles",
+    "context": "Create and manage profile types"
   },
   {
     "term": "page.permissions-group.profile-types-crud-description",
@@ -10021,8 +10021,8 @@
   },
   {
     "term": "page.permissions-group.profiles-create",
-    "definition": "Crear perfiles",
-    "context": "Create profiles"
+    "definition": "Crear y actualizar perfiles",
+    "context": "Create and update profiles"
   },
   {
     "term": "page.permissions-group.profiles-create-description",
@@ -10052,7 +10052,7 @@
   {
     "term": "page.permissions-group.profiles-subscribe",
     "definition": "Suscripción a perfiles",
-    "context": "Profiles subscribe"
+    "context": "Subscribe to profiles"
   },
   {
     "term": "page.permissions-group.profiles-subscribe-description",
@@ -10101,8 +10101,8 @@
   },
   {
     "term": "page.permissions-group.tags-crud-tags",
-    "definition": "Editar etiquetas",
-    "context": "Edit tags"
+    "definition": "Crear y gestionar etiquetas",
+    "context": "Create and manage tags"
   },
   {
     "term": "page.permissions-group.tags-crud-tags-description",
@@ -10111,8 +10111,8 @@
   },
   {
     "term": "page.permissions-group.teams-crud",
-    "definition": "Editar equipos",
-    "context": "Edit teams"
+    "definition": "Crear y gestionar equipos",
+    "context": "Create and manage teams"
   },
   {
     "term": "page.permissions-group.teams-crud-description",
@@ -10121,8 +10121,8 @@
   },
   {
     "term": "page.permissions-group.teams-edit-permissions",
-    "definition": "Editar permisos de equipo",
-    "context": "Edit team permissions"
+    "definition": "Gestionar permisos de equipo",
+    "context": "Manage team permissions"
   },
   {
     "term": "page.permissions-group.teams-edit-permissions-description",
@@ -10141,8 +10141,8 @@
   },
   {
     "term": "page.permissions-group.users-crud",
-    "definition": "Editar usuarios",
-    "context": "Edit users"
+    "definition": "Gestionar usuarios",
+    "context": "Manage users"
   },
   {
     "term": "page.permissions-group.users-crud-description",
@@ -10151,13 +10151,13 @@
   },
   {
     "term": "page.permissions-group.users-ghost-login",
-    "definition": "Acceder como...",
-    "context": "Ghost login"
+    "definition": "Acceder como otros usuarios",
+    "context": "Login as other users"
   },
   {
     "term": "page.permissions-group.users-ghost-login-description",
-    "definition": "Concede a los usuarios en este equipo permisos para acceder a la cuenta de cualquier usuario en la organización, incluyendo el propietario.",
-    "context": "Grants users in this team permissions to access the account of any user on the organization, including the owner."
+    "definition": "Concede a los usuarios en este equipo permisos para acceder a la cuenta de cualquier usuario en la organización .",
+    "context": "Grants users in this team permissions to login as other users on the organization."
   },
   {
     "term": "page.permissions-group.users-list",
