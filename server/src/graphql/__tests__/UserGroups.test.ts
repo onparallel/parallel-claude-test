@@ -1,6 +1,13 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { Organization, Petition, PetitionPermission, User, UserGroup } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  PetitionPermission,
+  User,
+  UserGroup,
+  UserGroupPermission,
+} from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
@@ -43,8 +50,12 @@ describe("GraphQL/UserGroups", () => {
     await mocks.knex.from("user_group_permission").delete();
     await mocks.knex.from("user_group_member").delete();
     await mocks.knex.from("user_group").delete();
+    await mocks.knex.from("feature_flag_override").delete();
+    await mocks.knex.from("feature_flag").delete();
     await mocks.knex.from("user_authentication_token").delete();
     await mocks.knex.from("user").where({ is_org_owner: false }).delete();
+
+    await mocks.createFeatureFlags([{ name: "PERMISSION_MANAGEMENT", default_value: true }]);
 
     [allUsersGroup] = await mocks.createUserGroups(
       1,
@@ -77,6 +88,19 @@ describe("GraphQL/UserGroups", () => {
         user_id: sessionUser.id,
         petition_id: petition.id,
         type: "OWNER",
+      },
+    ]);
+
+    await mocks.knex<UserGroupPermission>("user_group_permission").insert([
+      {
+        user_group_id: userGroups[0].id,
+        effect: "GRANT",
+        name: "ORG_SETTINGS",
+      },
+      {
+        user_group_id: userGroups[0].id,
+        effect: "DENY",
+        name: "INTEGRATIONS:CRUD_API",
       },
     ]);
 
@@ -289,6 +313,7 @@ describe("GraphQL/UserGroups", () => {
 
   describe("deleteUserGroup", () => {
     it("fails if trying to delete an INITIAL group without PERMISSION_MANAGEMENT feature flag", async () => {
+      await mocks.updateFeatureFlag("PERMISSION_MANAGEMENT", false);
       const [initialType] = await mocks.createUserGroups(1, organization.id, undefined, () => ({
         type: "INITIAL",
       }));
@@ -529,7 +554,7 @@ describe("GraphQL/UserGroups", () => {
   });
 
   describe("cloneUserGroups", () => {
-    it("clones a user group and all its members", async () => {
+    it("clones a user group and all its members and permissions", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation UserGroups_cloneUserGroups($userGroupIds: [GID!]!, $locale: UserLocale!) {
@@ -539,6 +564,10 @@ describe("GraphQL/UserGroups", () => {
                 user {
                   id
                 }
+              }
+              permissions {
+                name
+                effect
               }
             }
           }
@@ -553,11 +582,21 @@ describe("GraphQL/UserGroups", () => {
         {
           name: userGroups[0].name.concat(" (copy)"),
           members: users.slice(0, 3).map((user) => ({ user: { id: toGlobalId("User", user.id) } })),
+          permissions: [
+            {
+              name: "ORG_SETTINGS",
+              effect: "GRANT",
+            },
+            {
+              name: "INTEGRATIONS:CRUD_API",
+              effect: "DENY",
+            },
+          ],
         },
       ]);
     });
 
-    it("cloning a user group should not clone the group permissions", async () => {
+    it("cloning a user group should not clone the group petition permissions", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation UserGroups_cloneUserGroups($userGroupIds: [GID!]!, $locale: UserLocale!) {
@@ -586,10 +625,6 @@ describe("GraphQL/UserGroups", () => {
   });
 
   describe("updateUserGroupPermissions", () => {
-    beforeAll(async () => {
-      await mocks.createFeatureFlags([{ name: "PERMISSION_MANAGEMENT", default_value: true }]);
-    });
-
     it("fails if user doesn't have PERMISSION_MANAGEMENT feature flag", async () => {
       await mocks.updateFeatureFlag("PERMISSION_MANAGEMENT", false);
       const { errors, data } = await testClient.execute(
@@ -617,8 +652,6 @@ describe("GraphQL/UserGroups", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
-
-      await mocks.updateFeatureFlag("PERMISSION_MANAGEMENT", true);
     });
 
     it("fails when trying to give SUPERADMIN permission to an org that is not ROOT", async () => {
@@ -730,7 +763,7 @@ describe("GraphQL/UserGroups", () => {
       expect(data).toBeNull();
     });
 
-    it("allows a permission on a group", async () => {
+    it("grants a permission on a group", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($userGroupId: GID!, $permissions: [UpdateUserGroupPermissionsInput!]!) {
@@ -767,6 +800,7 @@ describe("GraphQL/UserGroups", () => {
     });
 
     it("denies a permission on a group", async () => {
+      await mocks.createFeatureFlags([{ name: "GHOST_LOGIN", default_value: true }]);
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($userGroupId: GID!, $permissions: [UpdateUserGroupPermissionsInput!]!) {
@@ -836,7 +870,67 @@ describe("GraphQL/UserGroups", () => {
       });
     });
 
+    it("fails if trying to update GHOST_LOGIN permission without having its feature flag", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($userGroupId: GID!, $permissions: [UpdateUserGroupPermissionsInput!]!) {
+            updateUserGroupPermissions(userGroupId: $userGroupId, permissions: $permissions) {
+              id
+              permissions {
+                effect
+                name
+              }
+            }
+          }
+        `,
+        {
+          userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
+          permissions: [
+            {
+              effect: "DENY",
+              name: "USERS:GHOST_LOGIN",
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to update PROFILES permission without having its feature flag", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($userGroupId: GID!, $permissions: [UpdateUserGroupPermissionsInput!]!) {
+            updateUserGroupPermissions(userGroupId: $userGroupId, permissions: $permissions) {
+              id
+              permissions {
+                effect
+                name
+              }
+            }
+          }
+        `,
+        {
+          userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
+          permissions: [
+            { effect: "DENY", name: "PROFILES:DELETE_PERMANENTLY_PROFILES" },
+            { effect: "GRANT", name: "PROFILE_TYPES:CRUD_PROFILE_TYPES" },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("updates multiple permissions on a group", async () => {
+      await mocks.createFeatureFlags([
+        { name: "DEVELOPER_ACCESS", default_value: true },
+        { name: "PROFILES", default_value: true },
+        { name: "ON_BEHALF_OF", default_value: true },
+        { name: "GHOST_LOGIN", default_value: true },
+      ]);
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($userGroupId: GID!, $permissions: [UpdateUserGroupPermissionsInput!]!) {
@@ -857,6 +951,9 @@ describe("GraphQL/UserGroups", () => {
             { effect: "NONE", name: "PETITIONS:CREATE_TEMPLATES" },
             { effect: "NONE", name: "REPORTS:OVERVIEW" }, // this does nothing
             { effect: "GRANT", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
+            { effect: "GRANT", name: "PROFILE_TYPES:CRUD_PROFILE_TYPES" },
+            { effect: "GRANT", name: "PETITIONS:SEND_ON_BEHALF" },
+            { effect: "DENY", name: "USERS:GHOST_LOGIN" },
           ],
         },
       );
@@ -869,6 +966,9 @@ describe("GraphQL/UserGroups", () => {
           { effect: "DENY", name: "PETITIONS:CREATE_PETITIONS" },
           { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
           { effect: "GRANT", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
+          { effect: "GRANT", name: "PROFILE_TYPES:CRUD_PROFILE_TYPES" },
+          { effect: "GRANT", name: "PETITIONS:SEND_ON_BEHALF" },
+          { effect: "DENY", name: "USERS:GHOST_LOGIN" },
         ]),
       });
     });

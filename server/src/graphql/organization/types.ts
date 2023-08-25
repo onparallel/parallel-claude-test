@@ -12,11 +12,12 @@ import {
 } from "nexus";
 import { isDefined, omit } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
-import { or } from "../helpers/authorize";
+import { and, or } from "../helpers/authorize";
 import { addDuration, multiplyDuration } from "../../util/duration";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -171,7 +172,7 @@ export const Organization = objectType({
       description: "The users in the organization.",
       searchable: true,
       sortableBy: ["firstName", "lastName", "fullName", "email", "createdAt", "lastActiveAt"],
-      authorize: isOwnOrgOrSuperAdmin(),
+      authorize: and(isOwnOrgOrSuperAdmin(), contextUserHasPermission("USERS:LIST_USERS")),
       extendArgs: {
         exclude: list(nonNull(globalIdArg("User"))),
         searchByEmailOnly: booleanArg(),

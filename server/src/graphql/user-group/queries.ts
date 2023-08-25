@@ -3,12 +3,13 @@ import { authenticate, authenticateAnd, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasAccessToUserGroups } from "./authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 
 export const userGroupsQuery = queryField((t) => {
   t.paginationField("userGroups", {
     type: "UserGroup",
     description: "Paginated list of user groups in the organization",
-    authorize: authenticate(),
+    authorize: authenticateAnd(contextUserHasPermission("TEAMS:LIST_TEAMS")),
     searchable: true,
     sortableBy: ["name", "createdAt"],
     resolve: (_, { offset, limit, sortBy, search }, ctx) => {

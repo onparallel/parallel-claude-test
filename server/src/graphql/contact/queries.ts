@@ -1,18 +1,19 @@
 import { list, nonNull, nullable, queryField, stringArg } from "nexus";
 import pMap from "p-map";
-import { SortBy } from "../../db/helpers/utils";
 import { Contact } from "../../db/__types";
-import { authenticate, chain } from "../helpers/authorize";
+import { SortBy } from "../../db/helpers/utils";
+import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validEmail } from "../helpers/validators/validEmail";
+import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToContacts } from "./authorizers";
 
 export const contactQueries = queryField((t) => {
   t.paginationField("contacts", {
     type: "Contact",
     description: "The contacts of the user",
-    authorize: authenticate(),
+    authorize: authenticateAnd(contextUserHasPermission("CONTACTS:LIST_CONTACTS")),
     searchable: true,
     extendArgs: {
       exclude: list(nonNull(globalIdArg("Contact"))),
@@ -55,7 +56,7 @@ export const contactQueries = queryField((t) => {
     args: {
       id: nonNull(globalIdArg()),
     },
-    authorize: chain(authenticate(), userHasAccessToContacts("id")),
+    authorize: authenticateAnd(userHasAccessToContacts("id")),
     resolve: async (root, args, ctx) => {
       return await ctx.contacts.loadContact(args.id);
     },

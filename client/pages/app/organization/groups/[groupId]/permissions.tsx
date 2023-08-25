@@ -112,18 +112,22 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
           defaultMessage: "Parallels",
         }),
         permissions: [
-          {
-            name: "PETITIONS:SEND_ON_BEHALF",
-            title: intl.formatMessage({
-              id: "page.permissions-group.petitions-send-on-behalf",
-              defaultMessage: "Send on behalf of anyone",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.petitions-send-on-behalf-description",
-              defaultMessage:
-                "Grants users in this team permissions to send parallels on behalf of any other user in their organization without explicit delegation.",
-            }),
-          },
+          ...(me.hasOnBehalfOfAccess
+            ? [
+                {
+                  name: "PETITIONS:SEND_ON_BEHALF",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.petitions-send-on-behalf",
+                    defaultMessage: "Send on behalf of anyone",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.petitions-send-on-behalf-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to send parallels on behalf of any other user in their organization without explicit delegation.",
+                  }),
+                },
+              ]
+            : []),
           {
             name: "PETITIONS:CHANGE_PATH",
             title: intl.formatMessage({
@@ -206,142 +210,150 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
           },
         ],
       },
-      {
-        category: intl.formatMessage({
-          id: "page.permissions-group.category-profiles",
-          defaultMessage: "Profiles",
-        }),
-        permissions: [
-          {
-            name: "PROFILES:DELETE_PROFILES",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profile-delete-profiles",
-              defaultMessage: "Delete profiles",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profile-delete-profiles-description",
-              defaultMessage:
-                "Grants users in this team permissions to send profiles to the thrash bin.",
-            }),
-          },
-          {
-            name: "PROFILES:DELETE_PERMANENTLY_PROFILES",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profiles-delete-permanently-profiles",
-              defaultMessage: "Delete profiles permanently",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profiles-delete-permanently-profiles-description",
-              defaultMessage:
-                "Grants users in this team permissions to permanently delete profiles.",
-            }),
-          },
-          {
-            name: "PROFILE_TYPES:CRUD_PROFILE_TYPES",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profile-types-crud",
-              defaultMessage: "Edit profile types",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profile-types-crud-description",
-              defaultMessage:
-                "Grants users in this team permissions to configure and create profile types on the organization.",
-            }),
-          },
-          {
-            name: "PROFILES:CREATE_PROFILES",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profiles-create",
-              defaultMessage: "Create profiles",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profiles-create-description",
-              defaultMessage:
-                "Grants users in this team permissions to create and manage profiles on the organization",
-            }),
-          },
-          {
-            name: "PROFILES:CLOSE_PROFILES",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profiles-close",
-              defaultMessage: "Close profiles",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profiles-close-description",
-              defaultMessage:
-                "Grants users in this team permissions to close and reopen profiles on the organization",
-            }),
-          },
-          {
-            name: "PROFILES:LIST_PROFILES",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profiles-list",
-              defaultMessage: "List profiles",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profiles-list-description",
-              defaultMessage:
-                "Grants users in this team permissions to view the list of profiles created on the organization",
-            }),
-          },
-          {
-            name: "PROFILE_ALERTS:LIST_ALERTS",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profile-alerts-list",
-              defaultMessage: "View alerts",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profile-alerts-list-description",
-              defaultMessage:
-                "Grants users in this team permissions to view the list of property expiration alerts of the profiles",
-            }),
-          },
-          {
-            name: "PROFILES:SUBSCRIBE_PROFILES",
-            title: intl.formatMessage({
-              id: "page.permissions-group.profiles-subscribe",
-              defaultMessage: "Profiles subscribe",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.profiles-subscribe-description",
-              defaultMessage:
-                "Grants users in this team permissions to manage profile alerts subscriptions",
-            }),
-          },
-        ],
-      },
-      {
-        category: intl.formatMessage({
-          id: "page.permissions-group.category-integrations",
-          defaultMessage: "Integrations",
-        }),
-        permissions: [
-          {
-            name: "INTEGRATIONS:CRUD_INTEGRATIONS",
-            title: intl.formatMessage({
-              id: "page.permissions-group.integrations-crud",
-              defaultMessage: "Edit integrations",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.integrations-crud-description",
-              defaultMessage:
-                "Grants users in this team permissions to manage the different integrations of the organization",
-            }),
-          },
-          {
-            name: "INTEGRATIONS:CRUD_API",
-            title: intl.formatMessage({
-              id: "page.permissions-group.integrations-crud-api",
-              defaultMessage: "Developers panel",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.integrations-crud-api-description",
-              defaultMessage:
-                "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens",
-            }),
-          },
-        ],
-      },
+      ...(me.hasProfilesAccess
+        ? [
+            {
+              category: intl.formatMessage({
+                id: "page.permissions-group.category-profiles",
+                defaultMessage: "Profiles",
+              }),
+              permissions: [
+                {
+                  name: "PROFILES:DELETE_PROFILES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profile-delete-profiles",
+                    defaultMessage: "Delete profiles",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profile-delete-profiles-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to send profiles to the thrash bin.",
+                  }),
+                },
+                {
+                  name: "PROFILES:DELETE_PERMANENTLY_PROFILES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profiles-delete-permanently-profiles",
+                    defaultMessage: "Delete profiles permanently",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profiles-delete-permanently-profiles-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to permanently delete profiles.",
+                  }),
+                },
+                {
+                  name: "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profile-types-crud",
+                    defaultMessage: "Edit profile types",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profile-types-crud-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to configure and create profile types on the organization.",
+                  }),
+                },
+                {
+                  name: "PROFILES:CREATE_PROFILES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profiles-create",
+                    defaultMessage: "Create profiles",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profiles-create-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to create and manage profiles on the organization",
+                  }),
+                },
+                {
+                  name: "PROFILES:CLOSE_PROFILES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profiles-close",
+                    defaultMessage: "Close profiles",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profiles-close-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to close and reopen profiles on the organization",
+                  }),
+                },
+                {
+                  name: "PROFILES:LIST_PROFILES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profiles-list",
+                    defaultMessage: "List profiles",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profiles-list-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to view the list of profiles created on the organization",
+                  }),
+                },
+                {
+                  name: "PROFILE_ALERTS:LIST_ALERTS",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profile-alerts-list",
+                    defaultMessage: "View alerts",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profile-alerts-list-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to view the list of property expiration alerts of the profiles",
+                  }),
+                },
+                {
+                  name: "PROFILES:SUBSCRIBE_PROFILES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profiles-subscribe",
+                    defaultMessage: "Profiles subscribe",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profiles-subscribe-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to manage profile alerts subscriptions",
+                  }),
+                },
+              ],
+            },
+          ]
+        : []),
+      ...(me.hasDeveloperAccess
+        ? [
+            {
+              category: intl.formatMessage({
+                id: "page.permissions-group.category-integrations",
+                defaultMessage: "Integrations",
+              }),
+              permissions: [
+                {
+                  name: "INTEGRATIONS:CRUD_INTEGRATIONS",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.integrations-crud",
+                    defaultMessage: "Edit integrations",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.integrations-crud-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to manage the different integrations of the organization",
+                  }),
+                },
+                {
+                  name: "INTEGRATIONS:CRUD_API",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.integrations-crud-api",
+                    defaultMessage: "Developers panel",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.integrations-crud-api-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens",
+                  }),
+                },
+              ],
+            },
+          ]
+        : []),
       {
         category: intl.formatMessage({
           id: "page.permissions-group.category-users",
@@ -373,18 +385,22 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                 "Grants users in this team permissions to manage the users on the organization",
             }),
           },
-          {
-            name: "USERS:GHOST_LOGIN",
-            title: intl.formatMessage({
-              id: "page.permissions-group.users-ghost-login",
-              defaultMessage: "Ghost login",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.users-ghost-login-description",
-              defaultMessage:
-                "Grants users in this team permissions to access the account of any user on the organization, including the owner.",
-            }),
-          },
+          ...(me.hasLoginAsAccess
+            ? [
+                {
+                  name: "USERS:GHOST_LOGIN",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.users-ghost-login",
+                    defaultMessage: "Ghost login",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.users-ghost-login-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to access the account of any user on the organization, including the owner.",
+                  }),
+                },
+              ]
+            : []),
         ],
       },
       {
@@ -682,6 +698,10 @@ const _queries = [
       ...UserGroupLayout_Query
       me {
         permissions
+        hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
+        hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+        hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
+        hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         organization {
           id
           status

@@ -148,13 +148,22 @@ export class UserGroupRepository extends BaseRepository {
         t,
       );
 
+      // copy group members
       await t.raw(
         /* sql */ `
-        with group_member as (select user_id from user_group_member where user_group_id = ? and deleted_at is null)
-        insert into user_group_member(user_group_id, user_id, created_by)
-        select ?::int, user_id, ? from group_member;
-      `,
-        [userGroupId, newGroup.id, `User:${user.id}`],
+            insert into user_group_member(user_group_id, user_id, created_by)
+            select ?::int, user_id, ? from user_group_member where user_group_id = ? and deleted_at is null;
+          `,
+        [newGroup.id, `User:${user.id}`, userGroupId],
+      );
+
+      // copy group permissions
+      await t.raw(
+        /* sql */ `
+            insert into user_group_permission (user_group_id, name, effect, created_by)
+            select ?::int, name, effect, ? from user_group_permission where user_group_id = ? and deleted_at is null;
+          `,
+        [newGroup.id, `User:${user.id}`, userGroupId],
       );
 
       return newGroup;

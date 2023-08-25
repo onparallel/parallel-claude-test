@@ -19392,8 +19392,11 @@ export type PermissionsGroup_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPermissionManagement: boolean;
+    hasOnBehalfOfAccess: boolean;
     hasProfilesAccess: boolean;
+    hasDeveloperAccess: boolean;
+    hasLoginAsAccess: boolean;
+    hasPermissionManagement: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -42546,6 +42549,10 @@ export const PermissionsGroup_userDocument = gql`
     ...UserGroupLayout_Query
     me {
       permissions
+      hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
+      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
+      hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       organization {
         id
         status

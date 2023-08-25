@@ -6,6 +6,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { userHasAccessToProfile, userHasAccessToProfileType } from "./authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 
 export const profileTypes = queryField((t) => {
   t.paginationField("profileTypes", {
@@ -74,7 +75,10 @@ export const profileType = queryField((t) => {
 export const profiles = queryField((t) => {
   t.paginationField("profiles", {
     type: "Profile",
-    authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILES:LIST_PROFILES"),
+    ),
     searchable: true,
     sortableBy: ["createdAt", "name"],
     extendArgs: {
@@ -122,7 +126,10 @@ export const profile = queryField((t) => {
 export const expiringProfileProperties = queryField((t) => {
   t.paginationField("expiringProfileProperties", {
     type: "ProfileFieldProperty",
-    authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILE_ALERTS:LIST_ALERTS"),
+    ),
     searchable: true,
     extendArgs: {
       filter: inputObjectType({
