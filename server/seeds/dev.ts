@@ -260,7 +260,7 @@ export async function seed(knex: Knex): Promise<any> {
           {
             org_id: orgId,
             name: "Admins",
-            type: "NORMAL",
+            type: "INITIAL",
             created_by: `User:${ownerId}`,
             updated_by: `User:${ownerId}`,
           },

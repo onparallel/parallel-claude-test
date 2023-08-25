@@ -71,6 +71,17 @@ export function useFeatureFlags() {
               defaultMessage: "Allows recipients to access the client portal.",
             }),
           },
+          {
+            name: "PERMISSION_MANAGEMENT",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.permission-management-name",
+              defaultMessage: "Permissions management",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.permission-management-description",
+              defaultMessage: "Allows users to manage user permissions on teams.",
+            }),
+          },
         ],
       },
       {

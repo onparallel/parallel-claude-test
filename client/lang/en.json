@@ -2240,6 +2240,16 @@
     "context": "Others"
   },
   {
+    "term": "component.feature-flag-descriptions.permission-management-description",
+    "definition": "Allows users to manage user permissions on teams.",
+    "context": "Allows users to manage user permissions on teams."
+  },
+  {
+    "term": "component.feature-flag-descriptions.permission-management-name",
+    "definition": "Permissions management",
+    "context": "Permissions management"
+  },
+  {
     "term": "component.feature-flag-descriptions.petition-access-recipient-url-field-description",
     "definition": "Allows obtaining the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity.",
     "context": "Allows obtaining the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity."
@@ -7433,6 +7443,16 @@
     "term": "component.user-group-layout.permissions",
     "definition": "Permissions",
     "context": "Permissions"
+  },
+  {
+    "term": "component.user-group-layout.permissions-enterprise-explanation",
+    "definition": "This is an enterprise feature. To know more <a>contact our support team</a>.",
+    "context": "This is an enterprise feature. To know more <a>contact our support team</a>."
+  },
+  {
+    "term": "component.user-group-layout.permissions-enterprise-message",
+    "definition": "Hi, I would like to get more information about permission management.",
+    "context": "Hi, I would like to get more information about permission management."
   },
   {
     "term": "component.user-group-layout.users",

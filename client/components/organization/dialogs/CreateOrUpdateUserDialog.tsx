@@ -52,7 +52,7 @@ function CreateOrUpdateUserDialog({
     async (search: string, excludeUserGroups: string[]) => {
       return await _handleSearchUserGroups(search, {
         excludeUserGroups,
-        type: ["NORMAL"],
+        type: ["NORMAL", "INITIAL"],
       });
     },
     [_handleSearchUserGroups],

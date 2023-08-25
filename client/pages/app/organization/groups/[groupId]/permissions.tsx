@@ -17,6 +17,7 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
+import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
 import {
@@ -27,8 +28,9 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useHandleNavigation } from "@parallel/utils/navigation";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
@@ -46,6 +48,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
   const intl = useIntl();
   const {
     data: { me, realMe },
+    refetch: refetchMe,
   } = useAssertQuery(PermissionsGroup_userDocument);
 
   const {
@@ -545,7 +548,16 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
     reset({
       permissions: data.permissions,
     });
+    await refetchMe();
   }
+
+  const navigate = useHandleNavigation();
+  useEffect(() => {
+    // if user removes their permission to edit permissions, redirect to the group view
+    if (!me.permissions.includes("TEAMS:CRUD_PERMISSIONS")) {
+      navigate(`/app/organization/groups/${groupId}`);
+    }
+  }, [me.permissions.includes("TEAMS:CRUD_PERMISSIONS")]);
 
   return (
     <UserGroupLayout
@@ -670,6 +682,7 @@ const _queries = [
     query PermissionsGroup_user {
       ...UserGroupLayout_Query
       me {
+        permissions
         organization {
           id
           status
@@ -705,6 +718,7 @@ PermissionsGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
 
 export default compose(
   withDialogs,
+  withFeatureFlag("PERMISSION_MANAGEMENT", "/app/organization"),
   withPermission("TEAMS:CRUD_PERMISSIONS", { orPath: "/app/organization" }),
   withApolloData,
 )(PermissionsGroup);

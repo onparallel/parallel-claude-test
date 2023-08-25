@@ -64,7 +64,8 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     },
   });
 
-  const canEdit = useHasPermission("TEAMS:CRUD_TEAMS") && userGroup!.type === "NORMAL";
+  const canEditGroupMembers =
+    useHasPermission("TEAMS:CRUD_TEAMS") && ["NORMAL", "INITIAL"].includes(userGroup!.type);
 
   const [userList, searchedList] = useMemo(() => {
     const {
@@ -172,7 +173,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={24}>
         <TablePage
           flex="0 1 auto"
-          isSelectable={canEdit}
+          isSelectable={canEditGroupMembers}
           isHighlightable
           columns={columns}
           rows={userList}
@@ -208,7 +209,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onAddMember={handleAddMember}
-              canAddMember={canEdit}
+              canAddMember={canEditGroupMembers}
             />
           }
           body={

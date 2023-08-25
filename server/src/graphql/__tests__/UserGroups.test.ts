@@ -288,6 +288,23 @@ describe("GraphQL/UserGroups", () => {
   });
 
   describe("deleteUserGroup", () => {
+    it("fails if trying to delete an INITIAL group without PERMISSION_MANAGEMENT feature flag", async () => {
+      const [initialType] = await mocks.createUserGroups(1, organization.id, undefined, () => ({
+        type: "INITIAL",
+      }));
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation UserGroups_deleteUserGroup($groupId: GID!) {
+            deleteUserGroup(ids: [$groupId])
+          }
+        `,
+        { groupId: toGlobalId("UserGroup", initialType.id) },
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("deletes a user group", async () => {
       const { data: deleteData, errors: deleteError } = await testClient.mutate({
         mutation: gql`
@@ -569,6 +586,41 @@ describe("GraphQL/UserGroups", () => {
   });
 
   describe("updateUserGroupPermissions", () => {
+    beforeAll(async () => {
+      await mocks.createFeatureFlags([{ name: "PERMISSION_MANAGEMENT", default_value: true }]);
+    });
+
+    it("fails if user doesn't have PERMISSION_MANAGEMENT feature flag", async () => {
+      await mocks.updateFeatureFlag("PERMISSION_MANAGEMENT", false);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($userGroupId: GID!, $permissions: [UpdateUserGroupPermissionsInput!]!) {
+            updateUserGroupPermissions(userGroupId: $userGroupId, permissions: $permissions) {
+              id
+              permissions {
+                effect
+                name
+              }
+            }
+          }
+        `,
+        {
+          userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
+          permissions: [
+            {
+              effect: "ALLOW",
+              name: "TAGS:CRUD_TAGS",
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks.updateFeatureFlag("PERMISSION_MANAGEMENT", true);
+    });
+
     it("fails when trying to give SUPERADMIN permission to an org that is not ROOT", async () => {
       const [org] = await mocks.createRandomOrganizations(1, () => ({ status: "DEV" }));
       const [user] = await mocks.createRandomUsers(org.id, 1, () => ({ is_org_owner: true }));

@@ -45,3 +45,27 @@ export function userGroupHasType<
     return userGroups.every((ug) => isDefined(ug) && allowedTypes.includes(ug.type));
   };
 }
+
+export function userGroupCanBeDeleted<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null | undefined>,
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    if (!isDefined(args[argName])) {
+      return false;
+    }
+    const userGroupIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+    const userGroups = await ctx.userGroups.loadUserGroup(userGroupIds);
+
+    if (userGroups.some((ug) => !isDefined(ug) || ug.type === "ALL_USERS")) {
+      return false;
+    }
+
+    if (userGroups.some((ug) => ug!.type === "INITIAL")) {
+      return ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PERMISSION_MANAGEMENT");
+    }
+
+    return true;
+  };
+}

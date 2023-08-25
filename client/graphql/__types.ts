@@ -387,6 +387,7 @@ export type FeatureFlag =
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
+  | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_SIGNATURE"
   | "PROFILES"
@@ -5168,7 +5169,7 @@ export interface UserGroupPermission {
 
 export type UserGroupPermissionEffect = "ALLOW" | "DENY";
 
-export type UserGroupType = "ALL_USERS" | "NORMAL";
+export type UserGroupType = "ALL_USERS" | "INITIAL" | "NORMAL";
 
 /** The preferred locale for the user */
 export type UserLocale = "en" | "es";
@@ -6756,6 +6757,7 @@ export type UserGroupLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasPermissionManagement: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -19313,6 +19315,7 @@ export type OrganizationGroup_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasPermissionManagement: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -19377,18 +19380,19 @@ export type PermissionsGroup_userQueryVariables = Exact<{ [key: string]: never }
 export type PermissionsGroup_userQuery = {
   me: {
     __typename?: "User";
+    permissions: Array<string>;
     id: string;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasPermissionManagement: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -19590,6 +19594,7 @@ export type OrganizationGroups_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasPermissionManagement: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -33869,6 +33874,9 @@ export const OrganizationSettingsLayout_QueryFragmentDoc = gql`
 export const UserGroupLayout_QueryFragmentDoc = gql`
   fragment UserGroupLayout_Query on Query {
     ...OrganizationSettingsLayout_Query
+    me {
+      hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
+    }
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<UserGroupLayout_QueryFragment, unknown>;
@@ -42537,6 +42545,7 @@ export const PermissionsGroup_userDocument = gql`
   query PermissionsGroup_user {
     ...UserGroupLayout_Query
     me {
+      permissions
       organization {
         id
         status
@@ -42608,6 +42617,9 @@ export const OrganizationGroups_userGroupsDocument = gql`
 export const OrganizationGroups_userDocument = gql`
   query OrganizationGroups_user {
     ...OrganizationSettingsLayout_Query
+    me {
+      hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
+    }
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroups_userQuery, OrganizationGroups_userQueryVariables>;

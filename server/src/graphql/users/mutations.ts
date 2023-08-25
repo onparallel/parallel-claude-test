@@ -129,7 +129,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
         orgCanCreateNewUser(),
         contextUserHasPermission("USERS:CRUD_USERS"),
         userHasAccessToUserGroups("userGroupIds"),
-        userGroupHasType("userGroupIds", "NORMAL"),
+        userGroupHasType("userGroupIds", ["NORMAL", "INITIAL"]),
       ),
     ),
     emailIsNotRegisteredInTargetOrg("email", "orgId" as never),
@@ -408,7 +408,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
     contextUserHasPermission("USERS:CRUD_USERS"),
     userHasAccessToUsers("userId"),
     userHasAccessToUserGroups("userGroupIds"),
-    userGroupHasType("userGroupIds", "NORMAL"),
+    userGroupHasType("userGroupIds", ["NORMAL", "INITIAL"]),
   ),
   args: {
     userId: nonNull(globalIdArg("User")),
@@ -442,7 +442,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
       if (userGroupIds) {
         const userGroups = await ctx.userGroups.loadUserGroupsByUserId(userId);
         const actualUserGroupsIds = userGroups
-          .filter((ug) => ug.type === "NORMAL") // avoid removing ALL_USERS group
+          .filter((ug) => ug.type !== "ALL_USERS") // avoid removing ALL_USERS group
           .map((userGroup) => userGroup.id);
 
         const userGroupsIdsToDelete = difference(actualUserGroupsIds, userGroupIds);

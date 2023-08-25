@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Flex, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
+import { Box, Flex, MenuDivider, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import {
   SettingsTabsInnerLayout,
@@ -26,6 +26,8 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { EditableHeading } from "../common/EditableHeading";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
+import { SmallPopover } from "../common/SmallPopover";
+import { SupportLink } from "../common/SupportLink";
 import { WhenPermission } from "../common/WhenPermission";
 import { OrganizationSettingsLayout } from "./OrganizationSettingsLayout";
 
@@ -67,7 +69,37 @@ export function UserGroupLayout({
           defaultMessage: "Permissions",
         }),
         href: `/app/organization/groups/${groupId}/permissions`,
-        isDisabled: !canCrudPermissions,
+        isDisabled: !canCrudPermissions || !me.hasPermissionManagement,
+        decorate:
+          !canCrudPermissions || !me.hasPermissionManagement
+            ? (tab) => (
+                <SmallPopover
+                  content={
+                    <Text fontSize="sm">
+                      <FormattedMessage
+                        id="component.user-group-layout.permissions-enterprise-explanation"
+                        defaultMessage="This is an enterprise feature. To know more <a>contact our support team</a>."
+                        values={{
+                          a: (chunks: any) => (
+                            <SupportLink
+                              message={intl.formatMessage({
+                                id: "component.user-group-layout.permissions-enterprise-message",
+                                defaultMessage:
+                                  "Hi, I would like to get more information about permission management.",
+                              })}
+                            >
+                              {chunks}
+                            </SupportLink>
+                          ),
+                        }}
+                      />
+                    </Text>
+                  }
+                >
+                  <Box>{tab}</Box>
+                </SmallPopover>
+              )
+            : undefined,
       },
     ],
     [intl.locale, canCrudPermissions],
@@ -124,7 +156,7 @@ export function UserGroupLayout({
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <EditableHeading
             maxLength={100}
-            isDisabled={!canCrudTeams || userGroup!.type !== "NORMAL"}
+            isDisabled={!canCrudTeams || userGroup!.type === "ALL_USERS"}
             value={name}
             onChange={handleChangeGroupName}
           />
@@ -135,7 +167,7 @@ export function UserGroupLayout({
                 <MenuList>
                   <MenuItem
                     onClick={handleCloneGroup}
-                    isDisabled={!canCrudTeams || userGroup!.type !== "NORMAL"}
+                    isDisabled={!canCrudTeams || userGroup!.type === "ALL_USERS"}
                     icon={<CopyIcon display="block" boxSize={4} />}
                   >
                     <FormattedMessage
@@ -147,7 +179,11 @@ export function UserGroupLayout({
                   <MenuItem
                     color="red.500"
                     onClick={handleDeleteGroup}
-                    isDisabled={!canCrudTeams || userGroup!.type !== "NORMAL"}
+                    isDisabled={
+                      !canCrudTeams ||
+                      userGroup!.type === "ALL_USERS" ||
+                      (userGroup!.type === "INITIAL" && !me.hasPermissionManagement)
+                    }
                     icon={<DeleteIcon display="block" boxSize={4} />}
                   >
                     <FormattedMessage
@@ -174,6 +210,9 @@ UserGroupLayout.fragments = {
   Query: gql`
     fragment UserGroupLayout_Query on Query {
       ...OrganizationSettingsLayout_Query
+      me {
+        hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
+      }
     }
     ${OrganizationSettingsLayout.fragments.Query}
   `,

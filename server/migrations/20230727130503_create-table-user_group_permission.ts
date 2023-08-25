@@ -1,6 +1,8 @@
 import { Knex } from "knex";
 import { sqlValues } from "./helpers/knex";
 import { timestamps } from "./helpers/timestamps";
+import { addFeatureFlag, removeFeatureFlag } from "./helpers/featureFlags";
+import { addUserGroupType, removeUserGroupType } from "./helpers/userGroupsTypes";
 
 const PERMISSIONS = {
   SUPERADMIN: ["SUPERADMIN"],
@@ -40,6 +42,9 @@ const PERMISSIONS = {
 };
 
 export async function up(knex: Knex): Promise<void> {
+  await addUserGroupType(knex, "INITIAL");
+  await addFeatureFlag(knex, "PERMISSION_MANAGEMENT", false);
+
   await knex.schema.createTable("user_group_permission", (t) => {
     t.increments("id");
     t.integer("user_group_id").notNullable().references("user_group.id");
@@ -113,7 +118,7 @@ export async function up(knex: Knex): Promise<void> {
       select
         org.id,
         'Admins',
-        'NORMAL'::user_group_type
+        'INITIAL'::user_group_type
       from "organization" org where deleted_at is null
       returning *
     ),
@@ -167,7 +172,7 @@ export async function up(knex: Knex): Promise<void> {
       select
         o.id,
         'Collaborators',
-        'NORMAL'::user_group_type
+        'INITIAL'::user_group_type
       from organizations_with_collaborators o
       returning *
     ),
@@ -197,7 +202,7 @@ export async function up(knex: Knex): Promise<void> {
     [
       knex.raw(
         ...sqlValues(
-          [...PERMISSIONS.NORMAL].map((p) => [p]),
+          [...PERMISSIONS.ADMIN, ...PERMISSIONS.NORMAL].map((p) => [p]),
           ["user_group_permission_name"],
         ),
       ),
@@ -217,7 +222,7 @@ export async function up(knex: Knex): Promise<void> {
       select
         o.id,
         'Superadmins',
-        'NORMAL'::user_group_type
+        'INITIAL'::user_group_type
       from organizations_with_superadmins o
       returning *
     ),
@@ -255,6 +260,8 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
+  await removeFeatureFlag(knex, "PERMISSION_MANAGEMENT");
+  await removeUserGroupType(knex, "INITIAL");
   await knex.schema.dropTable("user_group_permission");
 
   await knex.raw(/* sql */ `

@@ -34,7 +34,8 @@ export type FeatureFlagName =
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "CLIENT_PORTAL"
   | "PROFILES"
-  | "COPY_PETITION_REPLIES";
+  | "COPY_PETITION_REPLIES"
+  | "PERMISSION_MANAGEMENT";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -58,6 +59,7 @@ export const FeatureFlagNameValues = [
   "CLIENT_PORTAL",
   "PROFILES",
   "COPY_PETITION_REPLIES",
+  "PERMISSION_MANAGEMENT",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";
@@ -475,9 +477,9 @@ export const UserGroupPermissionNameValues = [
   "TEAMS:LIST_TEAMS",
 ] as UserGroupPermissionName[];
 
-export type UserGroupType = "NORMAL" | "ALL_USERS";
+export type UserGroupType = "NORMAL" | "ALL_USERS" | "INITIAL";
 
-export const UserGroupTypeValues = ["NORMAL", "ALL_USERS"] as UserGroupType[];
+export const UserGroupTypeValues = ["NORMAL", "ALL_USERS", "INITIAL"] as UserGroupType[];
 
 export type UserLocale = "en" | "es";
 

@@ -1,6 +1,6 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs, useSafeLayoutEffect } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ReactNode, useRef } from "react";
+import { Fragment, ReactNode, useRef } from "react";
 import { NakedLink } from "../common/Link";
 
 export interface TabDefinition<T extends string> {
@@ -8,6 +8,7 @@ export interface TabDefinition<T extends string> {
   href?: string;
   title: string;
   isDisabled?: boolean;
+  decorate?: (children: ReactNode) => ReactNode;
 }
 
 interface SettingsTabsInnerLayoutProps<T extends string> {
@@ -44,13 +45,13 @@ export function SettingsTabsInnerLayout<T extends string>({
       minHeight={0}
     >
       <TabList paddingLeft={6} background="white" paddingTop={2} marginBottom={0}>
-        {tabs.map(({ key, title, href, isDisabled }) =>
-          isDisabled ? (
-            <Tab key={key} fontWeight="500" color="gray.400" cursor="not-allowed" isDisabled>
+        {tabs.map(({ key, title, href, isDisabled, decorate }) => {
+          const tab = isDisabled ? (
+            <Tab fontWeight="500" color="gray.400" cursor="not-allowed" isDisabled>
               {title}
             </Tab>
           ) : (
-            <NakedLink key={key} href={href!}>
+            <NakedLink href={href!}>
               <Tab
                 ref={key === currentTabKey ? currentTabRef : undefined}
                 as="a"
@@ -65,8 +66,9 @@ export function SettingsTabsInnerLayout<T extends string>({
                 {title}
               </Tab>
             </NakedLink>
-          ),
-        )}
+          );
+          return <Fragment key={key}>{decorate ? decorate(tab) : tab}</Fragment>;
+        })}
       </TabList>
       <TabPanels flex={1} display="flex" flexDirection="column" minHeight={0}>
         {tabs.map((t) => (

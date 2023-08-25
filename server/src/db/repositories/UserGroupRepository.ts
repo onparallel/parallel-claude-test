@@ -364,7 +364,7 @@ export class UserGroupRepository extends BaseRepository {
   readonly loadUserGroupPermissionsByUserGroupId = this.buildLoadMultipleBy(
     "user_group_permission",
     "user_group_id",
-    (q) => q.whereNull("deleted_at").orderBy("name"),
+    (q) => q.whereNull("deleted_at"),
   );
 
   readonly loadHasUserGroupPermissionsByUserGroupId = this.buildLoadExistsBy(

@@ -272,7 +272,10 @@ function OrganizationGroups() {
               onClick: handleDeleteClick,
               colorScheme: "red",
               leftIcon: <DeleteIcon />,
-              isDisabled: selectedRows.some((r) => r.type === "ALL_USERS"),
+              isDisabled: selectedRows.some(
+                (r) =>
+                  r.type === "ALL_USERS" || (r.type === "INITIAL" && !me.hasPermissionManagement),
+              ),
               children: (
                 <FormattedMessage
                   id="organization-groups.delete-group"
@@ -531,6 +534,9 @@ OrganizationGroups.queries = [
   gql`
     query OrganizationGroups_user {
       ...OrganizationSettingsLayout_Query
+      me {
+        hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
+      }
     }
     ${OrganizationSettingsLayout.fragments.Query}
   `,
