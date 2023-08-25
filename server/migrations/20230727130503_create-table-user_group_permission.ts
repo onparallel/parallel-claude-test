@@ -114,12 +114,14 @@ export async function up(knex: Knex): Promise<void> {
     /* sql */ `
     with admin_user_group as (
       -- create groups
-      insert into user_group (org_id, name, type)
+      insert into user_group (org_id, name, type, created_at, created_by)
       select
-        org.id,
+        o.id,
         'Admins',
-        'INITIAL'::user_group_type
-      from "organization" org where deleted_at is null
+        'INITIAL'::user_group_type,
+        o.created_at,
+        o.created_by
+      from "organization" o where deleted_at is null
       returning *
     ),
     admin_permission as (
@@ -162,17 +164,20 @@ export async function up(knex: Knex): Promise<void> {
     /* sql */ `
     with organizations_with_collaborators as (
       -- pick orgs with at least one COLLABORATOR
-      select distinct u.org_id as id
+      select distinct u.org_id as id, o.created_at, o.created_by
       from "user" u
+      join organization o on u.org_id = o.id
       where u.organization_role = 'COLLABORATOR' and u.status = 'ACTIVE' and u.deleted_at is null
     ),
     collaborator_user_group as (
       -- create groups
-      insert into user_group (org_id, name, type)
+      insert into user_group (org_id, name, type, created_at, created_by)
       select
         o.id,
         'Collaborators',
-        'INITIAL'::user_group_type
+        'INITIAL'::user_group_type,
+        o.created_at,
+        o.created_by
       from organizations_with_collaborators o
       returning *
     ),
@@ -214,15 +219,19 @@ export async function up(knex: Knex): Promise<void> {
     /* sql */ `
     with organizations_with_superadmins as (
       -- pick just ROOT orgs
-      select id from organization o where o.status = 'ROOT'
+      select id, created_at, created_by
+      from organization o
+      where o.status = 'ROOT'
     ),
     superadmin_user_group as (
       -- insert groups
-      insert into user_group (org_id, name, type)
+      insert into user_group (org_id, name, type, created_at, created_by)
       select
         o.id,
         'Superadmins',
-        'INITIAL'::user_group_type
+        'INITIAL'::user_group_type,
+        o.created_at,
+        o.created_by
       from organizations_with_superadmins o
       returning *
     ),
