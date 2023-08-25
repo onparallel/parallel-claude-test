@@ -367,6 +367,7 @@ export const updateUserGroupMembership = mutationField("updateUserGroupMembershi
     userHasAccessToUsers("userId"),
     userHasAccessToUserGroups("userGroupIds"),
     userHasStatus("userId", ["ACTIVE", "ON_HOLD"]),
+    userGroupHasType("userGroupIds", ["NORMAL", "INITIAL"]),
   ),
   args: {
     userId: nonNull(globalIdArg("User")),
@@ -375,7 +376,9 @@ export const updateUserGroupMembership = mutationField("updateUserGroupMembershi
   resolve: async (_, { userId, userGroupIds }, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
       const userGroups = await ctx.userGroups.loadUserGroupsByUserId(userId);
-      const actualUserGroupsIds = userGroups.map((userGroup) => userGroup.id);
+      const actualUserGroupsIds = userGroups
+        .filter((ug) => ug.type !== "ALL_USERS") // avoid removing ALL_USERS group
+        .map((userGroup) => userGroup.id);
 
       const userGroupsIdsToDelete = difference(actualUserGroupsIds, userGroupIds);
       const userGroupsIdsToAdd = difference(userGroupIds, actualUserGroupsIds);

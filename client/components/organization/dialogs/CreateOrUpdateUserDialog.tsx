@@ -14,6 +14,7 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ActionMeta } from "react-select";
 import { isDefined } from "remeda";
 
 interface CreateOrUpdateUserDialogProps {
@@ -39,7 +40,8 @@ function CreateOrUpdateUserDialog({
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
       email: user?.email ?? "",
-      userGroups: (user?.userGroups ?? []).filter((ug) => ug.type === "NORMAL"),
+      userGroups:
+        user?.userGroups.map((ug) => ({ ...ug, isDisabled: ug.type === "ALL_USERS" })) ?? [],
     },
   });
 
@@ -173,7 +175,17 @@ function CreateOrUpdateUserDialog({
                       e.preventDefault();
                     }
                   }}
-                  onChange={(userGroups: any) => {
+                  onChange={(
+                    userGroups,
+                    actionMeta: ActionMeta<UserSelect_UserGroupFragment & { isDisabled?: boolean }>,
+                  ) => {
+                    switch (actionMeta.action) {
+                      case "remove-value":
+                      case "pop-value":
+                        if (actionMeta.removedValue.isDisabled) {
+                          return;
+                        }
+                    }
                     onChange(userGroups);
                   }}
                   onBlur={onBlur}

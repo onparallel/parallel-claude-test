@@ -271,7 +271,9 @@ function OrganizationUsers() {
         await updateUserGroupMembership({
           variables: {
             userId: user.id,
-            userGroupIds: userGroups.map((userGroup) => userGroup.id),
+            userGroupIds: userGroups
+              .filter((ug) => ug.type !== "ALL_USERS")
+              .map((userGroup) => userGroup.id),
           },
         });
         toast({

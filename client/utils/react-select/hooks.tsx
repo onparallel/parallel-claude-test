@@ -252,30 +252,47 @@ export function useReactSelectProps<
       },
       multiValueRemove: (
         styles: CSSObjectWithLabel,
-        { data, theme }: MultiValueProps & ExtendComponentProps,
+        { data, theme, isFocused }: MultiValueProps & ExtendComponentProps,
       ) => {
         const {
           colors: {
+            neutral20: backgroundColor,
             neutral30: backgroundColorHover,
             error30: backgroundColorHoverError,
             neutral90: fontColor,
           },
         } = theme;
-        return {
-          ...styles,
-          borderRadius: `0 ${radii["sm"]} ${radii["sm"]} 0`,
-          ":hover": {
-            backgroundColor:
-              typeof data === "object" && isDefined(data) && "isInvalid" in (data as any)
-                ? backgroundColorHoverError
-                : backgroundColorHover,
-            color: fontColor,
-          },
-        };
+        return typeof data === "object" &&
+          isDefined(data) &&
+          "isDisabled" in data &&
+          data.isDisabled
+          ? { display: "none" }
+          : {
+              ...styles,
+              backgroundColor: isFocused ? backgroundColorHover : backgroundColor,
+              borderRadius: `0 ${radii["sm"]} ${radii["sm"]} 0`,
+              ":hover": {
+                backgroundColor:
+                  typeof data === "object" &&
+                  isDefined(data) &&
+                  "isInvalid" in data &&
+                  data.isInvalid
+                    ? backgroundColorHoverError
+                    : backgroundColorHover,
+                color: fontColor,
+              },
+            };
       },
-      multiValueLabel: (styles: CSSObjectWithLabel) => {
+      multiValueLabel: (
+        styles: CSSObjectWithLabel,
+        { data }: MultiValueProps & ExtendComponentProps,
+      ) => {
         return {
           ...omit(styles, ["borderRadius"]),
+          paddingRight:
+            typeof data === "object" && isDefined(data) && "isDisabled" in data && data.isDisabled
+              ? 6
+              : undefined,
         };
       },
     };
