@@ -253,8 +253,7 @@ function useOrganizationMembersTableColumns() {
           defaultMessage: "ID",
         }),
         cellProps: {
-          width: "10%",
-          minWidth: "140px",
+          width: "1px",
         },
         CellContent: ({ row }) => {
           return <>{row.id}</>;
@@ -267,10 +266,6 @@ function useOrganizationMembersTableColumns() {
           id: "organization-users.header.name",
           defaultMessage: "Name",
         }),
-        cellProps: {
-          width: "30%",
-          minWidth: "200px",
-        },
         CellContent: ({ row }) => {
           return (
             <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
@@ -310,10 +305,6 @@ function useOrganizationMembersTableColumns() {
           id: "organization-users.header.user-email",
           defaultMessage: "Email",
         }),
-        cellProps: {
-          width: "30%",
-          minWidth: "200px",
-        },
         CellContent: ({ row }) => <>{row.email}</>,
       },
       {
@@ -324,8 +315,7 @@ function useOrganizationMembersTableColumns() {
         }),
         isSortable: true,
         cellProps: {
-          width: "10%",
-          minWidth: "210px",
+          minWidth: "220px",
         },
         CellContent: ({ row }) =>
           row.lastActiveAt ? (
@@ -349,8 +339,7 @@ function useOrganizationMembersTableColumns() {
           defaultMessage: "Created at",
         }),
         cellProps: {
-          width: "10%",
-          minWidth: "195px",
+          minWidth: "220px",
         },
         CellContent: ({ row }) => (
           <DateTime

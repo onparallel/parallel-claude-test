@@ -681,10 +681,6 @@ function useOrganizationUsersTableColumns() {
           id: "organization-users.header.name",
           defaultMessage: "Name",
         }),
-        cellProps: {
-          width: "25%",
-          minWidth: "220px",
-        },
         CellContent: ({ row }) => {
           return (
             <Text
@@ -745,10 +741,6 @@ function useOrganizationUsersTableColumns() {
           id: "organization-users.header.user-email",
           defaultMessage: "Email",
         }),
-        cellProps: {
-          width: "25%",
-          minWidth: "220px",
-        },
         CellContent: ({ row }) => (
           <Text opacity={row.status === "INACTIVE" ? 0.5 : 1}>{row.email}</Text>
         ),
@@ -786,7 +778,6 @@ function useOrganizationUsersTableColumns() {
           defaultMessage: "Created at",
         }),
         cellProps: {
-          width: "15%",
           minWidth: "220px",
         },
         CellContent: ({ row }) => (
