@@ -139,10 +139,12 @@ export async function up(knex: Knex): Promise<void> {
       from admin_user_group ug cross join admin_permission p
     )
     -- insert members
-    insert into user_group_member (user_group_id, user_id)
+    insert into user_group_member (user_group_id, user_id, created_at, created_by)
     select
       ug.id,
-      u.id
+      u.id,
+      u.created_at,
+      u.created_by
     from "user" u 
     join admin_user_group ug on ug.org_id = u.org_id
     where u.organization_role = 'ADMIN' and u.deleted_at is null;
@@ -196,10 +198,12 @@ export async function up(knex: Knex): Promise<void> {
       from collaborator_user_group ug cross join collaborator_permission p
     )
     -- insert members
-    insert into user_group_member (user_group_id, user_id)
+    insert into user_group_member (user_group_id, user_id, created_at, created_by)
     select
       ug.id,
-      u.id
+      u.id,
+      u.created_at,
+      u.created_by
     from "user" u 
     join collaborator_user_group ug on ug.org_id = u.org_id
     where u.organization_role = 'COLLABORATOR' and u.status = 'ACTIVE' and u.deleted_at is null;
@@ -249,10 +253,12 @@ export async function up(knex: Knex): Promise<void> {
         ug.updated_by
       from superadmin_user_group ug cross join superadmin_permission p
     )
-    insert into user_group_member (user_group_id, user_id)
+    insert into user_group_member (user_group_id, user_id, created_at, created_by)
     select
       ug.id,
-      u.id
+      u.id,
+      u.created_at,
+      u.created_by
     from "user" u 
     join superadmin_user_group ug on ug.org_id = u.org_id
     where u.organization_role in ('ADMIN', 'OWNER') and u.status = 'ACTIVE' and u.deleted_at is null;

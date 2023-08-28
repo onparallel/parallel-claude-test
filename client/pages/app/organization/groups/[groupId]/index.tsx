@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Flex, Text, useToast } from "@chakra-ui/react";
+import { Badge, Flex, Text, useToast } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -253,11 +253,19 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
           defaultMessage: "Name",
         }),
         cellProps: {
-          width: "43%",
           minWidth: "240px",
         },
         CellContent: ({ row }) => {
-          return <Text as="span">{row.user.fullName}</Text>;
+          return (
+            <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
+              <Text as="span">{row.user.fullName}</Text>
+              {row.user.isOrgOwner ? (
+                <Badge marginLeft={2} colorScheme="primary" position="relative" top="1.5px">
+                  <FormattedMessage id="generic.organization-owner" defaultMessage="Owner" />
+                </Badge>
+              ) : null}
+            </Text>
+          );
         },
       },
       {
@@ -268,10 +276,32 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
           defaultMessage: "Email",
         }),
         cellProps: {
-          width: "42%",
           minWidth: "240px",
         },
         CellContent: ({ row }) => <>{row.user.email}</>,
+      },
+      {
+        key: "lastActiveAt",
+        label: intl.formatMessage({
+          id: "generic.last-active-at",
+          defaultMessage: "Last active at",
+        }),
+        cellProps: {
+          minWidth: "220px",
+        },
+        CellContent: ({ row }) =>
+          row.user.lastActiveAt ? (
+            <DateTime
+              value={row.user.lastActiveAt}
+              format={FORMATS.LLL}
+              useRelativeTime
+              whiteSpace="nowrap"
+            />
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage id="generic.never-active" defaultMessage="Never active" />
+            </Text>
+          ),
       },
       {
         key: "addedAt",
@@ -281,8 +311,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
           defaultMessage: "Added at",
         }),
         cellProps: {
-          width: "15%",
-          minWidth: "140px",
+          minWidth: "220px",
         },
         CellContent: ({ row }) => (
           <DateTime value={row.addedAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
@@ -319,6 +348,8 @@ const _fragments = {
           id
           fullName
           email
+          isOrgOwner
+          lastActiveAt
         }
       }
     `;

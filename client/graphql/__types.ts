@@ -19222,7 +19222,14 @@ export type OrganizationGroup_UserGroupFragment = {
     __typename?: "UserGroupMember";
     id: string;
     addedAt: string;
-    user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    user: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+      isOrgOwner: boolean;
+      lastActiveAt?: string | null;
+    };
   }>;
 };
 
@@ -19230,7 +19237,14 @@ export type OrganizationGroup_UserGroupMemberFragment = {
   __typename?: "UserGroupMember";
   id: string;
   addedAt: string;
-  user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  user: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
+    isOrgOwner: boolean;
+    lastActiveAt?: string | null;
+  };
 };
 
 export type OrganizationGroup_addUsersToUserGroupMutationVariables = Exact<{
@@ -19250,7 +19264,14 @@ export type OrganizationGroup_addUsersToUserGroupMutation = {
       __typename?: "UserGroupMember";
       id: string;
       addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        isOrgOwner: boolean;
+        lastActiveAt?: string | null;
+      };
     }>;
   };
 };
@@ -19272,7 +19293,14 @@ export type OrganizationGroup_removeUsersFromGroupMutation = {
       __typename?: "UserGroupMember";
       id: string;
       addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        isOrgOwner: boolean;
+        lastActiveAt?: string | null;
+      };
     }>;
   };
 };
@@ -19293,7 +19321,14 @@ export type OrganizationGroup_userGroupQuery = {
       __typename?: "UserGroupMember";
       id: string;
       addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        isOrgOwner: boolean;
+        lastActiveAt?: string | null;
+      };
     }>;
   } | null;
 };
@@ -33150,116 +33185,6 @@ export type usePetitionMessagePlaceholderOptions_PetitionBaseFragment =
   | usePetitionMessagePlaceholderOptions_PetitionBase_Petition_Fragment
   | usePetitionMessagePlaceholderOptions_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionSignaturesCardPolling_petitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-}>;
-
-export type PetitionSignaturesCardPolling_petitionQuery = {
-  petition?:
-    | {
-        __typename?: "Petition";
-        id: string;
-        status: PetitionStatus;
-        name?: string | null;
-        signatureRequests: Array<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          isAnonymized: boolean;
-          metadata: { [key: string]: any };
-          auditTrailFilename?: string | null;
-          errorCode?: string | null;
-          createdAt: string;
-          errorMessage?: string | null;
-          extraErrorData?: any | null;
-          cancelReason?: string | null;
-          signatureConfig: {
-            __typename?: "SignatureConfig";
-            signers: Array<{
-              __typename?: "PetitionSigner";
-              contactId?: string | null;
-              email: string;
-              firstName: string;
-              lastName?: string | null;
-            } | null>;
-          };
-          signerStatus: Array<{
-            __typename?: "PetitionSignatureRequestSignerStatus";
-            status: string;
-            sentAt?: string | null;
-            openedAt?: string | null;
-            signedAt?: string | null;
-            declinedAt?: string | null;
-            bouncedAt?: string | null;
-            signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-          }>;
-          petition: { __typename?: "Petition"; id: string };
-        }>;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          status: PetitionAccessStatus;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            firstName: string;
-            lastName?: string | null;
-            email: string;
-          } | null;
-        }>;
-        signatureConfig?: {
-          __typename?: "SignatureConfig";
-          title?: string | null;
-          review: boolean;
-          allowAdditionalSigners: boolean;
-          timezone: string;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            name: string;
-            provider: SignatureOrgIntegrationProvider;
-            environment: SignatureOrgIntegrationEnvironment;
-            isDefault: boolean;
-          } | null;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: string | null;
-            firstName: string;
-            lastName?: string | null;
-            email: string;
-            fullName: string;
-          } | null>;
-        } | null;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          isReadOnly: boolean;
-          optional: boolean;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          visibility?: { [key: string]: any } | null;
-          replies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            content: { [key: string]: any };
-            isAnonymized: boolean;
-          }>;
-          previewReplies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            content: { [key: string]: any };
-            isAnonymized: boolean;
-          }>;
-        }>;
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-      }
-    | { __typename?: "PetitionTemplate" }
-    | null;
-};
-
 export type usePetitionsTableColumns_PetitionFolderFragment = {
   __typename?: "PetitionFolder";
   folderId: string;
@@ -35268,6 +35193,8 @@ export const OrganizationGroup_UserGroupMemberFragmentDoc = gql`
       id
       fullName
       email
+      isOrgOwner
+      lastActiveAt
     }
   }
 ` as unknown as DocumentNode<OrganizationGroup_UserGroupMemberFragment, unknown>;
@@ -45106,17 +45033,6 @@ export const useLoginAs_restoreLoginDocument = gql`
 ` as unknown as DocumentNode<
   useLoginAs_restoreLoginMutation,
   useLoginAs_restoreLoginMutationVariables
->;
-export const PetitionSignaturesCardPolling_petitionDocument = gql`
-  query PetitionSignaturesCardPolling_petition($petitionId: GID!) {
-    petition(id: $petitionId) {
-      ...PetitionSignaturesCard_Petition
-    }
-  }
-  ${PetitionSignaturesCard_PetitionFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSignaturesCardPolling_petitionQuery,
-  PetitionSignaturesCardPolling_petitionQueryVariables
 >;
 export const useSearchContacts_contactsDocument = gql`
   query useSearchContacts_contacts($search: String, $exclude: [GID!]) {
