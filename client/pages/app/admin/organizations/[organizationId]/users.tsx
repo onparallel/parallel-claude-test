@@ -219,7 +219,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
-                      id="view.group.no-results"
+                      id="page.group.no-results"
                       defaultMessage="There's no users matching your search"
                     />
                   </Text>
@@ -228,7 +228,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text fontSize="lg">
                     <FormattedMessage
-                      id="view.group.no-users"
+                      id="page.group.no-users"
                       defaultMessage="No users added to this team yet"
                     />
                   </Text>

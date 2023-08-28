@@ -15,7 +15,7 @@ function OrganizationSettings() {
   return (
     <OrganizationSettingsLayout
       title={intl.formatMessage({
-        id: "view.organization.title",
+        id: "page.organization.title",
         defaultMessage: "Organization",
       })}
       isBase

@@ -30,11 +30,6 @@
     "context": "Themes"
   },
   {
-    "term": "component..update-profile-field-expiration-dialog.title",
-    "definition": "Configurar vencimiento",
-    "context": "Configure expiration date"
-  },
-  {
     "term": "component.account-delegates.delegates",
     "definition": "Delegados",
     "context": "Delegates"
@@ -7260,6 +7255,11 @@
     "context": "This property does not have any established alerts."
   },
   {
+    "term": "component.update-profile-field-expiration-dialog.title",
+    "definition": "Configurar vencimiento",
+    "context": "Configure expiration date"
+  },
+  {
     "term": "component.update-profile-type-field-dialog.is-expirable-description",
     "definition": "Selecciona si esta propiedad tendrá una fecha de vencimiento. Ejemplo: Pasaportes y contratos.",
     "context": "Select if these properties have an expiration date (e.g., passports and contracts)."
@@ -7575,12 +7575,12 @@
     "context": "Rename view"
   },
   {
-    "term": "components.view-tabs.confirm-delete-body",
+    "term": "component.view-tabs.confirm-delete-body",
     "definition": "¿Estás seguro de que quieres borrar <b>{name}</b>?",
     "context": "Are you sure you want to delete <b>{name}</b>?"
   },
   {
-    "term": "components.view-tabs.confirm-delete-header",
+    "term": "component.view-tabs.confirm-delete-header",
     "definition": "Borrar vista",
     "context": "Delete view"
   },
@@ -9665,6 +9665,66 @@
     "context": "Users"
   },
   {
+    "term": "page.admin-organizations-subscriptions.activate-signature-button",
+    "definition": "Activar firma",
+    "context": "Activate signature"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.card-end-date",
+    "definition": "Fin de suscripción",
+    "context": "Subscription end"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.card-limit",
+    "definition": "Límite",
+    "context": "Limit"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.card-period",
+    "definition": "Periodo",
+    "context": "Period"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.card-remaining-cycles",
+    "definition": "Ciclos pendientes",
+    "context": "Remaining cycles"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.card-users",
+    "definition": "Usuarios",
+    "context": "Users"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.petitions-header",
+    "definition": "Parallels",
+    "context": "Parallels"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.signatures-card.not-active",
+    "definition": "No se ha activado la firma en esta organización",
+    "context": "The eSignature has not been activated in this organization"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.signatures-header",
+    "definition": "Firmas",
+    "context": "Signatures"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.update-.current-petitions-header",
+    "definition": "Periodo de parallels en curso",
+    "context": "Ongoing parallels period"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.update-.current-signatures-header",
+    "definition": "Periodo de firmas en curso",
+    "context": "Ongoing signatures period"
+  },
+  {
+    "term": "page.admin-organizations-subscriptions.users-header",
+    "definition": "Usuarios",
+    "context": "Users"
+  },
+  {
     "term": "page.alerts.no-alerts",
     "definition": "Aún no tienes alertas.",
     "context": "You have no alerts yet."
@@ -9775,6 +9835,86 @@
     "context": "{amount} years"
   },
   {
+    "term": "page.group.no-results",
+    "definition": "No hay usuarios que coincidan con su búsqueda",
+    "context": "There's no users matching your search"
+  },
+  {
+    "term": "page.group.no-users",
+    "definition": "Aún no se agregaron usuarios a este equipo",
+    "context": "No users added to this team yet"
+  },
+  {
+    "term": "page.group.users-added-title",
+    "definition": "Los usuarios se agregaron correctamente.",
+    "context": "Users added successfully."
+  },
+  {
+    "term": "page.groups.clone-success-description",
+    "definition": "{count, plural, =1 {Equipo <b>{name}</b> clonado} other{<b>#</b> equipos clonados}} con éxito.",
+    "context": "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully cloned."
+  },
+  {
+    "term": "page.groups.clone-success-title",
+    "definition": "{count, plural, =1{Equipo clonado} other{Equipos clonados}} con éxito.",
+    "context": "{count, plural, =1{Team} other{Teams}} cloned successfully."
+  },
+  {
+    "term": "page.groups.confirm-delete-body",
+    "definition": "¿Estás seguro de querer eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> equipos seleccionados}}? Si continúa, todos los miembros perderán el acceso a los parallels compartidos con {count, plural, =1 {el equipo} other {los equipos}}.",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected teams}}? If you continue, all members will lose access to parallels shared with the {count, plural, =1 {team} other {teams}}."
+  },
+  {
+    "term": "page.groups.confirm-delete-header",
+    "definition": "Eliminar {count, plural, =1 {equipo} other {equipos}}",
+    "context": "Delete {count, plural, =1 {team} other {teams}}"
+  },
+  {
+    "term": "page.groups.create-success-description",
+    "definition": "El equipo {name} se creó correctamente.",
+    "context": "Team {name} successfully created."
+  },
+  {
+    "term": "page.groups.create-success-title",
+    "definition": "Equipo creado con éxito.",
+    "context": "Team created successfully."
+  },
+  {
+    "term": "page.groups.delete-success-description",
+    "definition": "{count, plural, =1 {Equipo <b>{name}</b> eliminado} other{<b>#</b> equipos eliminados}} correctamente.",
+    "context": "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully deleted."
+  },
+  {
+    "term": "page.groups.delete-success-title",
+    "definition": "{count, plural, =1{Equipo eliminado} other{Equipos eliminados}} correctamente.",
+    "context": "{count, plural, =1{Team} other{Teams}} deleted successfully."
+  },
+  {
+    "term": "page.groups.group-has-permission",
+    "definition": "Este equipo tiene permisos establecidos.",
+    "context": "This team has permissions established."
+  },
+  {
+    "term": "page.groups.no-groups",
+    "definition": "Aún no tienes equipos",
+    "context": "You have no teams yet"
+  },
+  {
+    "term": "page.groups.no-results",
+    "definition": "No hay equipos que coincidan con su búsqueda",
+    "context": "There's no teams matching your search"
+  },
+  {
+    "term": "page.groups.no-users-added",
+    "definition": "No hay usuarios añadidos",
+    "context": "No users added"
+  },
+  {
+    "term": "page.groups.title",
+    "definition": "Equipos",
+    "context": "Teams"
+  },
+  {
     "term": "page.organization-profile-type.add-profile-type-field",
     "definition": "Añadir propiedad",
     "context": "Add property"
@@ -9793,6 +9933,11 @@
     "term": "page.organization-users.no-search-results",
     "definition": "No encontramos usuarios con este criterio",
     "context": "There's no users matching your criteria"
+  },
+  {
+    "term": "page.organization.title",
+    "definition": "Organización",
+    "context": "Organization"
   },
   {
     "term": "page.organizations.features-active",
@@ -10868,6 +11013,21 @@
     "term": "page.tokens.no-tokens-message",
     "definition": "No has creado ningún token API todavía",
     "context": "You haven't created any API tokens yet"
+  },
+  {
+    "term": "page.update-browser.header",
+    "definition": "Navegador no soportado",
+    "context": "Unsupported browser"
+  },
+  {
+    "term": "page.update-browser.text-1",
+    "definition": "Está utilizando un navegador antiguo. Le recomendamos actualizar su navegador o descargar la última versión de alguno de los siguientes:",
+    "context": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
+  },
+  {
+    "term": "page.update-browser.text-2",
+    "definition": "Si el error persiste por favor, contacta con la persona que te envió este enlace.",
+    "context": "If the error persists, please contact the person who sent you this link."
   },
   {
     "term": "page.usage.parallels",
@@ -13173,165 +13333,5 @@
     "term": "validate-petition-fields.select-fields-without-options-error",
     "definition": "Por favor, añada dos o más opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>desplegable</em>.",
     "context": "Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}."
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.activate-signature-button",
-    "definition": "Activar firma",
-    "context": "Activate signature"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.card-end-date",
-    "definition": "Fin de suscripción",
-    "context": "Subscription end"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.card-limit",
-    "definition": "Límite",
-    "context": "Limit"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.card-period",
-    "definition": "Periodo",
-    "context": "Period"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.card-remaining-cycles",
-    "definition": "Ciclos pendientes",
-    "context": "Remaining cycles"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.card-users",
-    "definition": "Usuarios",
-    "context": "Users"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.petitions-header",
-    "definition": "Parallels",
-    "context": "Parallels"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.signatures-card.not-active",
-    "definition": "No se ha activado la firma en esta organización",
-    "context": "The eSignature has not been activated in this organization"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.signatures-header",
-    "definition": "Firmas",
-    "context": "Signatures"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.update-.current-petitions-header",
-    "definition": "Periodo de parallels en curso",
-    "context": "Ongoing parallels period"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.update-.current-signatures-header",
-    "definition": "Periodo de firmas en curso",
-    "context": "Ongoing signatures period"
-  },
-  {
-    "term": "view.admin-organizations-subscriptions.users-header",
-    "definition": "Usuarios",
-    "context": "Users"
-  },
-  {
-    "term": "view.group.no-results",
-    "definition": "No hay usuarios que coincidan con su búsqueda",
-    "context": "There's no users matching your search"
-  },
-  {
-    "term": "view.group.no-users",
-    "definition": "Aún no se agregaron usuarios a este equipo",
-    "context": "No users added to this team yet"
-  },
-  {
-    "term": "view.group.users-added-title",
-    "definition": "Los usuarios se agregaron correctamente.",
-    "context": "Users added successfully."
-  },
-  {
-    "term": "view.groups.clone-success-description",
-    "definition": "{count, plural, =1 {Equipo <b>{name}</b> clonado} other{<b>#</b> equipos clonados}} con éxito.",
-    "context": "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully cloned."
-  },
-  {
-    "term": "view.groups.clone-success-title",
-    "definition": "{count, plural, =1{Equipo clonado} other{Equipos clonados}} con éxito.",
-    "context": "{count, plural, =1{Team} other{Teams}} cloned successfully."
-  },
-  {
-    "term": "view.groups.confirm-delete-body",
-    "definition": "¿Estás seguro de querer eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> equipos seleccionados}}? Si continúa, todos los miembros perderán el acceso a los parallels compartidos con {count, plural, =1 {el equipo} other {los equipos}}.",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected teams}}? If you continue, all members will lose access to parallels shared with the {count, plural, =1 {team} other {teams}}."
-  },
-  {
-    "term": "view.groups.confirm-delete-header",
-    "definition": "Eliminar {count, plural, =1 {equipo} other {equipos}}",
-    "context": "Delete {count, plural, =1 {team} other {teams}}"
-  },
-  {
-    "term": "view.groups.create-success-description",
-    "definition": "El equipo {name} se creó correctamente.",
-    "context": "Team {name} successfully created."
-  },
-  {
-    "term": "view.groups.create-success-title",
-    "definition": "Equipo creado con éxito.",
-    "context": "Team created successfully."
-  },
-  {
-    "term": "view.groups.delete-success-description",
-    "definition": "{count, plural, =1 {Equipo <b>{name}</b> eliminado} other{<b>#</b> equipos eliminados}} correctamente.",
-    "context": "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully deleted."
-  },
-  {
-    "term": "view.groups.delete-success-title",
-    "definition": "{count, plural, =1{Equipo eliminado} other{Equipos eliminados}} correctamente.",
-    "context": "{count, plural, =1{Team} other{Teams}} deleted successfully."
-  },
-  {
-    "term": "view.groups.group-has-permission",
-    "definition": "Este equipo tiene permisos establecidos.",
-    "context": "This team has permissions established."
-  },
-  {
-    "term": "view.groups.no-groups",
-    "definition": "Aún no tienes equipos",
-    "context": "You have no teams yet"
-  },
-  {
-    "term": "view.groups.no-results",
-    "definition": "No hay equipos que coincidan con su búsqueda",
-    "context": "There's no teams matching your search"
-  },
-  {
-    "term": "view.groups.no-users-added",
-    "definition": "No hay usuarios añadidos",
-    "context": "No users added"
-  },
-  {
-    "term": "view.groups.title",
-    "definition": "Equipos",
-    "context": "Teams"
-  },
-  {
-    "term": "view.organization.title",
-    "definition": "Organización",
-    "context": "Organization"
-  },
-  {
-    "term": "view.update-browser.header",
-    "definition": "Navegador no soportado",
-    "context": "Unsupported browser"
-  },
-  {
-    "term": "view.update-browser.text-1",
-    "definition": "Está utilizando un navegador antiguo. Le recomendamos actualizar su navegador o descargar la última versión de alguno de los siguientes:",
-    "context": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
-  },
-  {
-    "term": "view.update-browser.text-2",
-    "definition": "Si el error persiste por favor, contacta con la persona que te envió este enlace.",
-    "context": "If the error persists, please contact the person who sent you this link."
   }
 ]

@@ -126,14 +126,14 @@ function OrganizationGroups() {
       toast({
         title: intl.formatMessage(
           {
-            id: "view.groups.clone-success-title",
+            id: "page.groups.clone-success-title",
             defaultMessage: "{count, plural, =1{Team} other{Teams}} cloned successfully.",
           },
           { count: selectedIds.length },
         ),
         description: intl.formatMessage(
           {
-            id: "view.groups.clone-success-description",
+            id: "page.groups.clone-success-description",
             defaultMessage:
               "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully cloned.",
           },
@@ -165,14 +165,14 @@ function OrganizationGroups() {
       toast({
         title: intl.formatMessage(
           {
-            id: "view.groups.delete-success-title",
+            id: "page.groups.delete-success-title",
             defaultMessage: "{count, plural, =1{Team} other{Teams}} deleted successfully.",
           },
           { count: selectedIds.length },
         ),
         description: intl.formatMessage(
           {
-            id: "view.groups.delete-success-description",
+            id: "page.groups.delete-success-description",
             defaultMessage:
               "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully deleted.",
           },
@@ -202,12 +202,12 @@ function OrganizationGroups() {
       refetch();
       toast({
         title: intl.formatMessage({
-          id: "view.groups.create-success-title",
+          id: "page.groups.create-success-title",
           defaultMessage: "Team created successfully.",
         }),
         description: intl.formatMessage(
           {
-            id: "view.groups.create-success-description",
+            id: "page.groups.create-success-description",
             defaultMessage: "Team {name} successfully created.",
           },
           { name: newGroup.name },
@@ -222,14 +222,14 @@ function OrganizationGroups() {
   return (
     <OrganizationSettingsLayout
       title={intl.formatMessage({
-        id: "view.groups.title",
+        id: "page.groups.title",
         defaultMessage: "Teams",
       })}
       me={me}
       realMe={realMe}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="view.groups.title" defaultMessage="Teams" />
+          <FormattedMessage id="page.groups.title" defaultMessage="Teams" />
         </Heading>
       }
     >
@@ -299,7 +299,7 @@ function OrganizationGroups() {
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
-                      id="view.groups.no-results"
+                      id="page.groups.no-results"
                       defaultMessage="There's no teams matching your search"
                     />
                   </Text>
@@ -308,7 +308,7 @@ function OrganizationGroups() {
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text fontSize="lg">
                     <FormattedMessage
-                      id="view.groups.no-groups"
+                      id="page.groups.no-groups"
                       defaultMessage="You have no teams yet"
                     />
                   </Text>
@@ -349,7 +349,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
                     content={
                       <Text fontSize="sm">
                         <FormattedMessage
-                          id="view.groups.group-has-permission"
+                          id="page.groups.group-has-permission"
                           defaultMessage="This team has permissions established."
                         />
                       </Text>
@@ -384,7 +384,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           ) : (
             <OverflownText textStyle={"hint"}>
               {intl.formatMessage({
-                id: "view.groups.no-users-added",
+                id: "page.groups.no-users-added",
                 defaultMessage: "No users added",
               })}
             </OverflownText>
@@ -435,14 +435,14 @@ function ConfirmDeleteGroupsDialog({
       hasCloseButton
       header={
         <FormattedMessage
-          id="view.groups.confirm-delete-header"
+          id="page.groups.confirm-delete-header"
           defaultMessage="Delete {count, plural, =1 {team} other {teams}}"
           values={{ count }}
         />
       }
       body={
         <FormattedMessage
-          id="view.groups.confirm-delete-body"
+          id="page.groups.confirm-delete-body"
           defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected teams}}? If you continue, all members will lose access to parallels shared with the {count, plural, =1 {team} other {teams}}."
           values={{
             count,

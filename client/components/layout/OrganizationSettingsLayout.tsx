@@ -23,7 +23,7 @@ export function OrganizationSettingsLayout({
       {...props}
       basePath={basePath ?? "/app/organization"}
       sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
+        <FormattedMessage id="page.organization.title" defaultMessage="Organization" />
       }
       sections={sections}
       me={me}

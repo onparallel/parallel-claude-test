@@ -23,14 +23,14 @@ export default function UpdateBrowser() {
   return (
     <ErrorPage
       header={
-        <FormattedMessage id="view.update-browser.header" defaultMessage="Unsupported browser" />
+        <FormattedMessage id="page.update-browser.header" defaultMessage="Unsupported browser" />
       }
       imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_back_in_the_day.svg`}
     >
       <Stack spacing={6}>
         <Text>
           <FormattedMessage
-            id="view.update-browser.text-1"
+            id="page.update-browser.text-1"
             defaultMessage="You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
           />
         </Text>
@@ -65,7 +65,7 @@ export default function UpdateBrowser() {
         </Stack>
         <Text>
           <FormattedMessage
-            id="view.update-browser.text-2"
+            id="page.update-browser.text-2"
             defaultMessage="If the error persists, please contact the person who sent you this link."
           />
         </Text>

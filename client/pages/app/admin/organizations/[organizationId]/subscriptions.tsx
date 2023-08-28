@@ -92,7 +92,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
       const { limit } = await showUpdateOrganizationUsageDetailsDialog({
         hidePeriodSection: true,
         header: intl.formatMessage({
-          id: "view.admin-organizations-subscriptions.users-header",
+          id: "page.admin-organizations-subscriptions.users-header",
           defaultMessage: "Users",
         }),
         usageDetails: { limit: organization.usageDetails.USER_LIMIT },
@@ -111,7 +111,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
       const details = organization.usageDetails.PETITION_SEND;
       const result = await showUpdateOrganizationUsageDetailsDialog({
         header: intl.formatMessage({
-          id: "view.admin-organizations-subscriptions.petitions-header",
+          id: "page.admin-organizations-subscriptions.petitions-header",
           defaultMessage: "Parallels",
         }),
         usageDetails: {
@@ -148,7 +148,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
     try {
       const result = await showUpdateOrganizationUsageDetailsDialog({
         header: intl.formatMessage({
-          id: "view.admin-organizations-subscriptions.signatures-header",
+          id: "page.admin-organizations-subscriptions.signatures-header",
           defaultMessage: "Signatures",
         }),
         usageDetails: organization.usageDetails.SIGNATURIT_SHARED_APIKEY,
@@ -197,11 +197,11 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
         header:
           tableState.limitName === "PETITION_SEND"
             ? intl.formatMessage({
-                id: "view.admin-organizations-subscriptions.update-.current-petitions-header",
+                id: "page.admin-organizations-subscriptions.update-.current-petitions-header",
                 defaultMessage: "Ongoing parallels period",
               })
             : intl.formatMessage({
-                id: "view.admin-organizations-subscriptions.update-.current-signatures-header",
+                id: "page.admin-organizations-subscriptions.update-.current-signatures-header",
                 defaultMessage: "Ongoing signatures period",
               }),
         usagePeriod,
@@ -249,7 +249,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
         <Grid gap={4} templateColumns={{ base: "auto", lg: "1fr 1fr 1fr" }}>
           <AdminOrganizationsSubscriptionCard
             headerLabel={intl.formatMessage({
-              id: "view.admin-organizations-subscriptions.users-header",
+              id: "page.admin-organizations-subscriptions.users-header",
               defaultMessage: "Users",
             })}
             onAction={handleUpdateOrganizationUsersSubscription}
@@ -257,14 +257,14 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
             <Grid as="dl" templateColumns="auto 1fr" gap={4} width="100%">
               <Text as="dt" fontWeight="600">
                 <FormattedMessage
-                  id="view.admin-organizations-subscriptions.card-users"
+                  id="page.admin-organizations-subscriptions.card-users"
                   defaultMessage="Users"
                 />
               </Text>
               <Text as="dd">{organization.activeUserCount}</Text>
               <Text as="dt" fontWeight="600">
                 <FormattedMessage
-                  id="view.admin-organizations-subscriptions.card-limit"
+                  id="page.admin-organizations-subscriptions.card-limit"
                   defaultMessage="Limit"
                 />
               </Text>
@@ -273,7 +273,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
           </AdminOrganizationsSubscriptionCard>
           <AdminOrganizationsSubscriptionCard
             headerLabel={intl.formatMessage({
-              id: "view.admin-organizations-subscriptions.petitions-header",
+              id: "page.admin-organizations-subscriptions.petitions-header",
               defaultMessage: "Parallels",
             })}
             onAction={handleUpdateOrganizationPetitionsSubscription}
@@ -281,14 +281,14 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
             <Grid as="dl" templateColumns="auto 1fr" gap={4} width="100%">
               <Text as="dt" fontWeight="600">
                 <FormattedMessage
-                  id="view.admin-organizations-subscriptions.card-limit"
+                  id="page.admin-organizations-subscriptions.card-limit"
                   defaultMessage="Limit"
                 />
               </Text>
               <Text as="dd"> {organization.usageDetails.PETITION_SEND.limit}</Text>
               <Text as="dt" fontWeight="600">
                 <FormattedMessage
-                  id="view.admin-organizations-subscriptions.card-period"
+                  id="page.admin-organizations-subscriptions.card-period"
                   defaultMessage="Period"
                 />
               </Text>
@@ -297,14 +297,14 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
               </Text>
               <Text as="dt" fontWeight="600">
                 <FormattedMessage
-                  id="view.admin-organizations-subscriptions.card-remaining-cycles"
+                  id="page.admin-organizations-subscriptions.card-remaining-cycles"
                   defaultMessage="Remaining cycles"
                 />
               </Text>
               <Text as="dd">{remainingCycles.PETITION_SEND}</Text>
               <Text as="dt" fontWeight="600">
                 <FormattedMessage
-                  id="view.admin-organizations-subscriptions.card-end-date"
+                  id="page.admin-organizations-subscriptions.card-end-date"
                   defaultMessage="Subscription end"
                 />
               </Text>
@@ -324,13 +324,13 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
           </AdminOrganizationsSubscriptionCard>
           <AdminOrganizationsSubscriptionCard
             headerLabel={intl.formatMessage({
-              id: "view.admin-organizations-subscriptions.signatures-header",
+              id: "page.admin-organizations-subscriptions.signatures-header",
               defaultMessage: "Signatures",
             })}
             buttonLabel={
               !isDefined(organization.usageDetails.SIGNATURIT_SHARED_APIKEY)
                 ? intl.formatMessage({
-                    id: "view.admin-organizations-subscriptions.activate-signature-button",
+                    id: "page.admin-organizations-subscriptions.activate-signature-button",
                     defaultMessage: "Activate signature",
                   })
                 : null
@@ -341,14 +341,14 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
               <Grid as="dl" templateColumns="auto 1fr" gap={4} width="100%">
                 <Text as="dt" fontWeight="600">
                   <FormattedMessage
-                    id="view.admin-organizations-subscriptions.card-limit"
+                    id="page.admin-organizations-subscriptions.card-limit"
                     defaultMessage="Limit"
                   />
                 </Text>
                 <Text as="dd">{organization.usageDetails.SIGNATURIT_SHARED_APIKEY.limit}</Text>
                 <Text as="dt" fontWeight="600">
                   <FormattedMessage
-                    id="view.admin-organizations-subscriptions.card-period"
+                    id="page.admin-organizations-subscriptions.card-period"
                     defaultMessage="Period"
                   />
                 </Text>
@@ -359,14 +359,14 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
                 </Text>
                 <Text as="dt" fontWeight="600">
                   <FormattedMessage
-                    id="view.admin-organizations-subscriptions.card-remaining-cycles"
+                    id="page.admin-organizations-subscriptions.card-remaining-cycles"
                     defaultMessage="Remaining cycles"
                   />
                 </Text>
                 <Text as="dd">{remainingCycles.SIGNATURIT_SHARED_APIKEY}</Text>
                 <Text as="dt" fontWeight="600">
                   <FormattedMessage
-                    id="view.admin-organizations-subscriptions.card-end-date"
+                    id="page.admin-organizations-subscriptions.card-end-date"
                     defaultMessage="Subscription end"
                   />
                 </Text>
@@ -386,7 +386,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
             ) : (
               <Center width="100%" marginY="auto" textAlign="center">
                 <FormattedMessage
-                  id="view.admin-organizations-subscriptions.signatures-card.not-active"
+                  id="page.admin-organizations-subscriptions.signatures-card.not-active"
                   defaultMessage="The eSignature has not been activated in this organization"
                 />
               </Center>

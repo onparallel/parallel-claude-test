@@ -551,14 +551,14 @@ function ConfirmDeleteViewDialog({ name, ...props }: DialogProps<{ name: string 
     <ConfirmDialog
       header={
         <FormattedMessage
-          id="components.view-tabs.confirm-delete-header"
+          id="component.view-tabs.confirm-delete-header"
           defaultMessage="Delete view"
         />
       }
       body={
         <Text>
           <FormattedMessage
-            id="components.view-tabs.confirm-delete-body"
+            id="component.view-tabs.confirm-delete-body"
             defaultMessage="Are you sure you want to delete <b>{name}</b>?"
             values={{ name }}
           />

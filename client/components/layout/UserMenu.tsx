@@ -172,7 +172,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
 
           <NakedLink href="/app/organization">
             <MenuItem as="a" icon={<BusinessIcon display="block" boxSize={4} />}>
-              <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
+              <FormattedMessage id="page.organization.title" defaultMessage="Organization" />
             </MenuItem>
           </NakedLink>
 

@@ -136,7 +136,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       });
       toast({
         title: intl.formatMessage({
-          id: "view.group.users-added-title",
+          id: "page.group.users-added-title",
           defaultMessage: "Users added successfully.",
         }),
         status: "success",
@@ -218,7 +218,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
-                      id="view.group.no-results"
+                      id="page.group.no-results"
                       defaultMessage="There's no users matching your search"
                     />
                   </Text>
@@ -227,7 +227,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text fontSize="lg">
                     <FormattedMessage
-                      id="view.group.no-users"
+                      id="page.group.no-users"
                       defaultMessage="No users added to this team yet"
                     />
                   </Text>

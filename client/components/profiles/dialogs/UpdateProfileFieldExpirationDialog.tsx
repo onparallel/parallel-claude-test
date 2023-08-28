@@ -84,7 +84,7 @@ function UpdateProfileFieldExpirationDialog({
           <FieldDateIcon />
           <Text>
             <FormattedMessage
-              id="component..update-profile-field-expiration-dialog.title"
+              id="component.update-profile-field-expiration-dialog.title"
               defaultMessage="Configure expiration date"
             />
           </Text>

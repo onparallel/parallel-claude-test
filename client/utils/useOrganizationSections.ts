@@ -28,7 +28,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         ? [
             {
               title: intl.formatMessage({
-                id: "view.groups.title",
+                id: "page.groups.title",
                 defaultMessage: "Teams",
               }),
               path: "/app/organization/groups",
