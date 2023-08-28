@@ -172,8 +172,11 @@ export const AppLayout = Object.assign(
     }
 
     useEffect(() => {
-      // eslint-disable-next-line no-console
-      console.log(me.permissions);
+      if (process.env.ENV === "staging") {
+        /* eslint-disable no-console */
+        console.log("Permissions: ", me.permissions);
+        /* eslint-enable no-console */
+      }
     }, []);
 
     return (
