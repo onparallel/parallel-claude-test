@@ -502,7 +502,6 @@ function OrganizationUsers() {
         {isUserLimitReached ? <UserLimitReachedAlert /> : null}
         <TablePage
           flex="0 1 auto"
-          minHeight={0}
           isSelectable={userCanEditUsers || userCanGhostLogin}
           isHighlightable
           context={context}

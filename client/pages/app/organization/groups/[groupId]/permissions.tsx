@@ -640,6 +640,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                             as={ListItem}
                             display="flex"
                             alignItems="center"
+                            gap={2}
                           >
                             <Flex flex={1} alignItems="center">
                               <FormLabel margin={0} fontWeight={400}>

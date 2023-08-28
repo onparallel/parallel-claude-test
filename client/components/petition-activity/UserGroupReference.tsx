@@ -39,7 +39,7 @@ export const UserGroupReference = Object.assign(
                   </Text>
                 }
               >
-                <UsersIcon marginBottom={0.5} />
+                <UsersIcon marginBottom={0.5} marginLeft={0.5} />
               </SmallPopover>
             </>
           ) : null}

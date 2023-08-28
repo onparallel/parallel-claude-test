@@ -22,9 +22,6 @@ export function OrganizationGroupsListTableHeader({
   const intl = useIntl();
   return (
     <Stack direction="row" padding={2}>
-      <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
-      </Box>
       <IconButtonWithTooltip
         onClick={onReload}
         icon={<RepeatIcon />}
@@ -35,6 +32,10 @@ export function OrganizationGroupsListTableHeader({
           defaultMessage: "Reload",
         })}
       />
+      <Box flex="0 1 400px">
+        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
+      </Box>
+
       <WhenPermission permission="TEAMS:CRUD_TEAMS">
         <Spacer />
         <Button colorScheme="primary" onClick={onCreateGroup}>
