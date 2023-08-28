@@ -604,13 +604,14 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
       realMe={realMe}
       userGroup={userGroup}
     >
-      <HStack padding={4} alignItems="start">
-        <Card
-          flex={2}
-          maxWidth="container.sm"
-          as="form"
-          onSubmit={handleSubmit(handleSubmitPermissionsGroup)}
-        >
+      <Flex
+        padding={4}
+        gap={4}
+        flexDirection={{ base: "column", xl: "row" }}
+        alignItems={{ base: "stretch", xl: "start" }}
+        css={{ sm: { background: "red" } }}
+      >
+        <Card flex={2} as="form" onSubmit={handleSubmit(handleSubmitPermissionsGroup)}>
           <CardHeader>
             <FormattedMessage
               id="page.permissions-group.permissions-group"
@@ -700,7 +701,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             </HStack>
           </Stack>
         </Card>
-        <Card flex={1} maxWidth="container.sm" position="sticky" top={4}>
+        <Card flex={1} position={{ xl: "sticky" }} top={{ xl: 4 }}>
           <CardHeader
             rightAction={
               <HelpCenterLink articleId={5935983}>
@@ -721,7 +722,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             ))}
           </Grid>
         </Card>
-      </HStack>
+      </Flex>
     </UserGroupLayout>
   );
 }
