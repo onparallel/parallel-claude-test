@@ -6,8 +6,6 @@ import {
   NewSignatureRequestRow_UserFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { isDefined, omit } from "remeda";
@@ -16,6 +14,7 @@ import {
   ConfirmPetitionSignersDialog,
   useConfirmPetitionSignersDialog,
 } from "../petition-common/dialogs/ConfirmPetitionSignersDialog";
+import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 
 interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;
@@ -39,12 +38,7 @@ export function NewSignatureRequestRow({
 
   const startSignature = reviewBeforeSigning || petition.status === "COMPLETED";
 
-  const fieldVisibility = useFieldVisibility(petition.fields);
-
-  const canFinalize = petition.fields.every(
-    (f, index) =>
-      !fieldVisibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly,
-  );
+  const { canFinalize } = usePetitionCanFinalize(petition);
 
   const handleStartSignature = async () => {
     try {
@@ -153,13 +147,6 @@ NewSignatureRequestRow.fragments = {
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
       status
-      fields {
-        id
-        isReadOnly
-        optional
-        ...useFieldVisibility_PetitionField
-        ...completedFieldReplies_PetitionField
-      }
       signatureConfig {
         signers {
           ...SignerReference_PetitionSigner
@@ -181,12 +168,12 @@ NewSignatureRequestRow.fragments = {
       signatureRequests {
         ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
       }
+      ...usePetitionCanFinalize_PetitionBase
     }
-    ${completedFieldReplies.fragments.PetitionField}
-    ${useFieldVisibility.fragments.PetitionField}
     ${SignerReference.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
+    ${usePetitionCanFinalize.fragments.PetitionBase}
   `,
 };

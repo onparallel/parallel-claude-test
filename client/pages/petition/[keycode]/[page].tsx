@@ -45,6 +45,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
+import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import useResizeObserver from "@react-hook/resize-observer";
 import { AnimatePresence } from "framer-motion";
@@ -104,18 +105,11 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const showConfirmPetitionSignersDialog = useRecipientViewConfirmPetitionSignersDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
   const showCompletingMessageDialog = useCompletingMessageDialog();
+  const { canFinalize, incompleteFields } = usePetitionCanFinalize(petition, true);
   const handleFinalize = useCallback(
     async function () {
       try {
         setFinalized(true);
-        const canFinalize = petition.fields.every(
-          (f, index) =>
-            !visibility[index] ||
-            f.isInternal ||
-            f.optional ||
-            completedFieldReplies(f).length > 0 ||
-            f.isReadOnly,
-        );
         if (canFinalize) {
           let confirmSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
@@ -153,22 +147,11 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           }
         } else {
           // go to first repliable field without replies
-          let page = 1;
-          const field = petition.fields.find((field, index) => {
-            if (field.type === "HEADING" && field.options.hasPageBreak && !field.isInternal) {
-              page += 1;
-            }
-            return (
-              visibility[index] &&
-              !completedFieldReplies(field).length &&
-              !field.optional &&
-              !field.isInternal &&
-              !field.isReadOnly
-            );
-          })!;
+
+          const field = incompleteFields[0];
           const { keycode } = router.query;
           router.push(
-            `/petition/${keycode}/${page}?${new URLSearchParams({
+            `/petition/${keycode}/${field.page}?${new URLSearchParams({
               field: field.id,
             })}`,
           );
@@ -188,7 +171,15 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
         }
       }
     },
-    [petition.fields, visibility, granter, router.query, pending],
+    [
+      canFinalize,
+      incompleteFields?.[0]?.id,
+      incompleteFields?.[0]?.page,
+      visibility,
+      granter,
+      router.query,
+      pending,
+    ],
   );
 
   const [sidebarTop, setSidebarTop] = useState(0);
@@ -473,6 +464,7 @@ const _fragments = {
         ...RecipientViewFooter_PublicPetition
         ...RecipientViewPetitionStatusAlert_PublicPetition
         ...RecipientViewSignatureSentAlert_PublicPetition
+        ...usePetitionCanFinalize_PublicPetition
       }
 
       ${this.PublicPetitionField}
@@ -486,6 +478,7 @@ const _fragments = {
       ${useCompletingMessageDialog.fragments.PublicPetition}
       ${RecipientViewPetitionStatusAlert.fragments.PublicPetition}
       ${RecipientViewSignatureSentAlert.fragments.PublicPetition}
+      ${usePetitionCanFinalize.fragments.PublicPetition}
     `;
   },
   get PublicPetitionField() {

@@ -181,7 +181,6 @@ useFieldVisibility.fragments = {
       type
       options
       visibility
-      isInternal
       replies {
         id
         content
@@ -199,7 +198,6 @@ useFieldVisibility.fragments = {
       replies {
         id
         content
-        isAnonymized
       }
       previewReplies @client {
         id

@@ -74,6 +74,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
+import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { withMetadata } from "@parallel/utils/withMetadata";
@@ -214,14 +215,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const [completePetition] = useMutation(PetitionPreview_completePetitionDocument);
   const showTestSignatureDialog = useHandledTestSignatureDialog();
 
+  const { canFinalize, incompleteFields } = usePetitionCanFinalize(petition);
   const handleFinalize = useCallback(
     async function () {
       try {
         setFinalized(true);
-        const canFinalize = petition.fields.every(
-          (f, index) =>
-            !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly,
-        );
         if (canFinalize && isPetition) {
           const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
@@ -317,29 +315,24 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           }
         } else {
           // go to first repliable field without replies
-          let page = 1;
-          const field = petition.fields.find((field, index) => {
-            if (field.type === "HEADING" && field.options.hasPageBreak) {
-              page += 1;
-            }
-            return (
-              visibility[index] &&
-              !completedFieldReplies(field).length &&
-              !field.optional &&
-              !field.isReadOnly
-            );
-          })!;
-
+          const field = incompleteFields[0];
           router.push(
             `/app/petitions/${query.petitionId}/preview?${new URLSearchParams({
-              page: page.toString(),
+              page: field.page.toString(),
               field: field.id,
             })}`,
           );
         }
       } catch {}
     },
-    [petition.fields, visibility, router, query],
+    [
+      canFinalize,
+      incompleteFields?.[0]?.id,
+      incompleteFields?.[0]?.page,
+      visibility,
+      router,
+      query,
+    ],
   );
 
   const displayPetitionLimitReachedAlert =
@@ -658,6 +651,7 @@ const _fragments = {
       ...PetitionLayout_PetitionBase
       ...useLiquidScope_PetitionBase
       ...PreviewPetitionField_PetitionBase
+      ...usePetitionCanFinalize_PetitionBase
     }
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
@@ -674,6 +668,7 @@ const _fragments = {
     ${completedFieldReplies.fragments.PetitionField}
     ${HiddenFieldDialog.fragments.PetitionField}
     ${GeneratePrefilledPublicLinkDialog.fragments.PetitionTemplate}
+    ${usePetitionCanFinalize.fragments.PetitionBase}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {
