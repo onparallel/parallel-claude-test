@@ -166,7 +166,10 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
 
           <NakedLink href="/app/settings">
             <MenuItem as="a" icon={<UserIcon display="block" boxSize={4} />}>
-              <FormattedMessage id="settings.title" defaultMessage="Settings" />
+              <FormattedMessage
+                id="component.user-settings-layout.page-title"
+                defaultMessage="Settings"
+              />
             </MenuItem>
           </NakedLink>
 

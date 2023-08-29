@@ -62,7 +62,7 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
           <FormControl id="password-confirm" marginTop={2} isInvalid={!!errors.passwordConfirm}>
             <FormLabel>
               <FormattedMessage
-                id="generic.forms.confirm-password-label"
+                id="generic.confirm-password-label"
                 defaultMessage="Confirm password"
               />
             </FormLabel>
@@ -73,7 +73,7 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.passwords-must-match"
+                id="generic.passwords-must-match-error"
                 defaultMessage="Passwords must match"
               />
             </FormErrorMessage>

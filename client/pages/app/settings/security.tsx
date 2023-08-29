@@ -69,11 +69,11 @@ function Security() {
           reset();
           toast({
             title: intl.formatMessage({
-              id: "settings.security.password-change-toast-title",
+              id: "page.security.password-change-toast-title",
               defaultMessage: "Password changed",
             }),
             description: intl.formatMessage({
-              id: "settings.security.password-change-toast-description",
+              id: "page.security.password-change-toast-description",
               defaultMessage: "Your password has been successfully changed.",
             }),
             status: "success",
@@ -84,32 +84,17 @@ function Security() {
   }
 
   return (
-    <UserSettingsLayout
-      title={intl.formatMessage({
-        id: "settings.security",
-        defaultMessage: "Security",
-      })}
-      me={me}
-      realMe={realMe}
-      header={
-        <Heading as="h3" size="md">
-          <FormattedMessage id="settings.security" defaultMessage="Security" />
-        </Heading>
-      }
-    >
+    <UserSettingsLayout me={me} realMe={realMe}>
       <Stack padding={6} spacing={8} maxWidth="container.2xs" width="100%" paddingBottom={16}>
         <Stack spacing={4}>
           <Heading as="h4" size="md" fontWeight="semibold">
-            <FormattedMessage
-              id="settings.security.password-header"
-              defaultMessage="Change password"
-            />
+            <FormattedMessage id="page.security.password-header" defaultMessage="Change password" />
           </Heading>
           {me.isSsoUser ? (
             <Alert borderRadius="md">
               <AlertIcon />
               <FormattedMessage
-                id="settings.security.sso-user-explanation"
+                id="page.security.sso-user-explanation"
                 defaultMessage="SSO users are not able to change passwords"
               />
             </Alert>
@@ -117,10 +102,7 @@ function Security() {
           <Stack as="form" onSubmit={handleSubmit(onChangePassword)} spacing={4}>
             <FormControl id="password" isInvalid={!!errors.password} isDisabled={me.isSsoUser}>
               <FormLabel fontWeight="semibold">
-                <FormattedMessage
-                  id="generic.forms.old-password-label"
-                  defaultMessage="Old password"
-                />
+                <FormattedMessage id="generic.old-password-label" defaultMessage="Old password" />
               </FormLabel>
               <PasswordInput
                 backgroundColor="white"
@@ -129,17 +111,17 @@ function Security() {
               <FormErrorMessage>
                 {errors.password?.type === "required" ? (
                   <FormattedMessage
-                    id="generic.forms.required-old-password-error"
+                    id="page.security.old-password-required-error"
                     defaultMessage="Old password is required"
                   />
                 ) : errors.password?.type === "validate" ? (
                   <FormattedMessage
-                    id="generic.forms.invalid-old-password-error"
+                    id="page.security.old-password-incorrect-error"
                     defaultMessage="Old password is incorrect"
                   />
                 ) : errors.password?.type === "limit-exceeded" ? (
                   <FormattedMessage
-                    id="generic.forms.limit-exceeded-error"
+                    id="page.security.attempt-limit-exceeded-error"
                     defaultMessage="You have exceeded the number of attempts. Please try again later."
                   />
                 ) : null}
@@ -151,10 +133,7 @@ function Security() {
               isDisabled={me.isSsoUser}
             >
               <FormLabel fontWeight="semibold">
-                <FormattedMessage
-                  id="generic.forms.new-password-label"
-                  defaultMessage="New password"
-                />
+                <FormattedMessage id="generic.new-password-label" defaultMessage="New password" />
               </FormLabel>
               <PasswordInput
                 backgroundColor="white"
@@ -166,12 +145,12 @@ function Security() {
               <FormErrorMessage>
                 {errors.newPassword?.type === "invalid" ? (
                   <FormattedMessage
-                    id="generic.forms.invalid-password-policy-error"
+                    id="generic.invalid-password-policy-error"
                     defaultMessage="Please choose a stronger password"
                   />
                 ) : (
                   <FormattedMessage
-                    id="generic.forms.password-policy-error"
+                    id="generic.password-length-error"
                     defaultMessage="The password must have a least 8 characters"
                   />
                 )}
@@ -185,7 +164,7 @@ function Security() {
             >
               <FormLabel fontWeight="semibold">
                 <FormattedMessage
-                  id="generic.forms.confirm-password-label"
+                  id="generic.confirm-password-label"
                   defaultMessage="Confirm password"
                 />
               </FormLabel>
@@ -198,14 +177,14 @@ function Security() {
               />
               <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.passwords-must-match"
+                  id="generic.passwords-must-match-error"
                   defaultMessage="Passwords must match"
                 />
               </FormErrorMessage>
             </FormControl>
             <Button type="submit" colorScheme="primary" isDisabled={me.isSsoUser}>
               <FormattedMessage
-                id="settings.account.change-password-button"
+                id="page.account.change-password-button"
                 defaultMessage="Change password"
               />
             </Button>

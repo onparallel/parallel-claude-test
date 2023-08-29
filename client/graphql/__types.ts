@@ -6341,8 +6341,8 @@ export type DevelopersLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -6861,8 +6861,8 @@ export type UserSettingsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30433,9 +30433,9 @@ export type Account_QueryFragment = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
-    hasDeveloperAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30517,9 +30517,9 @@ export type Account_userQuery = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
-    hasDeveloperAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30682,8 +30682,8 @@ export type Subscriptions_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30757,8 +30757,8 @@ export type Tokens_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30800,8 +30800,8 @@ export type Settings_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30851,8 +30851,8 @@ export type Security_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -33426,8 +33426,6 @@ export type useSearchUsers_searchUsersQuery = {
   >;
 };
 
-export type useSettingsSections_UserFragment = { __typename?: "User"; hasDeveloperAccess: boolean };
-
 export type useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
   errorCode?: string | null;
@@ -33750,21 +33748,15 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     progress
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
-export const useSettingsSections_UserFragmentDoc = gql`
-  fragment useSettingsSections_User on User {
-    hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
-  }
-` as unknown as DocumentNode<useSettingsSections_UserFragment, unknown>;
 export const UserSettingsLayout_QueryFragmentDoc = gql`
   fragment UserSettingsLayout_Query on Query {
     ...SidebarLayout_Query
     me {
       id
-      ...useSettingsSections_User
+      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
     }
   }
   ${SidebarLayout_QueryFragmentDoc}
-  ${useSettingsSections_UserFragmentDoc}
 ` as unknown as DocumentNode<UserSettingsLayout_QueryFragment, unknown>;
 export const DevelopersLayout_QueryFragmentDoc = gql`
   fragment DevelopersLayout_Query on Query {

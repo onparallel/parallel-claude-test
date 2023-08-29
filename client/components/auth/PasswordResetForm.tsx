@@ -128,7 +128,7 @@ export function PasswordResetForm({
         </Text>
         <FormControl id="password" isInvalid={!!errors.password || isInvalidPassword}>
           <FormLabel>
-            <FormattedMessage id="generic.forms.new-password-label" defaultMessage="New password" />
+            <FormattedMessage id="generic.new-password-label" defaultMessage="New password" />
           </FormLabel>
           <PasswordInput
             {...register("password", {
@@ -140,13 +140,13 @@ export function PasswordResetForm({
           <FormErrorMessage>
             {errors.password && (
               <FormattedMessage
-                id="generic.forms.password-policy-error"
+                id="generic.password-length-error"
                 defaultMessage="The password must have a least 8 characters"
               />
             )}
             {isInvalidPassword ? (
               <FormattedMessage
-                id="generic.forms.invalid-password-policy-error"
+                id="generic.invalid-password-policy-error"
                 defaultMessage="Please choose a stronger password"
               />
             ) : null}
@@ -155,7 +155,7 @@ export function PasswordResetForm({
         <FormControl id="password-confirm" marginTop={2} isInvalid={!!errors.passwordConfirm}>
           <FormLabel>
             <FormattedMessage
-              id="generic.forms.confirm-password-label"
+              id="generic.confirm-password-label"
               defaultMessage="Confirm password"
             />
           </FormLabel>
@@ -167,7 +167,7 @@ export function PasswordResetForm({
           />
           <FormErrorMessage>
             <FormattedMessage
-              id="generic.forms.passwords-must-match"
+              id="generic.passwords-must-match-error"
               defaultMessage="Passwords must match"
             />
           </FormErrorMessage>

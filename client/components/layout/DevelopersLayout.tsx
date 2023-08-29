@@ -1,9 +1,8 @@
 import { gql } from "@apollo/client";
-import { Heading } from "@chakra-ui/react";
 import { SettingsTabsInnerLayout } from "@parallel/components/layout/SettingsTabsInnerLayout";
 import { DevelopersLayout_QueryFragment } from "@parallel/graphql/__types";
 import { ReactNode, useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { UserSettingsLayout } from "./UserSettingsLayout";
 
 type DevelopersSection = "subscriptions" | "tokens";
@@ -39,16 +38,7 @@ export function DevelopersLayout({ currentTabKey, me, realMe, children }: Develo
   const currentTab = tabs.find((t) => t.key === currentTabKey)!;
 
   return (
-    <UserSettingsLayout
-      title={`${currentTab.title}`}
-      me={me}
-      realMe={realMe}
-      header={
-        <Heading as="h3" size="md">
-          <FormattedMessage id="settings.developers" defaultMessage="Developers" />
-        </Heading>
-      }
-    >
+    <UserSettingsLayout title={`${currentTab.title}`} me={me} realMe={realMe}>
       <SettingsTabsInnerLayout tabs={tabs} currentTabKey={currentTabKey}>
         {children}
       </SettingsTabsInnerLayout>

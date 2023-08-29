@@ -142,7 +142,7 @@ function useApiTokensColumns(): TableColumn<Tokens_UserAuthenticationTokenFragme
       {
         key: "tokenName",
         label: intl.formatMessage({
-          id: "page.tokens.header.token-name",
+          id: "page.tokens.column-header-token-name",
           defaultMessage: "Name",
         }),
         cellProps: {
@@ -155,7 +155,7 @@ function useApiTokensColumns(): TableColumn<Tokens_UserAuthenticationTokenFragme
       {
         key: "hint",
         label: intl.formatMessage({
-          id: "page.tokens.header.hint",
+          id: "page.tokens.column-header-hint",
           defaultMessage: "Token",
         }),
         CellContent: ({ row }) => {

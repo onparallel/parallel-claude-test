@@ -7530,6 +7530,26 @@
     "context": "Team"
   },
   {
+    "term": "component.user-settings-layout.account-section",
+    "definition": "Cuenta",
+    "context": "Account"
+  },
+  {
+    "term": "component.user-settings-layout.developers-section",
+    "definition": "Desarrolladores",
+    "context": "Developers"
+  },
+  {
+    "term": "component.user-settings-layout.page-title",
+    "definition": "Ajustes",
+    "context": "Settings"
+  },
+  {
+    "term": "component.user-settings-layout.security-section",
+    "definition": "Seguridad",
+    "context": "Security"
+  },
+  {
     "term": "component.view-tabs.action-clone-view",
     "definition": "Duplicar vista",
     "context": "Clone view"
@@ -7555,6 +7575,16 @@
     "context": "Clone view"
   },
   {
+    "term": "component.view-tabs.confirm-delete-body",
+    "definition": "¿Estás seguro de que quieres borrar <b>{name}</b>?",
+    "context": "Are you sure you want to delete <b>{name}</b>?"
+  },
+  {
+    "term": "component.view-tabs.confirm-delete-header",
+    "definition": "Borrar vista",
+    "context": "Delete view"
+  },
+  {
     "term": "component.view-tabs.new-default-view",
     "definition": "Nueva vista favorita",
     "context": "New default view"
@@ -7573,16 +7603,6 @@
     "term": "component.view-tabs.rename-view-header",
     "definition": "Renombrar vista",
     "context": "Rename view"
-  },
-  {
-    "term": "component.view-tabs.confirm-delete-body",
-    "definition": "¿Estás seguro de que quieres borrar <b>{name}</b>?",
-    "context": "Are you sure you want to delete <b>{name}</b>?"
-  },
-  {
-    "term": "component.view-tabs.confirm-delete-header",
-    "definition": "Borrar vista",
-    "context": "Delete view"
   },
   {
     "term": "contact.edit-details-button",
@@ -8055,6 +8075,11 @@
     "context": "Yes, delete"
   },
   {
+    "term": "generic.confirm-password-label",
+    "definition": "Confirmar contraseña",
+    "context": "Confirm password"
+  },
+  {
     "term": "generic.confirm-send",
     "definition": "Si, enviar",
     "context": "Yes, send"
@@ -8320,11 +8345,6 @@
     "context": "example@company.com"
   },
   {
-    "term": "generic.forms.confirm-password-label",
-    "definition": "Confirmar contraseña",
-    "context": "Confirm password"
-  },
-  {
     "term": "generic.forms.email-already-registered-error",
     "definition": "Este email ya está registrado",
     "context": "This email is already registered"
@@ -8380,16 +8400,6 @@
     "context": "Please, enter the last name"
   },
   {
-    "term": "generic.forms.invalid-old-password-error",
-    "definition": "La contraseña actual es incorrecta",
-    "context": "Old password is incorrect"
-  },
-  {
-    "term": "generic.forms.invalid-password-policy-error",
-    "definition": "Por favor, escoge una contraseña más robusta",
-    "context": "Please choose a stronger password"
-  },
-  {
     "term": "generic.forms.invalid-verification-code",
     "definition": "El código de verificación es inválido",
     "context": "The verification code is invalid"
@@ -8398,11 +8408,6 @@
     "term": "generic.forms.last-name-label",
     "definition": "Apellidos",
     "context": "Last name"
-  },
-  {
-    "term": "generic.forms.limit-exceeded-error",
-    "definition": "Has superado el número de intentos. Por favor, inténtalo de nuevo más tarde.",
-    "context": "You have exceeded the number of attempts. Please try again later."
   },
   {
     "term": "generic.forms.message-label",
@@ -8415,29 +8420,9 @@
     "context": "Name"
   },
   {
-    "term": "generic.forms.new-password-label",
-    "definition": "Contraseña nueva",
-    "context": "New password"
-  },
-  {
-    "term": "generic.forms.old-password-label",
-    "definition": "Contraseña antigua",
-    "context": "Old password"
-  },
-  {
     "term": "generic.forms.password-label",
     "definition": "Contraseña",
     "context": "Password"
-  },
-  {
-    "term": "generic.forms.password-policy-error",
-    "definition": "La contraseña debe contener al menos 8 caracteres",
-    "context": "The password must have a least 8 characters"
-  },
-  {
-    "term": "generic.forms.passwords-must-match",
-    "definition": "Las contraseñas deben coincidir",
-    "context": "Passwords must match"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -8448,11 +8433,6 @@
     "term": "generic.forms.required-last-name-error",
     "definition": "El apellido es un campo requerido",
     "context": "Last name is required"
-  },
-  {
-    "term": "generic.forms.required-old-password-error",
-    "definition": "La contraseña actual es requerida",
-    "context": "Old password is required"
   },
   {
     "term": "generic.forms.required-password-error",
@@ -8543,6 +8523,11 @@
     "term": "generic.integration-provider",
     "definition": "Proveedor",
     "context": "Provider"
+  },
+  {
+    "term": "generic.invalid-password-policy-error",
+    "definition": "Por favor, escoge una contraseña más robusta",
+    "context": "Please choose a stronger password"
   },
   {
     "term": "generic.invite-user",
@@ -8650,6 +8635,11 @@
     "context": "New"
   },
   {
+    "term": "generic.new-password-label",
+    "definition": "Contraseña nueva",
+    "context": "New password"
+  },
+  {
     "term": "generic.new-petition",
     "definition": "Nuevo parallel",
     "context": "New parallel"
@@ -8710,6 +8700,11 @@
     "context": "OK"
   },
   {
+    "term": "generic.old-password-label",
+    "definition": "Contraseña antigua",
+    "context": "Old password"
+  },
+  {
     "term": "generic.omit",
     "definition": "Omitir",
     "context": "Omit"
@@ -8763,6 +8758,16 @@
     "term": "generic.parallel-type-plural",
     "definition": "Parallels",
     "context": "Parallels"
+  },
+  {
+    "term": "generic.password-length-error",
+    "definition": "La contraseña debe contener al menos 8 caracteres",
+    "context": "The password must have a least 8 characters"
+  },
+  {
+    "term": "generic.passwords-must-match-error",
+    "definition": "Las contraseñas deben coincidir",
+    "context": "Passwords must match"
   },
   {
     "term": "generic.petition-count",
@@ -9663,6 +9668,21 @@
     "term": "organizations.header.user-count",
     "definition": "Usuarios",
     "context": "Users"
+  },
+  {
+    "term": "page.account.change-password-button",
+    "definition": "Cambiar contraseña",
+    "context": "Change password"
+  },
+  {
+    "term": "page.account.update-success-description",
+    "definition": "Tu cuenta ha sido actualizada con éxito.",
+    "context": "Your account has been successfully updated."
+  },
+  {
+    "term": "page.account.update-success-title",
+    "definition": "Cambios guardados correctamente",
+    "context": "Changes saved correctly"
   },
   {
     "term": "page.admin-organizations-subscriptions.activate-signature-button",
@@ -10835,6 +10855,41 @@
     "context": "Reports"
   },
   {
+    "term": "page.security.attempt-limit-exceeded-error",
+    "definition": "Has superado el número de intentos. Por favor, inténtalo de nuevo más tarde.",
+    "context": "You have exceeded the number of attempts. Please try again later."
+  },
+  {
+    "term": "page.security.old-password-incorrect-error",
+    "definition": "La contraseña actual es incorrecta",
+    "context": "Old password is incorrect"
+  },
+  {
+    "term": "page.security.old-password-required-error",
+    "definition": "La contraseña actual es requerida",
+    "context": "Old password is required"
+  },
+  {
+    "term": "page.security.password-change-toast-description",
+    "definition": "Tu contraseña ha sido actualizada con éxito.",
+    "context": "Your password has been successfully changed."
+  },
+  {
+    "term": "page.security.password-change-toast-title",
+    "definition": "Contraseña actualizada",
+    "context": "Password changed"
+  },
+  {
+    "term": "page.security.password-header",
+    "definition": "Cambiar contraseña",
+    "context": "Change password"
+  },
+  {
+    "term": "page.security.sso-user-explanation",
+    "definition": "Los usuarios de SSO no pueden cambiar la contraseña",
+    "context": "SSO users are not able to change passwords"
+  },
+  {
     "term": "page.signature.consent-required-popover",
     "definition": "<a>Haz click aquí</a> para reautorizar tu integración de DocuSign.",
     "context": "<a>Click here</a> to reauthorize your DocuSign integration."
@@ -10890,6 +10945,41 @@
     "context": "Hi, I would like to use eSignatures. Could I have more information, please?"
   },
   {
+    "term": "page.subscriptions.column-header-event-types",
+    "definition": "Tipos de evento",
+    "context": "Event types"
+  },
+  {
+    "term": "page.subscriptions.column-header-events-url",
+    "definition": "URL de eventos",
+    "context": "Events URL"
+  },
+  {
+    "term": "page.subscriptions.column-header-from-any-petition",
+    "definition": "Cualquier parallel",
+    "context": "Any parallel"
+  },
+  {
+    "term": "page.subscriptions.column-header-from-template",
+    "definition": "Desde la plantilla",
+    "context": "From template"
+  },
+  {
+    "term": "page.subscriptions.column-header-is-enabled",
+    "definition": "Activado",
+    "context": "Enabled"
+  },
+  {
+    "term": "page.subscriptions.column-header-name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "page.subscriptions.column-header-signature-keys",
+    "definition": "Claves",
+    "context": "Keys"
+  },
+  {
     "term": "page.subscriptions.confirm-delete-body",
     "definition": "¿Estás seguro de que quieres borrar {count, plural, =1 {la suscripción seleccionada} other {las # suscripciones seleccionadas}}?",
     "context": "Are you sure you want to delete the {count, plural, =1 {selected event subscription} other {# selected event subscriptions}}?"
@@ -10908,41 +10998,6 @@
     "term": "page.subscriptions.create-subscription",
     "definition": "Crear suscripción",
     "context": "Create subscription"
-  },
-  {
-    "term": "page.subscriptions.header.event-types",
-    "definition": "Tipos de evento",
-    "context": "Event types"
-  },
-  {
-    "term": "page.subscriptions.header.events-url",
-    "definition": "URL de eventos",
-    "context": "Events URL"
-  },
-  {
-    "term": "page.subscriptions.header.from-any-petition",
-    "definition": "Cualquier parallel",
-    "context": "Any parallel"
-  },
-  {
-    "term": "page.subscriptions.header.from-template",
-    "definition": "Desde la plantilla",
-    "context": "From template"
-  },
-  {
-    "term": "page.subscriptions.header.is-enabled",
-    "definition": "Activado",
-    "context": "Enabled"
-  },
-  {
-    "term": "page.subscriptions.header.name",
-    "definition": "Nombre",
-    "context": "Name"
-  },
-  {
-    "term": "page.subscriptions.header.signature-keys",
-    "definition": "Claves",
-    "context": "Keys"
   },
   {
     "term": "page.subscriptions.n-events",
@@ -10975,6 +11030,16 @@
     "context": "The events could not be sent to the URL, if the error persists check the webhook"
   },
   {
+    "term": "page.tokens.column-header-hint",
+    "definition": "Token",
+    "context": "Token"
+  },
+  {
+    "term": "page.tokens.column-header-token-name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
     "term": "page.tokens.confirm-delete-body",
     "definition": "¿Estás seguro que quieres eliminar {count, plural, =1 {el token seleccionado} other {los # tokens seleccionados}}?",
     "context": "Are you sure you want to delete the {count, plural, =1 {selected access token} other {# selected access tokens}}?"
@@ -10998,16 +11063,6 @@
     "term": "page.tokens.explanation",
     "definition": "Las claves de acceso personal pueden ser utilizadas para acceder a la <a>API de Parallel</a>.",
     "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
-  },
-  {
-    "term": "page.tokens.header.hint",
-    "definition": "Token",
-    "context": "Token"
-  },
-  {
-    "term": "page.tokens.header.token-name",
-    "definition": "Nombre",
-    "context": "Name"
   },
   {
     "term": "page.tokens.no-tokens-message",
@@ -12795,16 +12850,6 @@
     "context": "Enter verification code"
   },
   {
-    "term": "settings.account",
-    "definition": "Cuenta",
-    "context": "Account"
-  },
-  {
-    "term": "settings.account.change-password-button",
-    "definition": "Cambiar contraseña",
-    "context": "Change password"
-  },
-  {
     "term": "settings.account.name-header",
     "definition": "Nombre y apellidos",
     "context": "Name"
@@ -12815,54 +12860,9 @@
     "context": "SSO users are not able to change their name"
   },
   {
-    "term": "settings.account.success-toast-description",
-    "definition": "Tu cuenta ha sido actualizada con éxito.",
-    "context": "Your account has been successfully updated."
-  },
-  {
-    "term": "settings.account.success-toast-title",
-    "definition": "Cambios guardados correctamente",
-    "context": "Changes saved correctly"
-  },
-  {
     "term": "settings.api-tokens.generate-new-token",
     "definition": "Crear token",
     "context": "Create token"
-  },
-  {
-    "term": "settings.developers",
-    "definition": "Desarrolladores",
-    "context": "Developers"
-  },
-  {
-    "term": "settings.security",
-    "definition": "Seguridad",
-    "context": "Security"
-  },
-  {
-    "term": "settings.security.password-change-toast-description",
-    "definition": "Tu contraseña ha sido actualizada con éxito.",
-    "context": "Your password has been successfully changed."
-  },
-  {
-    "term": "settings.security.password-change-toast-title",
-    "definition": "Contraseña actualizada",
-    "context": "Password changed"
-  },
-  {
-    "term": "settings.security.password-header",
-    "definition": "Cambiar contraseña",
-    "context": "Change password"
-  },
-  {
-    "term": "settings.security.sso-user-explanation",
-    "definition": "Los usuarios de SSO no pueden cambiar la contraseña",
-    "context": "SSO users are not able to change passwords"
-  },
-  {
-    "term": "settings.title",
-    "definition": "Ajustes",
-    "context": "Settings"
   },
   {
     "term": "short-text-formats.email",

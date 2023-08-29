@@ -52,7 +52,7 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormControl id="password" isInvalid={!!errors.password}>
           <FormLabel>
-            <FormattedMessage id="generic.forms.new-password-label" defaultMessage="New password" />
+            <FormattedMessage id="generic.new-password-label" defaultMessage="New password" />
           </FormLabel>
           <PasswordInput
             {...register("password", {
@@ -63,7 +63,7 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
           <PasswordStrengthIndicator password={password} />
           <FormErrorMessage>
             <FormattedMessage
-              id="generic.forms.password-policy-error"
+              id="generic.password-length-error"
               defaultMessage="The password must have a least 8 characters"
             />
           </FormErrorMessage>

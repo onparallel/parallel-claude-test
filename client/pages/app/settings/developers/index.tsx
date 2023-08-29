@@ -284,7 +284,7 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "name",
         label: intl.formatMessage({
-          id: "page.subscriptions.header.name",
+          id: "page.subscriptions.column-header-name",
           defaultMessage: "Name",
         }),
         cellProps: {
@@ -317,7 +317,7 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "eventsUrl",
         label: intl.formatMessage({
-          id: "page.subscriptions.header.events-url",
+          id: "page.subscriptions.column-header-events-url",
           defaultMessage: "Events URL",
         }),
         cellProps: {
@@ -333,7 +333,7 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "fromTemplate",
         label: intl.formatMessage({
-          id: "page.subscriptions.header.from-template",
+          id: "page.subscriptions.column-header-from-template",
           defaultMessage: "From template",
         }),
         cellProps: {
@@ -359,7 +359,7 @@ function useSubscriptionsColumns(): TableColumn<
               ) : (
                 <Text textStyle="hint">
                   <FormattedMessage
-                    id="page.subscriptions.header.from-any-petition"
+                    id="page.subscriptions.column-header-from-any-petition"
                     defaultMessage="Any parallel"
                   />
                 </Text>
@@ -371,7 +371,7 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "eventTypes",
         label: intl.formatMessage({
-          id: "page.subscriptions.header.event-types",
+          id: "page.subscriptions.column-header-event-types",
           defaultMessage: "Event types",
         }),
         align: "center",
@@ -411,7 +411,7 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "signatureKeys",
         label: intl.formatMessage({
-          id: "page.subscriptions.header.signature-keys",
+          id: "page.subscriptions.column-header-signature-keys",
           defaultMessage: "Keys",
         }),
         align: "center",
@@ -437,7 +437,7 @@ function useSubscriptionsColumns(): TableColumn<
       {
         key: "isEnabled",
         label: intl.formatMessage({
-          id: "page.subscriptions.header.is-enabled",
+          id: "page.subscriptions.column-header-is-enabled",
           defaultMessage: "Enabled",
         }),
         align: "center",

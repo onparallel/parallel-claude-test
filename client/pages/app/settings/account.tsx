@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
-import { Divider, Heading, Stack, useToast } from "@chakra-ui/react";
+import { Divider, Stack, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
 import {
   AccountChangeName,
@@ -20,7 +20,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRouter } from "next/router";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 
 function Account() {
   const intl = useIntl();
@@ -31,11 +31,11 @@ function Account() {
   const updateSuccessToast = () => {
     toast({
       title: intl.formatMessage({
-        id: "settings.account.success-toast-title",
+        id: "page.account.update-success-title",
         defaultMessage: "Changes saved correctly",
       }),
       description: intl.formatMessage({
-        id: "settings.account.success-toast-description",
+        id: "page.account.update-success-description",
         defaultMessage: "Your account has been successfully updated.",
       }),
       status: "success",
@@ -82,19 +82,7 @@ function Account() {
   }
 
   return (
-    <UserSettingsLayout
-      title={intl.formatMessage({
-        id: "settings.account",
-        defaultMessage: "Account",
-      })}
-      me={me}
-      realMe={realMe}
-      header={
-        <Heading as="h3" size="md">
-          <FormattedMessage id="settings.account" defaultMessage="Account" />
-        </Heading>
-      }
-    >
+    <UserSettingsLayout me={me} realMe={realMe}>
       <Stack padding={6} spacing={8} maxWidth="container.sm" width="100%" paddingBottom={16}>
         <AccountChangeName user={me} onSubmit={onSaveName} />
         <Divider borderColor="gray.300" />
