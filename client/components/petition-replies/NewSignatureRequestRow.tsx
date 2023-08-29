@@ -55,7 +55,7 @@ export function NewSignatureRequestRow({
       } = await showConfirmPetitionSignersDialog({
         user,
         accesses: petition.accesses,
-        presetSigners: signers,
+        signers,
         allowAdditionalSigners,
         isUpdate: !startSignature && !canFinalize,
         previousSignatures: petition.signatureRequests,

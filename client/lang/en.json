@@ -75,9 +75,14 @@
     "context": "Add signers"
   },
   {
-    "term": "component.add-petition-access-dialog.add-signers-text",
+    "term": "component.add-petition-access-dialog.add-signers-text-optional",
     "definition": "Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier.",
     "context": "Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier."
+  },
+  {
+    "term": "component.add-petition-access-dialog.add-signers-text-required",
+    "definition": "Before sending, <b>include the signers.</b>",
+    "context": "Before sending, <b>include the signers.</b>"
   },
   {
     "term": "component.add-petition-access-dialog.edit-signers",
@@ -85,12 +90,17 @@
     "context": "Edit signers"
   },
   {
-    "term": "component.add-petition-access-dialog.petition-limit-near.text",
+    "term": "component.add-petition-access-dialog.header",
+    "definition": "Who do you want to complete it?",
+    "context": "Who do you want to complete it?"
+  },
+  {
+    "term": "component.add-petition-access-dialog.petition-limit-near",
     "definition": "You can send {left, plural, =1{# more parallel} other{# more parallels}}.",
     "context": "You can send {left, plural, =1{# more parallel} other{# more parallels}}."
   },
   {
-    "term": "component.add-petition-access-dialog.petition-limit-reached.text",
+    "term": "component.add-petition-access-dialog.petition-limit-reached",
     "definition": "You reached the limit of parallels sent.",
     "context": "You reached the limit of parallels sent."
   },
@@ -885,19 +895,24 @@
     "context": "Keep draft"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.confirmation-text",
-    "definition": "When you start the signature, we will send the document to be signed to the following contacts:",
-    "context": "When you start the signature, we will send the document to be signed to the following contacts:"
+    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
+    "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
+    "context": "If this option is disabled, only the indicated people will be able to sign the document."
   },
   {
-    "term": "component.confirm-petition-signers-dialog.contact-select.placeholder",
+    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-label",
+    "definition": "Allow recipients to add additional signers",
+    "context": "Allow recipients to add additional signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.contact-select-placeholder",
     "definition": "Add a contact to sign",
     "context": "Add a contact to sign"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.header",
-    "definition": "Who has to sign the document?",
-    "context": "Who has to sign the document?"
+    "term": "component.confirm-petition-signers-dialog.edit-signers-header",
+    "definition": "Edit signers",
+    "context": "Edit signers"
   },
   {
     "term": "component.confirm-petition-signers-dialog.include-message",
@@ -910,12 +925,32 @@
     "context": "Write here a message for the signers..."
   },
   {
-    "term": "component.confirm-petition-signers-dialog.signers-added",
-    "definition": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}",
-    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
+    "term": "component.confirm-petition-signers-dialog.no-signers-added",
+    "definition": "You have not added any signers",
+    "context": "You have not added any signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.no-signers-set",
+    "definition": "We will send the document to the following contacts:",
+    "context": "We will send the document to the following contacts:"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.preset-signers",
+    "definition": "{names} will sign together with the signers you add.",
+    "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.signer-added-by-recipient",
+    "definition": "Signers added by the recipient",
+    "context": "Signers added by the recipient"
   },
   {
     "term": "component.confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.start-signature-header",
     "definition": "Start signature",
     "context": "Start signature"
   },
@@ -1528,6 +1563,21 @@
     "term": "component.deactivate-dow-jones-integration-dialog.title",
     "definition": "Deactivate integration",
     "context": "Deactivate integration"
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-1",
+    "definition": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}",
+    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-2",
+    "definition": "We will send them an email with instructions on how to proceed.",
+    "context": "We will send them an email with instructions on how to proceed."
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-title",
+    "definition": "Invite collaborator",
+    "context": "Invite collaborator"
   },
   {
     "term": "component.delete-petitions.confirm-delete-folders.part-folders",
@@ -2755,22 +2805,22 @@
     "context": "The subject of this email will be the same as the subject of the parallel message."
   },
   {
-    "term": "component.message-email-editor.body-required-error",
+    "term": "component.message-email-body-form-control.required-error",
     "definition": "Customizing the initial message improves the response time of the recipients",
     "context": "Customizing the initial message improves the response time of the recipients"
   },
   {
-    "term": "component.message-email-editor.subject-label",
+    "term": "component.message-email-subject-form-control.label",
     "definition": "Subject",
     "context": "Subject"
   },
   {
-    "term": "component.message-email-editor.subject-placeholder",
+    "term": "component.message-email-subject-form-control.placeholder",
     "definition": "Enter the subject of the email",
     "context": "Enter the subject of the email"
   },
   {
-    "term": "component.message-email-editor.subject-required-error",
+    "term": "component.message-email-subject-form-control.required-error",
     "definition": "A subject helps the recipient understand the context of your parallel",
     "context": "A subject helps the recipient understand the context of your parallel"
   },
@@ -4325,12 +4375,12 @@
     "context": "Set the retention period of the data collected with this {type, select, PETITION {parallel} other{template}} according to its purpose. The period will start from the closing of the parallel, after which the data will be anonymized."
   },
   {
-    "term": "component.petition-settings.compliance-updated.toast-description",
+    "term": "component.petition-settings.compliance-updated-toast-description",
     "definition": "Compliance period successfully updated.",
     "context": "Compliance period successfully updated."
   },
   {
-    "term": "component.petition-settings.compliance-updated.toast-title",
+    "term": "component.petition-settings.compliance-updated-toast-title",
     "definition": "Changes saved correctly",
     "context": "Changes saved correctly"
   },
@@ -4338,6 +4388,11 @@
     "term": "component.petition-settings.deadline-description",
     "definition": "This date is used to inform the recipients of the deadline for which you need to have the information.",
     "context": "This date is used to inform the recipients of the deadline for which you need to have the information."
+  },
+  {
+    "term": "component.petition-settings.deadline-label",
+    "definition": "Deadline",
+    "context": "Deadline"
   },
   {
     "term": "component.petition-settings.default-path",
@@ -4525,7 +4580,7 @@
     "context": "Signature completed: {signedAt}"
   },
   {
-    "term": "component.petition-signatures-card.add-signature.label",
+    "term": "component.petition-signatures-card.add-signature-label",
     "definition": "Add signature",
     "context": "Add signature"
   },
@@ -4565,12 +4620,12 @@
     "context": "Previous signatures"
   },
   {
-    "term": "component.petition-signatures-card.reminder-sent.toast-description",
+    "term": "component.petition-signatures-card.reminder-sent-toast-description",
     "definition": "We have sent a reminder to the pending signers",
     "context": "We have sent a reminder to the pending signers"
   },
   {
-    "term": "component.petition-signatures-card.reminder-sent.toast-title",
+    "term": "component.petition-signatures-card.reminder-sent-toast-title",
     "definition": "Reminder sent",
     "context": "Reminder sent"
   },
@@ -5445,7 +5500,7 @@
     "context": "Add another parallel"
   },
   {
-    "term": "component.recipient-select-groups.delete-group.label",
+    "term": "component.recipient-select-groups.delete-group-label",
     "definition": "Delete recipient group",
     "context": "Delete recipient group"
   },
@@ -5503,6 +5558,46 @@
     "term": "component.recipient-select-groups.unknown-recipients",
     "definition": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list.",
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.add-signer-button",
+    "definition": "Add signers",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.confirmation-text",
+    "definition": "We will send the document to the following contacts:",
+    "context": "We will send the document to the following contacts:"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.header",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.include-message",
+    "definition": "Include message",
+    "context": "Include message"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.message-placeholder",
+    "definition": "Write here a message for the signers...",
+    "context": "Write here a message for the signers..."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.preset-signers-added",
+    "definition": "{names} will sign together with the signers you add.",
+    "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
+    "definition": "You haven't added any signers yet",
+    "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Start signature",
+    "context": "Start signature"
   },
   {
     "term": "component.recipient-view-contactless-form.access",
@@ -5745,39 +5840,39 @@
     "context": "Start"
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
-    "definition": "Add signers",
-    "context": "Add signers"
+    "term": "component.recipient-view-petition-status-alert.petition-closed-alert",
+    "definition": "This parallel has been closed. If you need to make any changes, please reach out to {name}.",
+    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.confirmation-text",
-    "definition": "When you start the signature, we will send the document to be signed to the following contacts:",
-    "context": "When you start the signature, we will send the document to be signed to the following contacts:"
+    "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
+    "definition": "<b>Information completed!</b> We have notified {name} for review and validation.",
+    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.header",
-    "definition": "Who has to sign the document?",
-    "context": "Who has to sign the document?"
+    "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
+    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.include-message",
-    "definition": "Include message",
-    "context": "Include message"
+    "term": "component.recipient-view-signature-sent-alert.check-status-button",
+    "definition": "Check status",
+    "context": "Check status"
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
-    "definition": "Write here a message for the signers...",
-    "context": "Write here a message for the signers..."
+    "term": "component.recipient-view-signature-sent-alert.petition-completed-alert-2",
+    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.signers-added",
-    "definition": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}",
-    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
+    "term": "component.recipient-view-signature-sent-alert.petition-requires-signature-alert-1",
+    "definition": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed.",
+    "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.start-signature-button",
-    "definition": "Start signature",
-    "context": "Start signature"
+    "term": "component.recipient-view-signature-sent-alert.petition-signature-request-sent-alert",
+    "definition": "<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}.",
+    "context": "<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}."
   },
   {
     "term": "component.recipient-view.reminder-submit",
@@ -6665,39 +6760,39 @@
     "context": "An unknown error happened."
   },
   {
-    "term": "component.signature-config-dialog.allow-additional-signers.help",
+    "term": "component.signature-config-dialog.allow-additional-signers-help",
     "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
   },
   {
-    "term": "component.signature-config-dialog.allow-additional-signers.label",
+    "term": "component.signature-config-dialog.allow-additional-signers-label",
     "definition": "Allow recipients to add additional signers",
     "context": "Allow recipients to add additional signers"
   },
   {
-    "term": "component.signature-config-dialog.confirm-start",
-    "definition": "Start signature",
-    "context": "Start signature"
-  },
-  {
-    "term": "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
+    "term": "component.signature-config-dialog.contact-select-add-contact-to-sign-placeholder",
     "definition": "Add a contact to sign",
     "context": "Add a contact to sign"
   },
   {
-    "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
-    "definition": "The signature process will start when all the information has been completed.",
-    "context": "The signature process will start when all the information has been completed."
-  },
-  {
-    "term": "component.signature-config-dialog.header.help-link",
+    "term": "component.signature-config-dialog.header-help-link",
     "definition": "More about eSignature",
     "context": "More about eSignature"
   },
   {
-    "term": "component.signature-config-dialog.header.subtitle",
+    "term": "component.signature-config-dialog.header-subtitle",
     "definition": "Sign a PDF document with all the replies using one of our integrated eSignature providers.",
     "context": "Sign a PDF document with all the replies using one of our integrated eSignature providers."
+  },
+  {
+    "term": "component.signature-config-dialog.include-fixed-signers-template-label",
+    "definition": "Include contacts who always sign the document",
+    "context": "Include contacts who always sign the document"
+  },
+  {
+    "term": "component.signature-config-dialog.no-signers-added",
+    "definition": "You haven't added any signers yet",
+    "context": "You haven't added any signers yet"
   },
   {
     "term": "component.signature-config-dialog.provider-label",
@@ -6705,49 +6800,44 @@
     "context": "eSignature provider"
   },
   {
-    "term": "component.signature-config-dialog.radiobutton.option-1",
-    "definition": "Indicate later",
-    "context": "Indicate later"
-  },
-  {
-    "term": "component.signature-config-dialog.radiobutton.option-2",
-    "definition": "Include signers",
-    "context": "Include signers"
-  },
-  {
     "term": "component.signature-config-dialog.review-before-send-label",
     "definition": "When do you want the eSignature to start?",
     "context": "When do you want the eSignature to start?"
   },
   {
-    "term": "component.signature-config-dialog.review-before-send.option-no",
+    "term": "component.signature-config-dialog.review-before-send-option-no",
     "definition": "After the parallel is completed",
     "context": "After the parallel is completed"
   },
   {
-    "term": "component.signature-config-dialog.review-before-send.option-yes",
+    "term": "component.signature-config-dialog.review-before-send-option-no-explainer",
+    "definition": "The signature process will start when all the information has been completed.",
+    "context": "The signature process will start when all the information has been completed."
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-yes",
     "definition": "After reviewing the information",
     "context": "After reviewing the information"
   },
   {
-    "term": "component.signature-config-dialog.review-before-send.option-yes.explainer",
+    "term": "component.signature-config-dialog.review-before-send-option-yes-explainer",
     "definition": "After reviewing the information you will have to start the signature manually.",
     "context": "After reviewing the information you will have to start the signature manually."
   },
   {
-    "term": "component.signature-config-dialog.signers-added",
-    "definition": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}",
-    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
-  },
-  {
-    "term": "component.signature-config-dialog.step-1.header",
+    "term": "component.signature-config-dialog.step-1-header",
     "definition": "eSignature configuration",
     "context": "eSignature configuration"
   },
   {
-    "term": "component.signature-config-dialog.step-2.header",
-    "definition": "Who has to sign the document?",
-    "context": "Who has to sign the document?"
+    "term": "component.signature-config-dialog.step-2-header",
+    "definition": "Set up document signatures",
+    "context": "Set up document signatures"
+  },
+  {
+    "term": "component.signature-config-dialog.step-3-header",
+    "definition": "Add signers",
+    "context": "Add signers"
   },
   {
     "term": "component.signature-config-dialog.template-alert",
@@ -6768,6 +6858,36 @@
     "term": "component.signature-config-dialog.title-placeholder",
     "definition": "Enter a title...",
     "context": "Enter a title..."
+  },
+  {
+    "term": "component.signature-status-badge.bounced",
+    "definition": "Bounced",
+    "context": "Bounced"
+  },
+  {
+    "term": "component.signature-status-badge.canceled",
+    "definition": "Canceled",
+    "context": "Canceled"
+  },
+  {
+    "term": "component.signature-status-badge.pending",
+    "definition": "Pending signature",
+    "context": "Pending signature"
+  },
+  {
+    "term": "component.signature-status-badge.signed",
+    "definition": "Signed",
+    "context": "Signed"
+  },
+  {
+    "term": "component.signature-status-dialog.body",
+    "definition": "We have sent the document to these signers.",
+    "context": "We have sent the document to these signers."
+  },
+  {
+    "term": "component.signature-status-dialog.header",
+    "definition": "Signature started",
+    "context": "Signature started"
   },
   {
     "term": "component.signature-tokens-table.default-description",
@@ -8818,11 +8938,6 @@
     "term": "generic.profile-type-field-type.text",
     "definition": "Long text",
     "context": "Long text"
-  },
-  {
-    "term": "generic.recommended",
-    "definition": "Recommended",
-    "context": "Recommended"
   },
   {
     "term": "generic.reload-data",
@@ -11485,11 +11600,6 @@
     "context": "Waiting for signature"
   },
   {
-    "term": "petition.add-access.header",
-    "definition": "Who do you want to complete it?",
-    "context": "Who do you want to complete it?"
-  },
-  {
     "term": "petition.add-another-field-button",
     "definition": "Add another field",
     "context": "Add another field"
@@ -11603,11 +11713,6 @@
     "term": "petition.contents",
     "definition": "Contents",
     "context": "Contents"
-  },
-  {
-    "term": "petition.deadline-label",
-    "definition": "Deadline",
-    "context": "Deadline"
   },
   {
     "term": "petition.field-type.checkbox",
@@ -12680,24 +12785,9 @@
     "context": "Invite collaborator"
   },
   {
-    "term": "recipient-view.invite-collaborator-dialog.subtitle-1",
-    "definition": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}",
-    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
-  },
-  {
-    "term": "recipient-view.invite-collaborator-dialog.subtitle-2",
-    "definition": "We will send them an email with instructions on how to proceed.",
-    "context": "We will send them an email with instructions on how to proceed."
-  },
-  {
     "term": "recipient-view.invite-collaborator.help",
     "definition": "Use this option to request someone else to complete the information for you.",
     "context": "Use this option to request someone else to complete the information for you."
-  },
-  {
-    "term": "recipient-view.invite-collaborator.title",
-    "definition": "Invite collaborator",
-    "context": "Invite collaborator"
   },
   {
     "term": "recipient-view.last-saved-info",
@@ -12720,21 +12810,6 @@
     "context": "Saved {time}"
   },
   {
-    "term": "recipient-view.petition-closed-alert",
-    "definition": "This parallel has been closed. If you need to make any changes, please reach out to {name}.",
-    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
-  },
-  {
-    "term": "recipient-view.petition-completed-alert-1",
-    "definition": "<b>Information completed!</b> We have notified {name} for review and validation.",
-    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
-  },
-  {
-    "term": "recipient-view.petition-completed-alert-2",
-    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
-    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-  },
-  {
     "term": "recipient-view.petition-delegated.toast-body",
     "definition": "We have sent an email to {email} with instructions to access this parallel.",
     "context": "We have sent an email to {email} with instructions to access this parallel."
@@ -12753,16 +12828,6 @@
     "term": "recipient-view.petition-not-available-error.text",
     "definition": "If you need to access it, please reach out to the person that sent it to you.",
     "context": "If you need to access it, please reach out to the person that sent it to you."
-  },
-  {
-    "term": "recipient-view.petition-requires-signature-alert-1",
-    "definition": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed.",
-    "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
-  },
-  {
-    "term": "recipient-view.petition-signature-request-sent-alert",
-    "definition": "<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}.",
-    "context": "<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}."
   },
   {
     "term": "recipient-view.petition-subject",

@@ -107,7 +107,7 @@ function DelegateAccessDialog({
           </Circle>
           <Text as="div" flex="1">
             <FormattedMessage
-              id="recipient-view.invite-collaborator.title"
+              id="component.delegate-access-dialog.invite-collaborator-title"
               defaultMessage="Invite collaborator"
             />
           </Text>
@@ -118,14 +118,14 @@ function DelegateAccessDialog({
           <Box fontSize="sm">
             <Text>
               <FormattedMessage
-                id="recipient-view.invite-collaborator-dialog.subtitle-1"
+                id="component.delegate-access-dialog.invite-collaborator-subtitle-1"
                 defaultMessage="{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
                 values={{ tone }}
               />
             </Text>
             <Text>
               <FormattedMessage
-                id="recipient-view.invite-collaborator-dialog.subtitle-2"
+                id="component.delegate-access-dialog.invite-collaborator-subtitle-2"
                 defaultMessage="We will send them an email with instructions on how to proceed."
                 values={{ tone }}
               />
@@ -204,7 +204,7 @@ function DelegateAccessDialog({
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="component.message-email-editor.body-required-error"
+                id="component.message-email-body-form-control.required-error"
                 defaultMessage="Customizing the initial message improves the response time of the recipients"
               />
             </FormErrorMessage>

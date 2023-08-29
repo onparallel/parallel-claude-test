@@ -100,6 +100,26 @@ export const PublicPetitionSignerDataInput = inputObjectType({
   },
 });
 
+export const PublicPetitionSignatureRequest = objectType({
+  name: "PublicPetitionSignatureRequest",
+  sourceType: "db.PetitionSignatureRequest",
+  definition(t) {
+    t.globalId("id", { prefixName: "PetitionSignatureRequest" });
+    t.nonNull.list.nonNull.field("signerStatus", {
+      type: "PetitionSignatureRequestSignerStatus",
+      resolve: (o) =>
+        ((o.signature_config.signersInfo as any[]) ?? []).map((signer, index) => ({
+          ...signer,
+          status: o.signer_status[index],
+        })),
+    });
+    t.field("status", {
+      type: "PetitionSignatureRequestStatus",
+      description: "The status of the petition signature.",
+    });
+  },
+});
+
 export const PublicPetition = objectType({
   name: "PublicPetition",
   sourceType: "db.Petition",
@@ -239,6 +259,13 @@ export const PublicPetition = objectType({
       description: "The progress of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPublicPetitionProgress(root.id);
+      },
+    });
+    t.nullable.field("latestSignatureRequest", {
+      type: "PublicPetitionSignatureRequest",
+      description: "The latest signature request of the petition.",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(o.id);
       },
     });
   },

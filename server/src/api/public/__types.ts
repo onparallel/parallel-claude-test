@@ -3321,6 +3321,7 @@ export type PetitionSigner = {
   email: Scalars["String"]["output"];
   firstName: Scalars["String"]["output"];
   fullName: Scalars["String"]["output"];
+  isPreset: Scalars["Boolean"]["output"];
   lastName: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -3864,6 +3865,8 @@ export type PublicPetition = Timestamps & {
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
+  /** The latest signature request of the petition. */
+  latestSignatureRequest: Maybe<PublicPetitionSignatureRequest>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** The organization of the petition. */
@@ -4003,6 +4006,11 @@ export type PublicPetitionMessage = {
   sentAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Subject of a email. */
   subject: Maybe<Scalars["String"]["output"]>;
+};
+
+export type PublicPetitionSignatureRequest = {
+  id: Scalars["GID"]["output"];
+  signerStatus: Array<PetitionSignatureRequestSignerStatus>;
 };
 
 export type PublicPetitionSignerDataInput = {
@@ -4623,6 +4631,7 @@ export type SignatureConfigInputSigner = {
   contactId?: InputMaybe<Scalars["GID"]["input"]>;
   email: Scalars["String"]["input"];
   firstName: Scalars["String"]["input"];
+  isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 

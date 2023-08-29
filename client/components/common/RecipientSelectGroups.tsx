@@ -193,18 +193,8 @@ export function RecipientSelectGroups({
   );
 
   return (
-    <>
-      <Stack
-        margin={-1}
-        padding={1}
-        overflow="auto"
-        maxHeight="240px"
-        _after={{
-          content: "''",
-          display: "block",
-          paddingBottom: "1px",
-        }}
-      >
+    <Stack>
+      <Stack margin={-1} padding={1} overflow="auto" maxHeight="240px">
         {recipientGroups.map((recipients, index) => (
           <FormControl
             key={index}
@@ -274,7 +264,7 @@ export function RecipientSelectGroups({
                   marginLeft={2}
                   variant="ghost"
                   aria-label={intl.formatMessage({
-                    id: "component.recipient-select-groups.delete-group.label",
+                    id: "component.recipient-select-groups.delete-group-label",
                     defaultMessage: "Delete recipient group",
                   })}
                   onClick={() => deleteRecipientGroup(index)}
@@ -323,7 +313,7 @@ export function RecipientSelectGroups({
         </CloseableAlert>
       ) : null}
       {canAddRecipientGroups ? (
-        <Flex justifyContent="flex-start" alignItems="center" marginTop={2}>
+        <Flex justifyContent="flex-start" alignItems="center">
           <Button
             data-testid="petition-add-recipient-group-button"
             variant="outline"
@@ -372,7 +362,7 @@ export function RecipientSelectGroups({
           </AlertDescription>
         </CloseableAlert>
       ) : null}
-    </>
+    </Stack>
   );
 }
 

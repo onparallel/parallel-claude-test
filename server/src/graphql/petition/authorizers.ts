@@ -15,9 +15,9 @@ import {
 import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
+import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
-import { NexusGenInputs } from "../__types";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
   predicate: (petition: Petition, ...rest: TRest) => boolean,

@@ -291,6 +291,7 @@ export interface NexusGenInputs {
     contactId?: NexusGenScalars["GID"] | null; // GID
     email: string; // String!
     firstName: string; // String!
+    isPreset?: boolean | null; // Boolean
     lastName?: string | null; // String
   };
   UpdateContactInput: {
@@ -860,6 +861,7 @@ export interface NexusGenObjects {
     firstName: string;
     lastName: string;
     email: string;
+    isPreset?: boolean;
   };
   PetitionTemplate: db.Petition;
   PetitionUserGroupPermission: db.PetitionPermission;
@@ -952,6 +954,7 @@ export interface NexusGenObjects {
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicPetitionLink: db.PublicPetitionLink;
   PublicPetitionMessage: db.PetitionMessage;
+  PublicPetitionSignatureRequest: db.PetitionSignatureRequest;
   PublicPublicPetitionLink: db.PublicPetitionLink;
   PublicRemindersOptOut: {
     // root type
@@ -998,6 +1001,7 @@ export interface NexusGenObjects {
       firstName: string;
       lastName: string;
       email: string;
+      isPreset?: boolean;
     }[];
     timezone: string;
     title: string | null;
@@ -2235,6 +2239,7 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     firstName: string; // String!
     fullName: string; // String!
+    isPreset: boolean; // Boolean!
     lastName: string | null; // String
   };
   PetitionTemplate: {
@@ -2561,6 +2566,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
+    latestSignatureRequest: NexusGenRootTypes["PublicPetitionSignatureRequest"] | null; // PublicPetitionSignatureRequest
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     organization: NexusGenRootTypes["PublicOrganization"]; // PublicOrganization!
     progress: NexusGenRootTypes["PublicPetitionFieldProgress"]; // PublicPetitionFieldProgress!
@@ -2653,6 +2659,12 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     sentAt: NexusGenScalars["DateTime"] | null; // DateTime
     subject: string | null; // String
+  };
+  PublicPetitionSignatureRequest: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    signerStatus: NexusGenRootTypes["PetitionSignatureRequestSignerStatus"][]; // [PetitionSignatureRequestSignerStatus!]!
+    status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
   };
   PublicPublicPetitionLink: {
     // field return type
@@ -4363,6 +4375,7 @@ export interface NexusGenFieldTypeNames {
     email: "String";
     firstName: "String";
     fullName: "String";
+    isPreset: "Boolean";
     lastName: "String";
   };
   PetitionTemplate: {
@@ -4689,6 +4702,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
+    latestSignatureRequest: "PublicPetitionSignatureRequest";
     locale: "PetitionLocale";
     organization: "PublicOrganization";
     progress: "PublicPetitionFieldProgress";
@@ -4781,6 +4795,12 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     sentAt: "DateTime";
     subject: "String";
+  };
+  PublicPetitionSignatureRequest: {
+    // field return type name
+    id: "GID";
+    signerStatus: "PetitionSignatureRequestSignerStatus";
+    status: "PetitionSignatureRequestStatus";
   };
   PublicPublicPetitionLink: {
     // field return type name

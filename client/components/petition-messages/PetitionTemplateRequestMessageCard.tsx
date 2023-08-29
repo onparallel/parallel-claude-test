@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, FormControl, FormLabel, HStack, Stack, Text } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -17,7 +17,8 @@ import { FormattedMessage } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
 import { HelpPopover } from "../common/HelpPopover";
 import { UserSelect } from "../common/UserSelect";
-import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
+import { MessageEmailBodyFormControl } from "../petition-common/MessageEmailBodyFormControl";
+import { MessageEmailSubjectFormControl } from "../petition-common/MessageEmailSubjectFormControl";
 
 interface PetitionTemplateRequestMessageCardProps {
   petition: PetitionTemplateRequestMessageCard_PetitionTemplateFragment;
@@ -68,7 +69,8 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
         setOnBehalf(user);
         onUpdatePetition({ defaultOnBehalfId: user?.id ?? null });
       };
-
+      const isDisabled =
+        petition.isRestricted || petition.isPublic || myEffectivePermission === "READ";
       return (
         <Card ref={ref} {...props}>
           <CardHeader leftIcon={<EmailIcon marginRight={2} role="presentation" />}>
@@ -86,14 +88,14 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
               />
             </Text>
             {user.hasOnBehalfOf ? (
-              <>
-                <HStack>
-                  <Text fontWeight={500}>
+              <FormControl isDisabled={isDisabled}>
+                <HStack marginBottom={2}>
+                  <FormLabel fontWeight="normal" margin={0}>
                     <FormattedMessage
                       id="component.petition-template-request-message.send-as"
                       defaultMessage="Send as..."
                     />
-                  </Text>
+                  </FormLabel>
                   <HelpPopover>
                     <Text>
                       <FormattedMessage
@@ -108,25 +110,26 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
                   value={onBehalf}
                   onChange={handleDefaultOnBehalf}
                   isClearable
-                  isDisabled={
-                    petition.isRestricted || petition.isPublic || myEffectivePermission === "READ"
-                  }
                 />
-              </>
+              </FormControl>
             ) : null}
-
-            <MessageEmailEditor
-              id={`request-message-${petition.id}`}
-              showErrors={false}
-              subject={messages.emailSubject}
-              body={messages.emailBody}
-              onSubjectChange={handleMessagesEmailSubjectChange}
-              onBodyChange={handleMessagesEmailBodyChange}
-              petition={petition}
-              isReadOnly={
-                petition.isRestricted || petition.isPublic || myEffectivePermission === "READ"
-              }
-            />
+            <Box>
+              <MessageEmailSubjectFormControl
+                id={`request-message-${petition.id}-subject`}
+                value={messages.emailSubject}
+                onChange={handleMessagesEmailSubjectChange}
+                petition={petition}
+                isDisabled={isDisabled}
+              />
+              <MessageEmailBodyFormControl
+                id={`request-message-${petition.id}-body`}
+                marginTop={4}
+                value={messages.emailBody}
+                onChange={handleMessagesEmailBodyChange}
+                petition={petition}
+                isDisabled={isDisabled}
+              />
+            </Box>
           </Stack>
         </Card>
       );
@@ -147,10 +150,13 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
           defaultOnBehalf {
             ...UserSelect_User
           }
-          ...MessageEmailEditor_PetitionBase
+
+          ...MessageEmailSubjectFormControl_PetitionBase
+          ...MessageEmailBodyFormControl_PetitionBase
         }
         ${UserSelect.fragments.User}
-        ${MessageEmailEditor.fragments.PetitionBase}
+        ${MessageEmailSubjectFormControl.fragments.PetitionBase}
+        ${MessageEmailBodyFormControl.fragments.PetitionBase}
       `,
       User: gql`
         fragment PetitionTemplateRequestMessageCard_User on User {

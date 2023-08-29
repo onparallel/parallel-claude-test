@@ -292,10 +292,6 @@ export const PetitionSignaturesCard = Object.assign(
         await updateSignatureConfig({
           variables: { petitionId: petition.id, signatureConfig },
         });
-
-        if (["COMPLETED", "CLOSED"].includes(petition.status)) {
-          await handleStartSignatureProcess();
-        }
       } catch {}
     }
 
@@ -311,11 +307,11 @@ export const PetitionSignaturesCard = Object.assign(
           await sendSignatureRequestReminders({ variables: { petitionSignatureRequestId } });
           toast({
             title: intl.formatMessage({
-              id: "component.petition-signatures-card.reminder-sent.toast-title",
+              id: "component.petition-signatures-card.reminder-sent-toast-title",
               defaultMessage: "Reminder sent",
             }),
             description: intl.formatMessage({
-              id: "component.petition-signatures-card.reminder-sent.toast-description",
+              id: "component.petition-signatures-card.reminder-sent-toast-description",
               defaultMessage: "We have sent a reminder to the pending signers",
             }),
             duration: 5000,
@@ -338,7 +334,7 @@ export const PetitionSignaturesCard = Object.assign(
               <IconButtonWithTooltip
                 isDisabled={isDisabled}
                 label={intl.formatMessage({
-                  id: "component.petition-signatures-card.add-signature.label",
+                  id: "component.petition-signatures-card.add-signature-label",
                   defaultMessage: "Add signature",
                 })}
                 size="sm"

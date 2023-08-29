@@ -1,7 +1,5 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { AlertDescription, AlertIcon, Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
-import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
-import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
+import { Box, Button, Flex, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
@@ -28,7 +26,9 @@ import { RecipientViewContentsCard } from "@parallel/components/recipient-view/R
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
+import { RecipientViewPetitionStatusAlert } from "@parallel/components/recipient-view/RecipientViewPetitionStatusAlert";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
+import { RecipientViewSignatureSentAlert } from "@parallel/components/recipient-view/RecipientViewSignatureSentAlert";
 import {
   RecipientView_accessDocument,
   RecipientView_accessesDocument,
@@ -61,6 +61,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const router = useRouter();
   const {
     data: { access },
+    refetch: refetchAccess,
   } = useAssertQuery(RecipientView_accessDocument, { variables: { keycode } });
 
   const { data: accesessData, refetch: refetchAccessesCount } = useQuery(
@@ -83,7 +84,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const granter = access!.granter!;
   const contact = access!.contact!;
   const signers = petition!.signatureConfig?.signers ?? [];
-  const totalSigners = signers.concat(petition.signatureConfig?.additionalSigners ?? []);
+
   const recipients = petition!.recipients;
   const message = access!.message;
 
@@ -203,6 +204,11 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     ? granter.organization.name
     : "Parallel";
 
+  async function handleRefetchPetition() {
+    const { data } = await refetchAccess();
+    return data.access.petition;
+  }
+
   return (
     <LastSavedProvider>
       <ToneProvider value={tone}>
@@ -245,109 +251,17 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               {["COMPLETED", "CLOSED"].includes(petition.status) ? (
                 !petition.signatureConfig ||
                 (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
-                  <CloseableAlert status="success" variant="subtle" zIndex={2}>
-                    <Flex
-                      maxWidth="container.lg"
-                      alignItems="center"
-                      justifyContent="flex-start"
-                      marginX="auto"
-                      width="100%"
-                      paddingLeft={4}
-                      paddingRight={12}
-                    >
-                      <AlertIcon />
-                      <AlertDescription>
-                        {petition.status === "COMPLETED" ? (
-                          <>
-                            <Text>
-                              <FormattedMessage
-                                id="recipient-view.petition-completed-alert-1"
-                                defaultMessage="<b>Information completed!</b> We have notified {name} for review and validation."
-                                values={{
-                                  name: <b>{granter.fullName}</b>,
-                                  tone,
-                                }}
-                              />
-                            </Text>
-                            <Text>
-                              <FormattedMessage
-                                id="recipient-view.petition-completed-alert-2"
-                                defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-                                values={{ tone }}
-                              />
-                            </Text>
-                          </>
-                        ) : (
-                          <FormattedMessage
-                            id="recipient-view.petition-closed-alert"
-                            defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
-                            values={{
-                              name: <b>{granter.fullName}</b>,
-                            }}
-                          />
-                        )}
-                      </AlertDescription>
-                    </Flex>
-                  </CloseableAlert>
+                  <RecipientViewPetitionStatusAlert
+                    petition={petition}
+                    granter={granter}
+                    tone={tone}
+                  />
                 ) : (
-                  <CloseableAlert
-                    status={petition.signatureConfig.review ? "warning" : "success"}
-                    zIndex={2}
-                  >
-                    <Flex
-                      maxWidth="container.lg"
-                      alignItems="center"
-                      justifyContent="flex-start"
-                      marginX="auto"
-                      width="100%"
-                      paddingLeft={4}
-                      paddingRight={12}
-                    >
-                      <AlertIcon
-                        color={petition.signatureConfig.review ? "yellow.400" : undefined}
-                      />
-                      <AlertDescription>
-                        {petition.signatureConfig.review ? (
-                          <Text>
-                            <FormattedMessage
-                              id="recipient-view.petition-requires-signature-alert-1"
-                              defaultMessage="<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
-                              values={{ tone }}
-                            />
-                          </Text>
-                        ) : (
-                          <Text>
-                            <FormattedMessage
-                              id="recipient-view.petition-signature-request-sent-alert"
-                              defaultMessage="<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}."
-                              values={{
-                                a: (chunks: any) => (
-                                  <ContactListPopover contacts={totalSigners.slice(1)}>
-                                    <Text
-                                      display="initial"
-                                      textDecoration="underline"
-                                      color="primary.600"
-                                      cursor="pointer"
-                                    >
-                                      {chunks}
-                                    </Text>
-                                  </ContactListPopover>
-                                ),
-                                name: totalSigners[0]!.fullName,
-                                email: totalSigners[0]!.email,
-                                count: totalSigners.length - 1,
-                              }}
-                            />
-                          </Text>
-                        )}
-                        <FormattedMessage
-                          id="recipient-view.petition-completed-alert-2"
-                          defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-                          values={{ tone }}
-                        />
-                      </AlertDescription>
-                    </Flex>
-                  </CloseableAlert>
+                  <RecipientViewSignatureSentAlert
+                    petition={petition}
+                    tone={tone}
+                    onRefetch={handleRefetchPetition}
+                  />
                 )
               ) : null}
             </Box>
@@ -557,6 +471,8 @@ const _fragments = {
         isCompletingMessageEnabled
         ...useCompletingMessageDialog_PublicPetition
         ...RecipientViewFooter_PublicPetition
+        ...RecipientViewPetitionStatusAlert_PublicPetition
+        ...RecipientViewSignatureSentAlert_PublicPetition
       }
 
       ${this.PublicPetitionField}
@@ -568,6 +484,8 @@ const _fragments = {
       ${useGetPageFields.fragments.PublicPetitionField}
       ${useLiquidScope.fragments.PublicPetition}
       ${useCompletingMessageDialog.fragments.PublicPetition}
+      ${RecipientViewPetitionStatusAlert.fragments.PublicPetition}
+      ${RecipientViewSignatureSentAlert.fragments.PublicPetition}
     `;
   },
   get PublicPetitionField() {
@@ -591,10 +509,12 @@ const _fragments = {
         ...RecipientViewHeader_PublicUser
         ...RecipientViewContentsCard_PublicUser
         ...useCompletingMessageDialog_PublicUser
+        ...RecipientViewPetitionStatusAlert_PublicUser
       }
       ${RecipientViewHeader.fragments.PublicUser}
       ${RecipientViewContentsCard.fragments.PublicUser}
       ${useCompletingMessageDialog.fragments.PublicUser}
+      ${RecipientViewPetitionStatusAlert.fragments.PublicUser}
     `;
   },
   ConnectionMetadata: gql`

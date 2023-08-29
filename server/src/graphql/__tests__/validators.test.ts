@@ -337,7 +337,7 @@ describe("GraphQL custom validators", () => {
       ).resolves.not.toThrowError();
     });
 
-    it("throws error if user didn't specify signers and recipient is not allowed to choose", async () => {
+    it("doesn't error if user didn't specify signers and recipient is not allowed to choose", async () => {
       await expect(
         validSignatureConfig((args) => args.config, "config")(
           {},
@@ -354,7 +354,7 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any,
         ),
-      ).rejects.toThrowError();
+      ).resolves.not.toThrowError();
     });
   });
 

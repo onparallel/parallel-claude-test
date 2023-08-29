@@ -223,14 +223,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly,
         );
         if (canFinalize && isPetition) {
-          const presetSigners = petition!.signatureConfig?.signers.filter(isDefined) ?? [];
-
           const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
               accesses: petition.accesses,
-              presetSigners,
+              signers: petition!.signatureConfig?.signers.filter(isDefined) ?? [],
               user: me,
               allowAdditionalSigners,
               previousSignatures: petition.signatureRequests,
@@ -315,7 +313,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 isClosable: true,
               });
             }
-            router.push("/app/petitions");
+            router.push(`/app/petitions/${query.petitionId}/replies`);
           }
         } else {
           // go to first repliable field without replies

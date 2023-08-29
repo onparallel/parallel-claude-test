@@ -582,6 +582,7 @@ export const SignatureConfigInput = inputObjectType({
           t.nonNull.string("firstName");
           t.string("lastName");
           t.nonNull.string("email");
+          t.nullable.boolean("isPreset");
         },
       }),
     });

@@ -166,6 +166,7 @@ export interface PetitionSignatureConfigSigner {
   firstName: string;
   lastName: string;
   email: string;
+  isPreset?: boolean; // preset signers can only be edited on compose
 }
 
 export interface PetitionSignatureConfig {

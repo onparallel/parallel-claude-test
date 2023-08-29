@@ -730,12 +730,16 @@ export const PetitionSigner = objectType({
     t.nullable.string("lastName", { resolve: (o) => o?.lastName ?? null });
     t.string("fullName", { resolve: (o) => fullName(o?.firstName, o?.lastName) ?? "" });
     t.string("email", { resolve: (o) => o?.email ?? "" });
+    t.boolean("isPreset", {
+      resolve: (o) => o.isPreset ?? false,
+    });
   },
   sourceType: /* ts */ `{
     contactId?: number;
     firstName: string;
     lastName: string;
     email: string;
+    isPreset?: boolean;
   }`,
 });
 
@@ -778,6 +782,7 @@ export const SignatureConfig = objectType({
       firstName: string;
       lastName: string;
       email: string;
+      isPreset?: boolean;
     }[];
     timezone: string;
     title: string | null;

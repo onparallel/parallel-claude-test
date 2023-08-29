@@ -6,8 +6,8 @@ import {
   Box,
   Button,
   CloseButton,
-  Heading,
   HStack,
+  Heading,
   Input,
   InputGroup,
   InputRightAddon,
@@ -33,38 +33,37 @@ import {
   TimeIcon,
 } from "@parallel/chakra/icons";
 import {
+  PetitionSettings_PetitionBaseFragment,
+  PetitionSettings_UserFragment,
   PetitionSettings_cancelPetitionSignatureRequestDocument,
   PetitionSettings_createPublicPetitionLinkDocument,
-  PetitionSettings_PetitionBaseFragment,
-  PetitionSettings_startPetitionSignatureRequestDocument,
   PetitionSettings_updatePetitionRestrictionDocument,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
   PetitionSettings_updateTemplateDocumentThemeDocument,
-  PetitionSettings_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
+import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
-import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, noop, pick } from "remeda";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
-import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { Divider } from "../common/Divider";
 import { HelpPopover } from "../common/HelpPopover";
 import { NormalLink } from "../common/Link";
 import { PathName } from "../common/PathName";
+import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
+import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
 import {
   PublicLinkSettingsDialog,
   usePublicLinkSettingsDialog,
@@ -78,7 +77,8 @@ import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
 } from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
-import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
+import { SettingsRowButton } from "./SettingsRowButton";
+import { SettingsRowSwitch } from "./SettingsRowSwitch";
 import {
   CompliancePeriodDialog,
   useCompliancePeriodDialog,
@@ -87,8 +87,6 @@ import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
 import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
 import { SettingsRow } from "./settings/SettingsRow";
-import { SettingsRowButton } from "./SettingsRowButton";
-import { SettingsRowSwitch } from "./SettingsRowSwitch";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -134,15 +132,11 @@ function _PetitionSettings({
   const [cancelSignatureRequest] = useMutation(
     PetitionSettings_cancelPetitionSignatureRequestDocument,
   );
-  const [startSignatureRequest] = useMutation(
-    PetitionSettings_startPetitionSignatureRequestDocument,
-  );
 
   const [updatePetitionRestriction] = useMutation(
     PetitionSettings_updatePetitionRestrictionDocument,
   );
 
-  const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
   async function handleConfigureSignatureClick() {
     try {
       assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
@@ -171,17 +165,7 @@ function _PetitionSettings({
       if (ongoingSignatureRequest && signatureConfigHasChanged) {
         await showConfirmSignatureConfigChanged();
       }
-      await onUpdatePetition({ signatureConfig });
-
-      if (petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status)) {
-        try {
-          await startSignatureRequest({ variables: { petitionId: petition.id } });
-        } catch (error) {
-          if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
-            await withError(showPetitionLimitReachedErrorDialog());
-          }
-        }
-      }
+      onUpdatePetition({ signatureConfig });
     } catch {}
   }
 
@@ -426,11 +410,11 @@ function _PetitionSettings({
         status: "success",
         isClosable: true,
         title: intl.formatMessage({
-          id: "component.petition-settings.compliance-updated.toast-title",
+          id: "component.petition-settings.compliance-updated-toast-title",
           defaultMessage: "Changes saved correctly",
         }),
         description: intl.formatMessage({
-          id: "component.petition-settings.compliance-updated.toast-description",
+          id: "component.petition-settings.compliance-updated-toast-description",
           defaultMessage: "Compliance period successfully updated.",
         }),
         duration: 5000,
@@ -624,7 +608,12 @@ function _PetitionSettings({
           isActive={Boolean(petition.deadline)}
           icon={<FieldDateIcon />}
           isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-          label={<FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.deadline-label"
+              defaultMessage="Deadline"
+            />
+          }
           description={
             <FormattedMessage
               id="component.petition-settings.deadline-description"
@@ -955,14 +944,6 @@ const mutations = [
   gql`
     mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
       cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
-        id
-        status
-      }
-    }
-  `,
-  gql`
-    mutation PetitionSettings_startPetitionSignatureRequest($petitionId: GID!) {
-      startSignatureRequest(petitionId: $petitionId) {
         id
         status
       }
