@@ -36,7 +36,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { OptionProps, SingleValueProps, components } from "react-select";
@@ -713,12 +713,12 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
           </CardHeader>
           <Grid as="dl" templateColumns="auto 1fr" padding={4} gap={4}>
             {permissionEffects.map((permission) => (
-              <>
+              <Fragment key={permission.value}>
                 <Box as="dt">
                   <PermissionOption option={permission} />
                 </Box>
                 <Box as="dd">{permission.description}</Box>
-              </>
+              </Fragment>
             ))}
           </Grid>
         </Card>
