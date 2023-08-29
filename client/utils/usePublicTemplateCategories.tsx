@@ -12,119 +12,119 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
     () => [
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.administration",
+          id: "generic.template-category-administration",
           defaultMessage: "Administration",
         }),
         slug: "administration",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.business-development",
+          id: "generic.template-category-business-development",
           defaultMessage: "Business development",
         }),
         slug: "business-development",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.compliance",
+          id: "generic.template-category-compliance",
           defaultMessage: "Compliance",
         }),
         slug: "compliance",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.customer-service",
+          id: "generic.template-category-customer-service",
           defaultMessage: "Customer service",
         }),
         slug: "customer-service",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.engineering",
+          id: "generic.template-category-engineering",
           defaultMessage: "Engineering",
         }),
         slug: "engineering",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.finance",
+          id: "generic.template-category-finance",
           defaultMessage: "Finance",
         }),
         slug: "finance",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.general-management",
+          id: "generic.template-category-general-management",
           defaultMessage: "General Management",
         }),
         slug: "general-management",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.it",
+          id: "generic.template-category-it",
           defaultMessage: "IT",
         }),
         slug: "it",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.hr",
+          id: "generic.template-category-hr",
           defaultMessage: "HR",
         }),
         slug: "hr",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.legal",
+          id: "generic.template-category-legal",
           defaultMessage: "Legal",
         }),
         slug: "legal",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.marketing",
+          id: "generic.template-category-marketing",
           defaultMessage: "Marketing",
         }),
         slug: "marketing",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.operations",
+          id: "generic.template-category-operations",
           defaultMessage: "Operations",
         }),
         slug: "operations",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.procurement",
+          id: "generic.template-category-procurement",
           defaultMessage: "Procurement",
         }),
         slug: "procurement",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.product",
+          id: "generic.template-category-product",
           defaultMessage: "Product",
         }),
         slug: "product",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.real-estate",
+          id: "generic.template-category-real-estate",
           defaultMessage: "Real Estate",
         }),
         slug: "real-estate",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.sales",
+          id: "generic.template-category-sales",
           defaultMessage: "Sales",
         }),
         slug: "sales",
       },
       {
         label: intl.formatMessage({
-          id: "public-templates.categories.other",
+          id: "generic.template-category-other",
           defaultMessage: "Other",
         }),
         slug: "other",

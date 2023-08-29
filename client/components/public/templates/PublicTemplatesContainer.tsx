@@ -76,7 +76,7 @@ export function PublicTemplatesContainer({
               }}
             >
               <FormattedMessage
-                id="public-templates.categories.all-categories"
+                id="generic.template-category-all-categories"
                 defaultMessage="All categories"
               />
             </Button>
@@ -130,7 +130,7 @@ export function PublicTemplatesContainer({
                     currentCategory.label
                   ) : (
                     <FormattedMessage
-                      id="public-templates.categories.all-categories"
+                      id="generic.template-category-all-categories"
                       defaultMessage="All categories"
                     />
                   )}
@@ -147,7 +147,7 @@ export function PublicTemplatesContainer({
                         }}
                       >
                         <FormattedMessage
-                          id="public-templates.categories.all-categories"
+                          id="generic.template-category-all-categories"
                           defaultMessage="All categories"
                         />
                       </MenuItem>

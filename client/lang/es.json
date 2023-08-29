@@ -8975,6 +8975,96 @@
     "context": "Template"
   },
   {
+    "term": "generic.template-category-administration",
+    "definition": "Administración",
+    "context": "Administration"
+  },
+  {
+    "term": "generic.template-category-all-categories",
+    "definition": "Todas las categorías",
+    "context": "All categories"
+  },
+  {
+    "term": "generic.template-category-business-development",
+    "definition": "Desarrollo de negocio",
+    "context": "Business development"
+  },
+  {
+    "term": "generic.template-category-compliance",
+    "definition": "Compliance",
+    "context": "Compliance"
+  },
+  {
+    "term": "generic.template-category-customer-service",
+    "definition": "Servicio al cliente",
+    "context": "Customer service"
+  },
+  {
+    "term": "generic.template-category-engineering",
+    "definition": "Ingeniería",
+    "context": "Engineering"
+  },
+  {
+    "term": "generic.template-category-finance",
+    "definition": "Finanzas",
+    "context": "Finance"
+  },
+  {
+    "term": "generic.template-category-general-management",
+    "definition": "Gestión general",
+    "context": "General Management"
+  },
+  {
+    "term": "generic.template-category-hr",
+    "definition": "RRHH",
+    "context": "HR"
+  },
+  {
+    "term": "generic.template-category-it",
+    "definition": "IT",
+    "context": "IT"
+  },
+  {
+    "term": "generic.template-category-legal",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "generic.template-category-marketing",
+    "definition": "Marketing",
+    "context": "Marketing"
+  },
+  {
+    "term": "generic.template-category-operations",
+    "definition": "Operaciones",
+    "context": "Operations"
+  },
+  {
+    "term": "generic.template-category-other",
+    "definition": "Otros",
+    "context": "Other"
+  },
+  {
+    "term": "generic.template-category-procurement",
+    "definition": "Compras",
+    "context": "Procurement"
+  },
+  {
+    "term": "generic.template-category-product",
+    "definition": "Producto",
+    "context": "Product"
+  },
+  {
+    "term": "generic.template-category-real-estate",
+    "definition": "Inmobiliario",
+    "context": "Real Estate"
+  },
+  {
+    "term": "generic.template-category-sales",
+    "definition": "Ventas",
+    "context": "Sales"
+  },
+  {
     "term": "generic.template-count",
     "definition": "{count, plural, =1 {# plantilla} other {# plantillas}}",
     "context": "{count, plural, =1 {# template} other {# templates}}"
@@ -11978,96 +12068,6 @@
     "term": "public-petition.help.title",
     "definition": "¿Por qué pedimos estos datos?",
     "context": "Why do we ask for this data?"
-  },
-  {
-    "term": "public-templates.categories.administration",
-    "definition": "Administración",
-    "context": "Administration"
-  },
-  {
-    "term": "public-templates.categories.all-categories",
-    "definition": "Todas las categorías",
-    "context": "All categories"
-  },
-  {
-    "term": "public-templates.categories.business-development",
-    "definition": "Desarrollo de negocio",
-    "context": "Business development"
-  },
-  {
-    "term": "public-templates.categories.compliance",
-    "definition": "Compliance",
-    "context": "Compliance"
-  },
-  {
-    "term": "public-templates.categories.customer-service",
-    "definition": "Servicio al cliente",
-    "context": "Customer service"
-  },
-  {
-    "term": "public-templates.categories.engineering",
-    "definition": "Ingeniería",
-    "context": "Engineering"
-  },
-  {
-    "term": "public-templates.categories.finance",
-    "definition": "Finanzas",
-    "context": "Finance"
-  },
-  {
-    "term": "public-templates.categories.general-management",
-    "definition": "Gestión general",
-    "context": "General Management"
-  },
-  {
-    "term": "public-templates.categories.hr",
-    "definition": "RRHH",
-    "context": "HR"
-  },
-  {
-    "term": "public-templates.categories.it",
-    "definition": "IT",
-    "context": "IT"
-  },
-  {
-    "term": "public-templates.categories.legal",
-    "definition": "Legal",
-    "context": "Legal"
-  },
-  {
-    "term": "public-templates.categories.marketing",
-    "definition": "Marketing",
-    "context": "Marketing"
-  },
-  {
-    "term": "public-templates.categories.operations",
-    "definition": "Operaciones",
-    "context": "Operations"
-  },
-  {
-    "term": "public-templates.categories.other",
-    "definition": "Otros",
-    "context": "Other"
-  },
-  {
-    "term": "public-templates.categories.procurement",
-    "definition": "Compras",
-    "context": "Procurement"
-  },
-  {
-    "term": "public-templates.categories.product",
-    "definition": "Producto",
-    "context": "Product"
-  },
-  {
-    "term": "public-templates.categories.real-estate",
-    "definition": "Inmobiliario",
-    "context": "Real Estate"
-  },
-  {
-    "term": "public-templates.categories.sales",
-    "definition": "Ventas",
-    "context": "Sales"
   },
   {
     "term": "public.footer.language-select-label",
