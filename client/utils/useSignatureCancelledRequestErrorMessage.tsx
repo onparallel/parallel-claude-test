@@ -15,7 +15,7 @@ export function useSignatureCancelledRequestErrorMessage() {
         case "INSUFFICIENT_SIGNATURE_CREDITS":
           return (
             <FormattedMessage
-              id="component.signature-cancelled-request-error.insufficient-credits.description"
+              id="util.use-signature-cancelled-request-error-message.insufficient-credits-description"
               defaultMessage="The eSignature could not be started due to lack of signature credits {timeAgo}"
               values={{
                 timeAgo: (
@@ -27,7 +27,7 @@ export function useSignatureCancelledRequestErrorMessage() {
         case "UNKNOWN_ERROR":
           return (
             <FormattedMessage
-              id="component.signature-cancelled-request-error.unknown-error.description"
+              id="util.use-signature-cancelled-request-error-message.unknown-error-description"
               defaultMessage="The eSignature could not be started due to an unknown error {timeAgo}"
               values={{
                 timeAgo: (
@@ -39,7 +39,7 @@ export function useSignatureCancelledRequestErrorMessage() {
         default:
           return (
             <FormattedMessage
-              id="component.signature-cancelled-request-error.description"
+              id="util.use-signature-cancelled-request-error-message.description"
               defaultMessage="The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
               values={{
                 timeAgo: (
@@ -48,7 +48,7 @@ export function useSignatureCancelledRequestErrorMessage() {
                 message:
                   event.errorCode === "EMAIL_BOUNCED" ? (
                     <FormattedMessage
-                      id="component.signature-cancelled-request-error.email-bounced.description"
+                      id="util.use-signature-cancelled-request-error-message.email-bounced-description"
                       defaultMessage="{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
                       values={{
                         hasEmail: Boolean(event.extraErrorData?.email),
@@ -57,23 +57,23 @@ export function useSignatureCancelledRequestErrorMessage() {
                     />
                   ) : event.errorCode === "MAX_SIZE_EXCEEDED" ? (
                     <FormattedMessage
-                      id="component.signature-cancelled-request-error.max-size-exceeded.description"
+                      id="util.use-signature-cancelled-request-error-message.max-size-exceeded-description"
                       defaultMessage="The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
                     />
                   ) : event.errorCode === "CONSENT_REQUIRED" ||
                     event.errorCode === "ACCOUNT_SUSPENDED" ? (
                     <FormattedMessage
-                      id="component.signature-cancelled-request-error.consent-required.description"
+                      id="util.use-signature-cancelled-request-error-message.consent-required-description"
                       defaultMessage="The integration has expired and needs to be reauthorized."
                     />
                   ) : event.errorCode === "INVALID_CREDENTIALS" ? (
                     <FormattedMessage
-                      id="component.signature-cancelled-request-error.invalid-credentials.description"
+                      id="util.use-signature-cancelled-request-error-message.invalid-credentials-description"
                       defaultMessage="The provided credentials are not valid anymore and need to be updated."
                     />
                   ) : (
                     <FormattedMessage
-                      id="component.signature-cancelled-request-error.unknown.description"
+                      id="util.use-signature-cancelled-request-error-message.unknown-description"
                       defaultMessage="An unknown error happened."
                     />
                   ),

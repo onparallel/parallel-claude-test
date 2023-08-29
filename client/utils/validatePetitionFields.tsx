@@ -33,7 +33,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       error: "NO_REPLIABLE_FIELDS",
       message: (
         <FormattedMessage
-          id="validate-petition-fields.no-fields-error"
+          id="util.validate-petition-fields.no-fields-error"
           defaultMessage="Please add at least one field with information you want to ask."
         />
       ),
@@ -48,7 +48,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       fieldsWithIndices: fieldsWithoutTitle,
       message: (
         <FormattedMessage
-          id="validate-petition-fields.fields-without-title-error"
+          id="util.validate-petition-fields.fields-without-title-error"
           defaultMessage="Please add a title to the following {count, plural, one{field} other{fields}}."
           values={{ count: fieldsWithoutTitle.length }}
         />
@@ -69,7 +69,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       fieldsWithIndices: selectFieldsWithoutOptions,
       message: (
         <FormattedMessage
-          id="validate-petition-fields.select-fields-without-options-error"
+          id="util.validate-petition-fields.select-fields-without-options-error"
           defaultMessage="Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}."
           values={{
             count: selectFieldsWithoutOptions.length,
@@ -93,7 +93,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       fieldsWithIndices: checkboxFieldsWithoutOptions,
       message: (
         <FormattedMessage
-          id="validate-petition-fields.checkbox-fields-without-options-error"
+          id="util.validate-petition-fields.checkbox-fields-without-options-error"
           defaultMessage="Please add one or more options to the following <em>multiple options</em> {count, plural, one{field} other{fields}}."
           values={{
             count: checkboxFieldsWithoutOptions.length,
@@ -117,7 +117,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       fieldsWithIndices: dynamicSelectFieldsWithoutOptions,
       message: (
         <FormattedMessage
-          id="validate-petition-fields.dynamic-select-field-without-options-error"
+          id="util.validate-petition-fields.dynamic-select-field-without-options-error"
           defaultMessage="Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}."
           values={{
             count: dynamicSelectFieldsWithoutOptions.length,
@@ -141,7 +141,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       fieldsWithIndices: numberFieldsWithInvalidLimits,
       message: (
         <FormattedMessage
-          id="validate-petition-fields..number-field-with-invalid-limits-error"
+          id="util.validate-petition-fields.number-field-with-invalid-limits-error"
           defaultMessage="Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum."
           values={{
             count: numberFieldsWithInvalidLimits.length,

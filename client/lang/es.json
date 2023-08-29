@@ -6720,46 +6720,6 @@
     "context": "Error sending"
   },
   {
-    "term": "component.signature-cancelled-request-error.consent-required.description",
-    "definition": "La integración de firma digital ha caducado y necesita reautorizarse.",
-    "context": "The integration has expired and needs to be reauthorized."
-  },
-  {
-    "term": "component.signature-cancelled-request-error.description",
-    "definition": "La firma se ha cancelado debido a un error con el proveedor {timeAgo}: {message}",
-    "context": "The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
-  },
-  {
-    "term": "component.signature-cancelled-request-error.email-bounced.description",
-    "definition": "{hasEmail, select, true{El correo <{signerEmail}>} other{Un correo}} ha rebotado.",
-    "context": "{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
-  },
-  {
-    "term": "component.signature-cancelled-request-error.insufficient-credits.description",
-    "definition": "No se ha podido iniciar el proceso de firma por falta de créditos {timeAgo}",
-    "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
-  },
-  {
-    "term": "component.signature-cancelled-request-error.invalid-credentials.description",
-    "definition": "Las credenciales proporcionadas no son más válidas y necesitan ser actualizadas.",
-    "context": "The provided credentials are not valid anymore and need to be updated."
-  },
-  {
-    "term": "component.signature-cancelled-request-error.max-size-exceeded.description",
-    "definition": "El documento excede el tamaño máximo permitido. Por favor, reduce el tamaño de los archivos anexos e inténtalo de nuevo.",
-    "context": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
-  },
-  {
-    "term": "component.signature-cancelled-request-error.unknown-error.description",
-    "definition": "La firma no se ha podido iniciar debido a un error desconocido {timeAgo}",
-    "context": "The eSignature could not be started due to an unknown error {timeAgo}"
-  },
-  {
-    "term": "component.signature-cancelled-request-error.unknown.description",
-    "definition": "Ocurrió un error desconocido.",
-    "context": "An unknown error happened."
-  },
-  {
     "term": "component.signature-config-dialog.allow-additional-signers-help",
     "definition": "Si esta opción está desactivada, solo podrán firmar el documento las personas indicadas.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
@@ -12930,51 +12890,6 @@
     "context": "Create token"
   },
   {
-    "term": "short-text-formats.email",
-    "definition": "correo electrónico",
-    "context": "email"
-  },
-  {
-    "term": "short-text-formats.es-dni",
-    "definition": "DNI/NIE",
-    "context": "national ID number"
-  },
-  {
-    "term": "short-text-formats.es-nif",
-    "definition": "NIF",
-    "context": "tax ID number"
-  },
-  {
-    "term": "short-text-formats.es-postalcode",
-    "definition": "código postal",
-    "context": "postal code"
-  },
-  {
-    "term": "short-text-formats.es-ssn",
-    "definition": "número de la seguridad social",
-    "context": "social security number"
-  },
-  {
-    "term": "short-text-formats.group-generic",
-    "definition": "Genérico",
-    "context": "Generic"
-  },
-  {
-    "term": "short-text-formats.iban",
-    "definition": "número de cuenta IBAN",
-    "context": "IBAN account number"
-  },
-  {
-    "term": "short-text-formats.us-postalcode",
-    "definition": "código postal",
-    "context": "zip code"
-  },
-  {
-    "term": "short-text-formats.us-ssn",
-    "definition": "número de la seguridad social",
-    "context": "social security number"
-  },
-  {
     "term": "supported-locales.english",
     "definition": "Inglés",
     "context": "English"
@@ -13370,32 +13285,117 @@
     "context": "This team contains all users from the organization."
   },
   {
-    "term": "validate-petition-fields..number-field-with-invalid-limits-error",
-    "definition": "Por favor arregle el límite de rango en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>número</em>. El máximo no puede ser inferior al mínimo.",
-    "context": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum."
+    "term": "util.use-short-text-formats.email",
+    "definition": "correo electrónico",
+    "context": "email"
   },
   {
-    "term": "validate-petition-fields.checkbox-fields-without-options-error",
+    "term": "util.use-short-text-formats.es-dni",
+    "definition": "DNI/NIE",
+    "context": "national ID number"
+  },
+  {
+    "term": "util.use-short-text-formats.es-nif",
+    "definition": "NIF",
+    "context": "tax ID number"
+  },
+  {
+    "term": "util.use-short-text-formats.es-postalcode",
+    "definition": "código postal",
+    "context": "postal code"
+  },
+  {
+    "term": "util.use-short-text-formats.es-ssn",
+    "definition": "número de la seguridad social",
+    "context": "social security number"
+  },
+  {
+    "term": "util.use-short-text-formats.group-generic",
+    "definition": "Genérico",
+    "context": "Generic"
+  },
+  {
+    "term": "util.use-short-text-formats.iban",
+    "definition": "número de cuenta IBAN",
+    "context": "IBAN account number"
+  },
+  {
+    "term": "util.use-short-text-formats.us-postalcode",
+    "definition": "código postal",
+    "context": "zip code"
+  },
+  {
+    "term": "util.use-short-text-formats.us-ssn",
+    "definition": "número de la seguridad social",
+    "context": "social security number"
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.consent-required-description",
+    "definition": "La integración de firma digital ha caducado y necesita reautorizarse.",
+    "context": "The integration has expired and needs to be reauthorized."
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.description",
+    "definition": "La firma se ha cancelado debido a un error con el proveedor {timeAgo}: {message}",
+    "context": "The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.email-bounced-description",
+    "definition": "{hasEmail, select, true{El correo <{signerEmail}>} other{Un correo}} ha rebotado.",
+    "context": "{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.insufficient-credits-description",
+    "definition": "No se ha podido iniciar el proceso de firma por falta de créditos {timeAgo}",
+    "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.invalid-credentials-description",
+    "definition": "Las credenciales proporcionadas no son más válidas y necesitan ser actualizadas.",
+    "context": "The provided credentials are not valid anymore and need to be updated."
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.max-size-exceeded-description",
+    "definition": "El documento excede el tamaño máximo permitido. Por favor, reduce el tamaño de los archivos anexos e inténtalo de nuevo.",
+    "context": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.unknown-description",
+    "definition": "Ocurrió un error desconocido.",
+    "context": "An unknown error happened."
+  },
+  {
+    "term": "util.use-signature-cancelled-request-error-message.unknown-error-description",
+    "definition": "La firma no se ha podido iniciar debido a un error desconocido {timeAgo}",
+    "context": "The eSignature could not be started due to an unknown error {timeAgo}"
+  },
+  {
+    "term": "util.validate-petition-fields.checkbox-fields-without-options-error",
     "definition": "Por favor, añada una o más opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>opciones</em>.",
     "context": "Please add one or more options to the following <em>multiple options</em> {count, plural, one{field} other{fields}}."
   },
   {
-    "term": "validate-petition-fields.dynamic-select-field-without-options-error",
+    "term": "util.validate-petition-fields.dynamic-select-field-without-options-error",
     "definition": "Por favor, configure las opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>desplegable condicional</em>.",
     "context": "Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}."
   },
   {
-    "term": "validate-petition-fields.fields-without-title-error",
+    "term": "util.validate-petition-fields.fields-without-title-error",
     "definition": "Por favor, añada un título en {count, plural, one{el siguiente campo} other{los siguientes campos}}.",
     "context": "Please add a title to the following {count, plural, one{field} other{fields}}."
   },
   {
-    "term": "validate-petition-fields.no-fields-error",
+    "term": "util.validate-petition-fields.no-fields-error",
     "definition": "Por favor, añade al menos un campo con información que quieras solicitar.",
     "context": "Please add at least one field with information you want to ask."
   },
   {
-    "term": "validate-petition-fields.select-fields-without-options-error",
+    "term": "util.validate-petition-fields.number-field-with-invalid-limits-error",
+    "definition": "Por favor arregle el límite de rango en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>número</em>. El máximo no puede ser inferior al mínimo.",
+    "context": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum."
+  },
+  {
+    "term": "util.validate-petition-fields.select-fields-without-options-error",
     "definition": "Por favor, añada dos o más opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>desplegable</em>.",
     "context": "Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}."
   }

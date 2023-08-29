@@ -26,7 +26,7 @@ export function useShortTextFormats() {
       {
         value: "EMAIL",
         label: intl.formatMessage({
-          id: "short-text-formats.email",
+          id: "util.use-short-text-formats.email",
           defaultMessage: "email",
         }),
         example: intl.formatMessage({
@@ -40,7 +40,7 @@ export function useShortTextFormats() {
       {
         value: "IBAN",
         label: intl.formatMessage({
-          id: "short-text-formats.iban",
+          id: "util.use-short-text-formats.iban",
           defaultMessage: "IBAN account number",
         }),
         example: "ES21 1465 0100 7220 3087 6293",
@@ -80,7 +80,7 @@ export function useShortTextFormats() {
       {
         value: "ES_DNI",
         label: intl.formatMessage({
-          id: "short-text-formats.es-dni",
+          id: "util.use-short-text-formats.es-dni",
           defaultMessage: "national ID number",
         }),
         example: "12345678Z",
@@ -96,7 +96,7 @@ export function useShortTextFormats() {
       {
         value: "ES_NIF",
         label: intl.formatMessage({
-          id: "short-text-formats.es-nif",
+          id: "util.use-short-text-formats.es-nif",
           defaultMessage: "tax ID number",
         }),
         example: "J12345674",
@@ -114,7 +114,7 @@ export function useShortTextFormats() {
       {
         value: "ES_SSN",
         label: intl.formatMessage({
-          id: "short-text-formats.es-ssn",
+          id: "util.use-short-text-formats.es-ssn",
           defaultMessage: "social security number",
         }),
         example: "28 12345678 40",
@@ -127,7 +127,7 @@ export function useShortTextFormats() {
       {
         value: "US_SSN",
         label: intl.formatMessage({
-          id: "short-text-formats.us-ssn",
+          id: "util.use-short-text-formats.us-ssn",
           defaultMessage: "social security number",
         }),
         example: "078-05-1120",
@@ -140,7 +140,7 @@ export function useShortTextFormats() {
       {
         value: "ES_POSTALCODE",
         label: intl.formatMessage({
-          id: "short-text-formats.es-postalcode",
+          id: "util.use-short-text-formats.es-postalcode",
           defaultMessage: "postal code",
         }),
         example: "08018",
@@ -153,7 +153,7 @@ export function useShortTextFormats() {
       {
         value: "US_POSTALCODE",
         label: intl.formatMessage({
-          id: "short-text-formats.us-postalcode",
+          id: "util.use-short-text-formats.us-postalcode",
           defaultMessage: "zip code",
         }),
         example: "20500",
@@ -182,7 +182,7 @@ export function useShortTextFormatsSelectOptions() {
     const grouped = [
       {
         label: intl.formatMessage({
-          id: "short-text-formats.group-generic",
+          id: "util.use-short-text-formats.group-generic",
           defaultMessage: "Generic",
         }),
         options: formats.filter((f) => !isDefined(f.country)),
