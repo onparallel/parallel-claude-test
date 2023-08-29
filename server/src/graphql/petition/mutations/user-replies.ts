@@ -1,4 +1,3 @@
-import { zonedTimeToUtc } from "date-fns-tz";
 import {
   booleanArg,
   idArg,
@@ -8,9 +7,13 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import pMap from "p-map";
 import { isDefined, uniq } from "remeda";
+import { CreatePetitionFieldReply } from "../../../db/__types";
 import { InvalidCredentialsError } from "../../../integrations/GenericIntegration";
+import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
+import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
@@ -31,135 +34,7 @@ import {
   userHasEnabledIntegration,
   userHasFeatureFlag,
 } from "../authorizers";
-import {
-  validateCreateReplyContent,
-  validateFieldReplyValue,
-  validateReplyUpdate,
-  validateUpdateReplyContent,
-} from "../validations";
-import { isFileTypeField } from "../../../util/isFileTypeField";
-import { CreatePetitionFieldReply } from "../../../db/__types";
-import pMap from "p-map";
-import { fieldReplyContent } from "../../../util/fieldReplyContent";
-
-/** @deprecated */
-export const createPetitionFieldReply = mutationField("createPetitionFieldReply", {
-  deprecation: "use createPetitionFieldReplies",
-  description: "Creates a reply on a petition field",
-  type: "PetitionFieldReply",
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    fieldId: nonNull(globalIdArg("PetitionField")),
-    reply: nonNull("JSON"),
-  },
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", [
-      "TEXT",
-      "SHORT_TEXT",
-      "SELECT",
-      "PHONE",
-      "NUMBER",
-      "DYNAMIC_SELECT",
-      "DATE",
-      "DATE_TIME",
-      "CHECKBOX",
-    ]),
-    fieldCanBeReplied("fieldId"),
-    petitionIsNotAnonymized("petitionId"),
-  ),
-  validateArgs: validateFieldReplyValue(
-    (args) => [{ id: args.fieldId, value: args.reply }],
-    "reply",
-  ),
-  resolve: async (_, args, ctx) => {
-    const { type } = (await ctx.petitions.loadField(args.fieldId))!;
-
-    try {
-      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
-      const content =
-        type === "DATE_TIME"
-          ? {
-              ...args.reply,
-              value: zonedTimeToUtc(args.reply.datetime, args.reply.timezone).toISOString(),
-            }
-          : { value: args.reply };
-
-      const [reply] = await ctx.petitions.createPetitionFieldReply(
-        args.petitionId,
-        {
-          petition_field_id: args.fieldId,
-          user_id: ctx.user!.id,
-          type,
-          status: "PENDING",
-          content,
-        },
-        `User:${ctx.user!.id}`,
-      );
-      return reply;
-    } catch (error: any) {
-      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
-        throw new ApolloError(
-          "Can't submit a reply due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED",
-        );
-      }
-      throw error;
-    }
-  },
-});
-
-/** @deprecated */
-export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply", {
-  deprecation: "use updatePetitionFieldReplies",
-  description: "Updates a reply on a petition field",
-  type: "PetitionFieldReply",
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    replyId: nonNull(globalIdArg("PetitionFieldReply")),
-    reply: nonNull("JSON"),
-  },
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    repliesBelongsToPetition("petitionId", "replyId"),
-    replyIsForFieldOfType("replyId", [
-      "TEXT",
-      "SHORT_TEXT",
-      "SELECT",
-      "PHONE",
-      "NUMBER",
-      "DYNAMIC_SELECT",
-      "DATE",
-      "DATE_TIME",
-      "CHECKBOX",
-    ]),
-    replyCanBeUpdated("replyId"),
-    petitionIsNotAnonymized("petitionId"),
-  ),
-  validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
-  resolve: async (_, args, ctx) => {
-    const { type } = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-    const content =
-      type === "DATE_TIME"
-        ? {
-            ...args.reply,
-            value: zonedTimeToUtc(args.reply.datetime, args.reply.timezone).toISOString(),
-          }
-        : { value: args.reply };
-
-    return await ctx.petitions.updatePetitionFieldReply(
-      args.replyId,
-      {
-        petition_access_id: null,
-        user_id: ctx.user!.id,
-        content,
-        status: "PENDING",
-      },
-      ctx.user!,
-    );
-  },
-});
+import { validateCreateReplyContent, validateUpdateReplyContent } from "../validations";
 
 export const FileUploadReplyResponse = objectType({
   name: "FileUploadReplyResponse",

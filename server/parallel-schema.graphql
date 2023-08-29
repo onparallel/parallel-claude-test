@@ -1007,12 +1007,6 @@ type Mutation {
   ): [PetitionFieldReply!]!
 
   """
-  Creates a reply on a petition field
-  """
-  createPetitionFieldReply(fieldId: GID!, petitionId: GID!, reply: JSON!): PetitionFieldReply!
-    @deprecated(reason: "use createPetitionFieldReplies")
-
-  """
   Creates a view with custom filters and ordering on the user's petitions list
   """
   createPetitionListView(data: PetitionListViewDataInput!, name: String!): PetitionListView!
@@ -1488,15 +1482,6 @@ type Mutation {
   ): [PublicPetitionFieldReply!]!
 
   """
-  Creates a reply on a petition field as recipient.
-  """
-  publicCreatePetitionFieldReply(
-    fieldId: GID!
-    keycode: ID!
-    reply: JSON!
-  ): PublicPetitionFieldReply! @deprecated(reason: "use publicCreatePetitionFieldReplies")
-
-  """
   Starts an export pdf task in a recipient context
   """
   publicCreatePrintPdfTask(keycode: ID!): Task!
@@ -1622,15 +1607,6 @@ type Mutation {
     keycode: ID!
     replies: [UpdatePetitionFieldReplyInput!]!
   ): [PublicPetitionFieldReply!]!
-
-  """
-  Creates a reply on a petition field as recipient.
-  """
-  publicUpdatePetitionFieldReply(
-    keycode: ID!
-    reply: JSON!
-    replyId: GID!
-  ): PublicPetitionFieldReply! @deprecated(reason: "use publicUpdatePetitionFieldReplies")
 
   """
   Reactivates the specified inactive petition accesses.
@@ -2113,12 +2089,6 @@ type Mutation {
     petitionId: GID!
     status: PetitionFieldReplyStatus!
   ): PetitionField!
-
-  """
-  Updates a reply on a petition field
-  """
-  updatePetitionFieldReply(petitionId: GID!, reply: JSON!, replyId: GID!): PetitionFieldReply!
-    @deprecated(reason: "use updatePetitionFieldReplies")
 
   """
   Updates the metadata of the specified petition field reply
@@ -3717,7 +3687,6 @@ input PetitionFilter {
   sharedWith: PetitionSharedWithFilter
   signature: [PetitionSignatureStatusFilter!]
   status: [PetitionStatus!]
-  tagIds: [GID!]
   tags: PetitionTagFilter
   type: PetitionBaseType
 }
@@ -3780,7 +3749,6 @@ type PetitionListViewData {
   signature: [PetitionSignatureStatusFilter!]
   sort: PetitionListViewSort
   status: [PetitionStatus!]
-  tags: [GID!] @deprecated(reason: "use tagsFilters")
   tagsFilters: PetitionListViewDataTags
 }
 
@@ -3794,7 +3762,6 @@ input PetitionListViewDataInput {
   signature: [PetitionSignatureStatusFilter!]
   sort: PetitionListViewSortInput
   status: [PetitionStatus!]
-  tags: [GID!]
   tagsFilters: PetitionTagFilter
 }
 

@@ -41,11 +41,6 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.string("path");
           t.nullable.field("locale", { type: "PetitionLocale" });
           t.nullable.field("type", { type: "PetitionBaseType" });
-          /** @deprecated */
-          t.nullable.list.nonNull.globalId("tagIds", {
-            prefixName: "Tag",
-            deprecation: "use tags field",
-          });
           t.nullable.field("tags", { type: "PetitionTagFilter" });
           t.nullable.field("sharedWith", { type: "PetitionSharedWithFilter" });
           t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
@@ -74,18 +69,6 @@ export const petitionsQuery = queryField((t) => {
           );
           if (!hasAccess) {
             throw new ArgValidationError(info, "filters.fromTemplateId", "Invalid template ID");
-          }
-        }
-      },
-      /** @deprecated remove next release */
-      async (_, args, ctx, info) => {
-        const tagIds = args.filters?.tagIds;
-        if (isDefined(tagIds)) {
-          const valid =
-            tagIds.length <= 10 &&
-            (await ctx.tags.loadTag(tagIds)).every((t) => t?.organization_id === ctx.user!.org_id);
-          if (!valid) {
-            throw new ArgValidationError(info, "filters.tagIds", "Invalid tag ids");
           }
         }
       },

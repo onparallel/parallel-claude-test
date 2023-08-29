@@ -39,7 +39,6 @@ export const PetitionListViewData = objectType({
         },
       }),
     });
-    t.nullable.list.nonNull.globalId("tags", { prefixName: "Tag", deprecation: "use tagsFilters" });
     t.nullable.field("tagsFilters", {
       type: objectType({
         name: "PetitionListViewDataTags",
@@ -115,8 +114,6 @@ export const PetitionListViewDataInput = inputObjectType({
   definition(t) {
     t.nullable.list.nonNull.field("status", { type: "PetitionStatus" });
     t.nullable.field("sharedWith", { type: "PetitionSharedWithFilter" });
-    /** @deprecated use tagsFilters */
-    t.nullable.list.nonNull.globalId("tags", { prefixName: "Tag", deprecation: "Use tagsFilters" });
     t.nullable.field("tagsFilters", { type: "PetitionTagFilter" });
     t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
     t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });

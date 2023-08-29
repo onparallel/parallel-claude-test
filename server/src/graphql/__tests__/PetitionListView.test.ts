@@ -82,7 +82,9 @@ describe("GraphQL/PetitionListView", () => {
                   }
                   operator
                 }
-                tags
+                tagsFilters {
+                  __typename
+                }
                 sort {
                   field
                   direction
@@ -112,7 +114,7 @@ describe("GraphQL/PetitionListView", () => {
                   filters: [{ operator: "SHARED_WITH", value: toGlobalId("User", user.id) }],
                   operator: "AND",
                 },
-                tags: null,
+                tagsFilters: null,
                 sort: { field: "sentAt", direction: "ASC" },
               },
             },

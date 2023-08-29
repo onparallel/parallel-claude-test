@@ -659,11 +659,6 @@ export type Mutation = {
   createPetitionFieldComment: PetitionFieldComment;
   /** Creates multiple replies for a petition at once */
   createPetitionFieldReplies: Array<PetitionFieldReply>;
-  /**
-   * Creates a reply on a petition field
-   * @deprecated use createPetitionFieldReplies
-   */
-  createPetitionFieldReply: PetitionFieldReply;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
@@ -782,11 +777,6 @@ export type Mutation = {
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates replies on a petition field as recipient. */
   publicCreatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
-  /**
-   * Creates a reply on a petition field as recipient.
-   * @deprecated use publicCreatePetitionFieldReplies
-   */
-  publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
@@ -818,11 +808,6 @@ export type Mutation = {
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates replies on a petition field as recipient. */
   publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
-  /**
-   * Creates a reply on a petition field as recipient.
-   * @deprecated use publicUpdatePetitionFieldReplies
-   */
-  publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes the password on a petition or template */
@@ -935,11 +920,6 @@ export type Mutation = {
   updatePetitionFieldReplies: Array<PetitionFieldReply>;
   /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
-  /**
-   * Updates a reply on a petition field
-   * @deprecated use updatePetitionFieldReplies
-   */
-  updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates a petition list view */
@@ -1218,12 +1198,6 @@ export type MutationcreatePetitionFieldRepliesArgs = {
   fields: Array<CreatePetitionFieldReplyInput>;
   overwriteExisting?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
-};
-
-export type MutationcreatePetitionFieldReplyArgs = {
-  fieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
 };
 
 export type MutationcreatePetitionListViewArgs = {
@@ -1574,12 +1548,6 @@ export type MutationpublicCreatePetitionFieldRepliesArgs = {
   keycode: Scalars["ID"]["input"];
 };
 
-export type MutationpublicCreatePetitionFieldReplyArgs = {
-  fieldId: Scalars["GID"]["input"];
-  keycode: Scalars["ID"]["input"];
-  reply: Scalars["JSON"]["input"];
-};
-
 export type MutationpublicCreatePrintPdfTaskArgs = {
   keycode: Scalars["ID"]["input"];
 };
@@ -1671,12 +1639,6 @@ export type MutationpublicUpdatePetitionFieldCommentArgs = {
 export type MutationpublicUpdatePetitionFieldRepliesArgs = {
   keycode: Scalars["ID"]["input"];
   replies: Array<UpdatePetitionFieldReplyInput>;
-};
-
-export type MutationpublicUpdatePetitionFieldReplyArgs = {
-  keycode: Scalars["ID"]["input"];
-  reply: Scalars["JSON"]["input"];
-  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationreactivateAccessesArgs = {
@@ -2001,12 +1963,6 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   petitionFieldReplyIds: Array<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
-};
-
-export type MutationupdatePetitionFieldReplyArgs = {
-  petitionId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
-  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionFieldReplyMetadataArgs = {
@@ -2997,7 +2953,6 @@ export type PetitionFilter = {
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;
-  tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   tags?: InputMaybe<PetitionTagFilter>;
   type?: InputMaybe<PetitionBaseType>;
 };
@@ -3045,8 +3000,6 @@ export type PetitionListViewData = {
   signature: Maybe<Array<PetitionSignatureStatusFilter>>;
   sort: Maybe<PetitionListViewSort>;
   status: Maybe<Array<PetitionStatus>>;
-  /** @deprecated use tagsFilters */
-  tags: Maybe<Array<Scalars["GID"]["output"]>>;
   tagsFilters: Maybe<PetitionListViewDataTags>;
 };
 
@@ -3060,7 +3013,6 @@ export type PetitionListViewDataInput = {
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
-  tags?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   tagsFilters?: InputMaybe<PetitionTagFilter>;
 };
 

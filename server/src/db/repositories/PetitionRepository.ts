@@ -42,8 +42,8 @@ import {
 import { SlateNode } from "../../util/slate/render";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
-import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
 import { validateReplyContent } from "../../util/validateReplyContent";
+import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
 import {
   Contact,
   ContactLocale,
@@ -141,8 +141,6 @@ interface PetitionFilter {
   locale?: ContactLocale | null;
   signature?: PetitionSignatureStatusFilter[] | null;
   type?: PetitionType | null;
-  /** @deprecated */
-  tagIds?: number[] | null;
   tags?: PetitionTagFilter | null;
   profileIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
@@ -537,18 +535,6 @@ export class PetitionRepository extends BaseRepository {
             }
           }
         });
-      });
-    } else if (filters?.tagIds) {
-      builders.push((q) => {
-        q.joinRaw(/* sql */ `left join petition_tag pt on pt.petition_id = p.id`);
-        if (filters.tagIds!.length === 0) {
-          // petition has no tags
-          q.havingRaw(/* sql */ `count(distinct pt.tag_id) = 0`);
-        } else {
-          q.havingRaw(/* sql */ `array_agg(distinct pt.tag_id) @> ?`, [
-            this.sqlArray(filters.tagIds!, "int"),
-          ]);
-        }
       });
     }
 
@@ -1934,68 +1920,6 @@ export class PetitionRepository extends BaseRepository {
     return replies;
   }
 
-  /** @deprecated */
-  async updatePetitionFieldReply(
-    replyId: number,
-    data: Partial<PetitionFieldReply>,
-    updater: User | PetitionAccess,
-  ) {
-    const field = await this.loadFieldForReply(replyId);
-    const oldReply = await this.loadFieldReply(replyId);
-
-    if (!field) {
-      throw new Error("Petition field not found");
-    }
-
-    const isContact = "keycode" in updater;
-    const updatedBy = isContact ? `Contact:${updater.contact_id}` : `User:${updater.id}`;
-
-    const [reply] = await this.from("petition_field_reply")
-      .where("id", replyId)
-      .update(
-        {
-          ...data,
-          updated_at: this.now(),
-          updated_by: updatedBy,
-        },
-        "*",
-      );
-
-    if (!field.is_internal) {
-      await this.updatePetition(
-        field.petition_id,
-        {
-          status: "PENDING",
-          closed_at: null,
-        },
-        updatedBy,
-      );
-      // clear cache to make sure petition status is updated in next graphql calls
-      this.loadPetition.dataloader.clear(field.petition_id);
-    }
-
-    const petitionAccessIdOrUserId = isContact
-      ? { petition_access_id: updater.id }
-      : { user_id: updater.id };
-
-    await this.createOrUpdateReplyEvent(field.petition_id, reply, petitionAccessIdOrUserId);
-
-    if (oldReply && oldReply.status !== "PENDING") {
-      await this.createEvent({
-        type: "REPLY_STATUS_CHANGED",
-        petition_id: field.petition_id,
-        data: {
-          status: "PENDING",
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
-          ...petitionAccessIdOrUserId,
-        },
-      });
-    }
-
-    return reply;
-  }
-
   async updatePetitionFieldRepliesContent(
     petitionId: number,
     data: { id: number; content?: any }[],
@@ -3085,46 +3009,6 @@ export class PetitionRepository extends BaseRepository {
         })),
         this.REPLY_EVENTS_DELAY_SECONDS,
         t,
-      );
-    }
-  }
-
-  /** @deprecated */
-  private async createOrUpdateReplyEvent(
-    petitionId: number,
-    reply: Pick<PetitionFieldReply, "id" | "petition_field_id">,
-    updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">,
-  ) {
-    const latestEvent = await this.getLatestEventForPetitionId(petitionId);
-
-    // accumulate REPLY_CREATED and REPLY_UPDATED events coming in a 60 seconds time span
-    // to avoid spamming webhooks, only notify the last one
-    if (
-      latestEvent &&
-      (latestEvent.type === "REPLY_UPDATED" || latestEvent.type === "REPLY_CREATED") &&
-      latestEvent.data.petition_field_reply_id === reply.id &&
-      ((isDefined(updater.user_id) && latestEvent.data.user_id === updater.user_id) ||
-        (isDefined(updater.petition_access_id) &&
-          latestEvent.data.petition_access_id === updater.petition_access_id)) &&
-      differenceInSeconds(new Date(), latestEvent.created_at) < this.REPLY_EVENTS_DELAY_SECONDS
-    ) {
-      await this.updateEvent(
-        latestEvent.id,
-        { created_at: new Date() },
-        this.REPLY_EVENTS_DELAY_SECONDS,
-      );
-    } else {
-      await this.createEventWithDelay(
-        {
-          type: "REPLY_UPDATED",
-          petition_id: petitionId,
-          data: {
-            petition_field_id: reply.petition_field_id,
-            petition_field_reply_id: reply.id,
-            ...updater,
-          },
-        },
-        this.REPLY_EVENTS_DELAY_SECONDS,
       );
     }
   }

@@ -704,11 +704,6 @@ export interface Mutation {
   createPetitionFieldComment: PetitionFieldComment;
   /** Creates multiple replies for a petition at once */
   createPetitionFieldReplies: Array<PetitionFieldReply>;
-  /**
-   * Creates a reply on a petition field
-   * @deprecated use createPetitionFieldReplies
-   */
-  createPetitionFieldReply: PetitionFieldReply;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
@@ -827,11 +822,6 @@ export interface Mutation {
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates replies on a petition field as recipient. */
   publicCreatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
-  /**
-   * Creates a reply on a petition field as recipient.
-   * @deprecated use publicCreatePetitionFieldReplies
-   */
-  publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
@@ -863,11 +853,6 @@ export interface Mutation {
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates replies on a petition field as recipient. */
   publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
-  /**
-   * Creates a reply on a petition field as recipient.
-   * @deprecated use publicUpdatePetitionFieldReplies
-   */
-  publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes the password on a petition or template */
@@ -980,11 +965,6 @@ export interface Mutation {
   updatePetitionFieldReplies: Array<PetitionFieldReply>;
   /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
-  /**
-   * Updates a reply on a petition field
-   * @deprecated use updatePetitionFieldReplies
-   */
-  updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates a petition list view */
@@ -1263,12 +1243,6 @@ export interface MutationcreatePetitionFieldRepliesArgs {
   fields: Array<CreatePetitionFieldReplyInput>;
   overwriteExisting?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
-}
-
-export interface MutationcreatePetitionFieldReplyArgs {
-  fieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
 }
 
 export interface MutationcreatePetitionListViewArgs {
@@ -1619,12 +1593,6 @@ export interface MutationpublicCreatePetitionFieldRepliesArgs {
   keycode: Scalars["ID"]["input"];
 }
 
-export interface MutationpublicCreatePetitionFieldReplyArgs {
-  fieldId: Scalars["GID"]["input"];
-  keycode: Scalars["ID"]["input"];
-  reply: Scalars["JSON"]["input"];
-}
-
 export interface MutationpublicCreatePrintPdfTaskArgs {
   keycode: Scalars["ID"]["input"];
 }
@@ -1716,12 +1684,6 @@ export interface MutationpublicUpdatePetitionFieldCommentArgs {
 export interface MutationpublicUpdatePetitionFieldRepliesArgs {
   keycode: Scalars["ID"]["input"];
   replies: Array<UpdatePetitionFieldReplyInput>;
-}
-
-export interface MutationpublicUpdatePetitionFieldReplyArgs {
-  keycode: Scalars["ID"]["input"];
-  reply: Scalars["JSON"]["input"];
-  replyId: Scalars["GID"]["input"];
 }
 
 export interface MutationreactivateAccessesArgs {
@@ -2046,12 +2008,6 @@ export interface MutationupdatePetitionFieldRepliesStatusArgs {
   petitionFieldReplyIds: Array<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
-}
-
-export interface MutationupdatePetitionFieldReplyArgs {
-  petitionId: Scalars["GID"]["input"];
-  reply: Scalars["JSON"]["input"];
-  replyId: Scalars["GID"]["input"];
 }
 
 export interface MutationupdatePetitionFieldReplyMetadataArgs {
@@ -3083,7 +3039,6 @@ export interface PetitionFilter {
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;
-  tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   tags?: InputMaybe<PetitionTagFilter>;
   type?: InputMaybe<PetitionBaseType>;
 }
@@ -3134,8 +3089,6 @@ export interface PetitionListViewData {
   signature?: Maybe<Array<PetitionSignatureStatusFilter>>;
   sort?: Maybe<PetitionListViewSort>;
   status?: Maybe<Array<PetitionStatus>>;
-  /** @deprecated use tagsFilters */
-  tags?: Maybe<Array<Scalars["GID"]["output"]>>;
   tagsFilters?: Maybe<PetitionListViewDataTags>;
 }
 
@@ -3149,7 +3102,6 @@ export interface PetitionListViewDataInput {
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
-  tags?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   tagsFilters?: InputMaybe<PetitionTagFilter>;
 }
 

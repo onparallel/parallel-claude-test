@@ -1838,10 +1838,6 @@ export interface Task {
   updated_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   started_at: Maybe<Date>; // timestamptz
-  /**
-   * @deprecated
-   */
-  finished_at: Maybe<Date>; // timestamptz
   anonymized_at: Maybe<Date>; // timestamptz
   processed_at: Maybe<Date>; // timestamptz
   processed_by: Maybe<string>; // varchar
@@ -1861,7 +1857,6 @@ export type CreateTask = PartialProps<
   | "updated_by"
   | "petition_access_id"
   | "started_at"
-  | "finished_at"
   | "anonymized_at"
   | "processed_at"
   | "processed_by"

@@ -791,9 +791,7 @@ describe("GraphQL/Users", () => {
         .whereNot("id", sessionUser.id)
         .update("deleted_at", mocks.knex.raw("CURRENT_TIMESTAMP"));
 
-      [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-        organization_role: "NORMAL",
-      }));
+      [normalUser] = await mocks.createRandomUsers(organization.id, 1);
       ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
         "normal-token",
         normalUser.id,

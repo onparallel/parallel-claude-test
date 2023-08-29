@@ -1,4 +1,3 @@
-import { zonedTimeToUtc } from "date-fns-tz";
 import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nexus";
 import { uniq } from "remeda";
 import { CreatePetitionFieldReply } from "../../../db/__types";
@@ -18,12 +17,7 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../../petition/authorizers";
-import {
-  validateCreateReplyContent,
-  validateFieldReplyValue,
-  validateReplyUpdate,
-  validateUpdateReplyContent,
-} from "../../petition/validations";
+import { validateCreateReplyContent, validateUpdateReplyContent } from "../../petition/validations";
 import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
@@ -31,65 +25,6 @@ import {
   replyBelongsToAccess,
   replyBelongsToExternalField,
 } from "../authorizers";
-
-/** @deprecated */
-export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitionFieldReply", {
-  deprecation: "use publicCreatePetitionFieldReplies",
-  description: "Creates a reply on a petition field as recipient.",
-  type: "PublicPetitionFieldReply",
-  args: {
-    keycode: nonNull(idArg()),
-    fieldId: nonNull(globalIdArg("PetitionField")),
-    reply: nonNull("JSON"),
-  },
-  authorize: chain(
-    authenticatePublicAccess("keycode"),
-    and(
-      fieldBelongsToAccess("fieldId"),
-      fieldIsExternal("fieldId"),
-      fieldHasType("fieldId", [
-        "TEXT",
-        "SHORT_TEXT",
-        "SELECT",
-        "PHONE",
-        "NUMBER",
-        "DYNAMIC_SELECT",
-        "DATE",
-        "DATE_TIME",
-        "CHECKBOX",
-      ]),
-      fieldCanBeReplied("fieldId"),
-    ),
-  ),
-  validateArgs: validateFieldReplyValue(
-    (args) => [{ id: args.fieldId, value: args.reply }],
-    "reply",
-  ),
-  resolve: async (_, args, ctx) => {
-    const field = (await ctx.petitions.loadField(args.fieldId))!;
-
-    const content =
-      field.type === "DATE_TIME"
-        ? {
-            ...args.reply,
-            value: zonedTimeToUtc(args.reply.datetime, args.reply.timezone).toISOString(),
-          }
-        : { value: args.reply };
-
-    const [reply] = await ctx.petitions.createPetitionFieldReply(
-      field.petition_id,
-      {
-        petition_field_id: args.fieldId,
-        petition_access_id: ctx.access!.id,
-        type: field.type,
-        content,
-      },
-      `Contact:${ctx.contact!.id}`,
-    );
-
-    return reply;
-  },
-});
 
 export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetitionFieldReplies", {
   description: "Creates replies on a petition field as recipient.",
@@ -141,59 +76,6 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
       ctx.access!.petition_id,
       data,
       `Contact:${ctx.contact!.id}`,
-    );
-  },
-});
-
-/** @deprecated */
-export const publicUpdatePetitionFieldReply = mutationField("publicUpdatePetitionFieldReply", {
-  deprecation: "use publicUpdatePetitionFieldReplies",
-  description: "Creates a reply on a petition field as recipient.",
-  type: "PublicPetitionFieldReply",
-  args: {
-    keycode: nonNull(idArg()),
-    replyId: nonNull(globalIdArg("PetitionFieldReply")),
-    reply: nonNull("JSON"),
-  },
-  authorize: chain(
-    authenticatePublicAccess("keycode"),
-    and(
-      replyBelongsToAccess("replyId"),
-      replyBelongsToExternalField("replyId"),
-      replyIsForFieldOfType("replyId", [
-        "TEXT",
-        "SHORT_TEXT",
-        "SELECT",
-        "PHONE",
-        "NUMBER",
-        "DYNAMIC_SELECT",
-        "DATE",
-        "DATE_TIME",
-        "CHECKBOX",
-      ]),
-      replyCanBeUpdated("replyId"),
-    ),
-  ),
-  validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
-  resolve: async (_, args, ctx) => {
-    const { type } = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-    const content =
-      type === "DATE_TIME"
-        ? {
-            ...args.reply,
-            value: zonedTimeToUtc(args.reply.datetime, args.reply.timezone).toISOString(),
-          }
-        : { value: args.reply };
-
-    return await ctx.petitions.updatePetitionFieldReply(
-      args.replyId,
-      {
-        petition_access_id: ctx.access!.id,
-        user_id: null,
-        content,
-        status: "PENDING",
-      },
-      ctx.access!,
     );
   },
 });
