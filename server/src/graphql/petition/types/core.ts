@@ -651,7 +651,7 @@ export const PetitionField = objectType({
         });
       },
     });
-    t.int("position", { resolve: (o) => o.position! });
+    t.int("position");
     t.nullable.jsonObject("visibility", {
       description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) =>

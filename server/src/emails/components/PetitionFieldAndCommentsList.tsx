@@ -17,7 +17,7 @@ interface FieldComment {
 export interface PetitionFieldAndComments {
   id: number;
   title: Maybe<string>;
-  position: Maybe<number>;
+  position: number;
   comments: FieldComment[];
 }
 
@@ -54,7 +54,7 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
             <MjmlColumn>
               <MjmlText padding="0 20px 0 50px" lineHeight="24px">
                 <ul style={{ margin: 0, padding: 0 }}>
-                  <li value={position! + 1} style={{ margin: 0, padding: 0 }}>
+                  <li value={position + 1} style={{ margin: 0, padding: 0 }}>
                     {title ? (
                       <span>{title}</span>
                     ) : (

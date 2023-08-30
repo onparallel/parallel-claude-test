@@ -1209,7 +1209,7 @@ export type CreatePetitionEventSubscription = PartialProps<
 export interface PetitionField {
   id: number; // int4
   petition_id: number; // int4
-  position: Maybe<number>; // int4
+  position: number; // int4
   type: PetitionFieldType; // petition_field_type
   title: Maybe<string>; // text
   description: Maybe<string>; // text
@@ -1235,7 +1235,6 @@ export interface PetitionField {
 
 export type CreatePetitionField = PartialProps<
   Omit<PetitionField, "id">,
-  | "position"
   | "title"
   | "description"
   | "optional"

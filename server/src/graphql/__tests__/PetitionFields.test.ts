@@ -947,6 +947,150 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
+    it("updates positions multiple times at once", async () => {
+      await mocks.knex.raw(
+        /* sql */ `
+        UPDATE petition_field SET visibility = null WHERE petition_id = ?
+      `,
+        [userPetition.id],
+      );
+
+      const results = await Promise.all(
+        [
+          [fieldGIDs[0], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4], fieldGIDs[3]],
+          [fieldGIDs[0], fieldGIDs[2], fieldGIDs[4], fieldGIDs[1], fieldGIDs[3]],
+          [fieldGIDs[0], fieldGIDs[3], fieldGIDs[1], fieldGIDs[2], fieldGIDs[4]],
+          [fieldGIDs[0], fieldGIDs[4], fieldGIDs[3], fieldGIDs[2], fieldGIDs[1]],
+          [fieldGIDs[0], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3], fieldGIDs[4]],
+          [fieldGIDs[0], fieldGIDs[3], fieldGIDs[2], fieldGIDs[4], fieldGIDs[1]],
+        ].map((fieldIds) =>
+          testClient.execute(
+            gql`
+              mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
+                updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
+                  fields {
+                    id
+                  }
+                }
+              }
+            `,
+            {
+              petitionId: toGlobalId("Petition", userPetition.id),
+              fieldIds,
+            },
+          ),
+        ),
+      );
+
+      expect(results).toMatchObject([
+        { errors: undefined },
+        { errors: undefined },
+        { errors: undefined },
+        { errors: undefined },
+        { errors: undefined },
+        { errors: undefined },
+      ]);
+    });
+
+    it("updates positions multiple times at once, ignoring errors", async () => {
+      const results = await Promise.all(
+        [
+          [fieldGIDs[0], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4], fieldGIDs[3]], // OK
+          [fieldGIDs[1], fieldGIDs[2], fieldGIDs[4], fieldGIDs[0], fieldGIDs[3]], // trying to move fixed HEADING, throws error
+          [fieldGIDs[0], fieldGIDs[4], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3]], // moving visibility condition, throws error
+          [fieldGIDs[0], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3], fieldGIDs[4]], // OK
+          [fieldGIDs[0], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3]], // not enough IDS, throws error
+          [fieldGIDs[0], fieldGIDs[3], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4]], // OK
+        ].map((fieldIds) =>
+          testClient.execute(
+            gql`
+              mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
+                updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
+                  fields {
+                    id
+                  }
+                }
+              }
+            `,
+            {
+              petitionId: toGlobalId("Petition", userPetition.id),
+              fieldIds,
+            },
+          ),
+        ),
+      );
+
+      expect(results[0].errors).toBeUndefined();
+      expect(results[1].errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
+      expect(results[2].errors).toContainGraphQLError("INVALID_FIELD_CONDITIONS_ORDER");
+      expect(results[3].errors).toBeUndefined();
+      expect(results[4].errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
+      expect(results[5].errors).toBeUndefined();
+    });
+
+    it("returns fields ordered by successful mutation", async () => {
+      const results = await Promise.all(
+        [
+          [fieldGIDs[1], fieldGIDs[2], fieldGIDs[4], fieldGIDs[0], fieldGIDs[3]], // trying to move fixed HEADING, throws error
+          [fieldGIDs[1], fieldGIDs[2], fieldGIDs[4], fieldGIDs[0], fieldGIDs[3]], // trying to move fixed HEADING, throws error
+          [fieldGIDs[0], fieldGIDs[3], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4]], // OK, this should be new order
+          [fieldGIDs[0], fieldGIDs[4], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3]], // moving visibility condition, throws error
+          [fieldGIDs[0], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3]], // not enough IDS, throws error
+        ].map((fieldIds) =>
+          testClient.execute(
+            gql`
+              mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
+                updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
+                  fields {
+                    id
+                  }
+                }
+              }
+            `,
+            {
+              petitionId: toGlobalId("Petition", userPetition.id),
+              fieldIds,
+            },
+          ),
+        ),
+      );
+
+      expect(results[0].errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
+      expect(results[1].errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
+      expect(results[3].errors).toContainGraphQLError("INVALID_FIELD_CONDITIONS_ORDER");
+      expect(results[4].errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
+
+      expect(results[2].errors).toBeUndefined();
+      expect(results[2].data.updateFieldPositions).toEqual({
+        fields: [fieldGIDs[0], fieldGIDs[3], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4]].map(
+          (id) => ({ id }),
+        ),
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($petitionId: GID!) {
+            petition(id: $petitionId) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+        },
+      );
+
+      // double check that the petition fields were correctly updated
+      expect(errors).toBeUndefined();
+      expect(data.petition).toEqual({
+        fields: [fieldGIDs[0], fieldGIDs[3], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4]].map(
+          (id) => ({ id }),
+        ),
+      });
+    });
+
     it("sends error when passing an incomplete fieldIds argument", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

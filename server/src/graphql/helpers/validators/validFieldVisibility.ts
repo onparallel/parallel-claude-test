@@ -92,7 +92,7 @@ function validateCondition<
       return;
     }
 
-    assert(referencedField.position! < field.position!, "Can't reference fields that come next");
+    assert(referencedField.position < field.position, "Can't reference fields that come next");
 
     assert(referencedField.type !== "HEADING", `Conditions can't reference HEADING fields`);
     assert(referencedField.id !== field.id, `Can't add a reference to field itself`);
