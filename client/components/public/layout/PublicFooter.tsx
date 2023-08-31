@@ -1,5 +1,5 @@
 import { Box, BoxProps, HStack } from "@chakra-ui/react";
-import { FacebookIcon, LinkedInIcon, TwitterIcon, YoutubeIcon } from "@parallel/chakra/icons";
+import { LinkedInIcon, TwitterIcon, YoutubeIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicContainer } from "./PublicContainer";
@@ -21,15 +21,6 @@ export function PublicFooter(props: BoxProps) {
         </Box>
         <HStack spacing={6}>
           <NormalLink
-            href="https://www.facebook.com/parallel.so/"
-            aria-label="Twitter"
-            isExternal
-            color="primary.800"
-            _hover={{ color: "primary.500" }}
-          >
-            <FacebookIcon role="presentation" boxSize={6} />
-          </NormalLink>
-          <NormalLink
             href="https://www.linkedin.com/company/onparallel"
             aria-label="LinkedIn"
             isExternal
@@ -50,7 +41,7 @@ export function PublicFooter(props: BoxProps) {
 
           <NormalLink
             href="https://www.youtube.com/channel/UCI0STY9hq6t2HB1MUeqcV-Q"
-            aria-label="Twitter"
+            aria-label="Youtube"
             isExternal
             color="primary.800"
             _hover={{ color: "primary.500" }}
