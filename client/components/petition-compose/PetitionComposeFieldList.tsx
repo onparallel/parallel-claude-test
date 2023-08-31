@@ -22,8 +22,8 @@ import {
   PetitionComposeFieldRef,
 } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
+  PetitionComposeFieldList_PetitionBaseFragment,
   PetitionComposeFieldList_UserFragment,
-  PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
@@ -33,34 +33,18 @@ import { defaultCondition } from "@parallel/utils/fieldVisibility/conditions";
 import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { Maybe } from "@parallel/utils/types";
-import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
+import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { indexBy, intersection, pick } from "remeda";
-import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-
-type FieldSelection = PetitionComposeField_PetitionFieldFragment;
-
-interface FieldsState {
-  fieldsById: Record<string, FieldSelection>;
-  fieldIds: string[];
-}
-
-function reset(fields: FieldSelection[]): () => FieldsState {
-  return () => ({
-    fieldsById: indexBy(fields, (f) => f.id),
-    fieldIds: fields.map((f) => f.id),
-  });
-}
+import { intersection, zip } from "remeda";
 
 export interface PetitionComposeFieldListProps extends BoxProps {
   user: PetitionComposeFieldList_UserFragment;
-  petitionId: string;
-  active: Maybe<string>;
-  fields: FieldSelection[];
+  activeFieldId: Maybe<string>;
+  petition: PetitionComposeFieldList_PetitionBaseFragment;
   showErrors: boolean;
   fieldRefs: MultipleRefObject<PetitionComposeFieldRef>;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
@@ -71,16 +55,13 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   onAddField: (type: PetitionFieldType, position?: number) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   isReadOnly?: boolean;
-  isAttachDisabled?: boolean;
-  isTemplate?: boolean;
 }
 
 export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({
     user,
-    petitionId,
-    active,
-    fields,
+    petition,
+    activeFieldId,
     showErrors,
     fieldRefs,
     onUpdateFieldPositions,
@@ -91,66 +72,22 @@ export const PetitionComposeFieldList = Object.assign(
     onAddField,
     onFieldEdit,
     isReadOnly,
-    isAttachDisabled,
-    isTemplate,
     ...props
   }: PetitionComposeFieldListProps) {
-    const [{ fieldsById, fieldIds }, setState] = useState(reset(fields));
-    useEffectSkipFirst(() => setState(reset(fields)), [fields]);
+    const { fields, onFieldMove } = usePetitionComposeFieldReorder({
+      fields: petition.fields,
+      onUpdateFieldPositions,
+    });
 
-    const indices = useFieldIndices(fieldIds.map((fieldId) => pick(fieldsById[fieldId], ["type"])));
-
-    const fieldsStateRef = useUpdatingRef({ fieldsById, fieldIds, fields });
-
-    const showError = useErrorDialog();
-    const handleFieldMove = useCallback(
-      async function (dragIndex: number, hoverIndex: number, dropped?: boolean) {
-        const { fieldIds, fieldsById, fields } = fieldsStateRef.current;
-        const newFieldIds = [...fieldIds];
-        const [fieldId] = newFieldIds.splice(dragIndex, 1);
-        newFieldIds.splice(hoverIndex, 0, fieldId);
-        if (dropped) {
-          // check that this order of fields is respecting that visibility only refers to previous fields
-          const fieldPositions = Object.fromEntries(
-            Array.from(newFieldIds.entries()).map(([i, id]) => [id, i]),
-          );
-          for (const [position, fieldId] of Array.from(fieldIds.entries())) {
-            const visibility = fieldsById[fieldId].visibility as PetitionFieldVisibility;
-            if (
-              visibility &&
-              visibility.conditions.some((c) => fieldPositions[c.fieldId] > position)
-            ) {
-              try {
-                setState(reset(fields));
-                await showError({
-                  message: (
-                    <FormattedMessage
-                      id="component.petition-compose-field-list.move-referenced-field-error"
-                      defaultMessage="You can only move fields so that visibility conditions refer only to previous fields."
-                    />
-                  ),
-                });
-              } catch {}
-              return;
-            }
-          }
-          setState({ fieldsById, fieldIds: newFieldIds });
-          setTimeout(() => onUpdateFieldPositions(newFieldIds));
-        } else {
-          setState({ fieldsById, fieldIds: newFieldIds });
-        }
-      },
-      [onUpdateFieldPositions],
-    );
+    const indices = useFieldIndices(fields);
 
     // Memoize field callbacks
-    const fieldsDataRef = useUpdatingRef({ fields, indices, active });
+    const fieldsDataRef = useUpdatingRef({ fields, active: activeFieldId });
     const fieldProps = useMemoFactory(
       (
         fieldId: string,
       ): Pick<
-        PetitionComposeFieldProps & BoxProps,
-        | "petitionId"
+        PetitionComposeFieldProps,
         | "onCloneField"
         | "onSettingsClick"
         | "onTypeIndicatorClick"
@@ -161,7 +98,6 @@ export const PetitionComposeFieldList = Object.assign(
         | "onFocusNextField"
         | "onAddField"
       > => ({
-        petitionId,
         onCloneField: () => onCloneField(fieldId),
         onSettingsClick: () => onFieldSettingsClick(fieldId),
         onTypeIndicatorClick: () => onFieldTypeIndicatorClick(fieldId),
@@ -418,33 +354,28 @@ export const PetitionComposeFieldList = Object.assign(
           }}
           {...props}
         >
-          {fieldIds.map((fieldId, index) => {
-            const field = fieldsById[fieldId];
-            const isActive = active === fieldId;
-            const nextFieldId = index < fieldIds.length - 1 ? fieldIds[index + 1] : null;
-            const showAddFieldButton =
-              fieldId === hoveredFieldId ||
-              nextFieldId === hoveredFieldId ||
-              fieldId === focusedFieldId ||
-              nextFieldId === focusedFieldId;
+          {zip(fields, indices).map(([field, index], i) => {
+            const nextFieldId = i < fields.length - 1 ? fields[i + 1].id : null;
+            const showAddFieldButton = [field.id, nextFieldId].some(
+              (id) => id === hoveredFieldId || id === focusedFieldId,
+            );
             return (
-              <Fragment key={fieldId}>
+              <Fragment key={field.id}>
                 <PetitionComposeField
-                  ref={fieldRefs[fieldId]}
-                  id={`field-${fieldId}`}
+                  ref={fieldRefs[field.id]}
+                  id={`field-${field.id}`}
                   data-section="compose-field"
                   data-testid="compose-field"
-                  onMove={handleFieldMove}
+                  onMove={onFieldMove}
                   field={field}
-                  fields={fields}
-                  fieldIndex={indices[index]}
-                  index={index}
-                  isActive={isActive}
+                  petition={petition}
+                  fieldIndex={index}
+                  index={i}
+                  isActive={activeFieldId === field.id}
                   showError={showErrors}
                   isReadOnly={isReadOnly}
-                  isAttachDisabled={isAttachDisabled}
-                  {...fieldProps(fieldId)}
-                  {...fieldMouseHandlers(fieldId)}
+                  {...fieldProps(field.id)}
+                  {...fieldMouseHandlers(field.id)}
                 />
                 {nextFieldId && !isReadOnly ? (
                   <Box
@@ -460,8 +391,10 @@ export const PetitionComposeFieldList = Object.assign(
                       transform="translate(-50%, 50%)"
                       className="add-field-after-button"
                       data-testid="small-add-field-button"
-                      colorScheme={isTemplate ? "primary" : undefined}
-                      {...addButtonMouseHandlers(fieldId)}
+                      colorScheme={
+                        petition.__typename === "PetitionTemplate" ? "primary" : undefined
+                      }
+                      {...addButtonMouseHandlers(field.id)}
                     />
                   </Box>
                 ) : null}
@@ -475,7 +408,7 @@ export const PetitionComposeFieldList = Object.assign(
               data-action="big-add-field"
               data-testid="big-add-field-button"
               onSelectFieldType={onAddField}
-              colorScheme={isTemplate ? "primary" : undefined}
+              colorScheme={petition.__typename === "PetitionTemplate" ? "primary" : undefined}
               user={user}
             />
           </Flex>
@@ -490,6 +423,23 @@ export const PetitionComposeFieldList = Object.assign(
           ...AddFieldPopover_User
         }
         ${AddFieldPopover.fragments.User}
+      `,
+      PetitionBase: gql`
+        fragment PetitionComposeFieldList_PetitionBase on PetitionBase {
+          id
+          fields {
+            id
+            type
+            options
+            visibility
+            isReadOnly
+            isFixed
+            ...PetitionComposeField_PetitionField
+            ...usePetitionComposeFieldReorder_PetitionField
+          }
+        }
+        ${PetitionComposeField.fragments.PetitionField}
+        ${usePetitionComposeFieldReorder.fragments.PetitionField}
       `,
     },
   },

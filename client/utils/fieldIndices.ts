@@ -66,5 +66,5 @@ export function useFieldIndices(fields: Pick<PetitionField, "type">[]): Petition
 export function useFieldWithIndices<T extends Pick<PetitionField, "type">>(
   fields: T[],
 ): [T, PetitionFieldIndex][] {
-  return useMemo(() => zip(fields, getFieldIndices(fields)), [fields.map((f) => f.type).join(",")]);
+  return useMemo(() => zip(fields, getFieldIndices(fields)), [fields]);
 }

@@ -17,13 +17,13 @@ import {
   SignatureOrgIntegrationEnvironment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { compareWithFragments } from "@parallel/utils/compareWithFragments";
+import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { filterPetitionFields, PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
+import { PetitionFieldFilter, filterPetitionFields } from "@parallel/utils/filterPetitionFields";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { ComponentType, createElement, memo, MouseEvent, ReactNode } from "react";
+import { ComponentType, MouseEvent, ReactNode, createElement } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
@@ -305,12 +305,9 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
   );
 }
 
-const PetitionContentsItem = memo(
-  _PetitionContentsItem,
-  compareWithFragments<PetitionContentsItemProps<PetitionContents_PetitionFieldFragment>>({
-    field: PetitionContents.fragments.PetitionField,
-  }),
-) as typeof _PetitionContentsItem;
+const PetitionContentsItem = memoWithFragments(_PetitionContentsItem, {
+  field: PetitionContents.fragments.PetitionField,
+});
 
 function PetitionContentsDivider({
   children,

@@ -3505,11 +3505,6 @@
     "context": "Remove attachment"
   },
   {
-    "term": "component.petition-compose-field-list.move-referenced-field-error",
-    "definition": "Solo se pueden mover campos de manera que las condiciones de visibilidad hagan referencia únicamente a campos anteriores.",
-    "context": "You can only move fields so that visibility conditions refer only to previous fields."
-  },
-  {
     "term": "component.petition-compose-field-settings.alias-warning",
     "definition": "<b>Aviso:</b> Los campos de documentos no pueden utilizarse para reemplazar contenido en las descripciones.",
     "context": "<b>Note:</b> Document fields cannot be used to replace content in descriptions."
@@ -13393,6 +13388,11 @@
     "term": "user-group.all-members.description",
     "definition": "Este equipo contiene a todos los usuarios de la organización.",
     "context": "This team contains all users from the organization."
+  },
+  {
+    "term": "util.use-petition-compose-field-reorder.move-referenced-field-error",
+    "definition": "Solo se pueden mover campos de manera que las condiciones de visibilidad hagan referencia únicamente a campos anteriores.",
+    "context": "You can only move fields so that visibility conditions refer only to previous fields."
   },
   {
     "term": "util.use-short-text-formats.email",

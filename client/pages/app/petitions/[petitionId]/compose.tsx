@@ -23,10 +23,7 @@ import { PetitionCompletedAlert } from "@parallel/components/petition-common/Pet
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
-import {
-  PetitionComposeField,
-  PetitionComposeFieldRef,
-} from "@parallel/components/petition-compose/PetitionComposeField";
+import { PetitionComposeFieldRef } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
@@ -609,11 +606,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         >
           <Box padding={4}>
             <PetitionComposeFieldList
-              petitionId={petition.id}
-              user={me}
               showErrors={showErrors}
-              fields={petition.fields}
-              active={activeFieldId}
+              user={me}
+              petition={petition}
+              activeFieldId={activeFieldId}
               fieldRefs={fieldRefs}
               onAddField={handleAddField}
               onCloneField={handleCloneField}
@@ -623,8 +619,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onFieldSettingsClick={handleFieldSettingsClick}
               onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
               isReadOnly={isReadOnly}
-              isAttachDisabled={isPublicTemplate || myEffectivePermission === "READ"}
-              isTemplate={petition?.__typename === "PetitionTemplate"}
             />
 
             <PetitionComposeAttachments petition={petition} isReadOnly={isReadOnly} marginTop="4" />
@@ -674,6 +668,7 @@ const _fragments = {
         id
         ...PetitionLayout_PetitionBase
         ...PetitionSettings_PetitionBase
+        ...PetitionComposeFieldList_PetitionBase
         ...PetitionComposeAttachments_PetitionBase
         organization {
           id
@@ -710,23 +705,22 @@ const _fragments = {
         }
         isAnonymized
       }
-      ${useSendPetitionHandler.fragments.Petition}
-      ${PetitionComposeAttachments.fragments.PetitionBase}
       ${PetitionLayout.fragments.PetitionBase}
+      ${PetitionComposeFieldList.fragments.PetitionBase}
       ${PetitionSettings.fragments.PetitionBase}
+      ${PetitionComposeAttachments.fragments.PetitionBase}
+      ${useSendPetitionHandler.fragments.Petition}
       ${this.PetitionField}
     `;
   },
   get PetitionField() {
     return gql`
       fragment PetitionCompose_PetitionField on PetitionField {
-        ...PetitionComposeField_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
         ...PetitionContents_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
       }
-      ${PetitionComposeField.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
       ${PetitionContents.fragments.PetitionField}
       ${validatePetitionFields.fragments.PetitionField}

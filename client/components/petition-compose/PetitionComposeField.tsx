@@ -27,6 +27,7 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
+  PetitionComposeField_PetitionBaseFragment,
   PetitionComposeField_PetitionFieldFragment,
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   PetitionComposeField_deletePetitionFieldAttachmentDocument,
@@ -35,7 +36,7 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { compareWithFragments } from "@parallel/utils/compareWithFragments";
+import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { PetitionFieldIndex, letters } from "@parallel/utils/fieldIndices";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
@@ -47,11 +48,11 @@ import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
 import pMap from "p-map";
-import { RefObject, memo, useCallback, useImperativeHandle, useRef, useState } from "react";
+import { RefObject, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { XYCoord, useDrag, useDrop } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit } from "remeda";
+import { omit, takeWhile } from "remeda";
 import { ConfimationPopover } from "../common/ConfirmationPopover";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
@@ -71,9 +72,8 @@ import {
 import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 
 export interface PetitionComposeFieldProps {
-  petitionId: string;
+  petition: PetitionComposeField_PetitionBaseFragment;
   field: PetitionComposeField_PetitionFieldFragment;
-  fields: PetitionComposeField_PetitionFieldFragment[];
   fieldIndex: PetitionFieldIndex;
   index: number;
   isActive: boolean;
@@ -89,7 +89,6 @@ export interface PetitionComposeFieldProps {
   onFocusPrevField: () => void;
   onAddField: () => void;
   isReadOnly?: boolean;
-  isAttachDisabled?: boolean;
 }
 
 export interface PetitionComposeFieldRef {
@@ -104,9 +103,8 @@ const _PetitionComposeField = chakraForwardRef<
   PetitionComposeFieldRef
 >(function PetitionComposeField(
   {
-    petitionId,
+    petition,
     field,
-    fields,
     fieldIndex,
     index,
     isActive,
@@ -123,7 +121,6 @@ const _PetitionComposeField = chakraForwardRef<
     onFocusPrevField,
     onAddField,
     isReadOnly,
-    isAttachDisabled,
     ...props
   },
   ref,
@@ -137,12 +134,7 @@ const _PetitionComposeField = chakraForwardRef<
   );
 
   const canChangeVisibility =
-    fields
-      .slice(
-        0,
-        fields.findIndex((f) => f.id === field.id),
-      )
-      .filter((f) => !f.isReadOnly).length > 0;
+    takeWhile(petition.fields, (f) => f.id !== field.id).filter((f) => !f.isReadOnly).length > 0;
 
   const uploads = useRef<Record<string, AbortController>>({});
   const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<Record<string, number>>(
@@ -164,7 +156,7 @@ const _PetitionComposeField = chakraForwardRef<
   const handleRemoveAttachment = async function (attachmentId: string) {
     uploads.current[attachmentId]?.abort();
     await deletePetitionFieldAttachment({
-      variables: { petitionId, fieldId: field.id, attachmentId },
+      variables: { petitionId: petition.id, fieldId: field.id, attachmentId },
     });
   };
 
@@ -172,7 +164,7 @@ const _PetitionComposeField = chakraForwardRef<
     await withError(
       openNewWindow(async () => {
         const { data } = await petitionFieldAttachmentDownloadLink({
-          variables: { petitionId, fieldId: field.id, attachmentId },
+          variables: { petitionId: petition.id, fieldId: field.id, attachmentId },
         });
         const { url } = data!.petitionFieldAttachmentDownloadLink;
         return url!;
@@ -243,7 +235,7 @@ const _PetitionComposeField = chakraForwardRef<
         async (file) => {
           const { data } = await createPetitionFieldAttachmentUploadLink({
             variables: {
-              petitionId: petitionId,
+              petitionId: petition.id,
               fieldId: field.id,
               data: { filename: file.name, size: file.size, contentType: file.type },
             },
@@ -273,7 +265,11 @@ const _PetitionComposeField = chakraForwardRef<
               // handled when aborted
             } else {
               await deletePetitionFieldAttachment({
-                variables: { petitionId, fieldId: field.id, attachmentId: attachment.id },
+                variables: {
+                  petitionId: petition.id,
+                  fieldId: field.id,
+                  attachmentId: attachment.id,
+                },
               });
             }
             return;
@@ -282,7 +278,7 @@ const _PetitionComposeField = chakraForwardRef<
           }
           await petitionFieldAttachmentUploadComplete({
             variables: {
-              petitionId: petitionId,
+              petitionId: petition.id,
               fieldId: field.id,
               attachmentId: attachment.id,
             },
@@ -450,9 +446,9 @@ const _PetitionComposeField = chakraForwardRef<
           paddingTop={2}
           paddingBottom={10}
           paddingRight={4}
+          petition={petition}
           field={field}
           fieldIndex={fieldIndex}
-          fields={fields}
           showError={showError}
           attachmentUploadProgress={attachmentUploadProgress}
           onFieldEdit={onFieldEdit}
@@ -462,7 +458,6 @@ const _PetitionComposeField = chakraForwardRef<
           onRemoveAttachment={handleRemoveAttachment}
           onDownloadAttachment={handleDownloadAttachment}
           isReadOnly={isReadOnly}
-          isAttachDisabled={isAttachDisabled}
         />
         <PetitionComposeFieldActions
           field={field}
@@ -478,7 +473,6 @@ const _PetitionComposeField = chakraForwardRef<
           bottom={0}
           right={2}
           isReadOnly={isReadOnly}
-          isAttachDisabled={isAttachDisabled}
         />
       </Box>
     </Box>
@@ -490,7 +484,7 @@ interface PetitionComposeFieldInnerProps
     PetitionComposeFieldProps,
     | "field"
     | "fieldIndex"
-    | "fields"
+    | "petition"
     | "showError"
     | "onFieldEdit"
     | "onFocusNextField"
@@ -501,7 +495,6 @@ interface PetitionComposeFieldInnerProps
   onRemoveAttachment: (attachmentId: string) => void;
   onDownloadAttachment: (attachmentId: string) => void;
   isReadOnly?: boolean;
-  isAttachDisabled?: boolean;
 }
 
 // This component was extracted so the whole PetitionComposeField doesn't rerender
@@ -514,7 +507,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   {
     field,
     fieldIndex,
-    fields,
+    petition,
     showError,
     attachmentUploadProgress,
     onFieldEdit,
@@ -524,7 +517,6 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     onDownloadAttachment,
     onRemoveAttachment,
     isReadOnly,
-    isAttachDisabled,
     ...props
   },
   ref,
@@ -774,7 +766,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               <PetitionComposeFieldAttachment
                 key={attachment.id}
                 attachment={attachment}
-                isDisabled={isAttachDisabled}
+                isDisabled={isReadOnly}
                 progress={attachmentUploadProgress[attachment.id]}
                 onDownload={() => onDownloadAttachment(attachment.id)}
                 onRemove={() => onRemoveAttachment(attachment.id)}
@@ -853,7 +845,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             showError={showError}
             fieldId={field.id}
             visibility={field.visibility as any}
-            fields={fields}
+            fields={petition.fields}
             onVisibilityEdit={(visibility) => onFieldEdit({ visibility })}
             isReadOnly={isReadOnly}
           />
@@ -872,7 +864,6 @@ interface PetitionComposeFieldActionsProps
   onVisibilityClick: () => void;
   onAttachmentClick: () => void;
   isReadOnly?: boolean;
-  isAttachDisabled?: boolean;
 }
 
 const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFieldActionsProps>(
@@ -887,7 +878,6 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       onDeleteClick,
       isReadOnly,
       isActive,
-      isAttachDisabled,
       ...props
     },
     ref,
@@ -953,7 +943,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           </SmallPopover>
         )}
         <IconButtonWithTooltip
-          isDisabled={isAttachDisabled}
+          isDisabled={isReadOnly}
           icon={<PaperclipIcon />}
           size="sm"
           variant="ghost"
@@ -1042,6 +1032,18 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
 );
 
 const fragments = {
+  get PetitionBase() {
+    return gql`
+      fragment PetitionComposeField_PetitionBase on PetitionBase {
+        id
+        fields {
+          isReadOnly
+          ...PetitionFieldVisibilityEditor_PetitionField
+        }
+      }
+      ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+    `;
+  },
   get PetitionField() {
     return gql`
       fragment PetitionComposeField_PetitionField on PetitionField {
@@ -1059,11 +1061,9 @@ const fragments = {
           ...PetitionComposeField_PetitionFieldAttachment
         }
         ...PetitionFieldOptionsListEditor_PetitionField
-        ...PetitionFieldVisibilityEditor_PetitionField
       }
       ${this.PetitionFieldAttachment}
       ${PetitionFieldOptionsListEditor.fragments.PetitionField}
-      ${PetitionFieldVisibilityEditor.fragments.PetitionField}
     `;
   },
   get PetitionFieldAttachment() {
@@ -1156,23 +1156,20 @@ const _mutations = [
   `,
 ];
 
-const comparePetitionComposeFieldProps = compareWithFragments<any>({
+const PetitionComposeFieldActions = memoWithFragments(_PetitionComposeFieldActions, {
   field: fragments.PetitionField,
-  fields: PetitionFieldVisibilityEditor.fragments.PetitionField,
-} as any);
+});
 
-const PetitionComposeFieldActions = memo(
-  _PetitionComposeFieldActions,
-  comparePetitionComposeFieldProps,
-) as typeof _PetitionComposeFieldActions;
-
-const PetitionComposeFieldInner = memo(
-  _PetitionComposeFieldInner,
-  comparePetitionComposeFieldProps,
-) as typeof _PetitionComposeFieldInner;
+const PetitionComposeFieldInner = memoWithFragments(_PetitionComposeFieldInner, {
+  field: fragments.PetitionField,
+  petition: fragments.PetitionBase,
+});
 
 export const PetitionComposeField = Object.assign(
-  memo(_PetitionComposeField, comparePetitionComposeFieldProps) as typeof _PetitionComposeField,
+  memoWithFragments(_PetitionComposeField, {
+    field: fragments.PetitionField,
+    petition: fragments.PetitionBase,
+  }),
   { fragments },
 );
 

@@ -45,14 +45,13 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
-import { compareWithFragments } from "@parallel/utils/compareWithFragments";
+import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, noop } from "remeda";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
@@ -1004,13 +1003,10 @@ const mutations = [
 ];
 
 export const PetitionSettings = Object.assign(
-  memo(
-    _PetitionSettings,
-    compareWithFragments<PetitionSettingsProps>({
-      user: fragments.User,
-      petition: fragments.PetitionBase,
-    }),
-  ) as typeof _PetitionSettings,
+  memoWithFragments(_PetitionSettings, {
+    user: fragments.User,
+    petition: fragments.PetitionBase,
+  }),
   { fragments, mutations },
 );
 

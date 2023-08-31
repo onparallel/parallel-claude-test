@@ -4,27 +4,34 @@ import {
   isField,
   isInlineFragment,
 } from "@apollo/client/utilities";
-import { DocumentNode, SelectionSetNode, FragmentDefinitionNode, FieldNode } from "graphql";
+import { DocumentNode, FieldNode, FragmentDefinitionNode, SelectionSetNode } from "graphql";
+import { ComponentProps, ComponentType, memo } from "react";
 
 /**
- * Creates a comparer function meant to be used with React.memo.
+ * Memoizes the component using a comparer function that takes into account
+ * the fragments for its props.
  * It will deep-compare props specified in `fragments` but it will only check
  * fields specified in the fragment.
  * It is useful when fragments are being composed in parent elements and these
  * props have other fields that don't affect the rendering of the component.
+ * @param Component The component to memoize
  * @param fragments A dictionary where the key is the name of the prop and the
  * value is the fragment document to use for it
  */
-export function compareWithFragments<T>(fragments: Partial<{ [K in keyof T]: DocumentNode }>) {
-  return (prev: Readonly<T>, next: Readonly<T>) => {
-    const prevKeys = Object.keys(prev) as (keyof T)[];
+export function memoWithFragments<T extends ComponentType<any>>(
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Component: T,
+  fragments: Partial<Record<keyof ComponentProps<T>, DocumentNode>>,
+): T {
+  return memo(Component, (prev: Readonly<ComponentProps<T>>, next: Readonly<ComponentProps<T>>) => {
+    const prevKeys = Object.keys(prev) as (keyof ComponentProps<T>)[];
     const nextKeys = Object.keys(prev);
     if (prevKeys.length !== nextKeys.length) {
       return false;
     }
     for (const key of prevKeys) {
       if (key in fragments) {
-        const doc = fragments[key] as DocumentNode;
+        const doc = fragments[key as keyof typeof fragments]!;
         const fragmentMap = createFragmentMap(doc.definitions as any);
         if (
           !checkSelectionSet(
@@ -43,7 +50,7 @@ export function compareWithFragments<T>(fragments: Partial<{ [K in keyof T]: Doc
       }
     }
     return true;
-  };
+  }) as unknown as T;
 }
 
 function checkSelectionSet(
