@@ -9,7 +9,7 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
-import { RecipientViewPetitionFieldCard } from "./RecipientViewPetitionFieldCard";
+import { RecipientViewPetitionFieldLayout } from "./RecipientViewPetitionFieldLayout";
 
 const _publicCreateFileUploadReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
@@ -22,7 +22,7 @@ const _publicCreateFileUploadReply = gql`
         ...uploadFile_AWSPresignedPostData
       }
       reply {
-        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
         field {
           id
           petition {
@@ -37,7 +37,7 @@ const _publicCreateFileUploadReply = gql`
     }
   }
   ${uploadFile.fragments.AWSPresignedPostData}
-  ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionFieldReply}
 `;
 const _publicFileUploadReplyComplete = gql`
   mutation RecipientViewPetitionFieldMutations_publicFileUploadReplyComplete(

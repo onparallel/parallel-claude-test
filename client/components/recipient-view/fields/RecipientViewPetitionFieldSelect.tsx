@@ -15,16 +15,16 @@ import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
-  RecipientViewPetitionFieldCard_PetitionFieldSelection,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
+} from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
@@ -38,7 +38,6 @@ type SelectInstance = _SelectInstance<SimpleOption, false>;
 export function RecipientViewPetitionFieldSelect({
   field,
   isDisabled,
-  isInvalid,
   onDownloadAttachment,
   onDeleteReply,
   onUpdateReply,
@@ -94,9 +93,8 @@ export function RecipientViewPetitionFieldSelect({
   const id = `reply-${field.id}-new`;
 
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
       addNewReplyIsDisabled={showNewReply}
@@ -166,13 +164,13 @@ export function RecipientViewPetitionFieldSelect({
           </Box>
         </FormControl>
       ) : null}
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }
 
 interface RecipientViewPetitionFieldReplySelectProps {
-  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
+  reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isDisabled: boolean;
   onUpdate: (content: string) => Promise<void>;
   onDelete: () => void;

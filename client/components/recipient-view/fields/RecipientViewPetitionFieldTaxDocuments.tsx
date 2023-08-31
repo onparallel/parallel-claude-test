@@ -10,14 +10,14 @@ import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useOverwriteDocumentationDialog } from "../dialogs/OverwriteDocumentationDialog";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+} from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 
 export interface RecipientViewPetitionFieldTaxDocumentsProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
@@ -31,7 +31,6 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
 export function RecipientViewPetitionFieldTaxDocuments({
   field,
   isDisabled,
-  isInvalid,
   onDeleteReply,
   onDownloadAttachment,
   onDownloadReply,
@@ -140,9 +139,8 @@ export function RecipientViewPetitionFieldTaxDocuments({
   };
 
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
       tone={tone}
@@ -237,6 +235,6 @@ export function RecipientViewPetitionFieldTaxDocuments({
           </HStack>
         </Stack>
       ) : null}
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }

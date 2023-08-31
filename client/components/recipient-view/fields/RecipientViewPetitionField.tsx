@@ -2,7 +2,7 @@ import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
-  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
+  RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionFieldDocument,
@@ -22,9 +22,9 @@ import {
   usePetitionFieldCommentsDialog,
 } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+} from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldCheckbox } from "./RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "./RecipientViewPetitionFieldDate";
 import { RecipientViewPetitionFieldDateTime } from "./RecipientViewPetitionFieldDateTime";
@@ -38,17 +38,19 @@ import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFiel
 import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 import { useCreateFileUploadReply } from "./clientMutations";
+import { RecipientViewPetitionFieldCard } from "./RecipientViewPetitionFieldCard";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
-  field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
+  field: RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment;
   keycode: string;
   access: RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment;
   petitionId: string;
   isDisabled: boolean;
+  isInvalid: boolean;
 }
 
 export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
@@ -235,42 +237,48 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     onCreateReply: handleCreatePetitionFieldReply,
   };
 
-  return props.field.type === "HEADING" ? (
-    <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
-  ) : props.field.type === "TEXT" ? (
-    <RecipientViewPetitionFieldText {...props} {...commonProps} />
-  ) : props.field.type === "SHORT_TEXT" ? (
-    <RecipientViewPetitionFieldShortText {...props} {...commonProps} />
-  ) : props.field.type === "SELECT" ? (
-    <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
-  ) : props.field.type === "FILE_UPLOAD" ? (
-    <RecipientViewPetitionFieldFileUpload
-      {...props}
-      {...commonProps}
-      onCreateReply={handleCreateFileUploadReply}
-      onDownloadReply={handleDownloadFileUploadReply}
-    />
-  ) : props.field.type === "DYNAMIC_SELECT" ? (
-    <RecipientViewPetitionFieldDynamicSelect {...props} {...commonProps} />
-  ) : props.field.type === "CHECKBOX" ? (
-    <RecipientViewPetitionFieldCheckbox {...props} {...commonProps} />
-  ) : props.field.type === "NUMBER" ? (
-    <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
-  ) : props.field.type === "DATE" ? (
-    <RecipientViewPetitionFieldDate {...props} {...commonProps} />
-  ) : props.field.type === "DATE_TIME" ? (
-    <RecipientViewPetitionFieldDateTime {...props} {...commonProps} />
-  ) : props.field.type === "PHONE" ? (
-    <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
-  ) : props.field.type === "ES_TAX_DOCUMENTS" ? (
-    <RecipientViewPetitionFieldTaxDocuments
-      {...props}
-      {...commonProps}
-      onDownloadReply={handleDownloadFileUploadReply}
-      onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
-      onRefreshField={handleRefreshAsyncField}
-    />
-  ) : null;
+  if (props.field.type === "HEADING") {
+    return <RecipientViewPetitionFieldHeading {...props} {...commonProps} />;
+  }
+
+  return (
+    <RecipientViewPetitionFieldCard isInvalid={props.isInvalid} field={props.field}>
+      {props.field.type === "TEXT" ? (
+        <RecipientViewPetitionFieldText {...props} {...commonProps} />
+      ) : props.field.type === "SHORT_TEXT" ? (
+        <RecipientViewPetitionFieldShortText {...props} {...commonProps} />
+      ) : props.field.type === "SELECT" ? (
+        <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
+      ) : props.field.type === "FILE_UPLOAD" ? (
+        <RecipientViewPetitionFieldFileUpload
+          {...props}
+          {...commonProps}
+          onCreateReply={handleCreateFileUploadReply}
+          onDownloadReply={handleDownloadFileUploadReply}
+        />
+      ) : props.field.type === "DYNAMIC_SELECT" ? (
+        <RecipientViewPetitionFieldDynamicSelect {...props} {...commonProps} />
+      ) : props.field.type === "CHECKBOX" ? (
+        <RecipientViewPetitionFieldCheckbox {...props} {...commonProps} />
+      ) : props.field.type === "NUMBER" ? (
+        <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
+      ) : props.field.type === "DATE" ? (
+        <RecipientViewPetitionFieldDate {...props} {...commonProps} />
+      ) : props.field.type === "DATE_TIME" ? (
+        <RecipientViewPetitionFieldDateTime {...props} {...commonProps} />
+      ) : props.field.type === "PHONE" ? (
+        <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
+      ) : props.field.type === "ES_TAX_DOCUMENTS" ? (
+        <RecipientViewPetitionFieldTaxDocuments
+          {...props}
+          {...commonProps}
+          onDownloadReply={handleDownloadFileUploadReply}
+          onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+          onRefreshField={handleRefreshAsyncField}
+        />
+      ) : null}
+    </RecipientViewPetitionFieldCard>
+  );
 }
 
 RecipientViewPetitionField.fragments = {
@@ -282,9 +290,11 @@ RecipientViewPetitionField.fragments = {
   `,
   PublicPetitionField: gql`
     fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
+      ...RecipientViewPetitionFieldLayout_PublicPetitionField
       ...RecipientViewPetitionFieldCard_PublicPetitionField
     }
     ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
+    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionField}
   `,
   PublicPetitionFieldReply: gql`
     fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
@@ -297,10 +307,10 @@ const _queries = [
   gql`
     query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
       publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
-        ...RecipientViewPetitionFieldCard_PublicPetitionField
+        ...RecipientViewPetitionFieldLayout_PublicPetitionField
       }
     }
-    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
+    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionField}
   `,
 ];
 
@@ -343,7 +353,7 @@ RecipientViewPetitionField.mutations = [
       $fields: [CreatePetitionFieldReplyInput!]!
     ) {
       publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
-        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
         field {
           id
           petition {
@@ -356,7 +366,7 @@ RecipientViewPetitionField.mutations = [
         }
       }
     }
-    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionFieldReply}
   `,
   gql`
     mutation RecipientViewPetitionField_publicUpdatePetitionFieldReplies(
@@ -364,7 +374,7 @@ RecipientViewPetitionField.mutations = [
       $replies: [UpdatePetitionFieldReplyInput!]!
     ) {
       publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
-        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
         field {
           id
           petition {
@@ -374,7 +384,7 @@ RecipientViewPetitionField.mutations = [
         }
       }
     }
-    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionFieldReply}
   `,
   gql`
     mutation RecipientViewPetitionField_publicStartAsyncFieldCompletion(

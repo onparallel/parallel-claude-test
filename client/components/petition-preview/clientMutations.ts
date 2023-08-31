@@ -16,7 +16,7 @@ import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { customAlphabet } from "nanoid";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
-import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
+import { RecipientViewPetitionFieldLayout } from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
 
 function getRandomId() {
   const nanoid = customAlphabet("1234567890abcdefgihjklmnopqrstvwxyz", 6);
@@ -159,7 +159,7 @@ const _createPetitionFieldReplies = gql`
     $fields: [CreatePetitionFieldReplyInput!]!
   ) {
     createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      ...RecipientViewPetitionFieldLayout_PetitionFieldReply
       field {
         id
         petition {
@@ -174,7 +174,7 @@ const _createPetitionFieldReplies = gql`
       }
     }
   }
-  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+  ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
 `;
 
 export function useCreatePetitionFieldReply() {
@@ -253,7 +253,7 @@ const _createFileUploadReply = gql`
         ...uploadFile_AWSPresignedPostData
       }
       reply {
-        ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        ...RecipientViewPetitionFieldLayout_PetitionFieldReply
         field {
           id
           petition {
@@ -270,7 +270,7 @@ const _createFileUploadReply = gql`
     }
   }
   ${uploadFile.fragments.AWSPresignedPostData}
-  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+  ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
 `;
 const _createFileUploadReplyComplete = gql`
   mutation PreviewPetitionFieldMutations_createFileUploadReplyComplete(

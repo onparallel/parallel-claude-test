@@ -3,10 +3,10 @@ import { useTone } from "@parallel/components/common/ToneProvider";
 import { usePreviewDowJonesPermissionDeniedDialog } from "@parallel/components/petition-preview/dialogs/PreviewDowJonesPermissionDeniedDialog";
 import { FormattedMessage } from "react-intl";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
-} from "../../recipient-view/fields/RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+} from "../../recipient-view/fields/RecipientViewPetitionFieldLayout";
 
 import {
   Box,
@@ -44,7 +44,7 @@ import { isDefined } from "remeda";
 
 export interface PreviewPetitionFieldKycProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   petition: PreviewPetitionFieldKyc_PetitionBaseFragment;
@@ -59,7 +59,7 @@ export function PreviewPetitionFieldKyc({
   field,
   petition,
   isDisabled,
-  isInvalid,
+
   onDeleteReply,
   onDownloadReply,
   onDownloadAttachment,
@@ -126,9 +126,8 @@ export function PreviewPetitionFieldKyc({
   };
 
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
       tone={tone}
@@ -197,13 +196,13 @@ export function PreviewPetitionFieldKyc({
           </HStack>
         </Stack>
       ) : null}
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }
 
 interface KYCResearchFieldReplyProfileProps {
   id: string;
-  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isDisabled: boolean;
   onRemove?: () => void;
   onDownload?: (replyId: string) => void;

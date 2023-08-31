@@ -2,14 +2,14 @@ import { Spinner, Tooltip } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, CloudOkIcon } from "@parallel/chakra/icons";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIntl } from "react-intl";
-import { RecipientViewPetitionFieldCard_PetitionFieldReplySelection } from "./RecipientViewPetitionFieldCard";
+import { RecipientViewPetitionFieldLayout_PetitionFieldReplySelection } from "./RecipientViewPetitionFieldLayout";
 
 export function RecipientViewPetitionFieldReplyStatusIndicator({
   reply,
   isSaving,
   showSavedIcon = true,
 }: {
-  reply?: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  reply?: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isSaving: boolean;
   showSavedIcon?: boolean;
 }) {

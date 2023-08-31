@@ -4,17 +4,18 @@ import { CheckboxTypeLabel } from "@parallel/components/petition-common/Checkbox
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+} from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
 export interface RecipientViewPetitionFieldCheckboxProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
+  isInvalid?: boolean;
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string[] }) => Promise<void>;
   onCreateReply: (content: { value: string[] }) => Promise<string | undefined>;
@@ -117,9 +118,8 @@ export function RecipientViewPetitionFieldCheckbox({
   };
 
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={false}
       onDownloadAttachment={onDownloadAttachment}
@@ -185,6 +185,6 @@ export function RecipientViewPetitionFieldCheckbox({
           </Checkbox>
         ))}
       </Stack>
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }

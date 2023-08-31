@@ -22,11 +22,11 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
-  RecipientViewPetitionFieldCard_PetitionFieldSelection,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
+} from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 import { useMetadata } from "@parallel/utils/withMetadata";
 
@@ -37,7 +37,7 @@ interface FieldDateTimeReply {
 
 export interface RecipientViewPetitionFieldDateTimeProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
@@ -49,7 +49,6 @@ export interface RecipientViewPetitionFieldDateTimeProps
 export function RecipientViewPetitionFieldDateTime({
   field,
   isDisabled,
-  isInvalid,
   onDownloadAttachment,
   onDeleteReply,
   onUpdateReply,
@@ -184,9 +183,8 @@ export function RecipientViewPetitionFieldDateTime({
     },
   };
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
       addNewReplyIsDisabled={showNewReply && !isValidDateString(value)}
@@ -233,13 +231,13 @@ export function RecipientViewPetitionFieldDateTime({
           </Flex>
         </Stack>
       ) : null}
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }
 
 interface RecipientViewPetitionFieldReplyDateProps {
-  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
+  reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isDisabled: boolean;
   onUpdate: (content: FieldDateTimeReply) => Promise<void>;
   onDelete: (focusPrev?: boolean) => void;

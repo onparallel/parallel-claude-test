@@ -36,16 +36,16 @@ import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
-  RecipientViewPetitionFieldCard_PetitionFieldSelection,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
+} from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
 export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
@@ -57,7 +57,6 @@ export interface RecipientViewPetitionFieldShortTextProps
 export function RecipientViewPetitionFieldShortText({
   field,
   isDisabled,
-  isInvalid,
   onDownloadAttachment,
   onDeleteReply,
   onUpdateReply,
@@ -251,9 +250,8 @@ export function RecipientViewPetitionFieldShortText({
   const isInvalidValue = value.length === 0 || (format?.validate ? !format.validate(value) : false);
 
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
       addNewReplyIsDisabled={showNewReply && isInvalidValue}
@@ -299,13 +297,13 @@ export function RecipientViewPetitionFieldShortText({
         ) : null}
         {isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
       </FormControl>
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }
 
 interface RecipientViewPetitionFieldReplyShortTextProps {
-  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
+  reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isDisabled: boolean;
   isInvalid: boolean;
   onUpdate: (content: string) => Promise<void>;

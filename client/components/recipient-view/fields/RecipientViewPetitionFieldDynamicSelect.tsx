@@ -13,18 +13,18 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
 import { countBy } from "remeda";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
-  RecipientViewPetitionFieldCard_PetitionFieldSelection,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
+} from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
 export type DynamicSelectValue = [string, Maybe<string>][];
 
 export interface RecipientViewPetitionFieldDynamicSelectProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
@@ -38,7 +38,6 @@ type SelectInstance = _SelectInstance<{ label: string; value: string }, false, n
 export function RecipientViewPetitionFieldDynamicSelect({
   field,
   isDisabled,
-  isInvalid,
   onDownloadAttachment,
   onDeleteReply,
   onUpdateReply,
@@ -91,9 +90,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
   const showAddNewReply = !isDisabled && field.multiple;
 
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={showAddNewReply}
       addNewReplyIsDisabled={
@@ -135,12 +133,12 @@ export function RecipientViewPetitionFieldDynamicSelect({
           />
         </Box>
       ) : null}
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }
 interface RecipientViewPetitionFieldReplyDynamicSelectProps {
-  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
+  reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isDisabled?: boolean;
   onChange: (content: [string, string | null][]) => Promise<void>;
   onDelete: () => void;
@@ -217,8 +215,8 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
 interface RecipientViewPetitionFieldReplyDynamicSelectLevelProps {
   label: string;
   level: number;
-  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  reply?: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
+  reply?: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isDisabled?: boolean;
   onChange: (value: string) => Promise<void>;
   onDeleteReply?: () => void;

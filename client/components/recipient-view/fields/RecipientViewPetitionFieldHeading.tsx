@@ -3,10 +3,10 @@ import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
 import { CommentsButton } from "../CommentsButton";
-import { RecipientViewPetitionFieldCard_PetitionFieldSelection } from "./RecipientViewPetitionFieldCard";
+import { RecipientViewPetitionFieldLayout_PetitionFieldSelection } from "./RecipientViewPetitionFieldLayout";
 
 export interface RecipientViewPetitionFieldHeadingProps {
-  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
   onDownloadAttachment: (attachmentId: string) => void;
   onCommentsButtonClick: () => Promise<void>;
 }

@@ -17465,6 +17465,48 @@ export type RecipientViewPetitionFieldCard_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
+};
+
+export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+  id: string;
+  type: PetitionFieldType;
+};
+
+export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables =
+  Exact<{
+    keycode: Scalars["ID"]["input"];
+    replyId: Scalars["GID"]["input"];
+    preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+  }>;
+
+export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation = {
+  publicFileUploadReplyDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
+};
+
+export type RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"]["input"];
+    replyId: Scalars["GID"]["input"];
+    preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+  }>;
+
+export type RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutation = {
+  fileUploadReplyDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
+};
+
+export type RecipientViewPetitionFieldLayout_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
   title?: string | null;
   description?: string | null;
   options: { [key: string]: any };
@@ -17501,7 +17543,7 @@ export type RecipientViewPetitionFieldCard_PetitionFieldFragment = {
   }>;
 };
 
-export type RecipientViewPetitionFieldCard_PetitionFieldReplyFragment = {
+export type RecipientViewPetitionFieldLayout_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
   status: PetitionFieldReplyStatus;
@@ -17511,7 +17553,7 @@ export type RecipientViewPetitionFieldCard_PetitionFieldReplyFragment = {
   isAnonymized: boolean;
 };
 
-export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
+export type RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   type: PetitionFieldType;
@@ -17546,7 +17588,7 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
   }>;
 };
 
-export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
+export type RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragment = {
   __typename?: "PublicPetitionFieldReply";
   id: string;
   status: PetitionFieldReplyStatus;
@@ -17554,36 +17596,6 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
   createdAt: string;
   updatedAt: string;
   isAnonymized: boolean;
-};
-
-export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"]["input"];
-    replyId: Scalars["GID"]["input"];
-    preview?: InputMaybe<Scalars["Boolean"]["input"]>;
-  }>;
-
-export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation = {
-  publicFileUploadReplyDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
-  };
-};
-
-export type RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"]["input"];
-    replyId: Scalars["GID"]["input"];
-    preview?: InputMaybe<Scalars["Boolean"]["input"]>;
-  }>;
-
-export type RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
-  };
 };
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables =
@@ -37947,8 +37959,8 @@ export const GeneratePrefilledPublicLinkDialog_PetitionTemplateFragmentDoc = gql
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<GeneratePrefilledPublicLinkDialog_PetitionTemplateFragment, unknown>;
-export const RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc = gql`
-  fragment RecipientViewPetitionFieldCard_PetitionFieldReply on PetitionFieldReply {
+export const RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldLayout_PetitionFieldReply on PetitionFieldReply {
     id
     status
     content
@@ -37956,7 +37968,7 @@ export const RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc = gql`
     updatedAt
     isAnonymized
   }
-` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PetitionFieldReplyFragment, unknown>;
+` as unknown as DocumentNode<RecipientViewPetitionFieldLayout_PetitionFieldReplyFragment, unknown>;
 export const FileAttachmentButton_FileUploadFragmentDoc = gql`
   fragment FileAttachmentButton_FileUpload on FileUpload {
     filename
@@ -37965,8 +37977,8 @@ export const FileAttachmentButton_FileUploadFragmentDoc = gql`
     isComplete
   }
 ` as unknown as DocumentNode<FileAttachmentButton_FileUploadFragment, unknown>;
-export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
-  fragment RecipientViewPetitionFieldCard_PetitionField on PetitionField {
+export const RecipientViewPetitionFieldLayout_PetitionFieldFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldLayout_PetitionField on PetitionField {
     id
     type
     title
@@ -37976,7 +37988,7 @@ export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
     multiple
     isInternal
     replies {
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      ...RecipientViewPetitionFieldLayout_PetitionFieldReply
     }
     attachments {
       id
@@ -37989,9 +38001,15 @@ export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
     hasCommentsEnabled
     ...completedFieldReplies_PetitionField
   }
-  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
   ${FileAttachmentButton_FileUploadFragmentDoc}
   ${completedFieldReplies_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<RecipientViewPetitionFieldLayout_PetitionFieldFragment, unknown>;
+export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldCard_PetitionField on PetitionField {
+    id
+    type
+  }
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PetitionFieldFragment, unknown>;
 export const PetitionFieldComment_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionFieldComment_PetitionFieldComment on PetitionFieldComment {
@@ -38038,15 +38056,17 @@ export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
 ` as unknown as DocumentNode<PreviewPetitionFieldCommentsDialog_PetitionFieldFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionField on PetitionField {
+    ...RecipientViewPetitionFieldLayout_PetitionField
     ...RecipientViewPetitionFieldCard_PetitionField
     ...PreviewPetitionFieldCommentsDialog_PetitionField
     previewReplies @client {
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      ...RecipientViewPetitionFieldLayout_PetitionFieldReply
     }
   }
+  ${RecipientViewPetitionFieldLayout_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
   ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
-  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldFragment, unknown>;
 export const groupFieldsByPages_PetitionFieldFragmentDoc = gql`
   fragment groupFieldsByPages_PetitionField on PetitionField {
@@ -39249,8 +39269,8 @@ export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
     lastUsedAt
   }
 ` as unknown as DocumentNode<Tokens_UserAuthenticationTokenFragment, unknown>;
-export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc = gql`
-  fragment RecipientViewPetitionFieldCard_PublicPetitionFieldReply on PublicPetitionFieldReply {
+export const RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldLayout_PublicPetitionFieldReply on PublicPetitionFieldReply {
     id
     status
     content
@@ -39259,7 +39279,7 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc 
     isAnonymized
   }
 ` as unknown as DocumentNode<
-  RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
+  RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragment,
   unknown
 >;
 export const completedFieldReplies_PublicPetitionFieldFragmentDoc = gql`
@@ -39272,8 +39292,8 @@ export const completedFieldReplies_PublicPetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<completedFieldReplies_PublicPetitionFieldFragment, unknown>;
-export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql`
-  fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {
+export const RecipientViewPetitionFieldLayout_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldLayout_PublicPetitionField on PublicPetitionField {
     id
     type
     title
@@ -39283,7 +39303,7 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
     multiple
     isInternal
     replies {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
     }
     attachments {
       id
@@ -39296,14 +39316,22 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
     hasCommentsEnabled
     ...completedFieldReplies_PublicPetitionField
   }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragmentDoc}
   ${FileAttachmentButton_FileUploadFragmentDoc}
   ${completedFieldReplies_PublicPetitionFieldFragmentDoc}
+` as unknown as DocumentNode<RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment, unknown>;
+export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {
+    id
+    type
+  }
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PublicPetitionFieldFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
+    ...RecipientViewPetitionFieldLayout_PublicPetitionField
     ...RecipientViewPetitionFieldCard_PublicPetitionField
   }
+  ${RecipientViewPetitionFieldLayout_PublicPetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionField_PublicPetitionFieldFragment, unknown>;
 export const useFieldVisibility_PublicPetitionFieldFragmentDoc = gql`
@@ -41436,7 +41464,7 @@ export const PreviewPetitionFieldMutations_createPetitionFieldRepliesDocument = 
     $fields: [CreatePetitionFieldReplyInput!]!
   ) {
     createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      ...RecipientViewPetitionFieldLayout_PetitionFieldReply
       field {
         id
         petition {
@@ -41451,7 +41479,7 @@ export const PreviewPetitionFieldMutations_createPetitionFieldRepliesDocument = 
       }
     }
   }
-  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   PreviewPetitionFieldMutations_createPetitionFieldRepliesMutation,
   PreviewPetitionFieldMutations_createPetitionFieldRepliesMutationVariables
@@ -41467,7 +41495,7 @@ export const PreviewPetitionFieldMutations_createFileUploadReplyDocument = gql`
         ...uploadFile_AWSPresignedPostData
       }
       reply {
-        ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        ...RecipientViewPetitionFieldLayout_PetitionFieldReply
         field {
           id
           petition {
@@ -41484,7 +41512,7 @@ export const PreviewPetitionFieldMutations_createFileUploadReplyDocument = gql`
     }
   }
   ${uploadFile_AWSPresignedPostDataFragmentDoc}
-  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   PreviewPetitionFieldMutations_createFileUploadReplyMutation,
   PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables
@@ -42113,10 +42141,10 @@ export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment
 export const RecipientViewPetitionField_PublicPetitionFieldDocument = gql`
   query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
     publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionField
+      ...RecipientViewPetitionFieldLayout_PublicPetitionField
     }
   }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionField_PublicPetitionFieldQuery,
   RecipientViewPetitionField_PublicPetitionFieldQueryVariables
@@ -42165,7 +42193,7 @@ export const RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument
     $fields: [CreatePetitionFieldReplyInput!]!
   ) {
     publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
       field {
         id
         petition {
@@ -42178,7 +42206,7 @@ export const RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument
       }
     }
   }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionField_publicCreatePetitionFieldRepliesMutation,
   RecipientViewPetitionField_publicCreatePetitionFieldRepliesMutationVariables
@@ -42189,7 +42217,7 @@ export const RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument
     $replies: [UpdatePetitionFieldReplyInput!]!
   ) {
     publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
       field {
         id
         petition {
@@ -42199,7 +42227,7 @@ export const RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument
       }
     }
   }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionField_publicUpdatePetitionFieldRepliesMutation,
   RecipientViewPetitionField_publicUpdatePetitionFieldRepliesMutationVariables
@@ -42259,7 +42287,7 @@ export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocu
         ...uploadFile_AWSPresignedPostData
       }
       reply {
-        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
         field {
           id
           petition {
@@ -42274,7 +42302,7 @@ export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocu
     }
   }
   ${uploadFile_AWSPresignedPostDataFragmentDoc}
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+  ${RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation,
   RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables

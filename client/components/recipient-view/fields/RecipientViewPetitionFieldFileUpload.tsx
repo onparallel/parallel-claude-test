@@ -27,15 +27,15 @@ import { useCallback, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
-  RecipientViewPetitionFieldCard_PetitionFieldSelection,
-} from "./RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
+} from "./RecipientViewPetitionFieldLayout";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
@@ -48,7 +48,6 @@ export interface RecipientViewPetitionFieldFileUploadProps
 export function RecipientViewPetitionFieldFileUpload({
   field,
   isDisabled,
-  isInvalid,
   onDownloadAttachment,
   onDeleteReply,
   onCreateReply,
@@ -68,9 +67,8 @@ export function RecipientViewPetitionFieldFileUpload({
   );
 
   return (
-    <RecipientViewPetitionFieldCard
+    <RecipientViewPetitionFieldLayout
       field={field}
-      isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
     >
@@ -106,14 +104,14 @@ export function RecipientViewPetitionFieldFileUpload({
           onCreateReply={onCreateReply}
         />
       </Box>
-    </RecipientViewPetitionFieldCard>
+    </RecipientViewPetitionFieldLayout>
   );
 }
 
 interface RecipientViewPetitionFieldReplyFileUploadProps {
   id: string;
   type: PetitionFieldType;
-  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
+  reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
   isDisabled: boolean;
   onRemove?: () => void;
   onDownload?: (replyId: string) => void;
@@ -272,7 +270,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
 
 interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   isDisabled: boolean;
-  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
+  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
   onCreateReply: (files: File[]) => MaybePromise<void>;
 }
 

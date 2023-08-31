@@ -14,9 +14,9 @@ import { useCallback, useRef } from "react";
 import { useTone } from "../common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
-  RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
-} from "../recipient-view/fields/RecipientViewPetitionFieldCard";
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+} from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
@@ -41,15 +41,17 @@ import {
   usePreviewPetitionFieldCommentsDialog,
 } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 import { RecipientViewPetitionFieldDateTime } from "../recipient-view/fields/RecipientViewPetitionFieldDateTime";
+import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
+    RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
   petition: PreviewPetitionField_PetitionBaseFragment;
   field: PreviewPetitionField_PetitionFieldFragment;
   isDisabled: boolean;
+  isInvalid: boolean;
   isCacheOnly: boolean;
   myEffectivePermission: PetitionPermissionType;
 }
@@ -230,53 +232,59 @@ export function PreviewPetitionField({
     isDisabled: fieldIsDisabled,
   };
 
-  return field.type === "HEADING" ? (
-    <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
-  ) : field.type === "TEXT" ? (
-    <RecipientViewPetitionFieldText {...props} {...commonProps} />
-  ) : field.type === "SHORT_TEXT" ? (
-    <RecipientViewPetitionFieldShortText {...props} {...commonProps} />
-  ) : field.type === "SELECT" ? (
-    <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
-  ) : field.type === "FILE_UPLOAD" ? (
-    <RecipientViewPetitionFieldFileUpload
-      {...props}
-      {...commonProps}
-      onCreateReply={handleCreateFileUploadReply}
-      onDownloadReply={handleDownloadFileUploadReply}
-      isCacheOnly={isCacheOnly}
-    />
-  ) : field.type === "DYNAMIC_SELECT" ? (
-    <RecipientViewPetitionFieldDynamicSelect {...props} {...commonProps} />
-  ) : field.type === "CHECKBOX" ? (
-    <RecipientViewPetitionFieldCheckbox {...props} {...commonProps} />
-  ) : field.type === "NUMBER" ? (
-    <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
-  ) : field.type === "DATE" ? (
-    <RecipientViewPetitionFieldDate {...props} {...commonProps} />
-  ) : field.type === "DATE_TIME" ? (
-    <RecipientViewPetitionFieldDateTime {...props} {...commonProps} />
-  ) : field.type === "PHONE" ? (
-    <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
-  ) : field.type === "ES_TAX_DOCUMENTS" ? (
-    <RecipientViewPetitionFieldTaxDocuments
-      {...props}
-      {...commonProps}
-      onDownloadReply={handleDownloadFileUploadReply}
-      onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
-      onRefreshField={handleRefreshAsyncField}
-      isCacheOnly={isCacheOnly}
-    />
-  ) : field.type === "DOW_JONES_KYC" ? (
-    <PreviewPetitionFieldKyc
-      {...props}
-      {...commonProps}
-      petition={petition}
-      onDownloadReply={handleDownloadFileUploadReply}
-      onRefreshField={handleRefreshAsyncField}
-      isCacheOnly={isCacheOnly}
-    />
-  ) : null;
+  if (field.type === "HEADING") {
+    return <RecipientViewPetitionFieldHeading {...props} {...commonProps} />;
+  }
+
+  return (
+    <RecipientViewPetitionFieldCard isInvalid={props.isInvalid} field={field}>
+      {field.type === "TEXT" ? (
+        <RecipientViewPetitionFieldText {...props} {...commonProps} />
+      ) : field.type === "SHORT_TEXT" ? (
+        <RecipientViewPetitionFieldShortText {...props} {...commonProps} />
+      ) : field.type === "SELECT" ? (
+        <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
+      ) : field.type === "FILE_UPLOAD" ? (
+        <RecipientViewPetitionFieldFileUpload
+          {...props}
+          {...commonProps}
+          onCreateReply={handleCreateFileUploadReply}
+          onDownloadReply={handleDownloadFileUploadReply}
+          isCacheOnly={isCacheOnly}
+        />
+      ) : field.type === "DYNAMIC_SELECT" ? (
+        <RecipientViewPetitionFieldDynamicSelect {...props} {...commonProps} />
+      ) : field.type === "CHECKBOX" ? (
+        <RecipientViewPetitionFieldCheckbox {...props} {...commonProps} />
+      ) : field.type === "NUMBER" ? (
+        <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
+      ) : field.type === "DATE" ? (
+        <RecipientViewPetitionFieldDate {...props} {...commonProps} />
+      ) : field.type === "DATE_TIME" ? (
+        <RecipientViewPetitionFieldDateTime {...props} {...commonProps} />
+      ) : field.type === "PHONE" ? (
+        <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
+      ) : field.type === "ES_TAX_DOCUMENTS" ? (
+        <RecipientViewPetitionFieldTaxDocuments
+          {...props}
+          {...commonProps}
+          onDownloadReply={handleDownloadFileUploadReply}
+          onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+          onRefreshField={handleRefreshAsyncField}
+          isCacheOnly={isCacheOnly}
+        />
+      ) : field.type === "DOW_JONES_KYC" ? (
+        <PreviewPetitionFieldKyc
+          {...props}
+          {...commonProps}
+          petition={petition}
+          onDownloadReply={handleDownloadFileUploadReply}
+          onRefreshField={handleRefreshAsyncField}
+          isCacheOnly={isCacheOnly}
+        />
+      ) : null}
+    </RecipientViewPetitionFieldCard>
+  );
 }
 
 PreviewPetitionField.fragments = {
@@ -288,14 +296,16 @@ PreviewPetitionField.fragments = {
   `,
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
+      ...RecipientViewPetitionFieldLayout_PetitionField
       ...RecipientViewPetitionFieldCard_PetitionField
       ...PreviewPetitionFieldCommentsDialog_PetitionField
       previewReplies @client {
-        ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        ...RecipientViewPetitionFieldLayout_PetitionFieldReply
       }
     }
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
-    ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+    ${RecipientViewPetitionFieldLayout.fragments.PetitionField}
+    ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
     ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
