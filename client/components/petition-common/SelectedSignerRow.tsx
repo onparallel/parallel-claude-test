@@ -1,14 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, ListItem, ListItemProps, Stack } from "@chakra-ui/react";
+import { Center, ListItem, ListItemProps, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { SelectedSignerRow_PetitionSignerFragment } from "@parallel/graphql/__types";
-import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 interface SelectedSignerRowProps extends ListItemProps {
   signer: SelectedSignerRow_PetitionSignerFragment;
-  marker?: ReactNode;
   isEditable?: boolean;
   onRemoveClick?: () => void;
   onEditClick?: () => void;
@@ -16,7 +14,6 @@ interface SelectedSignerRowProps extends ListItemProps {
 
 export function SelectedSignerRow({
   signer,
-  marker,
   isEditable,
   onRemoveClick: onRemove,
   onEditClick: onEdit,
@@ -30,16 +27,17 @@ export function SelectedSignerRow({
       borderRadius="md"
       paddingX={2}
       paddingY={1}
+      position="relative"
+      paddingRight={24}
       {...props}
     >
-      <Flex justifyContent="space-between" alignItems="center">
-        <Box>
-          {marker}
-          {signer.firstName} {signer.lastName} {"<"}
-          {signer.email}
-          {">"}
-        </Box>
-        {isEditable ? (
+      <Text as="span">
+        {signer.firstName} {signer.lastName} {"<"}
+        {signer.email}
+        {">"}
+      </Text>
+      {isEditable ? (
+        <Center position="absolute" right={2} top={0} height="100%">
           <Stack direction="row" spacing={1}>
             <IconButtonWithTooltip
               variant="ghost"
@@ -59,8 +57,8 @@ export function SelectedSignerRow({
               onClick={onRemove}
             />
           </Stack>
-        ) : null}
-      </Flex>
+        </Center>
+      ) : null}
     </ListItem>
   );
 }

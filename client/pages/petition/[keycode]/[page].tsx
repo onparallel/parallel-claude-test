@@ -84,7 +84,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const petition = access!.petition!;
   const granter = access!.granter!;
   const contact = access!.contact!;
-  const signers = petition!.signatureConfig?.signers ?? [];
 
   const recipients = petition!.recipients;
   const message = access!.message;
@@ -115,8 +114,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           if (petition.signatureConfig?.review === false) {
             confirmSignerInfoData = await showConfirmPetitionSignersDialog({
               recipients: petition.recipients,
-              allowAdditionalSigners: petition.signatureConfig.allowAdditionalSigners,
-              presetSigners: signers,
+              signatureConfig: petition.signatureConfig,
               keycode,
               organization: granter.organization.name,
               contact,
@@ -451,6 +449,7 @@ const _fragments = {
           additionalSigners {
             ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
           }
+          ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
         }
         recipients {
           ...RecipientViewHeader_PublicContact
@@ -469,6 +468,7 @@ const _fragments = {
 
       ${this.PublicPetitionField}
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PetitionSigner}
+      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicSignatureConfig}
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}

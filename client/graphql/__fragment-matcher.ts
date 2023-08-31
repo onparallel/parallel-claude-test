@@ -58,6 +58,7 @@ const result: PossibleTypesResultData = {
       "ReplyUpdatedEvent",
       "SignatureCancelledEvent",
       "SignatureCompletedEvent",
+      "SignatureDeliveredEvent",
       "SignatureOpenedEvent",
       "SignatureReminderEvent",
       "SignatureStartedEvent",

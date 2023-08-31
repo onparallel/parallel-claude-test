@@ -151,7 +151,7 @@ export class SignaturitClient implements ISignatureClient {
               files: [filePath],
               body: opts.initialMessage,
               delivery_type: "email",
-              signing_mode: "parallel",
+              signing_mode: opts.signingMode === "PARALLEL" ? "parallel" : "sequential",
               branding_id: brandingId,
               events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
                 "Petition",

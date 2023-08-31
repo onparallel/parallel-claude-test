@@ -1493,6 +1493,17 @@ const PetitionEventSchemas = {
       },
     },
   },
+  SIGNATURE_DELIVERED: {
+    description: "An eSignature request on the parallel was delivered to the signer.",
+    properties: {
+      signer: _PetitionSigner,
+      petitionSignatureRequestId: {
+        type: "string",
+        description: "The ID of the signature request",
+        example: toGlobalId("PetitionSignatureRequest", 2),
+      },
+    },
+  },
   SIGNATURE_OPENED: {
     description: "A signer has opened the signing page on the signature provider",
     properties: {

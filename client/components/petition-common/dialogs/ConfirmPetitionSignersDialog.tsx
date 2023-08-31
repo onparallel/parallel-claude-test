@@ -1,6 +1,20 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Checkbox, FormControl, HStack, List, ListItem, Text } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  Checkbox,
+  FormControl,
+  HStack,
+  ListItem,
+  OrderedList,
+  Stack,
+  Text,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
+import { BreakLines } from "@parallel/components/common/BreakLines";
 import {
   ContactSelect,
   ContactSelectInstance,
@@ -15,6 +29,7 @@ import {
   ConfirmPetitionSignersDialog_PetitionAccessFragment,
   ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment,
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
+  ConfirmPetitionSignersDialog_SignatureConfigFragment,
   ConfirmPetitionSignersDialog_UserFragment,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
@@ -34,8 +49,7 @@ import { MAX_SIGNERS_ALLOWED } from "./SignatureConfigDialog";
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
   accesses: ConfirmPetitionSignersDialog_PetitionAccessFragment[];
-  signers: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
-  allowAdditionalSigners: boolean;
+  signatureConfig: ConfirmPetitionSignersDialog_SignatureConfigFragment;
   isUpdate?: boolean;
   previousSignatures?: ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment[];
 }
@@ -54,10 +68,13 @@ export type SignerSelectSelection = Omit<
 export function ConfirmPetitionSignersDialog(
   props: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>,
 ) {
+  const { minSigners, instructions, signingMode } = props.signatureConfig;
   const [presetSigners, otherSigners] = partition(
-    props.signers.filter(isDefined),
+    props.signatureConfig.signers.filter(isDefined),
     (s) => s.isPreset,
   );
+
+  const isSequential = signingMode === "SEQUENTIAL";
 
   const {
     control,
@@ -70,11 +87,11 @@ export function ConfirmPetitionSignersDialog(
     message: Maybe<string>;
     allowAdditionalSigners: boolean;
   }>({
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues: {
       signers: otherSigners,
       message: null,
-      allowAdditionalSigners: props.allowAdditionalSigners,
+      allowAdditionalSigners: props.signatureConfig.allowAdditionalSigners,
     },
   });
 
@@ -157,7 +174,8 @@ export function ConfirmPetitionSignersDialog(
     };
 
   const isMaxSignersReached = allSigners.length >= MAX_SIGNERS_ALLOWED;
-
+  const showSignersAddedByRecipient = allowAdditionalSigners && (props.isUpdate ?? false);
+  const ListElement = isSequential ? OrderedList : UnorderedList;
   return (
     <ConfirmDialog
       size="xl"
@@ -205,19 +223,42 @@ export function ConfirmPetitionSignersDialog(
         </HStack>
       }
       body={
-        <>
+        <Stack>
           <Text>
             {presetSigners.length > 0 ? (
+              isSequential ? (
+                <FormattedMessage
+                  id="component.confirm-petition-signers-dialog.preset-signers-sequential"
+                  defaultMessage="{names} will sign after the other signers."
+                  values={{
+                    names: intl.formatList(
+                      presetSigners.map((s, i) => (
+                        <b key={i}>{fullName(s.firstName, s.lastName)}</b>
+                      )),
+                    ),
+                    // eslint-disable-next-line formatjs/enforce-placeholders
+                    count: presetSigners.length,
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.confirm-petition-signers-dialog.preset-signers"
+                  defaultMessage="{names} will sign together with the signers you add."
+                  values={{
+                    names: intl.formatList(
+                      presetSigners.map((s, i) => (
+                        <b key={i}>{fullName(s.firstName, s.lastName)}</b>
+                      )),
+                    ),
+                    // eslint-disable-next-line formatjs/enforce-placeholders
+                    count: presetSigners.length,
+                  }}
+                />
+              )
+            ) : isSequential ? (
               <FormattedMessage
-                id="component.confirm-petition-signers-dialog.preset-signers"
-                defaultMessage="{names} will sign together with the signers you add."
-                values={{
-                  names: intl.formatList(
-                    presetSigners.map((s, i) => <b key={i}>{fullName(s.firstName, s.lastName)}</b>),
-                  ),
-                  // eslint-disable-next-line formatjs/enforce-placeholders
-                  count: presetSigners.length,
-                }}
+                id="component.confirm-petition-signers-dialog.no-signers-set-sequential"
+                defaultMessage="We will send the document to sign to each contact after the one before has signed:"
               />
             ) : (
               <FormattedMessage
@@ -230,14 +271,22 @@ export function ConfirmPetitionSignersDialog(
             <Controller
               name="signers"
               control={control}
+              rules={{
+                validate: () => {
+                  return showSignersAddedByRecipient || minSigners <= allSigners.length;
+                },
+              }}
               render={({ field: { onChange, value: signers } }) => (
                 <>
-                  <List paddingY={1} marginLeft={0} maxH="210px" overflowY="auto">
-                    {allowAdditionalSigners && props.isUpdate && (
+                  <ListElement
+                    margin={0}
+                    paddingY={1}
+                    maxH="210px"
+                    overflowY="auto"
+                    listStylePosition="inside"
+                  >
+                    {showSignersAddedByRecipient && (
                       <ListItem padding={2}>
-                        <Text as="span" paddingX={2}>
-                          {"•"}
-                        </Text>
                         <Text as="span">
                           <FormattedMessage
                             id="component.confirm-petition-signers-dialog.signer-added-by-recipient"
@@ -246,32 +295,25 @@ export function ConfirmPetitionSignersDialog(
                         </Text>
                       </ListItem>
                     )}
-                    {signers.length === 0 ? (
-                      <ListItem>
-                        <Text color="gray.500" marginLeft={1} marginTop={2}>
-                          <FormattedMessage
-                            id="component.confirm-petition-signers-dialog.no-signers-added"
-                            defaultMessage="You have not added any signers"
-                          />
-                        </Text>
-                      </ListItem>
-                    ) : null}
                     {signers.map((signer, index) => (
                       <SelectedSignerRow
                         key={index}
                         isEditable
-                        marker={
-                          <Text as="span" paddingX={2}>
-                            {"•"}
-                          </Text>
-                        }
                         signer={signer}
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                         onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                       />
                     ))}
-                  </List>
-                  <Box marginTop={2}>
+                  </ListElement>
+                  <Stack marginTop={2}>
+                    {signers.length === 0 ? (
+                      <Text color="gray.500">
+                        <FormattedMessage
+                          id="component.confirm-petition-signers-dialog.no-signers-added"
+                          defaultMessage="You have not added any signers"
+                        />
+                      </Text>
+                    ) : null}
                     <ContactSelect
                       ref={contactSelectRef as any}
                       isDisabled={isMaxSignersReached}
@@ -284,12 +326,34 @@ export function ConfirmPetitionSignersDialog(
                         defaultMessage: "Add a contact to sign",
                       })}
                     />
+                    {allSigners.length < minSigners ? (
+                      <Text color={!!errors.signers ? "red.500" : undefined}>
+                        <FormattedMessage
+                          id="component.confirm-petition-signers-dialog.min-signers"
+                          defaultMessage="Add at least {count, plural, =1{# signer} other{# signers}}"
+                          values={{ count: minSigners - allSigners.length }}
+                        />
+                      </Text>
+                    ) : null}
+                    {instructions ? (
+                      <Alert
+                        variant="subtle"
+                        status="info"
+                        borderRadius="md"
+                        backgroundColor="gray.100"
+                      >
+                        <AlertIcon />
+                        <AlertDescription>
+                          <BreakLines>{instructions}</BreakLines>
+                        </AlertDescription>
+                      </Alert>
+                    ) : null}
                     <SuggestedSigners
                       isDisabled={isMaxSignersReached}
                       suggestions={suggestions}
                       onAddSigner={(s) => onChange([...signers, s])}
                     />
-                  </Box>
+                  </Stack>
                 </>
               )}
             />
@@ -336,11 +400,12 @@ export function ConfirmPetitionSignersDialog(
                     id: "component.confirm-petition-signers-dialog.message-placeholder",
                     defaultMessage: "Write here a message for the signers...",
                   })}
+                  maxLength={1_000}
                 />
               </PaddedCollapse>
             </FormControl>
           )}
-        </>
+        </Stack>
       }
       confirm={
         <Button
@@ -404,6 +469,17 @@ ConfirmPetitionSignersDialog.fragments = {
         signers {
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
+      }
+    }
+  `,
+  SignatureConfig: gql`
+    fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
+      signingMode
+      minSigners
+      instructions
+      allowAdditionalSigners
+      signers {
+        ...ConfirmPetitionSignersDialog_PetitionSigner
       }
     }
   `,

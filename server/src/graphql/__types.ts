@@ -278,9 +278,12 @@ export interface NexusGenInputs {
   SignatureConfigInput: {
     // input type
     allowAdditionalSigners: boolean; // Boolean!
+    instructions?: string | null; // String
+    minSigners?: number | null; // Int
     orgIntegrationId: NexusGenScalars["GID"]; // GID!
     review: boolean; // Boolean!
     signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
+    signingMode?: NexusGenEnums["SignatureConfigSigningMode"] | null; // SignatureConfigSigningMode
     timezone: string; // String!
     title?: string | null; // String
   };
@@ -489,6 +492,7 @@ export interface NexusGenEnums {
   QueryProfiles_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
+  SignatureConfigSigningMode: "PARALLEL" | "SEQUENTIAL";
   SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
   SignatureOrgIntegrationProvider: "DOCUSIGN" | "SIGNATURIT";
   Success: "SUCCESS";
@@ -963,6 +967,9 @@ export interface NexusGenObjects {
     review?: boolean;
     allowAdditionalSigners?: boolean;
     additionalSignersInfo?: any[];
+    minSigners?: number;
+    instructions?: string;
+    signingMode?: "PARALLEL" | "SEQUENTIAL"; // TODO signature: remove the ? after releasing
   };
   PublicUser: db.User;
   Query: {};
@@ -1004,7 +1011,12 @@ export interface NexusGenObjects {
     title: string | null;
     review?: boolean;
     allowAdditionalSigners?: boolean;
+    minSigners?: number; // TODO signature: remove the ? after releasing
+    instructions?: string | null;
+    message?: string;
+    signingMode?: "PARALLEL" | "SEQUENTIAL"; // TODO signature: remove the ? after releasing
   };
+  SignatureDeliveredEvent: petitionEvents.SignatureDeliveredEvent;
   SignatureOpenedEvent: petitionEvents.SignatureOpenedEvent;
   SignatureOrgIntegration: db.OrgIntegration;
   SignatureReminderEvent: petitionEvents.SignatureReminderEvent;
@@ -2677,8 +2689,11 @@ export interface NexusGenFieldTypes {
     // field return type
     additionalSigners: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
     allowAdditionalSigners: boolean; // Boolean!
+    instructions: string | null; // String
+    minSigners: number; // Int!
     review: boolean; // Boolean!
     signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
+    signingMode: NexusGenEnums["SignatureConfigSigningMode"]; // SignatureConfigSigningMode!
   };
   PublicUser: {
     // field return type
@@ -2889,11 +2904,28 @@ export interface NexusGenFieldTypes {
   SignatureConfig: {
     // field return type
     allowAdditionalSigners: boolean; // Boolean!
+    instructions: string | null; // String
     integration: NexusGenRootTypes["SignatureOrgIntegration"] | null; // SignatureOrgIntegration
+    message: string | null; // String
+    minSigners: number; // Int!
     review: boolean; // Boolean!
     signers: Array<NexusGenRootTypes["PetitionSigner"] | null>; // [PetitionSigner]!
+    signingMode: NexusGenEnums["SignatureConfigSigningMode"]; // SignatureConfigSigningMode!
     timezone: string; // String!
     title: string | null; // String
+  };
+  SignatureDeliveredEvent: {
+    // field return type
+    bouncedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    deliveredAt: NexusGenScalars["DateTime"] | null; // DateTime
+    id: NexusGenScalars["GID"]; // GID!
+    openedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    signature: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
+    signer: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SignatureOpenedEvent: {
     // field return type
@@ -2932,6 +2964,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     openedAt: NexusGenScalars["DateTime"] | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    signature: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SupportMethodResponse: {
@@ -4808,8 +4841,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     additionalSigners: "PetitionSigner";
     allowAdditionalSigners: "Boolean";
+    instructions: "String";
+    minSigners: "Int";
     review: "Boolean";
     signers: "PetitionSigner";
+    signingMode: "SignatureConfigSigningMode";
   };
   PublicUser: {
     // field return type name
@@ -5020,11 +5056,28 @@ export interface NexusGenFieldTypeNames {
   SignatureConfig: {
     // field return type name
     allowAdditionalSigners: "Boolean";
+    instructions: "String";
     integration: "SignatureOrgIntegration";
+    message: "String";
+    minSigners: "Int";
     review: "Boolean";
     signers: "PetitionSigner";
+    signingMode: "SignatureConfigSigningMode";
     timezone: "String";
     title: "String";
+  };
+  SignatureDeliveredEvent: {
+    // field return type name
+    bouncedAt: "DateTime";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    deliveredAt: "DateTime";
+    id: "GID";
+    openedAt: "DateTime";
+    petition: "Petition";
+    signature: "PetitionSignatureRequest";
+    signer: "PetitionSigner";
+    type: "PetitionEventType";
   };
   SignatureOpenedEvent: {
     // field return type name
@@ -5063,6 +5116,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     openedAt: "DateTime";
     petition: "Petition";
+    signature: "PetitionSignatureRequest";
     type: "PetitionEventType";
   };
   SupportMethodResponse: {
@@ -6939,6 +6993,7 @@ export interface NexusGenAbstractTypeMembers {
     | "ReplyUpdatedEvent"
     | "SignatureCancelledEvent"
     | "SignatureCompletedEvent"
+    | "SignatureDeliveredEvent"
     | "SignatureOpenedEvent"
     | "SignatureReminderEvent"
     | "SignatureStartedEvent"
@@ -7068,6 +7123,7 @@ export interface NexusGenTypeInterfaces {
   SignatureCancelledUserNotification: "PetitionUserNotification";
   SignatureCompletedEvent: "PetitionEvent";
   SignatureCompletedUserNotification: "PetitionUserNotification";
+  SignatureDeliveredEvent: "PetitionEvent";
   SignatureOpenedEvent: "PetitionEvent";
   SignatureOrgIntegration: "IOrgIntegration";
   SignatureReminderEvent: "PetitionEvent";

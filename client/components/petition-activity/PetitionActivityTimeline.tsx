@@ -42,6 +42,7 @@ import { TimelineUserPermissionEditedEvent } from "./timeline/events/TimelineUse
 import { TimelineUserPermissionRemovedEvent } from "./timeline/events/TimelineUserPermissionRemovedEvent";
 import { TimelineProfileDisassociatedEvent } from "./timeline/events/TimelineProfileDisassociatedEvent";
 import { TimelineProfileAssociatedEvent } from "./timeline/events/TimelineProfileAssociatedEvent";
+import { TimelineSignatureDeliveredEvent } from "./timeline/events/TimelineSignatureDeliveredEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -110,6 +111,8 @@ export function PetitionActivityTimeline({
               <TimelinePetitionClosedNotifiedEvent event={event} userId={userId} />
             ) : event.__typename === "PetitionReopenedEvent" ? (
               <TimelinePetitionReopenedEvent event={event} userId={userId} />
+            ) : event.__typename === "SignatureDeliveredEvent" ? (
+              <TimelineSignatureDeliveredEvent event={event} />
             ) : event.__typename === "SignatureOpenedEvent" ? (
               <TimelineSignatureOpenedEvent event={event} />
             ) : event.__typename === "SignatureStartedEvent" ? (
@@ -233,6 +236,9 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionReopenedEvent {
         ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
       }
+      ... on SignatureDeliveredEvent {
+        ...TimelineSignatureDeliveredEvent_SignatureDeliveredEvent
+      }
       ... on SignatureOpenedEvent {
         ...TimelineSignatureOpenedEvent_SignatureOpenedEvent
       }
@@ -312,6 +318,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionClosedEvent.fragments.PetitionClosedEvent}
     ${TimelinePetitionClosedNotifiedEvent.fragments.PetitionClosedNotifiedEvent}
     ${TimelinePetitionReopenedEvent.fragments.PetitionReopenedEvent}
+    ${TimelineSignatureDeliveredEvent.fragments.SignatureDeliveredEvent}
     ${TimelineSignatureOpenedEvent.fragments.SignatureOpenedEvent}
     ${TimelineSignatureStartedEvent.fragments.SignatureStartedEvent}
     ${TimelineSignatureCompletedEvent.fragments.SignatureCompletedEvent}

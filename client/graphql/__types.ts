@@ -2821,6 +2821,7 @@ export type PetitionEventType =
   | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_DELIVERED"
   | "SIGNATURE_OPENED"
   | "SIGNATURE_REMINDER"
   | "SIGNATURE_STARTED"
@@ -4145,10 +4146,15 @@ export interface PublicSignatureConfig {
   additionalSigners: Array<PetitionSigner>;
   /** If true, allows the recipients or users of the petition to select additional signers */
   allowAdditionalSigners: Scalars["Boolean"]["output"];
+  /** Instructions for the signers */
+  instructions?: Maybe<Scalars["String"]["output"]>;
+  /** The minimum number of signers required to complete the signature process */
+  minSigners: Scalars["Int"]["output"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["output"];
   /** The contacts that need to sign the generated document. */
   signers: Array<PetitionSigner>;
+  signingMode: SignatureConfigSigningMode;
 }
 
 export type PublicSignatureStatus = "COMPLETED" | "STARTED";
@@ -4721,12 +4727,18 @@ export interface SignatureConfig {
   __typename?: "SignatureConfig";
   /** If true, allows the recipients or users of the petition to select additional signers */
   allowAdditionalSigners: Scalars["Boolean"]["output"];
+  /** The instructions to be shown to the user or recipient before starting the signature process */
+  instructions?: Maybe<Scalars["String"]["output"]>;
   /** The signature integration selected for this signature config. */
   integration?: Maybe<SignatureOrgIntegration>;
+  message?: Maybe<Scalars["String"]["output"]>;
+  /** The minimum number of signers required to sign the document */
+  minSigners: Scalars["Int"]["output"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["output"];
   /** The signers of the generated document. */
   signers: Array<Maybe<PetitionSigner>>;
+  signingMode: SignatureConfigSigningMode;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"]["output"];
   /** Title of the signature document */
@@ -4737,11 +4749,16 @@ export interface SignatureConfig {
 export interface SignatureConfigInput {
   /** If true, allows the recipients or users of the petition to select additional signers */
   allowAdditionalSigners: Scalars["Boolean"]["input"];
+  /** The instructions to be shown to the user or recipient before starting the signature process */
+  instructions?: InputMaybe<Scalars["String"]["input"]>;
+  /** The minimum amount of signers required to start the signature process */
+  minSigners?: InputMaybe<Scalars["Int"]["input"]>;
   /** The Global ID of the signature integration to be used. */
   orgIntegrationId: Scalars["GID"]["input"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["input"];
   signersInfo: Array<SignatureConfigInputSigner>;
+  signingMode?: InputMaybe<SignatureConfigSigningMode>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"]["input"];
   /** The title of the signing document */
@@ -4755,6 +4772,23 @@ export interface SignatureConfigInputSigner {
   firstName: Scalars["String"]["input"];
   isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
+}
+
+/** The signing mode of a signature config */
+export type SignatureConfigSigningMode = "PARALLEL" | "SEQUENTIAL";
+
+export interface SignatureDeliveredEvent extends PetitionEvent {
+  __typename?: "SignatureDeliveredEvent";
+  bouncedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  deliveredAt?: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["GID"]["output"];
+  openedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  petition?: Maybe<Petition>;
+  signature: PetitionSignatureRequest;
+  signer?: Maybe<PetitionSigner>;
+  type: PetitionEventType;
 }
 
 export interface SignatureOpenedEvent extends PetitionEvent {
@@ -4798,13 +4832,17 @@ export interface SignatureReminderEvent extends PetitionEvent {
 
 export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
+  /** @deprecated remove after release */
   bouncedAt?: Maybe<Scalars["DateTime"]["output"]>;
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
+  /** @deprecated remove after release */
   deliveredAt?: Maybe<Scalars["DateTime"]["output"]>;
   id: Scalars["GID"]["output"];
+  /** @deprecated remove after release */
   openedAt?: Maybe<Scalars["DateTime"]["output"]>;
   petition?: Maybe<Petition>;
+  signature: PetitionSignatureRequest;
   type: PetitionEventType;
 }
 
@@ -8063,20 +8101,6 @@ export type useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   expiryAlertAheadTime?: Duration | null;
 };
 
-export type EmailEventsIndicator_PetitionMessageFragment = {
-  __typename?: "PetitionMessage";
-  bouncedAt?: string | null;
-  deliveredAt?: string | null;
-  openedAt?: string | null;
-};
-
-export type EmailEventsIndicator_SignatureStartedEventFragment = {
-  __typename?: "SignatureStartedEvent";
-  bouncedAt?: string | null;
-  deliveredAt?: string | null;
-  openedAt?: string | null;
-};
-
 export type PetitionAccessTable_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
@@ -8430,9 +8454,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
             emailSubject?: any | null;
             scheduledAt?: string | null;
             isAnonymized: boolean;
-            bouncedAt?: string | null;
-            deliveredAt?: string | null;
             openedAt?: string | null;
+            deliveredAt?: string | null;
+            bouncedAt?: string | null;
             emailBody?: string | null;
             sentAt?: string | null;
             sender: {
@@ -8811,6 +8835,25 @@ export type PetitionActivityTimeline_PetitionFragment = {
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | {
+          __typename?: "SignatureDeliveredEvent";
+          id: string;
+          createdAt: string;
+          openedAt?: string | null;
+          deliveredAt?: string | null;
+          bouncedAt?: string | null;
+          signature: {
+            __typename?: "PetitionSignatureRequest";
+            signatureConfig: {
+              __typename?: "SignatureConfig";
+              integration?: {
+                __typename?: "SignatureOrgIntegration";
+                provider: SignatureOrgIntegrationProvider;
+              } | null;
+            };
+          };
+          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+        }
+      | {
           __typename?: "SignatureOpenedEvent";
           id: string;
           createdAt: string;
@@ -8831,9 +8874,14 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "SignatureStartedEvent";
           id: string;
           createdAt: string;
-          bouncedAt?: string | null;
-          deliveredAt?: string | null;
-          openedAt?: string | null;
+          signature: {
+            __typename?: "PetitionSignatureRequest";
+            signatureConfig: {
+              __typename?: "SignatureConfig";
+              signingMode: SignatureConfigSigningMode;
+              message?: string | null;
+            };
+          };
         }
       | { __typename?: "TemplateUsedEvent"; id: string }
       | {
@@ -9114,9 +9162,9 @@ export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
     emailSubject?: any | null;
     scheduledAt?: string | null;
     isAnonymized: boolean;
-    bouncedAt?: string | null;
-    deliveredAt?: string | null;
     openedAt?: string | null;
+    deliveredAt?: string | null;
+    bouncedAt?: string | null;
     emailBody?: string | null;
     sentAt?: string | null;
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
@@ -9408,6 +9456,26 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragm
   createdAt: string;
 };
 
+export type PetitionActivityTimeline_PetitionEvent_SignatureDeliveredEvent_Fragment = {
+  __typename?: "SignatureDeliveredEvent";
+  id: string;
+  createdAt: string;
+  openedAt?: string | null;
+  deliveredAt?: string | null;
+  bouncedAt?: string | null;
+  signature: {
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
+  };
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_SignatureOpenedEvent_Fragment = {
   __typename?: "SignatureOpenedEvent";
   id: string;
@@ -9426,9 +9494,14 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragmen
   __typename?: "SignatureStartedEvent";
   id: string;
   createdAt: string;
-  bouncedAt?: string | null;
-  deliveredAt?: string | null;
-  openedAt?: string | null;
+  signature: {
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      message?: string | null;
+    };
+  };
 };
 
 export type PetitionActivityTimeline_PetitionEvent_TemplateUsedEvent_Fragment = {
@@ -9513,6 +9586,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_SignatureDeliveredEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureReminderEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment
@@ -9638,6 +9712,9 @@ export type AddPetitionAccessDialog_SignatureConfigFragment = {
   timezone: string;
   title?: string | null;
   allowAdditionalSigners: boolean;
+  signingMode: SignatureConfigSigningMode;
+  minSigners: number;
+  instructions?: string | null;
   integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
   signers: Array<{
     __typename?: "PetitionSigner";
@@ -9684,6 +9761,9 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     timezone: string;
     title?: string | null;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
@@ -9788,6 +9868,9 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
         timezone: string;
         title?: string | null;
         allowAdditionalSigners: boolean;
+        signingMode: SignatureConfigSigningMode;
+        minSigners: number;
+        instructions?: string | null;
         integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
         signers: Array<{
           __typename?: "PetitionSigner";
@@ -10146,9 +10229,9 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
     emailSubject?: any | null;
     scheduledAt?: string | null;
     isAnonymized: boolean;
-    bouncedAt?: string | null;
-    deliveredAt?: string | null;
     openedAt?: string | null;
+    deliveredAt?: string | null;
+    bouncedAt?: string | null;
     emailBody?: string | null;
     sentAt?: string | null;
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
@@ -10414,6 +10497,25 @@ export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
   createdAt: string;
 };
 
+export type TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragment = {
+  __typename?: "SignatureDeliveredEvent";
+  createdAt: string;
+  openedAt?: string | null;
+  deliveredAt?: string | null;
+  bouncedAt?: string | null;
+  signature: {
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
+  };
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
 export type TimelineSignatureOpenedEvent_SignatureOpenedEventFragment = {
   __typename?: "SignatureOpenedEvent";
   createdAt: string;
@@ -10429,9 +10531,14 @@ export type TimelineSignatureReminderEvent_SignatureReminderEventFragment = {
 export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
   __typename?: "SignatureStartedEvent";
   createdAt: string;
-  bouncedAt?: string | null;
-  deliveredAt?: string | null;
-  openedAt?: string | null;
+  signature: {
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      message?: string | null;
+    };
+  };
 };
 
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
@@ -10718,6 +10825,22 @@ export type ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment = {
       isPreset: boolean;
     } | null>;
   };
+};
+
+export type ConfirmPetitionSignersDialog_SignatureConfigFragment = {
+  __typename?: "SignatureConfig";
+  signingMode: SignatureConfigSigningMode;
+  minSigners: number;
+  instructions?: string | null;
+  allowAdditionalSigners: boolean;
+  signers: Array<{
+    __typename?: "PetitionSigner";
+    contactId?: string | null;
+    email: string;
+    firstName: string;
+    lastName?: string | null;
+    isPreset: boolean;
+  } | null>;
 };
 
 export type CreateFolderDialog_PetitionBase_Petition_Fragment = {
@@ -11603,6 +11726,9 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -11629,6 +11755,9 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -12080,6 +12209,9 @@ export type useSendPetitionHandler_PetitionFragment = {
     timezone: string;
     title?: string | null;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -12214,6 +12346,9 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
           timezone: string;
           title?: string | null;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -13154,6 +13289,9 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -13221,6 +13359,9 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -14884,10 +15025,13 @@ export type NewSignatureRequestRow_PetitionFragment = {
   status: PetitionStatus;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
     title?: string | null;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
+    allowAdditionalSigners: boolean;
     signers: Array<{
       __typename?: "PetitionSigner";
       email: string;
@@ -15384,6 +15528,9 @@ export type PetitionSignaturesCard_PetitionFragment = {
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -15495,6 +15642,9 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -15655,6 +15805,9 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       title?: string | null;
       review: boolean;
       allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
       timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
@@ -15766,6 +15919,9 @@ export type PetitionSignaturesCard_petitionQuery = {
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -17113,6 +17269,7 @@ export type RecipientViewSignatureSentAlert_PublicPetitionFragment = {
   signatureConfig?: {
     __typename?: "PublicSignatureConfig";
     review: boolean;
+    signingMode: SignatureConfigSigningMode;
     signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
     additionalSigners: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
   } | null;
@@ -17144,6 +17301,22 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment =
   firstName: string;
   lastName?: string | null;
   email: string;
+};
+
+export type useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragment = {
+  __typename?: "PublicSignatureConfig";
+  signingMode: SignatureConfigSigningMode;
+  minSigners: number;
+  instructions?: string | null;
+  allowAdditionalSigners: boolean;
+  signers: Array<{
+    __typename?: "PetitionSigner";
+    firstName: string;
+    lastName?: string | null;
+    fullName: string;
+    email: string;
+    isPreset: boolean;
+  }>;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment = {
@@ -21213,9 +21386,9 @@ export type PetitionActivity_PetitionFragment = {
             emailSubject?: any | null;
             scheduledAt?: string | null;
             isAnonymized: boolean;
-            bouncedAt?: string | null;
-            deliveredAt?: string | null;
             openedAt?: string | null;
+            deliveredAt?: string | null;
+            bouncedAt?: string | null;
             emailBody?: string | null;
             sentAt?: string | null;
             sender: {
@@ -21594,6 +21767,25 @@ export type PetitionActivity_PetitionFragment = {
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | {
+          __typename?: "SignatureDeliveredEvent";
+          id: string;
+          createdAt: string;
+          openedAt?: string | null;
+          deliveredAt?: string | null;
+          bouncedAt?: string | null;
+          signature: {
+            __typename?: "PetitionSignatureRequest";
+            signatureConfig: {
+              __typename?: "SignatureConfig";
+              integration?: {
+                __typename?: "SignatureOrgIntegration";
+                provider: SignatureOrgIntegrationProvider;
+              } | null;
+            };
+          };
+          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+        }
+      | {
           __typename?: "SignatureOpenedEvent";
           id: string;
           createdAt: string;
@@ -21614,9 +21806,14 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "SignatureStartedEvent";
           id: string;
           createdAt: string;
-          bouncedAt?: string | null;
-          deliveredAt?: string | null;
-          openedAt?: string | null;
+          signature: {
+            __typename?: "PetitionSignatureRequest";
+            signatureConfig: {
+              __typename?: "SignatureConfig";
+              signingMode: SignatureConfigSigningMode;
+              message?: string | null;
+            };
+          };
         }
       | { __typename?: "TemplateUsedEvent"; id: string }
       | {
@@ -21717,6 +21914,9 @@ export type PetitionActivity_PetitionFragment = {
     timezone: string;
     title?: string | null;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -22198,9 +22398,9 @@ export type PetitionActivity_updatePetitionMutation = {
                   emailSubject?: any | null;
                   scheduledAt?: string | null;
                   isAnonymized: boolean;
-                  bouncedAt?: string | null;
-                  deliveredAt?: string | null;
                   openedAt?: string | null;
+                  deliveredAt?: string | null;
+                  bouncedAt?: string | null;
                   emailBody?: string | null;
                   sentAt?: string | null;
                   sender: {
@@ -22613,6 +22813,25 @@ export type PetitionActivity_updatePetitionMutation = {
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
             | {
+                __typename?: "SignatureDeliveredEvent";
+                id: string;
+                createdAt: string;
+                openedAt?: string | null;
+                deliveredAt?: string | null;
+                bouncedAt?: string | null;
+                signature: {
+                  __typename?: "PetitionSignatureRequest";
+                  signatureConfig: {
+                    __typename?: "SignatureConfig";
+                    integration?: {
+                      __typename?: "SignatureOrgIntegration";
+                      provider: SignatureOrgIntegrationProvider;
+                    } | null;
+                  };
+                };
+                signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+              }
+            | {
                 __typename?: "SignatureOpenedEvent";
                 id: string;
                 createdAt: string;
@@ -22633,9 +22852,14 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "SignatureStartedEvent";
                 id: string;
                 createdAt: string;
-                bouncedAt?: string | null;
-                deliveredAt?: string | null;
-                openedAt?: string | null;
+                signature: {
+                  __typename?: "PetitionSignatureRequest";
+                  signatureConfig: {
+                    __typename?: "SignatureConfig";
+                    signingMode: SignatureConfigSigningMode;
+                    message?: string | null;
+                  };
+                };
               }
             | { __typename?: "TemplateUsedEvent"; id: string }
             | {
@@ -22741,6 +22965,9 @@ export type PetitionActivity_updatePetitionMutation = {
           timezone: string;
           title?: string | null;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -23263,9 +23490,9 @@ export type PetitionActivity_petitionQuery = {
                   emailSubject?: any | null;
                   scheduledAt?: string | null;
                   isAnonymized: boolean;
-                  bouncedAt?: string | null;
-                  deliveredAt?: string | null;
                   openedAt?: string | null;
+                  deliveredAt?: string | null;
+                  bouncedAt?: string | null;
                   emailBody?: string | null;
                   sentAt?: string | null;
                   sender: {
@@ -23678,6 +23905,25 @@ export type PetitionActivity_petitionQuery = {
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
             | {
+                __typename?: "SignatureDeliveredEvent";
+                id: string;
+                createdAt: string;
+                openedAt?: string | null;
+                deliveredAt?: string | null;
+                bouncedAt?: string | null;
+                signature: {
+                  __typename?: "PetitionSignatureRequest";
+                  signatureConfig: {
+                    __typename?: "SignatureConfig";
+                    integration?: {
+                      __typename?: "SignatureOrgIntegration";
+                      provider: SignatureOrgIntegrationProvider;
+                    } | null;
+                  };
+                };
+                signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+              }
+            | {
                 __typename?: "SignatureOpenedEvent";
                 id: string;
                 createdAt: string;
@@ -23698,9 +23944,14 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "SignatureStartedEvent";
                 id: string;
                 createdAt: string;
-                bouncedAt?: string | null;
-                deliveredAt?: string | null;
-                openedAt?: string | null;
+                signature: {
+                  __typename?: "PetitionSignatureRequest";
+                  signatureConfig: {
+                    __typename?: "SignatureConfig";
+                    signingMode: SignatureConfigSigningMode;
+                    message?: string | null;
+                  };
+                };
               }
             | { __typename?: "TemplateUsedEvent"; id: string }
             | {
@@ -23806,6 +24057,9 @@ export type PetitionActivity_petitionQuery = {
           timezone: string;
           title?: string | null;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -23959,6 +24213,9 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -24217,6 +24474,9 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -24406,6 +24666,9 @@ export type PetitionCompose_updatePetitionMutation = {
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -24525,6 +24788,9 @@ export type PetitionCompose_updatePetitionMutation = {
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -25008,6 +25274,9 @@ export type PetitionCompose_petitionQuery = {
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -25295,6 +25564,9 @@ export type PetitionCompose_petitionQuery = {
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -26217,6 +26489,9 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     review: boolean;
     timezone: string;
     title?: string | null;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -26387,6 +26662,9 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     review: boolean;
     timezone: string;
     title?: string | null;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -26626,6 +26904,9 @@ export type PetitionPreview_updatePetitionMutation = {
           review: boolean;
           timezone: string;
           title?: string | null;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -26795,6 +27076,9 @@ export type PetitionPreview_updatePetitionMutation = {
           review: boolean;
           timezone: string;
           title?: string | null;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -26984,6 +27268,9 @@ export type PetitionPreview_completePetitionMutation = {
       review: boolean;
       timezone: string;
       title?: string | null;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -27197,6 +27484,9 @@ export type PetitionPreview_petitionQuery = {
           review: boolean;
           timezone: string;
           title?: string | null;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -27366,6 +27656,9 @@ export type PetitionPreview_petitionQuery = {
           review: boolean;
           timezone: string;
           title?: string | null;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -27670,6 +27963,9 @@ export type PetitionReplies_PetitionFragment = {
     review: boolean;
     title?: string | null;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -28150,6 +28446,9 @@ export type PetitionReplies_closePetitionMutation = {
       review: boolean;
       title?: string | null;
       allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
       timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
@@ -28412,6 +28711,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       review: boolean;
       title?: string | null;
       allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
       timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
@@ -28845,6 +29147,9 @@ export type PetitionReplies_petitionQuery = {
           review: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
+          signingMode: SignatureConfigSigningMode;
+          minSigners: number;
+          instructions?: string | null;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -31163,6 +31468,9 @@ export type RecipientView_PublicPetitionAccessFragment = {
       __typename?: "PublicSignatureConfig";
       review: boolean;
       allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
       signers: Array<{
         __typename?: "PetitionSigner";
         fullName: string;
@@ -31284,6 +31592,9 @@ export type RecipientView_PublicPetitionFragment = {
     __typename?: "PublicSignatureConfig";
     review: boolean;
     allowAdditionalSigners: boolean;
+    signingMode: SignatureConfigSigningMode;
+    minSigners: number;
+    instructions?: string | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       fullName: string;
@@ -31438,6 +31749,9 @@ export type RecipientView_publicCompletePetitionMutation = {
       __typename?: "PublicSignatureConfig";
       review: boolean;
       allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
       signers: Array<{
         __typename?: "PetitionSigner";
         fullName: string;
@@ -31549,6 +31863,9 @@ export type RecipientView_accessQuery = {
         __typename?: "PublicSignatureConfig";
         review: boolean;
         allowAdditionalSigners: boolean;
+        signingMode: SignatureConfigSigningMode;
+        minSigners: number;
+        instructions?: string | null;
         signers: Array<{
           __typename?: "PetitionSigner";
           fullName: string;
@@ -36070,13 +36387,6 @@ export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gq
   ${ContactReference_ContactFragmentDoc}
   ${UserReference_UserFragmentDoc}
 ` as unknown as DocumentNode<TimelineMessageCancelledEvent_MessageCancelledEventFragment, unknown>;
-export const EmailEventsIndicator_PetitionMessageFragmentDoc = gql`
-  fragment EmailEventsIndicator_PetitionMessage on PetitionMessage {
-    bouncedAt
-    deliveredAt
-    openedAt
-  }
-` as unknown as DocumentNode<EmailEventsIndicator_PetitionMessageFragment, unknown>;
 export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
   fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
     message {
@@ -36094,14 +36404,15 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
         }
       }
       isAnonymized
-      ...EmailEventsIndicator_PetitionMessage
+      openedAt
+      deliveredAt
+      bouncedAt
       ...SentPetitionMessageDialog_PetitionMessage
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
-  ${EmailEventsIndicator_PetitionMessageFragmentDoc}
   ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
 ` as unknown as DocumentNode<TimelineMessageSentEvent_MessageSentEventFragment, unknown>;
 export const SentReminderMessageDialog_PetitionReminderFragmentDoc = gql`
@@ -36391,6 +36702,28 @@ export const SignerReference_PetitionSignerFragmentDoc = gql`
     fullName
   }
 ` as unknown as DocumentNode<SignerReference_PetitionSignerFragment, unknown>;
+export const TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragmentDoc = gql`
+  fragment TimelineSignatureDeliveredEvent_SignatureDeliveredEvent on SignatureDeliveredEvent {
+    createdAt
+    signature {
+      signatureConfig {
+        integration {
+          provider
+        }
+      }
+    }
+    signer {
+      ...SignerReference_PetitionSigner
+    }
+    openedAt
+    deliveredAt
+    bouncedAt
+  }
+  ${SignerReference_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragment,
+  unknown
+>;
 export const TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc = gql`
   fragment TimelineSignatureOpenedEvent_SignatureOpenedEvent on SignatureOpenedEvent {
     signer {
@@ -36400,19 +36733,16 @@ export const TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc = gql`
   }
   ${SignerReference_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<TimelineSignatureOpenedEvent_SignatureOpenedEventFragment, unknown>;
-export const EmailEventsIndicator_SignatureStartedEventFragmentDoc = gql`
-  fragment EmailEventsIndicator_SignatureStartedEvent on SignatureStartedEvent {
-    bouncedAt
-    deliveredAt
-    openedAt
-  }
-` as unknown as DocumentNode<EmailEventsIndicator_SignatureStartedEventFragment, unknown>;
 export const TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc = gql`
   fragment TimelineSignatureStartedEvent_SignatureStartedEvent on SignatureStartedEvent {
-    ...EmailEventsIndicator_SignatureStartedEvent
     createdAt
+    signature {
+      signatureConfig {
+        signingMode
+        message
+      }
+    }
   }
-  ${EmailEventsIndicator_SignatureStartedEventFragmentDoc}
 ` as unknown as DocumentNode<TimelineSignatureStartedEvent_SignatureStartedEventFragment, unknown>;
 export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc = gql`
   fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {
@@ -36751,6 +37081,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionReopenedEvent {
       ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
     }
+    ... on SignatureDeliveredEvent {
+      ...TimelineSignatureDeliveredEvent_SignatureDeliveredEvent
+    }
     ... on SignatureOpenedEvent {
       ...TimelineSignatureOpenedEvent_SignatureOpenedEvent
     }
@@ -36830,6 +37163,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
   ${TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc}
   ${TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc}
+  ${TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragmentDoc}
   ${TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc}
   ${TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc}
   ${TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc}
@@ -36928,6 +37262,18 @@ export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
     fullName
   }
 ` as unknown as DocumentNode<CopySignatureConfigDialog_PetitionSignerFragment, unknown>;
+export const ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
+    signingMode
+    minSigners
+    instructions
+    allowAdditionalSigners
+    signers {
+      ...ConfirmPetitionSignersDialog_PetitionSigner
+    }
+  }
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_SignatureConfigFragment, unknown>;
 export const AddPetitionAccessDialog_SignatureConfigFragmentDoc = gql`
   fragment AddPetitionAccessDialog_SignatureConfig on SignatureConfig {
     review
@@ -36941,9 +37287,11 @@ export const AddPetitionAccessDialog_SignatureConfigFragmentDoc = gql`
       ...CopySignatureConfigDialog_PetitionSigner
       ...ConfirmPetitionSignersDialog_PetitionSigner
     }
+    ...ConfirmPetitionSignersDialog_SignatureConfig
   }
   ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
 ` as unknown as DocumentNode<AddPetitionAccessDialog_SignatureConfigFragment, unknown>;
 export const ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc = gql`
   fragment ConfirmPetitionSignersDialog_PetitionAccess on PetitionAccess {
@@ -37228,6 +37576,9 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
       title
       review
       allowAdditionalSigners
+      signingMode
+      minSigners
+      instructions
     }
     ... on Petition {
       status
@@ -38233,6 +38584,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       signers {
         ...ConfirmPetitionSignersDialog_PetitionSigner
       }
+      ...ConfirmPetitionSignersDialog_SignatureConfig
     }
     ...RecipientViewContentsCard_PetitionBase
     ...PetitionLayout_PetitionBase
@@ -38251,6 +38603,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
   ${completedFieldReplies_PetitionFieldFragmentDoc}
   ${HiddenFieldDialog_PetitionFieldFragmentDoc}
+  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
   ${RecipientViewContentsCard_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${useLiquidScope_PetitionBaseFragmentDoc}
@@ -38465,7 +38818,6 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
         ...SignerReference_PetitionSigner
         ...ConfirmPetitionSignersDialog_PetitionSigner
       }
-      allowAdditionalSigners
       integration {
         id
         name
@@ -38474,6 +38826,7 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
       review
       timezone
       title
+      ...ConfirmPetitionSignersDialog_SignatureConfig
     }
     accesses {
       ...ConfirmPetitionSignersDialog_PetitionAccess
@@ -38485,6 +38838,7 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   }
   ${SignerReference_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
   ${usePetitionCanFinalize_PetitionBaseFragmentDoc}
@@ -39433,6 +39787,21 @@ export const useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment
   useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment,
   unknown
 >;
+export const useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig on PublicSignatureConfig {
+    signingMode
+    minSigners
+    instructions
+    allowAdditionalSigners
+    signers {
+      ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
+    }
+  }
+  ${useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragment,
+  unknown
+>;
 export const RecipientViewHeader_PublicContactFragmentDoc = gql`
   fragment RecipientViewHeader_PublicContact on PublicContact {
     id
@@ -39513,6 +39882,7 @@ export const RecipientViewSignatureSentAlert_PublicPetitionFragmentDoc = gql`
     }
     signatureConfig {
       review
+      signingMode
       signers {
         fullName
         email
@@ -39561,6 +39931,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
       additionalSigners {
         ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
       }
+      ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
     }
     recipients {
       ...RecipientViewHeader_PublicContact
@@ -39579,6 +39950,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientView_PublicPetitionFieldFragmentDoc}
   ${useGetPageFields_PublicPetitionFieldFragmentDoc}
   ${useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}

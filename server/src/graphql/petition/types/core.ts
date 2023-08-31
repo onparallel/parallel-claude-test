@@ -743,6 +743,12 @@ export const PetitionSigner = objectType({
   }`,
 });
 
+export const SignatureConfigSigningMode = enumType({
+  name: "SignatureConfigSigningMode",
+  description: "The signing mode of a signature config",
+  members: ["PARALLEL", "SEQUENTIAL"],
+});
+
 export const SignatureConfig = objectType({
   name: "SignatureConfig",
   description: "The signature settings of a petition",
@@ -775,6 +781,20 @@ export const SignatureConfig = objectType({
         "If true, allows the recipients or users of the petition to select additional signers",
       resolve: (o) => o.allowAdditionalSigners ?? false,
     });
+    t.int("minSigners", {
+      description: "The minimum number of signers required to sign the document",
+      resolve: (o) => o.minSigners ?? 1, // TODO signature: remove resolver after minSigners is not nullable anymore
+    });
+    t.nullable.string("instructions", {
+      description:
+        "The instructions to be shown to the user or recipient before starting the signature process",
+    });
+    t.field("signingMode", {
+      type: "SignatureConfigSigningMode",
+      // TODO signature: remove resolver after signingMode is not nullable anymore
+      resolve: (o) => o.signingMode ?? "PARALLEL",
+    });
+    t.nullable.string("message");
   },
   sourceType: /* ts */ `{
     orgIntegrationId: number;
@@ -788,6 +808,10 @@ export const SignatureConfig = objectType({
     title: string | null;
     review?: boolean;
     allowAdditionalSigners?: boolean;
+    minSigners?: number; // TODO signature: remove the ? after releasing
+    instructions?: string | null;
+    message?: string;
+    signingMode?: "PARALLEL" | "SEQUENTIAL" // TODO signature: remove the ? after releasing
   }`,
 });
 

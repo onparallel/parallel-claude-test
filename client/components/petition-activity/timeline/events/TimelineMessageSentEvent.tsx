@@ -117,7 +117,12 @@ export function TimelineMessageSentEvent({
               }}
             />
           )}
-          <EmailEventsIndicator event={message} marginLeft={2} />
+          <EmailEventsIndicator
+            openedAt={message.openedAt}
+            deliveredAt={message.deliveredAt}
+            bouncedAt={message.bouncedAt}
+            marginLeft={2}
+          />
         </Box>
         {message.emailBody ? (
           <Button
@@ -153,14 +158,15 @@ TimelineMessageSentEvent.fragments = {
           }
         }
         isAnonymized
-        ...EmailEventsIndicator_PetitionMessage
+        openedAt
+        deliveredAt
+        bouncedAt
         ...SentPetitionMessageDialog_PetitionMessage
       }
       createdAt
     }
     ${UserReference.fragments.User}
     ${ContactReference.fragments.Contact}
-    ${EmailEventsIndicator.fragments.PetitionMessage}
     ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,
 };

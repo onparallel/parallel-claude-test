@@ -191,6 +191,15 @@ export function mapEventPayload(event: PetitionEvent) {
         ),
       };
     }
+    case "SIGNATURE_DELIVERED": {
+      return {
+        signer: event.data.signer,
+        petitionSignatureRequestId: toGlobalId(
+          "PetitionSignatureRequest",
+          event.data.petition_signature_request_id,
+        ),
+      };
+    }
     case "SIGNATURE_OPENED": {
       return {
         signer: event.data.signer,

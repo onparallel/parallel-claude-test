@@ -247,7 +247,7 @@ export class BaseRepository {
         .modify((q) => builder?.(q as any))
         .distinct(this.knex.raw(`?? as column`, [column as string]));
       const set = new Set(rows.map((r) => r.column));
-      return values.map((value) => set.has(value));
+      return values.map((value) => set.has(value as any));
     });
   }
 

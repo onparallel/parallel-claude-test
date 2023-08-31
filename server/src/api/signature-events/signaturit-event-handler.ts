@@ -1,7 +1,7 @@
 import { RequestHandler, Router, urlencoded } from "express";
 import { isDefined, pick } from "remeda";
 import { ApiContext } from "../../context";
-import { SignatureStartedEvent } from "../../db/events/PetitionEvent";
+import { SignatureDeliveredEvent } from "../../db/events/PetitionEvent";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { SignaturitEvents } from "../../services/signature-clients/SignaturitClient";
 import { fromGlobalId } from "../../util/globalId";
@@ -163,7 +163,7 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
 
 async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
-  const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
+  const [signer, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
   await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
     signer_status: {
       ...signature.signer_status,
@@ -173,15 +173,20 @@ async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petiti
       },
     },
   });
-  await updateSignatureStartedEvent(
-    petitionId,
-    { email_delivered_at: new Date(data.created_at) },
-    ctx,
-  );
+
+  await ctx.petitions.createEvent({
+    type: "SIGNATURE_DELIVERED",
+    petition_id: petitionId,
+    data: {
+      petition_signature_request_id: signature.id,
+      signer: pick(signer, ["email", "firstName", "lastName"]),
+      email_delivered_at: new Date(data.created_at),
+    },
+  });
 }
 
 async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  await updateSignatureStartedEvent(
+  await updateSignatureDeliveredEvent(
     petitionId,
     { email_opened_at: new Date(data.created_at) },
     ctx,
@@ -215,7 +220,7 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
       },
     },
   });
-  await updateSignatureStartedEvent(
+  await updateSignatureDeliveredEvent(
     petitionId,
     { email_bounced_at: new Date(data.created_at) },
     ctx,
@@ -265,24 +270,27 @@ function findSigner(
   return [signer, signerIndex];
 }
 
-async function updateSignatureStartedEvent(
+async function updateSignatureDeliveredEvent(
   petitionId: number,
-  newData: Omit<SignatureStartedEvent["data"], "petition_signature_request_id">,
+  newData: Omit<SignatureDeliveredEvent["data"], "petition_signature_request_id" | "signer">,
   ctx: ApiContext,
 ) {
-  const [signatureStartedEvent] = await ctx.petitions.getPetitionEventsByType(petitionId, [
-    "SIGNATURE_STARTED",
+  const [signatureDeliveredEvent] = await ctx.petitions.getPetitionEventsByType(petitionId, [
+    "SIGNATURE_DELIVERED",
   ]);
 
-  if (isDefined(newData.email_opened_at) && isDefined(signatureStartedEvent.data.email_opened_at)) {
+  if (
+    isDefined(newData.email_opened_at) &&
+    isDefined(signatureDeliveredEvent.data.email_opened_at)
+  ) {
     // write the email_opened_at Date only once, so future email opens after signature is completed don't overwrite this date
     return;
   }
 
-  await ctx.petitions.updateEvent(signatureStartedEvent.id, {
-    ...signatureStartedEvent,
+  await ctx.petitions.updateEvent(signatureDeliveredEvent.id, {
+    ...signatureDeliveredEvent,
     data: {
-      ...signatureStartedEvent.data,
+      ...signatureDeliveredEvent.data,
       ...newData,
     },
   });

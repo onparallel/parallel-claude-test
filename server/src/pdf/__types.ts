@@ -2746,6 +2746,7 @@ export type PetitionEventType =
   | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_DELIVERED"
   | "SIGNATURE_OPENED"
   | "SIGNATURE_REMINDER"
   | "SIGNATURE_STARTED"
@@ -3995,10 +3996,15 @@ export type PublicSignatureConfig = {
   additionalSigners: Array<PetitionSigner>;
   /** If true, allows the recipients or users of the petition to select additional signers */
   allowAdditionalSigners: Scalars["Boolean"]["output"];
+  /** Instructions for the signers */
+  instructions: Maybe<Scalars["String"]["output"]>;
+  /** The minimum number of signers required to complete the signature process */
+  minSigners: Scalars["Int"]["output"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["output"];
   /** The contacts that need to sign the generated document. */
   signers: Array<PetitionSigner>;
+  signingMode: SignatureConfigSigningMode;
 };
 
 export type PublicSignatureStatus = "COMPLETED" | "STARTED";
@@ -4553,12 +4559,18 @@ export type SignatureCompletedUserNotification = PetitionUserNotification & {
 export type SignatureConfig = {
   /** If true, allows the recipients or users of the petition to select additional signers */
   allowAdditionalSigners: Scalars["Boolean"]["output"];
+  /** The instructions to be shown to the user or recipient before starting the signature process */
+  instructions: Maybe<Scalars["String"]["output"]>;
   /** The signature integration selected for this signature config. */
   integration: Maybe<SignatureOrgIntegration>;
+  message: Maybe<Scalars["String"]["output"]>;
+  /** The minimum number of signers required to sign the document */
+  minSigners: Scalars["Int"]["output"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["output"];
   /** The signers of the generated document. */
   signers: Array<Maybe<PetitionSigner>>;
+  signingMode: SignatureConfigSigningMode;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"]["output"];
   /** Title of the signature document */
@@ -4569,11 +4581,16 @@ export type SignatureConfig = {
 export type SignatureConfigInput = {
   /** If true, allows the recipients or users of the petition to select additional signers */
   allowAdditionalSigners: Scalars["Boolean"]["input"];
+  /** The instructions to be shown to the user or recipient before starting the signature process */
+  instructions?: InputMaybe<Scalars["String"]["input"]>;
+  /** The minimum amount of signers required to start the signature process */
+  minSigners?: InputMaybe<Scalars["Int"]["input"]>;
   /** The Global ID of the signature integration to be used. */
   orgIntegrationId: Scalars["GID"]["input"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["input"];
   signersInfo: Array<SignatureConfigInputSigner>;
+  signingMode?: InputMaybe<SignatureConfigSigningMode>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"]["input"];
   /** The title of the signing document */
@@ -4587,6 +4604,22 @@ export type SignatureConfigInputSigner = {
   firstName: Scalars["String"]["input"];
   isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+/** The signing mode of a signature config */
+export type SignatureConfigSigningMode = "PARALLEL" | "SEQUENTIAL";
+
+export type SignatureDeliveredEvent = PetitionEvent & {
+  bouncedAt: Maybe<Scalars["DateTime"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  deliveredAt: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["GID"]["output"];
+  openedAt: Maybe<Scalars["DateTime"]["output"]>;
+  petition: Maybe<Petition>;
+  signature: PetitionSignatureRequest;
+  signer: Maybe<PetitionSigner>;
+  type: PetitionEventType;
 };
 
 export type SignatureOpenedEvent = PetitionEvent & {
@@ -4626,13 +4659,17 @@ export type SignatureReminderEvent = PetitionEvent & {
 };
 
 export type SignatureStartedEvent = PetitionEvent & {
+  /** @deprecated remove after release */
   bouncedAt: Maybe<Scalars["DateTime"]["output"]>;
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
+  /** @deprecated remove after release */
   deliveredAt: Maybe<Scalars["DateTime"]["output"]>;
   id: Scalars["GID"]["output"];
+  /** @deprecated remove after release */
   openedAt: Maybe<Scalars["DateTime"]["output"]>;
   petition: Maybe<Petition>;
+  signature: PetitionSignatureRequest;
   type: PetitionEventType;
 };
 

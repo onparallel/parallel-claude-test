@@ -3272,6 +3272,7 @@ enum PetitionEventType {
   REPLY_UPDATED
   SIGNATURE_CANCELLED
   SIGNATURE_COMPLETED
+  SIGNATURE_DELIVERED
   SIGNATURE_OPENED
   SIGNATURE_REMINDER
   SIGNATURE_STARTED
@@ -5358,6 +5359,16 @@ type PublicSignatureConfig {
   allowAdditionalSigners: Boolean!
 
   """
+  Instructions for the signers
+  """
+  instructions: String
+
+  """
+  The minimum number of signers required to complete the signature process
+  """
+  minSigners: Int!
+
+  """
   If true, lets the user review the replies before starting the signature process
   """
   review: Boolean!
@@ -5366,6 +5377,7 @@ type PublicSignatureConfig {
   The contacts that need to sign the generated document.
   """
   signers: [PetitionSigner!]!
+  signingMode: SignatureConfigSigningMode!
 }
 
 enum PublicSignatureStatus {
@@ -6099,9 +6111,20 @@ type SignatureConfig {
   allowAdditionalSigners: Boolean!
 
   """
+  The instructions to be shown to the user or recipient before starting the signature process
+  """
+  instructions: String
+
+  """
   The signature integration selected for this signature config.
   """
   integration: SignatureOrgIntegration
+  message: String
+
+  """
+  The minimum number of signers required to sign the document
+  """
+  minSigners: Int!
 
   """
   If true, lets the user review the replies before starting the signature process
@@ -6112,6 +6135,7 @@ type SignatureConfig {
   The signers of the generated document.
   """
   signers: [PetitionSigner]!
+  signingMode: SignatureConfigSigningMode!
 
   """
   The timezone used to generate the document.
@@ -6134,6 +6158,16 @@ input SignatureConfigInput {
   allowAdditionalSigners: Boolean!
 
   """
+  The instructions to be shown to the user or recipient before starting the signature process
+  """
+  instructions: String
+
+  """
+  The minimum amount of signers required to start the signature process
+  """
+  minSigners: Int
+
+  """
   The Global ID of the signature integration to be used.
   """
   orgIntegrationId: GID!
@@ -6143,6 +6177,7 @@ input SignatureConfigInput {
   """
   review: Boolean!
   signersInfo: [SignatureConfigInputSigner!]!
+  signingMode: SignatureConfigSigningMode
 
   """
   The timezone used to generate the document.
@@ -6164,6 +6199,27 @@ input SignatureConfigInputSigner {
   firstName: String!
   isPreset: Boolean
   lastName: String
+}
+
+"""
+The signing mode of a signature config
+"""
+enum SignatureConfigSigningMode {
+  PARALLEL
+  SEQUENTIAL
+}
+
+type SignatureDeliveredEvent implements PetitionEvent {
+  bouncedAt: DateTime
+  createdAt: DateTime!
+  data: JSONObject!
+  deliveredAt: DateTime
+  id: GID!
+  openedAt: DateTime
+  petition: Petition
+  signature: PetitionSignatureRequest!
+  signer: PetitionSigner
+  type: PetitionEventType!
 }
 
 type SignatureOpenedEvent implements PetitionEvent {
@@ -6220,13 +6276,14 @@ type SignatureReminderEvent implements PetitionEvent {
 }
 
 type SignatureStartedEvent implements PetitionEvent {
-  bouncedAt: DateTime
+  bouncedAt: DateTime @deprecated(reason: "remove after release")
   createdAt: DateTime!
   data: JSONObject!
-  deliveredAt: DateTime
+  deliveredAt: DateTime @deprecated(reason: "remove after release")
   id: GID!
-  openedAt: DateTime
+  openedAt: DateTime @deprecated(reason: "remove after release")
   petition: Petition
+  signature: PetitionSignatureRequest!
   type: PetitionEventType!
 }
 

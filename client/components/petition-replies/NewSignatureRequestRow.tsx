@@ -32,7 +32,6 @@ export function NewSignatureRequestRow({
   isDisabled,
 }: NewSignatureRequestRowProps) {
   const signers = petition.signatureConfig?.signers.filter(isDefined) ?? [];
-  const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
   const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
 
@@ -49,8 +48,7 @@ export function NewSignatureRequestRow({
       } = await showConfirmPetitionSignersDialog({
         user,
         accesses: petition.accesses,
-        signers,
-        allowAdditionalSigners,
+        signatureConfig: petition.signatureConfig!,
         isUpdate: !startSignature && !canFinalize,
         previousSignatures: petition.signatureRequests,
       });
@@ -152,7 +150,6 @@ NewSignatureRequestRow.fragments = {
           ...SignerReference_PetitionSigner
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
-        allowAdditionalSigners
         integration {
           id
           name
@@ -161,6 +158,7 @@ NewSignatureRequestRow.fragments = {
         review
         timezone
         title
+        ...ConfirmPetitionSignersDialog_SignatureConfig
       }
       accesses {
         ...ConfirmPetitionSignersDialog_PetitionAccess
@@ -174,6 +172,7 @@ NewSignatureRequestRow.fragments = {
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
+    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     ${usePetitionCanFinalize.fragments.PetitionBase}
   `,
 };

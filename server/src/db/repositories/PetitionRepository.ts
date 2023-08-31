@@ -176,6 +176,9 @@ export interface PetitionSignatureConfig {
   allowAdditionalSigners?: boolean;
   message?: string;
   additionalSignersInfo?: PetitionSignatureConfigSigner[];
+  minSigners?: number; // TODO signature: remove ? after release
+  instructions?: string | null;
+  signingMode?: "PARALLEL" | "SEQUENTIAL"; // TODO signature: remove ? after release
 }
 
 type TemplateDefaultPermissionInput = {

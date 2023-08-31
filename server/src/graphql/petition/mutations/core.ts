@@ -600,6 +600,18 @@ export const SignatureConfigInput = inputObjectType({
       description:
         "If true, allows the recipients or users of the petition to select additional signers",
     });
+    t.nullable.int("minSigners", {
+      // TODO signature: make this field nonNull after releasing the feature and start passing it on front-end. (backwards compatibility)
+      description: "The minimum amount of signers required to start the signature process",
+    });
+    t.nullable.string("instructions", {
+      description:
+        "The instructions to be shown to the user or recipient before starting the signature process",
+    });
+    t.nullable.field("signingMode", {
+      // TODO signature: make this field nonNull after releasing the feature and start passing it on front-end. (backwards compatibility)
+      type: "SignatureConfigSigningMode",
+    });
   },
 });
 
@@ -871,7 +883,13 @@ export const updatePetition = mutationField("updatePetition", {
       data.hide_recipient_view_contents = isRecipientViewContentsHidden;
     }
     if (signatureConfig !== undefined) {
-      data.signature_config = signatureConfig;
+      // TODO signature: uncomment this change once the minSigners is made nonNull
+      // data.signature_config = signatureConfig;
+      data.signature_config = signatureConfig && {
+        ...signatureConfig,
+        minSigners: signatureConfig.minSigners || 1,
+        signingMode: signatureConfig.signingMode ?? "PARALLEL",
+      };
     }
     if (description !== undefined) {
       data.template_description = description === null ? null : JSON.stringify(description);

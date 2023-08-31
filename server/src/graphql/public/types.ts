@@ -82,12 +82,28 @@ export const PublicSignatureConfig = objectType({
         "If true, allows the recipients or users of the petition to select additional signers",
       resolve: (o) => o.allowAdditionalSigners ?? false,
     });
+    t.int("minSigners", {
+      description: "The minimum number of signers required to complete the signature process",
+      resolve: (o) => o.minSigners ?? 1, // TODO signature: remove resolver after minSigners is not nullable anymore
+    });
+    t.nullable.string("instructions", {
+      description: "Instructions for the signers",
+      resolve: (o) => o.instructions ?? null,
+    });
+    t.field("signingMode", {
+      type: "SignatureConfigSigningMode",
+      // TODO signature: remove resolver after signingMode is not nullable anymore
+      resolve: (o) => o.signingMode ?? "PARALLEL",
+    });
   },
   sourceType: /* ts */ `{
     signersInfo: any[];
     review?: boolean;
     allowAdditionalSigners?: boolean;
     additionalSignersInfo?: any[];
+    minSigners?: number;
+    instructions?: string;
+    signingMode?: "PARALLEL" | "SEQUENTIAL" // TODO signature: remove the ? after releasing
   }`,
 });
 

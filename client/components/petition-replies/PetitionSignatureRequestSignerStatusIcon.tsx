@@ -128,6 +128,22 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
             <TimeIcon ref={ref} color="yellow.500" {...(props as any)} />
           </SmallPopover>
         );
+      case "NOT_STARTED":
+        return (
+          <SmallPopover
+            content={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-signature-request-signer-status-icon.not-started"
+                  defaultMessage="The signature will start once the previous signer has signed."
+                />
+              </Text>
+            }
+            width="auto"
+          >
+            <TimeIcon ref={ref} color="gray.500" {...(props as any)} />
+          </SmallPopover>
+        );
       default:
         return null;
     }

@@ -24,6 +24,7 @@ export interface SignatureOptions {
    * Optional plain-text custom message to include in the "signature requested" emails
    */
   initialMessage?: string;
+  signingMode: "PARALLEL" | "SEQUENTIAL";
 }
 
 export interface SignatureResponse {

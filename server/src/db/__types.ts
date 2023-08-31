@@ -152,7 +152,8 @@ export type PetitionEventType =
   | "PETITION_ANONYMIZED"
   | "REPLY_STATUS_CHANGED"
   | "PROFILE_ASSOCIATED"
-  | "PROFILE_DISASSOCIATED";
+  | "PROFILE_DISASSOCIATED"
+  | "SIGNATURE_DELIVERED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -197,6 +198,7 @@ export const PetitionEventTypeValues = [
   "REPLY_STATUS_CHANGED",
   "PROFILE_ASSOCIATED",
   "PROFILE_DISASSOCIATED",
+  "SIGNATURE_DELIVERED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";

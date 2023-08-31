@@ -1,5 +1,4 @@
 import { WorkerContext } from "../../context";
-import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledRequestErrorEmail from "../../emails/emails/SignatureCancelledRequestErrorEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
@@ -21,8 +20,6 @@ export async function signatureCancelledRequestError(
 
   const users = await context.petitions.loadUsersOnPetition(petition.id);
 
-  const config = signatureRequest.signature_config as PetitionSignatureConfig;
-
   const emails = [];
   for (const user of users) {
     const isSubscribed = await context.petitions.isUserSubscribedToPetition(user.id, petition.id);
@@ -42,7 +39,7 @@ export async function signatureCancelledRequestError(
         petitionId: toGlobalId("Petition", petition.id),
         petitionName: petition.name,
         userName: userData.first_name,
-        signers: config.signersInfo.map((s) => ({
+        signers: signatureRequest.signature_config.signersInfo.map((s) => ({
           email: s.email,
           name: fullName(s.firstName, s.lastName),
         })),

@@ -14,7 +14,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { orgIntegrationId, signersInfo, timezone } = signatureConfig;
+      const { orgIntegrationId, signersInfo, timezone, instructions } = signatureConfig;
 
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
       if (
@@ -34,6 +34,14 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           info,
           `${argName}.timezone`,
           `Value must be a valid timezone.`,
+        );
+      }
+
+      if (isDefined(instructions) && instructions.length > 300) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.instructions`,
+          `Instructions must be equal or less than 300 characters.`,
         );
       }
     }

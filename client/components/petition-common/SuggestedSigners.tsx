@@ -11,10 +11,10 @@ interface SuggestedSignersProps {
 export function SuggestedSigners({ suggestions, onAddSigner, isDisabled }: SuggestedSignersProps) {
   return suggestions.length > 0 ? (
     <>
-      <Text fontWeight="bold" marginTop={4}>
+      <Text fontWeight="bold">
         <FormattedMessage id="component.suggested-signers.header" defaultMessage="Suggested:" />
       </Text>
-      <Stack marginTop={2} paddingLeft={2}>
+      <Stack>
         {suggestions.map((signer, i) => (
           <Flex key={i} justifyContent="space-between" alignItems="center">
             <Box>

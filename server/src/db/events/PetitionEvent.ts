@@ -102,6 +102,17 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_REOPENED: {
     user_id: number;
   };
+  SIGNATURE_DELIVERED: {
+    petition_signature_request_id: number;
+    email_delivered_at?: Date;
+    email_opened_at?: Date;
+    email_bounced_at?: Date;
+    signer: {
+      firstName: string;
+      lastName: string;
+      email: string;
+    };
+  };
   SIGNATURE_OPENED: {
     petition_signature_request_id: number;
     signer: {
@@ -112,8 +123,11 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   SIGNATURE_STARTED: {
     petition_signature_request_id: number;
+    /** @deprecated remove after release */
     email_delivered_at?: Date;
+    /** @deprecated remove after release */
     email_opened_at?: Date;
+    /** @deprecated remove after release */
     email_bounced_at?: Date;
   };
   SIGNATURE_CANCELLED: {
@@ -297,6 +311,10 @@ export type PetitionReopenedEvent<IsCreate extends boolean = false> = GenericPet
   "PETITION_REOPENED",
   IsCreate
 >;
+export type SignatureDeliveredEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "SIGNATURE_DELIVERED",
+  IsCreate
+>;
 export type SignatureOpenedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
   "SIGNATURE_OPENED",
   IsCreate
@@ -398,6 +416,7 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionClosedEvent<IsCreate>
   | PetitionClosedNotifiedEvent<IsCreate>
   | PetitionReopenedEvent<IsCreate>
+  | SignatureDeliveredEvent<IsCreate>
   | SignatureOpenedEvent<IsCreate>
   | SignatureStartedEvent<IsCreate>
   | SignatureCompletedEvent<IsCreate>

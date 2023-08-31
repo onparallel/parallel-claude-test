@@ -45,7 +45,9 @@ export const PetitionSignatureRequestSignerStatus = objectType({
           ? "DECLINED"
           : o.status?.bounced_at
           ? "BOUNCED"
-          : "PENDING",
+          : o.status?.sent_at
+          ? "PENDING"
+          : "NOT_STARTED",
     });
     t.nullable.datetime("sentAt", {
       resolve: (o) => o.status?.sent_at ?? null,

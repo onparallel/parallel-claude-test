@@ -49,7 +49,7 @@ async function startSignatureProcess(
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
 
-  const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
+  const { title, orgIntegrationId, signersInfo, message, signingMode } = signature.signature_config;
 
   let documentTmpPath: string | null = null;
   const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
@@ -106,6 +106,7 @@ async function startSignatureProcess(
       {
         locale: petition.recipient_locale,
         initialMessage: message,
+        signingMode: signingMode ?? "PARALLEL", // TODO signature: remove fallback after release
       },
     );
 

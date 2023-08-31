@@ -208,8 +208,7 @@ export function AddPetitionAccessDialog({
       const { signers, allowAdditionalSigners } = await showConfirmPetitionSignersDialog({
         user,
         accesses: petition.accesses,
-        signers: signatureConfig.signers.filter(isDefined) ?? [],
-        allowAdditionalSigners: signatureConfig.allowAdditionalSigners,
+        signatureConfig: signatureConfig,
         isUpdate: true,
         previousSignatures: petition.signatureRequests,
       });
@@ -581,9 +580,11 @@ AddPetitionAccessDialog.fragments = {
           ...CopySignatureConfigDialog_PetitionSigner
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
+        ...ConfirmPetitionSignersDialog_SignatureConfig
       }
       ${CopySignatureConfigDialog.fragments.PetitionSigner}
       ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+      ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     `;
   },
 

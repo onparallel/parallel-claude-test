@@ -73,8 +73,10 @@ export function OlderSignatureRequestRows({
                     <PetitionSignatureRequestSignerStatusIcon
                       signerStatus={{
                         ...sStatus,
-                        // don't show any icon when signer is pending
-                        status: sStatus.status === "PENDING" ? "" : sStatus.status,
+                        // don't show any icon when signer is pending or not started
+                        status: ["PENDING", "NOT_STARTED"].includes(sStatus.status)
+                          ? ""
+                          : sStatus.status,
                       }}
                       position="relative"
                       marginX={1}

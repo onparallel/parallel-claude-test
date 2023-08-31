@@ -54,7 +54,7 @@ import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, noop, pick } from "remeda";
+import { isDefined, noop } from "remeda";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { Divider } from "../common/Divider";
 import { HelpPopover } from "../common/HelpPopover";
@@ -127,7 +127,6 @@ function _PetitionSettings({
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
   const showSignatureConfigDialog = useSignatureConfigDialog();
-  const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
 
   const [cancelSignatureRequest] = useMutation(
     PetitionSettings_cancelPetitionSignatureRequestDocument,
@@ -146,25 +145,6 @@ function _PetitionSettings({
         integrations: signatureIntegrations,
       });
 
-      const previous = petition.signatureConfig;
-      const signatureConfigHasChanged = [
-        [signatureConfig.orgIntegrationId, previous?.integration?.id],
-        [
-          signatureConfig.signersInfo
-            .map((s) => JSON.stringify(pick(s, ["email", "firstName", "lastName"])))
-            .join(","),
-          previous?.signers
-            .filter(isDefined)
-            .map((s) => JSON.stringify(pick(s, ["email", "firstName", "lastName"])))
-            .join(","),
-        ],
-        [signatureConfig.title, previous?.title],
-        [signatureConfig.allowAdditionalSigners, previous?.allowAdditionalSigners],
-      ].some(([after, before]) => after !== before);
-
-      if (ongoingSignatureRequest && signatureConfigHasChanged) {
-        await showConfirmSignatureConfigChanged();
-      }
       onUpdatePetition({ signatureConfig });
     } catch {}
   }
@@ -1159,36 +1139,6 @@ function ConfirmSkipForwardSecurity(props: DialogProps<{}, void>) {
             id="component.confirm-skip-forward-security.confirm"
             defaultMessage="Disable Forward Security"
           />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
-function ConfirmSignatureConfigChanged(props: DialogProps<{}, void>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="component.confirm-signature-config-changed.header"
-          defaultMessage="Ongoing eSignature"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="component.confirm-signature-config-changed.body"
-          defaultMessage="You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
-        />
-      }
-      cancel={
-        <Button onClick={() => props.onReject()}>
-          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-        </Button>
-      }
-      confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
       {...props}

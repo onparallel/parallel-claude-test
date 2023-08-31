@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
-  Box,
   Button,
   Checkbox,
   Flex,
@@ -10,14 +9,23 @@ import {
   FormLabel,
   HStack,
   Input,
-  List,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  OrderedList,
+  Radio,
+  RadioGroup,
   Stack,
   Text,
+  UnorderedList,
   useCounter,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "@parallel/components/common/ContactSelect";
+import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Steps } from "@parallel/components/common/Steps";
@@ -29,6 +37,7 @@ import {
   SignatureConfigDialog_UserFragment,
   SignatureConfigInput,
   SignatureConfigInputSigner,
+  SignatureConfigSigningMode,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { withError } from "@parallel/utils/promises/withError";
@@ -67,6 +76,10 @@ interface SignatureConfigFormData {
   allowAdditionalSigners: boolean;
   includePresetSigners: boolean;
   presetSigners: SignatureConfigInputSigner[];
+  signingMode: SignatureConfigSigningMode;
+  minSigners: number;
+  instructions: Maybe<string>;
+  showInstructions: boolean;
 }
 
 export const MAX_SIGNERS_ALLOWED = 40;
@@ -83,7 +96,6 @@ export function SignatureConfigDialog({
     (petition.signatureConfig?.signers ?? []).filter(isDefined),
     (s) => s.isPreset,
   );
-
   const form = useForm<SignatureConfigFormData>({
     mode: "onSubmit",
     defaultValues: {
@@ -96,6 +108,10 @@ export function SignatureConfigDialog({
       allowAdditionalSigners: petition.signatureConfig?.allowAdditionalSigners ?? false,
       includePresetSigners: presetSigners.length > 0,
       presetSigners,
+      signingMode: petition.signatureConfig?.signingMode ?? "PARALLEL",
+      minSigners: petition.signatureConfig?.minSigners ?? 1,
+      instructions: petition.signatureConfig?.instructions ?? null,
+      showInstructions: isDefined(petition.signatureConfig?.instructions),
     },
   });
 
@@ -145,6 +161,9 @@ export function SignatureConfigDialog({
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         review: data.review,
         allowAdditionalSigners: data.allowAdditionalSigners,
+        signingMode: data.signingMode,
+        minSigners: data.minSigners,
+        instructions: data.showInstructions ? data.instructions : null,
         signersInfo: (data.includePresetSigners
           ? [...otherSigners, ...data.presetSigners.map((s) => ({ ...s, isPreset: true }))]
           : otherSigners
@@ -379,23 +398,112 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
 function SignatureConfigDialogBodyStep2({
   petition,
 }: Pick<SignatureConfigDialogProps, "petition">) {
-  const { register, watch } = useFormContext<SignatureConfigFormData>();
+  const intl = useIntl();
+  const { register, watch, control } = useFormContext<SignatureConfigFormData>();
   const review = watch("review");
+  const showInstructions = watch("showInstructions");
 
   const petitionIsCompleted =
     petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
 
   return (
     <Stack spacing={3}>
+      <FormControl id="minSigners">
+        <Controller
+          name="minSigners"
+          control={control}
+          rules={{ required: true, min: 1 }}
+          render={({ field: { ref, value, name, onChange, onBlur } }) => (
+            <HStack as={FormLabel} margin={0} fontWeight={400}>
+              <FormattedMessage
+                id="component.signature-config-dialog.min-signers-label"
+                defaultMessage="This document will have at least {input} {count, plural, =1{signer} other{signers}}"
+                values={{
+                  count: value,
+                  input: (
+                    <NumberInput
+                      marginX={2}
+                      onChange={(_, value) => onChange(value)}
+                      value={value ?? 1}
+                      min={1}
+                      clampValueOnBlur={true}
+                      maxWidth="80px"
+                    >
+                      <NumberInputField ref={ref} name={name} type="number" />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  ),
+                }}
+              />
+            </HStack>
+          )}
+        />
+      </FormControl>
+      <FormControl>
+        <FormLabel fontWeight="normal">
+          <FormattedMessage
+            id="component.signature-config-dialog.sending-type-label"
+            defaultMessage="How do you want Parallel to send the signatures?"
+          />
+        </FormLabel>
+        <Controller
+          name="signingMode"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup
+              as={HStack}
+              spacing={3}
+              onChange={onChange}
+              value={value}
+              colorScheme="purple"
+            >
+              <HStack spacing={0}>
+                <Radio backgroundColor="white" value="PARALLEL">
+                  <FormattedMessage
+                    id="component.signature-config-dialog.sending-same-time-label"
+                    defaultMessage="All at the same time"
+                  />
+                </Radio>
+                <HelpPopover>
+                  <FormattedMessage
+                    id="component.signature-config-dialog.sending-same-time-help"
+                    defaultMessage="All the signers will receive the document at the same time."
+                  />
+                </HelpPopover>
+              </HStack>
+
+              <HStack spacing={0}>
+                <Radio backgroundColor="white" value="SEQUENTIAL">
+                  <FormattedMessage
+                    id="component.signature-config-dialog.sending-sequential-label"
+                    defaultMessage="In order, signing one by one"
+                  />
+                </Radio>
+                <HelpPopover>
+                  <FormattedMessage
+                    id="component.signature-config-dialog.sending-sequential-help"
+                    defaultMessage="Each signer will receive the document after the one before has signed."
+                  />
+                </HelpPopover>
+              </HStack>
+            </RadioGroup>
+          )}
+        />
+      </FormControl>
       {!review && !petitionIsCompleted ? (
         <FormControl id="allowAdditionalSigners">
-          <FormLabel>
+          <FormLabel margin={0}>
             <Checkbox colorScheme="primary" {...register("allowAdditionalSigners")}>
-              <HStack alignContent="center" fontWeight="normal">
-                <FormattedMessage
-                  id="component.signature-config-dialog.allow-additional-signers-label"
-                  defaultMessage="Allow recipients to add additional signers"
-                />
+              <HStack alignContent="center" fontWeight="normal" spacing={0}>
+                <Text as="span">
+                  <FormattedMessage
+                    id="component.signature-config-dialog.allow-additional-signers-label"
+                    defaultMessage="Allow recipients to add additional signers"
+                  />
+                </Text>
                 <HelpPopover>
                   <FormattedMessage
                     id="component.signature-config-dialog.allow-additional-signers-help"
@@ -407,17 +515,49 @@ function SignatureConfigDialogBodyStep2({
           </FormLabel>
         </FormControl>
       ) : null}
-      <FormControl id="includePresetSigners">
-        <FormLabel>
-          <Checkbox colorScheme="primary" {...register("includePresetSigners")}>
-            <HStack alignContent="center" fontWeight="normal">
-              <FormattedMessage
-                id="component.signature-config-dialog.include-fixed-signers-template-label"
-                defaultMessage="Include contacts who always sign the document"
-              />
+      <FormControl id="showInstructions">
+        <FormLabel fontWeight="normal" margin={0}>
+          <Checkbox colorScheme="primary" {...register("showInstructions")}>
+            <HStack alignContent="center" fontWeight="normal" spacing={0}>
+              <Text as="span">
+                <FormattedMessage
+                  id="component.signature-config-dialog.add-instructions-label"
+                  defaultMessage="Add instructions"
+                />
+              </Text>
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.signature-config-dialog.add-instructions-help"
+                  defaultMessage="Instructions help other users and recipients understand who has to sign the document."
+                />
+              </HelpPopover>
             </HStack>
           </Checkbox>
         </FormLabel>
+      </FormControl>
+      {showInstructions ? (
+        <FormControl id="instructions">
+          <GrowingTextarea
+            {...register("instructions")}
+            placeholder={intl.formatMessage({
+              id: "component.signature-config-dialog.instructions-placeholder",
+              defaultMessage: "e.g. Add your company's legal representatives as signers",
+            })}
+            aria-label={intl.formatMessage({
+              id: "component.signature-config-dialog.instructions-label",
+              defaultMessage: "Instructions",
+            })}
+            maxLength={300}
+          />
+        </FormControl>
+      ) : null}
+      <FormControl id="includePresetSigners">
+        <Checkbox colorScheme="primary" {...register("includePresetSigners")}>
+          <FormattedMessage
+            id="component.signature-config-dialog.include-fixed-signers-template-label"
+            defaultMessage="Include contacts who always sign the document"
+          />
+        </Checkbox>
       </FormControl>
     </Stack>
   );
@@ -436,6 +576,8 @@ function SignatureConfigDialogBodyStep3({
 
   const presetSigners = watch("presetSigners");
   const includePresetSigners = watch("includePresetSigners");
+  const signingMode = watch("signingMode");
+  const isSequential = signingMode === "SEQUENTIAL";
 
   const isPetition = petition.__typename === "Petition";
 
@@ -516,6 +658,8 @@ function SignatureConfigDialogBodyStep3({
     }
   }, [presetSigners.length]);
 
+  const ListElement = isSequential ? OrderedList : UnorderedList;
+
   return (
     <FormControl id="presetSigners" isInvalid={!!errors.presetSigners}>
       {presetSigners.length === 0 ? (
@@ -535,35 +679,36 @@ function SignatureConfigDialogBodyStep3({
         }}
         render={({ field: { onChange, value: signers } }) => (
           <>
-            <List spacing={0} paddingY={1} maxH="210px" overflowY="auto">
+            <ListElement
+              spacing={0}
+              paddingY={1}
+              margin={0}
+              maxH="210px"
+              overflowY="auto"
+              listStylePosition="inside"
+            >
               {signers.map((signer, index) => (
                 <SelectedSignerRow
                   key={index}
                   isEditable
-                  marker={
-                    <Text as="span" paddingX={2}>
-                      {"•"}
-                    </Text>
-                  }
                   signer={signer}
                   onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                   onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                 />
               ))}
-            </List>
-            {!isPetition && signers.length > 0 ? (
-              <CloseableAlert status="info" borderRadius="base">
-                <AlertIcon color="blue.500" />
-                <AlertDescription>
-                  <FormattedMessage
-                    id="component.signature-config-dialog.template-alert"
-                    defaultMessage="These signers will be assigned to all parallels created from this template."
-                  />
-                </AlertDescription>
-              </CloseableAlert>
-            ) : null}
-
-            <Box marginTop={2}>
+            </ListElement>
+            <Stack marginTop={2}>
+              {!isPetition && signers.length > 0 ? (
+                <CloseableAlert status="info" borderRadius="base">
+                  <AlertIcon color="blue.500" />
+                  <AlertDescription>
+                    <FormattedMessage
+                      id="component.signature-config-dialog.template-alert"
+                      defaultMessage="These signers will be assigned to all parallels created from this template."
+                    />
+                  </AlertDescription>
+                </CloseableAlert>
+              ) : null}
               <ContactSelect
                 value={selectedContact}
                 onChange={handleContactSelectOnChange(onChange)}
@@ -580,7 +725,7 @@ function SignatureConfigDialogBodyStep3({
                   onChange([...signers, s]);
                 }}
               />
-            </Box>
+            </Stack>
           </>
         )}
       />
@@ -607,6 +752,9 @@ SignatureConfigDialog.fragments = {
           title
           review
           allowAdditionalSigners
+          signingMode
+          minSigners
+          instructions
         }
         ... on Petition {
           status

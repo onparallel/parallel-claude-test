@@ -925,6 +925,11 @@
     "context": "Write here a message for the signers..."
   },
   {
+    "term": "component.confirm-petition-signers-dialog.min-signers",
+    "definition": "Add at least {count, plural, =1{# signer} other{# signers}}",
+    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.no-signers-added",
     "definition": "You have not added any signers",
     "context": "You have not added any signers"
@@ -935,9 +940,19 @@
     "context": "We will send the document to the following contacts:"
   },
   {
+    "term": "component.confirm-petition-signers-dialog.no-signers-set-sequential",
+    "definition": "We will send the document to sign to each contact after the one before has signed:",
+    "context": "We will send the document to sign to each contact after the one before has signed:"
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.preset-signers",
     "definition": "{names} will sign together with the signers you add.",
     "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.preset-signers-sequential",
+    "definition": "{names} will sign after the other signers.",
+    "context": "{names} will sign after the other signers."
   },
   {
     "term": "component.confirm-petition-signers-dialog.signer-added-by-recipient",
@@ -1083,16 +1098,6 @@
     "term": "component.confirm-send-signature-reminder.header",
     "definition": "Send signature reminder",
     "context": "Send signature reminder"
-  },
-  {
-    "term": "component.confirm-signature-config-changed.body",
-    "definition": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled.",
-    "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
-  },
-  {
-    "term": "component.confirm-signature-config-changed.header",
-    "definition": "Ongoing eSignature",
-    "context": "Ongoing eSignature"
   },
   {
     "term": "component.confirm-signer-info-dialog.header",
@@ -4555,6 +4560,11 @@
     "context": "Starting"
   },
   {
+    "term": "component.petition-signature-request-signer-status-icon.not-started",
+    "definition": "The signature will start once the previous signer has signed.",
+    "context": "The signature will start once the previous signer has signed."
+  },
+  {
     "term": "component.petition-signature-request.signer-status.dates.bounced-at",
     "definition": "Email bounced: {bouncedAt}",
     "context": "Email bounced: {bouncedAt}"
@@ -5570,6 +5580,11 @@
     "context": "We will send the document to the following contacts:"
   },
   {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.confirmation-text-sequential",
+    "definition": "We will send the document to sign to each contact after the one before has signed:",
+    "context": "We will send the document to sign to each contact after the one before has signed:"
+  },
+  {
     "term": "component.recipient-view-confirm-petition-signers-dialog.header",
     "definition": "Start signature",
     "context": "Start signature"
@@ -5585,9 +5600,19 @@
     "context": "Write here a message for the signers..."
   },
   {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.min-signers",
+    "definition": "Add at least {count, plural, =1{# signer} other{# signers}}",
+    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
+  },
+  {
     "term": "component.recipient-view-confirm-petition-signers-dialog.preset-signers-added",
     "definition": "{names} will sign together with the signers you add.",
     "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.preset-signers-added-sequential",
+    "definition": "{names} will sign after the signers you add.",
+    "context": "{names} will sign after the signers you add."
   },
   {
     "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
@@ -5858,21 +5883,6 @@
     "term": "component.recipient-view-signature-sent-alert.check-status-button",
     "definition": "Check status",
     "context": "Check status"
-  },
-  {
-    "term": "component.recipient-view-signature-sent-alert.petition-completed-alert-2",
-    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
-    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-  },
-  {
-    "term": "component.recipient-view-signature-sent-alert.petition-requires-signature-alert-1",
-    "definition": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed.",
-    "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
-  },
-  {
-    "term": "component.recipient-view-signature-sent-alert.petition-signature-request-sent-alert",
-    "definition": "<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}.",
-    "context": "<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}."
   },
   {
     "term": "component.recipient-view.reminder-submit",
@@ -6720,6 +6730,16 @@
     "context": "Error sending"
   },
   {
+    "term": "component.signature-config-dialog.add-instructions-help",
+    "definition": "Instructions help other users and recipients understand who has to sign the document.",
+    "context": "Instructions help other users and recipients understand who has to sign the document."
+  },
+  {
+    "term": "component.signature-config-dialog.add-instructions-label",
+    "definition": "Add instructions",
+    "context": "Add instructions"
+  },
+  {
     "term": "component.signature-config-dialog.allow-additional-signers-help",
     "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
@@ -6748,6 +6768,21 @@
     "term": "component.signature-config-dialog.include-fixed-signers-template-label",
     "definition": "Include contacts who always sign the document",
     "context": "Include contacts who always sign the document"
+  },
+  {
+    "term": "component.signature-config-dialog.instructions-label",
+    "definition": "Instructions",
+    "context": "Instructions"
+  },
+  {
+    "term": "component.signature-config-dialog.instructions-placeholder",
+    "definition": "e.g. Add your company's legal representatives as signers",
+    "context": "e.g. Add your company's legal representatives as signers"
+  },
+  {
+    "term": "component.signature-config-dialog.min-signers-label",
+    "definition": "This document will have at least {input} {count, plural, =1{signer} other{signers}}",
+    "context": "This document will have at least {input} {count, plural, =1{signer} other{signers}}"
   },
   {
     "term": "component.signature-config-dialog.no-signers-added",
@@ -6785,6 +6820,31 @@
     "context": "After reviewing the information you will have to start the signature manually."
   },
   {
+    "term": "component.signature-config-dialog.sending-same-time-help",
+    "definition": "All the signers will receive the document at the same time.",
+    "context": "All the signers will receive the document at the same time."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-same-time-label",
+    "definition": "All at the same time",
+    "context": "All at the same time"
+  },
+  {
+    "term": "component.signature-config-dialog.sending-sequential-help",
+    "definition": "Each signer will receive the document after the one before has signed.",
+    "context": "Each signer will receive the document after the one before has signed."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-sequential-label",
+    "definition": "In order, signing one by one",
+    "context": "In order, signing one by one"
+  },
+  {
+    "term": "component.signature-config-dialog.sending-type-label",
+    "definition": "How do you want Parallel to send the signatures?",
+    "context": "How do you want Parallel to send the signatures?"
+  },
+  {
     "term": "component.signature-config-dialog.step-1-header",
     "definition": "eSignature configuration",
     "context": "eSignature configuration"
@@ -6820,6 +6880,31 @@
     "context": "Enter a title..."
   },
   {
+    "term": "component.signature-sent-alert.petition-completed-alert-2",
+    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
+    "definition": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed.",
+    "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert",
+    "definition": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}.",
+    "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert-sequential",
+    "definition": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{, <a># more</a> will receive the document after the one before has signed}}.",
+    "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{, <a># more</a> will receive the document after the one before has signed}}."
+  },
+  {
+    "term": "component.signature-started-message-dialog.message-sent",
+    "definition": "Message sent on {date}",
+    "context": "Message sent on {date}"
+  },
+  {
     "term": "component.signature-status-badge.bounced",
     "definition": "Bounced",
     "context": "Bounced"
@@ -6828,6 +6913,11 @@
     "term": "component.signature-status-badge.canceled",
     "definition": "Canceled",
     "context": "Canceled"
+  },
+  {
+    "term": "component.signature-status-badge.not-started",
+    "definition": "Not started",
+    "context": "Not started"
   },
   {
     "term": "component.signature-status-badge.pending",
@@ -6843,6 +6933,11 @@
     "term": "component.signature-status-dialog.body",
     "definition": "We have sent the document to these signers.",
     "context": "We have sent the document to these signers."
+  },
+  {
+    "term": "component.signature-status-dialog.body-sequential",
+    "definition": "We have sent the document to the first contact, the rest will receive the signature after the one before has signed.",
+    "context": "We have sent the document to the first contact, the rest will receive the signature after the one before has signed."
   },
   {
     "term": "component.signature-status-dialog.header",
@@ -7168,6 +7263,11 @@
     "term": "component.test-signature-dialog.title",
     "definition": "Test signature",
     "context": "Test signature"
+  },
+  {
+    "term": "component.timeline-signature-started-event.signature-started-description",
+    "definition": "We started a {signingMode, select, SEQUENTIAL{sequential} other{}} signature process on the parallel {timeAgo}",
+    "context": "We started a {signingMode, select, SEQUENTIAL{sequential} other{}} signature process on the parallel {timeAgo}"
   },
   {
     "term": "component.timespan.days-part",
@@ -9163,6 +9263,11 @@
     "term": "generic.thanks",
     "definition": "Thanks",
     "context": "Thanks"
+  },
+  {
+    "term": "generic.timeline-see-message-button",
+    "definition": "See message",
+    "context": "See message"
   },
   {
     "term": "generic.today-at",
@@ -13260,6 +13365,11 @@
     "context": "See reason"
   },
   {
+    "term": "timeline.signature-delivered.description",
+    "definition": "We sent the signature email to {signer} {timeAgo}",
+    "context": "We sent the signature email to {signer} {timeAgo}"
+  },
+  {
     "term": "timeline.signature-opened-description",
     "definition": "{signer} opened the signing document {timeAgo}",
     "context": "{signer} opened the signing document {timeAgo}"
@@ -13273,11 +13383,6 @@
     "term": "timeline.signature-restarted.description",
     "definition": "The eSignature process has been restarted {timeAgo}",
     "context": "The eSignature process has been restarted {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-started-description",
-    "definition": "We started an eSignature process on the parallel {timeAgo}",
-    "context": "We started an eSignature process on the parallel {timeAgo}"
   },
   {
     "term": "user-group.all-members.description",

@@ -75,6 +75,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionClosedNotifiedEvent";
       case "PETITION_REOPENED":
         return "PetitionReopenedEvent";
+      case "SIGNATURE_DELIVERED":
+        return "SignatureDeliveredEvent";
       case "SIGNATURE_OPENED":
         return "SignatureOpenedEvent";
       case "SIGNATURE_STARTED":
@@ -507,6 +509,30 @@ export const PetitionReopenedEvent = createPetitionEvent("PetitionReopenedEvent"
 });
 
 /**
+ * Triggered when the the signature provider sends an email to one of the signers
+ */
+export const SignatureDeliveredEvent = createPetitionEvent("SignatureDeliveredEvent", (t) => {
+  t.field("signature", {
+    type: "PetitionSignatureRequest",
+    resolve: async ({ data }, _, ctx) =>
+      (await ctx.petitions.loadPetitionSignatureById(data.petition_signature_request_id))!,
+  });
+  t.nullable.field("signer", {
+    type: "PetitionSigner",
+    resolve: ({ data }) => data.signer,
+  });
+  t.nullable.datetime("deliveredAt", {
+    resolve: ({ data }) => data.email_delivered_at ?? null,
+  });
+  t.nullable.datetime("openedAt", {
+    resolve: ({ data }) => data.email_opened_at ?? null,
+  });
+  t.nullable.datetime("bouncedAt", {
+    resolve: ({ data }) => data.email_bounced_at ?? null,
+  });
+});
+
+/**
  * Triggered when the signers opens the signing page
  */
 export const SignatureOpenedEvent = createPetitionEvent("SignatureOpenedEvent", (t) => {
@@ -520,13 +546,24 @@ export const SignatureOpenedEvent = createPetitionEvent("SignatureOpenedEvent", 
  * Triggered when a signature request on the petition is started.
  */
 export const SignatureStartedEvent = createPetitionEvent("SignatureStartedEvent", (t) => {
+  t.field("signature", {
+    type: "PetitionSignatureRequest",
+    resolve: async (o, _, ctx) =>
+      (await ctx.petitions.loadPetitionSignatureById(o.data.petition_signature_request_id))!,
+  });
+  /** @deprecated */
   t.nullable.datetime("deliveredAt", {
+    deprecation: "remove after release",
     resolve: ({ data }) => data.email_delivered_at ?? null,
   });
+  /** @deprecated */
   t.nullable.datetime("openedAt", {
+    deprecation: "remove after release",
     resolve: ({ data }) => data.email_opened_at ?? null,
   });
+  /** @deprecated */
   t.nullable.datetime("bouncedAt", {
+    deprecation: "remove after release",
     resolve: ({ data }) => data.email_bounced_at ?? null,
   });
 });

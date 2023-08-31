@@ -18,7 +18,6 @@ import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
-import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 
 function getPetitionSignatureStatus({
   status,
@@ -27,7 +26,7 @@ function getPetitionSignatureStatus({
 }: {
   status: PetitionStatus;
   currentSignatureRequest?: PetitionSignatureRequest | null;
-  signatureConfig?: PetitionSignatureConfig | null;
+  signatureConfig?: any;
 }) {
   if (
     isDefined(signatureConfig) &&

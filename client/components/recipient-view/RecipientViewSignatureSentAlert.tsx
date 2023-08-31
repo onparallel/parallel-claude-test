@@ -1,8 +1,10 @@
 import { gql } from "@apollo/client";
 import {
+  Alert,
   AlertDescription,
   AlertIcon,
   Badge,
+  Box,
   Button,
   Flex,
   HStack,
@@ -17,7 +19,6 @@ import {
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
-import { CloseableAlert } from "../common/CloseableAlert";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
@@ -45,69 +46,100 @@ export function RecipientViewSignatureSentAlert({
   const isPendingStart =
     petition.signatureConfig?.review === true && !isDefined(petition.latestSignatureRequest);
   return (
-    <CloseableAlert status={isPendingStart ? "warning" : "success"} zIndex={2}>
+    <Alert status={isPendingStart ? "warning" : "success"} zIndex={2}>
       <Flex
         maxWidth="container.lg"
-        alignItems="center"
+        alignItems={{ base: "end", md: "center" }}
         justifyContent="flex-start"
         marginX="auto"
         width="100%"
         paddingLeft={4}
+        flexDirection={{ base: "column", md: "row" }}
+        gap={{ base: 2, md: 6 }}
       >
-        <AlertIcon color={isPendingStart ? "yellow.400" : undefined} />
-        <AlertDescription>
-          {isPendingStart ? (
-            <Text>
+        <Flex alignItems={{ base: "start", md: "center" }}>
+          <AlertIcon color={isPendingStart ? "yellow.400" : undefined} />
+          <AlertDescription>
+            {isPendingStart ? (
+              <Text>
+                <FormattedMessage
+                  id="component.signature-sent-alert.petition-requires-signature-alert-1"
+                  defaultMessage="<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
+                  values={{ tone }}
+                />
+              </Text>
+            ) : (
+              <Text as="span">
+                {petition.signatureConfig?.signingMode === "SEQUENTIAL" ? (
+                  <FormattedMessage
+                    id="component.signature-sent-alert.petition-signature-request-sent-alert-sequential"
+                    defaultMessage="<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{, <a># more</a> will receive the document after the one before has signed}}."
+                    values={{
+                      a: (chunks: any) => (
+                        <ContactListPopover contacts={totalSigners.slice(1)}>
+                          <Text
+                            display="initial"
+                            textDecoration="underline"
+                            color="primary.600"
+                            cursor="pointer"
+                            as="span"
+                          >
+                            {chunks}
+                          </Text>
+                        </ContactListPopover>
+                      ),
+                      name: totalSigners[0]!.fullName,
+                      email: totalSigners[0]!.email,
+                      count: totalSigners.length - 1,
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.signature-sent-alert.petition-signature-request-sent-alert"
+                    defaultMessage="<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}."
+                    values={{
+                      a: (chunks: any) => (
+                        <ContactListPopover contacts={totalSigners.slice(1)}>
+                          <Text
+                            display="initial"
+                            textDecoration="underline"
+                            color="primary.600"
+                            cursor="pointer"
+                            as="span"
+                          >
+                            {chunks}
+                          </Text>
+                        </ContactListPopover>
+                      ),
+                      name: totalSigners[0]!.fullName,
+                      email: totalSigners[0]!.email,
+                      count: totalSigners.length - 1,
+                    }}
+                  />
+                )}
+              </Text>
+            )}{" "}
+            <Text as="span">
               <FormattedMessage
-                id="component.recipient-view-signature-sent-alert.petition-requires-signature-alert-1"
-                defaultMessage="<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
+                id="component.signature-sent-alert.petition-completed-alert-2"
+                defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
                 values={{ tone }}
               />
             </Text>
-          ) : (
-            <Text>
-              <FormattedMessage
-                id="component.recipient-view-signature-sent-alert.petition-signature-request-sent-alert"
-                defaultMessage="<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}."
-                values={{
-                  a: (chunks: any) => (
-                    <ContactListPopover contacts={totalSigners.slice(1)}>
-                      <Text
-                        display="initial"
-                        textDecoration="underline"
-                        color="primary.600"
-                        cursor="pointer"
-                        as="span"
-                      >
-                        {chunks}
-                      </Text>
-                    </ContactListPopover>
-                  ),
-                  name: totalSigners[0]!.fullName,
-                  email: totalSigners[0]!.email,
-                  count: totalSigners.length - 1,
-                }}
-              />
-            </Text>
-          )}
-          <Text>
-            <FormattedMessage
-              id="component.recipient-view-signature-sent-alert.petition-completed-alert-2"
-              defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-              values={{ tone }}
-            />
-          </Text>
-        </AlertDescription>
+          </AlertDescription>
+        </Flex>
         {petition.latestSignatureRequest && !isPendingStart && (
-          <Button marginLeft="auto" onClick={handleCheckStatusClick} background="white">
-            <FormattedMessage
-              id="component.recipient-view-signature-sent-alert.check-status-button"
-              defaultMessage="Check status"
-            />
-          </Button>
+          <Box>
+            <Button marginLeft="auto" onClick={handleCheckStatusClick} background="white">
+              <FormattedMessage
+                id="component.recipient-view-signature-sent-alert.check-status-button"
+                defaultMessage="Check status"
+              />
+            </Button>
+          </Box>
         )}
       </Flex>
-    </CloseableAlert>
+    </Alert>
   );
 }
 
@@ -126,6 +158,7 @@ RecipientViewSignatureSentAlert.fragments = {
       }
       signatureConfig {
         review
+        signingMode
         signers {
           fullName
           email
@@ -170,6 +203,15 @@ function SignatureStatusBadge({ status }: { status: string }) {
         />
       </Badge>
     );
+  } else if (status === "NOT_STARTED") {
+    return (
+      <Badge colorScheme="gray">
+        <FormattedMessage
+          id="component.signature-status-badge.not-started"
+          defaultMessage="Not started"
+        />
+      </Badge>
+    );
   }
   return null;
 }
@@ -179,6 +221,7 @@ function SignatureStatusDialog({
   ...props
 }: DialogProps<{ petition: RecipientViewSignatureSentAlert_PublicPetitionFragment }>) {
   const signers = petition.latestSignatureRequest?.signerStatus ?? [];
+  const isSequential = petition.signatureConfig?.signingMode === "SEQUENTIAL";
   return (
     <ConfirmDialog
       hasCloseButton
@@ -194,10 +237,19 @@ function SignatureStatusDialog({
       }
       body={
         <Stack>
-          <FormattedMessage
-            id="component.signature-status-dialog.body"
-            defaultMessage="We have sent the document to these signers."
-          />
+          <Text>
+            {isSequential ? (
+              <FormattedMessage
+                id="component.signature-status-dialog.body-sequential"
+                defaultMessage="We have sent the document to the first contact, the rest will receive the signature after the one before has signed."
+              />
+            ) : (
+              <FormattedMessage
+                id="component.signature-status-dialog.body"
+                defaultMessage="We have sent the document to these signers."
+              />
+            )}
+          </Text>
           <Stack as="ul" spacing={1} paddingLeft={4}>
             {signers.map((signer, i) => (
               <Text as="li" key={i}>

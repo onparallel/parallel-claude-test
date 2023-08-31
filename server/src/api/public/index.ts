@@ -738,6 +738,9 @@ api
               review
               timezone
               title
+              signingMode
+              instructions
+              minSigners
             }
           }
         }
@@ -774,11 +777,8 @@ api
         }
 
         inputData.signatureConfig = {
-          allowAdditionalSigners: queryResult.petition!.signatureConfig!.allowAdditionalSigners,
+          ...omit(queryResult.petition!.signatureConfig!, ["integration"]),
           orgIntegrationId: queryResult.petition!.signatureConfig!.integration!.id,
-          review: queryResult.petition!.signatureConfig!.review,
-          timezone: queryResult.petition!.signatureConfig!.timezone,
-          title: queryResult.petition!.signatureConfig!.title,
           signersInfo: body.signers,
         };
       } else if (body.signers === null) {

@@ -221,14 +221,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       try {
         setFinalized(true);
         if (canFinalize && isPetition) {
-          const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
               accesses: petition.accesses,
-              signers: petition!.signatureConfig?.signers.filter(isDefined) ?? [],
               user: me,
-              allowAdditionalSigners,
+              signatureConfig: petition.signatureConfig,
               previousSignatures: petition.signatureRequests,
             });
           }
@@ -646,6 +644,7 @@ const _fragments = {
         signers {
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
+        ...ConfirmPetitionSignersDialog_SignatureConfig
       }
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
@@ -655,6 +654,7 @@ const _fragments = {
     }
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     ${RecipientViewProgressFooter.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
     ${RecipientViewContentsCard.fragments.PetitionBase}

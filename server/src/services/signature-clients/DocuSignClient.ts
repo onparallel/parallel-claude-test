@@ -156,6 +156,8 @@ export class DocuSignClient implements ISignatureClient {
           recipients: {
             signers: recipients.map((r, recipientIndex) => ({
               recipientId: (recipientIndex + 1).toString(),
+              routingOrder:
+                options.signingMode === "PARALLEL" ? undefined : (recipientIndex + 1).toString(),
               email: r.email,
               name: r.name,
               tabs: {

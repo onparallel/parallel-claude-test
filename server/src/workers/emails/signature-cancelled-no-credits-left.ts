@@ -1,5 +1,4 @@
 import { WorkerContext } from "../../context";
-import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledNoCreditsLeftEmail from "../../emails/emails/SignatureCancelledNoCreditsLeftEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
@@ -20,8 +19,9 @@ export async function signatureCancelledNoCreditsLeft(
 
   const users = await context.petitions.loadUsersOnPetition(petition.id);
 
-  const config = signatureRequest.signature_config as PetitionSignatureConfig;
-  const signatureIntegration = await context.integrations.loadIntegration(config.orgIntegrationId);
+  const signatureIntegration = await context.integrations.loadIntegration(
+    signatureRequest.signature_config.orgIntegrationId,
+  );
 
   const orgOwner = (await context.organizations.loadOrgOwner(petition.org_id))!;
   const orgOwnerData = await context.users.loadUserData(orgOwner.user_data_id);
