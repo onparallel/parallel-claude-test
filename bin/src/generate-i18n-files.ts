@@ -1,6 +1,6 @@
+import { MessageFormatElement, parse, TYPE } from "@formatjs/icu-messageformat-parser";
 import chalk from "chalk";
 import { promises as fs } from "fs";
-import { MessageFormatElement, parse, TYPE } from "@formatjs/icu-messageformat-parser";
 import outdent from "outdent";
 import path from "path";
 import { difference, uniq } from "remeda";
@@ -9,8 +9,6 @@ import { Term } from "./extract-i18n-terms";
 import { readJson, writeJson } from "./utils/json";
 import { warn } from "./utils/log";
 import { run } from "./utils/run";
-
-const WHITELISTED_EXTRA_TERMS = ["tone"];
 
 async function generate(
   locales: string[],
@@ -47,16 +45,9 @@ async function generate(
               .join(", ")}`,
           );
         }
-        const extra = difference(termValues, [...reference, ...WHITELISTED_EXTRA_TERMS]);
-        if (extra.length) {
-          warn(
-            `Term "${term}" (${locale}) has some extra values: ${extra
-              .map((v) => `"${v}"`)
-              .join(", ")}`,
-          );
-        }
       }
     }
+
     if (rawOutput) {
       await writeJson(path.join(rawOutput, `${locale}.json`), raw);
       await fs.writeFile(

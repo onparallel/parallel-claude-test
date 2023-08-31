@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const icu_messageformat_parser_1 = require("@formatjs/icu-messageformat-parser");
 const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = require("fs");
-const icu_messageformat_parser_1 = require("@formatjs/icu-messageformat-parser");
 const outdent_1 = __importDefault(require("outdent"));
 const path_1 = __importDefault(require("path"));
 const remeda_1 = require("remeda");
@@ -13,7 +13,6 @@ const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const log_1 = require("./utils/log");
 const run_1 = require("./utils/run");
-const WHITELISTED_EXTRA_TERMS = ["tone"];
 async function generate(locales, input, rawOutput, compiledOutput) {
     // store the values used in the default (first) locale to make sure they
     // are used in all the other locales
@@ -40,12 +39,6 @@ async function generate(locales, input, rawOutput, compiledOutput) {
                 const missing = (0, remeda_1.difference)(reference, termValues);
                 if (missing.length) {
                     (0, log_1.warn)(`Term "${term}" (${locale}) is missing the following values: ${missing
-                        .map((v) => `"${v}"`)
-                        .join(", ")}`);
-                }
-                const extra = (0, remeda_1.difference)(termValues, [...reference, ...WHITELISTED_EXTRA_TERMS]);
-                if (extra.length) {
-                    (0, log_1.warn)(`Term "${term}" (${locale}) has some extra values: ${extra
                         .map((v) => `"${v}"`)
                         .join(", ")}`);
                 }
