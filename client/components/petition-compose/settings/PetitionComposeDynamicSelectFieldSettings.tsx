@@ -21,6 +21,7 @@ import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRow } from "./SettingsRow";
+import { untranslated } from "@parallel/utils/untranslated";
 
 export function DynamicSelectSettings({
   petitionId,
@@ -137,7 +138,7 @@ function UploadedFileData({
         fontSize="xs"
         fontWeight="bold"
       >
-        XLSX
+        {untranslated("XLSX")}
       </Center>
 
       <Box flex="1" overflow="hidden">

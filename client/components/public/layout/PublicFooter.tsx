@@ -3,6 +3,7 @@ import { LinkedInIcon, TwitterIcon, YoutubeIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicContainer } from "./PublicContainer";
+import { untranslated } from "@parallel/utils/untranslated";
 
 export function PublicFooter(props: BoxProps) {
   return (
@@ -22,7 +23,7 @@ export function PublicFooter(props: BoxProps) {
         <HStack spacing={6}>
           <NormalLink
             href="https://www.linkedin.com/company/onparallel"
-            aria-label="LinkedIn"
+            aria-label={untranslated("LinkedIn")}
             isExternal
             color="primary.800"
             _hover={{ color: "primary.500" }}
@@ -31,7 +32,7 @@ export function PublicFooter(props: BoxProps) {
           </NormalLink>
           <NormalLink
             href="https://twitter.com/onparallelHQ"
-            aria-label="Twitter"
+            aria-label={untranslated("Twitter")}
             isExternal
             color="primary.800"
             _hover={{ color: "primary.500" }}
@@ -41,7 +42,7 @@ export function PublicFooter(props: BoxProps) {
 
           <NormalLink
             href="https://www.youtube.com/channel/UCI0STY9hq6t2HB1MUeqcV-Q"
-            aria-label="Youtube"
+            aria-label={untranslated("Youtube")}
             isExternal
             color="primary.800"
             _hover={{ color: "primary.500" }}

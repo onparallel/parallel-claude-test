@@ -66,10 +66,11 @@ function OptOut(props: OptOutProps) {
     <>
       <Head>
         <title>
-          {`Parallel | ${intl.formatMessage({
+          {"Parallel"} |{" "}
+          {intl.formatMessage({
             id: "public.opt-out.title",
             defaultMessage: "Opt out from emails",
-          })}`}
+          })}
         </title>
       </Head>
       <Grid

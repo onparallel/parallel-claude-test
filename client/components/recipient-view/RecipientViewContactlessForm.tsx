@@ -298,7 +298,7 @@ export function RecipientViewContactlessForm({
                   <IconButton
                     marginLeft={2}
                     icon={<QuestionOutlineIcon />}
-                    aria-label="help"
+                    aria-label={intl.formatMessage({ id: "generic.help", defaultMessage: "Help" })}
                     onClick={handleHelpClick}
                     variant="ghost"
                     borderRadius="full"

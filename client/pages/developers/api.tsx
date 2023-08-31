@@ -3,6 +3,7 @@ import { default as nodeFetch } from "node-fetch";
 import Head from "next/head";
 import { useEffect, useRef } from "react";
 import Script from "next/script";
+import { untranslated } from "@parallel/utils/untranslated";
 
 function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const ref = useRef<HTMLDivElement>(null);
@@ -37,7 +38,7 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
   return (
     <>
       <Head>
-        <title>Parallel API | Parallel for developers</title>
+        <title>{untranslated("Parallel API | Parallel for developers")}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Integrate Parallel into your workflow" />
         <link

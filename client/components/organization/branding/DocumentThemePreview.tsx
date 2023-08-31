@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Center, Flex, Image, Stack, Text } from "@chakra-ui/react";
 import { Fonts } from "@parallel/components/organization/branding/DocumentFont";
 import { DocumentThemePreview_OrganizationFragment } from "@parallel/graphql/__types";
+import { untranslated } from "@parallel/utils/untranslated";
 import { CSSProperties } from "react";
 import { FormattedMessage } from "react-intl";
 import { uniq } from "remeda";
@@ -125,12 +126,12 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
           <Stack spacing={`calc(${mmRatio}*5)`}>
             <Stack spacing={`calc(${mmRatio}*2)`}>
               <Text fontWeight="bold" style={styles.title2}>
-                Lorem ipsum
+                {untranslated("Lorem ipsum")}
               </Text>
               <Text style={styles.text}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                {untranslated(
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                )}
               </Text>
             </Stack>
             <Stack
@@ -141,27 +142,28 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
               spacing={`calc(${mmRatio}*2)`}
             >
               <Text fontWeight="bold" style={styles.text}>
-                Lorem ipsum
+                {untranslated("Lorem ipsum")}
               </Text>
-              <Text style={styles.text}>Lorem</Text>
+              <Text style={styles.text}> {untranslated("Lorem ipsum")}</Text>
             </Stack>
             <Stack spacing={`calc(${mmRatio}*2)`}>
               <Text fontWeight="bold" style={styles.title2}>
-                Lorem ipsum
+                {untranslated("Lorem ipsum")}
               </Text>
               <Text style={styles.text}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua.
+                {untranslated(
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                )}
               </Text>
             </Stack>
             <Stack spacing={`calc(${mmRatio}*2)`}>
               <Text fontWeight="bold" style={styles.title2}>
-                Lorem ipsum
+                {untranslated("Lorem ipsum")}
               </Text>
               <Text style={styles.text}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                {untranslated(
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                )}
               </Text>
             </Stack>
           </Stack>

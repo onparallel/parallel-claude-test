@@ -1,3 +1,4 @@
+/* eslint-disable formatjs/no-literal-string-in-jsx */
 import { gql, useApolloClient } from "@apollo/client";
 import {
   Button,

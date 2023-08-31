@@ -37,6 +37,7 @@ import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
 import { HelpPopover } from "./HelpPopover";
 import { Link } from "./Link";
+import { untranslated } from "@parallel/utils/untranslated";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
@@ -221,13 +222,13 @@ export function RecipientSelectGroups({
                     </Text>
                     <Stack spacing={0.5}>
                       <HStack>
-                        <Text>Parallel 1:</Text>
+                        <Text>{untranslated("Parallel 1:")}</Text>
                         <Image
                           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/multiple-recipient-group.svg`}
                         />
                       </HStack>
                       <HStack>
-                        <Text>Parallel 2:</Text>
+                        <Text>{untranslated("Parallel 2:")}</Text>
                         <Image
                           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/individual-recipient-group.svg`}
                         />

@@ -51,6 +51,7 @@ module.exports = {
     "formatjs/enforce-default-message": ["error", "literal"],
     "formatjs/enforce-placeholders": ["error", { ignoreList: ["b", "tone"] }],
     "formatjs/no-multiple-whitespaces": "error",
+    "formatjs/no-complex-selectors": ["error", { limit: 12 }],
   },
   plugins: ["formatjs", "prettier"],
   settings: {

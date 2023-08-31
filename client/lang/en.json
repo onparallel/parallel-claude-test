@@ -6390,6 +6390,11 @@
     "context": "Signed"
   },
   {
+    "term": "component.reports-statistics-time.step",
+    "definition": "Step",
+    "context": "Step"
+  },
+  {
     "term": "component.reports-statistics-time.steps",
     "definition": "Steps",
     "context": "Steps"

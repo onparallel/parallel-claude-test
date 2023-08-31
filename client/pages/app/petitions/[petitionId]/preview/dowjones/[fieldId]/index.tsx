@@ -62,7 +62,9 @@ function DowJonesFieldSearch() {
   return (
     <>
       <Head>
-        <title>{"Dow Jones | Parallel"}</title>
+        <title>
+          {"Dow Jones"} | {"Parallel"}
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <Center minHeight="100vh" backgroundColor="gray.50" padding={4}>

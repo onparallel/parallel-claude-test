@@ -40,6 +40,7 @@ import { Chart } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { getTimeSpan, TimeSpan } from "../common/TimeSpan";
+import { untranslated } from "@parallel/utils/untranslated";
 
 type RadioValues = "opened" | "first_reply" | "completed" | "signed" | "closed";
 
@@ -342,7 +343,14 @@ export function ReportsStatisticsTime({
       </HStack>
       <Flex gap={10} direction={{ base: "column", xl: "row" }} marginTop={2}>
         <Box overflow="auto" flex="1">
-          <RadioGroup aria-label="step" name="step" value={selectedValue}>
+          <RadioGroup
+            aria-label={intl.formatMessage({
+              id: "component.reports-statistics-time.step",
+              defaultMessage: "Step",
+            })}
+            name="step"
+            value={selectedValue}
+          >
             <TableContainer>
               <Table
                 size="sm"
@@ -373,14 +381,14 @@ export function ReportsStatisticsTime({
                         />
                       </Text>
                     </Th>
-                    <Th textAlign="end">P25</Th>
+                    <Th textAlign="end">{untranslated("P25")}</Th>
                     <Th textAlign="end">
                       <FormattedMessage
                         id="component.reports-statistics-time.median"
                         defaultMessage="Median"
                       />
                     </Th>
-                    <Th textAlign="end">P75</Th>
+                    <Th textAlign="end">{untranslated("P75")}</Th>
                     <Th textAlign="end">
                       <FormattedMessage
                         id="component.reports-statistics-time.max"

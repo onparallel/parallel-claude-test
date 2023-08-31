@@ -21,9 +21,10 @@ import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor
 import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import fonts from "../../../utils/fonts.json";
+import { untranslated } from "@parallel/utils/untranslated";
 
 interface DocumentThemeEditorProps {
   canRestoreFonts: boolean;
@@ -246,7 +247,9 @@ export function DocumentThemeEditor({
                 backgroundColor="white"
               >
                 {FONT_SIZES_PT.map((v) => (
-                  <option key={v} value={v}>{`${v} pt`}</option>
+                  <option key={v} value={v}>
+                    {<FormattedNumber value={v} />} {untranslated("pt")}
+                  </option>
                 ))}
               </Select>
             </FormControl>

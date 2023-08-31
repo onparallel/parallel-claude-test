@@ -33,6 +33,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
+import { untranslated } from "@parallel/utils/untranslated";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useMemo, useRef, useState } from "react";
@@ -314,7 +315,9 @@ export function PublicLinkSettingsDialog({
               }}
               render={({ field: { onChange, ...props } }) => (
                 <InputGroup>
-                  <InputLeftAddon>{`${parallelUrl}/${template.locale}/pp/`}</InputLeftAddon>
+                  <InputLeftAddon>
+                    {untranslated(`${parallelUrl}/${template.locale}/pp/`)}
+                  </InputLeftAddon>
                   <Input
                     onChange={(e) => onChange(e.target.value.replace(/[^a-z0-9-]/gi, ""))}
                     {...props}

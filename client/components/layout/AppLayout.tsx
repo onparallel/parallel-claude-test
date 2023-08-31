@@ -182,7 +182,9 @@ export const AppLayout = Object.assign(
     return (
       <>
         <Head>
-          <title>{`${title} | Parallel`}</title>
+          <title>
+            {title} | {"Parallel"}
+          </title>
           <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"

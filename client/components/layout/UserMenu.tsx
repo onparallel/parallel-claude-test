@@ -114,7 +114,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
               throw new Error("Debug");
             }}
           >
-            This is to test sentry errors
+            {/* This is to test sentry errors */}
           </Box>
           <HStack paddingX={3.5} paddingY={1}>
             <UserAvatar user={me} size="sm" />

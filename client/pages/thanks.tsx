@@ -11,6 +11,7 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { Thanks_publicOrganizationDocument } from "@parallel/graphql/__types";
+import { untranslated } from "@parallel/utils/untranslated";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -97,21 +98,27 @@ function ThanksFooter() {
       <Stack direction="row" marginTop={2}>
         <NormalLink
           href="https://www.linkedin.com/company/onparallel"
-          aria-label="LinkedIn"
+          aria-label={untranslated("LinkedIn")}
           isExternal
         >
           <Center boxSize="24px" backgroundColor="primary.500" borderRadius="md">
             <LinkedInSimpleIcon color="white" role="presentation" />
           </Center>
         </NormalLink>
-        <NormalLink href="https://twitter.com/onparallelHQ" aria-label="Twitter" isExternal>
+        <NormalLink
+          href="https://twitter.com/onparallelHQ"
+          aria-label={untranslated("Twitter")}
+          isExternal
+        >
           <Center boxSize="24px" backgroundColor="primary.500" borderRadius="md">
             <TwitterIcon color="white" role="presentation" />
           </Center>
         </NormalLink>
       </Stack>
       <Text align="center" fontSize="12px" marginTop={2}>
-        {`Parallel Solutions, S.L. - C/Almogàvers 165, 59.203, 08018 Barcelona, Spain`}
+        {untranslated(
+          `Parallel Solutions, S.L. - C/Almogàvers 165, 59.203, 08018 Barcelona, Spain`,
+        )}
       </Text>
       <Flex alignItems="center" marginTop={1}>
         <Link href={`/legal/terms`}>
