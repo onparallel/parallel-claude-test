@@ -63,7 +63,10 @@ function DowJonesFieldSearch() {
     <>
       <Head>
         <title>
-          {"Dow Jones"} | {"Parallel"}
+          {
+            // eslint-disable-next-line formatjs/no-literal-string-in-jsx
+            "Dow Jones | Parallel"
+          }
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>

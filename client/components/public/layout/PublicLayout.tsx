@@ -52,9 +52,10 @@ export function PublicLayout({
               />
             )),
         )}
-        <title>
-          {title} | {"Parallel"}
-        </title>
+        <title>{
+          // eslint-disable-next-line formatjs/no-literal-string-in-jsx
+          `${title} | Parallel`
+        }</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"

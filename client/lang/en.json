@@ -12450,77 +12450,77 @@
     "context": "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal."
   },
   {
-    "term": "public.opt-out.answer-no-reminders",
+    "term": "page.opt-out.answer-no-reminders",
     "definition": "I will upload the information but I do not want to receive any more emails",
     "context": "I will upload the information but I do not want to receive any more emails"
   },
   {
-    "term": "public.opt-out.answer-not-interested",
+    "term": "page.opt-out.answer-not-interested",
     "definition": "I am not interested in this service anymore",
     "context": "I am not interested in this service anymore"
   },
   {
-    "term": "public.opt-out.answer-not-requested",
+    "term": "page.opt-out.answer-not-requested",
     "definition": "I have not requested this service",
     "context": "I have not requested this service"
   },
   {
-    "term": "public.opt-out.answer-other",
+    "term": "page.opt-out.answer-other",
     "definition": "Other",
     "context": "Other"
   },
   {
-    "term": "public.opt-out.answer-spam",
+    "term": "page.opt-out.answer-spam",
     "definition": "I consider this is spam",
     "context": "I consider this is spam"
   },
   {
-    "term": "public.opt-out.answer-wrong-person",
+    "term": "page.opt-out.answer-wrong-person",
     "definition": "I am not the person to complete this information",
     "context": "I am not the person to complete this information"
   },
   {
-    "term": "public.opt-out.done-body",
+    "term": "page.opt-out.done-body",
     "definition": "We have informed the sender and you will not receive any more reminders related with this process.",
     "context": "We have informed the sender and you will not receive any more reminders related with this process."
   },
   {
-    "term": "public.opt-out.done-title",
+    "term": "page.opt-out.done-title",
     "definition": "Done!",
     "context": "Done!"
   },
   {
-    "term": "public.opt-out.feedback-title",
+    "term": "page.opt-out.feedback-title",
     "definition": "Please let us know why you would like to stop receiving reminders related with this process.",
     "context": "Please let us know why you would like to stop receiving reminders related with this process."
   },
   {
-    "term": "public.opt-out.opt-out-button",
+    "term": "page.opt-out.opt-out-button",
     "definition": "Confirm",
     "context": "Confirm"
   },
   {
-    "term": "public.opt-out.other-error-message",
+    "term": "page.opt-out.other-error-message",
     "definition": "Please, enter a reason",
     "context": "Please, enter a reason"
   },
   {
-    "term": "public.opt-out.other-placeholder",
+    "term": "page.opt-out.other-placeholder",
     "definition": "Indicate other reasons",
     "context": "Indicate other reasons"
   },
   {
-    "term": "public.opt-out.review-before-opt-out",
+    "term": "page.opt-out.review-before-opt-out",
     "definition": "Before opting out from receiving reminders, check the requested information.",
     "context": "Before opting out from receiving reminders, check the requested information."
   },
   {
-    "term": "public.opt-out.review-button",
+    "term": "page.opt-out.review-button",
     "definition": "Review the information",
     "context": "Review the information"
   },
   {
-    "term": "public.opt-out.title",
+    "term": "page.opt-out.title",
     "definition": "Opt out from emails",
     "context": "Opt out from emails"
   },

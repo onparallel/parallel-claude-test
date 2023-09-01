@@ -14,28 +14,28 @@ export function useReminderOptOutReasons(): Record<ReminderOptOutReason, string>
   return useMemo(
     () => ({
       NOT_INTERESTED: intl.formatMessage({
-        id: "public.opt-out.answer-not-interested",
+        id: "page.opt-out.answer-not-interested",
         defaultMessage: "I am not interested in this service anymore",
       }),
       NOT_REQUESTED: intl.formatMessage({
-        id: "public.opt-out.answer-not-requested",
+        id: "page.opt-out.answer-not-requested",
         defaultMessage: "I have not requested this service",
       }),
       WRONG_PERSON: intl.formatMessage({
-        id: "public.opt-out.answer-wrong-person",
+        id: "page.opt-out.answer-wrong-person",
         defaultMessage: "I am not the person to complete this information",
       }),
       NO_REMINDERS: intl.formatMessage({
-        id: "public.opt-out.answer-no-reminders",
+        id: "page.opt-out.answer-no-reminders",
         defaultMessage:
           "I will upload the information but I do not want to receive any more emails",
       }),
       SPAM: intl.formatMessage({
-        id: "public.opt-out.answer-spam",
+        id: "page.opt-out.answer-spam",
         defaultMessage: "I consider this is spam",
       }),
       OTHER: intl.formatMessage({
-        id: "public.opt-out.answer-other",
+        id: "page.opt-out.answer-other",
         defaultMessage: "Other",
       }),
     }),

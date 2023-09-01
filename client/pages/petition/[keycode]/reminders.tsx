@@ -65,13 +65,13 @@ function OptOut(props: OptOutProps) {
   return (
     <>
       <Head>
-        <title>
-          {"Parallel"} |{" "}
-          {intl.formatMessage({
-            id: "public.opt-out.title",
+        <title>{
+          // eslint-disable-next-line formatjs/no-literal-string-in-jsx
+          `Parallel | ${intl.formatMessage({
+            id: "page.opt-out.title",
             defaultMessage: "Opt out from emails",
-          })}
-        </title>
+          })}`
+        }</title>
       </Head>
       <Grid
         gridTemplateRows="auto 1fr auto"
@@ -105,11 +105,11 @@ function OptOut(props: OptOutProps) {
                 <CheckIcon color="white" fontSize="2.5rem" />
               </Circle>
               <Heading>
-                <FormattedMessage id="public.opt-out.done-title" defaultMessage="Done!" />
+                <FormattedMessage id="page.opt-out.done-title" defaultMessage="Done!" />
               </Heading>
               <Text>
                 <FormattedMessage
-                  id="public.opt-out.done-body"
+                  id="page.opt-out.done-body"
                   defaultMessage="We have informed the sender and you will not receive any more reminders related with this process."
                 />
               </Text>
@@ -119,7 +119,7 @@ function OptOut(props: OptOutProps) {
               <Stack spacing={6} maxWidth={"container.sm"}>
                 <Heading>
                   <FormattedMessage
-                    id="public.opt-out.feedback-title"
+                    id="page.opt-out.feedback-title"
                     defaultMessage="Please let us know why you would like to stop receiving reminders related with this process."
                   />
                   {" *"}
@@ -139,7 +139,7 @@ function OptOut(props: OptOutProps) {
                       <Input
                         type="text"
                         placeholder={intl.formatMessage({
-                          id: "public.opt-out.other-placeholder",
+                          id: "page.opt-out.other-placeholder",
                           defaultMessage: "Indicate other reasons",
                         })}
                         onChange={(event) => setother(event.target.value)}
@@ -147,7 +147,7 @@ function OptOut(props: OptOutProps) {
                       />
                       <FormErrorMessage>
                         <FormattedMessage
-                          id="public.opt-out.other-error-message"
+                          id="page.opt-out.other-error-message"
                           defaultMessage="Please, enter a reason"
                         />
                       </FormErrorMessage>
@@ -163,7 +163,7 @@ function OptOut(props: OptOutProps) {
                   variant="solid"
                   type="submit"
                 >
-                  <FormattedMessage id="public.opt-out.opt-out-button" defaultMessage="Confirm" />
+                  <FormattedMessage id="page.opt-out.opt-out-button" defaultMessage="Confirm" />
                 </Button>
               </Stack>
             </form>
@@ -178,14 +178,14 @@ function OptOut(props: OptOutProps) {
           >
             <Text as="div">
               <FormattedMessage
-                id="public.opt-out.review-before-opt-out"
+                id="page.opt-out.review-before-opt-out"
                 defaultMessage="Before opting out from receiving reminders, check the requested information."
               />
             </Text>
             <NakedLink href={`/petition/${keycode}`}>
               <Button variant="outline" as="a" backgroundColor="white">
                 <FormattedMessage
-                  id="public.opt-out.review-button"
+                  id="page.opt-out.review-button"
                   defaultMessage="Review the information"
                 />
               </Button>

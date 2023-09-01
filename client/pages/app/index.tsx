@@ -43,13 +43,13 @@ function ChooseOrg({ organizations }: ChooseOrgProps) {
   return (
     <>
       <Head>
-        <title>
-          {intl.formatMessage({
+        <title>{
+          // eslint-disable-next-line formatjs/no-literal-string-in-jsx
+          `${intl.formatMessage({
             id: "page.choose-org.title",
             defaultMessage: "Choose organization",
-          })}{" "}
-          | {"Parallel"}
-        </title>
+          })} | Parallel`
+        }</title>
       </Head>
       <Flex direction="column" minHeight="100vh">
         <Box paddingX={{ base: 6, md: 8, lg: 10 }} paddingY={{ base: 6, md: 8 }}>
