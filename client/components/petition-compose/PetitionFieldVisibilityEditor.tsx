@@ -22,6 +22,7 @@ import {
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
 import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import { dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
@@ -40,7 +41,6 @@ import {
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { ValueProps } from "@parallel/utils/ValueProps";
 import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { createFilter } from "react-select";
@@ -146,11 +146,8 @@ export function PetitionFieldVisibilityEditor({
   };
 
   return (
-    <Stack spacing={1}>
+    <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="gray.100">
       <Grid
-        padding={3}
-        borderRadius="md"
-        backgroundColor="gray.100"
         templateColumns={{
           base: "auto minmax(160px, 1fr)",
           xl: "auto minmax(160px, 2fr) 3fr",
@@ -174,7 +171,6 @@ export function PetitionFieldVisibilityEditor({
                   <Stack direction="row">
                     <IconButton
                       size="sm"
-                      variant="outline"
                       icon={<DeleteIcon />}
                       aria-label={intl.formatMessage({
                         id: "generic.remove",
@@ -259,9 +255,8 @@ export function PetitionFieldVisibilityEditor({
 
       {visibility.conditions.length < 5 && !isReadOnly ? (
         <Button
-          variant="ghost"
           fontWeight="normal"
-          size="xs"
+          size="sm"
           leftIcon={<PlusCircleIcon position="relative" top="-1px" />}
           alignSelf="start"
           onClick={addCondition}

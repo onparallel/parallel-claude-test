@@ -14,6 +14,7 @@ import {
   Switch,
   Text,
   Tooltip,
+  usePrevious,
 } from "@chakra-ui/react";
 import {
   ChevronRightIcon,
@@ -36,10 +37,10 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { PetitionFieldIndex, letters } from "@parallel/utils/fieldIndices";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
+import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
@@ -70,6 +71,18 @@ import {
   PetitionFieldOptionsListEditorRef,
 } from "./PetitionFieldOptionsListEditor";
 import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
+
+import {
+  Accordion,
+  AccordionButton,
+  AccordionItem,
+  AccordionPanel,
+  HStack,
+  Heading,
+} from "@chakra-ui/react";
+import { ChevronFilledIcon } from "@parallel/chakra/icons";
+import { HelpCenterLink } from "../common/HelpCenterLink";
+import { HelpPopover } from "../common/HelpPopover";
 
 export interface PetitionComposeFieldProps {
   petition: PetitionComposeField_PetitionBaseFragment;
@@ -569,6 +582,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   );
 
   const letter = letters();
+  const previousVisibility = usePrevious(field.visibility);
 
   return (
     <Stack ref={elementRef} spacing={1} {...props}>
@@ -837,18 +851,17 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         </Box>
       ) : null}
       {field.visibility ? (
-        <Box
-          paddingTop={1}
-          marginBottom={field.visibility && field.visibility.conditions.length < 5 ? -5 : 0}
-        >
-          <PetitionFieldVisibilityEditor
-            showError={showError}
-            fieldId={field.id}
-            visibility={field.visibility as any}
-            fields={petition.fields}
-            onVisibilityEdit={(visibility) => onFieldEdit({ visibility })}
-            isReadOnly={isReadOnly}
-          />
+        <Box paddingTop={1}>
+          <PetitionComposeFieldVisibilityAccordion isOpen={previousVisibility === null}>
+            <PetitionFieldVisibilityEditor
+              showError={showError}
+              fieldId={field.id}
+              visibility={field.visibility as any}
+              fields={petition.fields}
+              onVisibilityEdit={(visibility) => onFieldEdit({ visibility })}
+              isReadOnly={isReadOnly}
+            />
+          </PetitionComposeFieldVisibilityAccordion>
         </Box>
       ) : null}
     </Stack>
@@ -1258,3 +1271,64 @@ function useDragAndDrop(
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging };
 }
+
+interface PetitionComposeFieldVisibilityAccordionProps {
+  isOpen: boolean;
+}
+
+const PetitionComposeFieldVisibilityAccordion = chakraForwardRef<
+  "div",
+  PetitionComposeFieldVisibilityAccordionProps
+>(function PetitionComposeFieldVisibilityAccordion({ isOpen, children }, ref) {
+  return (
+    <Accordion
+      defaultIndex={isOpen ? [0] : undefined}
+      allowToggle
+      reduceMotion
+      borderRadius="md"
+      backgroundColor="gray.100"
+      border="none"
+      ref={ref}
+    >
+      <AccordionItem border="none">
+        {({ isExpanded }) => {
+          return (
+            <>
+              <Heading>
+                <AccordionButton borderRadius="md">
+                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
+                    <ChevronFilledIcon
+                      color="gray.500"
+                      fontSize="xs"
+                      transform={isExpanded ? "rotate(90deg)" : undefined}
+                      marginRight={2}
+                    />
+                    <ConditionIcon />
+                    <FormattedMessage
+                      id="component.petition-compose-field.visibility-title"
+                      defaultMessage="Visibility conditions"
+                    />
+                    <HelpPopover marginLeft={1}>
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="component.petition-compose-field.visibility-help"
+                          defaultMessage="This field will only be shown or hidden when the conditions are met."
+                        />
+                      </Text>
+                      <Text fontSize="sm">
+                        <HelpCenterLink articleId={6076369}>
+                          <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+                        </HelpCenterLink>
+                      </Text>
+                    </HelpPopover>
+                  </HStack>
+                </AccordionButton>
+              </Heading>
+              <AccordionPanel padding={0}>{isExpanded ? children : null}</AccordionPanel>
+            </>
+          );
+        }}
+      </AccordionItem>
+    </Accordion>
+  );
+});

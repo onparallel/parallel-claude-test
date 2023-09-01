@@ -3630,6 +3630,16 @@
     "context": "Too many attachments"
   },
   {
+    "term": "component.petition-compose-field.visibility-help",
+    "definition": "Este campo sólo se mostrará u ocultará cuando se cumplan las condiciones.",
+    "context": "This field will only be shown or hidden when the conditions are met."
+  },
+  {
+    "term": "component.petition-compose-field.visibility-title",
+    "definition": "Condiciones de visibilidad",
+    "context": "Visibility conditions"
+  },
+  {
     "term": "component.petition-compose-text-settings.format",
     "definition": "Formato:",
     "context": "Format:"
@@ -10205,6 +10215,81 @@
     "context": "Teams"
   },
   {
+    "term": "page.opt-out.answer-no-reminders",
+    "definition": "Subiré la información pero no quiero seguir recibiendo más correos",
+    "context": "I will upload the information but I do not want to receive any more emails"
+  },
+  {
+    "term": "page.opt-out.answer-not-interested",
+    "definition": "Ya no estoy interesado en el servicio",
+    "context": "I am not interested in this service anymore"
+  },
+  {
+    "term": "page.opt-out.answer-not-requested",
+    "definition": "No he solicitado este servicio",
+    "context": "I have not requested this service"
+  },
+  {
+    "term": "page.opt-out.answer-other",
+    "definition": "Otro",
+    "context": "Other"
+  },
+  {
+    "term": "page.opt-out.answer-spam",
+    "definition": "Considero que es correo basura (spam)",
+    "context": "I consider this is spam"
+  },
+  {
+    "term": "page.opt-out.answer-wrong-person",
+    "definition": "No soy la persona adecuada para completar esta información",
+    "context": "I am not the person to complete this information"
+  },
+  {
+    "term": "page.opt-out.done-body",
+    "definition": "Hemos informado al remitente y no recibirá más recordatorios de este proceso.",
+    "context": "We have informed the sender and you will not receive any more reminders related with this process."
+  },
+  {
+    "term": "page.opt-out.done-title",
+    "definition": "¡Hecho!",
+    "context": "Done!"
+  },
+  {
+    "term": "page.opt-out.feedback-title",
+    "definition": "Por favor, ¿podrías indicarnos el motivo para no querer seguir recibiendo recordatorios de este proceso?",
+    "context": "Please let us know why you would like to stop receiving reminders related with this process."
+  },
+  {
+    "term": "page.opt-out.opt-out-button",
+    "definition": "Confirmar",
+    "context": "Confirm"
+  },
+  {
+    "term": "page.opt-out.other-error-message",
+    "definition": "Por favor, elija un motivo",
+    "context": "Please, enter a reason"
+  },
+  {
+    "term": "page.opt-out.other-placeholder",
+    "definition": "Indicar otros motivos",
+    "context": "Indicate other reasons"
+  },
+  {
+    "term": "page.opt-out.review-before-opt-out",
+    "definition": "Antes de cancelar el envío de recordatorios, compruebe la información solicitada.",
+    "context": "Before opting out from receiving reminders, check the requested information."
+  },
+  {
+    "term": "page.opt-out.review-button",
+    "definition": "Revisar la información",
+    "context": "Review the information"
+  },
+  {
+    "term": "page.opt-out.title",
+    "definition": "Cancelar correos electrónicos",
+    "context": "Opt out from emails"
+  },
+  {
     "term": "page.organization-profile-type.add-profile-type-field",
     "definition": "Añadir propiedad",
     "context": "Add property"
@@ -12448,81 +12533,6 @@
     "term": "public.meta-description",
     "definition": "Parallel ayuda a profesionales a recopilar y organizar información de sus clientes mediante la automatización de emails y checklists, y un portal de cliente similar a formularios.",
     "context": "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal."
-  },
-  {
-    "term": "page.opt-out.answer-no-reminders",
-    "definition": "Subiré la información pero no quiero seguir recibiendo más correos",
-    "context": "I will upload the information but I do not want to receive any more emails"
-  },
-  {
-    "term": "page.opt-out.answer-not-interested",
-    "definition": "Ya no estoy interesado en el servicio",
-    "context": "I am not interested in this service anymore"
-  },
-  {
-    "term": "page.opt-out.answer-not-requested",
-    "definition": "No he solicitado este servicio",
-    "context": "I have not requested this service"
-  },
-  {
-    "term": "page.opt-out.answer-other",
-    "definition": "Otro",
-    "context": "Other"
-  },
-  {
-    "term": "page.opt-out.answer-spam",
-    "definition": "Considero que es correo basura (spam)",
-    "context": "I consider this is spam"
-  },
-  {
-    "term": "page.opt-out.answer-wrong-person",
-    "definition": "No soy la persona adecuada para completar esta información",
-    "context": "I am not the person to complete this information"
-  },
-  {
-    "term": "page.opt-out.done-body",
-    "definition": "Hemos informado al remitente y no recibirá más recordatorios de este proceso.",
-    "context": "We have informed the sender and you will not receive any more reminders related with this process."
-  },
-  {
-    "term": "page.opt-out.done-title",
-    "definition": "¡Hecho!",
-    "context": "Done!"
-  },
-  {
-    "term": "page.opt-out.feedback-title",
-    "definition": "Por favor, ¿podrías indicarnos el motivo para no querer seguir recibiendo recordatorios de este proceso?",
-    "context": "Please let us know why you would like to stop receiving reminders related with this process."
-  },
-  {
-    "term": "page.opt-out.opt-out-button",
-    "definition": "Confirmar",
-    "context": "Confirm"
-  },
-  {
-    "term": "page.opt-out.other-error-message",
-    "definition": "Por favor, elija un motivo",
-    "context": "Please, enter a reason"
-  },
-  {
-    "term": "page.opt-out.other-placeholder",
-    "definition": "Indicar otros motivos",
-    "context": "Indicate other reasons"
-  },
-  {
-    "term": "page.opt-out.review-before-opt-out",
-    "definition": "Antes de cancelar el envío de recordatorios, compruebe la información solicitada.",
-    "context": "Before opting out from receiving reminders, check the requested information."
-  },
-  {
-    "term": "page.opt-out.review-button",
-    "definition": "Revisar la información",
-    "context": "Review the information"
-  },
-  {
-    "term": "page.opt-out.title",
-    "definition": "Cancelar correos electrónicos",
-    "context": "Opt out from emails"
   },
   {
     "term": "public.preview-button",

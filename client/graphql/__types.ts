@@ -33532,12 +33532,6 @@ export type uploadFile_AWSPresignedPostDataFragment = {
   fields: { [key: string]: any };
 };
 
-export type usePetitionComposeFieldReorder_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  visibility?: { [key: string]: any } | null;
-};
-
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -33812,6 +33806,12 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
       isAnonymized: boolean;
     }>;
   }>;
+};
+
+export type usePetitionComposeFieldReorder_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  visibility?: { [key: string]: any } | null;
 };
 
 export type usePetitionMessagePlaceholderOptions_PetitionBase_Petition_Fragment = {
