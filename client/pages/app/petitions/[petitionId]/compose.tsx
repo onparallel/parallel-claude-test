@@ -157,48 +157,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   }, []);
 
-  const fieldsDataRef = useUpdatingRef({ fields: petition.fields, indices, active: activeField });
-  const handleReferencedFieldError = async (fieldId: string) => {
-    const { fields } = fieldsDataRef.current!;
-    // if this field is being referenced by any other field ask the user
-    // if they want to remove the conflicting conditions
-    const referencing = zip(fields, indices).filter(
-      ([f]) =>
-        (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId),
-    );
-    if (referencing.length > 0) {
-      try {
-        await showReferencedFieldDialog({
-          type: "DELETING_FIELD",
-          fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
-            field,
-            fieldIndex,
-          })),
-        });
-        for (const [field] of referencing) {
-          const visibility = field.visibility! as PetitionFieldVisibility;
-          const conditions = visibility.conditions.filter((c) => c.fieldId !== fieldId);
-          await _handleFieldEdit(field.id, {
-            visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
-          });
-        }
-      } catch {
-        return;
-      }
-    }
-    await handleDeleteField(fieldId);
-  };
-
-  const confirmDelete = useConfirmDeleteFieldDialog();
-  const handleFieldWithRepliesError = async (fieldId: string) => {
-    try {
-      await confirmDelete();
-    } catch {
-      return;
-    }
-    await handleDeleteField(fieldId, true);
-  };
-
   const [updatePetition] = useMutation(PetitionCompose_updatePetitionDocument);
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
@@ -234,22 +192,59 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
+  const confirmDelete = useConfirmDeleteFieldDialog();
+  const fieldsDataRef = useUpdatingRef({ fields: petition.fields, indices, active: activeField });
   const handleDeleteField = useCallback(
-    wrapper(async function (fieldId: string, force?: boolean) {
+    wrapper(async function (fieldId: string) {
       setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : activeFieldId));
-      try {
-        await deletePetitionField({
-          variables: { petitionId, fieldId, force: force ?? false },
-        });
-        return;
-      } catch (e) {
-        if (isApolloError(e, "FIELD_IS_REFERENCED_ERROR")) {
-          await handleReferencedFieldError(fieldId);
-        } else if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
-          await handleFieldWithRepliesError(fieldId);
-        } else {
-          // throw error to show compose generic error dialog
-          throw e;
+      await deleteField(false);
+
+      async function deleteField(force: boolean) {
+        try {
+          await deletePetitionField({ variables: { petitionId, fieldId, force } });
+        } catch (e) {
+          if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
+            try {
+              await confirmDelete();
+            } catch {
+              return;
+            }
+            await deleteField(true);
+          } else if (isApolloError(e, "FIELD_IS_REFERENCED_ERROR")) {
+            const { fields, indices } = fieldsDataRef.current!;
+            // if this field is being referenced by any other field ask the user
+            // if they want to remove the conflicting conditions
+            const referencing = zip(fields, indices).filter(
+              ([f]) =>
+                (f.visibility as PetitionFieldVisibility)?.conditions.some(
+                  (c) => c.fieldId === fieldId,
+                ),
+            );
+            if (referencing.length > 0) {
+              try {
+                await showReferencedFieldDialog({
+                  type: "DELETING_FIELD",
+                  fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
+                    field,
+                    fieldIndex,
+                  })),
+                });
+              } catch {
+                return;
+              }
+              for (const [field] of referencing) {
+                const visibility = field.visibility! as PetitionFieldVisibility;
+                const conditions = visibility.conditions.filter((c) => c.fieldId !== fieldId);
+                await _handleFieldEdit(field.id, {
+                  visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
+                });
+              }
+              await deleteField(false);
+            }
+          } else {
+            // throw error to show compose generic error dialog
+            throw e;
+          }
         }
       }
     }),
@@ -282,7 +277,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [updatePetitionField] = useMutation(PetitionCompose_updatePetitionFieldDocument);
   const _handleFieldEdit = useCallback(
     async function (fieldId: string, data: UpdatePetitionFieldInput, force?: boolean) {
-      const { fields } = petitionDataRef.current!;
+      const { fields, indices } = fieldsDataRef.current!;
       if (data.multiple === false) {
         // check no field is referencing with invalid NUMBER_OF_REPLIES condition
         const validCondition = (c: PetitionFieldVisibilityCondition) => {

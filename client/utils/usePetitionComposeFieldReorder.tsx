@@ -3,7 +3,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { usePetitionComposeFieldReorder_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { indexBy } from "remeda";
+import { indexBy, isDefined } from "remeda";
 import { PetitionFieldVisibility } from "./fieldVisibility/types";
 import { Maybe } from "./types";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
@@ -30,7 +30,7 @@ export function usePetitionComposeFieldReorder<
   return {
     fields: useMemo(() => {
       const byId = indexBy(fields, (f) => f.id);
-      return fieldIds.map((id) => byId[id]);
+      return fieldIds.map((id) => byId[id]).filter(isDefined);
     }, [fields, fieldIds.join(",")]),
     onFieldMove: useCallback(async (dragIndex: number, hoverIndex: number, dropped?: boolean) => {
       startDragIndex.current = startDragIndex.current ?? dragIndex;
