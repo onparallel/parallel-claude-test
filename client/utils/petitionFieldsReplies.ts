@@ -174,7 +174,7 @@ export const isReplyContentCompatible = (
         }
 
         // Check if the number is within the specified range
-        if ((min && number < min) || (max && number > max)) {
+        if ((isDefined(min) && number < min) || (isDefined(max) && number > max)) {
           return false;
         }
 
