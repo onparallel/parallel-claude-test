@@ -9712,8 +9712,8 @@ export type AddPetitionAccessDialog_SignatureConfigFragment = {
   timezone: string;
   title?: string | null;
   allowAdditionalSigners: boolean;
-  signingMode: SignatureConfigSigningMode;
   minSigners: number;
+  signingMode: SignatureConfigSigningMode;
   instructions?: string | null;
   integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
   signers: Array<{
@@ -9761,8 +9761,8 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     timezone: string;
     title?: string | null;
     allowAdditionalSigners: boolean;
-    signingMode: SignatureConfigSigningMode;
     minSigners: number;
+    signingMode: SignatureConfigSigningMode;
     instructions?: string | null;
     integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
     signers: Array<{
@@ -9868,8 +9868,8 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
         timezone: string;
         title?: string | null;
         allowAdditionalSigners: boolean;
-        signingMode: SignatureConfigSigningMode;
         minSigners: number;
+        signingMode: SignatureConfigSigningMode;
         instructions?: string | null;
         integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
         signers: Array<{
@@ -12209,8 +12209,8 @@ export type useSendPetitionHandler_PetitionFragment = {
     timezone: string;
     title?: string | null;
     allowAdditionalSigners: boolean;
-    signingMode: SignatureConfigSigningMode;
     minSigners: number;
+    signingMode: SignatureConfigSigningMode;
     instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -12346,8 +12346,8 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
           timezone: string;
           title?: string | null;
           allowAdditionalSigners: boolean;
-          signingMode: SignatureConfigSigningMode;
           minSigners: number;
+          signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -22012,8 +22012,8 @@ export type PetitionActivity_PetitionFragment = {
     timezone: string;
     title?: string | null;
     allowAdditionalSigners: boolean;
-    signingMode: SignatureConfigSigningMode;
     minSigners: number;
+    signingMode: SignatureConfigSigningMode;
     instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -23063,8 +23063,8 @@ export type PetitionActivity_updatePetitionMutation = {
           timezone: string;
           title?: string | null;
           allowAdditionalSigners: boolean;
-          signingMode: SignatureConfigSigningMode;
           minSigners: number;
+          signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -24155,8 +24155,8 @@ export type PetitionActivity_petitionQuery = {
           timezone: string;
           title?: string | null;
           allowAdditionalSigners: boolean;
-          signingMode: SignatureConfigSigningMode;
           minSigners: number;
+          signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -37340,6 +37340,7 @@ export const AddPetitionAccessDialog_SignatureConfigFragmentDoc = gql`
     timezone
     title
     allowAdditionalSigners
+    minSigners
     integration {
       id
     }

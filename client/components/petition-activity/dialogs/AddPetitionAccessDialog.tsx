@@ -125,11 +125,11 @@ export function AddPetitionAccessDialog({
   const signatureConfig = watch("signatureConfig");
   const sendAsUser = watch("sendAsUser");
 
-  const requiredSigners =
-    signatureConfig &&
+  const isMissingSigners =
+    isDefined(signatureConfig) &&
     !signatureConfig.review &&
     !signatureConfig.allowAdditionalSigners &&
-    signatureConfig.signers.length === 0;
+    signatureConfig.signers.length < signatureConfig.minSigners;
 
   const [accesses, setAccesses] = useState(petition.accesses);
 
@@ -240,7 +240,7 @@ export function AddPetitionAccessDialog({
   const showContactlessLinkDialog = useContactlessLinkDialog();
   const handleShareByLinkClick = useCallback(async () => {
     try {
-      if (requiredSigners) {
+      if (isMissingSigners) {
         setError("signatureConfig", { type: "required", message: "This field is required" });
         return;
       }
@@ -265,7 +265,7 @@ export function AddPetitionAccessDialog({
         petitionId: petition.id,
       });
     } catch {}
-  }, [accesses, requiredSigners]);
+  }, [accesses, isMissingSigners]);
 
   const { petitionsPeriod } = petition.organization;
 
@@ -312,18 +312,14 @@ export function AddPetitionAccessDialog({
                 name="signatureConfig"
                 control={control}
                 rules={{
-                  validate: (signatureConfig) =>
-                    !isDefined(signatureConfig) ||
-                    signatureConfig.review ||
-                    signatureConfig.signers.length > 0 ||
-                    signatureConfig.allowAdditionalSigners,
+                  validate: () => !isMissingSigners,
                 }}
                 render={({ field: { value, onChange }, fieldState: { error } }) => (
                   <Alert status="info" borderRadius="md">
                     <AlertIcon />
                     <HStack justifyContent="space-between" width="100%">
                       <Text>
-                        {!requiredSigners ? (
+                        {!isMissingSigners ? (
                           <FormattedMessage
                             id="component.add-petition-access-dialog.add-signers-text-optional"
                             defaultMessage="Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier."
@@ -573,6 +569,7 @@ AddPetitionAccessDialog.fragments = {
         timezone
         title
         allowAdditionalSigners
+        minSigners
         integration {
           id
         }
