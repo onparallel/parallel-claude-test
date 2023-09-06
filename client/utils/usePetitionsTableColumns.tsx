@@ -385,22 +385,22 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
               </Text>
             )}
             {nextReminderAt ? (
-              <SmallPopover
-                content={
-                  <Text color="gray.800" fontSize="sm">
-                    <FormattedMessage
-                      id="petitions.header.reminders-next-reminder-at.popover"
-                      defaultMessage="Next reminder configured for {date}"
-                      values={{
-                        date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
-                      }}
-                    />
-                  </Text>
-                }
-                placement="bottom-end"
-              >
-                <WithIntl>
-                  {(intl) => (
+              <WithIntl>
+                {(intl) => (
+                  <SmallPopover
+                    content={
+                      <Text color="gray.800" fontSize="sm">
+                        <FormattedMessage
+                          id="petitions.header.reminders-next-reminder-at.popover"
+                          defaultMessage="Next reminder configured for {date}"
+                          values={{
+                            date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
+                          }}
+                        />
+                      </Text>
+                    }
+                    placement="bottom-end"
+                  >
                     <IconButton
                       marginLeft={1}
                       variant="ghost"
@@ -411,9 +411,9 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
                       size="xs"
                       icon={<BellSettingsIcon fontSize="16px" color="gray.500" />}
                     />
-                  )}
-                </WithIntl>
-              </SmallPopover>
+                  </SmallPopover>
+                )}
+              </WithIntl>
             ) : null}
           </Flex>
         );
