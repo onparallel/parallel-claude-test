@@ -77,14 +77,21 @@ export function validateCreateReplyContent<TypeName extends string, FieldName ex
         for (const reply of fieldReplies) {
           validateReplyContent(field, reply.content);
 
-          // for FILE replies, we need to make sure the user has access to the provided reply and the reply type matches the field type
+          // for FILE replies, we need to make sure the user has access to the provided reply
           if (isFileTypeField(field.type)) {
             const { id: replyId } = fromGlobalId(
               reply.content.petitionFieldReplyId as string,
               "PetitionFieldReply",
             );
             const petitionFieldReply = await ctx.petitions.loadFieldReply(replyId);
-            if (!petitionFieldReply || petitionFieldReply.type !== field.type) {
+
+            const isValid =
+              isDefined(petitionFieldReply) &&
+              ((field.type === "FILE_UPLOAD" &&
+                ["FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(petitionFieldReply.type)) ||
+                field.type === petitionFieldReply.type);
+
+            if (!isValid) {
               throw new Error(
                 `Invalid PetitionFieldReply id ${reply.content.petitionFieldReplyId}`,
               );

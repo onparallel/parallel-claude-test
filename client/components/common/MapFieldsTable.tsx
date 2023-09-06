@@ -63,11 +63,7 @@ export const excludedFieldsTarget = [
   "DOW_JONES_KYC",
 ] as PetitionFieldType[];
 
-export const excludedFieldsOrigin = [
-  "HEADING",
-  "ES_TAX_DOCUMENTS",
-  "DYNAMIC_SELECT",
-] as PetitionFieldType[];
+export const excludedFieldsOrigin = ["HEADING", "DYNAMIC_SELECT"] as PetitionFieldType[];
 
 export const MapFieldsTable = Object.assign(
   chakraForwardRef<"table", MapFieldsTableProps>(function MapFieldsTable(
@@ -582,10 +578,10 @@ const checkMultipleRepliesConflict = (
 ) => {
   if (target.type === "CHECKBOX" && origin.type === "CHECKBOX") return false;
 
-  const respliesLength =
+  const repliesLength =
     origin.type === "CHECKBOX"
       ? origin.replies[0]?.content?.value?.length ?? 0
       : origin.replies.length;
 
-  return !target.multiple && (origin.multiple || origin.type === "CHECKBOX") && respliesLength > 1;
+  return !target.multiple && (origin.multiple || origin.type === "CHECKBOX") && repliesLength > 1;
 };
