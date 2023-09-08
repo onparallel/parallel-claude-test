@@ -85,6 +85,7 @@ const SCHEMAS = {
           "US_SSN",
           "ES_POSTALCODE",
           "US_POSTALCODE",
+          null,
         ],
       },
     },
