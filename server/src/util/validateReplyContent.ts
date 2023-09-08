@@ -5,8 +5,20 @@ import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues
 import { Maybe } from "./types";
 import { isValidDate, isValidDatetime, isValidTimezone } from "./time";
 import { isGlobalId } from "./globalId";
+import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
+import { validDNI, validNIE, validCIF } from "spain-id";
+import { isValid as validIban } from "iban";
 
-export function validateReplyContent(field: PetitionField, content: any) {
+export class ValidateReplyContentError extends Error {
+  constructor(
+    public readonly code: string,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+export async function validateReplyContent(field: PetitionField, content: any) {
   switch (field.type) {
     case "NUMBER": {
       if (
@@ -14,90 +26,107 @@ export function validateReplyContent(field: PetitionField, content: any) {
         typeof content.value !== "number" ||
         Number.isNaN(content.value)
       ) {
-        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type number." };
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type number.");
       }
       const options = field.options;
       const min = (options.range?.min as number) ?? -Infinity;
       const max = (options.range?.max as number) ?? Infinity;
       if (content.value > max || content.value < min) {
-        throw { code: "OUT_OF_RANGE_ERROR", message: `Reply must be in range [${min}, ${max}].` };
+        throw new ValidateReplyContentError(
+          "OUT_OF_RANGE_ERROR",
+          `Reply must be in range [${min}, ${max}].`,
+        );
       }
       break;
     }
     case "SELECT": {
       if (!("value" in content) || typeof content.value !== "string") {
-        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type string." };
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type string.");
       }
       const options = field.options.values as Maybe<string[]>;
       if (!options?.includes(content.value)) {
-        throw {
-          code: "UNKNOWN_OPTION_ERROR",
-          message: `Reply must be one of [${(options ?? []).map((opt) => `'${opt}'`).join(", ")}].`,
-        };
+        throw new ValidateReplyContentError(
+          "UNKNOWN_OPTION_ERROR",
+          `Reply must be one of [${(options ?? []).map((opt) => `'${opt}'`).join(", ")}].`,
+        );
       }
       break;
     }
     case "DATE": {
       if (!("value" in content) || typeof content.value !== "string") {
-        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type string." };
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type string.");
       }
       if (!isValidDate(content.value)) {
-        throw {
-          code: "INVALID_VALUE_ERROR",
-          message: "Reply is not a valid date with YYYY-MM-DD format.",
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          "Reply is not a valid date with YYYY-MM-DD format.",
+        );
       }
       break;
     }
     case "DATE_TIME": {
       if (typeof content !== "object") {
-        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type object." };
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type object.");
       }
       if (!("datetime" in content)) {
-        throw { code: "INVALID_TYPE_ERROR", message: 'Reply is missing a "datetime" key.' };
+        throw new ValidateReplyContentError(
+          "INVALID_TYPE_ERROR",
+          'Reply is missing a "datetime" key.',
+        );
       }
       if (!("timezone" in content)) {
-        throw { code: "INVALID_TYPE_ERROR", message: 'Reply is missing a "timezone" key.' };
+        throw new ValidateReplyContentError(
+          "INVALID_TYPE_ERROR",
+          'Reply is missing a "timezone" key.',
+        );
       }
 
       if (!isValidDatetime(content.datetime)) {
-        throw {
-          code: "INVALID_VALUE_ERROR",
-          message: `${content.datetime} is not a valid date with YYYY-MM-DDTHH:mm format.`,
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          `${content.datetime} is not a valid date with YYYY-MM-DDTHH:mm format.`,
+        );
       }
 
       if (!isValidTimezone(content.timezone)) {
-        throw {
-          code: "INVALID_VALUE_ERROR",
-          message: `${content.timezone} is not have a valid timezone.`,
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          `${content.timezone} is not have a valid timezone.`,
+        );
       }
       break;
     }
     case "TEXT":
     case "SHORT_TEXT": {
       if (!("value" in content) || typeof content.value !== "string") {
-        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type string." };
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type string.");
       }
       const maxLength = (field.options.maxLength as Maybe<number>) ?? Infinity;
       if (content.value.length > maxLength) {
-        throw {
-          code: "MAX_LENGTH_EXCEEDED_ERROR",
-          message: `Reply exceeds max length allowed of ${maxLength} chars.`,
-        };
+        throw new ValidateReplyContentError(
+          "MAX_LENGTH_EXCEEDED_ERROR",
+          `Reply exceeds max length allowed of ${maxLength} chars.`,
+        );
+      }
+      if (isDefined(field.options.format)) {
+        if (!(await validateShortTextFormat(content.value, field.options.format))) {
+          throw new ValidateReplyContentError(
+            "INVALID_FORMAT",
+            `Reply is not valid according to format ${field.options.format}.`,
+          );
+        }
       }
       break;
     }
     case "PHONE": {
       if (!("value" in content) || typeof content.value !== "string") {
-        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type string." };
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type string.");
       }
       if (!isPossiblePhoneNumber(content.value)) {
-        throw {
-          code: "INVALID_PHONE_NUMBER",
-          message: `${content.value} is not a valid phone number in e164 format`,
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_PHONE_NUMBER",
+          `${content.value} is not a valid phone number in e164 format`,
+        );
       }
       break;
     }
@@ -108,99 +137,100 @@ export function validateReplyContent(field: PetitionField, content: any) {
         !(content.value as any[]).every((r) => typeof r === "string") ||
         content.value.length === 0
       ) {
-        throw {
-          code: "INVALID_TYPE_ERROR",
-          message: "Reply must be an array of strings with at least one value.",
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_TYPE_ERROR",
+          "Reply must be an array of strings with at least one value.",
+        );
       }
 
       const { type: subtype, min, max } = field.options.limit;
       if (subtype === "RADIO" && content.value.length !== 1) {
-        throw { code: "INVALID_VALUE_ERROR", message: "Reply must contain exactly 1 choice." };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          "Reply must contain exactly 1 choice.",
+        );
       } else if (
         subtype === "EXACT" &&
         (content.value.length > max || content.value.length < min)
       ) {
-        throw {
-          code: "INVALID_VALUE_ERROR",
-          message: `Reply must contain exactly ${min} choice(s).`,
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          `Reply must contain exactly ${min} choice(s).`,
+        );
       } else if (
         subtype === "RANGE" &&
         (content.value.length > max || content.value.length < min)
       ) {
-        throw {
-          code: "INVALID_VALUE_ERROR",
-          message: `Reply must contain between ${min} and ${max} choices.`,
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          `Reply must contain between ${min} and ${max} choices.`,
+        );
       }
 
       const differences = difference(content.value, field.options.values);
       if (differences.length !== 0) {
-        throw {
-          code: "UNKNOWN_OPTION_ERROR",
-          message: `Reply must be some of [${(field.options.values ?? [])
+        throw new ValidateReplyContentError(
+          "UNKNOWN_OPTION_ERROR",
+          `Reply must be some of [${(field.options.values ?? [])
             .map((opt: string) => `'${opt}'`)
             .join(", ")}].`,
-        };
+        );
       }
       break;
     }
     case "DYNAMIC_SELECT": {
       if (!("value" in content) || !Array.isArray(content.value)) {
-        throw {
-          code: "INVALID_TYPE_ERROR",
-          message: "Reply must be an array with the selected options.",
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_TYPE_ERROR",
+          "Reply must be an array with the selected options.",
+        );
       }
 
       const labels = field.options.labels as string[];
       let values = field.options.values as string[] | DynamicSelectOption[];
       if (content.value.length > labels.length) {
-        throw {
-          code: "INVALID_VALUE_ERROR",
-          message: `Reply must be an array of length ${labels.length}.`,
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          `Reply must be an array of length ${labels.length}.`,
+        );
       }
       for (let level = 0; level < labels.length; level++) {
         if (content.value[level]?.[0] !== labels[level]) {
-          throw {
-            code: "INVALID_VALUE_ERROR",
-            message: `Expected '${labels[level]}' as label, received '${content.value[level]?.[0]}'.`,
-          };
+          throw new ValidateReplyContentError(
+            "INVALID_VALUE_ERROR",
+            `Expected '${labels[level]}' as label, received '${content.value[level]?.[0]}'.`,
+          );
         }
         if (content.value[level]?.[1] === null) {
           if (
             !(content.value as string[][]).slice(level + 1).every(([, value]) => value === null)
           ) {
-            throw {
-              code: "INVALID_VALUE_ERROR",
-              message: `A partial reply must contain null values starting from index ${level}.`,
-            };
+            throw new ValidateReplyContentError(
+              "INVALID_VALUE_ERROR",
+              `A partial reply must contain null values starting from index ${level}.`,
+            );
           }
         } else if (level === labels.length - 1) {
           if (!(values as string[]).includes(content.value[level][1]!)) {
-            throw {
-              code: "UNKNOWN_OPTION_ERROR",
-              message: `Reply for label '${content.value[level][0]}' must be one of [${(
-                values as string[]
-              )
+            throw new ValidateReplyContentError(
+              "UNKNOWN_OPTION_ERROR",
+              `Reply for label '${content.value[level][0]}' must be one of [${(values as string[])
                 .map((opt) => `'${opt}'`)
                 .join(", ")}], received '${content.value[level][1]}'.`,
-            };
+            );
           }
         } else {
           if (
             !(values as DynamicSelectOption[]).some(([value]) => value === content.value[level][1])
           ) {
-            throw {
-              code: "UNKNOWN_OPTION_ERROR",
-              message: `Reply for label '${content.value[level][0]}' must be one of [${(
+            throw new ValidateReplyContentError(
+              "UNKNOWN_OPTION_ERROR",
+              `Reply for label '${content.value[level][0]}' must be one of [${(
                 values as DynamicSelectOption[]
               )
                 .map(([opt]) => `'${opt}'`)
                 .join(", ")}], received '${content.value[level][1]}'.`,
-            };
+            );
           }
           values =
             (values as DynamicSelectOption[]).find(
@@ -214,22 +244,37 @@ export function validateReplyContent(field: PetitionField, content: any) {
     case "DOW_JONES_KYC":
     case "ES_TAX_DOCUMENTS": {
       if (typeof content !== "object") {
-        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type object." };
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type object.");
       }
       if (
         !("petitionFieldReplyId" in content) ||
         !isDefined(content.petitionFieldReplyId) ||
         !isGlobalId(content.petitionFieldReplyId, "PetitionFieldReply")
       ) {
-        throw {
-          code: "INVALID_VALUE_ERROR",
-          message: "Reply must contain a valid PetitionFieldReply id.",
-        };
+        throw new ValidateReplyContentError(
+          "INVALID_VALUE_ERROR",
+          "Reply must contain a valid PetitionFieldReply id.",
+        );
       }
 
       break;
     }
     default:
       throw new Error(`Invalid field type '${field.type}'.`);
+  }
+}
+
+async function validateShortTextFormat(value: string, format: string) {
+  switch (format) {
+    case "EMAIL":
+      return EMAIL_REGEX.test(value);
+    case "ES_DNI":
+      return validDNI(value) || validNIE(value);
+    case "ES_NIF":
+      return validCIF(value);
+    case "IBAN":
+      return validIban(value);
+    default:
+      return true;
   }
 }

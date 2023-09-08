@@ -6220,7 +6220,7 @@ export class PetitionRepository extends BaseRepository {
 
       for (const content of singleReplies) {
         try {
-          validateReplyContent(field, content);
+          await validateReplyContent(field, content);
           result.push({ fieldId: field.id, fieldType: field.type, content });
         } catch {}
       }

@@ -116,20 +116,18 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   );
   const handleUpdatePetitionFieldReply = useCallback(
     async (replyId: string, content: any) => {
-      try {
-        await publicUpdatePetitionFieldReplies({
-          variables: {
-            keycode: props.keycode,
-            replies: [
-              {
-                id: replyId,
-                content,
-              },
-            ],
-          },
-        });
-        updateLastSaved();
-      } catch {}
+      await publicUpdatePetitionFieldReplies({
+        variables: {
+          keycode: props.keycode,
+          replies: [
+            {
+              id: replyId,
+              content,
+            },
+          ],
+        },
+      });
+      updateLastSaved();
     },
     [publicUpdatePetitionFieldReplies, updateLastSaved],
   );
@@ -139,23 +137,19 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   );
   const handleCreatePetitionFieldReply = useCallback(
     async (content: any) => {
-      try {
-        const { data } = await publicCreatePetitionFieldReplies({
-          variables: {
-            keycode: props.keycode,
-            fields: [
-              {
-                id: props.field.id,
-                content,
-              },
-            ],
-          },
-        });
-        updateLastSaved();
-        return data?.publicCreatePetitionFieldReplies?.[0]?.id;
-      } catch {}
-
-      return;
+      const { data } = await publicCreatePetitionFieldReplies({
+        variables: {
+          keycode: props.keycode,
+          fields: [
+            {
+              id: props.field.id,
+              content,
+            },
+          ],
+        },
+      });
+      updateLastSaved();
+      return data?.publicCreatePetitionFieldReplies?.[0]?.id;
     },
     [publicCreatePetitionFieldReplies, updateLastSaved],
   );

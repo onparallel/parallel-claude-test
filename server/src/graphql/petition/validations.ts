@@ -1,9 +1,9 @@
 import { core } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
-import { groupBy, isDefined, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, mapValues, pipe, uniq } from "remeda";
 import { fromGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
-import { validateReplyContent } from "../../util/validateReplyContent";
+import { ValidateReplyContentError, validateReplyContent } from "../../util/validateReplyContent";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
@@ -63,58 +63,75 @@ export function validateCreateReplyContent<TypeName extends string, FieldName ex
 ) {
   return (async (_, args, ctx, info) => {
     const fieldReplies = prop(args);
-    const fields = await ctx.petitions.loadField(uniq(fieldReplies.map((fr) => fr.id)));
-
-    const byFieldId = groupBy(fieldReplies, (r) => r.id);
-    for (const [fieldId, fieldReplies] of Object.entries(byFieldId)) {
+    const fields = await ctx.petitions.loadField(fieldReplies.map((fr) => fr.id));
+    if (!fields.every(isDefined)) {
+      const index = fields.findIndex((f) => !isDefined(f));
+      throw new InvalidReplyError(
+        info,
+        argName + `[${index}].id`,
+        `Invalid PetitionField ID ${fieldReplies[index].id}`,
+      );
+    }
+    const fieldsById = indexBy(fields, (f) => f.id);
+    const replyCountByFieldId = pipe(
+      fieldReplies,
+      groupBy((r) => r.id),
+      mapValues((r) => r.length),
+    );
+    // Validate that we are not creating more replies than allowed
+    for (const field of Object.values(fieldsById)) {
+      if (!field.multiple && replyCountByFieldId[field.id] > 1) {
+        const firstReplyIndex = fieldReplies.findIndex((r) => r.id === field.id);
+        const index = fieldReplies.slice(firstReplyIndex + 1).findIndex((r) => r.id === field.id);
+        throw new InvalidReplyError(
+          info,
+          argName + `[${index}].id`,
+          `PetitionField with ID ${field.id} only accepts one reply`,
+        );
+      }
+    }
+    for (const [index, reply] of fieldReplies.entries()) {
+      const field = fieldsById[reply.id];
       try {
-        const field = fields.find((f) => f?.id === parseInt(fieldId))!;
-
-        if (!field.multiple && fieldReplies.length > 1) {
-          throw new Error(`Can't submit more than one reply on a single reply field`);
+        await validateReplyContent(field, reply.content);
+      } catch (e) {
+        if (e instanceof ValidateReplyContentError) {
+          throw new InvalidReplyError(info, argName + `[${index}].content`, e.message, {
+            subcode: e.code,
+          });
+        } else {
+          throw e;
         }
+      }
+      // for FILE replies, we need to make sure the user has access to the provided reply
+      if (isFileTypeField(field.type)) {
+        const { id: replyId } = fromGlobalId(
+          reply.content.petitionFieldReplyId as string,
+          "PetitionFieldReply",
+        );
+        const petitionFieldReply = await ctx.petitions.loadFieldReply(replyId);
 
-        for (const reply of fieldReplies) {
-          validateReplyContent(field, reply.content);
+        const isValid =
+          isDefined(petitionFieldReply) &&
+          ((field.type === "FILE_UPLOAD" &&
+            ["FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(petitionFieldReply.type)) ||
+            field.type === petitionFieldReply.type);
 
-          // for FILE replies, we need to make sure the user has access to the provided reply
-          if (isFileTypeField(field.type)) {
-            const { id: replyId } = fromGlobalId(
-              reply.content.petitionFieldReplyId as string,
-              "PetitionFieldReply",
-            );
-            const petitionFieldReply = await ctx.petitions.loadFieldReply(replyId);
+        const hasAccess =
+          isValid &&
+          isDefined(ctx.user) &&
+          (await ctx.petitions.userhasAccessToPetitionFieldReply(
+            petitionFieldReply.id,
+            ctx.user.id,
+          ));
 
-            const isValid =
-              isDefined(petitionFieldReply) &&
-              ((field.type === "FILE_UPLOAD" &&
-                ["FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(petitionFieldReply.type)) ||
-                field.type === petitionFieldReply.type);
-
-            if (!isValid) {
-              throw new Error(
-                `Invalid PetitionFieldReply id ${reply.content.petitionFieldReplyId}`,
-              );
-            }
-
-            const hasAccess =
-              isDefined(ctx.user) &&
-              (await ctx.petitions.userhasAccessToPetitionFieldReply(
-                petitionFieldReply.id,
-                ctx.user.id,
-              ));
-
-            if (!hasAccess) {
-              throw new Error(
-                `User doesn't have access to PetitionFieldReply id ${reply.content.petitionFieldReplyId}`,
-              );
-            }
-          }
+        if (!hasAccess) {
+          throw new InvalidReplyError(
+            info,
+            argName + `[${index}].content.petitionFieldReplyId`,
+            `PetitionFieldReply ID is invalid`,
+          );
         }
-      } catch (error: any) {
-        throw new InvalidReplyError(info, argName, error.message, {
-          subcode: error.code,
-        });
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
@@ -143,7 +160,7 @@ export function validateUpdateReplyContent<TypeName extends string, FieldName ex
         }
 
         for (const reply of fieldReplies) {
-          validateReplyContent(field, reply.content);
+          await validateReplyContent(field, reply.content);
         }
       } catch (error: any) {
         throw new InvalidReplyError(info, argName, error.message, {

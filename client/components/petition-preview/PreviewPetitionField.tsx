@@ -123,15 +123,13 @@ export function PreviewPetitionField({
   const updatePetitionFieldReply = useUpdatePetitionFieldReply();
   const handleUpdatePetitionFieldReply = useCallback(
     async (replyId: string, content: any) => {
-      try {
-        await updatePetitionFieldReply({
-          petitionId,
-          fieldId,
-          replyId,
-          content,
-          isCacheOnly,
-        });
-      } catch {}
+      await updatePetitionFieldReply({
+        petitionId,
+        fieldId,
+        replyId,
+        content,
+        isCacheOnly,
+      });
     },
     [updatePetitionFieldReply],
   );
@@ -139,17 +137,13 @@ export function PreviewPetitionField({
   const createPetitionFieldReply = useCreatePetitionFieldReply();
   const handleCreatePetitionFieldReply = useCallback(
     async (content: any) => {
-      try {
-        const res = await createPetitionFieldReply({
-          petitionId,
-          fieldId,
-          content,
-          isCacheOnly,
-        });
-        return res?.id;
-      } catch {}
-
-      return;
+      const res = await createPetitionFieldReply({
+        petitionId,
+        fieldId,
+        content,
+        isCacheOnly,
+      });
+      return res?.id;
     },
     [createPetitionFieldReply],
   );

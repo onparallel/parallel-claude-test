@@ -76,6 +76,16 @@ const SCHEMAS = {
       },
       format: {
         type: ["string", "null"],
+        enum: [
+          "EMAIL",
+          "IBAN",
+          "ES_DNI",
+          "ES_NIF",
+          "ES_SSN",
+          "US_SSN",
+          "ES_POSTALCODE",
+          "US_POSTALCODE",
+        ],
       },
     },
   },

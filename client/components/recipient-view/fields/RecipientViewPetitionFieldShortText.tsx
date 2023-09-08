@@ -42,6 +42,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
@@ -163,7 +164,11 @@ export function RecipientViewPetitionFieldShortText({
             newReplyElement?.focus();
           }
         }
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "INVALID_REPLY_ERROR")) {
+          handleInvalidReply(field.id, true);
+        }
+      }
       setIsSaving(false);
     },
     1000,
@@ -330,7 +335,11 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
       setIsSaving(true);
       try {
         await onUpdate(value.trim());
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "INVALID_REPLY_ERROR")) {
+          onInvalid(true);
+        }
+      }
       setIsSaving(false);
     },
     1000,
