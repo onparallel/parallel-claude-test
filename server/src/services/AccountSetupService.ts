@@ -63,19 +63,31 @@ export class AccountSetupService implements IAccountSetupService {
     );
 
     await this.tiers.updateOrganizationTier(organization, tier, createdBy);
+    const owner = await this.createOrgOwner(organization.id, userData, createdBy);
+    await this.createAllUsersGroup(organization.id, owner.id, createdBy);
 
-    const user = await this.users.createUser(
+    return {
+      // load org to get updated usage_details
+      organization: (await this.organizations.loadOrg(organization.id))!,
+      user: owner,
+    };
+  }
+
+  private async createOrgOwner(orgId: number, userData: CreateUserData, createdBy: string) {
+    return await this.users.createUser(
       {
         /** @deprecated */
         organization_role: "OWNER",
         is_org_owner: true,
-        org_id: organization.id,
+        org_id: orgId,
         status: "ACTIVE",
       },
       userData,
       createdBy,
     );
+  }
 
+  private async createAllUsersGroup(orgId: number, userId: number, createdBy: string) {
     const userGroup = await this.userGroups.createUserGroup(
       {
         name: "",
@@ -83,16 +95,31 @@ export class AccountSetupService implements IAccountSetupService {
           id: "account-setup.all-members-group.name",
           defaultMessage: "All users",
         }),
-        org_id: organization.id,
+        org_id: orgId,
         type: "ALL_USERS",
       },
       createdBy,
     );
-    await this.userGroups.addUsersToGroups(userGroup.id, user.id, createdBy);
+    await this.userGroups.addUsersToGroups(userGroup.id, userId, createdBy);
     await this.userGroups.upsertUserGroupPermissions(
       userGroup.id,
       (
         [
+          "REPORTS:OVERVIEW",
+          "REPORTS:TEMPLATE_STATISTICS",
+          "REPORTS:TEMPLATE_REPLIES",
+          "TAGS:CRUD_TAGS",
+          "PROFILES:DELETE_PROFILES",
+          "PROFILES:DELETE_PERMANENTLY_PROFILES",
+          "PROFILE_TYPES:CRUD_PROFILE_TYPES",
+          "INTEGRATIONS:CRUD_INTEGRATIONS",
+          "USERS:CRUD_USERS",
+          "USERS:GHOST_LOGIN",
+          "TEAMS:CRUD_TEAMS",
+          "TEAMS:CRUD_PERMISSIONS",
+          "ORG_SETTINGS",
+          "CONTACTS:DELETE_CONTACTS",
+          "PETITIONS:SEND_ON_BEHALF",
           "PETITIONS:CHANGE_PATH",
           "PETITIONS:CREATE_TEMPLATES",
           "INTEGRATIONS:CRUD_API",
@@ -106,17 +133,8 @@ export class AccountSetupService implements IAccountSetupService {
           "USERS:LIST_USERS",
           "TEAMS:LIST_TEAMS",
         ] as UserGroupPermissionName[]
-      ).map((name) => ({
-        effect: "GRANT",
-        name,
-      })),
+      ).map((name) => ({ effect: "GRANT", name })),
       createdBy,
     );
-
-    return {
-      // load org to get updated usage_details
-      organization: (await this.organizations.loadOrg(organization.id))!,
-      user,
-    };
   }
 }
