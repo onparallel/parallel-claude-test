@@ -111,6 +111,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
       firstName: string;
       lastName: string;
       email: string;
+      externalId: string | null;
     };
   };
   SIGNATURE_OPENED: {

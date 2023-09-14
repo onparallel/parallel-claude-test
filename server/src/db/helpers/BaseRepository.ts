@@ -33,7 +33,7 @@ export interface TableTypes
         {
           signature_config: Replace<
             PetitionSignatureConfig,
-            { signersInfo: (PetitionSignatureConfigSigner & { externalId?: string })[] }
+            { signersInfo: (PetitionSignatureConfigSigner & { externalId: string })[] }
           >;
         }
       >;

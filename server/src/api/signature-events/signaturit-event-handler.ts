@@ -95,19 +95,16 @@ async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petiti
 
 /** the document was signed by any of the assigned signers */
 async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`,
-  );
-
-  const [signer, signerIndex] = findSigner(signature!.signature_config.signersInfo, data.document);
+  const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
+  const [signer, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
 
   await ctx.petitions.updatePetitionSignatureByExternalId(
     `SIGNATURIT/${data.document.signature.id}`,
     {
       signer_status: {
-        ...signature!.signer_status,
+        ...signature.signer_status,
         [signerIndex]: {
-          ...signature!.signer_status[signerIndex],
+          ...signature.signer_status[signerIndex],
           signed_at: new Date(data.created_at),
         },
       },
@@ -163,7 +160,7 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
 
 async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
-  const [signer, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
+  const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
   await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
     signer_status: {
       ...signature.signer_status,
@@ -174,35 +171,25 @@ async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petiti
     },
   });
 
-  await ctx.petitions.createEvent({
-    type: "SIGNATURE_DELIVERED",
-    petition_id: petitionId,
-    data: {
-      petition_signature_request_id: signature.id,
-      signer: pick(signer, ["email", "firstName", "lastName"]),
-      email_delivered_at: new Date(data.created_at),
-    },
-  });
+  await upsertSignatureDeliveredEvent(
+    petitionId,
+    data,
+    { email_delivered_at: new Date(data.created_at) },
+    ctx,
+  );
 }
 
 async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  await updateSignatureDeliveredEvent(
+  await upsertSignatureDeliveredEvent(
     petitionId,
+    data,
     { email_opened_at: new Date(data.created_at) },
     ctx,
   );
 }
 
 async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`,
-  );
-
-  if (!signature) {
-    throw new Error(
-      `Can't find PetitionSignatureRequest with external_id: SIGNATURIT/${data.document.signature.id}`,
-    );
-  }
+  const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
 
   const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
   await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
@@ -220,8 +207,10 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
       },
     },
   });
-  await updateSignatureDeliveredEvent(
+
+  await upsertSignatureDeliveredEvent(
     petitionId,
+    data,
     { email_bounced_at: new Date(data.created_at) },
     ctx,
   );
@@ -252,9 +241,9 @@ async function appendEventLogs(ctx: ApiContext, data: SignaturItEventBody): Prom
 }
 
 function findSigner(
-  signers: (PetitionSignatureConfigSigner & { externalId?: string })[],
+  signers: (PetitionSignatureConfigSigner & { externalId: string })[],
   document: SignaturItEventBody["document"],
-): [PetitionSignatureConfigSigner, number] {
+): [PetitionSignatureConfigSigner & { externalId: string }, number] {
   const signerIndex = signers.findIndex((signer) => signer.externalId === document.id);
 
   const signer = signers[signerIndex];
@@ -270,28 +259,45 @@ function findSigner(
   return [signer, signerIndex];
 }
 
-async function updateSignatureDeliveredEvent(
+async function upsertSignatureDeliveredEvent(
   petitionId: number,
-  newData: Omit<SignatureDeliveredEvent["data"], "petition_signature_request_id" | "signer">,
+  body: SignaturItEventBody,
+  data: Pick<
+    SignatureDeliveredEvent["data"],
+    "email_delivered_at" | "email_opened_at" | "email_bounced_at"
+  >,
   ctx: ApiContext,
 ) {
-  const [signatureDeliveredEvent] = await ctx.petitions.getPetitionEventsByType(petitionId, [
-    "SIGNATURE_DELIVERED",
-  ]);
+  const signature = await fetchPetitionSignature(body.document.signature.id, ctx);
 
-  if (
-    isDefined(newData.email_opened_at) &&
-    isDefined(signatureDeliveredEvent.data.email_opened_at)
-  ) {
-    // write the email_opened_at Date only once, so future email opens after signature is completed don't overwrite this date
-    return;
+  const [signer] = findSigner(signature.signature_config.signersInfo, body.document);
+
+  const events = await ctx.petitions.getPetitionEventsByType(petitionId, ["SIGNATURE_DELIVERED"]);
+
+  const signerEvent = events.find((e) => e.data.signer.externalId === signer.externalId);
+
+  if (isDefined(signerEvent)) {
+    if (isDefined(signerEvent.data.email_opened_at) && isDefined(data.email_opened_at)) {
+      // write the email_opened_at Date only once, so future email opens after signature is completed don't overwrite this date
+      return;
+    }
+
+    await ctx.petitions.updateEvent(signerEvent.id, {
+      ...signerEvent,
+      data: {
+        ...signerEvent.data,
+        ...data,
+      },
+    });
+  } else {
+    await ctx.petitions.createEvent({
+      type: "SIGNATURE_DELIVERED",
+      petition_id: petitionId,
+      data: {
+        petition_signature_request_id: signature.id,
+        signer: pick(signer, ["email", "firstName", "lastName", "externalId"]),
+        ...data,
+      },
+    });
   }
-
-  await ctx.petitions.updateEvent(signatureDeliveredEvent.id, {
-    ...signatureDeliveredEvent,
-    data: {
-      ...signatureDeliveredEvent.data,
-      ...newData,
-    },
-  });
 }

@@ -182,12 +182,8 @@ async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionI
     was assigned by somebody else. In this case we will skip without throwing error
   */
   let signerIndex: number;
-  let signer: PetitionSignatureConfigSigner;
   try {
-    [signer, signerIndex] = findSigner(
-      signature.signature_config.signersInfo,
-      body.data.recipientId!,
-    );
+    [, signerIndex] = findSigner(signature.signature_config.signersInfo, body.data.recipientId!);
   } catch {
     return;
   }
@@ -202,15 +198,12 @@ async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionI
     },
   });
 
-  await ctx.petitions.createEvent({
-    type: "SIGNATURE_DELIVERED",
-    petition_id: petitionId,
-    data: {
-      petition_signature_request_id: signature.id,
-      signer: pick(signer, ["email", "firstName", "lastName"]),
-      email_delivered_at: new Date(body.generatedDateTime),
-    },
-  });
+  await upsertSignatureDeliveredEvent(
+    petitionId,
+    body,
+    { email_delivered_at: new Date(body.generatedDateTime) },
+    ctx,
+  );
 }
 
 /** a signer opened the signing page on the signature provider */
@@ -395,8 +388,9 @@ async function recipientAutoresponded(
     },
   );
 
-  await updateSignatureDeliveredEvent(
+  await upsertSignatureDeliveredEvent(
     petitionId,
+    body,
     { email_bounced_at: new Date(body.generatedDateTime) },
     ctx,
   );
@@ -425,9 +419,9 @@ async function appendEventLogs(ctx: ApiContext, body: DocuSignEventBody): Promis
 }
 
 function findSigner(
-  signers: (PetitionSignatureConfigSigner & { externalId?: string })[],
+  signers: (PetitionSignatureConfigSigner & { externalId: string })[],
   recipientExternalId: string,
-): [PetitionSignatureConfigSigner, number] {
+): [PetitionSignatureConfigSigner & { externalId: string }, number] {
   const signerIndex = signers.findIndex((signer) => signer.externalId === recipientExternalId);
 
   const signer = signers[signerIndex];
@@ -443,28 +437,42 @@ function findSigner(
   return [signer, signerIndex];
 }
 
-async function updateSignatureDeliveredEvent(
+async function upsertSignatureDeliveredEvent(
   petitionId: number,
-  newData: Omit<SignatureDeliveredEvent["data"], "petition_signature_request_id" | "signer">,
+  body: DocuSignEventBody,
+  data: Pick<
+    SignatureDeliveredEvent["data"],
+    "email_delivered_at" | "email_opened_at" | "email_bounced_at"
+  >,
   ctx: ApiContext,
 ) {
-  const [signatureDeliveredEvent] = await ctx.petitions.getPetitionEventsByType(petitionId, [
-    "SIGNATURE_DELIVERED",
-  ]);
+  const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
+    `DOCUSIGN/${body.data.envelopeId}`,
+  ))!;
 
-  if (
-    isDefined(newData.email_opened_at) &&
-    isDefined(signatureDeliveredEvent.data.email_opened_at)
-  ) {
-    // write the email_opened_at Date only once, so future email opens after signature is completed don't overwrite this date
-    return;
+  const [signer] = findSigner(signature.signature_config.signersInfo, body.data.recipientId!);
+
+  const events = await ctx.petitions.getPetitionEventsByType(petitionId, ["SIGNATURE_DELIVERED"]);
+
+  const signerEvent = events.find((e) => e.data.signer.externalId === signer.externalId);
+
+  if (isDefined(signerEvent)) {
+    await ctx.petitions.updateEvent(signerEvent.id, {
+      ...signerEvent,
+      data: {
+        ...signerEvent.data,
+        ...data,
+      },
+    });
+  } else {
+    await ctx.petitions.createEvent({
+      type: "SIGNATURE_DELIVERED",
+      petition_id: petitionId,
+      data: {
+        petition_signature_request_id: signature.id,
+        signer: pick(signer, ["email", "firstName", "lastName", "externalId"]),
+        ...data,
+      },
+    });
   }
-
-  await ctx.petitions.updateEvent(signatureDeliveredEvent.id, {
-    ...signatureDeliveredEvent,
-    data: {
-      ...signatureDeliveredEvent.data,
-      ...newData,
-    },
-  });
 }
