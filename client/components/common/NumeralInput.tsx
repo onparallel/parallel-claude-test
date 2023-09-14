@@ -18,27 +18,13 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
   { decimals, onlyPositive, value, prefix, suffix, onChange, ...props },
   ref,
 ) {
-  function format(value: number | undefined) {
-    if (!isDefined(value)) return "";
-
-    const formatted = intl.formatNumber(value, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: decimals ?? 5,
-    });
-    return isDefined(prefix)
-      ? prefix + formatted
-      : isDefined(suffix)
-      ? formatted + suffix
-      : formatted;
-  }
-
   const intl = useIntl();
-  const [_value, setValue] = useState(format(value));
+  const [_value, setValue] = useState(value);
 
   const valueRef = useRef(value);
   useEffect(() => {
     if (value !== valueRef.current) {
-      setValue(format(value));
+      setValue(value);
       assignRef(valueRef, value);
     }
   }, [value]);
@@ -54,10 +40,8 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
     };
   }, [intl.locale]);
 
-  const handleOnValueChange = (values: NumberFormatValues, sourceInfo: SourceInfo) => {
-    const { formattedValue, floatValue } = values;
-    setValue(formattedValue);
-
+  const handleOnValueChange = ({ floatValue }: NumberFormatValues, sourceInfo: SourceInfo) => {
+    setValue(floatValue);
     // Event is a Synthetic Event wrapper which holds target and other information.
     // Source tells whether the reason for this function being triggered was an 'event' or due to a 'prop' change
     const { event, source } = sourceInfo;
