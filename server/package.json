@@ -80,7 +80,7 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
     "deepmerge": "^4.3.1",
-    "docusign-esign": "^6.4.0",
+    "docusign-esign": "6.3.0",
     "dotenv": "^16.3.1",
     "email-providers": "^1.14.0",
     "escape-string-regexp": "^4.0.0",
