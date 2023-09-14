@@ -302,7 +302,8 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
               </FormLabel>
               <Select
                 backgroundColor="white"
-                {...register("fontFamily", { disabled: !userCanEditBranding })}
+                isDisabled={!userCanEditBranding}
+                {...register("fontFamily")}
               >
                 <option key="Default" value="DEFAULT">
                   {intl.formatMessage({
