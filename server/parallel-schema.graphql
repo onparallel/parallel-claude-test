@@ -2717,6 +2717,8 @@ type Petition implements PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
+  lastActivityAt: DateTime
+  lastRecipientActivityAt: DateTime
 
   """
   The locale of the parallel.
@@ -3032,6 +3034,8 @@ interface PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
+  lastActivityAt: DateTime
+  lastRecipientActivityAt: DateTime
 
   """
   The locale of the parallel.
@@ -3729,6 +3733,8 @@ type PetitionListView {
 
 enum PetitionListViewColumn {
   createdAt
+  lastActivityAt
+  lastRecipientActivityAt
   name
   recipients
   reminders
@@ -3803,6 +3809,8 @@ enum PetitionListViewSortDirection {
 
 enum PetitionListViewSortField {
   createdAt
+  lastActivityAt
+  lastRecipientActivityAt
   name
   sentAt
 }
@@ -4355,6 +4363,8 @@ type PetitionTemplate implements PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
+  lastActivityAt: DateTime
+  lastRecipientActivityAt: DateTime
 
   """
   The locale of the parallel.
@@ -5859,6 +5869,10 @@ Order to use on Query.petitions
 enum QueryPetitions_OrderBy {
   createdAt_ASC
   createdAt_DESC
+  lastActivityAt_ASC
+  lastActivityAt_DESC
+  lastRecipientActivityAt_ASC
+  lastRecipientActivityAt_DESC
   lastUsedAt_ASC
   lastUsedAt_DESC
   name_ASC

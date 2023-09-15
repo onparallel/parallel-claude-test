@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { DatabaseError } from "pg";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 
@@ -47,10 +48,11 @@ export class OrganizationCreditsService implements IOrganizationCreditsService {
         "SIGNATURIT_SHARED_APIKEY",
         amount,
       );
-    } catch (error: any) {
+    } catch (error) {
       if (
-        error.message === "ORGANIZATION_USAGE_LIMIT_EXPIRED" ||
-        error.constraint === "organization_usage_limit__used__limit__check"
+        (error instanceof Error && error.message === "ORGANIZATION_USAGE_LIMIT_EXPIRED") ||
+        (error instanceof DatabaseError &&
+          error.constraint === "organization_usage_limit__used__limit__check")
       ) {
         throw new Error("INSUFFICIENT_SIGNATURE_CREDITS");
       }

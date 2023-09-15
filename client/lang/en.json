@@ -4780,6 +4780,66 @@
     "context": "Mark as unread"
   },
   {
+    "term": "component.petitions-table-columns.header-name",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
+    "term": "component.petitions-table-columns.header-recipient",
+    "definition": "Recipient",
+    "context": "Recipient"
+  },
+  {
+    "term": "component.petitions-table-columns.header-reminders",
+    "definition": "Reminders",
+    "context": "Reminders"
+  },
+  {
+    "term": "component.petitions-table-columns.header-reminders-disabled",
+    "definition": "No reminders",
+    "context": "No reminders"
+  },
+  {
+    "term": "component.petitions-table-columns.header-reminders-next-reminder-at",
+    "definition": "Next reminder configured",
+    "context": "Next reminder configured"
+  },
+  {
+    "term": "component.petitions-table-columns.header-reminders-next-reminder-at-popover",
+    "definition": "Next reminder configured for {date}",
+    "context": "Next reminder configured for {date}"
+  },
+  {
+    "term": "component.petitions-table-columns.header-settings",
+    "definition": "Settings",
+    "context": "Settings"
+  },
+  {
+    "term": "component.petitions-table-columns.header-shared",
+    "definition": "Shared",
+    "context": "Shared"
+  },
+  {
+    "term": "component.petitions-table-columns.header-signature",
+    "definition": "eSignature status",
+    "context": "eSignature status"
+  },
+  {
+    "term": "component.petitions-table-columns.header-status",
+    "definition": "Status",
+    "context": "Status"
+  },
+  {
+    "term": "component.petitions-table-columns.header-tags",
+    "definition": "Tags",
+    "context": "Tags"
+  },
+  {
+    "term": "component.petitions-table-columns.header-template",
+    "definition": "Template",
+    "context": "Template"
+  },
+  {
     "term": "component.preview-comments-dialog.template-no-comments-added",
     "definition": "<b>Preview only</b> - comments are disabled.",
     "context": "<b>Preview only</b> - comments are disabled."
@@ -12135,39 +12195,9 @@
     "context": "Document signed successfully"
   },
   {
-    "term": "petitions.header.name",
-    "definition": "Name",
-    "context": "Name"
-  },
-  {
     "term": "petitions.header.recipient",
     "definition": "Recipient",
     "context": "Recipient"
-  },
-  {
-    "term": "petitions.header.reminders",
-    "definition": "Reminders",
-    "context": "Reminders"
-  },
-  {
-    "term": "petitions.header.reminders-disabled",
-    "definition": "No reminders",
-    "context": "No reminders"
-  },
-  {
-    "term": "petitions.header.reminders-next-reminder-at",
-    "definition": "Next reminder configured",
-    "context": "Next reminder configured"
-  },
-  {
-    "term": "petitions.header.reminders-next-reminder-at.popover",
-    "definition": "Next reminder configured for {date}",
-    "context": "Next reminder configured for {date}"
-  },
-  {
-    "term": "petitions.header.settings",
-    "definition": "Settings",
-    "context": "Settings"
   },
   {
     "term": "petitions.header.shared",
@@ -12183,16 +12213,6 @@
     "term": "petitions.header.status",
     "definition": "Status",
     "context": "Status"
-  },
-  {
-    "term": "petitions.header.tags",
-    "definition": "Tags",
-    "context": "Tags"
-  },
-  {
-    "term": "petitions.header.template",
-    "definition": "Template",
-    "context": "Template"
   },
   {
     "term": "petitions.no-parallels",

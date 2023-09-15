@@ -326,6 +326,12 @@ export const PetitionBase = interfaceType({
           : null;
       },
     });
+    t.nullable.datetime("lastActivityAt", {
+      resolve: (o) => o.last_activity_at,
+    });
+    t.nullable.datetime("lastRecipientActivityAt", {
+      resolve: (o) => o.last_recipient_activity_at,
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

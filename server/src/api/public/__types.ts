@@ -2394,6 +2394,8 @@ export type Petition = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -2563,6 +2565,8 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -2981,6 +2985,8 @@ export type PetitionListView = {
 
 export type PetitionListViewColumn =
   | "createdAt"
+  | "lastActivityAt"
+  | "lastRecipientActivityAt"
   | "name"
   | "recipients"
   | "reminders"
@@ -3046,7 +3052,12 @@ export type PetitionListViewSort = {
 
 export type PetitionListViewSortDirection = "ASC" | "DESC";
 
-export type PetitionListViewSortField = "createdAt" | "name" | "sentAt";
+export type PetitionListViewSortField =
+  | "createdAt"
+  | "lastActivityAt"
+  | "lastRecipientActivityAt"
+  | "name"
+  | "sentAt";
 
 export type PetitionListViewSortInput = {
   direction: PetitionListViewSortDirection;
@@ -3357,6 +3368,8 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -4368,6 +4381,10 @@ export type QueryOrganizations_OrderBy =
 export type QueryPetitions_OrderBy =
   | "createdAt_ASC"
   | "createdAt_DESC"
+  | "lastActivityAt_ASC"
+  | "lastActivityAt_DESC"
+  | "lastRecipientActivityAt_ASC"
+  | "lastRecipientActivityAt_DESC"
   | "lastUsedAt_ASC"
   | "lastUsedAt_DESC"
   | "name_ASC"

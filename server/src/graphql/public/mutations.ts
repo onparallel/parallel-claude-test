@@ -574,9 +574,12 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
       ]);
 
       return newAccess;
-    } catch (error: any) {
+    } catch (error) {
       // if the access already exists, just send the email
-      if (error.constraint === "petition_access__petition_id_contact_id_active") {
+      if (
+        error instanceof DatabaseError &&
+        error.constraint === "petition_access__petition_id_contact_id_active"
+      ) {
         const petitionAccesses = await ctx.petitions.loadAccessesForPetition(petitionId);
 
         const contactAccess = petitionAccesses.find((a) => a.contact_id === contactToDelegate!.id)!;

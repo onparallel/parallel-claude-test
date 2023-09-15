@@ -56,7 +56,14 @@ export const petitionsQuery = queryField((t) => {
       }),
     },
     searchable: true,
-    sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt"] as any,
+    sortableBy: [
+      "createdAt",
+      "sentAt",
+      "name",
+      "lastUsedAt",
+      "lastActivityAt",
+      "lastRecipientActivityAt",
+    ] as any,
     validateArgs: validateAnd(
       validPetitionSharedWithFilter((args) => args.filters?.sharedWith, "filters.sharedWith"),
       validPetitionTagFilter((args) => args.filters?.tags, "filters.tags"),

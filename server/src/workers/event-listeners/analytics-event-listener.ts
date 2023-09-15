@@ -27,7 +27,7 @@ import {
   UserCreatedEvent,
   UserLoggedInEvent,
 } from "../../db/events/SystemEvent";
-import { EventListener } from "../event-processor";
+import { listener } from "../helpers/EventProcessor";
 
 async function loadPetitionOwner(petitionId: number, ctx: WorkerContext) {
   const user = await ctx.petitions.loadPetitionOwner(petitionId);
@@ -537,79 +537,105 @@ async function trackOrganizationLimitReachedEvent(
   }
 }
 
-export const analyticsEventListener: EventListener = async (event, ctx) => {
-  switch (event.type) {
-    case "PETITION_CREATED":
-      await trackPetitionCreatedEvent(event, ctx);
-      break;
-    case "PETITION_CLONED":
-      await trackPetitionClonedEvent(event, ctx);
-      break;
-    case "PETITION_CLOSED":
-      await trackPetitionClosedEvent(event, ctx);
-      break;
-    case "PETITION_COMPLETED":
-      await trackPetitionCompletedEvent(event, ctx);
-      break;
-    case "PETITION_DELETED":
-      await trackPetitionDeletedEvent(event, ctx);
-      break;
-    case "USER_LOGGED_IN":
-      await trackUserLoggedInEvent(event, ctx);
-      break;
-    case "REMINDER_SENT":
-      await trackReminderSentEvent(event, ctx);
-      break;
-    case "TEMPLATE_USED":
-      await trackTemplateUsedEvent(event, ctx);
-      break;
-    case "USER_CREATED":
-      await trackUserCreatedEvent(event, ctx);
-      break;
-    case "ACCESS_OPENED":
-      await trackAccessOpenedEvent(event, ctx);
-      break;
-    case "ACCESS_ACTIVATED":
-      await trackAccessActivatedEvent(event, ctx);
-      break;
-    case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
-      await trackAccessActivatedFromPublicLinkEvent(event, ctx);
-      break;
-    case "EMAIL_VERIFIED":
-      await trackEmailVerifiedEvent(event, ctx);
-      break;
-    case "INVITE_SENT":
-      await trackInviteSentEvent(event, ctx);
-      break;
-    case "REMINDERS_OPT_OUT":
-      await trackRemindersOptOutEvent(event, ctx);
-      break;
-    case "REPLY_CREATED":
-      await trackFirstReplyCreatedEvent(event, ctx);
-      break;
-    case "COMMENT_PUBLISHED":
-      await trackCommentPublishedEvent(event, ctx);
-      break;
-    case "EMAIL_OPENED":
-      await trackEmailOpenedEvent(event, ctx);
-      break;
-    case "SIGNATURE_STARTED":
-      await trackSignatureStartedEvent(event, ctx);
-      break;
-    case "SIGNATURE_COMPLETED":
-      await trackSignatureCompletedEvent(event, ctx);
-      break;
-    case "SIGNATURE_REMINDER":
-      await trackSignatureReminderEvent(event, ctx);
-      break;
-    case "SIGNATURE_CANCELLED":
-      await trackSignatureCancelledEvent(event, ctx);
-      break;
-    case "ORGANIZATION_LIMIT_REACHED":
-      await trackOrganizationLimitReachedEvent(event, ctx);
-      break;
-    default:
-      throw new Error(`Tracking to analytics not implemented for event ${JSON.stringify(event)}`);
-      break;
-  }
-};
+export const analyticsEventListener = listener(
+  [
+    "PETITION_CREATED",
+    "PETITION_CLONED",
+    "PETITION_CLOSED",
+    "PETITION_COMPLETED",
+    "PETITION_DELETED",
+    "REMINDER_SENT",
+    "TEMPLATE_USED",
+    "ACCESS_OPENED",
+    "USER_LOGGED_IN",
+    "USER_CREATED",
+    "ACCESS_ACTIVATED",
+    "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+    "EMAIL_VERIFIED",
+    "INVITE_SENT",
+    "REMINDERS_OPT_OUT",
+    "REPLY_CREATED",
+    "COMMENT_PUBLISHED",
+    "EMAIL_OPENED",
+    "SIGNATURE_CANCELLED",
+    "SIGNATURE_STARTED",
+    "SIGNATURE_COMPLETED",
+    "SIGNATURE_REMINDER",
+    "ORGANIZATION_LIMIT_REACHED",
+  ],
+  async (event, ctx) => {
+    switch (event.type) {
+      case "PETITION_CREATED":
+        await trackPetitionCreatedEvent(event, ctx);
+        break;
+      case "PETITION_CLONED":
+        await trackPetitionClonedEvent(event, ctx);
+        break;
+      case "PETITION_CLOSED":
+        await trackPetitionClosedEvent(event, ctx);
+        break;
+      case "PETITION_COMPLETED":
+        await trackPetitionCompletedEvent(event, ctx);
+        break;
+      case "PETITION_DELETED":
+        await trackPetitionDeletedEvent(event, ctx);
+        break;
+      case "USER_LOGGED_IN":
+        await trackUserLoggedInEvent(event, ctx);
+        break;
+      case "REMINDER_SENT":
+        await trackReminderSentEvent(event, ctx);
+        break;
+      case "TEMPLATE_USED":
+        await trackTemplateUsedEvent(event, ctx);
+        break;
+      case "USER_CREATED":
+        await trackUserCreatedEvent(event, ctx);
+        break;
+      case "ACCESS_OPENED":
+        await trackAccessOpenedEvent(event, ctx);
+        break;
+      case "ACCESS_ACTIVATED":
+        await trackAccessActivatedEvent(event, ctx);
+        break;
+      case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
+        await trackAccessActivatedFromPublicLinkEvent(event, ctx);
+        break;
+      case "EMAIL_VERIFIED":
+        await trackEmailVerifiedEvent(event, ctx);
+        break;
+      case "INVITE_SENT":
+        await trackInviteSentEvent(event, ctx);
+        break;
+      case "REMINDERS_OPT_OUT":
+        await trackRemindersOptOutEvent(event, ctx);
+        break;
+      case "REPLY_CREATED":
+        await trackFirstReplyCreatedEvent(event, ctx);
+        break;
+      case "COMMENT_PUBLISHED":
+        await trackCommentPublishedEvent(event, ctx);
+        break;
+      case "EMAIL_OPENED":
+        await trackEmailOpenedEvent(event, ctx);
+        break;
+      case "SIGNATURE_STARTED":
+        await trackSignatureStartedEvent(event, ctx);
+        break;
+      case "SIGNATURE_COMPLETED":
+        await trackSignatureCompletedEvent(event, ctx);
+        break;
+      case "SIGNATURE_REMINDER":
+        await trackSignatureReminderEvent(event, ctx);
+        break;
+      case "SIGNATURE_CANCELLED":
+        await trackSignatureCancelledEvent(event, ctx);
+        break;
+      case "ORGANIZATION_LIMIT_REACHED":
+        await trackOrganizationLimitReachedEvent(event, ctx);
+        break;
+      default:
+        throw new Error(`Tracking to analytics not implemented for event ${JSON.stringify(event)}`);
+    }
+  },
+);

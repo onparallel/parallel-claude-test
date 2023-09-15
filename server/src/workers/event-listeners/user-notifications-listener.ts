@@ -13,7 +13,7 @@ import {
   UserPermissionAddedEvent,
 } from "../../db/events/PetitionEvent";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
-import { EventListener } from "../event-processor";
+import { listener } from "../helpers/EventProcessor";
 
 async function createPetitionCompletedUserNotifications(
   event: PetitionCompletedEvent,
@@ -292,37 +292,51 @@ async function createAccessActivatedFromPublicPetitionLinkUserNotifications(
   );
 }
 
-export const userNotificationsListener: EventListener = async (event, ctx) => {
-  switch (event.type) {
-    case "PETITION_COMPLETED":
-      await createPetitionCompletedUserNotifications(event, ctx);
-      break;
-    case "COMMENT_PUBLISHED":
-      await createCommentPublishedUserNotifications(event, ctx);
-      break;
-    case "PETITION_MESSAGE_BOUNCED":
-      await createPetitionMessageBouncedUserNotifications(event, ctx);
-      break;
-    case "PETITION_REMINDER_BOUNCED":
-      await createPetitionReminderBouncedUserNotifications(event, ctx);
-      break;
-    case "SIGNATURE_COMPLETED":
-      await createSignatureCompletedUserNotifications(event, ctx);
-      break;
-    case "SIGNATURE_CANCELLED":
-      await createSignatureCancelledUserNotifications(event, ctx);
-      break;
-    case "USER_PERMISSION_ADDED":
-    case "GROUP_PERMISSION_ADDED":
-      await createPetitionSharedUserNotifications(event, ctx);
-      break;
-    case "REMINDERS_OPT_OUT":
-      await createRemindersOptOutNotifications(event, ctx);
-      break;
-    case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
-      await createAccessActivatedFromPublicPetitionLinkUserNotifications(event, ctx);
-      break;
-    default:
-      break;
-  }
-};
+export const userNotificationsListener = listener(
+  [
+    "PETITION_COMPLETED",
+    "COMMENT_PUBLISHED",
+    "PETITION_MESSAGE_BOUNCED",
+    "PETITION_REMINDER_BOUNCED",
+    "SIGNATURE_COMPLETED",
+    "SIGNATURE_CANCELLED",
+    "USER_PERMISSION_ADDED",
+    "GROUP_PERMISSION_ADDED",
+    "REMINDERS_OPT_OUT",
+    "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+  ],
+  async (event, ctx) => {
+    switch (event.type) {
+      case "PETITION_COMPLETED":
+        await createPetitionCompletedUserNotifications(event, ctx);
+        break;
+      case "COMMENT_PUBLISHED":
+        await createCommentPublishedUserNotifications(event, ctx);
+        break;
+      case "PETITION_MESSAGE_BOUNCED":
+        await createPetitionMessageBouncedUserNotifications(event, ctx);
+        break;
+      case "PETITION_REMINDER_BOUNCED":
+        await createPetitionReminderBouncedUserNotifications(event, ctx);
+        break;
+      case "SIGNATURE_COMPLETED":
+        await createSignatureCompletedUserNotifications(event, ctx);
+        break;
+      case "SIGNATURE_CANCELLED":
+        await createSignatureCancelledUserNotifications(event, ctx);
+        break;
+      case "USER_PERMISSION_ADDED":
+      case "GROUP_PERMISSION_ADDED":
+        await createPetitionSharedUserNotifications(event, ctx);
+        break;
+      case "REMINDERS_OPT_OUT":
+        await createRemindersOptOutNotifications(event, ctx);
+        break;
+      case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
+        await createAccessActivatedFromPublicPetitionLinkUserNotifications(event, ctx);
+        break;
+      default:
+        break;
+    }
+  },
+);

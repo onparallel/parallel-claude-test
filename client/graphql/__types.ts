@@ -2449,6 +2449,8 @@ export interface Petition extends PetitionBase {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -2626,6 +2628,8 @@ export interface PetitionBase {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -3069,6 +3073,8 @@ export interface PetitionListView {
 
 export type PetitionListViewColumn =
   | "createdAt"
+  | "lastActivityAt"
+  | "lastRecipientActivityAt"
   | "name"
   | "recipients"
   | "reminders"
@@ -3140,7 +3146,12 @@ export interface PetitionListViewSort {
 
 export type PetitionListViewSortDirection = "ASC" | "DESC";
 
-export type PetitionListViewSortField = "createdAt" | "name" | "sentAt";
+export type PetitionListViewSortField =
+  | "createdAt"
+  | "lastActivityAt"
+  | "lastRecipientActivityAt"
+  | "name"
+  | "sentAt";
 
 export interface PetitionListViewSortInput {
   direction: PetitionListViewSortDirection;
@@ -3464,6 +3475,8 @@ export interface PetitionTemplate extends PetitionBase {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -4520,6 +4533,10 @@ export type QueryOrganizations_OrderBy =
 export type QueryPetitions_OrderBy =
   | "createdAt_ASC"
   | "createdAt_DESC"
+  | "lastActivityAt_ASC"
+  | "lastActivityAt_DESC"
+  | "lastRecipientActivityAt_ASC"
+  | "lastRecipientActivityAt_DESC"
   | "lastUsedAt_ASC"
   | "lastUsedAt_DESC"
   | "name_ASC"
@@ -29257,6 +29274,8 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   status: PetitionStatus;
   sentAt?: string | null;
   id: string;
+  lastActivityAt?: string | null;
+  lastRecipientActivityAt?: string | null;
   createdAt?: string;
   path: string;
   myEffectivePermission?: {
@@ -29354,6 +29373,8 @@ export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   name?: string | null;
   isPublic: boolean;
   id: string;
+  lastActivityAt?: string | null;
+  lastRecipientActivityAt?: string | null;
   createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
@@ -29544,6 +29565,8 @@ export type Petitions_petitionsQueryVariables = Exact<{
   includeCreatedAt: Scalars["Boolean"]["input"];
   includeReminders: Scalars["Boolean"]["input"];
   includeTags: Scalars["Boolean"]["input"];
+  includeLastActivityAt: Scalars["Boolean"]["input"];
+  includeLastRecipientActivityAt: Scalars["Boolean"]["input"];
 }>;
 
 export type Petitions_petitionsQuery = {
@@ -29557,6 +29580,8 @@ export type Petitions_petitionsQuery = {
           status: PetitionStatus;
           sentAt?: string | null;
           id: string;
+          lastActivityAt?: string | null;
+          lastRecipientActivityAt?: string | null;
           createdAt?: string;
           path: string;
           myEffectivePermission?: {
@@ -29657,6 +29682,8 @@ export type Petitions_petitionsQuery = {
           name?: string | null;
           isPublic: boolean;
           id: string;
+          lastActivityAt?: string | null;
+          lastRecipientActivityAt?: string | null;
           createdAt?: string;
           locale: PetitionLocale;
           isRestricted: boolean;
@@ -33859,6 +33886,8 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   sentAt?: string | null;
   id: string;
   name?: string | null;
+  lastActivityAt?: string | null;
+  lastRecipientActivityAt?: string | null;
   createdAt?: string;
   status: PetitionStatus;
   accesses?: Array<{
@@ -33942,6 +33971,8 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
+  lastActivityAt?: string | null;
+  lastRecipientActivityAt?: string | null;
   createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
@@ -39259,6 +39290,8 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
     id
     name
+    lastActivityAt @include(if: $includeLastActivityAt)
+    lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
     createdAt @include(if: $includeCreatedAt)
     permissions @include(if: $includeSharedWith) {
       permissionType
@@ -44509,6 +44542,8 @@ export const Petitions_petitionsDocument = gql`
     $includeCreatedAt: Boolean!
     $includeReminders: Boolean!
     $includeTags: Boolean!
+    $includeLastActivityAt: Boolean!
+    $includeLastRecipientActivityAt: Boolean!
   ) {
     petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
       items {

@@ -1039,6 +1039,8 @@ export interface Petition {
   latest_signature_status: Maybe<string>; // varchar
   send_on_behalf_user_id: Maybe<number>; // int4
   recipient_locale: ContactLocale; // contact_locale
+  last_activity_at: Maybe<Date>; // timestamptz
+  last_recipient_activity_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -1084,6 +1086,8 @@ export type CreatePetition = PartialProps<
   | "default_path"
   | "latest_signature_status"
   | "send_on_behalf_user_id"
+  | "last_activity_at"
+  | "last_recipient_activity_at"
 >;
 
 export interface PetitionAccess {

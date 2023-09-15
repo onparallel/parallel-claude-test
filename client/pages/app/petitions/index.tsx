@@ -100,7 +100,13 @@ import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, map, maxBy, omit, pick, pipe } from "remeda";
 
-const SORTING = ["name", "createdAt", "sentAt"] as const;
+const SORTING = [
+  "name",
+  "createdAt",
+  "sentAt",
+  "lastActivityAt",
+  "lastRecipientActivityAt",
+] as const;
 
 const QUERY_STATE = {
   view: string(),
@@ -749,6 +755,8 @@ const _queries = [
       $includeCreatedAt: Boolean!
       $includeReminders: Boolean!
       $includeTags: Boolean!
+      $includeLastActivityAt: Boolean!
+      $includeLastRecipientActivityAt: Boolean!
     ) {
       petitions(
         offset: $offset

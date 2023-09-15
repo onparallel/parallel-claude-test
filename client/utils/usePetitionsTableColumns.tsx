@@ -78,6 +78,8 @@ export function getPetitionsTableIncludes(columns?: PetitionsTableColumn[]) {
     includeSentAt: columns ? columns.includes("sentAt") : true,
     includeReminders: columns ? columns.includes("reminders") : true,
     includeTags: columns ? columns.includes("tagsFilters") : true,
+    includeLastActivityAt: columns ? columns.includes("lastActivityAt") : true,
+    includeLastRecipientActivityAt: columns ? columns.includes("lastRecipientActivityAt") : true,
   };
 }
 
@@ -92,6 +94,8 @@ export function getTemplatesTableIncludes() {
     includeSentAt: false,
     includeReminders: false,
     includeTags: true,
+    includeLastActivityAt: false,
+    includeLastRecipientActivityAt: false,
   };
 }
 
@@ -128,7 +132,11 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     key: "name",
     isSortable: true,
     isFixed: true,
-    label: (intl) => intl.formatMessage({ id: "petitions.header.name", defaultMessage: "Name" }),
+    label: (intl) =>
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-name",
+        defaultMessage: "Name",
+      }),
     cellProps: {
       maxWidth: 0,
       minWidth: "240px",
@@ -155,7 +163,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
   {
     key: "recipients",
     label: (intl) =>
-      intl.formatMessage({ id: "petitions.header.recipient", defaultMessage: "Recipient" }),
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-recipient",
+        defaultMessage: "Recipient",
+      }),
     cellProps: {
       minWidth: "200px",
       whiteSpace: "nowrap",
@@ -201,7 +212,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
   {
     key: "template",
     label: (intl) =>
-      intl.formatMessage({ id: "petitions.header.template", defaultMessage: "Template" }),
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-template",
+        defaultMessage: "Template",
+      }),
     cellProps: {
       maxWidth: 0,
       minWidth: "200px",
@@ -250,7 +264,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
   {
     key: "status",
     label: (intl) =>
-      intl.formatMessage({ id: "petitions.header.status", defaultMessage: "Status" }),
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-status",
+        defaultMessage: "Status",
+      }),
     isFilterable: true,
     Filter: PetitionListStatusFilter,
     align: "center",
@@ -272,7 +289,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     header: (
       <Tooltip
         label={
-          <FormattedMessage id="petitions.header.signature" defaultMessage="eSignature status" />
+          <FormattedMessage
+            id="component.petitions-table-columns.header-signature"
+            defaultMessage="eSignature status"
+          />
         }
       >
         <SignatureIcon />
@@ -280,7 +300,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     ),
     label: (intl) =>
       intl.formatMessage({
-        id: "petitions.header.signature",
+        id: "component.petitions-table-columns.header-signature",
         defaultMessage: "eSignature status",
       }),
     isFilterable: true,
@@ -300,7 +320,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
   {
     key: "sharedWith",
     label: (intl) =>
-      intl.formatMessage({ id: "petitions.header.shared", defaultMessage: "Shared" }),
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-shared",
+        defaultMessage: "Shared",
+      }),
     isFilterable: true,
     Filter: PetitionListSharedWithFilter,
     align: "left",
@@ -350,7 +373,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
   {
     key: "reminders",
     label: (intl) =>
-      intl.formatMessage({ id: "petitions.header.reminders", defaultMessage: "Reminders" }),
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-reminders",
+        defaultMessage: "Reminders",
+      }),
     CellContent: ({ row }) => {
       if (row.__typename === "Petition" && isDefined(row.accesses)) {
         const lastReminderDate = maxBy(
@@ -379,7 +405,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             ) : (
               <Text as="span" textStyle="hint">
                 <FormattedMessage
-                  id="petitions.header.reminders-disabled"
+                  id="component.petitions-table-columns.header-reminders-disabled"
                   defaultMessage="No reminders"
                 />
               </Text>
@@ -391,7 +417,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
                     content={
                       <Text color="gray.800" fontSize="sm">
                         <FormattedMessage
-                          id="petitions.header.reminders-next-reminder-at.popover"
+                          id="component.petitions-table-columns.header-reminders-next-reminder-at-popover"
                           defaultMessage="Next reminder configured for {date}"
                           values={{
                             date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
@@ -405,7 +431,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
                       marginLeft={1}
                       variant="ghost"
                       aria-label={intl.formatMessage({
-                        id: "petitions.header.reminders-next-reminder-at",
+                        id: "component.petitions-table-columns.header-reminders-next-reminder-at",
                         defaultMessage: "Next reminder configured",
                       })}
                       size="xs"
@@ -424,7 +450,11 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
   },
   {
     key: "tagsFilters",
-    label: (intl) => intl.formatMessage({ id: "petitions.header.tags", defaultMessage: "Tags" }),
+    label: (intl) =>
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-tags",
+        defaultMessage: "Tags",
+      }),
     cellProps: {
       minWidth: "300px",
       padding: 0,
@@ -437,6 +467,64 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
         <PetitionTagListCellContent petition={row} />
       ) : null,
   },
+  // {
+  //   key: "lastActivityAt",
+  //   isSortable: true,
+  //   label: (intl) =>
+  //     intl.formatMessage({
+  //       id: "component.petitions-table-columns.header-last-activity",
+  //       defaultMessage: "Last activity",
+  //     }),
+  //   cellProps: { minWidth: "160px" },
+  //   CellContent: ({ row }) => {
+  //     return row.__typename === "Petition" ? (
+  //       isDefined(row.lastActivityAt) ? (
+  //         <DateTime
+  //           value={row.lastActivityAt}
+  //           format={FORMATS.LLL}
+  //           useRelativeTime="always"
+  //           whiteSpace="nowrap"
+  //         />
+  //       ) : (
+  //         <Text textStyle="hint">
+  //           <FormattedMessage
+  //             id="component.petitions-table-columns.no-activity"
+  //             defaultMessage="No activity yet"
+  //           />
+  //         </Text>
+  //       )
+  //     ) : null;
+  //   },
+  // },
+  // {
+  //   key: "lastRecipientActivityAt",
+  //   isSortable: true,
+  //   label: (intl) =>
+  //     intl.formatMessage({
+  //       id: "component.petitions-table-columns.header-recipients-activity",
+  //       defaultMessage: "Recipient's activity",
+  //     }),
+  //   cellProps: { minWidth: "160px" },
+  //   CellContent: ({ row }) => {
+  //     return row.__typename === "Petition" ? (
+  //       isDefined(row.lastRecipientActivityAt) ? (
+  //         <DateTime
+  //           value={row.lastRecipientActivityAt}
+  //           format={FORMATS.LLL}
+  //           useRelativeTime="always"
+  //           whiteSpace="nowrap"
+  //         />
+  //       ) : (
+  //         <Text textStyle="hint">
+  //           <FormattedMessage
+  //             id="component.petitions-table-columns.no-activity"
+  //             defaultMessage="No activity yet"
+  //           />
+  //         </Text>
+  //       )
+  //     ) : null;
+  //   },
+  // },
 ];
 
 export const TEMPLATES_COLUMNS = (
@@ -445,7 +533,11 @@ export const TEMPLATES_COLUMNS = (
   {
     key: "name",
     isSortable: true,
-    label: (intl) => intl.formatMessage({ id: "petitions.header.name", defaultMessage: "Name" }),
+    label: (intl) =>
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-name",
+        defaultMessage: "Name",
+      }),
     cellProps: {
       maxWidth: 0,
       width: "30%",
@@ -473,7 +565,10 @@ export const TEMPLATES_COLUMNS = (
   {
     key: "settings",
     label: (intl) =>
-      intl.formatMessage({ id: "petitions.header.settings", defaultMessage: "Settings" }),
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-settings",
+        defaultMessage: "Settings",
+      }),
     align: "left",
     cellProps: {
       minWidth: "205px",
@@ -488,7 +583,10 @@ export const TEMPLATES_COLUMNS = (
   {
     key: "sharedWith",
     label: (intl) =>
-      intl.formatMessage({ id: "petitions.header.shared", defaultMessage: "Shared" }),
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-shared",
+        defaultMessage: "Shared",
+      }),
     isFilterable: true,
     Filter: PetitionListSharedWithFilter,
     align: "left",
@@ -520,7 +618,11 @@ export const TEMPLATES_COLUMNS = (
   },
   {
     key: "tagsFilters",
-    label: (intl) => intl.formatMessage({ id: "petitions.header.tags", defaultMessage: "Tags" }),
+    label: (intl) =>
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-tags",
+        defaultMessage: "Tags",
+      }),
     cellProps: {
       width: "30%",
       minWidth: "300px",
@@ -563,6 +665,8 @@ usePetitionsTableColumns.fragments = {
     fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
       id
       name
+      lastActivityAt @include(if: $includeLastActivityAt)
+      lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
       createdAt @include(if: $includeCreatedAt)
       permissions @include(if: $includeSharedWith) {
         permissionType

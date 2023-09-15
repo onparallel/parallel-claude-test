@@ -426,6 +426,8 @@ export interface NexusGenEnums {
   PetitionFieldType: db.PetitionFieldType;
   PetitionListViewColumn:
     | "createdAt"
+    | "lastActivityAt"
+    | "lastRecipientActivityAt"
     | "name"
     | "recipients"
     | "reminders"
@@ -437,7 +439,12 @@ export interface NexusGenEnums {
     | "template";
   PetitionListViewSearchIn: "CURRENT_FOLDER" | "EVERYWHERE";
   PetitionListViewSortDirection: "ASC" | "DESC";
-  PetitionListViewSortField: "createdAt" | "name" | "sentAt";
+  PetitionListViewSortField:
+    | "createdAt"
+    | "lastActivityAt"
+    | "lastRecipientActivityAt"
+    | "name"
+    | "sentAt";
   PetitionLocale: db.ContactLocale;
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionPermissionType: db.PetitionPermissionType;
@@ -482,6 +489,10 @@ export interface NexusGenEnums {
   QueryPetitions_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
+    | "lastActivityAt_ASC"
+    | "lastActivityAt_DESC"
+    | "lastRecipientActivityAt_ASC"
+    | "lastRecipientActivityAt_DESC"
     | "lastUsedAt_ASC"
     | "lastUsedAt_DESC"
     | "name_ASC"
@@ -1805,6 +1816,8 @@ export interface NexusGenFieldTypes {
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
+    lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
@@ -2277,6 +2290,8 @@ export interface NexusGenFieldTypes {
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
+    lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
@@ -3205,6 +3220,8 @@ export interface NexusGenFieldTypes {
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
+    lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
@@ -3957,6 +3974,8 @@ export interface NexusGenFieldTypeNames {
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
+    lastActivityAt: "DateTime";
+    lastRecipientActivityAt: "DateTime";
     locale: "PetitionLocale";
     metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";
@@ -4429,6 +4448,8 @@ export interface NexusGenFieldTypeNames {
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
+    lastActivityAt: "DateTime";
+    lastRecipientActivityAt: "DateTime";
     locale: "PetitionLocale";
     metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";
@@ -5357,6 +5378,8 @@ export interface NexusGenFieldTypeNames {
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
+    lastActivityAt: "DateTime";
+    lastRecipientActivityAt: "DateTime";
     locale: "PetitionLocale";
     metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";

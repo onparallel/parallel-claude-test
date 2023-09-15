@@ -60,7 +60,7 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when a recipient completes the petition", async () => {
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -95,7 +95,7 @@ describe("Worker - User Notifications Listener", () => {
 
   it("users should receive a notification when a recipient comments a field", async () => {
     const [comment] = await mocks.createRandomCommentsFromAccess(access.id, field.id, petition.id);
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -133,7 +133,7 @@ describe("Worker - User Notifications Listener", () => {
 
   it("users should receive a notification when another user comments a field", async () => {
     const [comment] = await mocks.createRandomCommentsFromUser(users[1].id, field.id, petition.id);
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -172,7 +172,7 @@ describe("Worker - User Notifications Listener", () => {
   it("users should receive a notification when another user mentions them on a comment", async () => {
     const [comment] = await mocks.createRandomCommentsFromUser(users[1].id, field.id, petition.id);
     await mocks.mentionUserInComment(users[0].id, comment.id);
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -215,7 +215,7 @@ describe("Worker - User Notifications Listener", () => {
     await mocks.insertUserGroupMembers(group.id, [users[0].id]);
     await mocks.mentionUserGroupInComment(group.id, comment.id);
 
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -253,7 +253,7 @@ describe("Worker - User Notifications Listener", () => {
 
   it("users should receive a notification when a petition is shared to them", async () => {
     const [newUser] = await mocks.createRandomUsers(organization.id, 1);
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -298,7 +298,7 @@ describe("Worker - User Notifications Listener", () => {
       members.map((m) => m.id),
     );
 
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -336,7 +336,7 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when a signature is completed", async () => {
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -371,7 +371,7 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when a signature is cancelled", async () => {
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -422,7 +422,7 @@ describe("Worker - User Notifications Listener", () => {
       users[0].id,
       () => ({ email_log_id: emailLog.id }),
     );
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),
@@ -461,7 +461,7 @@ describe("Worker - User Notifications Listener", () => {
       is_subscribed: false,
     }));
 
-    await userNotificationsListener(
+    await userNotificationsListener.handle(
       {
         id: 1,
         created_at: new Date(),

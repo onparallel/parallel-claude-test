@@ -114,7 +114,7 @@ describe("Worker - Event Subscriptions Listener", () => {
       1,
       ["PETITION_CREATED"],
     );
-    await eventSubscriptionsListener(
+    await eventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,
@@ -186,7 +186,7 @@ describe("Worker - Event Subscriptions Listener", () => {
     const [event] = await mocks.createRandomPetitionEvents(users[0].id, petition.id, 1, [
       "PETITION_COMPLETED",
     ]);
-    await eventSubscriptionsListener(
+    await eventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,
@@ -239,7 +239,7 @@ describe("Worker - Event Subscriptions Listener", () => {
       "PETITION_CREATED",
     ]);
 
-    await eventSubscriptionsListener(
+    await eventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,
@@ -324,7 +324,7 @@ describe("Worker - Event Subscriptions Listener", () => {
     const [event] = await mocks.createRandomPetitionEvents(users[0].id, petition.id, 1, [
       "PETITION_CREATED",
     ]);
-    await eventSubscriptionsListener(
+    await eventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,

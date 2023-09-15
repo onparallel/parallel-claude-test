@@ -9,7 +9,6 @@ import {
   indexBy,
   isDefined,
   mapValues,
-  maxBy,
   omit,
   partition,
   pipe,
@@ -438,7 +437,14 @@ export class PetitionRepository extends BaseRepository {
       search?: string | null;
       searchByNameOnly?: boolean;
       excludeAnonymized?: boolean;
-      sortBy?: SortBy<"name" | "lastUsedAt" | "sentAt" | "createdAt">[];
+      sortBy?: SortBy<
+        | "name"
+        | "lastUsedAt"
+        | "sentAt"
+        | "createdAt"
+        | "lastActivityAt"
+        | "lastRecipientActivityAt"
+      >[];
       filters?: PetitionFilter | null;
     } & PageOpts,
   ): Pagination<
@@ -731,6 +737,10 @@ export class PetitionRepository extends BaseRepository {
               q.orderByRaw(`is_folder ${order}, created_at ${order}`);
             } else if (column === "name") {
               q.orderBy(`_name`, order);
+            } else if (column === "lastActivityAt") {
+              q.orderBy("last_activity_at", order);
+            } else if (column === "lastRecipientActivityAt") {
+              q.orderBy("last_recipient_activity_at", order);
             }
           }
           // default ordering to avoid ambiguity
@@ -1517,6 +1527,23 @@ export class PetitionRepository extends BaseRepository {
           ...data,
           updated_at: this.now(),
           updated_by: updatedBy,
+        },
+        "*",
+      );
+  }
+
+  async updatePetitionLastActivityDates(
+    petitionId: number,
+    data: Pick<Partial<TableTypes["petition"]>, "last_activity_at" | "last_recipient_activity_at">,
+  ) {
+    await this.from("petition")
+      .where("id", petitionId)
+      .where("status", "<>", "CLOSED")
+      .whereNull("deleted_at")
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
         },
         "*",
       );
@@ -2336,6 +2363,8 @@ export class PetitionRepository extends BaseRepository {
             "from_template_id",
             "anonymized_at",
             "credits_used",
+            "last_activity_at",
+            "last_recipient_activity_at",
             // avoid copying deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition.is_template
               ? (["deadline"] as const)
@@ -2855,21 +2884,6 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async getLastEventsByType<T extends PetitionEventType>(
-    petitionId: number,
-    eventTypes: T[],
-  ): Promise<
-    // Distribute union type
-    (T extends any ? { type: T; last_used_at: Date } : never)[]
-  > {
-    const events = await this.from("petition_event")
-      .where("petition_id", petitionId)
-      .whereIn("type", eventTypes)
-      .groupBy("type")
-      .select("type", this.knex.raw("MAX(created_at) as last_used_at"));
-    return events as any[];
-  }
-
   async getPetitionEventsByType<T extends PetitionEventType>(
     petitionIds: MaybeArray<number>,
     eventType: T[],
@@ -2925,12 +2939,12 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async shouldNotifyPetitionClosed(petitionId: number) {
-    const events = await this.getLastEventsByType(petitionId, [
-      "PETITION_CLOSED_NOTIFIED",
-      "REPLY_CREATED",
-    ]);
-
-    const lastEvent = maxBy(events, (e) => e.last_used_at.valueOf());
+    const [lastEvent] = await this.from("petition_event")
+      .where("petition_id", petitionId)
+      .whereIn("type", ["PETITION_CLOSED_NOTIFIED", "REPLY_CREATED"])
+      .orderBy("created_at", "desc")
+      .limit(1)
+      .groupBy("type");
     if (lastEvent?.type === "PETITION_CLOSED_NOTIFIED") {
       return false;
     }

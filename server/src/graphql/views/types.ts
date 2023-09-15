@@ -77,7 +77,7 @@ export const PetitionListViewData = objectType({
           t.nonNull.field("field", {
             type: enumType({
               name: "PetitionListViewSortField",
-              members: ["sentAt", "name", "createdAt"],
+              members: ["sentAt", "name", "createdAt", "lastActivityAt", "lastRecipientActivityAt"],
             }),
           });
           t.nonNull.field("direction", {
@@ -103,6 +103,8 @@ export const PetitionListViewData = objectType({
           "createdAt",
           "reminders",
           "tagsFilters",
+          "lastActivityAt",
+          "lastRecipientActivityAt",
         ],
       }),
     });

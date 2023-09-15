@@ -1,17 +1,38 @@
 import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
-import { PetitionEventTypeValues } from "../../db/__types";
-import { EventListener, EventProcessorPayload, EventType } from "../event-processor";
+import { PetitionEventType, PetitionEventTypeValues, SystemEventType } from "../../db/__types";
+import { PetitionEvent } from "../../db/events/PetitionEvent";
+import { SystemEvent } from "../../db/events/SystemEvent";
+import { EventProcessorPayload, EventType } from "../event-processor";
+import { Prettify } from "../../util/types";
+
+type EventListener<T extends PetitionEventType | SystemEventType> = (
+  payload: Prettify<
+    T extends PetitionEventType ? PetitionEvent & { type: T } : SystemEvent & { type: T }
+  >,
+  ctx: WorkerContext,
+) => Promise<void>;
+
+interface Listener {
+  types: (PetitionEventType | SystemEventType)[] | "*";
+  handle: EventListener<PetitionEventType | SystemEventType>;
+}
+
+export function listener<
+  T extends PetitionEventType | SystemEventType = PetitionEventType | SystemEventType,
+>(types: T[] | "*", handle: EventListener<T>) {
+  return { types, handle } as Listener;
+}
 
 export class EventProcessor {
-  private listeners = new Map<EventType, EventListener[]>();
+  private listeners = new Map<EventType, EventListener<any>[]>();
 
-  register(types: EventType[] | "*", listener: EventListener<any>) {
+  register({ types, handle }: Listener) {
     for (const type of types === "*" ? PetitionEventTypeValues : types) {
       if (this.listeners.has(type)) {
-        this.listeners.get(type)!.push(listener);
+        this.listeners.get(type)!.push(handle);
       } else {
-        this.listeners.set(type, [listener]);
+        this.listeners.set(type, [handle]);
       }
     }
     return this;

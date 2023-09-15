@@ -1,13 +1,14 @@
 import stringify from "fast-safe-stringify";
 import pMap from "p-map";
 import { isDefined } from "remeda";
-import { PetitionEvent } from "../../db/events/PetitionEvent";
+import { petitionEventTypes } from "../../api/public/schemas";
 import { mapEvent } from "../../util/eventMapper";
 import { pFilter } from "../../util/promises/pFilter";
 import { buildSubscriptionSignatureHeaders } from "../../util/subscriptionSignatureHeaders";
-import { EventListener } from "../event-processor";
+import { listener } from "../helpers/EventProcessor";
+import { DatabaseError } from "pg";
 
-export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (event, ctx) => {
+export const eventSubscriptionsListener = listener(petitionEventTypes, async (event, ctx) => {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) {
     return;
@@ -18,8 +19,11 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
   );
   try {
     await ctx.petitions.attachPetitionEventsToUsers(event.id, userIds);
-  } catch (error: any) {
-    if (error.constraint === "user_petition_event_log__user_id__petition_event_id") {
+  } catch (error) {
+    if (
+      error instanceof DatabaseError &&
+      error.constraint === "user_petition_event_log__user_id__petition_event_id"
+    ) {
       // this event is already attached, continue normally
     } else {
       throw error;
@@ -118,4 +122,4 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
     },
     { concurrency: 10 },
   );
-};
+});
