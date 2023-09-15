@@ -43,6 +43,7 @@ export interface Recipient {
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
 
 export interface ISignatureClient {
+  getSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
   configure(integrationId: number): void;
   startSignatureRequest: (
     petitionId: number,

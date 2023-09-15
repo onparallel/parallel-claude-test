@@ -104,6 +104,10 @@ export class SignaturitClient implements ISignatureClient {
     });
   }
 
+  async getSignatureRequest(externalId: string) {
+    return await this.withSignaturitSDK(async (sdk) => await sdk.getSignature(externalId));
+  }
+
   async startSignatureRequest(
     petitionId: number,
     orgId: number,

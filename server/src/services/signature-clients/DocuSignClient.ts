@@ -89,6 +89,10 @@ export class DocuSignClient implements ISignatureClient {
     );
   }
 
+  async getSignatureRequest(externalId: string): Promise<SignatureResponse> {
+    throw new Error("Not implemented");
+  }
+
   async startSignatureRequest(
     petitionId: number,
     orgId: number,
