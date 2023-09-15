@@ -9,8 +9,8 @@ import { run } from "../utils/run";
 
 const API_KEY = process.env.API_KEY;
 
-const TEMPLATE_ID = "zas25KHxAByKWu6SFLA";
-const TEMPLATE_FIELD_ID = "FDXxUofV6Q2DPnQMZxXw7FYfeJy5F";
+const TEMPLATE_ID = "zas25KHxAByKXBamSGb";
+const TEMPLATE_FIELD_ID = "FDXxUofV6Q2DPnQMZxXwAEMNhTJMA";
 
 async function request(
   path: string,
