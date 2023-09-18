@@ -28,59 +28,63 @@ export const mapReplyContents = ({
       const replies = targetField.multiple ? originField.replies : [originField.replies[0]];
 
       if (replies.length) {
-        const mappedReplies = replies.filter(isDefined).flatMap((reply) => {
-          if (isFileTypeField(originField.type)) {
+        const mappedReplies = replies
+          .filter((r) => isDefined(r) && !isDefined(r.content.error))
+          .flatMap((reply) => {
+            if (isFileTypeField(originField.type)) {
+              return {
+                id: targetField.id,
+                content: { petitionFieldReplyId: reply.id },
+              };
+            }
+
+            if (
+              ["TEXT", "SHORT_TEXT", "SELECT"].includes(targetField.type) &&
+              ["CHECKBOX"].includes(originField.type)
+            ) {
+              const values = targetField.multiple
+                ? reply.content?.value
+                : [reply.content?.value[0]];
+              return values.map((value: string) => ({
+                id: targetField.id,
+                content: { value },
+              }));
+            }
+
+            if (targetField.type === "DATE_TIME") {
+              return {
+                id: targetField.id,
+                content: {
+                  datetime: reply.content.datetime,
+                  timezone: reply.content.timezone,
+                },
+              };
+            }
+
+            if (targetField.type === "NUMBER") {
+              return {
+                id: targetField.id,
+                content: { value: reply.content?.value },
+              };
+            }
+
+            if (targetField.type === "CHECKBOX") {
+              return {
+                id: targetField.id,
+                content: {
+                  value:
+                    originField.type === "CHECKBOX"
+                      ? reply.content?.value
+                      : [String(reply.content?.value)],
+                },
+              };
+            }
+
             return {
               id: targetField.id,
-              content: { petitionFieldReplyId: reply.id },
+              content: { value: String(reply.content?.value) },
             };
-          }
-
-          if (
-            ["TEXT", "SHORT_TEXT", "SELECT"].includes(targetField.type) &&
-            ["CHECKBOX"].includes(originField.type)
-          ) {
-            const values = targetField.multiple ? reply.content?.value : [reply.content?.value[0]];
-            return values.map((value: string) => ({
-              id: targetField.id,
-              content: { value },
-            }));
-          }
-
-          if (targetField.type === "DATE_TIME") {
-            return {
-              id: targetField.id,
-              content: {
-                datetime: reply.content.datetime,
-                timezone: reply.content.timezone,
-              },
-            };
-          }
-
-          if (targetField.type === "NUMBER") {
-            return {
-              id: targetField.id,
-              content: { value: reply.content?.value },
-            };
-          }
-
-          if (targetField.type === "CHECKBOX") {
-            return {
-              id: targetField.id,
-              content: {
-                value:
-                  originField.type === "CHECKBOX"
-                    ? reply.content?.value
-                    : [String(reply.content?.value)],
-              },
-            };
-          }
-
-          return {
-            id: targetField.id,
-            content: { value: String(reply.content?.value) },
-          };
-        });
+          });
 
         result = result.concat(mappedReplies);
       }

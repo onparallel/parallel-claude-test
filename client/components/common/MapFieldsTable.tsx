@@ -281,6 +281,13 @@ function TableRow({
   );
 
   const selectedField = sourcePetitionFields.find((f) => f.id === selectedFieldId);
+  if (selectedField) {
+    selectedField.replies =
+      selectedField?.replies.filter(
+        (r) => selectedField.type !== "ES_TAX_DOCUMENTS" || !isDefined(r.content.error),
+      ) ?? [];
+  }
+
   const hasMultipleRepliesConflict = selectedField
     ? checkMultipleRepliesConflict(field, selectedField)
     : false;
