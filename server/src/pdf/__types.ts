@@ -3977,8 +3977,6 @@ export type PublicPetitionMessage = {
 export type PublicPetitionSignatureRequest = {
   id: Scalars["GID"]["output"];
   signerStatus: Array<PetitionSignatureRequestSignerStatus>;
-  /** The status of the petition signature. */
-  status: PetitionSignatureRequestStatus;
 };
 
 export type PublicPetitionSignerDataInput = {

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
-import { range } from "remeda";
+import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
@@ -408,7 +408,7 @@ export class Mocks {
           const type = data.type ?? randomPetitionFieldType();
           return {
             petition_id: petitionId,
-            position: (count as number) + index,
+            position: isDefined(data.deleted_at) ? null : (count as number) + index,
             title: faker.word.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
