@@ -8096,7 +8096,7 @@
   },
   {
     "term": "field-settings.include-approval-description",
-    "definition": "Al activar esta opción se incluirán los botones de aprovar y rechazar respuestas.",
+    "definition": "Al activar esta opción se incluirán los botones de aprobar y rechazar respuestas.",
     "context": "Enabling this option will include the buttons for approving and rejecting replies."
   },
   {
