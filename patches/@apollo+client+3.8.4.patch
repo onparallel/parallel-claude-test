@@ -1,8 +1,8 @@
 diff --git a/node_modules/@apollo/client/apollo-client.cjs b/node_modules/@apollo/client/apollo-client.cjs
-index 6e3c874..7497ee8 100644
+index 8db5ab2..ed77cd3 100644
 --- a/node_modules/@apollo/client/apollo-client.cjs
 +++ b/node_modules/@apollo/client/apollo-client.cjs
-@@ -4742,6 +4742,7 @@ var ObservableQuery = (function (_super) {
+@@ -4747,6 +4747,7 @@ var ObservableQuery = (function (_super) {
          }
          else {
              var diff = this.queryInfo.getDiff();
@@ -11,7 +11,7 @@ index 6e3c874..7497ee8 100644
                  result.data = diff.result;
              }
 diff --git a/node_modules/@apollo/client/core/ObservableQuery.js b/node_modules/@apollo/client/core/ObservableQuery.js
-index 82df343..5b2b3df 100644
+index 82df343..d4143ee 100644
 --- a/node_modules/@apollo/client/core/ObservableQuery.js
 +++ b/node_modules/@apollo/client/core/ObservableQuery.js
 @@ -100,6 +100,7 @@ var ObservableQuery = (function (_super) {
@@ -23,7 +23,7 @@ index 82df343..5b2b3df 100644
                  result.data = diff.result;
              }
 diff --git a/node_modules/@apollo/client/core/core.cjs b/node_modules/@apollo/client/core/core.cjs
-index 810f46c..701e7cb 100644
+index dc396c1..a9839f9 100644
 --- a/node_modules/@apollo/client/core/core.cjs
 +++ b/node_modules/@apollo/client/core/core.cjs
 @@ -286,6 +286,7 @@ var ObservableQuery = (function (_super) {
