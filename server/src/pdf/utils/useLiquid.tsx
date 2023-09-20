@@ -102,7 +102,6 @@ function useCreateLiquid() {
       "include",
       "increment",
       "layout",
-      "liquid",
       "render",
       "tablerow",
     ]) {
