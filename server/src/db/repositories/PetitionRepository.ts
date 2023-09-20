@@ -1655,7 +1655,7 @@ export class PetitionRepository extends BaseRepository {
         "from_petition_field_id",
         "alias",
       ]),
-      field.position! + 1,
+      field.position + 1,
       user,
     );
   }
@@ -1739,23 +1739,20 @@ export class PetitionRepository extends BaseRepository {
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
     return await this.withTransaction(async (t) => {
-      const [field] = await this.raw<PetitionField & { old_position: number }>(
-        /* sql */ `
-        update petition_field f
-          set position = null,
-          deleted_at = NOW(),
-          deleted_by = ?
-        from petition_field f2 
-          where f.id = f2.id 
-          and f.petition_id = ?
-          and f.deleted_at is null
-          and f.is_fixed = false
-          and f.id = ?
-        returning f.*, f2.position as old_position;
-      `,
-        [`User:${user.id}`, petitionId, fieldId],
-        t,
-      );
+      const [field] = await this.from("petition_field", t)
+        .update(
+          {
+            deleted_at: this.now(),
+            deleted_by: `User:${user.id}`,
+          },
+          ["id", "position"],
+        )
+        .where({
+          petition_id: petitionId,
+          id: fieldId,
+          deleted_at: null,
+          is_fixed: false,
+        });
 
       if (!field) {
         throw new Error("Invalid petition field id");
@@ -1794,7 +1791,7 @@ export class PetitionRepository extends BaseRepository {
             petition_id: petitionId,
             deleted_at: null,
           })
-          .where("position", ">", field.old_position),
+          .where("position", ">", field.position),
         // safe-delete attachments on this field (same attachment can be linked to another field)
         this.deletePetitionFieldAttachmentByFieldId(fieldId, user, t),
         // delete user notifications related to this petition field
@@ -2520,7 +2517,7 @@ export class PetitionRepository extends BaseRepository {
       const newFieldIds = Object.fromEntries(
         zip(
           fields.map((f) => f.id),
-          sortBy(clonedFields, (f) => f.position!).map((f) => f.id),
+          sortBy(clonedFields, (f) => f.position).map((f) => f.id),
         ),
       );
 
