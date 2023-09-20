@@ -39,7 +39,7 @@ import {
   replacePlaceholdersInText,
 } from "../../util/slate/placeholders";
 import { SlateNode } from "../../util/slate/render";
-import { random } from "../../util/token";
+import { hashString, random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
 import { validateReplyContent } from "../../util/validateReplyContent";
 import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
@@ -1562,52 +1562,57 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async updateFieldPositions(petitionId: number, fieldIds: number[], user: User) {
-    return await this.withTransaction(async (t) => {
-      const fields = await this.from("petition_field", t)
-        .where("petition_id", petitionId)
-        .whereNull("deleted_at")
-        .select("id", "is_fixed", "position", "visibility")
-        .orderBy("position", "asc");
+    const fields = await this.from("petition_field")
+      .where("petition_id", petitionId)
+      .whereNull("deleted_at")
+      .select("id", "is_fixed", "position", "visibility")
+      .orderBy("position", "asc");
 
-      // check only valid fieldIds and not repeated
-      const _fieldIds = uniq(fieldIds);
-      const ids = new Set(fields.map((f) => f.id));
-      if (
-        _fieldIds.length !== fieldIds.length ||
-        _fieldIds.length !== ids.size ||
-        _fieldIds.some((id) => !ids.has(id))
-      ) {
-        throw new Error("INVALID_PETITION_FIELD_IDS");
+    // check only valid fieldIds and not repeated
+    const _fieldIds = uniq(fieldIds);
+    const ids = new Set(fields.map((f) => f.id));
+    if (
+      _fieldIds.length !== fieldIds.length ||
+      _fieldIds.length !== ids.size ||
+      _fieldIds.some((id) => !ids.has(id))
+    ) {
+      throw new Error("INVALID_PETITION_FIELD_IDS");
+    }
+
+    // check fixed positions have not moved
+    const fixedPositions = fields
+      .map((field, index) => [field, index] as const)
+      .filter(([field]) => field.is_fixed);
+    if (fixedPositions.some(([field, index]) => fieldIds.indexOf(field.id) !== index)) {
+      throw new Error("INVALID_PETITION_FIELD_IDS");
+    }
+
+    // check visibility conditions fields refer to previous fields
+    const positions = Object.fromEntries(
+      Array.from(fieldIds.entries()).map(([index, id]) => [id, index]),
+    );
+    for (const field of fields) {
+      const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
+      if (visibility?.conditions.some((c) => positions[c.fieldId] >= positions[field.id])) {
+        throw new Error("INVALID_FIELD_CONDITIONS_ORDER");
       }
+    }
 
-      // check fixed positions have not moved
-      const fixedPositions = fields
-        .map((field, index) => [field, index] as const)
-        .filter(([field]) => field.is_fixed);
-      if (fixedPositions.some(([field, index]) => fieldIds.indexOf(field.id) !== index)) {
-        throw new Error("INVALID_PETITION_FIELD_IDS");
-      }
-
-      // check visibility conditions fields refer to previous fields
-      const positions = Object.fromEntries(
-        Array.from(fieldIds.entries()).map(([index, id]) => [id, index]),
+    await this.withTransaction(async (t) => {
+      await this.raw(
+        /* sql */ `select pg_advisory_xact_lock(?)`,
+        [hashString(`updateFieldPositions(${petitionId})`)],
+        t,
       );
-      for (const field of fields) {
-        const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
-        if (visibility?.conditions.some((c) => positions[c.fieldId] >= positions[field.id])) {
-          throw new Error("INVALID_FIELD_CONDITIONS_ORDER");
-        }
-      }
-
       await this.raw(
         /* sql */ `
-      update petition_field as pf set
-        position = t.position,
-        updated_at = NOW(),
-        updated_by = ?
-      from (?) as t (id, position)
-      where t.id = pf.id and pf.position != t.position;
-    `,
+        update petition_field as pf set
+          position = t.position,
+          updated_at = NOW(),
+          updated_by = ?
+        from (?) as t (id, position)
+        where t.id = pf.id and pf.position != t.position;
+      `,
         [
           `User:${user.id}`,
           this.sqlValues(
@@ -1617,18 +1622,18 @@ export class PetitionRepository extends BaseRepository {
         ],
         t,
       );
-
-      const [petition] = await this.from("petition", t)
-        .where("id", petitionId)
-        .update(
-          {
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`,
-          },
-          "*",
-        );
-      return petition;
     });
+
+    const [petition] = await this.from("petition")
+      .where("id", petitionId)
+      .update(
+        {
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        },
+        "*",
+      );
+    return petition;
   }
 
   async clonePetitionField(petitionId: number, fieldId: number, user: User) {
