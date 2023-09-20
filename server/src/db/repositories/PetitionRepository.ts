@@ -2208,50 +2208,65 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getPetitionFieldsWithReplies(petitionIds: number[]) {
-    const [fields, fieldReplies] = await Promise.all([
-      this.from("petition_field")
-        .whereIn("petition_id", petitionIds)
-        .whereNull("deleted_at")
-        .whereNot("type", "HEADING"),
-      this.raw<PetitionFieldReply & { upload_complete: boolean | null }>(
+    const fields = await this.withTransaction(async (t) => {
+      // if not disabled it will seq scan petition_field_reply rather than using the index on petition_field_id
+      await t.raw(/* sql */ `set local enable_seqscan = off;`);
+      return await this.raw<
+        Pick<
+          PetitionField,
+          | "petition_id"
+          | "id"
+          | "title"
+          | "from_petition_field_id"
+          | "is_internal"
+          | "position"
+          | "type"
+          | "options"
+          | "visibility"
+          | "optional"
+        > & {
+          replies: Pick<PetitionFieldReply, "status" | "content" | "anonymized_at">[];
+        }
+      >(
         /* sql */ `
-          select pfr.*, fu.upload_complete
-          from petition_field_reply as pfr
-          join petition_field as pf on pf.id = pfr.petition_field_id 
-          left join file_upload fu
-            on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC')
-            and (pfr.content->>'file_upload_id')::int = fu.id
-          where pfr.deleted_at is null and pf.petition_id in ? and pf.deleted_at is null
-        `,
+        select
+          pf.petition_id, pf.id, pf.title, pf.from_petition_field_id, pf.is_internal, pf.position, pf.type, pf.options, pf.visibility, pf.optional,
+          coalesce( -- jsonb_agg filter (where ...) will return null if no rows match
+            case when count(*) filter (where pfr.id is not null) > 0 then
+              jsonb_agg(
+                jsonb_build_object('content', pfr.content, 'status', pfr.status, 'anonymized_at', pfr.anonymized_at) order by pfr.created_at asc
+              ) filter (
+                -- when file field types, filter replies with upload_complete
+                where
+                case when pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC') then fu.id is not null and fu.upload_complete
+                else true
+                end
+              )
+            end,
+            '[]'::jsonb
+          ) as replies
+        from petition_field pf
+        left join petition_field_reply as pfr on pfr.petition_field_id = pf.id and pfr.deleted_at is null
+        left join file_upload fu
+          on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC') and (pfr.content->>'file_upload_id')::int = fu.id
+        where
+          pf.petition_id in ?
+          and pf.type != 'HEADING'
+          and pf.deleted_at is null
+
+        group by pf.id; 
+      `,
         [this.sqlIn(petitionIds)],
-      ),
-    ]);
-
-    const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
-
-    return petitionIds.map((id) => {
-      return (fieldsByPetition[id] ?? [])
-        .map((field) => ({
-          ...field,
-          replies: fieldReplies
-            .filter((r) => r.petition_field_id === field.id && r.content !== null)
-            .filter((r) => (isFileTypeField(field.type) ? r.upload_complete : true))
-            .map((reply) => {
-              return {
-                content: isFileTypeField(field.type)
-                  ? {
-                      ...reply.content,
-                      uploadComplete: true,
-                    }
-                  : reply.content,
-                status: reply.status,
-                anonymized_at: reply.anonymized_at,
-              };
-            })
-            .filter((r) => r.content !== null),
-        }))
-        .sort((a, b) => a.position! - b.position!);
+        t,
+      );
     });
+
+    const fieldsByPetition = pipe(
+      fields,
+      groupBy((f) => f.petition_id),
+      mapValues((fields) => sortBy(fields, [(f) => f.position!, "asc"])),
+    );
+    return petitionIds.map((id) => fieldsByPetition[id] ?? []);
   }
 
   async completePetition(

@@ -470,7 +470,7 @@ export class Mocks {
 
   async createRandomDateReply(
     dateFieldId: number,
-    accessId: number,
+    accessId?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
@@ -519,7 +519,7 @@ export class Mocks {
 
   async createRandomPhoneReply(
     phoneFieldId: number,
-    accessId: number,
+    accessId?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>,
   ) {
@@ -585,6 +585,33 @@ export class Mocks {
           upload_complete: true,
           ...builder?.(index),
         })),
+      )
+      .returning("*");
+  }
+
+  async createRandomEsTaxDocumentsReply(
+    fieldId: number,
+    accessId?: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>,
+  ) {
+    const fileUploads = await this.createRandomFileUpload(amount);
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: fieldId,
+            type: "ES_TAX_DOCUMENTS",
+            content: {
+              file_upload_id: fileUploads[index].id,
+              request: { model: { type: "AEAT_IRPF_DATOS_FISCALES" } },
+              json_contents: {},
+              bankflip_session_id: random(16),
+            },
+            petition_access_id: accessId,
+            ...builder?.(index),
+          };
+        }),
       )
       .returning("*");
   }

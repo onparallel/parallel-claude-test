@@ -12,6 +12,7 @@ import {
   PetitionAccess,
   PetitionContactNotification,
   PetitionField,
+  PetitionFieldType,
   PetitionFieldTypeValues,
   PetitionUserNotification,
   User,
@@ -21,6 +22,7 @@ import { EmailLogRepository } from "../EmailLogRepository";
 import { FileRepository } from "../FileRepository";
 import { PetitionRepository } from "../PetitionRepository";
 import { Mocks } from "./mocks";
+import { random } from "../../../util/token";
 
 describe("repositories/PetitionRepository", () => {
   let container: Container;
@@ -1707,6 +1709,273 @@ describe("repositories/PetitionRepository", () => {
           total: 1,
         },
       });
+    });
+  });
+
+  describe("getPetitionFieldsWithReplies", () => {
+    let petition: Petition;
+
+    let shortText: PetitionField;
+    let number: PetitionField;
+    let phone: PetitionField;
+    let date: PetitionField;
+    let fileUpload: PetitionField;
+    let bankflip: PetitionField;
+    let bankflipWithError: PetitionField;
+
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+
+      [, shortText, number, phone, date, fileUpload, bankflip, bankflipWithError] =
+        await mocks.createRandomPetitionFields(petition.id, 8, (i) => ({
+          type: [
+            "HEADING",
+            "SHORT_TEXT",
+            "NUMBER",
+            "PHONE",
+            "DATE",
+            "FILE_UPLOAD",
+            "ES_TAX_DOCUMENTS",
+            "ES_TAX_DOCUMENTS",
+          ][i] as PetitionFieldType,
+        }));
+
+      await mocks.createRandomTextReply(shortText.id, undefined, 2, () => ({ user_id: user.id }));
+      await mocks.createRandomNumberReply(number.id, undefined, 1, () => ({ user_id: user.id }));
+      await mocks.createRandomPhoneReply(phone.id, undefined, 1, () => ({ user_id: user.id }));
+      await mocks.createRandomDateReply(date.id, undefined, 1, () => ({ user_id: user.id }));
+      await mocks.createRandomFileUploadReply(fileUpload.id, undefined, 2, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createRandomEsTaxDocumentsReply(bankflip.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createRandomEsTaxDocumentsReply(bankflipWithError.id, undefined, 2, (i) => ({
+        user_id: user.id,
+        ...(i === 0
+          ? {
+              content: {
+                file_upload_id: null,
+                request: { model: { type: "AEAT_IRPF_DATOS_FISCALES" } },
+                error: [{ reason: "test" }],
+                bankflip_session_id: random(16),
+              },
+            }
+          : {}),
+      }));
+    });
+
+    it("returns a list of fields with replies", async () => {
+      const [result] = await petitions.getPetitionFieldsWithReplies([petition.id]);
+
+      expect(
+        result.map((f) => pick(f, ["id", "petition_id", "position", "type", "replies"])),
+      ).toEqual([
+        {
+          id: shortText.id,
+          petition_id: petition.id,
+          position: 1,
+          type: "SHORT_TEXT",
+          replies: [
+            {
+              content: { value: expect.any(String) },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+            {
+              content: { value: expect.any(String) },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+          ],
+        },
+        {
+          id: number.id,
+          petition_id: petition.id,
+          position: 2,
+          type: "NUMBER",
+          replies: [
+            {
+              content: { value: expect.any(Number) },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+          ],
+        },
+        {
+          id: phone.id,
+          petition_id: petition.id,
+          position: 3,
+          type: "PHONE",
+          replies: [
+            {
+              content: { value: expect.any(String) },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+          ],
+        },
+        {
+          id: date.id,
+          petition_id: petition.id,
+          position: 4,
+          type: "DATE",
+          replies: [
+            {
+              content: { value: expect.any(String) },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+          ],
+        },
+        {
+          id: fileUpload.id,
+          petition_id: petition.id,
+          position: 5,
+          type: "FILE_UPLOAD",
+          replies: [
+            {
+              content: {
+                file_upload_id: expect.any(Number),
+              },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+            {
+              content: {
+                file_upload_id: expect.any(Number),
+              },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+          ],
+        },
+        {
+          id: bankflip.id,
+          petition_id: petition.id,
+          position: 6,
+          type: "ES_TAX_DOCUMENTS",
+          replies: [
+            {
+              content: {
+                file_upload_id: expect.any(Number),
+                bankflip_session_id: expect.any(String),
+                request: { model: { type: "AEAT_IRPF_DATOS_FISCALES" } },
+                json_contents: {},
+              },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+          ],
+        },
+        {
+          id: bankflipWithError.id,
+          petition_id: petition.id,
+          position: 7,
+          type: "ES_TAX_DOCUMENTS",
+          replies: [
+            {
+              content: {
+                file_upload_id: expect.any(Number),
+                bankflip_session_id: expect.any(String),
+                request: { model: { type: "AEAT_IRPF_DATOS_FISCALES" } },
+                json_contents: {},
+              },
+              status: "PENDING",
+              anonymized_at: null,
+            },
+          ],
+        },
+      ]);
+    });
+
+    it("returns a list of fields with replies on anonymized petition", async () => {
+      await petitions.anonymizePetition(petition.id);
+
+      const [result] = await petitions.getPetitionFieldsWithReplies([petition.id]);
+
+      expect(
+        result.map((f) => pick(f, ["id", "petition_id", "position", "type", "replies"])),
+      ).toEqual([
+        {
+          id: shortText.id,
+          petition_id: petition.id,
+          position: 1,
+          type: "SHORT_TEXT",
+          replies: [
+            {
+              content: { value: null },
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+            },
+            {
+              content: { value: null },
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+            },
+          ],
+        },
+        {
+          id: number.id,
+          petition_id: petition.id,
+          position: 2,
+          type: "NUMBER",
+          replies: [
+            {
+              content: { value: null },
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+            },
+          ],
+        },
+        {
+          id: phone.id,
+          petition_id: petition.id,
+          position: 3,
+          type: "PHONE",
+          replies: [
+            {
+              content: { value: null },
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+            },
+          ],
+        },
+        {
+          id: date.id,
+          petition_id: petition.id,
+          position: 4,
+          type: "DATE",
+          replies: [
+            {
+              content: { value: null },
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+            },
+          ],
+        },
+        {
+          id: fileUpload.id,
+          petition_id: petition.id,
+          position: 5,
+          type: "FILE_UPLOAD",
+          replies: [],
+        },
+        {
+          id: bankflip.id,
+          petition_id: petition.id,
+          position: 6,
+          type: "ES_TAX_DOCUMENTS",
+          replies: [],
+        },
+        {
+          id: bankflipWithError.id,
+          petition_id: petition.id,
+          position: 7,
+          type: "ES_TAX_DOCUMENTS",
+          replies: [],
+        },
+      ]);
     });
   });
 });
