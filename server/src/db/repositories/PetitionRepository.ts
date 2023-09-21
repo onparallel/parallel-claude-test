@@ -2960,9 +2960,10 @@ export class PetitionRepository extends BaseRepository {
     const [lastEvent] = await this.from("petition_event")
       .where("petition_id", petitionId)
       .whereIn("type", ["PETITION_CLOSED_NOTIFIED", "REPLY_CREATED"])
+      .select("type", this.knex.raw("max(created_at) as created_at"))
+      .groupBy("type")
       .orderBy("created_at", "desc")
-      .limit(1)
-      .groupBy("type");
+      .limit(1);
     if (lastEvent?.type === "PETITION_CLOSED_NOTIFIED") {
       return false;
     }
