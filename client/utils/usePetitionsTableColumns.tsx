@@ -467,64 +467,64 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
         <PetitionTagListCellContent petition={row} />
       ) : null,
   },
-  // {
-  //   key: "lastActivityAt",
-  //   isSortable: true,
-  //   label: (intl) =>
-  //     intl.formatMessage({
-  //       id: "component.petitions-table-columns.header-last-activity",
-  //       defaultMessage: "Last activity",
-  //     }),
-  //   cellProps: { minWidth: "160px" },
-  //   CellContent: ({ row }) => {
-  //     return row.__typename === "Petition" ? (
-  //       isDefined(row.lastActivityAt) ? (
-  //         <DateTime
-  //           value={row.lastActivityAt}
-  //           format={FORMATS.LLL}
-  //           useRelativeTime="always"
-  //           whiteSpace="nowrap"
-  //         />
-  //       ) : (
-  //         <Text textStyle="hint">
-  //           <FormattedMessage
-  //             id="component.petitions-table-columns.no-activity"
-  //             defaultMessage="No activity yet"
-  //           />
-  //         </Text>
-  //       )
-  //     ) : null;
-  //   },
-  // },
-  // {
-  //   key: "lastRecipientActivityAt",
-  //   isSortable: true,
-  //   label: (intl) =>
-  //     intl.formatMessage({
-  //       id: "component.petitions-table-columns.header-recipients-activity",
-  //       defaultMessage: "Recipient's activity",
-  //     }),
-  //   cellProps: { minWidth: "160px" },
-  //   CellContent: ({ row }) => {
-  //     return row.__typename === "Petition" ? (
-  //       isDefined(row.lastRecipientActivityAt) ? (
-  //         <DateTime
-  //           value={row.lastRecipientActivityAt}
-  //           format={FORMATS.LLL}
-  //           useRelativeTime="always"
-  //           whiteSpace="nowrap"
-  //         />
-  //       ) : (
-  //         <Text textStyle="hint">
-  //           <FormattedMessage
-  //             id="component.petitions-table-columns.no-activity"
-  //             defaultMessage="No activity yet"
-  //           />
-  //         </Text>
-  //       )
-  //     ) : null;
-  //   },
-  // },
+  {
+    key: "lastActivityAt",
+    isSortable: true,
+    label: (intl) =>
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-last-activity-at",
+        defaultMessage: "Last activity",
+      }),
+    cellProps: { minWidth: "160px" },
+    CellContent: ({ row }) => {
+      return row.__typename === "Petition" ? (
+        isDefined(row.lastActivityAt) ? (
+          <DateTime
+            value={row.lastActivityAt}
+            format={FORMATS.LLL}
+            useRelativeTime="always"
+            whiteSpace="nowrap"
+          />
+        ) : (
+          <Text textStyle="hint">
+            <FormattedMessage
+              id="component.petitions-table-columns.no-activity"
+              defaultMessage="No activity yet"
+            />
+          </Text>
+        )
+      ) : null;
+    },
+  },
+  {
+    key: "lastRecipientActivityAt",
+    isSortable: true,
+    label: (intl) =>
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-last-recipient-activity-at",
+        defaultMessage: "Last recipient activity",
+      }),
+    cellProps: { minWidth: "160px" },
+    CellContent: ({ row }) => {
+      return row.__typename === "Petition" ? (
+        isDefined(row.lastRecipientActivityAt) ? (
+          <DateTime
+            value={row.lastRecipientActivityAt}
+            format={FORMATS.LLL}
+            useRelativeTime="always"
+            whiteSpace="nowrap"
+          />
+        ) : (
+          <Text textStyle="hint">
+            <FormattedMessage
+              id="component.petitions-table-columns.no-activity"
+              defaultMessage="No activity yet"
+            />
+          </Text>
+        )
+      ) : null;
+    },
+  },
 ];
 
 export const TEMPLATES_COLUMNS = (

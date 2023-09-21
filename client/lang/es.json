@@ -4780,6 +4780,16 @@
     "context": "Mark as unread"
   },
   {
+    "term": "component.petitions-table-columns.header-last-activity-at",
+    "definition": "Última actividad",
+    "context": "Last activity"
+  },
+  {
+    "term": "component.petitions-table-columns.header-last-recipient-activity-at",
+    "definition": "Última actividad de destinatario",
+    "context": "Last recipient activity"
+  },
+  {
     "term": "component.petitions-table-columns.header-name",
     "definition": "Nombre",
     "context": "Name"
@@ -4838,6 +4848,11 @@
     "term": "component.petitions-table-columns.header-template",
     "definition": "Plantilla",
     "context": "Template"
+  },
+  {
+    "term": "component.petitions-table-columns.no-activity",
+    "definition": "Sin actividad todavía",
+    "context": "No activity yet"
   },
   {
     "term": "component.preview-comments-dialog.template-no-comments-added",
