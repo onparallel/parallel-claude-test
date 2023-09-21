@@ -551,21 +551,6 @@ export const SignatureStartedEvent = createPetitionEvent("SignatureStartedEvent"
     resolve: async (o, _, ctx) =>
       (await ctx.petitions.loadPetitionSignatureById(o.data.petition_signature_request_id))!,
   });
-  /** @deprecated */
-  t.nullable.datetime("deliveredAt", {
-    deprecation: "remove after release",
-    resolve: ({ data }) => data.email_delivered_at ?? null,
-  });
-  /** @deprecated */
-  t.nullable.datetime("openedAt", {
-    deprecation: "remove after release",
-    resolve: ({ data }) => data.email_opened_at ?? null,
-  });
-  /** @deprecated */
-  t.nullable.datetime("bouncedAt", {
-    deprecation: "remove after release",
-    resolve: ({ data }) => data.email_bounced_at ?? null,
-  });
 });
 
 /**

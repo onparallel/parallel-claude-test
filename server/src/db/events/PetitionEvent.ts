@@ -124,12 +124,6 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   SIGNATURE_STARTED: {
     petition_signature_request_id: number;
-    /** @deprecated remove after release */
-    email_delivered_at?: Date;
-    /** @deprecated remove after release */
-    email_opened_at?: Date;
-    /** @deprecated remove after release */
-    email_bounced_at?: Date;
   };
   SIGNATURE_CANCELLED: {
     petition_signature_request_id: number;

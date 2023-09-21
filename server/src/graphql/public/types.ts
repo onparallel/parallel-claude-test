@@ -84,7 +84,6 @@ export const PublicSignatureConfig = objectType({
     });
     t.int("minSigners", {
       description: "The minimum number of signers required to complete the signature process",
-      resolve: (o) => o.minSigners ?? 1, // TODO signature: remove resolver after minSigners is not nullable anymore
     });
     t.nullable.string("instructions", {
       description: "Instructions for the signers",
@@ -92,8 +91,6 @@ export const PublicSignatureConfig = objectType({
     });
     t.field("signingMode", {
       type: "SignatureConfigSigningMode",
-      // TODO signature: remove resolver after signingMode is not nullable anymore
-      resolve: (o) => o.signingMode ?? "PARALLEL",
     });
   },
   sourceType: /* ts */ `{
@@ -101,9 +98,9 @@ export const PublicSignatureConfig = objectType({
     review?: boolean;
     allowAdditionalSigners?: boolean;
     additionalSignersInfo?: any[];
-    minSigners?: number;
+    minSigners: number;
     instructions?: string;
-    signingMode?: "PARALLEL" | "SEQUENTIAL" // TODO signature: remove the ? after releasing
+    signingMode: "PARALLEL" | "SEQUENTIAL";
   }`,
 });
 

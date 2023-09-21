@@ -1310,7 +1310,6 @@ type Mutation {
     lastName: String!
     locale: UserLocale!
     orgId: GID
-    role: OrganizationRole
     userGroupIds: [GID!]
   ): User!
   loginAs(userId: GID!): Result!
@@ -2002,12 +2001,6 @@ type Mutation {
   ): Organization!
 
   """
-  Updates the role of another user in the organization.
-  """
-  updateOrganizationUser(role: OrganizationRole!, userGroupIds: [GID!], userId: GID!): User!
-    @deprecated(reason: "use updateUserGroupMembership")
-
-  """
   Updates the user limit for a organization
   """
   updateOrganizationUserLimit(
@@ -2480,16 +2473,6 @@ input OrganizationPdfDocumentThemeInput {
 input OrganizationPdfDocumentThemeInputLegalText {
   en: JSON
   es: JSON
-}
-
-"""
-The roles of a user within an organization.
-"""
-enum OrganizationRole {
-  ADMIN
-  COLLABORATOR
-  NORMAL
-  OWNER
 }
 
 """
@@ -6179,7 +6162,7 @@ input SignatureConfigInput {
   """
   The minimum amount of signers required to start the signature process
   """
-  minSigners: Int
+  minSigners: Int!
 
   """
   The Global ID of the signature integration to be used.
@@ -6191,7 +6174,7 @@ input SignatureConfigInput {
   """
   review: Boolean!
   signersInfo: [SignatureConfigInputSigner!]!
-  signingMode: SignatureConfigSigningMode
+  signingMode: SignatureConfigSigningMode!
 
   """
   The timezone used to generate the document.
@@ -6290,12 +6273,9 @@ type SignatureReminderEvent implements PetitionEvent {
 }
 
 type SignatureStartedEvent implements PetitionEvent {
-  bouncedAt: DateTime @deprecated(reason: "remove after release")
   createdAt: DateTime!
   data: JSONObject!
-  deliveredAt: DateTime @deprecated(reason: "remove after release")
   id: GID!
-  openedAt: DateTime @deprecated(reason: "remove after release")
   petition: Petition
   signature: PetitionSignatureRequest!
   type: PetitionEventType!
@@ -6667,7 +6647,6 @@ type User implements Timestamps {
   """
   petitionListViews: [PetitionListView!]!
   preferredLocale: UserLocale!
-  role: OrganizationRole @deprecated(reason: "not used anymore")
   status: UserStatus!
 
   """

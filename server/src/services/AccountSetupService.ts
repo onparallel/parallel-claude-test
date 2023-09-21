@@ -76,8 +76,6 @@ export class AccountSetupService implements IAccountSetupService {
   private async createOrgOwner(orgId: number, userData: CreateUserData, createdBy: string) {
     return await this.users.createUser(
       {
-        /** @deprecated */
-        organization_role: "OWNER",
         is_org_owner: true,
         org_id: orgId,
         status: "ACTIVE",

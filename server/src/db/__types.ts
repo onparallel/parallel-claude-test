@@ -487,15 +487,6 @@ export type UserLocale = "en" | "es";
 
 export const UserLocaleValues = ["en", "es"] as UserLocale[];
 
-export type UserOrganizationRole = "COLLABORATOR" | "NORMAL" | "ADMIN" | "OWNER";
-
-export const UserOrganizationRoleValues = [
-  "COLLABORATOR",
-  "NORMAL",
-  "ADMIN",
-  "OWNER",
-] as UserOrganizationRole[];
-
 export type UserStatus = "ACTIVE" | "INACTIVE" | "ON_HOLD";
 
 export const UserStatusValues = ["ACTIVE", "INACTIVE", "ON_HOLD"] as UserStatus[];
@@ -1913,10 +1904,6 @@ export type CreateTemporaryFile = PartialProps<
 export interface User {
   id: number; // int4
   org_id: number; // int4
-  /**
-   * @deprecated
-   */
-  organization_role: Maybe<UserOrganizationRole>; // user_organization_role
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -1932,7 +1919,6 @@ export interface User {
 
 export type CreateUser = PartialProps<
   Omit<User, "id">,
-  | "organization_role"
   | "created_at"
   | "created_by"
   | "updated_at"

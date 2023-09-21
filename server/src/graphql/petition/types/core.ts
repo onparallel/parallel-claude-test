@@ -789,7 +789,6 @@ export const SignatureConfig = objectType({
     });
     t.int("minSigners", {
       description: "The minimum number of signers required to sign the document",
-      resolve: (o) => o.minSigners ?? 1, // TODO signature: remove resolver after minSigners is not nullable anymore
     });
     t.nullable.string("instructions", {
       description:
@@ -797,8 +796,6 @@ export const SignatureConfig = objectType({
     });
     t.field("signingMode", {
       type: "SignatureConfigSigningMode",
-      // TODO signature: remove resolver after signingMode is not nullable anymore
-      resolve: (o) => o.signingMode ?? "PARALLEL",
     });
     t.nullable.string("message");
   },
@@ -814,10 +811,10 @@ export const SignatureConfig = objectType({
     title: string | null;
     review?: boolean;
     allowAdditionalSigners?: boolean;
-    minSigners?: number; // TODO signature: remove the ? after releasing
+    minSigners: number;
     instructions?: string | null;
     message?: string;
-    signingMode?: "PARALLEL" | "SEQUENTIAL" // TODO signature: remove the ? after releasing
+    signingMode: "PARALLEL" | "SEQUENTIAL"
   }`,
 });
 

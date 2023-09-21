@@ -946,11 +946,6 @@ export interface Mutation {
   updateOrganizationTier: SupportMethodResponse;
   /** Updates the usage_details of a given organization. Will impact the limits of coming usage periods. */
   updateOrganizationUsageDetails: Organization;
-  /**
-   * Updates the role of another user in the organization.
-   * @deprecated use updateUserGroupMembership
-   */
-  updateOrganizationUser: User;
   /** Updates the user limit for a organization */
   updateOrganizationUserLimit: Organization;
   /** Updates a petition. */
@@ -1482,7 +1477,6 @@ export interface MutationinviteUserToOrganizationArgs {
   lastName: Scalars["String"]["input"];
   locale: UserLocale;
   orgId?: InputMaybe<Scalars["GID"]["input"]>;
-  role?: InputMaybe<OrganizationRole>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
 
@@ -1958,12 +1952,6 @@ export interface MutationupdateOrganizationUsageDetailsArgs {
   startNewPeriod: Scalars["Boolean"]["input"];
 }
 
-export interface MutationupdateOrganizationUserArgs {
-  role: OrganizationRole;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  userId: Scalars["GID"]["input"];
-}
-
 export interface MutationupdateOrganizationUserLimitArgs {
   limit: Scalars["Int"]["input"];
   orgId: Scalars["GID"]["input"];
@@ -2317,9 +2305,6 @@ export interface OrganizationPdfDocumentThemeInputLegalText {
   en?: InputMaybe<Scalars["JSON"]["input"]>;
   es?: InputMaybe<Scalars["JSON"]["input"]>;
 }
-
-/** The roles of a user within an organization. */
-export type OrganizationRole = "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
 
 /** The status of the organization. */
 export type OrganizationStatus =
@@ -4769,13 +4754,13 @@ export interface SignatureConfigInput {
   /** The instructions to be shown to the user or recipient before starting the signature process */
   instructions?: InputMaybe<Scalars["String"]["input"]>;
   /** The minimum amount of signers required to start the signature process */
-  minSigners?: InputMaybe<Scalars["Int"]["input"]>;
+  minSigners: Scalars["Int"]["input"];
   /** The Global ID of the signature integration to be used. */
   orgIntegrationId: Scalars["GID"]["input"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["input"];
   signersInfo: Array<SignatureConfigInputSigner>;
-  signingMode?: InputMaybe<SignatureConfigSigningMode>;
+  signingMode: SignatureConfigSigningMode;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"]["input"];
   /** The title of the signing document */
@@ -5103,8 +5088,6 @@ export interface User extends Timestamps {
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
   preferredLocale: UserLocale;
-  /** @deprecated not used anymore */
-  role?: Maybe<OrganizationRole>;
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;

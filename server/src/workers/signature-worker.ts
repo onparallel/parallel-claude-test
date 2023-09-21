@@ -106,7 +106,7 @@ async function startSignatureProcess(
       {
         locale: petition.recipient_locale,
         initialMessage: message,
-        signingMode: signingMode ?? "PARALLEL", // TODO signature: remove fallback after release
+        signingMode,
       },
     );
 

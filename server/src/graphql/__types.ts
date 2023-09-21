@@ -279,11 +279,11 @@ export interface NexusGenInputs {
     // input type
     allowAdditionalSigners: boolean; // Boolean!
     instructions?: string | null; // String
-    minSigners?: number | null; // Int
+    minSigners: number; // Int!
     orgIntegrationId: NexusGenScalars["GID"]; // GID!
     review: boolean; // Boolean!
     signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
-    signingMode?: NexusGenEnums["SignatureConfigSigningMode"] | null; // SignatureConfigSigningMode
+    signingMode: NexusGenEnums["SignatureConfigSigningMode"]; // SignatureConfigSigningMode!
     timezone: string; // String!
     title?: string | null; // String
   };
@@ -402,7 +402,6 @@ export interface NexusGenEnums {
   ImageOptionsResizeFit: "contain" | "cover" | "fill" | "inside" | "outside";
   IntegrationType: db.IntegrationType;
   OrgLicenseSource: "APPSUMO";
-  OrganizationRole: "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsageLimitName: db.OrganizationUsageLimitName;
   OrganizationUsers_OrderBy:
@@ -978,9 +977,9 @@ export interface NexusGenObjects {
     review?: boolean;
     allowAdditionalSigners?: boolean;
     additionalSignersInfo?: any[];
-    minSigners?: number;
+    minSigners: number;
     instructions?: string;
-    signingMode?: "PARALLEL" | "SEQUENTIAL"; // TODO signature: remove the ? after releasing
+    signingMode: "PARALLEL" | "SEQUENTIAL";
   };
   PublicUser: db.User;
   Query: {};
@@ -1022,10 +1021,10 @@ export interface NexusGenObjects {
     title: string | null;
     review?: boolean;
     allowAdditionalSigners?: boolean;
-    minSigners?: number; // TODO signature: remove the ? after releasing
+    minSigners: number;
     instructions?: string | null;
     message?: string;
-    signingMode?: "PARALLEL" | "SEQUENTIAL"; // TODO signature: remove the ? after releasing
+    signingMode: "PARALLEL" | "SEQUENTIAL";
   };
   SignatureDeliveredEvent: petitionEvents.SignatureDeliveredEvent;
   SignatureOpenedEvent: petitionEvents.SignatureOpenedEvent;
@@ -1670,7 +1669,6 @@ export interface NexusGenFieldTypes {
     updateOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationTier: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationUsageDetails: NexusGenRootTypes["Organization"]; // Organization!
-    updateOrganizationUser: NexusGenRootTypes["User"]; // User!
     updateOrganizationUserLimit: NexusGenRootTypes["Organization"]; // Organization!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionAttachmentType: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
@@ -2972,12 +2970,9 @@ export interface NexusGenFieldTypes {
   };
   SignatureStartedEvent: {
     // field return type
-    bouncedAt: NexusGenScalars["DateTime"] | null; // DateTime
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
-    deliveredAt: NexusGenScalars["DateTime"] | null; // DateTime
     id: NexusGenScalars["GID"]; // GID!
-    openedAt: NexusGenScalars["DateTime"] | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     signature: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
@@ -3064,7 +3059,6 @@ export interface NexusGenFieldTypes {
     permissions: string[]; // [String!]!
     petitionListViews: NexusGenRootTypes["PetitionListView"][]; // [PetitionListView!]!
     preferredLocale: NexusGenEnums["UserLocale"]; // UserLocale!
-    role: NexusGenEnums["OrganizationRole"] | null; // OrganizationRole
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
     unreadNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -3828,7 +3822,6 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationPdfDocumentTheme: "Organization";
     updateOrganizationTier: "SupportMethodResponse";
     updateOrganizationUsageDetails: "Organization";
-    updateOrganizationUser: "User";
     updateOrganizationUserLimit: "Organization";
     updatePetition: "PetitionBase";
     updatePetitionAttachmentType: "PetitionAttachment";
@@ -5130,12 +5123,9 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureStartedEvent: {
     // field return type name
-    bouncedAt: "DateTime";
     createdAt: "DateTime";
     data: "JSONObject";
-    deliveredAt: "DateTime";
     id: "GID";
-    openedAt: "DateTime";
     petition: "Petition";
     signature: "PetitionSignatureRequest";
     type: "PetitionEventType";
@@ -5222,7 +5212,6 @@ export interface NexusGenFieldTypeNames {
     permissions: "String";
     petitionListViews: "PetitionListView";
     preferredLocale: "UserLocale";
-    role: "OrganizationRole";
     status: "UserStatus";
     tokens: "UserAuthenticationToken";
     unreadNotificationIds: "GID";
@@ -5943,7 +5932,6 @@ export interface NexusGenArgTypes {
       lastName: string; // String!
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
       orgId?: NexusGenScalars["GID"] | null; // GID
-      role?: NexusGenEnums["OrganizationRole"] | null; // OrganizationRole
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     loginAs: {
@@ -6417,12 +6405,6 @@ export interface NexusGenArgTypes {
       orgId: NexusGenScalars["GID"]; // GID!
       renewalCycles: number; // Int!
       startNewPeriod: boolean; // Boolean!
-    };
-    updateOrganizationUser: {
-      // args
-      role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
-      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
-      userId: NexusGenScalars["GID"]; // GID!
     };
     updateOrganizationUserLimit: {
       // args

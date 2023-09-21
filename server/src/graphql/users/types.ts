@@ -1,11 +1,6 @@
 import { arg, enumType, nonNull, objectType, unionType } from "nexus";
 import { indexBy, isDefined, omit, sortBy, uniq } from "remeda";
-import {
-  FeatureFlagNameValues,
-  UserLocaleValues,
-  UserOrganizationRoleValues,
-  UserStatusValues,
-} from "../../db/__types";
+import { FeatureFlagNameValues, UserLocaleValues, UserStatusValues } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { getInitials } from "../../util/initials";
 import { datetimeArg } from "../helpers/scalars/DateTime";
@@ -16,13 +11,6 @@ export const UserLocale = enumType({
   members: UserLocaleValues,
   description: "The preferred locale for the user",
   sourceType: "db.UserLocale",
-});
-
-/** @deprecated */
-export const OrganizationRole = enumType({
-  name: "OrganizationRole",
-  members: UserOrganizationRoleValues,
-  description: "The roles of a user within an organization.",
 });
 
 export const FeatureFlag = enumType({
@@ -56,12 +44,6 @@ export const User = objectType({
     });
     t.boolean("isMe", {
       resolve: (o, _, ctx) => o.id === ctx.user!.id,
-    });
-    /** @deprecated */
-    t.nullable.field("role", {
-      deprecation: "not used anymore",
-      type: "OrganizationRole",
-      resolve: (o) => o.organization_role,
     });
     t.list.string("permissions", {
       authorize: rootIsContextUser(),
