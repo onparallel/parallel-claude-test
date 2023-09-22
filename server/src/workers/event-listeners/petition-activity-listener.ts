@@ -65,7 +65,6 @@ export const petitionActivityListener = listener(
         "SIGNATURE_COMPLETED",
         "RECIPIENT_SIGNED",
         "REMINDERS_OPT_OUT",
-        "PETITION_CLOSED",
       ].includes(event.type)
     ) {
       lastRecipientActivityAt = event.created_at;
