@@ -5480,7 +5480,10 @@ export class PetitionRepository extends BaseRepository {
   async anonymizePetition(petitionId: number) {
     const [accesses, fields] = await Promise.all([
       this.from("petition_access").where("petition_id", petitionId).select("id"),
-      this.from("petition_field").where("petition_id", petitionId).select("id"),
+      this.from("petition_field")
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .select("id"),
     ]);
 
     const fieldIds = fields.map((f) => f.id);
