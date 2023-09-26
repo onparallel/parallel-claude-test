@@ -46,11 +46,8 @@ async function createCommentPublishedUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const comment = await ctx.petitions.loadPetitionFieldComment(
-    event.data.petition_field_comment_id,
-  );
-
-  if (!comment) {
+  let comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id);
+  if (!isDefined(comment)) {
     // if the comment is already deleted, avoid sending notification
     return;
   }
@@ -74,21 +71,29 @@ async function createCommentPublishedUserNotifications(
     .filter(
       (a) =>
         a.status === "ACTIVE" && // active access
-        a.id !== comment.petition_access_id && // don't notify comment author
+        a.id !== comment!.petition_access_id && // don't notify comment author
         isDefined(a.contact_id), // filter contactless
     )
     .map((a) => a.id);
-  const userIds = users.filter((u) => u.id !== comment.user_id).map((u) => u.id);
+  const userIds = users.filter((u) => u.id !== comment!.user_id).map((u) => u.id);
+
+  // make sure comment was not deleted in the meantime
+  comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id, {
+    refresh: true,
+  });
+  if (!isDefined(comment)) {
+    return;
+  }
 
   await Promise.all([
     ctx.petitions.createPetitionUserNotification(
       userIds.map((userId) => ({
         type: "COMMENT_CREATED",
-        petition_id: comment.petition_id,
+        petition_id: comment!.petition_id,
         user_id: userId,
         data: {
-          petition_field_id: comment.petition_field_id,
-          petition_field_comment_id: comment.id,
+          petition_field_id: comment!.petition_field_id,
+          petition_field_comment_id: comment!.id,
           is_mentioned: mentionedUserIds.includes(userId),
         },
       })),
@@ -96,11 +101,11 @@ async function createCommentPublishedUserNotifications(
     ctx.petitions.createPetitionContactNotification(
       accessIds.map((id) => ({
         type: "COMMENT_CREATED",
-        petition_id: comment.petition_id,
+        petition_id: comment!.petition_id,
         petition_access_id: id,
         data: {
-          petition_field_id: comment.petition_field_id,
-          petition_field_comment_id: comment.id,
+          petition_field_id: comment!.petition_field_id,
+          petition_field_comment_id: comment!.id,
         },
       })),
     ),
