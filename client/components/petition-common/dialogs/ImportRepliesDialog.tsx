@@ -74,13 +74,27 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
     ImportRepliesDialog_createPetitionFieldRepliesDocument,
   );
 
+  const selectedPetitionFields = (selectedPetitionData?.petition?.fields ?? []).map((f) => ({
+    ...f,
+    replies:
+      f.type === "ES_TAX_DOCUMENTS"
+        ? f.replies.filter((r) => !isDefined(r.content.error))
+        : f.replies,
+  }));
+
   const setInitialMapping = async (
     sourcePetition: ImportRepliesDialog_petitionQuery | undefined | null,
   ) => {
     const mapping = {} as Record<string, string>;
 
     const fields = petitionData?.petition?.fields ?? [];
-    const sourcePetitionFields = sourcePetition?.petition?.fields ?? [];
+    const sourcePetitionFields = (sourcePetition?.petition?.fields ?? []).map((f) => ({
+      ...f,
+      replies:
+        f.type === "ES_TAX_DOCUMENTS"
+          ? f.replies.filter((r) => !isDefined(r.content.error))
+          : f.replies,
+    }));
 
     const filteredFields = fields.filter(
       (f) => !excludedFieldsTarget.includes(f.type) && mapping[f.id] === undefined,
@@ -139,7 +153,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
             const mappedFields = mapReplyContents({
               mapping: data.mapping,
               fields: petitionData?.petition?.fields ?? [],
-              sourcePetitionFields: selectedPetitionData?.petition?.fields ?? [],
+              sourcePetitionFields: selectedPetitionFields,
             });
             if (mappedFields.length) {
               await createPetitionFieldReplies({
@@ -234,7 +248,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                   return (
                     <MapFieldsTable
                       fields={petitionData?.petition?.fields ?? []}
-                      sourcePetitionFields={selectedPetitionData?.petition?.fields ?? []}
+                      sourcePetitionFields={selectedPetitionFields}
                       overwriteExisting={overwriteExisting}
                       value={value}
                       onChange={onChange}
