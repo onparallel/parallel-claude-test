@@ -10,6 +10,7 @@ import {
 import { cx } from "@chakra-ui/utils";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ChangeEvent, createContext, useContext } from "react";
+import { omit } from "remeda";
 
 const RadioTabContext = createContext<ReturnType<typeof useRadioGroup>["getRadioProps"]>(
   null as any,
@@ -62,15 +63,15 @@ export const RadioTab = chakraForwardRef<"label", RadioTabProps>(function RadioT
   { ...props },
   ref,
 ) {
-  const getRadioProps = useContext(RadioTabContext);
-  const { getInputProps, getCheckboxProps, htmlProps } = useRadio(getRadioProps(props as any));
+  const getUseRadioProps = useContext(RadioTabContext);
+  const { getInputProps, getRadioProps, htmlProps } = useRadio(getUseRadioProps(props as any));
 
   const styles = useStyles();
   const inputProps = getInputProps();
   return (
     <chakra.label
       ref={ref as any}
-      {...getCheckboxProps()}
+      {...omit(getRadioProps(), ["aria-hidden"])}
       aria-selected={(inputProps as any).checked}
       {...htmlProps}
       className={cx("chakra-radio-tabs__radiotab", props.className)}
