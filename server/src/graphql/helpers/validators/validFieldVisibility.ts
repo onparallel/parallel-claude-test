@@ -21,7 +21,7 @@ const schema = {
     conditions: {
       type: "array",
       minItems: 1,
-      maxItems: 5,
+      maxItems: 15,
       items: {
         type: "object",
         additionalProperties: false,

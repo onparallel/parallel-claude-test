@@ -253,7 +253,7 @@ export function PetitionFieldVisibilityEditor({
         })}
       </Grid>
 
-      {visibility.conditions.length < 5 && !isReadOnly ? (
+      {visibility.conditions.length < 15 && !isReadOnly ? (
         <Button
           fontWeight="normal"
           size="sm"
