@@ -1,9 +1,13 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { TimelineMessageScheduledEvent_MessageScheduledEventFragment } from "@parallel/graphql/__types";
+import {
+  PetitionActivity_petitionDocument,
+  TimelineMessageScheduledEvent_MessageScheduledEventFragment,
+  TimelineMessageScheduledEvent_cancelScheduledMessageDocument,
+} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import {
@@ -11,20 +15,21 @@ import {
   useSentPetitionMessageDialog,
 } from "../../dialogs/SentPetitionMessageDialog";
 
+import { getOperationName } from "@apollo/client/utilities";
+import { useCallback } from "react";
 import { UserReference } from "../../UserReference";
+import { useConfirmCancelScheduledMessageDialog } from "../../dialogs/ConfirmCancelScheduledMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
 export interface TimelineMessageScheduledEventProps {
   userId: string;
   event: TimelineMessageScheduledEvent_MessageScheduledEventFragment;
-  onCancelScheduledMessage: () => void;
 }
 
 export function TimelineMessageScheduledEvent({
-  event: { message, createdAt },
+  event: { message, petition, createdAt },
   userId,
-  onCancelScheduledMessage,
 }: TimelineMessageScheduledEventProps) {
   const showSentPetitionMessage = useSentPetitionMessageDialog();
   async function handleSeeMessageClick() {
@@ -32,6 +37,21 @@ export function TimelineMessageScheduledEvent({
       await showSentPetitionMessage({ message });
     } catch {}
   }
+  const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
+  const [cancelScheduledMessage] = useMutation(
+    TimelineMessageScheduledEvent_cancelScheduledMessageDocument,
+  );
+  const handleCancelScheduledMessage = useCallback(async () => {
+    try {
+      await confirmCancelScheduledMessage();
+    } catch {
+      return;
+    }
+    await cancelScheduledMessage({
+      variables: { petitionId: petition!.id, messageId: message.id },
+      refetchQueries: [getOperationName(PetitionActivity_petitionDocument)!],
+    });
+  }, []);
   return (
     <TimelineItem icon={<TimelineIcon icon={TimeIcon} color="black" backgroundColor="gray.200" />}>
       <Flex alignItems="center">
@@ -91,7 +111,7 @@ export function TimelineMessageScheduledEvent({
             variant="outline"
             colorScheme="red"
             marginLeft={4}
-            onClick={onCancelScheduledMessage}
+            onClick={handleCancelScheduledMessage}
           >
             <FormattedMessage id="timeline.message-scheduled-cancel" defaultMessage="Cancel" />
           </Button>
@@ -104,7 +124,11 @@ export function TimelineMessageScheduledEvent({
 TimelineMessageScheduledEvent.fragments = {
   MessageScheduledEvent: gql`
     fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
+      petition {
+        id
+      }
       message {
+        id
         sender {
           ...UserReference_User
         }
@@ -128,3 +152,17 @@ TimelineMessageScheduledEvent.fragments = {
     ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,
 };
+
+const _mutations = [
+  gql`
+    mutation TimelineMessageScheduledEvent_cancelScheduledMessage(
+      $petitionId: GID!
+      $messageId: GID!
+    ) {
+      cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
+        id
+        status
+      }
+    }
+  `,
+];

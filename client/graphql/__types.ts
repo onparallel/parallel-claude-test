@@ -4834,15 +4834,9 @@ export interface SignatureReminderEvent extends PetitionEvent {
 
 export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
-  /** @deprecated remove after release */
-  bouncedAt?: Maybe<Scalars["DateTime"]["output"]>;
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
-  /** @deprecated remove after release */
-  deliveredAt?: Maybe<Scalars["DateTime"]["output"]>;
   id: Scalars["GID"]["output"];
-  /** @deprecated remove after release */
-  openedAt?: Maybe<Scalars["DateTime"]["output"]>;
   petition?: Maybe<Petition>;
   signature: PetitionSignatureRequest;
   type: PetitionEventType;
@@ -8414,6 +8408,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "MessageScheduledEvent";
           id: string;
           createdAt: string;
+          petition?: { __typename?: "Petition"; id: string } | null;
           message: {
             __typename?: "PetitionMessage";
             id: string;
@@ -9131,6 +9126,7 @@ export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragmen
   __typename?: "MessageScheduledEvent";
   id: string;
   createdAt: string;
+  petition?: { __typename?: "Petition"; id: string } | null;
   message: {
     __typename?: "PetitionMessage";
     id: string;
@@ -10200,8 +10196,10 @@ export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
 export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
   __typename?: "MessageScheduledEvent";
   createdAt: string;
+  petition?: { __typename?: "Petition"; id: string } | null;
   message: {
     __typename?: "PetitionMessage";
+    id: string;
     status: PetitionMessageStatus;
     scheduledAt?: string | null;
     emailSubject?: any | null;
@@ -10219,6 +10217,19 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
       contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
+};
+
+export type TimelineMessageScheduledEvent_cancelScheduledMessageMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  messageId: Scalars["GID"]["input"];
+}>;
+
+export type TimelineMessageScheduledEvent_cancelScheduledMessageMutation = {
+  cancelScheduledMessage?: {
+    __typename?: "PetitionMessage";
+    id: string;
+    status: PetitionMessageStatus;
+  } | null;
 };
 
 export type TimelineMessageSentEvent_MessageSentEventFragment = {
@@ -21444,6 +21455,7 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "MessageScheduledEvent";
           id: string;
           createdAt: string;
+          petition?: { __typename?: "Petition"; id: string } | null;
           message: {
             __typename?: "PetitionMessage";
             id: string;
@@ -22456,6 +22468,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "MessageScheduledEvent";
                 id: string;
                 createdAt: string;
+                petition?: { __typename?: "Petition"; id: string } | null;
                 message: {
                   __typename?: "PetitionMessage";
                   id: string;
@@ -23169,19 +23182,6 @@ export type PetitionActivity_reactivateAccessesMutation = {
   }>;
 };
 
-export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  messageId: Scalars["GID"]["input"];
-}>;
-
-export type PetitionActivity_cancelScheduledMessageMutation = {
-  cancelScheduledMessage?: {
-    __typename?: "PetitionMessage";
-    id: string;
-    status: PetitionMessageStatus;
-  } | null;
-};
-
 export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
   start: Scalars["Boolean"]["input"];
   petitionId: Scalars["GID"]["input"];
@@ -23548,6 +23548,7 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "MessageScheduledEvent";
                 id: string;
                 createdAt: string;
+                petition?: { __typename?: "Petition"; id: string } | null;
                 message: {
                   __typename?: "PetitionMessage";
                   id: string;
@@ -36417,7 +36418,11 @@ export const SentPetitionMessageDialog_PetitionMessageFragmentDoc = gql`
 ` as unknown as DocumentNode<SentPetitionMessageDialog_PetitionMessageFragment, unknown>;
 export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gql`
   fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
+    petition {
+      id
+    }
     message {
+      id
       sender {
         ...UserReference_User
       }
@@ -37105,9 +37110,6 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
       ...TimelineAccessOpenedEvent_AccessOpenedEvent
     }
     ... on MessageScheduledEvent {
-      message {
-        id
-      }
       ...TimelineMessageScheduledEvent_MessageScheduledEvent
     }
     ... on MessageCancelledEvent {
@@ -41029,6 +41031,20 @@ export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
   AddPetitionAccessDialog_createPetitionAccessMutation,
   AddPetitionAccessDialog_createPetitionAccessMutationVariables
 >;
+export const TimelineMessageScheduledEvent_cancelScheduledMessageDocument = gql`
+  mutation TimelineMessageScheduledEvent_cancelScheduledMessage(
+    $petitionId: GID!
+    $messageId: GID!
+  ) {
+    cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  TimelineMessageScheduledEvent_cancelScheduledMessageMutation,
+  TimelineMessageScheduledEvent_cancelScheduledMessageMutationVariables
+>;
 export const AssociateProfileToPetitionDialog_createProfileDocument = gql`
   mutation AssociateProfileToPetitionDialog_createProfile($profileTypeId: GID!) {
     createProfile(profileTypeId: $profileTypeId, subscribe: true) {
@@ -43888,17 +43904,6 @@ export const PetitionActivity_reactivateAccessesDocument = gql`
 ` as unknown as DocumentNode<
   PetitionActivity_reactivateAccessesMutation,
   PetitionActivity_reactivateAccessesMutationVariables
->;
-export const PetitionActivity_cancelScheduledMessageDocument = gql`
-  mutation PetitionActivity_cancelScheduledMessage($petitionId: GID!, $messageId: GID!) {
-    cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
-      id
-      status
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionActivity_cancelScheduledMessageMutation,
-  PetitionActivity_cancelScheduledMessageMutationVariables
 >;
 export const PetitionActivity_switchAutomaticRemindersDocument = gql`
   mutation PetitionActivity_switchAutomaticReminders(

@@ -388,7 +388,6 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
           row.accesses.filter((a) => !!a.nextReminderAt),
           (a) => new Date(a.nextReminderAt!).valueOf(),
         )?.nextReminderAt;
-
         const redirect = useGoToPetition();
 
         return (
@@ -477,6 +476,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       }),
     cellProps: { minWidth: "160px" },
     CellContent: ({ row }) => {
+      const redirect = useGoToPetition();
       return row.__typename === "Petition" ? (
         isDefined(row.lastActivityAt) ? (
           <DateTime
@@ -484,6 +484,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             format={FORMATS.LLL}
             useRelativeTime="always"
             whiteSpace="nowrap"
+            onClick={(e) => {
+              e.stopPropagation();
+              redirect(row.id, "activity");
+            }}
           />
         ) : (
           <Text textStyle="hint">
@@ -506,6 +510,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       }),
     cellProps: { minWidth: "160px" },
     CellContent: ({ row }) => {
+      const redirect = useGoToPetition();
       return row.__typename === "Petition" ? (
         isDefined(row.lastRecipientActivityAt) ? (
           <DateTime
@@ -513,6 +518,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             format={FORMATS.LLL}
             useRelativeTime="always"
             whiteSpace="nowrap"
+            onClick={(e) => {
+              e.stopPropagation();
+              redirect(row.id, "activity");
+            }}
           />
         ) : (
           <Text textStyle="hint">

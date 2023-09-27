@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, BoxProps } from "@chakra-ui/react";
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
-import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { TimelineAccessActivatedEvent } from "./timeline/events/TimelineAccessActivatedEvent";
 import { TimelineAccessActivatedFromLinkEvent } from "./timeline/events/TimelineAccessActivatedFromLinkEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/events/TimelineAccessDeactivatedEvent";
@@ -25,6 +24,8 @@ import { TimelinePetitionCreatedEvent } from "./timeline/events/TimelinePetition
 import { TimelinePetitionMessageBouncedEvent } from "./timeline/events/TimelinePetitionMessageBouncedEvent";
 import { TimelinePetitionReminderBouncedEvent } from "./timeline/events/TimelinePetitionReminderBouncedEvent";
 import { TimelinePetitionReopenedEvent } from "./timeline/events/TimelinePetitionReopenedEvent";
+import { TimelineProfileAssociatedEvent } from "./timeline/events/TimelineProfileAssociatedEvent";
+import { TimelineProfileDisassociatedEvent } from "./timeline/events/TimelineProfileDisassociatedEvent";
 import { TimelineRecipientSignedEvent } from "./timeline/events/TimelineRecipientSignedEvent";
 import { TimelineReminderSentEvent } from "./timeline/events/TimelineReminderSentEvent";
 import { TimelineRemindersOptOutEvent } from "./timeline/events/TimelineRemindersOptOutEvent";
@@ -34,32 +35,24 @@ import { TimelineReplyStatusChangedEvent } from "./timeline/events/TimelineReply
 import { TimelineReplyUpdatedEvent } from "./timeline/events/TimelineReplyUpdatedEvent";
 import { TimelineSignatureCancelledEvent } from "./timeline/events/TimelineSignatureCancelledEvent";
 import { TimelineSignatureCompletedEvent } from "./timeline/events/TimelineSignatureCompletedEvent";
+import { TimelineSignatureDeliveredEvent } from "./timeline/events/TimelineSignatureDeliveredEvent";
 import { TimelineSignatureOpenedEvent } from "./timeline/events/TimelineSignatureOpenedEvent";
 import { TimelineSignatureReminderEvent } from "./timeline/events/TimelineSignatureReminderEvent";
 import { TimelineSignatureStartedEvent } from "./timeline/events/TimelineSignatureStartedEvent";
 import { TimelineUserPermissionAddedEvent } from "./timeline/events/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/events/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/events/TimelineUserPermissionRemovedEvent";
-import { TimelineProfileDisassociatedEvent } from "./timeline/events/TimelineProfileDisassociatedEvent";
-import { TimelineProfileAssociatedEvent } from "./timeline/events/TimelineProfileAssociatedEvent";
-import { TimelineSignatureDeliveredEvent } from "./timeline/events/TimelineSignatureDeliveredEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
   events: PetitionActivityTimeline_PetitionEventFragment[];
-  onCancelScheduledMessage: (messageId: string) => void;
 } & BoxProps;
 
 export function PetitionActivityTimeline({
   userId,
   events,
-  onCancelScheduledMessage,
   ...props
 }: PetitionActivityTimelineProps) {
-  const handleCancelScheduledMessage = useMemoFactory(
-    (messageId: string) => () => onCancelScheduledMessage(messageId),
-    [onCancelScheduledMessage],
-  );
   return (
     <Box {...props}>
       <Box as="ol">
@@ -76,11 +69,7 @@ export function PetitionActivityTimeline({
             ) : event.__typename === "AccessOpenedEvent" ? (
               <TimelineAccessOpenedEvent event={event} />
             ) : event.__typename === "MessageScheduledEvent" ? (
-              <TimelineMessageScheduledEvent
-                event={event}
-                userId={userId}
-                onCancelScheduledMessage={handleCancelScheduledMessage(event.message.id)}
-              />
+              <TimelineMessageScheduledEvent event={event} userId={userId} />
             ) : event.__typename === "MessageCancelledEvent" ? (
               <TimelineMessageCancelledEvent event={event} userId={userId} />
             ) : event.__typename === "MessageSentEvent" ? (
@@ -186,9 +175,6 @@ PetitionActivityTimeline.fragments = {
         ...TimelineAccessOpenedEvent_AccessOpenedEvent
       }
       ... on MessageScheduledEvent {
-        message {
-          id
-        }
         ...TimelineMessageScheduledEvent_MessageScheduledEvent
       }
       ... on MessageCancelledEvent {

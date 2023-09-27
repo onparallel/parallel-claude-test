@@ -1,49 +1,47 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, useToast } from "@chakra-ui/react";
+import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   FieldErrorDialog,
   useFieldErrorDialog,
 } from "@parallel/components/common/dialogs/FieldErrorDialog";
-import { ShareButton } from "@parallel/components/common/ShareButton";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
+import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
+import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
+import { PetitionProfilesTable } from "@parallel/components/petition-activity/PetitionProfilesTable";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/dialogs/ConfigureRemindersDialog";
-import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/dialogs/ConfirmCancelScheduledMessageDialog";
 import {
   ConfirmDeactivateAccessDialog,
   useConfirmDeactivateAccessDialog,
 } from "@parallel/components/petition-activity/dialogs/ConfirmDeactivateAccessDialog";
+import { useConfirmDisassociateProfileDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDisassociateProfileDialog";
 import {
   ConfirmReactivateAccessDialog,
   useConfirmReactivateAccessDialog,
 } from "@parallel/components/petition-activity/dialogs/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/dialogs/ConfirmSendReminderDialog";
-import { useConfirmDisassociateProfileDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDisassociateProfileDialog";
-import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
-import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
-import { PetitionProfilesTable } from "@parallel/components/petition-activity/PetitionProfilesTable";
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import {
   PetitionAccessTable_PetitionAccessFragment,
-  PetitionActivity_cancelScheduledMessageDocument,
-  PetitionActivity_deactivateAccessesDocument,
-  PetitionActivity_associateProfileToPetitionDocument,
-  PetitionActivity_petitionDocument,
   PetitionActivity_PetitionFragment,
+  PetitionActivity_associateProfileToPetitionDocument,
+  PetitionActivity_deactivateAccessesDocument,
+  PetitionActivity_disassociateProfileFromPetitionDocument,
+  PetitionActivity_petitionDocument,
   PetitionActivity_reactivateAccessesDocument,
   PetitionActivity_sendRemindersDocument,
   PetitionActivity_switchAutomaticRemindersDocument,
-  PetitionActivity_disassociateProfileFromPetitionDocument,
   PetitionActivity_updatePetitionDocument,
   PetitionActivity_userDocument,
   UpdatePetitionInput,
@@ -185,20 +183,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       await refetch();
     },
     [petitionId, petition.accesses],
-  );
-  const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
-  const [cancelScheduledMessage] = useMutation(PetitionActivity_cancelScheduledMessageDocument);
-  const handleCancelScheduledMessage = useCallback(
-    async (messageId: string) => {
-      try {
-        await confirmCancelScheduledMessage();
-      } catch {
-        return;
-      }
-      await cancelScheduledMessage({ variables: { petitionId, messageId } });
-      await refetch();
-    },
-    [petitionId],
   );
 
   const confirmReactivateAccess = useConfirmReactivateAccessDialog();
@@ -424,7 +408,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           id="petition-activity-timeline"
           userId={me.id}
           events={petition.events.items}
-          onCancelScheduledMessage={handleCancelScheduledMessage}
         />
       </Box>
     </PetitionLayout>
@@ -516,14 +499,6 @@ PetitionActivity.mutations = [
   gql`
     mutation PetitionActivity_reactivateAccesses($petitionId: GID!, $accessIds: [GID!]!) {
       reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
-        id
-        status
-      }
-    }
-  `,
-  gql`
-    mutation PetitionActivity_cancelScheduledMessage($petitionId: GID!, $messageId: GID!) {
-      cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
         id
         status
       }
