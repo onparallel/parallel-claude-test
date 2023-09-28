@@ -93,7 +93,7 @@ export function PublicLayout({
           property="og:image"
           content={
             og?.image ??
-            `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${locale}.png?v=${process.env.BUILD_ID}`
+            `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_software_bg.png?v=${process.env.BUILD_ID}`
           }
         />
         <meta property="og:description" content={og?.description ?? description} />
