@@ -7,7 +7,7 @@ import { run } from "../utils/run";
 
 const API_KEY = process.env.API_KEY;
 
-const TEMPLATE_IDS = ["zas25KHxAByKWu6SFLA"];
+const TEMPLATE_IDS = ["zas25KHxAByKXBamSGb"];
 
 async function request(
   path: string,
@@ -37,13 +37,14 @@ async function main() {
   const petitions = await request("/petitions", {
     query: new URLSearchParams({
       fromTemplateId: TEMPLATE_IDS.join(","),
+      status: "COMPLETED",
       limit: "1000",
     }),
   });
   let i = 0;
   for (const petition of petitions.items as any[]) {
     if (petition.status !== "CLOSED") {
-      console.log(`Closing petition ${petition.id} (${++i}/${petitions.totalCount}))`);
+      console.log(`Closing petition ${petition.id} (${++i}/${petitions.totalCount})`);
       await request(`/petitions/${petition.id}/close`, { method: "POST" });
     }
   }

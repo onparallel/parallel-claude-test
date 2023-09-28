@@ -9,8 +9,8 @@ import { run } from "../utils/run";
 
 const API_KEY = process.env.API_KEY;
 
-const TEMPLATE_ID = "zas25KHxAByKXBamSGb";
-const TEMPLATE_FIELD_ID = "FDXxUofV6Q2DPnQMZxXwAEMNhTJMA";
+const TEMPLATE_ID = "zas25KHxAByKXBfqRXS";
+const TEMPLATE_FIELD_ID = "FDXxUofV6Q2DPnQMZxXwAFcfqTgoK";
 
 async function request(
   path: string,
@@ -47,7 +47,9 @@ async function main() {
   });
   for (const petition of petitions.items as any[]) {
     const field = petition.fields.find((f: any) => f.fromPetitionFieldId === TEMPLATE_FIELD_ID);
-    const replies = field.replies?.[0]?.content?.map((r: string) => r.replace(/ - .*/, ""));
+    const replies = field.replies?.[0]?.content?.map((r: string) =>
+      r.replace(/^[\d_]+/, "").replace(/: .*$/, ""),
+    );
     if (replies && replies.length > 0) {
       const tags = difference(replies, petition.tags) as string[];
       if (tags.length > 0) {
