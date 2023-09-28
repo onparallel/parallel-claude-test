@@ -3017,8 +3017,8 @@ interface PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
-  lastActivityAt: DateTime
-  lastRecipientActivityAt: DateTime
+  lastActivityAt: DateTime @deprecated(reason: "")
+  lastRecipientActivityAt: DateTime @deprecated(reason: "")
 
   """
   The locale of the parallel.
@@ -4346,8 +4346,8 @@ type PetitionTemplate implements PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
-  lastActivityAt: DateTime
-  lastRecipientActivityAt: DateTime
+  lastActivityAt: DateTime @deprecated(reason: "")
+  lastRecipientActivityAt: DateTime @deprecated(reason: "")
 
   """
   The locale of the parallel.

@@ -327,9 +327,11 @@ export const PetitionBase = interfaceType({
       },
     });
     t.nullable.datetime("lastActivityAt", {
+      deprecation: "",
       resolve: (o) => o.last_activity_at,
     });
     t.nullable.datetime("lastRecipientActivityAt", {
+      deprecation: "",
       resolve: (o) => o.last_recipient_activity_at,
     });
   },
@@ -472,6 +474,12 @@ export const Petition = objectType({
       resolve: async (o, _, ctx) => {
         return await ctx.profiles.loadProfilesByPetitionId(o.id);
       },
+    });
+    t.nullable.datetime("lastActivityAt", {
+      resolve: (o) => o.last_activity_at,
+    });
+    t.nullable.datetime("lastRecipientActivityAt", {
+      resolve: (o) => o.last_recipient_activity_at,
     });
   },
 });

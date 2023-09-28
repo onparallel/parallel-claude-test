@@ -2613,7 +2613,9 @@ export interface PetitionBase {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  /** @deprecated  */
   lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  /** @deprecated  */
   lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
@@ -3460,7 +3462,9 @@ export interface PetitionTemplate extends PetitionBase {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  /** @deprecated  */
   lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  /** @deprecated  */
   lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
@@ -29257,9 +29261,9 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   name?: string | null;
   status: PetitionStatus;
   sentAt?: string | null;
-  id: string;
   lastActivityAt?: string | null;
   lastRecipientActivityAt?: string | null;
+  id: string;
   createdAt?: string;
   path: string;
   myEffectivePermission?: {
@@ -29357,8 +29361,6 @@ export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   name?: string | null;
   isPublic: boolean;
   id: string;
-  lastActivityAt?: string | null;
-  lastRecipientActivityAt?: string | null;
   createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
@@ -29563,9 +29565,9 @@ export type Petitions_petitionsQuery = {
           name?: string | null;
           status: PetitionStatus;
           sentAt?: string | null;
-          id: string;
           lastActivityAt?: string | null;
           lastRecipientActivityAt?: string | null;
+          id: string;
           createdAt?: string;
           path: string;
           myEffectivePermission?: {
@@ -29666,8 +29668,6 @@ export type Petitions_petitionsQuery = {
           name?: string | null;
           isPublic: boolean;
           id: string;
-          lastActivityAt?: string | null;
-          lastRecipientActivityAt?: string | null;
           createdAt?: string;
           locale: PetitionLocale;
           isRestricted: boolean;
@@ -33868,10 +33868,10 @@ export type usePetitionsTableColumns_PetitionFolderFragment = {
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   sentAt?: string | null;
-  id: string;
-  name?: string | null;
   lastActivityAt?: string | null;
   lastRecipientActivityAt?: string | null;
+  id: string;
+  name?: string | null;
   createdAt?: string;
   status: PetitionStatus;
   accesses?: Array<{
@@ -33955,8 +33955,6 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-  lastActivityAt?: string | null;
-  lastRecipientActivityAt?: string | null;
   createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
@@ -39275,8 +39273,6 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
     id
     name
-    lastActivityAt @include(if: $includeLastActivityAt)
-    lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
     createdAt @include(if: $includeCreatedAt)
     permissions @include(if: $includeSharedWith) {
       permissionType
@@ -39318,6 +39314,8 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       }
       ...PetitionStatusCellContent_Petition @include(if: $includeStatus)
       ...PetitionSignatureCellContent_Petition @include(if: $includeSignature)
+      lastActivityAt @include(if: $includeLastActivityAt)
+      lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
     }
     ... on PetitionTemplate {
       ...TemplateActiveSettingsIcons_PetitionTemplate

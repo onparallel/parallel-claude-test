@@ -674,8 +674,6 @@ usePetitionsTableColumns.fragments = {
     fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
       id
       name
-      lastActivityAt @include(if: $includeLastActivityAt)
-      lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
       createdAt @include(if: $includeCreatedAt)
       permissions @include(if: $includeSharedWith) {
         permissionType
@@ -717,6 +715,8 @@ usePetitionsTableColumns.fragments = {
         }
         ...PetitionStatusCellContent_Petition @include(if: $includeStatus)
         ...PetitionSignatureCellContent_Petition @include(if: $includeSignature)
+        lastActivityAt @include(if: $includeLastActivityAt)
+        lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
       }
       ... on PetitionTemplate {
         ...TemplateActiveSettingsIcons_PetitionTemplate
