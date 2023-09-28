@@ -380,14 +380,14 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     CellContent: ({ row }) => {
       if (row.__typename === "Petition" && isDefined(row.accesses)) {
         const lastReminderDate = maxBy(
-          row.accesses.map((a) => a.reminders[0]?.createdAt),
+          row.accesses.map((a) => a.reminders?.[0]?.createdAt).filter(isDefined),
           (date) => new Date(date).valueOf(),
         );
 
         const nextReminderAt = minBy(
-          row.accesses.filter((a) => !!a.nextReminderAt),
-          (a) => new Date(a.nextReminderAt!).valueOf(),
-        )?.nextReminderAt;
+          row.accesses.map((a) => a.nextReminderAt).filter(isDefined),
+          (date) => new Date(date).valueOf(),
+        );
         const redirect = useGoToPetition();
 
         return (
@@ -399,7 +399,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
             }}
             whiteSpace="nowrap"
           >
-            {lastReminderDate ? (
+            {isDefined(lastReminderDate) ? (
               <DateTime value={lastReminderDate} format={FORMATS.MMMdd} whiteSpace="nowrap" />
             ) : (
               <Text as="span" textStyle="hint">
@@ -409,7 +409,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
                 />
               </Text>
             )}
-            {nextReminderAt ? (
+            {isDefined(nextReminderAt) ? (
               <WithIntl>
                 {(intl) => (
                   <SmallPopover
