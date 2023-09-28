@@ -192,7 +192,7 @@ function LandingTemplateDetails({
                 objectFit="contain"
                 maxHeight="225px"
                 alt={intl.formatMessage({
-                  id: "public.template-card.image-alt",
+                  id: "component.public-template-card.image-alt",
                   defaultMessage: "Example of question you will find in this template.",
                 })}
                 src={

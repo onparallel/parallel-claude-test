@@ -25,7 +25,7 @@ export function LandingTemplateCard({ template }: LandingTemplateCardProps) {
             height="100%"
             objectFit="contain"
             alt={intl.formatMessage({
-              id: "public.template-card.image-alt",
+              id: "component.public-template-card.image-alt",
               defaultMessage: "Example of question you will find in this template.",
             })}
             src={

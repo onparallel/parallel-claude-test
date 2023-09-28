@@ -12640,7 +12640,7 @@
     "context": "Created by {name} on {orgName}"
   },
   {
-    "term": "public.template-card.image-alt",
+    "term": "component.public-template-card.image-alt",
     "definition": "Example of question you will find in this template.",
     "context": "Example of question you will find in this template."
   },

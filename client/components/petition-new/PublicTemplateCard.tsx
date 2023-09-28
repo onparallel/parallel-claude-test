@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Center,
-  Flex,
-  HStack,
-  Image,
-  Stack,
-  Text,
-  useMultiStyleConfig,
-} from "@chakra-ui/react";
+import { Box, Center, HStack, Image, Stack, Text, useMultiStyleConfig } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -69,7 +60,7 @@ export const PublicTemplateCard = Object.assign(
               height="100%"
               objectFit="contain"
               alt={intl.formatMessage({
-                id: "public.template-card.image-alt",
+                id: "component.public-template-card.image-alt",
                 defaultMessage: "Example of question you will find in this template.",
               })}
               src={
@@ -85,15 +76,11 @@ export const PublicTemplateCard = Object.assign(
               </Text>
               {otherCategories?.length && (
                 <StringListPopover items={otherCategories}>
-                  <Flex
-                    alignItems="center"
-                    fontSize="2xs"
-                    borderRadius="full"
-                    paddingLeft="2px"
-                    sx={styles.excessLabel}
-                  >
-                    <Box as="span">+{otherCategories.length}</Box>
-                  </Flex>
+                  <Center borderRadius="full" sx={styles.excessLabel}>
+                    <Box as="span" fontSize="2xs">
+                      +{otherCategories.length}
+                    </Box>
+                  </Center>
                 </StringListPopover>
               )}
             </HStack>
