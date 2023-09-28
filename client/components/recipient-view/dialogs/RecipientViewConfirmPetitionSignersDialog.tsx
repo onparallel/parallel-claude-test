@@ -146,7 +146,6 @@ function RecipientViewConfirmPetitionSignersDialog({
               email: s.email,
               firstName: s.firstName,
               lastName: s.lastName ?? "",
-              isPreset: false,
             })),
           });
         }),
@@ -294,7 +293,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                   <GrowingTextarea
                     {...register("message", {
                       required: showMessage,
-                      validate: (m) => isDefined(m) && m.length > 0,
+                      validate: (m) => !showMessage || (isDefined(m) && m.length > 0),
                     })}
                     maxHeight="30vh"
                     aria-label={intl.formatMessage(
