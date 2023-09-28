@@ -18,6 +18,7 @@ getPetitionSignatureEnvironment.fragments = {
   Petition: gql`
     fragment getPetitionSignatureEnvironment_Petition on Petition {
       currentSignatureRequest {
+        id
         environment
       }
       signatureConfig {

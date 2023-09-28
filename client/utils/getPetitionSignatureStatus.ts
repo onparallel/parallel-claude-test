@@ -44,6 +44,7 @@ getPetitionSignatureStatus.fragments = {
     fragment getPetitionSignatureStatus_Petition on Petition {
       status
       currentSignatureRequest {
+        id
         status
         cancelReason
       }

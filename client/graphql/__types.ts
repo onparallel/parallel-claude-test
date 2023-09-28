@@ -5679,6 +5679,7 @@ export type PetitionSignatureCellContent_PetitionFragment = {
   status: PetitionStatus;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
@@ -15665,6 +15666,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
   } | null;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     environment: SignatureOrgIntegrationEnvironment;
   } | null;
   fields: Array<{
@@ -15779,6 +15781,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         } | null;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
+          id: string;
           environment: SignatureOrgIntegrationEnvironment;
         } | null;
         fields: Array<{
@@ -15942,6 +15945,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
     } | null;
     currentSignatureRequest?: {
       __typename?: "PetitionSignatureRequest";
+      id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
     fields: Array<{
@@ -16056,6 +16060,7 @@ export type PetitionSignaturesCard_petitionQuery = {
         } | null;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
+          id: string;
           environment: SignatureOrgIntegrationEnvironment;
         } | null;
         fields: Array<{
@@ -16619,6 +16624,7 @@ export type ProfilePetitionsTable_PetitionFragment = {
   };
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
@@ -16708,6 +16714,7 @@ export type ProfilePetitionsTable_petitionsQuery = {
         };
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
+          id: string;
           status: PetitionSignatureRequestStatus;
           cancelReason?: string | null;
           environment: SignatureOrgIntegrationEnvironment;
@@ -19008,6 +19015,7 @@ export type Contact_ContactFragment = {
         };
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
+          id: string;
           status: PetitionSignatureRequestStatus;
           cancelReason?: string | null;
           environment: SignatureOrgIntegrationEnvironment;
@@ -19087,6 +19095,7 @@ export type Contact_PetitionAccessFragment = {
     };
     currentSignatureRequest?: {
       __typename?: "PetitionSignatureRequest";
+      id: string;
       status: PetitionSignatureRequestStatus;
       cancelReason?: string | null;
       environment: SignatureOrgIntegrationEnvironment;
@@ -19152,6 +19161,7 @@ export type Contact_PetitionFragment = {
   };
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
@@ -19291,6 +19301,7 @@ export type Contact_contactQuery = {
           };
           currentSignatureRequest?: {
             __typename?: "PetitionSignatureRequest";
+            id: string;
             status: PetitionSignatureRequestStatus;
             cancelReason?: string | null;
             environment: SignatureOrgIntegrationEnvironment;
@@ -29333,6 +29344,7 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   };
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
@@ -29642,6 +29654,7 @@ export type Petitions_petitionsQuery = {
           };
           currentSignatureRequest?: {
             __typename?: "PetitionSignatureRequest";
+            id: string;
             status: PetitionSignatureRequestStatus;
             cancelReason?: string | null;
             environment: SignatureOrgIntegrationEnvironment;
@@ -32670,6 +32683,7 @@ export type getPetitionSignatureEnvironment_PetitionFragment = {
   __typename?: "Petition";
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     environment: SignatureOrgIntegrationEnvironment;
   } | null;
   signatureConfig?: {
@@ -32686,6 +32700,7 @@ export type getPetitionSignatureStatus_PetitionFragment = {
   status: PetitionStatus;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
   } | null;
@@ -33937,6 +33952,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   };
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
@@ -35440,6 +35456,7 @@ export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
   fragment getPetitionSignatureStatus_Petition on Petition {
     status
     currentSignatureRequest {
+      id
       status
       cancelReason
     }
@@ -35451,6 +35468,7 @@ export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
 export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
   fragment getPetitionSignatureEnvironment_Petition on Petition {
     currentSignatureRequest {
+      id
       environment
     }
     signatureConfig {
