@@ -7,6 +7,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionField, User } from "../../db/__types";
 import { deleteAllData } from "../../util/knexUtils";
 import { validateFieldVisibilityConditions } from "../helpers/validators/validFieldVisibility";
+import { times } from "remeda";
 
 describe("Field Visibility Conditions", () => {
   let container: Container;
@@ -205,7 +206,7 @@ describe("Field Visibility Conditions", () => {
     ).toThrowError();
   });
 
-  it("should have up to 5 conditions", () => {
+  it("should have up to 15 conditions", () => {
     expect(() =>
       validateFieldVisibilityConditions(
         {
@@ -213,44 +214,12 @@ describe("Field Visibility Conditions", () => {
           visibility: {
             type: "HIDE",
             operator: "OR",
-            conditions: [
-              {
-                fieldId: textField.id,
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "GREATER_THAN",
-                value: 1,
-              },
-              {
-                fieldId: textField.id,
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "GREATER_THAN",
-                value: 1,
-              },
-              {
-                fieldId: textField.id,
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "GREATER_THAN",
-                value: 1,
-              },
-              {
-                fieldId: textField.id,
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "GREATER_THAN",
-                value: 1,
-              },
-              {
-                fieldId: textField.id,
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "GREATER_THAN",
-                value: 1,
-              },
-              {
-                fieldId: textField.id,
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "GREATER_THAN",
-                value: 1,
-              },
-            ],
+            conditions: times(20, () => ({
+              fieldId: textField.id,
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            })),
           },
         },
         allFields,
