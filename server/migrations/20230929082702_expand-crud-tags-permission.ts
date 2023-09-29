@@ -21,18 +21,6 @@ export async function up(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
     insert into user_group_permission (user_group_id, name, effect, created_by, updated_by)
     select 
-      ug.id,
-      'TAGS:CREATE_TAGS',
-      'DENY',
-      ug.created_by,
-      ug.updated_by
-    from user_group ug
-    where ug.type = 'INITIAL' and ug.name = 'Collaborators'
-    and ug.deleted_at is null;
-  `);
-  await knex.raw(/* sql */ `
-    insert into user_group_permission (user_group_id, name, effect, created_by, updated_by)
-    select 
       ugp.user_group_id,
       'TAGS:UPDATE_TAGS',
       ugp.effect, 
