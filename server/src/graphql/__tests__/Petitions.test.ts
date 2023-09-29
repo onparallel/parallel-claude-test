@@ -199,7 +199,10 @@ describe("GraphQL/Petitions", () => {
     // a petition from secondary user
     [otherPetition] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1);
 
-    await mocks.createFeatureFlags([{ name: "ON_BEHALF_OF", default_value: true }]);
+    await mocks.createFeatureFlags([
+      { name: "ON_BEHALF_OF", default_value: true },
+      { name: "CUSTOM_PROPERTIES", default_value: true },
+    ]);
   });
 
   afterAll(async () => {

@@ -2185,6 +2185,16 @@
     "context": "Subdomain feature (UI)"
   },
   {
+    "term": "component.feature-flag-descriptions.custom-properties-description",
+    "definition": "Concede acceso al endpoint de la API para modificar las propiedades personalizadas de la petición",
+    "context": "Grants access to the API endpoint for modifying petition custom properties"
+  },
+  {
+    "term": "component.feature-flag-descriptions.custom-properties-name",
+    "definition": "Propiedades personalizadas de la petición",
+    "context": "Petition custom properties"
+  },
+  {
     "term": "component.feature-flag-descriptions.custom-solutions",
     "definition": "Soluciones a medida",
     "context": "Custom solutions"

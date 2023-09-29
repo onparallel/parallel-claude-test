@@ -2216,6 +2216,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
+    userHasFeatureFlag("CUSTOM_PROPERTIES"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

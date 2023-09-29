@@ -322,6 +322,18 @@ export function useFeatureFlags() {
               defaultMessage: "Grants access import replies dialog in the petition",
             }),
           },
+          {
+            name: "CUSTOM_PROPERTIES",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.custom-properties-name",
+              defaultMessage: "Petition custom properties",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.custom-properties-description",
+              defaultMessage:
+                "Grants access to the API endpoint for modifying petition custom properties",
+            }),
+          },
         ],
       },
     ],
