@@ -878,6 +878,8 @@ export type Mutation = {
   updateContact: Contact;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
+  /** Activate or deactivate a feature flag on a specific user */
+  updateFeatureFlag: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
   /** Updates the positions of the petition fields */
@@ -1837,6 +1839,12 @@ export type MutationupdateEventSubscriptionArgs = {
   id: Scalars["GID"]["input"];
   isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type MutationupdateFeatureFlagArgs = {
+  featureFlag: FeatureFlag;
+  userId: Scalars["GID"]["input"];
+  value: Scalars["Boolean"]["input"];
 };
 
 export type MutationupdateFeatureFlagsArgs = {

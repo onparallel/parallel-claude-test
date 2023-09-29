@@ -170,6 +170,28 @@ export class FeatureFlagRepository extends BaseRepository {
     );
   }
 
+  async upsertFeatureFlagOverrideForUser(
+    userId: number,
+    featureFlag: MaybeArray<{ name: FeatureFlagName; value: boolean }>,
+    t?: Knex.Transaction,
+  ) {
+    const featureFlags = unMaybeArray(featureFlag);
+    if (featureFlags.length === 0) {
+      return [];
+    }
+    return await this.raw<FeatureFlagOverride>(
+      /* sql */ `
+        insert into feature_flag_override (feature_flag_name, user_id, "value") ? 
+          on conflict (user_id, feature_flag_name) where org_id is null do update
+        set
+          value = EXCLUDED.value
+        returning *;
+      `,
+      [this.sqlValues(featureFlags.map(({ name, value }) => [name, userId, value]))],
+      t,
+    );
+  }
+
   async removeFeatureFlagOverrides(orgId: number, t?: Knex.Transaction) {
     await this.from("feature_flag_override", t).where("org_id", orgId).delete();
   }
