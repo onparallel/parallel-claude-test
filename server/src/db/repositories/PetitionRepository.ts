@@ -3272,6 +3272,12 @@ export class PetitionRepository extends BaseRepository {
       });
   }
 
+  async deleteOldPetitionUserNotifications(months: number) {
+    await this.from("petition_user_notification")
+      .whereRaw(/* sql */ `created_at < NOW() - make_interval(months => ?)`, [months])
+      .delete();
+  }
+
   private filterPetitionUserNotificationQueryBuilder(
     filter?: Maybe<PetitionUserNotificationFilter>,
   ): Knex.QueryCallback<PetitionUserNotification<false>> {
