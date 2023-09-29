@@ -143,8 +143,9 @@ describe("UserRepository", () => {
         "PETITIONS:CREATE_PETITIONS",
       );
 
-      expect(users).toHaveLength(2);
-      expect(users).toMatchObject([{ id: owner.id }, { id: user.id }]);
+      const userIds = users.map((u) => u.id);
+      expect(userIds).toHaveLength(2);
+      expect(userIds).toIncludeSameMembers([owner.id, user.id]);
     });
 
     it("user should be denied PETITIONS:CREATE_PETITIONS permission", async () => {
