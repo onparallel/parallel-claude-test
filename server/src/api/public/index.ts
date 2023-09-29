@@ -353,7 +353,19 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
   return {
     include: enumParam({
       schemaTitle: "PetitionIncludeInResponse",
-      description: "Include optional fields in the response",
+      description: outdent`
+        Include optional fields in the response:
+        - \`recipients\`: List of the recipients the parallel has been sent to.
+        - \`fields\`: A list of fields of the parallel and their replies.
+        - \`tags\`: List of the tags the parallel has.
+        - \`replies\`: An object with the replies by alias. Only fields with an alias defined will be shown.
+        - \`signers\`: List of the signers, if any, of the parallel.
+        ${
+          includeRecipientUrl
+            ? `- \`recipients.recipientUrl\`: Include the recipient URL in when using \`recipients\`. **A special permission is required as there are security implications**.`
+            : ``
+        }
+      `,
       array: true,
       required: false,
       values: [
