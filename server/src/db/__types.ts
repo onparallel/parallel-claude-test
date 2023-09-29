@@ -35,7 +35,8 @@ export type FeatureFlagName =
   | "CLIENT_PORTAL"
   | "PROFILES"
   | "COPY_PETITION_REPLIES"
-  | "PERMISSION_MANAGEMENT";
+  | "PERMISSION_MANAGEMENT"
+  | "CUSTOM_PROPERTIES";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -60,6 +61,7 @@ export const FeatureFlagNameValues = [
   "PROFILES",
   "COPY_PETITION_REPLIES",
   "PERMISSION_MANAGEMENT",
+  "CUSTOM_PROPERTIES",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";

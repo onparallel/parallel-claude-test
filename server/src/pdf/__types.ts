@@ -352,6 +352,7 @@ export type FeatureFlag =
   | "CLIENT_PORTAL"
   | "COPY_PETITION_REPLIES"
   | "CUSTOM_HOST_UI"
+  | "CUSTOM_PROPERTIES"
   | "DEVELOPER_ACCESS"
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "DOW_JONES_KYC"
@@ -2550,7 +2551,9 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  /** @deprecated  */
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  /** @deprecated  */
   lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
@@ -3353,7 +3356,9 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
+  /** @deprecated  */
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  /** @deprecated  */
   lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
