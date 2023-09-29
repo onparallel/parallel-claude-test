@@ -644,7 +644,7 @@ describe("GraphQL/UserGroups", () => {
           permissions: [
             {
               effect: "GRANT",
-              name: "TAGS:CRUD_TAGS",
+              name: "TAGS:CREATE_TAGS",
             },
           ],
         },
@@ -753,8 +753,8 @@ describe("GraphQL/UserGroups", () => {
         {
           userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
           permissions: [
-            { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
-            { effect: "DENY", name: "TAGS:CRUD_TAGS" },
+            { effect: "GRANT", name: "TAGS:CREATE_TAGS" },
+            { effect: "DENY", name: "TAGS:CREATE_TAGS" },
           ],
         },
       );
@@ -781,7 +781,7 @@ describe("GraphQL/UserGroups", () => {
           permissions: [
             {
               effect: "GRANT",
-              name: "TAGS:CRUD_TAGS",
+              name: "TAGS:CREATE_TAGS",
             },
           ],
         },
@@ -794,7 +794,7 @@ describe("GraphQL/UserGroups", () => {
           { effect: "GRANT", name: "PETITIONS:CHANGE_PATH" },
           { effect: "GRANT", name: "PETITIONS:CREATE_PETITIONS" },
           { effect: "GRANT", name: "PETITIONS:CREATE_TEMPLATES" },
-          { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
+          { effect: "GRANT", name: "TAGS:CREATE_TAGS" },
         ]),
       });
     });
@@ -946,7 +946,7 @@ describe("GraphQL/UserGroups", () => {
         {
           userGroupId: toGlobalId("UserGroup", allUsersGroup.id),
           permissions: [
-            { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
+            { effect: "GRANT", name: "TAGS:CREATE_TAGS" },
             { effect: "DENY", name: "PETITIONS:CREATE_PETITIONS" },
             { effect: "NONE", name: "PETITIONS:CREATE_TEMPLATES" },
             { effect: "NONE", name: "REPORTS:OVERVIEW" }, // this does nothing
@@ -964,7 +964,7 @@ describe("GraphQL/UserGroups", () => {
         permissions: expect.toIncludeSameMembers([
           { effect: "GRANT", name: "PETITIONS:CHANGE_PATH" },
           { effect: "DENY", name: "PETITIONS:CREATE_PETITIONS" },
-          { effect: "GRANT", name: "TAGS:CRUD_TAGS" },
+          { effect: "GRANT", name: "TAGS:CREATE_TAGS" },
           { effect: "GRANT", name: "INTEGRATIONS:CRUD_INTEGRATIONS" },
           { effect: "GRANT", name: "PROFILE_TYPES:CRUD_PROFILE_TYPES" },
           { effect: "GRANT", name: "PETITIONS:SEND_ON_BEHALF" },

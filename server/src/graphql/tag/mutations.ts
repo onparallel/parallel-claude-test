@@ -18,7 +18,7 @@ import { validateHexColor } from "./validators";
 export const createTag = mutationField("createTag", {
   description: "Creates a tag in the user's organization",
   type: "Tag",
-  authorize: authenticateAnd(contextUserHasPermission("TAGS:CRUD_TAGS")),
+  authorize: authenticateAnd(contextUserHasPermission("TAGS:CREATE_TAGS")),
   validateArgs: validateAnd(
     validateHexColor((args) => args.color, "color"),
     notEmptyString((args) => args.name, "name"),
@@ -56,7 +56,10 @@ export const createTag = mutationField("createTag", {
 export const updateTag = mutationField("updateTag", {
   description: "Updates the name and color of a given tag",
   type: "Tag",
-  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasPermission("TAGS:CRUD_TAGS")),
+  authorize: authenticateAnd(
+    userHasAccessToTags("id"),
+    contextUserHasPermission("TAGS:UPDATE_TAGS"),
+  ),
   validateArgs: validateAnd(
     validateHexColor((args) => args.data.color, "data.color"),
     notEmptyString((args) => args.data.name, "data.name"),
@@ -104,7 +107,10 @@ export const updateTag = mutationField("updateTag", {
 export const deleteTag = mutationField("deleteTag", {
   description: "Removes the tag from every petition and soft-deletes it",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasPermission("TAGS:CRUD_TAGS")),
+  authorize: authenticateAnd(
+    userHasAccessToTags("id"),
+    contextUserHasPermission("TAGS:DELETE_TAGS"),
+  ),
   args: {
     id: nonNull(globalIdArg("Tag")),
     force: nullable(

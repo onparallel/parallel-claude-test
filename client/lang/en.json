@@ -5560,6 +5560,11 @@
     "context": "Work better with"
   },
   {
+    "term": "component.public-template-card.image-alt",
+    "definition": "Example of question you will find in this template.",
+    "context": "Example of question you will find in this template."
+  },
+  {
     "term": "component.react-select.loading",
     "definition": "Loading...",
     "context": "Loading..."
@@ -10451,8 +10456,8 @@
   },
   {
     "term": "page.permissions-group.contacts-list-description",
-    "definition": "Grants users in this team permissions to view the list of contacts on the organization",
-    "context": "Grants users in this team permissions to view the list of contacts on the organization"
+    "definition": "Grants users in this team permissions to view the list of contacts on the organization.",
+    "context": "Grants users in this team permissions to view the list of contacts on the organization."
   },
   {
     "term": "page.permissions-group.delete-contacts",
@@ -10461,8 +10466,8 @@
   },
   {
     "term": "page.permissions-group.delete-contacts-description",
-    "definition": "Grants users in this team permissions to delete contacts on the organization",
-    "context": "Grants users in this team permissions to delete contacts on the organization"
+    "definition": "Grants users in this team permissions to delete contacts on the organization.",
+    "context": "Grants users in this team permissions to delete contacts on the organization."
   },
   {
     "term": "page.permissions-group.effects-deny",
@@ -10506,13 +10511,13 @@
   },
   {
     "term": "page.permissions-group.integrations-crud-api-description",
-    "definition": "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens",
-    "context": "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens"
+    "definition": "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens.",
+    "context": "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens."
   },
   {
     "term": "page.permissions-group.integrations-crud-description",
-    "definition": "Grants users in this team permissions to manage the different integrations of the organization",
-    "context": "Grants users in this team permissions to manage the different integrations of the organization"
+    "definition": "Grants users in this team permissions to manage the different integrations of the organization.",
+    "context": "Grants users in this team permissions to manage the different integrations of the organization."
   },
   {
     "term": "page.permissions-group.org-settings",
@@ -10536,8 +10541,8 @@
   },
   {
     "term": "page.permissions-group.petitions-change-path-description",
-    "definition": "Grants users in this team permissions to create and manage folders of templates and parallels",
-    "context": "Grants users in this team permissions to create and manage folders of templates and parallels"
+    "definition": "Grants users in this team permissions to create and manage folders of templates and parallels.",
+    "context": "Grants users in this team permissions to create and manage folders of templates and parallels."
   },
   {
     "term": "page.permissions-group.petitions-create",
@@ -10576,8 +10581,8 @@
   },
   {
     "term": "page.permissions-group.profile-alerts-list-description",
-    "definition": "Grants users in this team permissions to view the list of property expiration alerts of the profiles",
-    "context": "Grants users in this team permissions to view the list of property expiration alerts of the profiles"
+    "definition": "Grants users in this team permissions to view the list of property expiration alerts of the profiles.",
+    "context": "Grants users in this team permissions to view the list of property expiration alerts of the profiles."
   },
   {
     "term": "page.permissions-group.profile-delete-profiles",
@@ -10606,8 +10611,8 @@
   },
   {
     "term": "page.permissions-group.profiles-close-description",
-    "definition": "Grants users in this team permissions to close and reopen profiles on the organization",
-    "context": "Grants users in this team permissions to close and reopen profiles on the organization"
+    "definition": "Grants users in this team permissions to close and reopen profiles on the organization.",
+    "context": "Grants users in this team permissions to close and reopen profiles on the organization."
   },
   {
     "term": "page.permissions-group.profiles-create",
@@ -10616,8 +10621,8 @@
   },
   {
     "term": "page.permissions-group.profiles-create-description",
-    "definition": "Grants users in this team permissions to create and manage profiles on the organization",
-    "context": "Grants users in this team permissions to create and manage profiles on the organization"
+    "definition": "Grants users in this team permissions to create and manage profiles on the organization.",
+    "context": "Grants users in this team permissions to create and manage profiles on the organization."
   },
   {
     "term": "page.permissions-group.profiles-delete-permanently-profiles",
@@ -10636,8 +10641,8 @@
   },
   {
     "term": "page.permissions-group.profiles-list-description",
-    "definition": "Grants users in this team permissions to view the list of profiles created on the organization",
-    "context": "Grants users in this team permissions to view the list of profiles created on the organization"
+    "definition": "Grants users in this team permissions to view the list of profiles created on the organization.",
+    "context": "Grants users in this team permissions to view the list of profiles created on the organization."
   },
   {
     "term": "page.permissions-group.profiles-subscribe",
@@ -10646,8 +10651,8 @@
   },
   {
     "term": "page.permissions-group.profiles-subscribe-description",
-    "definition": "Grants users in this team permissions to manage profile alerts subscriptions",
-    "context": "Grants users in this team permissions to manage profile alerts subscriptions"
+    "definition": "Grants users in this team permissions to manage profile alerts subscriptions.",
+    "context": "Grants users in this team permissions to manage profile alerts subscriptions."
   },
   {
     "term": "page.permissions-group.reports-overview",
@@ -10656,8 +10661,8 @@
   },
   {
     "term": "page.permissions-group.reports-overview-description",
-    "definition": "Grants users in this team permissions to view the general usage report of the organization",
-    "context": "Grants users in this team permissions to view the general usage report of the organization"
+    "definition": "Grants users in this team permissions to view the general usage report of the organization.",
+    "context": "Grants users in this team permissions to view the general usage report of the organization."
   },
   {
     "term": "page.permissions-group.reports-template-replies",
@@ -10666,8 +10671,8 @@
   },
   {
     "term": "page.permissions-group.reports-template-replies-description",
-    "definition": "Grants users in this team permissions to view the template replies report of the organization",
-    "context": "Grants users in this team permissions to view the template replies report of the organization"
+    "definition": "Grants users in this team permissions to view the template replies report of the organization.",
+    "context": "Grants users in this team permissions to view the template replies report of the organization."
   },
   {
     "term": "page.permissions-group.reports-template-statistics",
@@ -10676,8 +10681,8 @@
   },
   {
     "term": "page.permissions-group.reports-template-statistics-description",
-    "definition": "Grants users in this team permissions to view the template statistics report of the organization",
-    "context": "Grants users in this team permissions to view the template statistics report of the organization"
+    "definition": "Grants users in this team permissions to view the template statistics report of the organization.",
+    "context": "Grants users in this team permissions to view the template statistics report of the organization."
   },
   {
     "term": "page.permissions-group.superadmin",
@@ -10690,14 +10695,34 @@
     "context": "Grants users in this team permissions to access the Admin Panel. (only for Parallel org)"
   },
   {
-    "term": "page.permissions-group.tags-crud-tags",
-    "definition": "Create and manage tags",
-    "context": "Create and manage tags"
+    "term": "page.permissions-group.tags-create-tags",
+    "definition": "Create tags",
+    "context": "Create tags"
   },
   {
-    "term": "page.permissions-group.tags-crud-tags-description",
-    "definition": "Grants users in this team permissions to create, edit and delete tags for the templates and parallels on the organization",
-    "context": "Grants users in this team permissions to create, edit and delete tags for the templates and parallels on the organization"
+    "term": "page.permissions-group.tags-create-tags-description",
+    "definition": "Grants users in this team permissions to create new tags.",
+    "context": "Grants users in this team permissions to create new tags."
+  },
+  {
+    "term": "page.permissions-group.tags-delete-tags",
+    "definition": "Delete tags",
+    "context": "Delete tags"
+  },
+  {
+    "term": "page.permissions-group.tags-delete-tags-description",
+    "definition": "Grants users in this team permissions to delete tags.",
+    "context": "Grants users in this team permissions to delete tags."
+  },
+  {
+    "term": "page.permissions-group.tags-update-tags",
+    "definition": "Update tags",
+    "context": "Update tags"
+  },
+  {
+    "term": "page.permissions-group.tags-update-tags-description",
+    "definition": "Grants users in this team permissions to update existing tags.",
+    "context": "Grants users in this team permissions to update existing tags."
   },
   {
     "term": "page.permissions-group.teams-crud",
@@ -10706,8 +10731,8 @@
   },
   {
     "term": "page.permissions-group.teams-crud-description",
-    "definition": "Grants users in this team permissions to manage the teams on the organization",
-    "context": "Grants users in this team permissions to manage the teams on the organization"
+    "definition": "Grants users in this team permissions to manage the teams on the organization.",
+    "context": "Grants users in this team permissions to manage the teams on the organization."
   },
   {
     "term": "page.permissions-group.teams-edit-permissions",
@@ -10716,8 +10741,8 @@
   },
   {
     "term": "page.permissions-group.teams-edit-permissions-description",
-    "definition": "Grants users in this team permissions to manage the permissions of each team on the organization",
-    "context": "Grants users in this team permissions to manage the permissions of each team on the organization"
+    "definition": "Grants users in this team permissions to manage the permissions of each team on the organization.",
+    "context": "Grants users in this team permissions to manage the permissions of each team on the organization."
   },
   {
     "term": "page.permissions-group.teams-list",
@@ -10726,8 +10751,8 @@
   },
   {
     "term": "page.permissions-group.teams-list-description",
-    "definition": "Grants users in this team permissions to view the list of teams on the organization",
-    "context": "Grants users in this team permissions to view the list of teams on the organization"
+    "definition": "Grants users in this team permissions to view the list of teams on the organization.",
+    "context": "Grants users in this team permissions to view the list of teams on the organization."
   },
   {
     "term": "page.permissions-group.users-crud",
@@ -12638,11 +12663,6 @@
     "term": "public.template-card.created-by",
     "definition": "Created by {name} on {orgName}",
     "context": "Created by {name} on {orgName}"
-  },
-  {
-    "term": "component.public-template-card.image-alt",
-    "definition": "Example of question you will find in this template.",
-    "context": "Example of question you will find in this template."
   },
   {
     "term": "public.template-category-empty.coming-soon",

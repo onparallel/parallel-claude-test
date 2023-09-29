@@ -151,7 +151,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.petitions-change-path-description",
               defaultMessage:
-                "Grants users in this team permissions to create and manage folders of templates and parallels",
+                "Grants users in this team permissions to create and manage folders of templates and parallels.",
             }),
           },
           ...(me.hasOnBehalfOfAccess
@@ -187,7 +187,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.reports-overview-description",
               defaultMessage:
-                "Grants users in this team permissions to view the general usage report of the organization",
+                "Grants users in this team permissions to view the general usage report of the organization.",
             }),
           },
           {
@@ -199,7 +199,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.reports-template-statistics-description",
               defaultMessage:
-                "Grants users in this team permissions to view the template statistics report of the organization",
+                "Grants users in this team permissions to view the template statistics report of the organization.",
             }),
           },
           {
@@ -211,7 +211,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.reports-template-replies-description",
               defaultMessage:
-                "Grants users in this team permissions to view the template replies report of the organization",
+                "Grants users in this team permissions to view the template replies report of the organization.",
             }),
           },
         ],
@@ -245,7 +245,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   description: intl.formatMessage({
                     id: "page.permissions-group.profiles-list-description",
                     defaultMessage:
-                      "Grants users in this team permissions to view the list of profiles created on the organization",
+                      "Grants users in this team permissions to view the list of profiles created on the organization.",
                   }),
                 },
                 {
@@ -257,7 +257,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   description: intl.formatMessage({
                     id: "page.permissions-group.profiles-create-description",
                     defaultMessage:
-                      "Grants users in this team permissions to create and manage profiles on the organization",
+                      "Grants users in this team permissions to create and manage profiles on the organization.",
                   }),
                 },
                 {
@@ -269,7 +269,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   description: intl.formatMessage({
                     id: "page.permissions-group.profiles-close-description",
                     defaultMessage:
-                      "Grants users in this team permissions to close and reopen profiles on the organization",
+                      "Grants users in this team permissions to close and reopen profiles on the organization.",
                   }),
                 },
                 {
@@ -305,7 +305,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   description: intl.formatMessage({
                     id: "page.permissions-group.profile-alerts-list-description",
                     defaultMessage:
-                      "Grants users in this team permissions to view the list of property expiration alerts of the profiles",
+                      "Grants users in this team permissions to view the list of property expiration alerts of the profiles.",
                   }),
                 },
                 {
@@ -317,7 +317,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   description: intl.formatMessage({
                     id: "page.permissions-group.profiles-subscribe-description",
                     defaultMessage:
-                      "Grants users in this team permissions to manage profile alerts subscriptions",
+                      "Grants users in this team permissions to manage profile alerts subscriptions.",
                   }),
                 },
               ],
@@ -341,7 +341,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   description: intl.formatMessage({
                     id: "page.permissions-group.integrations-crud-description",
                     defaultMessage:
-                      "Grants users in this team permissions to manage the different integrations of the organization",
+                      "Grants users in this team permissions to manage the different integrations of the organization.",
                   }),
                 },
                 {
@@ -353,7 +353,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   description: intl.formatMessage({
                     id: "page.permissions-group.integrations-crud-api-description",
                     defaultMessage:
-                      "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens",
+                      "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens.",
                   }),
                 },
               ],
@@ -424,7 +424,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.teams-list-description",
               defaultMessage:
-                "Grants users in this team permissions to view the list of teams on the organization",
+                "Grants users in this team permissions to view the list of teams on the organization.",
             }),
           },
           {
@@ -436,7 +436,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.teams-crud-description",
               defaultMessage:
-                "Grants users in this team permissions to manage the teams on the organization",
+                "Grants users in this team permissions to manage the teams on the organization.",
             }),
           },
           {
@@ -448,7 +448,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.teams-edit-permissions-description",
               defaultMessage:
-                "Grants users in this team permissions to manage the permissions of each team on the organization",
+                "Grants users in this team permissions to manage the permissions of each team on the organization.",
             }),
           },
         ],
@@ -468,7 +468,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.contacts-list-description",
               defaultMessage:
-                "Grants users in this team permissions to view the list of contacts on the organization",
+                "Grants users in this team permissions to view the list of contacts on the organization.",
             }),
           },
           {
@@ -480,7 +480,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             description: intl.formatMessage({
               id: "page.permissions-group.delete-contacts-description",
               defaultMessage:
-                "Grants users in this team permissions to delete contacts on the organization",
+                "Grants users in this team permissions to delete contacts on the organization.",
             }),
           },
         ],
@@ -492,15 +492,36 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
         }),
         permissions: [
           {
-            name: "TAGS:CRUD_TAGS",
+            name: "TAGS:CREATE_TAGS",
             title: intl.formatMessage({
-              id: "page.permissions-group.tags-crud-tags",
-              defaultMessage: "Create and manage tags",
+              id: "page.permissions-group.tags-create-tags",
+              defaultMessage: "Create tags",
             }),
             description: intl.formatMessage({
-              id: "page.permissions-group.tags-crud-tags-description",
-              defaultMessage:
-                "Grants users in this team permissions to create, edit and delete tags for the templates and parallels on the organization",
+              id: "page.permissions-group.tags-create-tags-description",
+              defaultMessage: "Grants users in this team permissions to create new tags.",
+            }),
+          },
+          {
+            name: "TAGS:UPDATE_TAGS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.tags-update-tags",
+              defaultMessage: "Update tags",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.tags-update-tags-description",
+              defaultMessage: "Grants users in this team permissions to update existing tags.",
+            }),
+          },
+          {
+            name: "TAGS:DELETE_TAGS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.tags-delete-tags",
+              defaultMessage: "Delete tags",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.tags-delete-tags-description",
+              defaultMessage: "Grants users in this team permissions to delete tags.",
             }),
           },
         ],

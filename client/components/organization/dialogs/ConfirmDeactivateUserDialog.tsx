@@ -195,7 +195,7 @@ function ConfirmDeactivateUserDialog({
               render={({ field: { value, onChange } }) => (
                 <TagSelect
                   isClearable
-                  canCreateTags
+                  allowCreatingTags
                   isMulti
                   value={value}
                   onChange={(tags) => onChange(tags.map((tag) => tag.id))}

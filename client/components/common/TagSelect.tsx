@@ -63,14 +63,15 @@ import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { Tag } from "./Tag";
 import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 
 type TagSelection = TagSelect_TagFragment;
 
 interface TagSelectProps<IsMulti extends boolean = false>
   extends Omit<CustomAsyncSelectProps<TagSelection, IsMulti, never>, "value"> {
   value: If<IsMulti, TagSelection[] | string[], TagSelection | string | null>;
-  canEditTags?: boolean;
-  canCreateTags?: boolean;
+  allowCreatingTags?: boolean;
+  allowUpdatingTags?: boolean;
   maxItems?: number;
 }
 
@@ -86,7 +87,7 @@ export type TagSelectInstance<IsMulti extends boolean = false> = SelectInstance<
 
 export const TagSelect = Object.assign(
   forwardRef(function TagSelect<IsMulti extends boolean = false>(
-    { value, canEditTags, canCreateTags, maxItems, ...props }: TagSelectProps<IsMulti>,
+    { value, maxItems, allowCreatingTags, allowUpdatingTags, ...props }: TagSelectProps<IsMulti>,
     ref: ForwardedRef<TagSelectInstance<IsMulti>>,
   ) {
     const intl = useIntl();
@@ -94,7 +95,8 @@ export const TagSelect = Object.assign(
     const apollo = useApolloClient();
     const [id, setId] = useState(0);
     const _value = useGetTagValues(value, props.isMulti ?? false, [id]);
-
+    const canCreateTags = useHasPermission("TAGS:CREATE_TAGS") && allowCreatingTags;
+    const canUpdateTags = useHasPermission("TAGS:UPDATE_TAGS") && allowUpdatingTags;
     // The following code makes sure the component is rerendered whenever the tag search is invalidated
     const firstLoadRef = useRef(true);
     useEffect(() => {
@@ -161,7 +163,7 @@ export const TagSelect = Object.assign(
           ) => {
             return {
               ...styles,
-              ...((selectProps as any).canEditTags ? { paddingBottom: 0 } : {}),
+              ...((selectProps as any).canUpdateTags ? { paddingBottom: 0 } : {}),
             };
           },
         } as any),
@@ -230,7 +232,7 @@ export const TagSelect = Object.assign(
         {...({
           canCreateTags,
           newTagColor,
-          canEditTags,
+          canUpdateTags,
         } as any)}
       />
     );
@@ -277,7 +279,7 @@ const _mutations = [
 
 interface ReactSelectExtraProps {
   newTagColor: string;
-  canEditTags?: () => void;
+  canUpdateTags?: () => void;
   canCreateTags?: boolean;
 }
 
@@ -388,7 +390,7 @@ function Option(props: OptionProps<TagSelection> & { selectProps: ReactSelectExt
 
 function MenuList(props: MenuListProps<TagSelection> & { selectProps: ReactSelectExtraProps }) {
   const {
-    selectProps: { canEditTags },
+    selectProps: { canUpdateTags },
   } = props;
   const showTagEditDialog = useTagEditDialog();
   const handleEditTags = async () => {
@@ -397,7 +399,7 @@ function MenuList(props: MenuListProps<TagSelection> & { selectProps: ReactSelec
   return (
     <components.MenuList {...props}>
       {props.children}
-      {props.options.length > 0 && canEditTags ? (
+      {props.options.length > 0 && canUpdateTags ? (
         <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
           <Button
             width="100%"
@@ -514,6 +516,7 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
     },
   });
 
+  const canDeleteTags = useHasPermission("TAGS:DELETE_TAGS");
   const [updateTag, { loading: isUpdating }] = useMutation(TagEditDialog_updateTagDocument);
   const tagId = watch("tagId");
 
@@ -636,9 +639,11 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
         </Button>
       }
       alternative={
-        <Button isDisabled={!tagId} colorScheme="red" variant="outline" onClick={handleDeleteTag}>
-          <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-        </Button>
+        canDeleteTags ? (
+          <Button isDisabled={!tagId} colorScheme="red" variant="outline" onClick={handleDeleteTag}>
+            <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+          </Button>
+        ) : null
       }
       cancel={<></>}
     />
