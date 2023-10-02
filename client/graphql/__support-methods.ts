@@ -450,7 +450,7 @@ export const supportMethods: {
         },
         {
           name: "userId",
-          description: null,
+          description: "Global ID of the user",
           type: {
             kind: "NON_NULL",
             name: null,
@@ -760,6 +760,12 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       { name: "CUSTOM_HOST_UI", description: null, isDeprecated: false, deprecationReason: null },
+      {
+        name: "CUSTOM_PROPERTIES",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
       { name: "DEVELOPER_ACCESS", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "DOCUSIGN_SANDBOX_PROVIDER",
