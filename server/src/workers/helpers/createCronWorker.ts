@@ -44,7 +44,7 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
         const job = new CronJob(config.cronWorkers[name].rule, async function () {
           try {
             running = true;
-            logger.info(`Execution start`);
+            logger.info(`Cron ${name}: Execution start`);
             const duration = await stopwatch(async () => {
               await handler(
                 container.get<WorkerContext>(WorkerContext),
@@ -53,7 +53,7 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
             });
             const nextExecution = job.nextDate().toISO();
             logger.info(
-              `Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
+              `Cron ${name}: Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
               { duration },
             );
           } catch (error: any) {
@@ -64,29 +64,29 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
           }
         });
         process.on("SIGINT", function () {
-          logger.info(`Received SIGINT. Shutting down cron worker`);
+          logger.info(`Cron ${name}: Received SIGINT. Shutting down cron worker`);
           shutdown();
         });
         process.on("SIGTERM", function () {
-          logger.info(`Received SIGTERM. Shutting down cron worker`);
+          logger.info(`Cron ${name}: Received SIGTERM. Shutting down cron worker`);
           shutdown();
         });
         function shutdown() {
           job.stop();
           if (running) {
-            logger.info(`Waiting for cron job to finish`);
+            logger.info(`Cron ${name}: Waiting for cron job to finish`);
             events.once("finish", () => {
-              logger.info(`Cron worker stopped`);
+              logger.info(`Cron ${name}: Cron worker stopped`);
               process.exit(0);
             });
           } else {
-            logger.info(`Cron worker stopped`);
+            logger.info(`Cron ${name}: Cron worker stopped`);
             process.exit(0);
           }
         }
         job.start();
         const nextExecution = job.nextDate().toISO();
-        logger.info(`Cron worker running. Next execution on ${nextExecution}`);
+        logger.info(`Cron ${name}: Cron worker running. Next execution on ${nextExecution}`);
       },
     ).argv;
 }

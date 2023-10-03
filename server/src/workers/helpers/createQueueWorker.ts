@@ -106,7 +106,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           heartbeatInterval: queueConfig.heartbeatInterval,
           batchSize,
           handleMessage: async (message) => {
-            logger.info("Start processing message", { payload: message.Body });
+            logger.info(`Queue ${name}: Start processing message`, { payload: message.Body });
             try {
               const duration = await stopwatch(async () => {
                 if (forkHandlers) {
@@ -155,12 +155,12 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                   }
                 }
               });
-              logger.info(`Successfully processed message in ${duration}ms`, {
+              logger.info(`Queue ${name}: Successfully processed message in ${duration}ms`, {
                 payload: message.Body,
                 duration,
               });
             } catch {
-              logger.info(`Error processing message`, {
+              logger.info(`Queue ${name}: Error processing message`, {
                 payload: message.Body,
               });
             }
@@ -178,16 +178,16 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           logger.error(error.stack ?? "", { payload: message.Body });
         });
         process.on("SIGINT", function () {
-          logger.info(`Received SIGINT. Shutting down queue worker`);
+          logger.info(`Queue ${name}: Received SIGINT. Shutting down queue worker`);
           shutdown();
         });
         process.on("SIGTERM", function () {
-          logger.info(`Received SIGTERM. Shutting down queue worker`);
+          logger.info(`Queue ${name}: Received SIGTERM. Shutting down queue worker`);
           shutdown();
         });
         function shutdown() {
           consumer.on("stopped", () => {
-            logger.info(`Queue worker stopped`);
+            logger.info(`Queue ${name}: Queue worker stopped`);
             process.exit(0);
           });
           consumer.stop();
