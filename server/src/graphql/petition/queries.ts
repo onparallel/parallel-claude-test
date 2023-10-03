@@ -85,6 +85,9 @@ export const petitionsQuery = queryField((t) => {
       { offset, limit, search, sortBy, filters, searchByNameOnly, excludeAnonymized },
       ctx,
     ) => {
+      if (isDefined(limit) && limit > 100) {
+        ctx.logger.info(`User:${ctx.user!.id} from Org:${ctx.user!.org_id} using limit ${limit}`);
+      }
       return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
         offset,
