@@ -664,6 +664,7 @@ function CustomFooter({
         onChange={setStatus as any}
         size="sm"
         variant="ghost"
+        data-action="user-status-filter"
       />
       {children}
     </>
