@@ -184,7 +184,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
    *              - 1 REPLY_CREATED or REPLY_UPDATED event (made by a recipient); or
    *              - 1 PETITION_COMPLETED (made by a recipient) and petition status is COMPLETED or CLOSED
    *            Here we check that the reply is not currently deleted.
-   *            For REPLY_UPDATED, the reply could be first created by an User, but then updated by the recipient and we consider that as a recipient reply.
+   *            For REPLY_UPDATED, the reply could be first created by a User, but then updated by the recipient and we consider that as a recipient reply.
    *            If there are no REPLY events made by a recipient, check the PETITION_COMPLETED, as the petition can have all optional non replied fields.
    *            If the reply is created by a recipient, or petition is completed by a recipient, the petition must have an ACCESS_OPENED, so the funnel is ensured.
    *

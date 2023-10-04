@@ -60,7 +60,7 @@ describe("repositories/UserAuthenticationRepository", () => {
     expect(userTokens).toEqual(authTokens);
   });
 
-  it("deletes an user auth token by its id", async () => {
+  it("deletes a user auth token by its id", async () => {
     const [deletedToken] = await userAuth.deleteUserAuthenticationTokens([authTokens[0].id], user);
 
     const availableTokens = await userAuth.loadUserAuthenticationTokens(user.id);

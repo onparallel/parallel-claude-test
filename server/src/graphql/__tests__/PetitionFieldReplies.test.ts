@@ -1479,7 +1479,7 @@ describe("GraphQL/Petition Field Replies", () => {
         expect(data).toBeNull();
       });
 
-      it("updates a simple reply as an User, previously created by a Contact", async () => {
+      it("updates a simple reply as a User, previously created by a Contact", async () => {
         const { data, errors } = await testClient.execute(
           gql`
             mutation ($petitionId: GID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
@@ -1530,7 +1530,7 @@ describe("GraphQL/Petition Field Replies", () => {
         });
       });
 
-      it("updates a simple reply as an User, previously created by an User", async () => {
+      it("updates a simple reply as a User, previously created by a User", async () => {
         const { errors, data } = await testClient.execute(
           gql`
             mutation ($petitionId: GID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
@@ -3250,7 +3250,7 @@ describe("GraphQL/Petition Field Replies", () => {
       });
     });
 
-    it("deletes a TEXT reply as an User", async () => {
+    it("deletes a TEXT reply as a User", async () => {
       const [userSimpleReply] = await mocks.createRandomTextReply(
         textField.id,
         petitionAccess.id,

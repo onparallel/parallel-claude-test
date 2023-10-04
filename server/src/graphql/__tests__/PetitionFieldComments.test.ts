@@ -355,7 +355,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       });
     });
 
-    it("sends error when trying to mention an user of another org", async () => {
+    it("sends error when trying to mention a user of another org", async () => {
       const [privateOrg] = await mocks.createRandomOrganizations(1);
       const [privateUser] = await mocks.createRandomUsers(privateOrg.id, 1, undefined, () => ({
         first_name: "Chandler",

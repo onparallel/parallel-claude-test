@@ -461,7 +461,7 @@ describe("Petition Filters", () => {
     });
   });
 
-  it("sends error when passing a globalId value different than User or UserGroup", async () => {
+  it("sends error when passing a globalId value different tha User or UserGroup", async () => {
     const { errors, data } = await testClient.execute(
       gql`
         query ($filters: PetitionFilter) {

@@ -2431,7 +2431,7 @@ api
         (!isDefined(query.userId) && !isDefined(query.email)) ||
         (isDefined(query.userId) && isDefined(query.email))
       ) {
-        throw new BadRequestError("Bad user input. You must specify an userId or an email");
+        throw new BadRequestError("Bad user input. You must specify a userId or an email");
       }
 
       if (isDefined(query.email) && !query.email.match(EMAIL_REGEX)) {

@@ -1133,7 +1133,7 @@ const PetitionEventSchemas = {
       reason: {
         type: "string",
         description:
-          "Wether the access was deactivated manually by an user, or it was deactivated automatically because an email was bounced.",
+          "Wether the access was deactivated manually by a user, or it was deactivated automatically because an email was bounced.",
         enum: ["DEACTIVATED_BY_USER", "EMAIL_BOUNCED"],
         example: "DEACTIVATED_BY_USER",
       },
@@ -1166,7 +1166,7 @@ const PetitionEventSchemas = {
     },
   },
   COMMENT_DELETED: {
-    description: "A comment was deleted either by a recipient or an user.",
+    description: "A comment was deleted either by a recipient or a user.",
     properties: {
       petitionFieldCommentId: {
         description: "The ID of the comment",
@@ -1223,7 +1223,7 @@ const PetitionEventSchemas = {
       reason: {
         type: "string",
         description:
-          "Wether the message was cancelled manually by an user, or it was cancelled automatically because an email was bounced.",
+          "Wether the message was cancelled manually by a user, or it was cancelled automatically because an email was bounced.",
         enum: ["CANCELLED_BY_USER", "EMAIL_BOUNCED"],
         example: "CANCELLED_BY_USER",
       },
@@ -1270,7 +1270,7 @@ const PetitionEventSchemas = {
     },
   },
   PETITION_CLOSED: {
-    description: "A petition was closed by an user",
+    description: "A petition was closed by a user",
     properties: {
       userId: {
         description: "The ID of the user that closed the parallel",
@@ -1341,7 +1341,7 @@ const PetitionEventSchemas = {
     },
   },
   REPLY_CREATED: {
-    description: "A reply on the parallel was submitted either by a recipient or an user.",
+    description: "A reply on the parallel was submitted either by a recipient or a user.",
     properties: {
       petitionAccessId: {
         description:
@@ -1367,7 +1367,7 @@ const PetitionEventSchemas = {
     },
   },
   REPLY_DELETED: {
-    description: "A reply on the parallel was deleted either by a recipient or an user.",
+    description: "A reply on the parallel was deleted either by a recipient or a user.",
     properties: {
       petitionAccessId: {
         description:
@@ -1393,7 +1393,7 @@ const PetitionEventSchemas = {
     },
   },
   REPLY_UPDATED: {
-    description: "A reply on the parallel was updated either by a recipient or an user.",
+    description: "A reply on the parallel was updated either by a recipient or a user.",
     properties: {
       petitionAccessId: {
         description:

@@ -525,7 +525,7 @@ export class Auth implements IAuth {
           // cognito user is in status FORCE_CHANGE_PASSWORD, can't reset the password
           res.status(401).send({ error: "ForceChangePasswordException" });
         } else if (!data) {
-          // if the user is SSO, adminGetUser will throw an UserNotFoundException
+          // if the user is SSO, adminGetUser will throw a UserNotFoundException
           res.status(401).send({ error: "ExternalUser" });
         }
         return;

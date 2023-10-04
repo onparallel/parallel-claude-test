@@ -139,7 +139,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
       keyId = keys[Math.floor(Math.random() * keys.length)].id;
     });
 
-    it("deletes an user's subscription key", async () => {
+    it("deletes a user's subscription key", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($ids: [GID!]!) {

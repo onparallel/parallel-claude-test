@@ -429,7 +429,7 @@ export class SignaturitClient implements ISignatureClient {
    */
   private async handleDocumentsAlreadySigned(signature: SignatureResponse) {
     if (signature.documents.some((d) => d.status === "canceled")) {
-      // the document was manually cancelled by an User, data is in sync
+      // the document was manually cancelled by a User, data is in sync
       return;
     }
     const signatureRequest = await this.petitions.loadPetitionSignatureByExternalId(

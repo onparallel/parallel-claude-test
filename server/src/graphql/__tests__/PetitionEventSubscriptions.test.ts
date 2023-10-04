@@ -300,7 +300,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
   });
 
   describe("deleteEventSubscription", () => {
-    it("deletes an user's subscription", async () => {
+    it("deletes a user's subscription", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($ids: [GID!]!) {
