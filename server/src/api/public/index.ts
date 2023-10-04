@@ -125,7 +125,7 @@ import {
   UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
   UserFragmentDoc,
 } from "./__types";
-import { description, newParallelEvent } from "./descriptions";
+import { description } from "./description";
 import {
   ContactFragment,
   PermissionFragment,
@@ -163,7 +163,6 @@ import {
 } from "./helpers";
 import { anyFileUploadMiddleware, singleFileUploadMiddleware } from "./middleware";
 import {
-  _PetitionEvent,
   AssociatePetitionToProfileInput,
   Contact,
   CreateContact,
@@ -190,6 +189,7 @@ import {
   Petition,
   PetitionAccess,
   PetitionCustomProperties,
+  PetitionEvent,
   petitionEventTypes,
   PetitionField,
   PetitionFieldReply,
@@ -248,7 +248,7 @@ export const api = new RestApi({
       },
     },
     schemas: {
-      PetitionEvent: _PetitionEvent,
+      PetitionEvent: PetitionEvent as any,
     },
   },
   "x-tagGroups": [
@@ -265,11 +265,9 @@ export const api = new RestApi({
         "Contacts",
         "Users",
         "Subscriptions",
-        "Parallel Events",
         "Profiles",
       ],
     },
-    { name: "Events", tags: ["Parallel Event"] },
   ],
   tags: [
     {
@@ -312,17 +310,17 @@ export const api = new RestApi({
     },
     {
       name: "Subscriptions",
-      description: "Subscribe to our events to get real time updates on your parallels",
+      description: outdent`
+        Subscribe to our events to get real time updates on your parallels.
+
+        Here's a list of all possible events:
+        ${PetitionEvent.description}
+      `,
     },
     {
-      name: "Parallel Event",
-      description: "Subscribe to our events to get real time updates on your parallels",
+      name: "Profiles",
+      description: "Profiles allow you to store all your relevant information",
     },
-    {
-      name: "Parallel Event",
-      description: '<SchemaDefinition schemaRef="#/components/schemas/PetitionEvent" />',
-    },
-    { name: "Profiles", description: "Profiles allow you to store all your relevant information" },
   ],
   context: ({ req }) => {
     const authorization = req.header("authorization");
@@ -3145,10 +3143,16 @@ api
             post: {
               operationId: "PetitionEventCreated",
               summary: "New Parallel Event",
-              description: newParallelEvent,
+              description: outdent`
+                A new event was triggered on one of your subscribed parallels.
+                
+                A POST request will be sent to the provided events URL containing the event information.
+                
+                Additionally, if you created one or more signature keys, special headers will be sent with the request, containing the event signatures. You can read more about signature verification in [this help center article](https://help.onparallel.com/en/articles/7035199-event-subscriptions-and-signature-keys).
+              `,
               requestBody: {
                 required: true,
-                content: { "application/json": { schema: _PetitionEvent } },
+                content: { "application/json": { schema: PetitionEvent as any } },
               },
               responses: {
                 "200": {
@@ -3228,6 +3232,7 @@ api.path("/petition-events").get(
   {
     operationId: "GetPetitionEvents",
     summary: "Get your latest petition events",
+    excludeFromSpec: true,
     description: "Returns a list with your latest parallel events",
     query: {
       before: idParam({
@@ -3243,7 +3248,6 @@ api.path("/petition-events").get(
       }),
     },
     responses: { 200: SuccessResponse(ListOfPetitionEvents) },
-    tags: ["Parallel Events"],
   },
   async ({ client, query }) => {
     const _query = gql`

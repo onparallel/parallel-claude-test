@@ -1270,7 +1270,7 @@ const PetitionEventSchemas = {
     },
   },
   PETITION_CLOSED: {
-    description: "A petition was marked as `closed` by an user",
+    description: "A petition was closed by an user",
     properties: {
       userId: {
         description: "The ID of the user that closed the parallel",
@@ -1854,6 +1854,12 @@ export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionE
 export const _PetitionEvent = {
   title: "PetitionEvent",
   type: "object",
+  description: Object.entries(PetitionEventSchemas)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([event, data]) => {
+      return `- \`${event}\`: ${data.description}`;
+    })
+    .join("\n"),
   oneOf: Object.entries(PetitionEventSchemas)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(
