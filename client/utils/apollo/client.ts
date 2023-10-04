@@ -2,6 +2,7 @@ import { ApolloClient, FieldMergeFunction, from, InMemoryCache } from "@apollo/c
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
 import { setContext } from "@apollo/client/link/context";
 import { split } from "@apollo/client/link/core";
+import { RetryLink } from "@apollo/client/link/retry";
 import { onError } from "@apollo/client/link/error";
 import { getOperationName } from "@apollo/client/utilities";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
@@ -62,45 +63,59 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
   const uri = typeof window !== "undefined" ? "/graphql" : "http://localhost:4000/graphql";
   const isDefinitionNode = (node: DefinitionNode): node is OperationDefinitionNode =>
     node.kind === Kind.OPERATION_DEFINITION;
-  const terminalLink = split(
-    (op) => {
-      const definition = op.query.definitions.find(isDefinitionNode);
-      return definition?.operation === OperationTypeNode.QUERY;
-    },
-    // Batch requests happening concurrently
-    new BatchHttpLink({ uri, batchInterval: 0 }),
-    createUploadLink({ uri, headers: { "Apollo-Require-Preflight": "true" } }),
-  );
-
-  const authLink = setContext((_, { headers }) => {
-    return {
-      headers: {
-        ...headers,
-        ...(typeof window !== "undefined"
-          ? {}
-          : {
-              ...pick(req!.headers, ["x-forwarded-for", "user-agent"]),
-              cookie: filterCookies(req!.headers["cookie"]!),
-            }),
-      },
-    };
-  });
-
-  const authErrorHandler = onError(({ graphQLErrors, operation }) => {
-    if (typeof window !== "undefined") {
-      // CurrentUser is the operation used in the login page, if we dont
-      // check for it we get into a redirect loop
-      if (
-        operation.operationName !== getOperationName(Login_currentUserDocument) &&
-        graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED"
-      ) {
-        Router.push("/login");
-      }
-    }
-  });
 
   const client = new ApolloClient({
-    link: from([authLink, authErrorHandler, terminalLink]),
+    link: from([
+      // Auth link
+      setContext((_, { headers }) => {
+        return {
+          headers: {
+            ...headers,
+            ...(typeof window !== "undefined"
+              ? {}
+              : {
+                  ...pick(req!.headers, ["x-forwarded-for", "user-agent"]),
+                  cookie: filterCookies(req!.headers["cookie"]!),
+                }),
+          },
+        };
+      }),
+      // Auth error handler
+      onError(({ graphQLErrors, operation }) => {
+        if (typeof window !== "undefined") {
+          // CurrentUser is the operation used in the login page, if we dont
+          // check for it we get into a redirect loop
+          if (
+            operation.operationName !== getOperationName(Login_currentUserDocument) &&
+            graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED"
+          ) {
+            Router.push("/login");
+          }
+        }
+      }),
+      // When for whatever reason fetch fails, wait and retry again
+      new RetryLink({
+        attempts: {
+          max: 3,
+          retryIf: (error) => {
+            return error instanceof TypeError && error.message === "fetch failed";
+          },
+        },
+        delay: {
+          initial: 300,
+        },
+      }),
+      // if operation is Query, then batch
+      split(
+        (op) => {
+          const definition = op.query.definitions.find(isDefinitionNode);
+          return definition?.operation === OperationTypeNode.QUERY;
+        },
+        // Batch requests happening concurrently
+        new BatchHttpLink({ uri, batchInterval: 0 }),
+        createUploadLink({ uri, headers: { "Apollo-Require-Preflight": "true" } }),
+      ),
+    ]),
     ssrMode: typeof window === "undefined",
     cache: new InMemoryCache({
       dataIdFromObject: (o) => {
