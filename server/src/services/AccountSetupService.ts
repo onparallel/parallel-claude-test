@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "../config";
 import {
   CreateOrganization,
+  CreateUser,
   CreateUserData,
   Organization,
   User,
@@ -14,6 +15,7 @@ import { I18N_SERVICE, II18nService } from "./I18nService";
 import { IIntegrationsSetupService, INTEGRATIONS_SETUP_SERVICE } from "./IntegrationsSetupService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./ProfilesSetupService";
 import { ITiersService, TIERS_SERVICE } from "./TiersService";
+import { PetitionViewRepository } from "../db/repositories/PetitionViewRepository";
 
 export const ACCOUNT_SETUP_SERVICE = Symbol.for("ACCOUNT_SETUP_SERVICE");
 export interface IAccountSetupService {
@@ -23,6 +25,11 @@ export interface IAccountSetupService {
     userData: CreateUserData,
     createdBy: string,
   ): Promise<{ organization: Organization; user: User }>;
+  createUser(
+    data: Omit<CreateUser, "user_data_id">,
+    userData: CreateUserData,
+    createdBy: string,
+  ): Promise<User>;
 }
 
 @injectable()
@@ -32,11 +39,78 @@ export class AccountSetupService implements IAccountSetupService {
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(UserRepository) private users: UserRepository,
     @inject(UserGroupRepository) private userGroups: UserGroupRepository,
+    @inject(PetitionViewRepository) private views: PetitionViewRepository,
     @inject(INTEGRATIONS_SETUP_SERVICE) private integrationsSetup: IIntegrationsSetupService,
     @inject(PROFILES_SETUP_SERVICE) private profilesSetup: IProfilesSetupService,
     @inject(TIERS_SERVICE) private tiers: ITiersService,
     @inject(I18N_SERVICE) private intl: II18nService,
   ) {}
+
+  async createUser(
+    data: Omit<CreateUser, "user_data_id">,
+    userData: CreateUserData,
+    createdBy: string,
+  ) {
+    const user = await this.users.createUser(data, userData, createdBy);
+
+    const groups = await this.userGroups.loadAllUsersGroupsByOrgId(user.org_id);
+    await this.userGroups.addUsersToGroups(
+      groups.map((g) => g.id),
+      user.id,
+      createdBy,
+    );
+
+    const intl = await this.intl.getIntl(userData.preferred_locale);
+    const defaultView = {
+      path: "/",
+      sort: null,
+      tags: null,
+      search: null,
+      status: null,
+      searchIn: "EVERYWHERE",
+      signature: null,
+      sharedWith: null,
+      fromTemplateId: null,
+    };
+    await this.views.createPetitionListView(
+      (
+        [
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.ongoing",
+              defaultMessage: "Ongoing",
+            }),
+            { ...defaultView, status: ["COMPLETED", "PENDING"] },
+          ],
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.closed",
+              defaultMessage: "Closed",
+            }),
+            { ...defaultView, status: ["CLOSED"] },
+          ],
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.draft",
+              defaultMessage: "Draft",
+            }),
+            { ...defaultView, status: ["DRAFT"] },
+          ],
+        ] as [string, any][]
+      ).map(([name, data], index) => ({
+        user_id: user.id,
+        name,
+        data,
+        position: index,
+        is_default: false,
+
+        updated_by: `User:${user.id}`,
+      })),
+      `User:${user.id}`,
+    );
+
+    return user;
+  }
 
   async createOrganization(
     tier: string,
@@ -62,9 +136,18 @@ export class AccountSetupService implements IAccountSetupService {
       createdBy,
     );
 
+    await this.createAllUsersGroup(organization.id, createdBy);
+
     await this.tiers.updateOrganizationTier(organization, tier, createdBy);
-    const owner = await this.createOrgOwner(organization.id, userData, createdBy);
-    await this.createAllUsersGroup(organization.id, owner.id, createdBy);
+    const owner = await this.createUser(
+      {
+        org_id: organization.id,
+        is_org_owner: true,
+        status: "ACTIVE",
+      },
+      userData,
+      createdBy,
+    );
 
     return {
       // load org to get updated usage_details
@@ -73,19 +156,7 @@ export class AccountSetupService implements IAccountSetupService {
     };
   }
 
-  private async createOrgOwner(orgId: number, userData: CreateUserData, createdBy: string) {
-    return await this.users.createUser(
-      {
-        is_org_owner: true,
-        org_id: orgId,
-        status: "ACTIVE",
-      },
-      userData,
-      createdBy,
-    );
-  }
-
-  private async createAllUsersGroup(orgId: number, userId: number, createdBy: string) {
+  private async createAllUsersGroup(orgId: number, createdBy: string) {
     const userGroup = await this.userGroups.createUserGroup(
       {
         name: "",
@@ -98,7 +169,6 @@ export class AccountSetupService implements IAccountSetupService {
       },
       createdBy,
     );
-    await this.userGroups.addUsersToGroups(userGroup.id, userId, createdBy);
     await this.userGroups.upsertUserGroupPermissions(
       userGroup.id,
       (
@@ -136,5 +206,7 @@ export class AccountSetupService implements IAccountSetupService {
       ).map((name) => ({ effect: "GRANT", name })),
       createdBy,
     );
+
+    return userGroup;
   }
 }

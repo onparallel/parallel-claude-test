@@ -130,7 +130,7 @@ scim
         );
         const email = emails?.find((e) => e.type === "work")?.value;
         if (ssoIntegrations.length > 0 && email) {
-          const user = await req.context.users.createUser(
+          const user = await req.context.accountSetup.createUser(
             {
               org_id: orgId,
               status: active ? "ACTIVE" : "INACTIVE",

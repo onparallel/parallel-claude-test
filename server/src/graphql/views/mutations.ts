@@ -18,7 +18,7 @@ export const createPetitionListView = mutationField("createPetitionListView", {
   resolve: async (_, args, ctx) => {
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
     const maxPosition = maxBy(userViews, (v) => v.position)?.position ?? -1;
-    const view = await ctx.views.createPetitionListView(
+    const [view] = await ctx.views.createPetitionListView(
       {
         name: args.name,
         data: args.data,

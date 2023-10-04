@@ -58,6 +58,7 @@ import { EmailPayload } from "../workers/email-sender";
 import { ILogger, LOGGER } from "./Logger";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
 import { IRedis, REDIS } from "./Redis";
+import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./AccountSetupService";
 
 export interface IAuth {
   guessLogin: RequestHandler;
@@ -131,6 +132,7 @@ export class Auth implements IAuth {
     @inject(REDIS) private redis: IRedis,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(LOGGER) private logger: ILogger,
+    @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
     private users: UserRepository,
@@ -344,7 +346,7 @@ export class Auth implements IAuth {
           throw new Error("Invalid user");
         }
         const preferredLocale = this.asUserLocale(state.get("locale"));
-        user = await this.users.createUser(
+        user = await this.accountSetup.createUser(
           {
             org_id: org.id,
             external_id: externalId,

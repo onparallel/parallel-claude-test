@@ -367,56 +367,6 @@ export class UserRepository extends BaseRepository {
       t,
     );
 
-    const intl = await this.intlService.getIntl(userData.preferred_locale);
-    const defaultView = {
-      path: "/",
-      sort: null,
-      tags: null,
-      search: null,
-      status: null,
-      searchIn: "EVERYWHERE",
-      signature: null,
-      sharedWith: null,
-      fromTemplateId: null,
-    };
-    await this.insert(
-      "petition_list_view",
-      (
-        [
-          [
-            intl.formatMessage({
-              id: "default-petition-list-views.ongoing",
-              defaultMessage: "Ongoing",
-            }),
-            { ...defaultView, status: ["COMPLETED", "PENDING"] },
-          ],
-          [
-            intl.formatMessage({
-              id: "default-petition-list-views.closed",
-              defaultMessage: "Closed",
-            }),
-            { ...defaultView, status: ["CLOSED"] },
-          ],
-          [
-            intl.formatMessage({
-              id: "default-petition-list-views.draft",
-              defaultMessage: "Draft",
-            }),
-            { ...defaultView, status: ["DRAFT"] },
-          ],
-        ] as [string, any][]
-      ).map(([name, data], index) => ({
-        user_id: user.id,
-        name,
-        data: this.json(data),
-        position: index,
-        is_default: false,
-        created_by: `User:${user.id}`,
-        updated_by: `User:${user.id}`,
-      })),
-      t,
-    );
-
     await this.system.createEvent(
       {
         type: "USER_CREATED",

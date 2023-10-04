@@ -1,9 +1,10 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { Maybe } from "../../util/types";
+import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreatePetitionListView, PetitionListView, User } from "../__types";
+import { unMaybeArray } from "../../util/arrays";
 
 @injectable()
 export class PetitionViewRepository extends BaseRepository {
@@ -36,12 +37,19 @@ export class PetitionViewRepository extends BaseRepository {
       .select("*");
   }
 
-  async createPetitionListView(data: CreatePetitionListView, createdBy: string) {
-    const [view] = await this.from("petition_list_view").insert(
-      { ...data, created_by: createdBy },
+  async createPetitionListView(data: MaybeArray<CreatePetitionListView>, createdBy: string) {
+    const views = unMaybeArray(data);
+    if (views.length === 0) {
+      return [];
+    }
+    return await this.from("petition_list_view").insert(
+      views.map((view) => ({
+        ...view,
+        data: this.json(view.data),
+        created_by: createdBy,
+      })),
       "*",
     );
-    return view;
   }
 
   async updatePetitionListView(

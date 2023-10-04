@@ -159,7 +159,7 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
       true,
     );
     const [user] = await Promise.all([
-      ctx.users.createUser(
+      ctx.accountSetup.createUser(
         { org_id: orgId },
         {
           cognito_id: cognitoId!,
@@ -184,15 +184,15 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
       }),
     ]);
 
-    const allUsersGroups = await ctx.userGroups.loadAllUsersGroupsByOrgId(orgId);
+    if ((args.userGroupIds ?? []).length > 0) {
+      await ctx.userGroups.addUsersToGroups(
+        uniq(args.userGroupIds ?? []),
+        user.id,
+        `User:${ctx.user!.id}`,
+      );
 
-    await ctx.userGroups.addUsersToGroups(
-      uniq([...(args.userGroupIds ?? []), ...allUsersGroups.map((ug) => ug.id)]),
-      user.id,
-      `User:${ctx.user!.id}`,
-    );
-
-    ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(user.id);
+      ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(user.id);
+    }
 
     return user;
   },
