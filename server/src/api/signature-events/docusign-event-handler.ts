@@ -188,15 +188,11 @@ async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionI
     return;
   }
 
-  await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
-    signer_status: {
-      ...signature.signer_status,
-      [signerIndex]: {
-        ...signature.signer_status[signerIndex],
-        sent_at: new Date(body.generatedDateTime),
-      },
-    },
-  });
+  await ctx.petitions.updatePetitionSignatureSignerStatusByExternalId(
+    signature.external_id!,
+    signerIndex,
+    { sent_at: new Date(body.generatedDateTime) },
+  );
 
   await upsertSignatureDeliveredEvent(
     petitionId,
@@ -216,15 +212,11 @@ async function recipientDelivered(ctx: ApiContext, body: DocuSignEventBody, peti
     body.data.recipientId!,
   );
 
-  await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
-    signer_status: {
-      ...signature.signer_status,
-      [signerIndex]: {
-        ...signature.signer_status[signerIndex],
-        opened_at: new Date(body.generatedDateTime),
-      },
-    },
-  });
+  await ctx.petitions.updatePetitionSignatureSignerStatusByExternalId(
+    signature.external_id!,
+    signerIndex,
+    { opened_at: new Date(body.generatedDateTime) },
+  );
 
   await ctx.petitions.createEvent({
     type: "SIGNATURE_OPENED",
@@ -310,15 +302,11 @@ async function recipientCompleted(ctx: ApiContext, body: DocuSignEventBody, peti
     return;
   }
 
-  await ctx.petitions.updatePetitionSignatureByExternalId(`DOCUSIGN/${body.data.envelopeId}`, {
-    signer_status: {
-      ...signature!.signer_status,
-      [signerIndex]: {
-        ...signature!.signer_status[signerIndex],
-        signed_at: new Date(body.generatedDateTime),
-      },
-    },
-  });
+  await ctx.petitions.updatePetitionSignatureSignerStatusByExternalId(
+    `DOCUSIGN/${body.data.envelopeId}`,
+    signerIndex,
+    { signed_at: new Date(body.generatedDateTime) },
+  );
 
   await ctx.petitions.createEvent({
     type: "RECIPIENT_SIGNED",

@@ -78,15 +78,11 @@ async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petiti
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [signer, signerIndex] = await findSigner(signature!.signature_config, data.document, ctx);
 
-  await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
-    signer_status: {
-      ...signature.signer_status,
-      [signerIndex]: {
-        ...signature.signer_status[signerIndex],
-        opened_at: new Date(data.created_at),
-      },
-    },
-  });
+  await ctx.petitions.updatePetitionSignatureSignerStatusByExternalId(
+    signature.external_id!,
+    signerIndex,
+    { opened_at: new Date(data.created_at) },
+  );
   await ctx.petitions.createEvent({
     type: "SIGNATURE_OPENED",
     petition_id: petitionId,
@@ -102,17 +98,10 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [signer, signerIndex] = await findSigner(signature.signature_config, data.document, ctx);
 
-  await ctx.petitions.updatePetitionSignatureByExternalId(
+  await ctx.petitions.updatePetitionSignatureSignerStatusByExternalId(
     `SIGNATURIT/${data.document.signature.id}`,
-    {
-      signer_status: {
-        ...signature.signer_status,
-        [signerIndex]: {
-          ...signature.signer_status[signerIndex],
-          signed_at: new Date(data.created_at),
-        },
-      },
-    },
+    signerIndex,
+    { signed_at: new Date(data.created_at) },
   );
   await ctx.petitions.createEvent({
     type: "RECIPIENT_SIGNED",
@@ -166,15 +155,11 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
 async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [, signerIndex] = await findSigner(signature.signature_config, data.document, ctx);
-  await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
-    signer_status: {
-      ...signature.signer_status,
-      [signerIndex]: {
-        ...signature.signer_status[signerIndex],
-        sent_at: new Date(data.created_at),
-      },
-    },
-  });
+  await ctx.petitions.updatePetitionSignatureSignerStatusByExternalId(
+    signature.external_id!,
+    signerIndex,
+    { sent_at: new Date(data.created_at) },
+  );
 
   await upsertSignatureDeliveredEvent(
     petitionId,

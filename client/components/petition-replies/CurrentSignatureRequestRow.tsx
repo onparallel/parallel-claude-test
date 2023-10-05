@@ -35,12 +35,14 @@ export function CurrentSignatureRequestRow({
   const intl = useIntl();
   const status = signatureRequest.status;
   const signerStatus = signatureRequest.signerStatus;
-  const isAwaitingSignature = ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(status);
+  const isAwaitingSignature = status === "PROCESSED";
 
   // when everyone signed (or declined) the document, there is a time window where the request is still in "processing" status
   // because the signed documents are being generated. In this window it makes no sense to cancel the request or send reminders,
   // so we will show this actions only of there is at least one signer that didn't sign/decline the document
-  const someSignerIsPending = signerStatus.some((s) => s.status === "PENDING");
+  const someSignerIsPending = signerStatus.some(
+    (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
+  );
 
   const showConfirmSendSignatureReminderDialog = useConfirmSendSignatureReminderDialog();
   async function handleConfirmSendSignatureReminders() {
@@ -74,6 +76,8 @@ export function CurrentSignatureRequestRow({
     } catch {}
   }
 
+  const { signingMode } = signatureRequest.signatureConfig;
+
   return (
     <>
       <GridItem padding={2} paddingLeft={4}>
@@ -98,9 +102,11 @@ export function CurrentSignatureRequestRow({
               value={signerStatus.map((sStatus, index) => (
                 <Fragment key={index}>
                   <SignerReference signer={sStatus.signer} />
-                  {isAwaitingSignature ? (
+                  {isAwaitingSignature &&
+                  (signingMode === "PARALLEL" || index > 0 || sStatus.status !== "NOT_STARTED") ? (
                     <PetitionSignatureRequestSignerStatusIcon
                       signerStatus={sStatus}
+                      signingMode={signatureRequest.signatureConfig.signingMode}
                       position="relative"
                       marginX={1}
                     />
@@ -116,7 +122,7 @@ export function CurrentSignatureRequestRow({
         </Box>
       </GridItem>
       <GridItem padding={2} paddingRight={4} marginLeft="auto">
-        {status === "PROCESSED" && someSignerIsPending ? (
+        {isAwaitingSignature && someSignerIsPending ? (
           <>
             <IconButtonWithTooltip
               marginRight={2}
@@ -201,6 +207,9 @@ CurrentSignatureRequestRow.fragments = {
       }
       petition {
         id
+      }
+      signatureConfig {
+        signingMode
       }
       metadata
       auditTrailFilename

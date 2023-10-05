@@ -15133,6 +15133,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
     signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
   }>;
   petition: { __typename?: "Petition"; id: string };
+  signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
 };
 
 export type NewSignatureRequestRow_UserFragment = {
@@ -15613,6 +15614,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -15728,6 +15730,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
+            signingMode: SignatureConfigSigningMode;
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
@@ -15892,6 +15895,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
+        signingMode: SignatureConfigSigningMode;
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
@@ -16007,6 +16011,7 @@ export type PetitionSignaturesCard_petitionQuery = {
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
+            signingMode: SignatureConfigSigningMode;
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
@@ -27995,6 +28000,7 @@ export type PetitionReplies_PetitionFragment = {
     cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -28478,6 +28484,7 @@ export type PetitionReplies_closePetitionMutation = {
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
+        signingMode: SignatureConfigSigningMode;
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
@@ -28743,6 +28750,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
+        signingMode: SignatureConfigSigningMode;
         signers: Array<{
           __typename?: "PetitionSigner";
           contactId?: string | null;
@@ -29179,6 +29187,7 @@ export type PetitionReplies_petitionQuery = {
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
+            signingMode: SignatureConfigSigningMode;
             signers: Array<{
               __typename?: "PetitionSigner";
               contactId?: string | null;
@@ -38997,6 +39006,9 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     }
     petition {
       id
+    }
+    signatureConfig {
+      signingMode
     }
     metadata
     auditTrailFilename

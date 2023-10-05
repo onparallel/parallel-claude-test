@@ -4935,6 +4935,38 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
+  async updatePetitionSignatureSignerStatusByExternalId(
+    prefixedExternalId: string,
+    signerIndex: number,
+    status: { opened_at?: Date; signed_at?: Date; sent_at?: Date },
+  ) {
+    if (Object.keys(status).length > 1) {
+      throw new Error("Only one of opened_at, signed_at, sent_at can be set");
+    }
+    const key =
+      "opened_at" in status ? "opened_at" : "signed_at" in status ? "signed_at" : "sent_at";
+    const value = status[key];
+    if (!value) {
+      throw new Error("Value must be set");
+    }
+
+    await this.raw(
+      /* sql */ `
+      update petition_signature_request
+      set signer_status = 
+        signer_status || jsonb_build_object(
+          ?::text, jsonb_set(
+            coalesce(signer_status->?, '{}'::jsonb),
+            ?,
+            to_jsonb(?::text)
+          )
+        )
+      where external_id = ?;
+    `,
+      [signerIndex, signerIndex, this.sqlArray([key]), value, prefixedExternalId],
+    );
+  }
+
   async updatePetitionSignatureRequestAsCancelled<
     CancelReason extends PetitionSignatureCancelReason,
   >(

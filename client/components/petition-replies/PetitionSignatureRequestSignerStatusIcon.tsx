@@ -5,6 +5,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment,
   DatesList_SignerStatusFragment,
+  SignatureConfigSigningMode,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -84,9 +85,16 @@ DatesList.fragments = {
 export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
   chakraForwardRef<
     "svg",
-    { signerStatus: PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment }
+    {
+      signerStatus: PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment;
+      signingMode: SignatureConfigSigningMode;
+    }
   >(function PetitionSignatureRequestSignerStatusIcon(
-    { signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt }, ...props },
+    {
+      signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt },
+      signingMode,
+      ...props
+    },
     ref,
   ) {
     switch (status) {
@@ -129,21 +137,25 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
           </SmallPopover>
         );
       case "NOT_STARTED":
-        return (
-          <SmallPopover
-            content={
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="component.petition-signature-request-signer-status-icon.not-started"
-                  defaultMessage="The signature will start once the previous signer has signed."
-                />
-              </Text>
-            }
-            width="auto"
-          >
-            <TimeIcon ref={ref} color="gray.500" {...(props as any)} />
-          </SmallPopover>
-        );
+        if (signingMode === "SEQUENTIAL") {
+          return (
+            <SmallPopover
+              content={
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="component.petition-signature-request-signer-status-icon.not-started"
+                    defaultMessage="The signature will start once the previous signer has signed."
+                  />
+                </Text>
+              }
+              width="auto"
+            >
+              <TimeIcon ref={ref} color="gray.500" {...(props as any)} />
+            </SmallPopover>
+          );
+        } else {
+          return null;
+        }
       default:
         return null;
     }
