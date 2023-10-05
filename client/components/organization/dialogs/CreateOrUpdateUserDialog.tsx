@@ -188,6 +188,7 @@ function CreateOrUpdateUserDialog({
                     }
                     onChange(userGroups);
                   }}
+                  data-section="add-user-to-groups"
                   onBlur={onBlur}
                   onSearch={handleSearchUserGroups}
                 />
