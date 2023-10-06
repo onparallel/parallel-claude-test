@@ -357,6 +357,7 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
         - \`fields\`: A list of fields of the parallel and their replies.
         - \`tags\`: List of the tags the parallel has.
         - \`replies\`: An object with the replies by alias. Only fields with an alias defined will be shown.
+        - \`progress\`: An object describing the progress of the parallel.
         - \`signers\`: List of the signers, if any, of the parallel.
         ${
           includeRecipientUrl
