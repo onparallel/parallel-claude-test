@@ -1057,30 +1057,26 @@ export class PetitionRepository extends BaseRepository {
     return rows;
   }
 
-  async createAccess(
-    petitionId: number,
-    granterId: number,
-    contactId: number | null,
-    user: User,
-    t?: Knex.Transaction,
-  ) {
-    const [access] = await this.insert(
-      "petition_access",
-      {
-        petition_id: petitionId,
-        granter_id: granterId,
-        contact_id: contactId,
-        keycode: random(16),
-        reminders_left: 10,
-        status: "ACTIVE",
-        created_by: `User:${user.id}`,
-        updated_by: `User:${user.id}`,
-      },
-      t,
-    ).returning("*");
+  async createContactlessAccess(petitionId: number, user: User) {
+    const [access] = await this.insert("petition_access", {
+      petition_id: petitionId,
+      granter_id: user.id,
+      contact_id: null,
+      keycode: random(16),
+      reminders_left: 10,
+      status: "ACTIVE",
+      created_by: `User:${user.id}`,
+      updated_by: `User:${user.id}`,
+    }).returning("*");
 
     return access;
   }
+
+  readonly loadContactlessAccessByPetitionId = this.buildLoadBy(
+    "petition_access",
+    "petition_id",
+    (q) => q.where({ status: "ACTIVE", contact_id: null }),
+  );
 
   async createAccessFromRecipient(
     petitionId: number,

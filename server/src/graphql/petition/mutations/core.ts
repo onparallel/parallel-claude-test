@@ -1468,19 +1468,29 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   resolve: async (_, args, ctx) => {
-    const access = await ctx.petitions.createAccess(args.petitionId, ctx.user!.id, null, ctx.user!);
+    try {
+      const access = await ctx.petitions.createContactlessAccess(args.petitionId, ctx.user!);
 
-    await ctx.petitions.createEvent({
-      type: "ACCESS_ACTIVATED",
-      petition_id: args.petitionId,
-      data: {
-        petition_access_id: access.id,
-        user_id: ctx.user!.id,
-      },
-    });
+      await ctx.petitions.createEvent({
+        type: "ACCESS_ACTIVATED",
+        petition_id: args.petitionId,
+        data: {
+          petition_access_id: access.id,
+          user_id: ctx.user!.id,
+        },
+      });
 
-    ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
-    return access;
+      ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
+      return access;
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.constraint === "petition_access__petition_id_contactless"
+      ) {
+        return (await ctx.petitions.loadContactlessAccessByPetitionId(args.petitionId))!;
+      }
+      throw error;
+    }
   },
 });
 
