@@ -15261,7 +15261,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
-    createdAt: string;
+    updatedAt: string;
     metadata: { [key: string]: any };
     lastReviewedAt?: string | null;
     isAnonymized: boolean;
@@ -15317,7 +15317,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
-  createdAt: string;
+  updatedAt: string;
   metadata: { [key: string]: any };
   lastReviewedAt?: string | null;
   isAnonymized: boolean;
@@ -15512,7 +15512,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
-  createdAt: string;
+  updatedAt: string;
   metadata: { [key: string]: any };
   lastReviewedAt?: string | null;
   isAnonymized: boolean;
@@ -27843,7 +27843,7 @@ export type PetitionReplies_PetitionFragment = {
       id: string;
       isAnonymized: boolean;
       status: PetitionFieldReplyStatus;
-      createdAt: string;
+      updatedAt: string;
       metadata: { [key: string]: any };
       lastReviewedAt?: string | null;
       field?: {
@@ -28072,7 +28072,7 @@ export type PetitionReplies_PetitionFieldFragment = {
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
     isAnonymized: boolean;
-    createdAt: string;
+    updatedAt: string;
     metadata: { [key: string]: any };
     lastReviewedAt?: string | null;
     field?: {
@@ -28327,7 +28327,7 @@ export type PetitionReplies_closePetitionMutation = {
         id: string;
         isAnonymized: boolean;
         status: PetitionFieldReplyStatus;
-        createdAt: string;
+        updatedAt: string;
         metadata: { [key: string]: any };
         lastReviewedAt?: string | null;
         field?: {
@@ -28593,7 +28593,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         id: string;
         isAnonymized: boolean;
         status: PetitionFieldReplyStatus;
-        createdAt: string;
+        updatedAt: string;
         metadata: { [key: string]: any };
         lastReviewedAt?: string | null;
         field?: {
@@ -28835,7 +28835,7 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
       id: string;
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
-      createdAt: string;
+      updatedAt: string;
       metadata: { [key: string]: any };
       lastReviewedAt?: string | null;
       isAnonymized: boolean;
@@ -29025,7 +29025,7 @@ export type PetitionReplies_petitionQuery = {
             id: string;
             isAnonymized: boolean;
             status: PetitionFieldReplyStatus;
-            createdAt: string;
+            updatedAt: string;
             metadata: { [key: string]: any };
             lastReviewedAt?: string | null;
             field?: {
@@ -38771,7 +38771,7 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     id
     content
     status
-    createdAt
+    updatedAt
     metadata
     field {
       id

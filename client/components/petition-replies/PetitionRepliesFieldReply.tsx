@@ -227,7 +227,7 @@ export function PetitionRepliesFieldReply({
                   <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
                 )}
                 {", "}
-                <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
+                <DateTime as="span" value={reply.updatedAt} format={FORMATS.LLL} />
               </Text>
               {reply.lastReviewedAt && reply.lastReviewedBy && reply.status !== "PENDING" ? (
                 <HStack>
@@ -300,7 +300,7 @@ PetitionRepliesFieldReply.fragments = {
       id
       content
       status
-      createdAt
+      updatedAt
       metadata
       field {
         id
