@@ -78,6 +78,7 @@ export function OlderSignatureRequestRows({
                           ? ""
                           : sStatus.status,
                       }}
+                      signingMode={signature.signatureConfig.signingMode}
                       position="relative"
                       marginX={1}
                     />
@@ -151,6 +152,9 @@ OlderSignatureRequestRows.fragments = {
       }
       petition {
         id
+      }
+      signatureConfig {
+        signingMode
       }
       metadata
       isAnonymized

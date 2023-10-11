@@ -15245,6 +15245,7 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
     signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
   }>;
   petition: { __typename?: "Petition"; id: string };
+  signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
 };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
@@ -39034,6 +39035,9 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
     }
     petition {
       id
+    }
+    signatureConfig {
+      signingMode
     }
     metadata
     isAnonymized
