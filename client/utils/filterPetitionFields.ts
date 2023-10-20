@@ -2,10 +2,12 @@ import { gql } from "@apollo/client";
 import { filterPetitionFields_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "./fieldIndices";
 import { zipX } from "./zipX";
+import { isFileTypeField } from "./isFileTypeField";
 
 export type PetitionFieldFilterType =
   | "SHOW_NOT_REPLIED"
   | "SHOW_REPLIED"
+  | "SHOW_ONLY_FILE_UPLOAD"
   | "SHOW_REVIEWED"
   | "SHOW_NOT_REVIEWED"
   | "SHOW_WITH_COMMENTS";
@@ -23,6 +25,7 @@ type FilterPetitionFieldResult<T extends filterPetitionFields_PetitionFieldFragm
 export const defaultFieldsFilter = {
   SHOW_NOT_REPLIED: false,
   SHOW_REPLIED: false,
+  SHOW_ONLY_FILE_UPLOAD: false,
   SHOW_REVIEWED: false,
   SHOW_NOT_REVIEWED: false,
   SHOW_WITH_COMMENTS: false,
@@ -57,6 +60,10 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
         conditions.push(field.replies.length === 0);
       }
 
+      if (filter.SHOW_ONLY_FILE_UPLOAD) {
+        conditions.push(isFileTypeField(field.type));
+      }
+
       if (filter.SHOW_REVIEWED && !filter.SHOW_NOT_REVIEWED) {
         conditions.push(
           field.replies.length > 0 && field.replies.every((r) => r.status === "APPROVED"),
@@ -83,6 +90,7 @@ filterPetitionFields.fragments = {
   PetitionField: gql`
     fragment filterPetitionFields_PetitionField on PetitionField {
       id
+      type
       isReadOnly
       comments {
         id

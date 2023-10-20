@@ -32689,6 +32689,7 @@ export type useFieldVisibility_PetitionFieldFragment = {
 export type filterPetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  type: PetitionFieldType;
   isReadOnly: boolean;
   comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
   replies: Array<{
@@ -37969,6 +37970,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
 export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
   fragment filterPetitionFields_PetitionField on PetitionField {
     id
+    type
     isReadOnly
     comments {
       id

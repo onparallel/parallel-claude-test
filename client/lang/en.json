@@ -4320,6 +4320,11 @@
     "context": "Not reviewed"
   },
   {
+    "term": "component.petition-replies-filter-button.show-only-file-uploads",
+    "definition": "Only file uploads",
+    "context": "Only file uploads"
+  },
+  {
     "term": "component.petition-replies-filter-button.show-reviewed",
     "definition": "Reviewed",
     "context": "Reviewed"

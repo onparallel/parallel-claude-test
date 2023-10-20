@@ -55,6 +55,15 @@ export function PetitionRepliesFilterButton({ value, onChange }: PetitionReplies
             />
           </CheckboxMenuItemOption>
           <CheckboxMenuItemOption
+            value={value.SHOW_ONLY_FILE_UPLOAD}
+            onChange={handleChange("SHOW_ONLY_FILE_UPLOAD")}
+          >
+            <FormattedMessage
+              id="component.petition-replies-filter-button.show-only-file-uploads"
+              defaultMessage="Only file uploads"
+            />
+          </CheckboxMenuItemOption>
+          <CheckboxMenuItemOption
             value={value.SHOW_REVIEWED}
             onChange={handleChange("SHOW_REVIEWED")}
           >
