@@ -44,8 +44,10 @@ import {
   and,
   argIsDefined,
   authenticateAnd,
+  chain,
   ifArgDefined,
   ifArgEquals,
+  ifNotEmptyArray,
   ifSomeDefined,
   not,
   or,
@@ -64,7 +66,7 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
-import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
+import { validFieldVisibility } from "../../helpers/validators/validFieldVisibility";
 import { validFolderId } from "../../helpers/validators/validFolderId";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validPath } from "../../helpers/validators/validPath";
@@ -87,9 +89,13 @@ import {
   accessesIsNotOptedOut,
   contextUserCanClonePetitions,
   defaultOnBehalfUserBelongsToContextOrganization,
+  fieldHasParent,
   fieldHasType,
+  fieldIsNotBeingReferencedByVisibilityCondition,
+  fieldIsNotFirstChild,
   fieldIsNotFixed,
   fieldsBelongsToPetition,
+  firstChildHasType,
   foldersAreInPath,
   messageBelongToPetition,
   petitionHasRepliableFields,
@@ -516,29 +522,61 @@ export const deletePetitions = mutationField("deletePetitions", {
 });
 
 export const updateFieldPositions = mutationField("updateFieldPositions", {
-  description: "Updates the positions of the petition fields",
+  description:
+    "Updates the positions of the petition fields. If parentFieldId is defined, it will update the positions of it's children fields.",
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
+    ifArgDefined(
+      "parentFieldId",
+      and(
+        fieldHasType("parentFieldId" as never, "FIELD_GROUP"),
+        fieldHasParent("fieldIds", "parentFieldId" as never),
+      ),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldIds: nonNull(list(nonNull(globalIdArg("PetitionField")))),
+    parentFieldId: globalIdArg("PetitionField"),
   },
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.petitions.updateFieldPositions(args.petitionId, args.fieldIds, ctx.user!);
-    } catch (e: any) {
-      if (e.message === "INVALID_PETITION_FIELD_IDS") {
-        throw new ApolloError("Invalid petition field ids", "INVALID_PETITION_FIELD_IDS");
-      } else if (e.message === "INVALID_FIELD_CONDITIONS_ORDER") {
-        throw new ApolloError("Invalid field conditions order", "INVALID_FIELD_CONDITIONS_ORDER");
-      } else {
-        throw e;
+      await ctx.petitions.updateFieldPositions(
+        args.petitionId,
+        args.fieldIds,
+        args.parentFieldId ?? null,
+        `User:${ctx.user!.id}`,
+      );
+
+      const [petition] = await ctx.petitions.updatePetition(
+        args.petitionId,
+        {},
+        `User:${ctx.user!.id}`,
+      );
+      return petition;
+    } catch (e) {
+      if (e instanceof Error) {
+        if (e.message === "INVALID_PETITION_FIELD_IDS") {
+          throw new ApolloError("Invalid petition field ids", "INVALID_PETITION_FIELD_IDS");
+        } else if (e.message === "INVALID_FIELD_CONDITIONS_ORDER") {
+          throw new ApolloError("Invalid field conditions order", "INVALID_FIELD_CONDITIONS_ORDER");
+        } else if (e.message === "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR") {
+          throw new ApolloError(
+            "First child cannot have visibility conditions",
+            "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR",
+          );
+        } else if (e.message === "FIRST_CHILD_IS_INTERNAL_ERROR") {
+          throw new ApolloError(
+            "First child of an external field cannot be internal",
+            "FIRST_CHILD_IS_INTERNAL_ERROR",
+          );
+        }
       }
+      throw e;
     }
   },
 });
@@ -955,25 +993,37 @@ export const createPetitionField = mutationField("createPetitionField", {
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
     ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
+    ifArgEquals("type", "FIELD_GROUP", userHasFeatureFlag("FIELD_GROUP")),
     petitionIsNotAnonymized("petitionId"),
+    ifArgDefined(
+      "parentFieldId",
+      and(
+        fieldsBelongsToPetition("petitionId", "parentFieldId" as never),
+        fieldHasType("parentFieldId" as never, "FIELD_GROUP"),
+      ),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     type: nonNull(arg({ type: "PetitionFieldType" })),
     position: intArg(),
+    parentFieldId: globalIdArg("PetitionField"),
   },
   validateArgs: inRange((args) => args.position, "position", 0),
   resolve: async (_, args, ctx) => {
     ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
-    return await ctx.petitions.createPetitionFieldAtPosition(
+    const [field] = await ctx.petitions.createPetitionFieldsAtPosition(
       args.petitionId,
       {
         type: args.type,
         ...defaultFieldProperties(args.type),
       },
+      args.parentFieldId ?? null,
       args.position ?? -1,
       ctx.user!,
     );
+
+    return field;
   },
 });
 
@@ -1006,6 +1056,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
+    fieldIsNotBeingReferencedByVisibilityCondition("petitionId", "fieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1013,21 +1064,43 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     force: booleanArg({ default: false }),
   },
   resolve: async (_, args, ctx) => {
-    const petitionFields = await ctx.petitions.loadFieldsForPetition.raw(args.petitionId);
-    if (
-      petitionFields.some(
-        (f) => f.visibility?.conditions.some((c: any) => c.fieldId === args.fieldId),
-      )
-    ) {
-      throw new ApolloError(
-        "The petition field is being referenced in another field.",
-        "FIELD_IS_REFERENCED_ERROR",
+    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(args.petitionId);
+    const field = petitionFields.find((f) => f.id === args.fieldId)!;
+    const childrenFields =
+      field.type === "FIELD_GROUP"
+        ? petitionFields.filter((f) => f.parent_petition_field_id === args.fieldId)
+        : [];
+
+    const fieldIds = [field.id, ...childrenFields.map((c) => c.id)];
+
+    if (field.parent_petition_field_id !== null && field.position === 0) {
+      const secondChild = petitionFields.find(
+        (f) => f.parent_petition_field_id === field.parent_petition_field_id && f.position === 1,
       );
+      // when deleting first child of a FIELD_GROUP, make sure 2nd field does not have visibility conditions, as it will end up in 1st position
+      if (isDefined(secondChild?.visibility)) {
+        throw new ApolloError(
+          "First child cannot have visibility conditions",
+          "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR",
+        );
+      }
+
+      // make sure 2nd field is not internal, if parent is external
+      const parentField = petitionFields.find((f) => f.id === field.parent_petition_field_id)!;
+      if (!parentField.is_internal && secondChild?.is_internal) {
+        throw new ApolloError(
+          "First child of an external field cannot be internal",
+          "FIRST_CHILD_IS_INTERNAL_ERROR",
+        );
+      }
     }
 
-    const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
-    if (!args.force && replies.length > 0) {
-      throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+    if (!args.force) {
+      const replies = (await ctx.petitions.loadRepliesForField(fieldIds)).flat();
+      // don't consider FIELD_GROUP "empty" replies
+      if (replies.filter((r) => r.type !== "FIELD_GROUP").length > 0) {
+        throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+      }
     }
 
     return await ctx.petitions.deletePetitionField(args.petitionId, args.fieldId, ctx.user!);
@@ -1043,7 +1116,31 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    ifArgEquals((args) => args.data.requireApproval, true, not(fieldHasType("fieldId", "HEADING"))),
+    ifArgEquals(
+      (args) => args.data.requireApproval,
+      true,
+      not(fieldHasType("fieldId", ["HEADING", "FIELD_GROUP"])),
+    ),
+    ifArgEquals(
+      (args) => args.data.isInternal,
+      false,
+      not(
+        chain(
+          fieldHasType("fieldId", ["FIELD_GROUP"]),
+          firstChildHasType("fieldId", ["DOW_JONES_KYC"]),
+        ),
+      ),
+    ),
+    ifArgDefined(
+      (args) => args.data.optional ?? args.data.isInternal,
+      fieldIsNotFirstChild("fieldId"),
+    ),
+    ifArgDefined(
+      (args) => args.data.isInternal ?? args.data.showInPdf,
+      not(fieldHasType("fieldId", ["DOW_JONES_KYC"])),
+    ),
+    ifArgDefined((args) => args.data.hasCommentsEnabled, not(fieldHasType("fieldId", ["HEADING"]))),
+    ifArgDefined((args) => args.data.multiple, not(fieldHasType("fieldId", ["FIELD_GROUP"]))),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1079,7 +1176,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     validateIf(
       (args) => isDefined(args.data.visibility),
-      validFieldVisibilityJson(
+      validFieldVisibility(
         (args) => args.petitionId,
         (args) => args.fieldId,
         (args) => args.data.visibility,
@@ -1118,15 +1215,15 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     if (isDefined(requireApproval)) {
       data.require_approval = requireApproval;
     }
-    if (isDefined(isInternal)) {
-      data.is_internal = isInternal;
-      if (isInternal) {
-        data.require_approval = false;
-      }
-    }
 
     if (isDefined(showInPdf)) {
       data.show_in_pdf = showInPdf;
+    }
+
+    if (isDefined(isInternal)) {
+      data.is_internal = isInternal;
+      data.require_approval = !isInternal;
+      data.show_in_pdf = !isInternal;
     }
 
     if (isDefined(showActivityInPdf)) {
@@ -1156,7 +1253,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           }
 
           if (replies.length > 0) {
-            await ctx.petitions.deletePetitionFieldReplies([args.fieldId], ctx.user!);
+            await ctx.petitions.deletePetitionFieldReplies([{ id: args.fieldId }], ctx.user!);
           }
         }
       } catch (e: any) {
@@ -1186,7 +1283,6 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     }
 
     try {
-      ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
       if (data.require_approval === false) {
         // If the field is not required to be approved anymore, we need to update its reply statuses to PENDING
         await ctx.petitions.updatePetitionFieldReplyStatusesByPetitionFieldId(
@@ -1195,12 +1291,64 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           `User:${ctx.user!.id}`,
         );
       }
-      return await ctx.petitions.updatePetitionField(
+      const [field] = await ctx.petitions.updatePetitionField(
         args.petitionId,
         args.fieldId,
         data,
-        ctx.user!,
+        `User:${ctx.user!.id}`,
       );
+
+      const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
+      if (!petition.is_template) {
+        // update petition status if changing anything other than title and description
+        if (Object.keys(omit(data, ["title", "description"])).length > 0) {
+          await ctx.petitions.updatePetitionToPendingStatus(
+            args.petitionId,
+            `User:${ctx.user!.id}`,
+          );
+        }
+
+        if (isDefined(data.optional) && field.type === "FIELD_GROUP") {
+          if (field.optional) {
+            // if updating FIELD_GROUP to optional, remove every empty field group reply
+            await ctx.petitions.deleteEmptyFieldGroupReplies(field.id, `User:${ctx.user!.id}`);
+          } else {
+            // if updating FIELD_GROUP to required, create an empty field group reply only if there are no replies
+            const replies = await ctx.petitions.loadRepliesForField(field.id);
+            if (replies.length === 0) {
+              await ctx.petitions.createEmptyFieldGroupReply([field.id], ctx.user!);
+              ctx.petitions.loadRepliesForField.dataloader.clear(field.id);
+            }
+          }
+        }
+        ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
+      }
+
+      if (isDefined(data.is_internal) && field.type === "FIELD_GROUP") {
+        const fieldChildren = await ctx.petitions.loadPetitionFieldChildren(field.id);
+        if (fieldChildren.length > 0) {
+          if (field.is_internal) {
+            // setting FIELD_GROUP as internal, set as internal all children fields
+            await ctx.petitions.updatePetitionField(
+              args.petitionId,
+              fieldChildren.filter((f) => !f.is_internal).map((f) => f.id),
+              { is_internal: true },
+              `User:${ctx.user!.id}`,
+            );
+          } else if (fieldChildren[0].is_internal) {
+            // setting FIELD_GROUP as external, set first child as external
+            await ctx.petitions.updatePetitionField(
+              args.petitionId,
+              fieldChildren[0].id,
+              { is_internal: false },
+              `User:${ctx.user!.id}`,
+            );
+          }
+          ctx.petitions.loadPetitionFieldChildren.dataloader.clear(field.id);
+        }
+      }
+
+      return field;
     } catch (e) {
       if (
         e instanceof DatabaseError &&
@@ -1285,12 +1433,16 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
       },
     };
     await ctx.petitions.validateFieldData(args.fieldId, { options });
-    return await ctx.petitions.updatePetitionField(
+    const [field] = await ctx.petitions.updatePetitionField(
       args.petitionId,
       args.fieldId,
       { options },
-      ctx.user!,
+      `User:${ctx.user!.id}`,
     );
+
+    await ctx.petitions.updatePetitionToPendingStatus(args.petitionId, `User:${ctx.user!.id}`);
+
+    return field;
   },
 });
 
@@ -1362,6 +1514,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds"),
     replyStatusCanBeUpdated("petitionFieldId"),
+    not(fieldHasType("petitionFieldId", "FIELD_GROUP")),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1912,8 +2065,14 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
+    not(fieldHasType("fieldId", "FIELD_GROUP")),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
     ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
+    ifArgEquals(
+      "type",
+      "FIELD_GROUP",
+      and(userHasFeatureFlag("FIELD_GROUP"), not(fieldHasParent("fieldId"))),
+    ),
     petitionIsNotAnonymized("petitionId"),
   ),
   args: {
@@ -1923,20 +2082,25 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     force: booleanArg({ default: false }),
   },
   resolve: async (_, args, ctx) => {
-    const replies = await ctx.petitions.loadRepliesForField.raw(args.fieldId);
-
-    const field = await ctx.petitions.loadField(args.fieldId);
-
-    if (field && !args.force && replies.length > 0 && !isValueCompatible(field.type, args.type)) {
-      throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+    if (!args.force) {
+      const field = await ctx.petitions.loadField(args.fieldId);
+      const replies = await ctx.petitions.loadRepliesForField.raw(args.fieldId);
+      if (isDefined(field) && replies.length > 0 && !isValueCompatible(field.type, args.type)) {
+        throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+      }
     }
+
     try {
-      return await ctx.petitions.changePetitionFieldType(
+      const field = await ctx.petitions.changePetitionFieldType(
         args.petitionId,
         args.fieldId,
         args.type,
         ctx.user!,
       );
+
+      await ctx.petitions.updatePetitionToPendingStatus(args.petitionId, `User:${ctx.user!.id}`);
+
+      return field;
     } catch (e: any) {
       if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
         throw new ApolloError("Can't change type of a fixed field", "UPDATE_FIXED_FIELD_ERROR");
@@ -2450,3 +2614,132 @@ export const createPublicPetitionLinkPrefillData = mutationField(
     },
   },
 );
+
+export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildren", {
+  type: "PetitionField",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    parentFieldId: nonNull(globalIdArg("PetitionField")),
+    childrenFieldIds: nonNull(list(nonNull(globalIdArg("PetitionField")))),
+    force: booleanArg(),
+  },
+  authorize: authenticateAnd(
+    userHasFeatureFlag("FIELD_GROUP"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    fieldsBelongsToPetition("petitionId", "parentFieldId"),
+    fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
+    fieldHasType("parentFieldId", "FIELD_GROUP"),
+    ifNotEmptyArray(
+      "childrenFieldIds",
+      and(
+        not(fieldHasType("childrenFieldIds", ["FIELD_GROUP", "HEADING"])),
+        not(fieldHasParent("childrenFieldIds")),
+      ),
+    ),
+  ),
+  validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
+  resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {
+    if (!force) {
+      const replies = (await ctx.petitions.loadRepliesForField(childrenFieldIds)).flat();
+      if (replies.length > 0) {
+        throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+      }
+    }
+    try {
+      await ctx.petitions.linkPetitionFieldChildren(
+        petitionId,
+        parentFieldId,
+        childrenFieldIds,
+        `User:${ctx.user!.id}`,
+      );
+
+      await ctx.petitions.updatePetitionToPendingStatus(petitionId, `User:${ctx.user!.id}`);
+
+      ctx.petitions.loadFieldsForPetition.dataloader.clear(petitionId);
+      ctx.petitions.loadPetitionFieldChildren.dataloader.clear(parentFieldId);
+
+      return (await ctx.petitions.loadField(parentFieldId))!;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR") {
+          throw new ApolloError(
+            "First child cannot have visibility conditions",
+            "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR",
+          );
+        } else if (error.message === "FIRST_CHILD_IS_INTERNAL_ERROR") {
+          throw new ApolloError(
+            "First child of an external field cannot be internal",
+            "FIRST_CHILD_IS_INTERNAL_ERROR",
+          );
+        }
+      }
+      throw error;
+    }
+  },
+});
+
+export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChildren", {
+  type: "PetitionField",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    parentFieldId: nonNull(globalIdArg("PetitionField")),
+    childrenFieldIds: nonNull(list(nonNull(globalIdArg("PetitionField")))),
+    force: booleanArg(),
+  },
+  authorize: authenticateAnd(
+    userHasFeatureFlag("FIELD_GROUP"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    fieldsBelongsToPetition("petitionId", "parentFieldId"),
+    fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
+    fieldHasType("parentFieldId", "FIELD_GROUP"),
+    fieldHasParent("childrenFieldIds", "parentFieldId"),
+    fieldIsNotBeingReferencedByVisibilityCondition("petitionId", "childrenFieldIds"),
+  ),
+  validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
+  resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {
+    if (!force) {
+      const replies = (await ctx.petitions.loadRepliesForField(childrenFieldIds)).flat();
+      if (replies.length > 0) {
+        throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+      }
+    }
+
+    try {
+      await ctx.petitions.unlinkPetitionFieldChildren(
+        petitionId,
+        parentFieldId,
+        childrenFieldIds,
+        `User:${ctx.user!.id}`,
+      );
+
+      await ctx.petitions.updatePetitionToPendingStatus(petitionId, `User:${ctx.user!.id}`);
+
+      ctx.petitions.loadFieldsForPetition.dataloader.clear(petitionId);
+      ctx.petitions.loadPetitionFieldChildren.dataloader.clear(parentFieldId);
+
+      return (await ctx.petitions.loadField(parentFieldId))!;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR") {
+          throw new ApolloError(
+            "First child cannot have visibility conditions",
+            "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR",
+          );
+        } else if (error.message === "FIRST_CHILD_IS_INTERNAL_ERROR") {
+          throw new ApolloError(
+            "First child of an external field cannot be internal",
+            "FIRST_CHILD_IS_INTERNAL_ERROR",
+          );
+        }
+      }
+
+      throw error;
+    }
+  },
+});

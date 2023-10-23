@@ -25,10 +25,11 @@ export interface RecipientViewPetitionFieldNumberProps
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
-  isInvalid: boolean;
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: number }) => Promise<void>;
   onCreateReply: (content: { value: number }) => Promise<string | undefined>;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 export function RecipientViewPetitionFieldNumber({
@@ -40,6 +41,7 @@ export function RecipientViewPetitionFieldNumber({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  parentReplyId,
 }: RecipientViewPetitionFieldNumberProps) {
   const intl = useIntl();
 
@@ -161,10 +163,10 @@ export function RecipientViewPetitionFieldNumber({
 
   const inputProps = {
     value,
-    id: `reply-${field.id}-new`,
+    id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef,
     isDisabled: isDisabled,
-    isInvalid: isInvalidReply[field.id],
+    isInvalid: isInvalidReply[field.id] || isInvalid,
     onlyPositive: isDefined(range.min) && range.min >= 0,
     decimals: decimals ?? 2,
     prefix,
@@ -378,7 +380,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     ref,
     prefix,
     suffix,
-    id: `reply-${field.id}-${reply.id}`,
+    id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED" || isInvalid,
     onlyPositive: isDefined(range.min) && range.min >= 0,

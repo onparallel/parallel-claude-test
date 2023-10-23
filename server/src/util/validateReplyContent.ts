@@ -18,7 +18,10 @@ export class ValidateReplyContentError extends Error {
   }
 }
 
-export async function validateReplyContent(field: PetitionField, content: any) {
+export async function validateReplyContent(
+  field: Pick<PetitionField, "type" | "options">,
+  content: any,
+) {
   switch (field.type) {
     case "NUMBER": {
       if (
@@ -256,7 +259,15 @@ export async function validateReplyContent(field: PetitionField, content: any) {
           "Reply must contain a valid PetitionFieldReply id.",
         );
       }
-
+      break;
+    }
+    case "FIELD_GROUP": {
+      if (typeof content !== "object") {
+        throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type object.");
+      }
+      if (Object.keys(content).length > 0) {
+        throw new ValidateReplyContentError("INVALID_VALUE_ERROR", "Reply must be empty.");
+      }
       break;
     }
     default:

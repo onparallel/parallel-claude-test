@@ -12,7 +12,7 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  CreateReferenceDialog_PetitionFieldFragment,
+  AddAliasToFieldDialog_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -24,22 +24,22 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldTypeIndicator } from "../PetitionFieldTypeIndicator";
 
-interface CreateReferenceDialogProps {
-  field: CreateReferenceDialog_PetitionFieldFragment;
+interface AddAliasToFieldDialogProps {
+  field: AddAliasToFieldDialog_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
-  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
 }
 
-export function useCreateReferenceDialog() {
-  return useDialog(CreateReferenceDialog);
+export function useAddAliasToFieldDialog() {
+  return useDialog(AddAliasToFieldDialog);
 }
 
-export function CreateReferenceDialog({
+export function AddAliasToFieldDialog({
   field,
   fieldIndex,
   onFieldEdit,
   ...props
-}: DialogProps<CreateReferenceDialogProps, string>) {
+}: DialogProps<AddAliasToFieldDialogProps, string>) {
   const {
     handleSubmit,
     register,
@@ -97,7 +97,7 @@ export function CreateReferenceDialog({
       {...props}
       header={
         <FormattedMessage
-          id="component.create-reference-dialog.header"
+          id="component.add-alias-to-field-dialog.header"
           defaultMessage="Create reference"
         />
       }
@@ -105,7 +105,7 @@ export function CreateReferenceDialog({
         <Stack spacing={4}>
           <Text>
             <FormattedMessage
-              id="component.create-reference-dialog.body"
+              id="component.add-alias-to-field-dialog.body"
               defaultMessage="Add the reference to a field description where you want it to be replaced by the reply."
             />
           </Text>
@@ -122,7 +122,7 @@ export function CreateReferenceDialog({
           <FormControl id="alias" isInvalid={!!errors.alias}>
             <FormLabel>
               <FormattedMessage
-                id="component.create-reference-dialog.field-reference"
+                id="component.add-alias-to-field-dialog.field-reference"
                 defaultMessage="Field reference"
               />
             </FormLabel>
@@ -130,12 +130,12 @@ export function CreateReferenceDialog({
             <FormErrorMessage>
               {errors.alias?.type === "ALIAS_ALREADY_EXISTS" ? (
                 <FormattedMessage
-                  id="component.create-reference-dialog.reference-exists-error"
+                  id="component.add-alias-to-field-dialog.reference-exists-error"
                   defaultMessage="This reference is already in use."
                 />
               ) : (
                 <FormattedMessage
-                  id="component.create-reference-dialog.reference-invalid-error"
+                  id="component.add-alias-to-field-dialog.reference-invalid-error"
                   defaultMessage="Use only letters, numbers or _"
                 />
               )}
@@ -152,9 +152,9 @@ export function CreateReferenceDialog({
   );
 }
 
-CreateReferenceDialog.fragments = {
+AddAliasToFieldDialog.fragments = {
   PetitionField: gql`
-    fragment CreateReferenceDialog_PetitionField on PetitionField {
+    fragment AddAliasToFieldDialog_PetitionField on PetitionField {
       id
       title
       type

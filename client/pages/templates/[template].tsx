@@ -3,12 +3,12 @@ import {
   Box,
   Button,
   Center,
-  Collapse,
   Grid,
   Heading,
   HStack,
   Image,
   ListItem,
+  OrderedList,
   Stack,
   Text,
   UnorderedList,
@@ -16,27 +16,28 @@ import {
 import { DateTime } from "@parallel/components/common/DateTime";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NakedLink } from "@parallel/components/common/Link";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import {
+  LandingTemplateCard_LandingTemplateFragment,
   LandingTemplateDetails_landingTemplateBySlugDocument,
   LandingTemplateDetails_LandingTemplateFragment,
   LandingTemplateDetails_landingTemplatesDocument,
   PetitionLocale,
-  LandingTemplateCard_LandingTemplateFragment,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
+import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isDefined } from "remeda";
 
 function LandingTemplateDetails({
   template,
@@ -74,11 +75,9 @@ function LandingTemplateDetails({
 
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
 
-  const filteredFields = template.fields.filter((field) =>
-    field.type === "HEADING" && !field.title ? false : true,
+  const fieldswithIndices = useFieldsWithIndices(
+    template.fields.filter((field) => (field.type === "HEADING" && !field.title ? false : true)),
   );
-
-  const indices = useFieldIndices(filteredFields);
 
   function handleClickPreview() {
     window.analytics?.track("Preview Template Clicked", {
@@ -269,32 +268,34 @@ function LandingTemplateDetails({
                   defaultMessage="Information list"
                 />
               </Heading>
-              <Collapse startingHeight={"300px"} in={fields.length <= 10 ? true : showFields}>
-                {zip(filteredFields, indices).map(([field, index]) => {
-                  return field.type === "HEADING" ? (
-                    <Text key={field.id} fontWeight="bold" marginBottom={2}>
-                      {index}.{" "}
-                      <Text as="span" fontWeight="bold">
-                        {field.title}
-                      </Text>
-                    </Text>
-                  ) : (
-                    <Text key={field.id} marginLeft={4} marginBottom={2}>
-                      {index}.{" "}
-                      {field.title ? (
-                        <Text as="span">{field.title}</Text>
-                      ) : (
-                        <Text as="span" textStyle="hint">
-                          <FormattedMessage
-                            id="generic.untitled-field"
-                            defaultMessage="Untitled field"
-                          />
+              <PaddedCollapse startingHeight={"300px"} in={fields.length <= 10 ? true : showFields}>
+                <OrderedList>
+                  {fieldswithIndices.map(([field, fieldIndex]) => {
+                    return field.type === "HEADING" ? (
+                      <Text key={field.id} fontWeight="bold" marginBottom={2}>
+                        {fieldIndex}.{" "}
+                        <Text as="span" fontWeight="bold">
+                          {field.title}
                         </Text>
-                      )}
-                    </Text>
-                  );
-                })}
-              </Collapse>
+                      </Text>
+                    ) : (
+                      <Text key={field.id} marginLeft={4} marginBottom={2}>
+                        {fieldIndex}.{" "}
+                        {field.title ? (
+                          <Text as="span">{field.title}</Text>
+                        ) : (
+                          <Text as="span" textStyle="hint">
+                            <FormattedMessage
+                              id="generic.untitled-field"
+                              defaultMessage="Untitled field"
+                            />
+                          </Text>
+                        )}
+                      </Text>
+                    );
+                  })}
+                </OrderedList>
+              </PaddedCollapse>
               {fields.length > 10 ? (
                 <Box
                   paddingTop={4}

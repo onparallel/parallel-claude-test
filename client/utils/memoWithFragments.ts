@@ -6,6 +6,7 @@ import {
 } from "@apollo/client/utilities";
 import { DocumentNode, FieldNode, FragmentDefinitionNode, SelectionSetNode } from "graphql";
 import { ComponentProps, ComponentType, memo } from "react";
+import { assert } from "ts-essentials";
 
 /**
  * Memoizes the component using a comparer function that takes into account
@@ -82,6 +83,12 @@ function checkSelectionSet(
           return false;
         }
       } else {
+        if (process.env.NODE_ENV === "development") {
+          assert(
+            selection.name.value in fragmentMap,
+            `Using fragment ...${selection.name.value} spread but fragment has not been included`,
+          );
+        }
         const fragment = fragmentMap[selection.name.value];
         if (!checkSelectionSet(a, b, fragment.selectionSet, fragmentMap)) {
           return false;

@@ -16,10 +16,10 @@ export function ReferencedFieldDialog({
   ...props
 }: DialogProps<{
   type: "DELETING_FIELD" | "INVALID_CONDITION";
-  fieldsWithIndices: {
-    field: ReferencedFieldDialog_PetitionFieldFragment;
-    fieldIndex: PetitionFieldIndex;
-  }[];
+  fieldsWithIndices: [
+    field: ReferencedFieldDialog_PetitionFieldFragment,
+    fieldIndex: PetitionFieldIndex,
+  ][];
 }>) {
   const focusRef = useRef<HTMLButtonElement>(null);
   return (

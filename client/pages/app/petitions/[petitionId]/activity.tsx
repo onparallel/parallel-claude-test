@@ -49,6 +49,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
@@ -94,12 +95,13 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const showErrorDialog = useErrorDialog();
   const showFieldErrorDialog = useFieldErrorDialog();
+  const allFieldsWithIndices = useAllFieldsWithIndices(petition.fields);
   const _validatePetitionFields = async () => {
-    const { error, message, fieldsWithIndices } = validatePetitionFields(petition.fields);
+    const { error, message, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices);
     if (error) {
       if (fieldsWithIndices && fieldsWithIndices.length > 0) {
         await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
-        const firstId = fieldsWithIndices[0].field.id;
+        const firstId = fieldsWithIndices[0][0].id;
         router.push(`/app/petitions/${query.petitionId}/compose#field-${firstId}`);
       } else {
         await withError(showErrorDialog({ message }));
@@ -432,8 +434,14 @@ const _fragments = {
       ...useSendPetitionHandler_Petition
       fields {
         id
+        ...useAllFieldsWithIndices_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
+        children {
+          id
+          ...validatePetitionFields_PetitionField
+          ...FieldErrorDialog_PetitionField
+        }
       }
       ...useConfirmSendReminderDialog_Petition
       ...PetitionProfilesTable_Petition
@@ -445,6 +453,7 @@ const _fragments = {
     ${ShareButton.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
+    ${useAllFieldsWithIndices.fragments.PetitionField}
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
     ${ConfirmDeactivateAccessDialog.fragments.PetitionAccess}

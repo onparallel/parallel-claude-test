@@ -4,6 +4,7 @@ import { outdent } from "outdent";
 import {
   PetitionEventType,
   PetitionFieldReplyStatusValues,
+  PetitionFieldTypeValues,
   ProfileTypeFieldTypeValues,
   UserLocaleValues,
 } from "../../db/__types";
@@ -31,6 +32,37 @@ function _OrNull<T extends JsonSchema>(
       ? [...item.type, "null"]
       : [item.type as JSONSchema6TypeName, "null"]) as any,
   };
+}
+
+function _PaginationOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
+  return {
+    title: `PaginatedList<${item.title ?? "*missing item title*"}>`,
+    type: "object",
+    description: "Paginated resource",
+    additionalProperties: false,
+    required: ["items", "totalCount"],
+    properties: {
+      items: {
+        description: "The requested slice of items from this paginated resource",
+        type: "array",
+        items: item,
+      },
+      totalCount: {
+        description: "The total count of elements in this paginated resource",
+        type: "integer",
+        minimum: 0,
+        example: 42,
+      },
+    },
+  } as const;
+}
+
+function ListOf<T extends JsonSchemaFor<any>>(
+  item: T,
+): T extends JsonSchemaFor<infer U> ? JsonSchemaFor<U[]> : never;
+function ListOf<T extends JsonSchema>(item: T): JsonSchemaFor<FromSchema<T>[]>;
+function ListOf(item: any) {
+  return _ListOf(item);
 }
 
 const _User = {
@@ -243,11 +275,21 @@ const _PetitionAccess = {
   },
 } as const;
 
-const _PetitionField = {
+const _PetitionFieldInner = {
   title: "PetitionField",
   type: "object",
   additionalProperties: false,
-  required: ["id", "title", "type", "multiple"],
+  required: [
+    "id",
+    "title",
+    "description",
+    "type",
+    "fromPetitionFieldId",
+    "alias",
+    "options",
+    "optional",
+    "multiple",
+  ],
   properties: {
     id: {
       type: "string",
@@ -266,21 +308,7 @@ const _PetitionField = {
     },
     type: {
       type: "string",
-      enum: [
-        "HEADING",
-        "TEXT",
-        "SHORT_TEXT",
-        "FILE_UPLOAD",
-        "SELECT",
-        "DYNAMIC_SELECT",
-        "CHECKBOX",
-        "NUMBER",
-        "DATE",
-        "DATE_TIME",
-        "PHONE",
-        "ES_TAX_DOCUMENTS",
-        "DOW_JONES_KYC",
-      ],
+      enum: PetitionFieldTypeValues,
       description: "The type of the field",
       example: "TEXT",
     },
@@ -295,11 +323,16 @@ const _PetitionField = {
       example: "firstName",
     },
     options: {
-      type: ["array", "null"],
+      type: ["array"],
       description:
         "For fields of type `SELECT`, `DYNAMIC_SELECT` and `CHECKBOX`. An array with valid options for the reply.",
       items: { type: "string" },
       example: [],
+    },
+    optional: {
+      type: "boolean",
+      description: "If `true`, this field is optional. Optional fields do not require a reply.",
+      example: false,
     },
     multiple: {
       type: "boolean",
@@ -309,7 +342,35 @@ const _PetitionField = {
   },
 } as const;
 
-const _PetitionFieldReply = {
+const _PetitionField = {
+  title: "PetitionField",
+  type: "object",
+  additionalProperties: false,
+  required: [..._PetitionFieldInner.required, "children"],
+  properties: {
+    ..._PetitionFieldInner.properties,
+    children: {
+      type: ["array", "null"],
+      example: null,
+      description: "For fields of type `FIELD_GROUP`. An array with the linked fields.",
+      items: {
+        ..._PetitionFieldInner,
+        properties: {
+          ..._PetitionFieldInner.properties,
+          type: {
+            type: "string",
+            enum: PetitionFieldTypeValues.filter((t) => !["HEADING", "FIELD_GROUP"].includes(t)),
+            description: "The type of the field",
+            example: "TEXT",
+          },
+        },
+      },
+    },
+  },
+} as const;
+
+const _PetitionFieldReplyInner = {
+  title: "PetitionFieldReply",
   type: "object",
   required: ["id", "content", "status", "createdAt", "updatedAt"],
   properties: {
@@ -414,6 +475,12 @@ const _PetitionFieldReply = {
             },
           },
         },
+        {
+          title: "Field group reply",
+          type: "object",
+          description: "The reply group for fields of type `FIELD_GROUP`",
+          example: {},
+        },
       ],
     },
     createdAt: {
@@ -427,6 +494,50 @@ const _PetitionFieldReply = {
       format: "date-time",
       description: "Last time update of the reply",
       example: new Date(2020, 2, 20).toISOString(),
+    },
+  },
+} as const;
+
+const _PetitionFieldReply = {
+  title: "PetitionFieldReply",
+  type: "object",
+  required: [..._PetitionFieldReplyInner.required, "children"],
+  properties: {
+    ..._PetitionFieldReplyInner.properties,
+    children: {
+      title: "PetitionFieldReplyGroup",
+      type: ["array", "null"],
+      example: null,
+      description:
+        "For fields of type `FIELD_GROUP`. An array with the linked field replies. Each child contains the replies of a field on the reply group.",
+      items: {
+        type: "object",
+        required: ["field", "replies"],
+        properties: {
+          field: {
+            type: "object",
+            properties: {
+              id: {
+                type: "string",
+                description: "The ID of the parallel field",
+                example: toGlobalId("PetitionField", 100),
+              },
+              type: {
+                type: "string",
+                enum: PetitionFieldTypeValues.filter(
+                  (v) => !["HEADING", "FIELD_GROUP"].includes(v),
+                ),
+                description: "The type of the field",
+                example: "TEXT",
+              },
+            },
+          },
+          replies: {
+            type: "array",
+            items: _PetitionFieldReplyInner,
+          },
+        },
+      },
     },
   },
 } as const;
@@ -1057,6 +1168,12 @@ const _PetitionFieldReplyStatus = {
   example: "APPROVED",
 } as const;
 
+const _PetitionFieldReplyParentReplyId = {
+  type: "string",
+  description: `The ID of the FIELD_GROUP reply. Only for replying children of \`FIELD_GROUP\``,
+  example: null,
+} as const;
+
 export const SubmitReply = schema({
   title: "SubmitReply",
   type: "object",
@@ -1074,6 +1191,26 @@ export const SubmitReply = schema({
       ],
     },
     status: _PetitionFieldReplyStatus,
+    parentReplyId: _PetitionFieldReplyParentReplyId,
+  },
+} as const);
+
+export const UpdateReply = schema({
+  title: "UpdateReply",
+  type: "object",
+  additionalProperties: false,
+  required: ["reply"],
+  properties: {
+    reply: {
+      anyOf: [
+        _TextReplySubmitContent,
+        _DateReplySubmitContent,
+        _NumberReplySubmitContent,
+        _CheckboxReplySubmitContent,
+        _DynamicSelectReplySubmitContent,
+        _DateTimeReplySubmitContent,
+      ],
+    },
   },
 } as const);
 
@@ -1085,6 +1222,17 @@ export const SubmitFileReply = schema({
   properties: {
     reply: _FileUploadReplySubmitContent,
     status: _PetitionFieldReplyStatus,
+    parentReplyId: _PetitionFieldReplyParentReplyId,
+  },
+} as const);
+
+export const UpdateFileReply = schema({
+  title: "UpdateFileReply",
+  type: "object",
+  additionalProperties: false,
+  required: ["reply"],
+  properties: {
+    reply: _FileUploadReplySubmitContent,
   },
 } as const);
 
@@ -1991,37 +2139,6 @@ export const CreateSubscription = schema({
   },
 } as const);
 
-function _PaginationOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
-  return {
-    title: `PaginatedList<${item.title ?? "*missing item title*"}>`,
-    type: "object",
-    description: "Paginated resource",
-    additionalProperties: false,
-    required: ["items", "totalCount"],
-    properties: {
-      items: {
-        description: "The requested slice of items from this paginated resource",
-        type: "array",
-        items: item,
-      },
-      totalCount: {
-        description: "The total count of elements in this paginated resource",
-        type: "integer",
-        minimum: 0,
-        example: 42,
-      },
-    },
-  } as const;
-}
-
-function ListOf<T extends JsonSchemaFor<any>>(
-  item: T,
-): T extends JsonSchemaFor<infer U> ? JsonSchemaFor<U[]> : never;
-function ListOf<T extends JsonSchema>(item: T): JsonSchemaFor<FromSchema<T>[]>;
-function ListOf(item: any) {
-  return _ListOf(item);
-}
-
 export const PetitionCustomProperties = schema({
   type: "object",
   additionalProperties: true,
@@ -2154,6 +2271,11 @@ export const SubmitPetitionReplies = schema({
     For \`DYNAMIC_SELECT\` fields:
     \`{ "select": ["Spain", "Barcelona"] }\` will submit a single reply on the field where the first level of options of a list of countries and the second level is a list of cities within the selected country.
     or: \`{ "select": [["Spain", "Barcelona"], ["Argentina", "Buenos Aires"]] }\` will submit two replies on the field with same options as the previous.
+
+    For \`FIELD_GROUP\` fields, you need to pass an object where each key is the alias of a field inside the group and the value is the reply to that field. Above examples apply here too.
+    \`{ "fieldGroup": { "name": "James", "age": 30 } }\` will submit a single reply on the field group, where "fieldGroup" is the alias of the group, and "name" and "age" are the aliases of the fields inside the group.
+    \`{ "fieldGroup": [{ "name": "James", "age": 30 }, { "name": "Mike", "age": 24 }] }\` will submit two replies on the field group.
+    You also can submit multiple replies on a single field inside the group by passing an array of values instead of a single value.
 
     If no field is found with the provided alias or the reply is invalid given the field type and options, that entry will be ignored.
 

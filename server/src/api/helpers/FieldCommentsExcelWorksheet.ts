@@ -82,7 +82,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     ];
   }
 
-  public async addFieldComments(fields: PetitionField[]) {
+  public async addFieldComments(fields: Pick<PetitionField, "id" | "petition_id" | "title">[]) {
     const comments = await pFlatMap(fields, async (field) => {
       const comments = await this.context.petitions.loadPetitionFieldCommentsForField({
         petitionFieldId: field.id,
@@ -108,7 +108,9 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     }
   }
 
-  private async loadCommentAuthor(comment: PetitionFieldComment): Promise<Contact | UserData> {
+  private async loadCommentAuthor(
+    comment: Pick<PetitionFieldComment, "id" | "user_id" | "petition_access_id">,
+  ): Promise<Contact | UserData> {
     if (comment.user_id) {
       const user = await this.context.users.loadUser(comment.user_id);
       const authorData = user ? await this.context.users.loadUserData(user.user_data_id) : null;

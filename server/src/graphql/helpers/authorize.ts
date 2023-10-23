@@ -160,6 +160,26 @@ export function ifArgEquals<
   };
 }
 
+export function ifNotEmptyArray<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, any[]>,
+>(
+  prop: TArg,
+  thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
+  elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    const array = args[prop] as unknown as any[];
+    if (array.length > 0) {
+      return await thenAuthorizer(root, args, ctx, info);
+    } else if (elseAuthorizer) {
+      return await elseAuthorizer(root, args, ctx, info);
+    }
+    return true;
+  };
+}
+
 export function argIsDefined<
   TypeName extends string,
   FieldName extends string,

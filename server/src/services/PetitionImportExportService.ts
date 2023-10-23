@@ -5,13 +5,14 @@ import { isDefined, omit } from "remeda";
 import {
   ContactLocale,
   ContactLocaleValues,
+  PetitionField,
   PetitionFieldType,
   PetitionFieldTypeValues,
   User,
 } from "../db/__types";
 import { validateFieldOptions } from "../db/helpers/fieldOptions";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { validateFieldVisibilityConditions } from "../graphql/helpers/validators/validFieldVisibility";
+import { validateFieldVisibility } from "../graphql/helpers/validators/validFieldVisibility";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
 import { safeJsonParse } from "../util/safeJsonParse";
 import { Maybe } from "../util/types";
@@ -19,78 +20,95 @@ import { Maybe } from "../util/types";
 export const PETITION_IMPORT_EXPORT_SERVICE = Symbol.for("PETITION_IMPORT_EXPORT_SERVICE");
 
 const PETITION_JSON_SCHEMA = {
-  type: "object",
-  required: ["name", "locale", "isTemplate", "fields"],
-  additionalProperties: false,
-  properties: {
-    name: { type: ["string", "null"] },
-    locale: {
-      type: "string",
-      enum: ContactLocaleValues,
+  definitions: {
+    "petition-field": {
+      type: "object",
+      required: [
+        "id",
+        "type",
+        "title",
+        "description",
+        "optional",
+        "multiple",
+        "options",
+        "visibility",
+        "alias",
+        "isInternal",
+        "showInPdf",
+        "showActivityInPdf",
+        "hasCommentsEnabled",
+      ],
+      additionalProperties: false,
+      properties: {
+        id: { type: "number" },
+        type: { type: "string", enum: PetitionFieldTypeValues },
+        title: { type: ["string", "null"] },
+        description: { type: ["string", "null"] },
+        optional: { type: "boolean" },
+        multiple: { type: "boolean" },
+        options: { type: "object" },
+        visibility: { type: ["object", "null"] },
+        alias: { type: ["string", "null"] },
+        isInternal: { type: "boolean" },
+        showInPdf: { type: "boolean" },
+        showActivityInPdf: { type: "boolean" },
+        hasCommentsEnabled: { type: "boolean" },
+        children: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/petition-field",
+          },
+        },
+      },
     },
-    isTemplate: { type: "boolean" },
-    templateDescription: { type: ["array", "null"], items: { type: "object" } },
-    fields: {
-      type: "array",
-      minItems: 1,
-      items: {
-        type: "object",
-        required: [
-          "id",
-          "type",
-          "title",
-          "description",
-          "optional",
-          "multiple",
-          "options",
-          "visibility",
-          "alias",
-          "isInternal",
-          "showInPdf",
-          "showActivityInPdf",
-          "hasCommentsEnabled",
-        ],
-        additionalProperties: false,
-        properties: {
-          id: { type: "number" },
-          type: { type: "string", enum: PetitionFieldTypeValues },
-          title: { type: ["string", "null"] },
-          description: { type: ["string", "null"] },
-          optional: { type: "boolean" },
-          multiple: { type: "boolean" },
-          options: { type: "object" },
-          visibility: { type: ["object", "null"] },
-          alias: { type: ["string", "null"] },
-          isInternal: { type: "boolean" },
-          showInPdf: { type: "boolean" },
-          showActivityInPdf: { type: "boolean" },
-          hasCommentsEnabled: { type: "boolean" },
+    petition: {
+      type: "object",
+      required: ["name", "locale", "isTemplate", "fields"],
+      additionalProperties: false,
+      properties: {
+        name: { type: ["string", "null"] },
+        locale: {
+          type: "string",
+          enum: ContactLocaleValues,
+        },
+        isTemplate: { type: "boolean" },
+        templateDescription: { type: ["array", "null"], items: { type: "object" } },
+        fields: {
+          type: "array",
+          minItems: 1,
+          items: {
+            $ref: "#/definitions/petition-field",
+          },
         },
       },
     },
   },
+  $ref: "#/definitions/petition",
 };
+
+interface PetitionFieldJson {
+  id: number;
+  type: PetitionFieldType;
+  title: Maybe<string>;
+  description: Maybe<string>;
+  optional: boolean;
+  multiple: boolean;
+  options: any;
+  visibility: any;
+  alias: Maybe<string>;
+  isInternal: boolean;
+  showInPdf: boolean;
+  showActivityInPdf: boolean;
+  hasCommentsEnabled: boolean;
+  children?: PetitionFieldJson[];
+}
 
 interface PetitionJson {
   name: Maybe<string>;
   locale: ContactLocale;
   isTemplate: boolean;
   templateDescription: Maybe<string>;
-  fields: {
-    id: number;
-    type: PetitionFieldType;
-    title: Maybe<string>;
-    description: Maybe<string>;
-    optional: boolean;
-    multiple: boolean;
-    options: any;
-    visibility: any;
-    alias: Maybe<string>;
-    isInternal: boolean;
-    showInPdf: boolean;
-    showActivityInPdf: boolean;
-    hasCommentsEnabled: boolean;
-  }[];
+  fields: PetitionFieldJson[];
 }
 
 export interface IPetitionImportExportService {
@@ -112,6 +130,14 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
     if (!petition) throw new Error(`Petition:${petitionId} not found`);
 
+    const fieldGroupIds = fields.filter((f) => f.type === "FIELD_GROUP").map((f) => f.id);
+
+    const children = await this.petitions.loadPetitionFieldChildren(fieldGroupIds);
+
+    const childrenByFieldId = Object.fromEntries(
+      fieldGroupIds.map((id, index) => [id, children[index]]),
+    );
+
     // add a random number to every field id, so its easier to merge fields of many petitions
     const randomNumber = Math.floor(Math.random() * 1_000_000_000);
     /**
@@ -119,6 +145,35 @@ export class PetitionImportExportService implements IPetitionImportExportService
      * [value] = random incremental integer
      */
     const customFieldIds: Record<number, number> = {};
+
+    function mapField(field: PetitionField, customFieldIds: Record<number, number>) {
+      return {
+        // replace the DB id with incremental integers to not expose database info.
+        // This is required to reconstruct visibility conditions
+        id: customFieldIds[field.id],
+        type: field.type,
+        title: field.title,
+        description: field.description,
+        optional: field.optional,
+        multiple: field.multiple,
+        options: omit(field.options, ["file"]),
+        visibility: isDefined(field.visibility)
+          ? {
+              ...field.visibility,
+              conditions: field.visibility.conditions.map((c: any) => ({
+                ...c,
+                fieldId: customFieldIds[c.fieldId],
+              })),
+            }
+          : null,
+        alias: field.alias,
+        isInternal: field.is_internal,
+        showInPdf: field.show_in_pdf,
+        showActivityInPdf: field.show_activity_in_pdf,
+        hasCommentsEnabled: field.has_comments_enabled,
+      };
+    }
+
     return {
       name: petition.name,
       locale: petition.recipient_locale,
@@ -127,29 +182,14 @@ export class PetitionImportExportService implements IPetitionImportExportService
       fields: fields.map((field) => {
         customFieldIds[field.id] = field.id + randomNumber;
         return {
-          // replace the DB id with incremental integers to not expose database info.
-          // This is required to reconstruct visibility conditions
-          id: customFieldIds[field.id],
-          type: field.type,
-          title: field.title,
-          description: field.description,
-          optional: field.optional,
-          multiple: field.multiple,
-          options: omit(field.options, ["file"]),
-          visibility: isDefined(field.visibility)
-            ? {
-                ...field.visibility,
-                conditions: field.visibility.conditions.map((c: any) => ({
-                  ...c,
-                  fieldId: customFieldIds[c.fieldId],
-                })),
-              }
-            : null,
-          alias: field.alias,
-          isInternal: field.is_internal,
-          showInPdf: field.show_in_pdf,
-          showActivityInPdf: field.show_activity_in_pdf,
-          hasCommentsEnabled: field.has_comments_enabled,
+          ...mapField(field, customFieldIds),
+          children:
+            field.type === "FIELD_GROUP"
+              ? childrenByFieldId[field.id].map((child) => {
+                  customFieldIds[child.id] = child.id + randomNumber;
+                  return mapField(child, customFieldIds);
+                })
+              : undefined,
         };
       }),
     };
@@ -171,17 +211,26 @@ export class PetitionImportExportService implements IPetitionImportExportService
     }
 
     // restore "position" property on fields based on array index
-    const fieldsWithPositions = json.fields.map((f, position) => ({
-      ...f,
-      position,
-      // petition_id is needed for part of the verification
-      // in this service fields are not present in DB so hardcode any number
-      petition_id: 0,
-    }));
+    const allFields = json.fields.flatMap((f, position) => [
+      {
+        ...omit(f, ["children"]),
+        position,
+        // petition_id is needed for part of the verification
+        // in this service fields are not present in DB so hardcode any number
+        petition_id: 0,
+        parent_petition_field_id: null,
+      },
+      ...(f.children?.map((child, childPosition) => ({
+        ...omit(child, ["children"]),
+        position: childPosition,
+        petition_id: 0,
+        parent_petition_field_id: f.id,
+      })) ?? []),
+    ]);
 
-    fieldsWithPositions.forEach((field) => {
+    allFields.forEach((field) => {
       validateFieldOptions(field.type, field.options);
-      validateFieldVisibilityConditions(field, fieldsWithPositions);
+      validateFieldVisibility(field, allFields);
     });
 
     return await this.petitions.withTransaction(async (t) => {
@@ -205,9 +254,9 @@ export class PetitionImportExportService implements IPetitionImportExportService
        */
       const newFieldIds: Record<number, number> = {};
       await pMap(
-        fieldsWithPositions,
+        allFields,
         async (jsonField) => {
-          const field = await this.petitions.createPetitionFieldAtPosition(
+          const [field] = await this.petitions.createPetitionFieldsAtPosition(
             petition.id,
             {
               type: jsonField.type,
@@ -236,6 +285,9 @@ export class PetitionImportExportService implements IPetitionImportExportService
               show_activity_in_pdf: jsonField.showActivityInPdf,
               has_comments_enabled: jsonField.hasCommentsEnabled,
             },
+            isDefined(jsonField.parent_petition_field_id)
+              ? newFieldIds[jsonField.parent_petition_field_id]
+              : null,
             jsonField.position,
             user,
             t,

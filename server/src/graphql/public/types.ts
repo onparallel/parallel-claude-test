@@ -348,9 +348,11 @@ export const PublicPetitionField = objectType({
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
+      resolve: ({ optional, type }) => optional || type === "HEADING",
     });
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
+      resolve: ({ multiple, type }) => multiple || type === "FIELD_GROUP",
     });
     t.boolean("isInternal", {
       description: "Determines if the field is visible by the recipients.",
@@ -419,6 +421,25 @@ export const PublicPetitionField = objectType({
     });
     t.nonNull.boolean("hasCommentsEnabled", {
       resolve: (o) => o.has_comments_enabled,
+    });
+    t.nullable.list.nonNull.field("children", {
+      type: "PublicPetitionField",
+      description: "The children of this field.",
+      resolve: async (o, _, ctx) => {
+        if (o.type !== "FIELD_GROUP") {
+          return null;
+        }
+        return await ctx.petitions.loadPetitionFieldChildren(o.id);
+      },
+    });
+    t.nullable.field("parent", {
+      type: "PublicPetitionField",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.parent_petition_field_id)) {
+          return await ctx.petitions.loadField(o.parent_petition_field_id);
+        }
+        return null;
+      },
     });
   },
 });
@@ -569,7 +590,56 @@ export const PublicPetitionFieldReply = objectType({
       },
     });
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
+    t.nullable.field("parent", {
+      type: "PublicPetitionFieldReply",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.parent_petition_field_reply_id)) {
+          return await ctx.petitions.loadFieldReply(o.parent_petition_field_reply_id);
+        }
+        return null;
+      },
+    });
+    t.nullable.list.nonNull.field("children", {
+      type: "PublicPetitionFieldGroupChildReply",
+      resolve: async (o, _, ctx) => {
+        if (o.type !== "FIELD_GROUP") {
+          return null;
+        }
+
+        const childrenFields = await ctx.petitions.loadPetitionFieldChildren(o.petition_field_id);
+        return childrenFields.map((field) => ({
+          petition_field_id: field.id,
+          parent_petition_field_reply_id: o.id,
+        }));
+      },
+    });
   },
+});
+
+export const PublicPetitionFieldGroupChildReply = objectType({
+  name: "PublicPetitionFieldGroupChildReply",
+  description: "References the replies of a FIELD_GROUP field on a specific field and group",
+  definition(t) {
+    t.nonNull.field("field", {
+      type: "PublicPetitionField",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.petitions.loadField(o.petition_field_id))!;
+      },
+    });
+    t.nonNull.list.nonNull.field("replies", {
+      type: "PublicPetitionFieldReply",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldGroupChildReplies({
+          parentPetitionFieldReplyId: o.parent_petition_field_reply_id,
+          petitionFieldId: o.petition_field_id,
+        });
+      },
+    });
+  },
+  sourceType: /* ts */ `{
+    parent_petition_field_reply_id: number;
+    petition_field_id: number;
+  }`,
 });
 
 export const PublicContact = objectType({

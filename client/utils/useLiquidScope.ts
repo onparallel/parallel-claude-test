@@ -8,32 +8,55 @@ import { useMemo } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
 import { FORMATS, prettifyTimezone } from "./dates";
-import { getFieldIndices, PetitionFieldIndex } from "./fieldIndices";
+import { PetitionFieldIndex, useFieldsWithIndices } from "./fieldIndices";
 import { isFileTypeField } from "./isFileTypeField";
-import { UnwrapArray } from "./types";
+import { ArrayUnionToUnion, UnwrapArray } from "./types";
 
 export function useLiquidScope(
   petition: useLiquidScope_PetitionBaseFragment | useLiquidScope_PublicPetitionFragment,
   usePreviewReplies?: boolean,
 ) {
   const intl = useIntl();
-  return useMemo(() => {
-    const indices = getFieldIndices(petition.fields);
-    const scope: Record<string, any> = { petitionId: petition.id, _: {} };
-    for (const [fieldIndex, field] of zip<
-      PetitionFieldIndex,
+  const fieldsWithIndices = useFieldsWithIndices(
+    petition.fields as (
       | UnwrapArray<useLiquidScope_PetitionBaseFragment["fields"]>
       | UnwrapArray<useLiquidScope_PublicPetitionFragment["fields"]>
-    >(indices, petition.fields)) {
+    )[],
+  );
+  return useMemo(() => {
+    const scope: Record<string, any> = { petitionId: petition.id, _: {} };
+    for (const [field, fieldIndex, childrenFieldIndices] of fieldsWithIndices) {
       const replies =
         field.__typename === "PetitionField" && usePreviewReplies
           ? field.previewReplies
           : field.replies;
-      const value = field.multiple
-        ? replies.map((r) => getReplyValue(field.type, r.content))
-        : replies.length > 0
-        ? getReplyValue(field.type, replies.at(-1)!.content)
-        : undefined;
+      let values: any[];
+      if (field.type === "FIELD_GROUP") {
+        values = replies.map((r) => {
+          const reply: Record<string, any> = { _: {} };
+          for (const [{ field, replies: _replies }, fieldIndex] of zip<
+            UnwrapArray<Exclude<ArrayUnionToUnion<typeof replies>["children"], null | undefined>>,
+            PetitionFieldIndex
+          >(r.children! as any, childrenFieldIndices!)) {
+            const values = _replies.map((r) => getReplyValue(field.type, r.content));
+            scope._[fieldIndex] = (scope._[fieldIndex] ?? []).concat(values);
+            if (isDefined(field.alias)) {
+              scope[field.alias] = scope._[fieldIndex];
+            }
+            const value = field.multiple ? values : values?.[0];
+            if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
+              reply._[fieldIndex] = value;
+              if (isDefined(field.alias)) {
+                reply[field.alias] = value;
+              }
+            }
+          }
+          return reply;
+        });
+      } else {
+        values = replies.map((r) => getReplyValue(field.type, r.content));
+      }
+      const value = field.multiple ? values : values?.[0];
       if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
         scope._[fieldIndex] = value;
         if (isDefined(field.alias)) {
@@ -56,38 +79,34 @@ export function useLiquidScope(
   }, [petition.fields]);
 }
 
-export class DateTimeLiquidValue {
-  readonly datetime: string;
-  readonly timezone: string;
-  readonly value: string;
-
+abstract class LiquidValue<T> {
   constructor(
-    private intl: IntlShape,
-    content: { datetime: string; timezone: string; value: string },
-  ) {
-    this.datetime = content.datetime;
-    this.timezone = content.timezone;
-    this.value = content.value;
-  }
+    protected intl: IntlShape,
+    public readonly content: T,
+  ) {}
+
+  abstract toString(): string;
+}
+
+export class DateTimeLiquidValue extends LiquidValue<{
+  datetime: string;
+  timezone: string;
+  value: string;
+}> {
   toString() {
-    return `${this.intl.formatDate(new Date(this.value), {
-      timeZone: this.timezone,
+    return `${this.intl.formatDate(new Date(this.content.value), {
+      timeZone: this.content.timezone,
       ...FORMATS["LLL"],
-    })} (${prettifyTimezone(this.timezone)})`;
+    })} (${prettifyTimezone(this.content.timezone)})`;
   }
 }
 
-export class DateLiquidValue {
-  readonly value: string;
-
-  constructor(
-    private intl: IntlShape,
-    content: { value: string },
-  ) {
-    this.value = content.value;
-  }
+export class DateLiquidValue extends LiquidValue<{ value: string }> {
   toString() {
-    return this.intl.formatDate(new Date(this.value), { timeZone: "UTC", ...FORMATS["LL"] });
+    return this.intl.formatDate(new Date(this.content.value), {
+      timeZone: "UTC",
+      ...FORMATS["LL"],
+    });
   }
 }
 
@@ -96,31 +115,61 @@ useLiquidScope.fragments = {
     fragment useLiquidScope_PetitionBase on PetitionBase {
       id
       fields {
-        id
-        type
-        multiple
-        alias
+        ...useLiquidScope_PetitionField
         previewReplies @client {
           content
+          children {
+            field {
+              ...useLiquidScope_PetitionField
+            }
+            replies {
+              content
+            }
+          }
         }
         replies {
           content
+          children {
+            field {
+              ...useLiquidScope_PetitionField
+            }
+            replies {
+              content
+            }
+          }
         }
       }
+    }
+    fragment useLiquidScope_PetitionField on PetitionField {
+      id
+      type
+      multiple
+      alias
     }
   `,
   PublicPetition: gql`
     fragment useLiquidScope_PublicPetition on PublicPetition {
       id
       fields {
-        id
-        type
-        multiple
-        alias
+        ...useLiquidScope_PublicPetitionField
         replies {
           content
+          children {
+            field {
+              ...useLiquidScope_PublicPetitionField
+            }
+            replies {
+              content
+            }
+          }
         }
       }
+    }
+    fragment useLiquidScope_PublicPetitionField on PublicPetitionField {
+      id
+      type
+      multiple
+      alias
     }
   `,
 };

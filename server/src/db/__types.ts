@@ -36,6 +36,7 @@ export type FeatureFlagName =
   | "PROFILES"
   | "COPY_PETITION_REPLIES"
   | "PERMISSION_MANAGEMENT"
+  | "FIELD_GROUP"
   | "CUSTOM_PROPERTIES";
 
 export const FeatureFlagNameValues = [
@@ -61,6 +62,7 @@ export const FeatureFlagNameValues = [
   "PROFILES",
   "COPY_PETITION_REPLIES",
   "PERMISSION_MANAGEMENT",
+  "FIELD_GROUP",
   "CUSTOM_PROPERTIES",
 ] as FeatureFlagName[];
 
@@ -224,7 +226,8 @@ export type PetitionFieldType =
   | "DATE"
   | "ES_TAX_DOCUMENTS"
   | "DOW_JONES_KYC"
-  | "DATE_TIME";
+  | "DATE_TIME"
+  | "FIELD_GROUP";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -240,6 +243,7 @@ export const PetitionFieldTypeValues = [
   "ES_TAX_DOCUMENTS",
   "DOW_JONES_KYC",
   "DATE_TIME",
+  "FIELD_GROUP",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
@@ -1234,6 +1238,7 @@ export interface PetitionField {
   has_comments_enabled: boolean; // bool
   show_activity_in_pdf: boolean; // bool
   require_approval: boolean; // bool
+  parent_petition_field_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionField = PartialProps<
@@ -1258,6 +1263,7 @@ export type CreatePetitionField = PartialProps<
   | "has_comments_enabled"
   | "show_activity_in_pdf"
   | "require_approval"
+  | "parent_petition_field_id"
 >;
 
 export interface PetitionFieldAttachment {
@@ -1323,6 +1329,7 @@ export interface PetitionFieldReply {
   metadata: any; // jsonb
   user_id: Maybe<number>; // int4
   anonymized_at: Maybe<Date>; // timestamptz
+  parent_petition_field_reply_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -1338,6 +1345,7 @@ export type CreatePetitionFieldReply = PartialProps<
   | "metadata"
   | "user_id"
   | "anonymized_at"
+  | "parent_petition_field_reply_id"
 >;
 
 export interface PetitionListView {

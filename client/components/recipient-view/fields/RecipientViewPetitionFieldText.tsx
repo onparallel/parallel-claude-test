@@ -1,4 +1,4 @@
-import { Center, Flex, List, Stack } from "@chakra-ui/react";
+import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -18,7 +18,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
@@ -27,6 +27,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface RecipientViewPetitionFieldTextProps
   extends Omit<
@@ -37,6 +38,8 @@ export interface RecipientViewPetitionFieldTextProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 export function RecipientViewPetitionFieldText({
@@ -47,6 +50,8 @@ export function RecipientViewPetitionFieldText({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  isInvalid,
+  parentReplyId,
 }: RecipientViewPetitionFieldTextProps) {
   const intl = useIntl();
 
@@ -149,12 +154,13 @@ export function RecipientViewPetitionFieldText({
   );
 
   const inputProps = {
-    id: `reply-${field.id}-new`,
+    id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef as any,
     paddingRight: 10,
     isDisabled: isDisabled,
     maxLength: field.options.maxLength ?? undefined,
     value,
+    isInvalid,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediateIfPending(value, false);
@@ -190,6 +196,9 @@ export function RecipientViewPetitionFieldText({
         defaultMessage: "Enter your answer",
       }),
   };
+
+  const fieldReplies = completedFieldReplies(field);
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
@@ -200,6 +209,15 @@ export function RecipientViewPetitionFieldText({
       onDownloadAttachment={onDownloadAttachment}
       onMouseDownNewReply={handleMouseDownNewReply}
     >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
@@ -272,7 +290,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   );
 
   const props = {
-    id: `reply-${field.id}-${reply.id}`,
+    id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref: ref as any,
     paddingRight: 10,
     value,

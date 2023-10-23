@@ -51,7 +51,7 @@ interface RiskEntityPlace {
   iso_alpha2: string;
 }
 
-interface RiskEntityProfileResult {
+export interface RiskEntityProfileResult {
   data: {
     id: string;
     attributes: {
@@ -101,7 +101,7 @@ interface RiskEntityProfileResult {
   };
 }
 
-interface RiskEntityProfilePdfResult {
+export interface RiskEntityProfilePdfResult {
   mime_type: string;
   binary_encoding: string;
   binary_stream: string;

@@ -109,17 +109,27 @@ export function ExportRepliesDialog({
   const [externalClientId, setExternalClientId] = useState("");
   const [clientIdError, setClientIdError] = useState(false);
   const clientIdRef = useRef<HTMLInputElement>(null);
-  const placeholdersRename = useFilenamePlaceholdersRename();
+  const placeholdersRename = useFilenamePlaceholdersRename(fields);
   const example = useMemo(() => {
+    function hasFileReply(
+      field: Pick<ExportRepliesDialog_PetitionFieldFragment, "type" | "replies">,
+    ) {
+      return (
+        isFileTypeField(field.type) &&
+        field.replies.length > 0 &&
+        field.replies.some((r) => !r.content.error && r.content.uploadComplete)
+      );
+    }
     const field = fields.find(
-      (f) =>
-        isFileTypeField(f.type) &&
-        f.replies.length > 0 &&
-        f.replies.some((r) => !r.content.error && r.content.uploadComplete),
+      (f) => hasFileReply(f) || (f.type === "FIELD_GROUP" && f.children?.some(hasFileReply)),
     );
+
     if (!field) return [null];
-    const reply = field.replies.find((r) => !r.content.error && r.content.uploadComplete)!;
-    return [reply.content.filename, placeholdersRename(fields)(field, reply, pattern)];
+    const fileTypeField = field.type === "FIELD_GROUP" ? field.children?.find(hasFileReply) : field;
+    if (!fileTypeField) return [null];
+
+    const reply = fileTypeField.replies.find((r) => !r.content.error && r.content.uploadComplete)!;
+    return [reply.content.filename, placeholdersRename(fileTypeField, reply, pattern)];
   }, [fields, placeholdersRename, pattern]);
 
   const inputRef = useRef<PlaceholderInputInstance>(null);
@@ -291,7 +301,17 @@ ExportRepliesDialog.fragments = {
       type
       ...useFilenamePlaceholdersRename_PetitionField
       replies {
+        content
         ...useFilenamePlaceholdersRename_PetitionFieldReply
+      }
+      children {
+        id
+        type
+        ...useFilenamePlaceholdersRename_PetitionField
+        replies {
+          content
+          ...useFilenamePlaceholdersRename_PetitionFieldReply
+        }
       }
     }
     ${useFilenamePlaceholdersRename.fragments.PetitionField}

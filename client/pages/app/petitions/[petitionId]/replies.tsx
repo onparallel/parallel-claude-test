@@ -70,14 +70,13 @@ import {
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   PetitionReplies_userDocument,
   PetitionSettings_cancelPetitionSignatureRequestDocument,
-  PetitionStatus,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
-import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
+import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import {
   defaultFieldsFilter,
   filterPetitionFields,
@@ -137,7 +136,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
-  const fieldVisibility = useFieldVisibility(petition.fields);
+  const fieldLogic = useFieldLogic(petition.fields);
   const toast = useToast();
 
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
@@ -166,6 +165,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     setTimeout(() => handlePetitionContentsFieldClick(fieldId));
   });
 
+  useTempQueryParam("parentReply", (replyId) => {
+    const element = document.getElementById(`reply-${replyId}`);
+    setTimeout(() => highlight(element));
+  });
+
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionReplies_updatePetitionDocument);
   const downloadReplyFile = useDownloadReplyFile();
@@ -175,9 +179,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     petitionFieldId: string,
     petitionFieldReplyIds: string[],
     status: PetitionFieldReplyStatus,
+    parentFieldId: string,
   ) {
     if (status === "REJECTED") {
-      setActiveFieldId(petitionFieldId);
+      setActiveFieldId(parentFieldId);
       setTimeout(() => {
         const input = document.querySelector<HTMLTextAreaElement>(
           "#petition-replies-comments-input",
@@ -188,15 +193,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         }
       }, 150);
     }
-    await updatePetitionFieldRepliesStatus(
-      {
-        petitionId,
-        petitionFieldId,
-        petitionFieldReplyIds,
-        status,
-      },
-      petition.status,
-    );
+    await updatePetitionFieldRepliesStatus({
+      petitionId,
+      petitionFieldId,
+      petitionFieldReplyIds,
+      status,
+    });
   }
 
   const handleUpdatePetition = useCallback(
@@ -241,7 +243,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, [petitionId, petition.fields]);
 
   const showDownloadAll = petition.fields.some(
-    (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0,
+    (f) =>
+      (!f.isReadOnly &&
+        ((f.type === "FIELD_GROUP" && f.children?.some((child) => child.replies.length > 0)) ||
+          (f.type !== "FIELD_GROUP" && f.replies.length > 0))) ||
+      f.comments.length > 0,
   );
 
   const handlePrintPdfTask = usePrintPdfTask();
@@ -295,7 +301,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     highlight(signaturesRef.current);
   }, []);
 
-  const indices = useFieldIndices(petition.fields);
+  const fieldsWithIndices = useFieldsWithIndices(petition.fields);
 
   const showClosePetitionDialog = useClosePetitionDialog();
   const [sendPetitionClosedNotification] = useMutation(
@@ -306,11 +312,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     async ({ requiredMessage }: { requiredMessage: boolean }) => {
       const petitionClosedNotificationToast = {
         title: intl.formatMessage({
-          id: "petition.message-sent.toast-header",
+          id: "page.replies.message-sent-toast-header",
           defaultMessage: "Message sent",
         }),
         description: intl.formatMessage({
-          id: "petition.message-sent.toast-description",
+          id: "page.replies.message-sent-toast-description",
           defaultMessage: "The message is on it's way",
         }),
         status: "success" as const,
@@ -536,7 +542,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               >
                 <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                   <FormattedMessage
-                    id="petition-replies.finalize-petition.button"
+                    id="page.replies.finalize-petition-button"
                     defaultMessage="Close parallel"
                   />
                 </Text>
@@ -556,7 +562,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 }}
               >
                 <FormattedMessage
-                  id="petition-replies.notify-petition-reviewed.button"
+                  id="page.replies.notify-petition-reviewed-button"
                   defaultMessage="Notify that it is correct"
                 />
               </Button>
@@ -581,12 +587,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                   {petition.profiles.length ? (
                     <FormattedMessage
-                      id="petition-replies.open-profile.button"
+                      id="page.replies.open-profile-button"
                       defaultMessage="Open profile"
                     />
                   ) : (
                     <FormattedMessage
-                      id="petition-replies.associate-profile.button"
+                      id="page.replies.associate-profile-button"
                       defaultMessage="Associate profile"
                     />
                   )}
@@ -614,7 +620,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   </MenuList>
                 }
               >
-                <FormattedMessage id="petition-replies.export-replies" defaultMessage="Export" />
+                <FormattedMessage id="page.replies.export-replies" defaultMessage="Export" />
               </ButtonWithMoreOptions>
             ) : null}
           </Stack>
@@ -679,14 +685,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                         <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
                       }
                     >
-                      <FormattedMessage id="petition.contents" defaultMessage="Contents" />
+                      <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                     </CardHeader>
                     <Box overflow="auto">
                       <PetitionContents
-                        fields={petition.fields}
+                        fieldsWithIndices={fieldsWithIndices}
                         filter={filter}
-                        fieldIndices={indices}
-                        fieldVisibility={fieldVisibility}
+                        fieldLogic={fieldLogic}
                         onFieldClick={handlePetitionContentsFieldClick}
                         fieldIndicators={PetitionContentsIndicators}
                         signatureStatus={petitionSignatureStatus}
@@ -715,35 +720,36 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           />
           <Stack flex="2" spacing={4} data-section="replies-fields">
             <LiquidScopeProvider scope={scope}>
-              {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
-                (x, index) =>
-                  x.type === "FIELD" ? (
-                    <PetitionRepliesField
-                      ref={fieldRefs[x.field.id]}
-                      id={`field-${x.field.id}`}
-                      data-section="replies-field"
-                      data-field-type={x.field.type}
-                      key={x.field.id}
-                      petitionId={petition.id}
-                      field={x.field}
-                      isVisible={true}
-                      fieldIndex={x.fieldIndex}
-                      onAction={handleAction}
-                      isActive={activeFieldId === x.field.id}
-                      onToggleComments={() => {
-                        setQueryState({
-                          comments: activeFieldId === x.field.id ? null : x.field.id,
-                          profile: null,
-                        });
-                      }}
-                      onUpdateReplyStatus={(replyId, status) =>
-                        handleUpdateRepliesStatus(x.field.id, [replyId], status)
-                      }
-                      isDisabled={myEffectivePermission === "READ"}
-                    />
-                  ) : (
-                    <PetitionRepliesFilteredFields key={index} count={x.count} />
-                  ),
+              {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) =>
+                x.type === "FIELD" ? (
+                  <PetitionRepliesField
+                    ref={fieldRefs[x.field.id]}
+                    id={`field-${x.field.id}`}
+                    data-section="replies-field"
+                    data-field-type={x.field.type}
+                    key={x.field.id}
+                    petitionId={petition.id}
+                    field={x.field}
+                    childrenFieldIndices={x.childrenFieldIndices}
+                    fieldIndex={x.fieldIndex}
+                    onAction={handleAction}
+                    isActive={activeFieldId === x.field.id}
+                    onToggleComments={() => {
+                      setQueryState({
+                        comments: activeFieldId === x.field.id ? null : x.field.id,
+                        profile: null,
+                      });
+                    }}
+                    onUpdateReplyStatus={(fieldId, replyId, status) =>
+                      handleUpdateRepliesStatus(fieldId, [replyId], status, x.field.id)
+                    }
+                    isDisabled={myEffectivePermission === "READ"}
+                    filter={filter}
+                    fieldLogic={x.fieldLogic!}
+                  />
+                ) : (
+                  <PetitionRepliesFilteredFields key={index} count={x.count} />
+                ),
               )}
             </LiquidScopeProvider>
           </Stack>
@@ -807,13 +813,13 @@ PetitionReplies.fragments = {
         ...PetitionContents_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
         ...ExportRepliesDialog_PetitionField
-        ...useFieldVisibility_PetitionField
+        ...useFieldLogic_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionContents.fragments.PetitionField}
-      ${useFieldVisibility.fragments.PetitionField}
+      ${useFieldLogic.fragments.PetitionField}
     `;
   },
   get Query() {
@@ -980,7 +986,6 @@ function useUpdatePetitionFieldRepliesStatus() {
   return useCallback(
     async (
       variables: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>,
-      petitionStatus: PetitionStatus,
     ) => await updatePetitionFieldRepliesStatus({ variables }),
     [updatePetitionFieldRepliesStatus],
   );

@@ -1,11 +1,6 @@
-import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
-  Flex,
-  Grid,
   HStack,
-  IconButton,
   Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -15,294 +10,94 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
-import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import {
   toSimpleSelectOption,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
-import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
+import { defaultFieldConditionValue } from "@parallel/utils/fieldLogic/conditions";
 import {
-  defaultCondition,
-  updateConditionModifier,
-  updateConditionOperator,
-} from "@parallel/utils/fieldVisibility/conditions";
-import {
-  PetitionFieldVisibility,
-  PetitionFieldVisibilityCondition,
-  PetitionFieldVisibilityConditionModifier,
-  PetitionFieldVisibilityOperator,
-  PetitionFieldVisibilityType,
+  PetitionFieldLogicCondition,
+  PetitionFieldLogicConditionMultipleValueModifier,
   PseudoPetitionFieldVisibilityConditionOperator,
-} from "@parallel/utils/fieldVisibility/types";
+} from "@parallel/utils/fieldLogic/types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { never } from "@parallel/utils/never";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { createFilter } from "react-select";
-import { pick, uniq, zip } from "remeda";
-import { HelpPopover } from "../common/HelpPopover";
-import { NumeralInput } from "../common/NumeralInput";
-import { SimpleOption, SimpleSelect, SimpleSelectProps } from "../common/SimpleSelect";
+import { isDefined, uniq } from "remeda";
+import { HelpPopover } from "../../common/HelpPopover";
+import { NumeralInput } from "../../common/NumeralInput";
+import { SimpleOption, SimpleSelect } from "../../common/SimpleSelect";
+import { PetitionFieldLogicConditionSubjectSelect } from "./PetitionFieldLogicConditionSubjectSelect";
+import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 
-export interface PetitionFieldVisibilityProps {
-  fieldId: string;
-  visibility: PetitionFieldVisibility;
-  fields: PetitionFieldVisibilityEditor_PetitionFieldFragment[];
-  showError: boolean;
-  onVisibilityEdit: (visibility: PetitionFieldVisibility) => void;
-  isReadOnly?: boolean;
-}
-
-export function PetitionFieldVisibilityEditor({
-  fieldId,
-  visibility,
-  fields,
-  showError,
-  onVisibilityEdit,
+export function PetitionFieldLogicConditionEditor({
+  condition,
+  onConditionChange,
   isReadOnly,
-}: PetitionFieldVisibilityProps) {
-  const intl = useIntl();
-  const indices = useFieldIndices(fields);
-  const [_fields, _indices] = useMemo(() => {
-    const index = fields.findIndex((f) => f.id === fieldId);
-    const pairs = zip(fields, indices)
-      .slice(0, index)
-      .filter(([f]) => !f.isReadOnly)
-      .map(
-        ([field, index]) =>
-          [
-            pick(field, ["id", "type", "title", "multiple", "isReadOnly", "options"]),
-            index,
-          ] as const,
-      );
-    const _fields: (typeof pairs)[0][0][] = [];
-    const _indices: (typeof pairs)[0][1][] = [];
-    for (const [field, index] of pairs) {
-      _fields.push(field);
-      _indices.push(index);
-    }
-    return [_fields, _indices];
-  }, [fields, indices]);
-  function setVisibility(dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility) {
-    onVisibilityEdit(dispatch(visibility));
-  }
-  function setConditions(value: SetStateAction<PetitionFieldVisibilityCondition[]>) {
-    return setVisibility((visibility) => ({
-      ...visibility,
-      conditions: typeof value === "function" ? value(visibility.conditions) : value,
-    }));
-  }
-  function setVisibilityOperator(value: SetStateAction<PetitionFieldVisibilityOperator>) {
-    return setVisibility((visibility) => ({
-      ...visibility,
-      operator: typeof value === "function" ? value(visibility.operator) : value,
-    }));
-  }
-  function setVisibilityType(value: SetStateAction<PetitionFieldVisibilityType>) {
-    return setVisibility((visibility) => ({
-      ...visibility,
-      type: typeof value === "function" ? value(visibility.type) : value,
-    }));
-  }
-  const updateCondition = function (index: number, condition: PetitionFieldVisibilityCondition) {
-    setConditions((conditions) => conditions.map((c, i) => (i === index ? condition : c)));
-  };
-  const removeCondition = function (index: number) {
-    setConditions((conditions) => conditions.filter((c, i) => i !== index));
-  };
-  const addCondition = function () {
-    setConditions((conditions) => {
-      const last = conditions[conditions.length - 1];
-
-      if (last.operator === "NUMBER_OF_SUBREPLIES" || last.modifier === "NUMBER_OF_REPLIES") {
-        return [...conditions, { ...last }];
-      }
-
-      const field = fields.find((f) => f.id === last.fieldId)!;
-      if (
-        field.type === "CHECKBOX" ||
-        (field.type === "SELECT" && !["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(last.operator))
-      ) {
-        // if the previous condition is of type SELECT or CHECKBOX try to get the next value
-        const values = field.options.values as string[];
-        const index = Math.min(values.indexOf(last.value as string) + 1, values.length - 1);
-
-        return [
-          ...conditions,
-          {
-            ...last,
-            value: values[index],
-          },
-        ];
-      } else {
-        return [...conditions, { ...last }];
-      }
-    });
-  };
-
+  showErrors,
+}: {
+  condition: PetitionFieldLogicCondition;
+  onConditionChange: (value: PetitionFieldLogicCondition) => void;
+  isReadOnly?: boolean;
+  showErrors?: boolean;
+}) {
+  const { fieldsWithIndices, field } = usePetitionFieldLogicContext();
+  const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0];
+  const isMultipleValue = isDefined(referencedField)
+    ? referencedField.multiple ||
+      (isDefined(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
+    : false;
   return (
-    <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="gray.100">
-      <Grid
-        templateColumns={{
-          base: "auto minmax(160px, 1fr)",
-          xl: "auto minmax(160px, 2fr) 3fr",
-        }}
-        alignItems="start"
-        columnGap={2}
-        rowGap={2}
-      >
-        {visibility.conditions.map((condition, index) => {
-          const conditionField = _fields.find((f) => f.id === condition.fieldId);
-          return (
-            <Fragment key={index}>
-              <Box fontSize="sm">
-                {index === 0 ? (
-                  <VisibilityTypeSelect
-                    value={visibility.type}
-                    onChange={(type) => setVisibilityType(type!)}
-                    isReadOnly={isReadOnly}
-                  />
-                ) : (
-                  <Stack direction="row">
-                    <IconButton
-                      size="sm"
-                      icon={<DeleteIcon />}
-                      aria-label={intl.formatMessage({
-                        id: "generic.remove",
-                        defaultMessage: "Remove",
-                      })}
-                      onClick={() => removeCondition(index)}
-                      isDisabled={isReadOnly}
-                    />
-                    {index === 1 ? (
-                      <Box flex="1" minWidth="0">
-                        <VisibilityOperatorSelect
-                          value={visibility.operator}
-                          onChange={(operator) => setVisibilityOperator(operator!)}
-                          isReadOnly={isReadOnly}
-                        />
-                      </Box>
-                    ) : (
-                      <Flex
-                        flex="1"
-                        alignItems="start"
-                        paddingLeft="11px"
-                        textStyle={isReadOnly ? "muted" : undefined}
-                      >
-                        {visibility.operator === "AND" ? (
-                          <FormattedMessage
-                            id="component.petition-field-visibility-editor.and"
-                            defaultMessage="and"
-                          />
-                        ) : (
-                          <FormattedMessage
-                            id="component.petition-field-visibility-editor.or"
-                            defaultMessage="or"
-                          />
-                        )}
-                      </Flex>
-                    )}
-                  </Stack>
-                )}
-              </Box>
-              {conditionField ? (
-                <>
-                  <PetitionFieldSelect
-                    size="sm"
-                    value={
-                      condition.column !== undefined && conditionField.type === "DYNAMIC_SELECT"
-                        ? [conditionField, condition.column]
-                        : conditionField
-                    }
-                    expandFields
-                    fields={_fields}
-                    indices={_indices}
-                    onChange={(value) => updateCondition(index, defaultCondition(value!))}
-                    isReadOnly={isReadOnly}
-                  />
-                  <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
-                    {conditionField.multiple ? (
-                      <ConditionMultipleFieldModifier
-                        field={conditionField}
-                        value={condition}
-                        onChange={(condition) => {
-                          updateCondition(index, condition);
-                        }}
-                        isReadOnly={isReadOnly}
-                      />
-                    ) : null}
-                    <ConditionPredicate
-                      showError={showError}
-                      field={conditionField}
-                      value={condition}
-                      onChange={(condition) => updateCondition(index, condition)}
-                      isReadOnly={isReadOnly}
-                    />
-                  </Stack>
-                </>
-              ) : (
-                <Box />
-              )}
-            </Fragment>
-          );
-        })}
-      </Grid>
-
-      {visibility.conditions.length < 15 && !isReadOnly ? (
-        <Button
-          fontWeight="normal"
-          size="sm"
-          leftIcon={<PlusCircleIcon position="relative" top="-1px" />}
-          alignSelf="start"
-          onClick={addCondition}
-        >
-          <FormattedMessage
-            id="component.petition-field-visibility-editor.add-condition"
-            defaultMessage="Add condition"
+    <>
+      <PetitionFieldLogicConditionSubjectSelect
+        value={condition}
+        onChange={onConditionChange}
+        isReadOnly={isReadOnly}
+      />
+      <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
+        {isMultipleValue ? (
+          <ConditionMultipleValuedModifier
+            value={condition}
+            onChange={onConditionChange}
+            isReadOnly={isReadOnly}
           />
-        </Button>
-      ) : null}
-    </Stack>
+        ) : null}
+        <ConditionPredicate
+          value={condition}
+          onChange={onConditionChange}
+          isReadOnly={isReadOnly}
+          showErrors={showErrors}
+        />
+      </Stack>
+    </>
   );
 }
 
-PetitionFieldVisibilityEditor.fragments = {
-  PetitionField: gql`
-    fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
-      id
-      type
-      multiple
-      options
-      isReadOnly
-      ...PetitionFieldSelect_PetitionField
-    }
-    ${PetitionFieldSelect.fragments.PetitionField}
-  `,
-};
-
-function ConditionMultipleFieldModifier({
+function ConditionMultipleValuedModifier({
   value: condition,
-  field,
   onChange,
   isReadOnly,
-}: ValueProps<PetitionFieldVisibilityCondition, false> & {
-  field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
+}: ValueProps<PetitionFieldLogicCondition, false> & {
   isReadOnly?: boolean;
 }) {
-  const options = useSimpleSelectOptions<PetitionFieldVisibilityConditionModifier>(
+  const { fieldsWithIndices } = usePetitionFieldLogicContext();
+  const conditionField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)![0];
+  const options = useSimpleSelectOptions<PetitionFieldLogicConditionMultipleValueModifier>(
     (intl) => {
       if (
-        isFileTypeField(field.type) ||
-        (field.type === "DYNAMIC_SELECT" && condition.column === undefined)
+        isFileTypeField(conditionField.type) ||
+        (conditionField.type === "DYNAMIC_SELECT" && condition.column === undefined) ||
+        conditionField.type === "FIELD_GROUP"
       ) {
         return [
           {
-            label: isFileTypeField(field.type)
+            label: isFileTypeField(conditionField.type)
               ? intl.formatMessage({
                   id: "component.petition-field-visibility-editor.number-of-files",
                   defaultMessage: "no. of files",
@@ -315,7 +110,7 @@ function ConditionMultipleFieldModifier({
           },
         ];
       } else {
-        const options: SimpleOption<PetitionFieldVisibilityConditionModifier>[] = [
+        const options: SimpleOption<PetitionFieldLogicConditionMultipleValueModifier>[] = [
           {
             label: intl.formatMessage({
               id: "component.petition-field-visibility-editor.any",
@@ -338,7 +133,7 @@ function ConditionMultipleFieldModifier({
             value: "NONE",
           },
         ];
-        if (field.type !== "DYNAMIC_SELECT") {
+        if (conditionField.type !== "DYNAMIC_SELECT") {
           // do not show "number of replies" option for dynamic select sub-columns
           options.push({
             label: intl.formatMessage({
@@ -351,13 +146,7 @@ function ConditionMultipleFieldModifier({
         return options;
       }
     },
-    [field.type, condition.column],
-  );
-  const handleChange = useCallback(
-    (value: PetitionFieldVisibilityConditionModifier | null) => {
-      onChange(updateConditionModifier(condition, field, value!));
-    },
-    [onChange, condition, field],
+    [conditionField.type, condition.column],
   );
 
   return (
@@ -366,7 +155,31 @@ function ConditionMultipleFieldModifier({
       isReadOnly={isReadOnly}
       options={options}
       value={condition.modifier}
-      onChange={handleChange}
+      onChange={(modifier) => {
+        if (modifier === null) {
+          never();
+        }
+        if (modifier === "NUMBER_OF_REPLIES" && condition.modifier !== "NUMBER_OF_REPLIES") {
+          onChange({
+            ...condition,
+            modifier,
+            operator: "GREATER_THAN",
+            value: 0,
+          });
+        } else if (modifier !== "NUMBER_OF_REPLIES" && condition.modifier === "NUMBER_OF_REPLIES") {
+          onChange({
+            ...condition,
+            modifier,
+            operator: "EQUAL",
+            value: defaultFieldConditionValue(conditionField, condition.column),
+          });
+        } else {
+          onChange({
+            ...condition,
+            modifier,
+          });
+        }
+      }}
       styles={{
         menu: (styles) => ({
           ...styles,
@@ -380,26 +193,29 @@ function ConditionMultipleFieldModifier({
   );
 }
 
-interface ConditionPredicateProps extends ValueProps<PetitionFieldVisibilityCondition, false> {
-  field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
-  showError: boolean;
-  max?: number;
+interface ConditionPredicateProps extends ValueProps<PetitionFieldLogicCondition, false> {
+  showErrors?: boolean;
   isReadOnly?: boolean;
 }
 
 function ConditionPredicate({
-  field,
   value: condition,
   onChange,
-  showError,
+  showErrors,
   isReadOnly,
 }: ConditionPredicateProps) {
+  const { fieldsWithIndices, field } = usePetitionFieldLogicContext();
+  const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0];
+  const isMultipleValue = isDefined(referencedField)
+    ? referencedField.multiple ||
+      (isDefined(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
+    : false;
   const options = useSimpleSelectOptions(
     (intl) => {
       const options: SimpleOption<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
       if (
-        (field.multiple && condition.modifier === "NUMBER_OF_REPLIES") ||
-        field.type === "NUMBER"
+        (isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") ||
+        referencedField?.type === "NUMBER"
       ) {
         options.push(
           { label: "=", value: "EQUAL" },
@@ -409,7 +225,7 @@ function ConditionPredicate({
           { label: "≤", value: "LESS_THAN_OR_EQUAL" },
           { label: "≥", value: "GREATER_THAN_OR_EQUAL" },
         );
-      } else if (field.type === "DATE" || field.type === "DATE_TIME") {
+      } else if (referencedField?.type === "DATE" || referencedField?.type === "DATE_TIME") {
         options.push(
           {
             label: intl.formatMessage({
@@ -454,7 +270,7 @@ function ConditionPredicate({
             value: "GREATER_THAN_OR_EQUAL",
           },
         );
-      } else if (field.type === "CHECKBOX") {
+      } else if (referencedField?.type === "CHECKBOX") {
         options.push(
           {
             label: intl.formatMessage({
@@ -479,8 +295,8 @@ function ConditionPredicate({
           },
         );
       } else if (
-        field.type === "SELECT" ||
-        (field.type === "DYNAMIC_SELECT" && condition.column !== undefined)
+        referencedField?.type === "SELECT" ||
+        (referencedField?.type === "DYNAMIC_SELECT" && "column" in condition)
       ) {
         options.push(
           {
@@ -524,7 +340,11 @@ function ConditionPredicate({
             value: "NOT_IS_ONE_OF",
           },
         );
-      } else if (!isFileTypeField(field.type) && field.type !== "DYNAMIC_SELECT") {
+      } else if (
+        isDefined(referencedField) &&
+        !isFileTypeField(referencedField.type) &&
+        referencedField.type !== "DYNAMIC_SELECT"
+      ) {
         options.push(
           {
             label: intl.formatMessage(
@@ -589,7 +409,7 @@ function ConditionPredicate({
           },
         );
       }
-      if (!field.multiple) {
+      if (!isMultipleValue) {
         options.push(
           {
             label: intl.formatMessage({
@@ -609,29 +429,103 @@ function ConditionPredicate({
       }
       return options;
     },
-    [field.type, field.multiple, condition.modifier],
+    [
+      referencedField?.type,
+      isMultipleValue,
+      condition.modifier,
+      "column" in condition && condition.column,
+    ],
   );
   const operator =
-    !field.multiple && condition.modifier === "NUMBER_OF_REPLIES"
+    !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES"
       ? condition.operator === "GREATER_THAN"
         ? "HAVE_REPLY"
         : "NOT_HAVE_REPLY"
       : condition.operator;
-  const handleChange = useCallback(
-    function (operator: PseudoPetitionFieldVisibilityConditionOperator | null) {
-      onChange(updateConditionOperator(condition, field, operator!));
-    },
-    [onChange, condition, field],
-  );
 
-  return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
+  const handleOperatorChange = (
+    operator: PseudoPetitionFieldVisibilityConditionOperator | null,
+  ) => {
+    if (operator === null) {
+      never();
+    }
+    if (operator === "HAVE_REPLY") {
+      onChange({
+        ...condition,
+        modifier: "NUMBER_OF_REPLIES",
+        operator: "GREATER_THAN",
+        value: 0,
+      });
+    } else if (operator === "NOT_HAVE_REPLY") {
+      onChange({
+        ...condition,
+        modifier: "NUMBER_OF_REPLIES",
+        operator: "EQUAL",
+        value: 0,
+      });
+    } else if (operator === "NUMBER_OF_SUBREPLIES") {
+      onChange({
+        ...condition,
+        modifier: "ANY",
+        operator: "NUMBER_OF_SUBREPLIES",
+        value: 0,
+      });
+    } else if (isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") {
+      onChange({ ...condition, operator });
+    } else if (
+      isDefined(referencedField) &&
+      ["SELECT", "DYNAMIC_SELECT"].includes(referencedField.type) &&
+      condition.modifier !== "NUMBER_OF_REPLIES"
+    ) {
+      onChange({
+        ...condition,
+        operator,
+        value:
+          ["EQUAL", "NOT_EQUAL"].includes(operator) && Array.isArray(condition.value)
+            ? condition.value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column)
+            : ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) &&
+              typeof condition.value === "string"
+            ? [condition.value]
+            : condition.value,
+      });
+    } else {
+      if (
+        isDefined(referencedField) &&
+        (condition.modifier === "NUMBER_OF_REPLIES" ||
+          condition.operator === "NUMBER_OF_SUBREPLIES")
+      ) {
+        // override existing "has replies/does not have replies"
+        const defaultValue = defaultFieldConditionValue(referencedField, condition.column);
+        onChange({
+          ...condition,
+          operator,
+          modifier: "ANY",
+          value: ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
+            ? isDefined(defaultValue) && typeof defaultValue === "string"
+              ? [defaultValue]
+              : null
+            : defaultValue,
+        });
+      } else {
+        const { value, modifier } = condition;
+        onChange({
+          ...condition,
+          operator,
+          modifier,
+          value,
+        });
+      }
+    }
+  };
+
+  return !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES" ? (
     <Box flex="1" minWidth="0">
       <SimpleSelect
         size="sm"
         isReadOnly={isReadOnly}
         options={options}
         value={operator}
-        onChange={handleChange}
+        onChange={handleOperatorChange}
       />
     </Box>
   ) : (
@@ -641,7 +535,7 @@ function ConditionPredicate({
         isReadOnly={isReadOnly}
         options={options}
         value={operator}
-        onChange={handleChange}
+        onChange={handleOperatorChange}
         styles={{
           menu: (styles) => ({
             ...styles,
@@ -654,49 +548,44 @@ function ConditionPredicate({
       />
       <Box flex="1" minWidth={20}>
         {condition.modifier === "NUMBER_OF_REPLIES" ||
-        condition.operator === "NUMBER_OF_SUBREPLIES" ? (
+        condition.operator === "NUMBER_OF_SUBREPLIES" ||
+        !isDefined(referencedField) ? (
           <ConditionPredicateValueNumber
-            field={field}
-            showError={showError}
             value={condition}
             onChange={onChange}
-            max={field.type === "CHECKBOX" ? field.options.values.length : Infinity}
             isReadOnly={isReadOnly}
+            showErrors={showErrors}
           />
-        ) : field.type === "CHECKBOX" ||
-          field.type === "SELECT" ||
-          (field.type === "DYNAMIC_SELECT" && condition.column !== undefined) ? (
+        ) : referencedField.type === "CHECKBOX" ||
+          referencedField.type === "SELECT" ||
+          (referencedField.type === "DYNAMIC_SELECT" && (condition as any).column !== undefined) ? (
           <ConditionPredicateValueSelect
-            field={field}
-            showError={showError}
             value={condition}
             onChange={onChange}
             isReadOnly={isReadOnly}
+            showErrors={showErrors}
           />
-        ) : field.type === "NUMBER" ? (
+        ) : referencedField.type === "NUMBER" ? (
           <ConditionPredicateValueFloat
-            field={field}
-            showError={showError}
             value={condition}
             onChange={onChange}
             isReadOnly={isReadOnly}
+            showErrors={showErrors}
           />
-        ) : field.type === "DATE" ? (
+        ) : referencedField.type === "DATE" ? (
           <ConditionPredicateValueDate
-            field={field}
-            showError={showError}
             value={condition}
             onChange={onChange}
             isReadOnly={isReadOnly}
+            showErrors={showErrors}
           />
-        ) : field.type === "DATE_TIME" ? (
+        ) : referencedField.type === "DATE_TIME" ? (
           <HStack>
             <ConditionPredicateValueDatetime
-              field={field}
-              showError={showError}
               value={condition}
               onChange={onChange}
               isReadOnly={isReadOnly}
+              showErrors={showErrors}
             />
             <HelpPopover>
               <Text fontSize="sm">
@@ -712,11 +601,10 @@ function ConditionPredicate({
           </HStack>
         ) : (
           <ConditionPredicateValueString
-            field={field}
-            showError={showError}
             value={condition}
             onChange={onChange}
             isReadOnly={isReadOnly}
+            showErrors={showErrors}
           />
         )}
       </Box>
@@ -725,7 +613,7 @@ function ConditionPredicate({
 }
 
 function ConditionPredicateValueDate({
-  showError,
+  showErrors: showError,
   value: condition,
   onChange,
   isReadOnly,
@@ -752,7 +640,7 @@ function ConditionPredicateValueDate({
 }
 
 function ConditionPredicateValueDatetime({
-  showError,
+  showErrors: showError,
   value: condition,
   onChange,
   isReadOnly,
@@ -763,7 +651,6 @@ function ConditionPredicateValueDatetime({
       ? dateToDatetimeLocal(condition.value)
       : null,
   );
-
   return (
     <Input
       size="sm"
@@ -810,23 +697,29 @@ function ConditionPredicateValueFloat({
 
 function ConditionPredicateValueNumber({
   value: condition,
-  max = Infinity,
   onChange,
   isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
+  const { fieldsWithIndices } = usePetitionFieldLogicContext();
+  const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0];
   const [value, setValue] = useState((condition.value as number) ?? 0);
+  const maxValue =
+    referencedField?.type === "CHECKBOX" ? referencedField.options.values.length : Infinity;
   useEffect(() => {
-    if (max < value) {
-      setValue(max);
-      onChange({ ...condition, value: max });
+    if (maxValue < value) {
+      setValue(maxValue);
+      onChange({ ...condition, value: maxValue });
     }
-  }, [max]);
+    if (!isDefined(condition.value)) {
+      onChange({ ...condition, value: 0 });
+    }
+  }, [maxValue]);
   return (
     <NumberInput
       size="sm"
       min={0}
-      max={max}
+      max={maxValue}
       value={value}
       onChange={(_, value) => setValue(value)}
       onBlur={() => onChange({ ...condition, value })}
@@ -854,27 +747,28 @@ function ConditionPredicateValueNumber({
 }
 
 function ConditionPredicateValueSelect({
-  field,
-  showError,
+  showErrors,
   value: condition,
   onChange,
   isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
+  const { fieldsWithIndices } = usePetitionFieldLogicContext();
+  const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)![0];
   const options = useMemo(() => {
     const values =
-      field.type === "SELECT"
-        ? (field.options as FieldOptions["SELECT"]).values
-        : field.type === "CHECKBOX"
-        ? (field.options as FieldOptions["CHECKBOX"]).values
+      referencedField.type === "SELECT"
+        ? (referencedField.options as FieldOptions["SELECT"]).values
+        : referencedField.type === "CHECKBOX"
+        ? (referencedField.options as FieldOptions["CHECKBOX"]).values
         : getDynamicSelectValues(
-            (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
+            (referencedField.options as FieldOptions["DYNAMIC_SELECT"]).values,
             condition.column!,
           );
     return uniq(values)
       .sort((a, b) => a.localeCompare(b))
       .map((value) => toSimpleSelectOption(value)!);
-  }, [field.type, field.options.values, condition.column]);
+  }, [referencedField.type, referencedField.options.values, condition.column]);
   const isMultiCondition =
     condition.operator === "IS_ONE_OF" || condition.operator === "NOT_IS_ONE_OF";
   return (
@@ -882,7 +776,7 @@ function ConditionPredicateValueSelect({
       size="sm"
       options={options}
       isReadOnly={isReadOnly}
-      isInvalid={showError && condition.value === null}
+      isInvalid={showErrors && condition.value === null}
       isMulti={isMultiCondition}
       value={condition.value as string | string[] | null}
       onChange={(value) => onChange({ ...condition, value: value })}
@@ -902,7 +796,7 @@ function ConditionPredicateValueSelect({
 }
 
 function ConditionPredicateValueString({
-  showError,
+  showErrors: showError,
   value: condition,
   onChange,
   isReadOnly,
@@ -923,72 +817,6 @@ function ConditionPredicateValueString({
       })}
       isDisabled={isReadOnly}
       opacity={isReadOnly ? "1 !important" : undefined}
-    />
-  );
-}
-
-function VisibilityOperatorSelect(
-  props: Omit<SimpleSelectProps<PetitionFieldVisibilityOperator>, "options">,
-) {
-  const options = useSimpleSelectOptions(
-    (intl) => [
-      {
-        value: "AND",
-        label: intl.formatMessage({
-          id: "component.petition-field-visibility-editor.and",
-          defaultMessage: "and",
-        }),
-      },
-      {
-        value: "OR",
-        label: intl.formatMessage({
-          id: "component.petition-field-visibility-editor.or",
-          defaultMessage: "or",
-        }),
-      },
-    ],
-    [],
-  );
-  return (
-    <SimpleSelect
-      size="sm"
-      options={options}
-      styles={{ control: (styles) => ({ ...styles, flexWrap: "nowrap" }) }}
-      {...props}
-    />
-  );
-}
-
-function VisibilityTypeSelect(
-  props: Omit<SimpleSelectProps<PetitionFieldVisibilityType>, "options">,
-) {
-  const intl = useIntl();
-  const options = useSimpleSelectOptions(
-    () => [
-      {
-        value: "SHOW",
-        label: intl.formatMessage({
-          id: "component.petition-field-visibility-editor.show",
-          defaultMessage: "Show when",
-        }),
-      },
-      {
-        value: "HIDE",
-        label: intl.formatMessage({
-          id: "component.petition-field-visibility-editor.hide",
-          defaultMessage: "Hide when",
-        }),
-      },
-    ],
-    [],
-  );
-
-  return (
-    <SimpleSelect
-      size="sm"
-      options={options}
-      styles={{ control: (styles) => ({ ...styles, flexWrap: "nowrap" }) }}
-      {...props}
     />
   );
 }

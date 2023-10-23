@@ -1,4 +1,4 @@
-import { Box, Center, FormControl, List, Stack } from "@chakra-ui/react";
+import { Box, Center, FormControl, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -12,7 +12,7 @@ import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
 import {
   RecipientViewPetitionFieldLayout,
@@ -21,6 +21,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
@@ -31,6 +32,8 @@ export interface RecipientViewPetitionFieldSelectProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 type SelectInstance = _SelectInstance<SimpleOption, false>;
@@ -43,6 +46,8 @@ export function RecipientViewPetitionFieldSelect({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  isInvalid,
+  parentReplyId,
 }: RecipientViewPetitionFieldSelectProps) {
   const intl = useIntl();
 
@@ -90,7 +95,9 @@ export function RecipientViewPetitionFieldSelect({
     setTimeout(() => newReplyRef.current?.focus());
   }
 
-  const id = `reply-${field.id}-new`;
+  const id = `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`;
+
+  const fieldReplies = completedFieldReplies(field);
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -101,6 +108,15 @@ export function RecipientViewPetitionFieldSelect({
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
@@ -157,6 +173,7 @@ export function RecipientViewPetitionFieldSelect({
                 menu: (styles) => ({ ...styles, zIndex: 100 }),
                 valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
               }}
+              isInvalid={isInvalid}
             />
             <Center height="100%" position="absolute" right="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
@@ -194,7 +211,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
     [options.values],
   );
 
-  const id = `reply-${field.id}-${reply.id}`;
+  const id = `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`;
   return (
     <Stack direction="row">
       <FormControl id={id} isDisabled={isDisabled}>

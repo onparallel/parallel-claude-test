@@ -2,20 +2,23 @@ import { gql } from "@apollo/client";
 import { Button, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { HiddenFieldDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  HiddenFieldDialog_PetitionBaseFragment,
+  HiddenFieldDialog_PetitionFieldFragment,
+} from "@parallel/graphql/__types";
 
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { PetitionFieldVisibilityEditor } from "../PetitionFieldVisibilityEditor";
+import { PetitionFieldVisibilityEditor } from "../logic/PetitionFieldVisibilityEditor";
 
 interface HiddenFieldDialogProps {
   field: HiddenFieldDialog_PetitionFieldFragment;
-  fields: HiddenFieldDialog_PetitionFieldFragment[];
+  petition: HiddenFieldDialog_PetitionBaseFragment;
 }
 
 export function HiddenFieldDialog({
   field,
-  fields,
+  petition,
   ...props
 }: DialogProps<HiddenFieldDialogProps, void>) {
   const focusRef = useRef<HTMLButtonElement>(null);
@@ -39,10 +42,9 @@ export function HiddenFieldDialog({
             defaultMessage="The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:"
           />
           <PetitionFieldVisibilityEditor
-            fieldId={field.id}
-            fields={fields}
-            visibility={field.visibility as any}
-            showError={false}
+            field={field}
+            petition={petition}
+            showErrors={false}
             isReadOnly={true}
             onVisibilityEdit={() => {}}
           />
@@ -68,10 +70,14 @@ export function useHiddenFieldDialog() {
 }
 
 HiddenFieldDialog.fragments = {
+  PetitionBase: gql`
+    fragment HiddenFieldDialog_PetitionBase on PetitionBase {
+      ...PetitionFieldVisibilityEditor_PetitionBase
+    }
+    ${PetitionFieldVisibilityEditor.fragments.PetitionBase}
+  `,
   PetitionField: gql`
     fragment HiddenFieldDialog_PetitionField on PetitionField {
-      id
-      visibility
       ...PetitionFieldVisibilityEditor_PetitionField
     }
     ${PetitionFieldVisibilityEditor.fragments.PetitionField}

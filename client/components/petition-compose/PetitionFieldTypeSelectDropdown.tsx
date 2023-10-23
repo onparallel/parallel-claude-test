@@ -19,20 +19,33 @@ import { usePetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
 import useMergedRef from "@react-hook/merged-ref";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { difference } from "remeda";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
 
 export interface PetitionFieldTypeSelectDropdownProps {
   showHeader?: boolean;
   showDescription?: boolean;
+  excludedFieldTypes?: PetitionFieldType[];
   onSelectFieldType: (type: PetitionFieldType) => void;
   user: PetitionFieldTypeSelectDropdown_UserFragment;
+  isFieldGroupChild?: boolean;
 }
+
+const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
 
 export const PetitionFieldTypeSelectDropdown = Object.assign(
   chakraForwardRef<"div", PetitionFieldTypeSelectDropdownProps>(
     function PetitionFieldTypeSelectDropdown(
-      { user, onSelectFieldType, showHeader, showDescription, role = "menu", ...props },
+      {
+        user,
+        onSelectFieldType,
+        isFieldGroupChild,
+        showHeader,
+        showDescription,
+        role = "menu",
+        ...props
+      },
       ref,
     ) {
       const intl = useIntl();
@@ -68,47 +81,54 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       const fieldListWidth = 260;
       const descriptionWidth = 270;
 
-      const fieldCategories = useMemo(
-        () =>
-          [
-            {
-              category: intl.formatMessage({
-                id: "component.petition-field-type-select-dropdown.category-headings",
-                defaultMessage: "Headings",
-              }),
-              fields: ["HEADING"],
-            },
-            {
-              category: intl.formatMessage({
-                id: "component.petition-field-type-select-dropdown.category-questions",
-                defaultMessage: "Questions",
-              }),
-              fields: [
-                "SHORT_TEXT",
-                "TEXT",
-                "FILE_UPLOAD",
-                "CHECKBOX",
-                "SELECT",
-                "NUMBER",
-                "DATE",
-                "DATE_TIME",
-                "PHONE",
-              ],
-            },
-            {
-              category: intl.formatMessage({
-                id: "component.petition-field-type-select-dropdown.category-advanced-fields",
-                defaultMessage: "Advanced fields",
-              }),
-              fields: [
-                "DYNAMIC_SELECT",
-                ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
-                ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
-              ],
-            },
-          ] as { category: string; fields: PetitionFieldType[] }[],
-        [user.hasEsTaxDocumentsField, user.hasDowJonesField],
-      );
+      const fieldCategories = useMemo(() => {
+        const options = [
+          {
+            // TODO: Change to Headings and groups and remove FF before release FIELD_GROUP
+            category: intl.formatMessage({
+              id: "component.petition-field-type-select-dropdown.category-headings",
+              defaultMessage: "Headings",
+            }),
+            fields: ["HEADING", ...(user.hasFieldGroup ? ["FIELD_GROUP"] : [])],
+          },
+          {
+            category: intl.formatMessage({
+              id: "component.petition-field-type-select-dropdown.category-questions",
+              defaultMessage: "Questions",
+            }),
+            fields: [
+              "SHORT_TEXT",
+              "TEXT",
+              "FILE_UPLOAD",
+              "CHECKBOX",
+              "SELECT",
+              "NUMBER",
+              "DATE",
+              "DATE_TIME",
+              "PHONE",
+            ],
+          },
+          {
+            category: intl.formatMessage({
+              id: "component.petition-field-type-select-dropdown.category-advanced-fields",
+              defaultMessage: "Advanced fields",
+            }),
+            fields: [
+              "DYNAMIC_SELECT",
+              ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
+              ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
+            ],
+          },
+        ] as { category: string; fields: PetitionFieldType[] }[];
+        if (isFieldGroupChild) {
+          return options.map((c) => ({
+            ...c,
+            fields: difference(c.fields, FIELD_GROUP_EXCLUDED_FIELD_TYPES),
+          }));
+        } else {
+          return options;
+        }
+      }, [user.hasEsTaxDocumentsField, user.hasDowJonesField, isFieldGroupChild]);
 
       const { locale } = useIntl();
       return (
@@ -143,31 +163,33 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
             </Box>
             <Box>
               <Box paddingBottom={2} paddingTop={{ base: 2, sm: showHeader ? 0 : 2 }}>
-                {fieldCategories.map(({ category, fields }, index) => {
-                  return (
-                    <MenuGroup
-                      key={index}
-                      title={category}
-                      color="gray.600"
-                      textTransform="uppercase"
-                    >
-                      {fields.map((type) => (
-                        <MenuItem
-                          key={type}
-                          paddingY={2}
-                          aria-describedby={
-                            activeType === type ? `field-description-${type}` : undefined
-                          }
-                          data-field-type={type}
-                          onClick={() => onSelectFieldType(type)}
-                          onFocus={() => setActiveType(type)}
-                        >
-                          <PetitionFieldTypeLabel type={type} />
-                        </MenuItem>
-                      ))}
-                    </MenuGroup>
-                  );
-                })}
+                {fieldCategories
+                  .filter(({ fields }) => fields.length > 0)
+                  .map(({ category, fields }, index) => {
+                    return (
+                      <MenuGroup
+                        key={index}
+                        title={category}
+                        color="gray.600"
+                        textTransform="uppercase"
+                      >
+                        {fields.map((type) => (
+                          <MenuItem
+                            key={type}
+                            paddingY={2}
+                            aria-describedby={
+                              activeType === type ? `field-description-${type}` : undefined
+                            }
+                            data-field-type={type}
+                            onClick={() => onSelectFieldType(type)}
+                            onFocus={() => setActiveType(type)}
+                          >
+                            <PetitionFieldTypeLabel type={type} />
+                          </MenuItem>
+                        ))}
+                      </MenuGroup>
+                    );
+                  })}
               </Box>
             </Box>
           </Box>
@@ -288,6 +310,11 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                     id="component.petition-field-type-select-dropdown.dow-jones-kyc-research-description"
                     defaultMessage="Easily search in Dow Jones to run a background check of an individual or legal entity."
                   />
+                ) : activeType === "FIELD_GROUP" ? (
+                  <FormattedMessage
+                    id="component.petition-field-type-select-dropdown.field-group-description"
+                    defaultMessage="Link fields to create a group that can be answered as many times as needed."
+                  />
                 ) : null}
               </Box>
             </Box>
@@ -302,6 +329,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
         fragment PetitionFieldTypeSelectDropdown_User on User {
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
           hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+          hasFieldGroup: hasFeatureFlag(featureFlag: FIELD_GROUP)
         }
       `,
     },

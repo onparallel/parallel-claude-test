@@ -71,7 +71,7 @@ export const theme = extendTheme({
   },
   layerStyles: {
     highlightable: {
-      _highlighted: {
+      "&[data-highlighted], [data-highlighted] &": {
         animation: ((theme: any) =>
           `${keyframes`
               0% { background-color: white; }

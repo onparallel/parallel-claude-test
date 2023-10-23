@@ -24,22 +24,19 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import {
+  MapFieldsTable_PetitionFieldDataFragment,
   MapFieldsTable_PetitionFieldFragment,
   MapFieldsTable_PetitionFieldReplyFragment,
   PetitionFieldType,
   getReplyContents_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import {
-  PetitionFieldIndex,
-  unzipFieldsWithIndices,
-  useFieldWithIndices,
-} from "@parallel/utils/fieldIndices";
+import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { groupBy, isDefined, omit } from "remeda";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { ReplyNotAvailable } from "../petition-replies/PetitionRepliesFieldReply";
 import { AlertPopover } from "./AlertPopover";
@@ -53,6 +50,7 @@ export interface MapFieldsTableProps {
   value: { [key: string]: string };
   onChange: (value: { [key: string]: string }) => void;
   overwriteExisting: boolean;
+  invalidGroups: string[] | null;
   isDisabled?: boolean;
 }
 
@@ -67,11 +65,25 @@ export const excludedFieldsOrigin = ["HEADING", "DYNAMIC_SELECT"] as PetitionFie
 
 export const MapFieldsTable = Object.assign(
   chakraForwardRef<"table", MapFieldsTableProps>(function MapFieldsTable(
-    { fields, sourcePetitionFields, value, onChange, overwriteExisting, isDisabled, ...props },
+    {
+      fields,
+      sourcePetitionFields,
+      value,
+      onChange,
+      overwriteExisting,
+      isDisabled,
+      invalidGroups,
+      ...props
+    },
     ref,
   ) {
-    const fieldsWithIndices = useFieldWithIndices(fields);
+    const fieldsWithIndices = useAllFieldsWithIndices(fields);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    const allSourcePetitionFields = useMemo(
+      () => sourcePetitionFields.flatMap((f) => [f, ...(f.children ?? [])]),
+      [sourcePetitionFields],
+    );
 
     useEffect(() => {
       if (!overwriteExisting) {
@@ -95,7 +107,6 @@ export const MapFieldsTable = Object.assign(
         border="1px solid"
         borderColor="gray.200"
         {...props}
-        id="map-fields-table-container"
       >
         <Table
           variant="unstyled"
@@ -156,25 +167,49 @@ export const MapFieldsTable = Object.assign(
           <Tbody>
             {fieldsWithIndices
               .filter(([field]) => !excludedFieldsTarget.includes(field.type))
-              .map(([field, index]) => (
-                <TableRow
-                  key={field.id}
-                  field={field}
-                  fieldIndex={index}
-                  selectedFieldId={value[field.id]}
-                  onChange={(fieldId) =>
-                    onChange(
-                      isDefined(fieldId)
-                        ? { ...value, [field.id]: fieldId }
-                        : omit(value, [field.id]),
-                    )
-                  }
-                  sourcePetitionFields={sourcePetitionFields}
-                  allowOverwrite={overwriteExisting}
-                  isDisabled={isDisabled}
-                  containerRef={containerRef}
-                />
-              ))}
+              .map(([field, index]) => {
+                const fieldIsChildAndParentIsUnmatched =
+                  field.parent?.id !== undefined && value[field.parent!.id] === undefined;
+
+                if (fieldIsChildAndParentIsUnmatched) {
+                  return null;
+                }
+
+                const parentFieldMatchedFieldId = field.parent?.id
+                  ? value[field.parent!.id]
+                  : undefined;
+
+                return (
+                  <TableRow
+                    key={field.id}
+                    field={field}
+                    fieldIndex={index}
+                    selectedFieldId={value[field.id]}
+                    onChange={(fieldId) => {
+                      if (fieldId === null) {
+                        onChange(
+                          omit(value, [field.id, ...(field.children ?? []).map((f) => f.id)]),
+                        );
+                      } else {
+                        onChange({
+                          ...omit(
+                            value,
+                            (field.children ?? []).map((f) => f.id),
+                          ),
+                          [field.id]: fieldId,
+                        });
+                      }
+                    }}
+                    sourcePetitionFields={sourcePetitionFields}
+                    allSourcePetitionFields={allSourcePetitionFields}
+                    allowOverwrite={overwriteExisting}
+                    isDisabled={isDisabled}
+                    containerRef={containerRef}
+                    parentFieldMatchedFieldId={parentFieldMatchedFieldId}
+                    isInvalid={invalidGroups?.some((id) => id === field.parent?.id) ?? undefined}
+                  />
+                );
+              })}
           </Tbody>
         </Table>
       </TableContainer>
@@ -189,6 +224,9 @@ export const MapFieldsTable = Object.assign(
             status
             content
             isAnonymized
+            parent {
+              id
+            }
             ...getReplyContents_PetitionFieldReply
           }
           ${getReplyContents.fragments.PetitionFieldReply}
@@ -197,6 +235,12 @@ export const MapFieldsTable = Object.assign(
       get PetitionField() {
         return gql`
           fragment MapFieldsTable_PetitionField on PetitionField {
+            ...MapFieldsTable_PetitionFieldData
+            children {
+              ...MapFieldsTable_PetitionFieldData
+            }
+          }
+          fragment MapFieldsTable_PetitionFieldData on PetitionField {
             id
             title
             type
@@ -210,9 +254,15 @@ export const MapFieldsTable = Object.assign(
             replies {
               ...MapFieldsTable_PetitionFieldReply
             }
-            ...PetitionFieldSelect_PetitionField
+            parent {
+              id
+            }
+            children {
+              id
+            }
             ...isReplyContentCompatible_PetitionField
             ...getReplyContents_PetitionField
+            ...PetitionFieldSelect_PetitionField
           }
           ${this.PetitionFieldReply}
           ${PetitionFieldSelect.fragments.PetitionField}
@@ -251,36 +301,48 @@ function TableRow({
   field,
   fieldIndex,
   sourcePetitionFields,
+  allSourcePetitionFields,
   selectedFieldId,
   onChange,
   allowOverwrite,
   isDisabled,
+  parentFieldMatchedFieldId,
+  isInvalid,
   containerRef,
 }: {
-  field: MapFieldsTable_PetitionFieldFragment;
+  field: MapFieldsTable_PetitionFieldDataFragment;
   fieldIndex: PetitionFieldIndex;
-  sourcePetitionFields: MapFieldsTable_PetitionFieldFragment[];
+  sourcePetitionFields: MapFieldsTable_PetitionFieldDataFragment[];
+  allSourcePetitionFields: MapFieldsTable_PetitionFieldDataFragment[];
   selectedFieldId: string;
   onChange: (fieldId: string | null) => void;
   allowOverwrite: boolean;
   isDisabled?: boolean;
+  parentFieldMatchedFieldId?: string;
+  isInvalid?: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
 }) {
   const intl = useIntl();
+  const targetFieldIsChild = field.parent?.id !== undefined;
 
-  const fieldsWithIndex = useFieldWithIndices(sourcePetitionFields);
+  const filterFields = useCallback(
+    (f: MapFieldsTable_PetitionFieldDataFragment) => {
+      const originFieldIsChild = f.parent?.id !== undefined;
+      const isChildSelectedParent = f.parent?.id === parentFieldMatchedFieldId;
 
-  const selectFieldsAndIndices = useMemo(
-    () =>
-      unzipFieldsWithIndices(
-        fieldsWithIndex.filter(
-          ([f]) => !excludedFieldsOrigin.includes(f.type) && isReplyContentCompatible(field, f),
-        ),
-      ),
-    [fieldsWithIndex],
+      return (
+        !excludedFieldsOrigin.includes(f.type) &&
+        isReplyContentCompatible(field, f) &&
+        targetFieldIsChild === originFieldIsChild &&
+        isChildSelectedParent
+      );
+    },
+    [parentFieldMatchedFieldId],
   );
 
-  const selectedField = sourcePetitionFields.find((f) => f.id === selectedFieldId);
+  const hasFields = allSourcePetitionFields.some(filterFields);
+
+  const selectedField = allSourcePetitionFields.find((f) => f.id === selectedFieldId);
 
   const hasMultipleRepliesConflict = selectedField
     ? checkMultipleRepliesConflict(field, selectedField)
@@ -288,9 +350,9 @@ function TableRow({
 
   const replyIsApproved = field.replies.length === 1 && field.replies[0].status === "APPROVED";
   const isFieldDisabled =
-    (field.replies.length > 0 && !allowOverwrite && !field.multiple) ||
+    (field.replies.length > 0 && !allowOverwrite && !field.multiple && !targetFieldIsChild) ||
     replyIsApproved ||
-    selectFieldsAndIndices.fields.length === 0 ||
+    !hasFields ||
     isDisabled;
 
   const opacity = isDisabled ? 0.5 : 1;
@@ -326,10 +388,12 @@ function TableRow({
     return () => tableContainer?.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
+  const groupedReplies = groupBy(selectedField?.replies ?? [], (r) => r?.parent?.id ?? "");
+
   return (
     <Tr>
       <Td padding={2} paddingLeft={4} minWidth={0} opacity={opacity}>
-        <HStack>
+        <HStack paddingLeft={targetFieldIsChild ? 3 : 0}>
           <PetitionFieldTypeIndicator
             as="span"
             marginTop="2px"
@@ -355,7 +419,7 @@ function TableRow({
                     id="component.map-fields-table.has-replies-approved-conflict-alert"
                     defaultMessage="You cannot import new answers to this field because it has approved answers."
                   />
-                ) : selectFieldsAndIndices.fields.length === 0 ? (
+                ) : !hasFields ? (
                   <FormattedMessage
                     id="component.map-fields-table.no-compatible-fields-alert"
                     defaultMessage="You cannot import replies to this field because no compatible fields have been found."
@@ -379,51 +443,63 @@ function TableRow({
       <Td padding={2} minWidth="240px">
         <PetitionFieldSelect
           value={selectedField ?? null}
-          {...selectFieldsAndIndices}
-          onChange={(field) => onChange(field?.id ?? null)}
+          fields={sourcePetitionFields}
+          filterFields={filterFields as any}
+          onChange={(field) => {
+            onChange(field?.id ?? null);
+          }}
           placeholder={intl.formatMessage({
             id: "component.map-fields-table.no-import-field",
             defaultMessage: "Don't import",
           })}
           isDisabled={isFieldDisabled}
-          isInvalid={isFieldDisabled ? false : undefined}
+          isInvalid={isFieldDisabled ? false : isInvalid}
           isClearable
           captureMenuScroll
           menuIsOpen={menuIsOpen}
           onMenuOpen={() => setMenuOpen(true)}
           onMenuClose={() => setMenuOpen(false)}
+          expandFieldGroups
         />
       </Td>
       <Td padding={2} paddingRight={4} minWidth={0} maxWidth="200px" opacity={opacity}>
         <HStack>
           {selectedField ? (
-            <Stack minWidth={0} flex="1" spacing={0.5}>
+            <Stack minWidth={0} flex="1" spacing={2}>
               {selectedField.replies.length > 0 ? (
-                selectedField.replies.slice(0, 4).map((reply, index) => {
-                  if (hasMultipleRepliesConflict && index) return null;
-
-                  if (index > 3) {
-                    return null;
-                  }
-                  if (index === 3 && selectedField.replies.length > 4) {
-                    return (
-                      <Text key={index}>
-                        <FormattedMessage
-                          id="component.map-fields-table.and-n-more"
-                          defaultMessage="and {count} more"
-                          values={{ count: selectedField.replies.length - 3 }}
-                        />
-                      </Text>
-                    );
-                  }
+                Object.values(groupedReplies).map((replies, i, groups) => {
                   return (
-                    <FieldReplies
-                      key={index}
-                      reply={reply}
-                      type={field.type}
-                      options={field.options}
-                      showOnlyFirstReply={hasMultipleRepliesConflict}
-                    />
+                    <Stack key={i} minWidth={0} flex="1" spacing={0.5}>
+                      {replies.slice(0, 4).map((reply, index) => {
+                        if (hasMultipleRepliesConflict && index) return null;
+
+                        const repliesLimit = targetFieldIsChild && groups.length > 1 ? 2 : 3;
+
+                        if (index > repliesLimit) {
+                          return null;
+                        }
+                        if (index === repliesLimit && replies.length > repliesLimit + 1) {
+                          return (
+                            <Text key={index}>
+                              <FormattedMessage
+                                id="component.map-fields-table.and-n-more"
+                                defaultMessage="and {count} more"
+                                values={{ count: replies.length - repliesLimit }}
+                              />
+                            </Text>
+                          );
+                        }
+                        return (
+                          <FieldReplies
+                            key={index}
+                            reply={reply}
+                            type={field.type}
+                            options={field.options}
+                            showOnlyFirstReply={hasMultipleRepliesConflict}
+                          />
+                        );
+                      })}
+                    </Stack>
                   );
                 })
               ) : (
@@ -490,6 +566,8 @@ function FieldReplies({
     reply,
     petitionField: { type, options } as getReplyContents_PetitionFieldFragment,
   });
+
+  if (!contents) return null;
 
   return (
     <>
@@ -574,8 +652,8 @@ function FieldReplies({
 }
 
 const checkMultipleRepliesConflict = (
-  target: MapFieldsTable_PetitionFieldFragment,
-  origin: MapFieldsTable_PetitionFieldFragment,
+  target: MapFieldsTable_PetitionFieldDataFragment,
+  origin: MapFieldsTable_PetitionFieldDataFragment,
 ) => {
   if (target.type === "CHECKBOX" && origin.type === "CHECKBOX") return false;
 

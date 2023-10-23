@@ -20,6 +20,8 @@ export function TimelineReplyUpdatedEvent({
   event: { updatedBy, field, reply, createdAt },
   userId,
 }: TimelineReplyUpdatedEventProps) {
+  const isChildren = field?.parent?.id !== undefined;
+
   return (
     <TimelineItem
       icon={<TimelineIcon icon={PlusCircleIcon} color="gray.600" size="18px" />}
@@ -27,16 +29,34 @@ export function TimelineReplyUpdatedEvent({
     >
       <HStack spacing={2}>
         <Text>
-          <FormattedMessage
-            id="timeline.reply-updated-description"
-            defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
-            values={{
-              userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-              updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
-              field: <PetitionFieldReference field={field} />,
-              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
-            }}
-          />
+          {isChildren ? (
+            <FormattedMessage
+              id="component.timeline-reply-updated-event.description-children-of-group"
+              defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
+              values={{
+                userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+                updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+                field: <PetitionFieldReference field={field} />,
+                parentField: <PetitionFieldReference field={field.parent!} />,
+                timeAgo: (
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="component.timeline-reply-updated-event.description"
+              defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+              values={{
+                userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+                updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+                field: <PetitionFieldReference field={field} />,
+                timeAgo: (
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
         </Text>
         <TimelineSeeReplyButton field={field} replyId={reply?.id} />
       </HStack>
@@ -48,6 +68,11 @@ TimelineReplyUpdatedEvent.fragments = {
   ReplyUpdatedEvent: gql`
     fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
       field {
+        type
+        ...PetitionFieldReference_PetitionField
+        parent {
+          ...PetitionFieldReference_PetitionField
+        }
         ...TimelineSeeReplyButton_PetitionField
         ...PetitionFieldReference_PetitionField
       }

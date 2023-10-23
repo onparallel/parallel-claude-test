@@ -1,15 +1,25 @@
+import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import { Readable } from "stream";
 import { ApiContext, WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
+import { FORMATS } from "../../util/dates";
+import { Maybe, UnwrapArray } from "../../util/types";
 import { FieldCommentsExcelWorksheet } from "./FieldCommentsExcelWorksheet";
 import { TextRepliesExcelWorksheet } from "./TextRepliesExcelWorksheet";
+
+type ComposedPetitionField = Pick<PetitionField, "type" | "title" | "parent_petition_field_id"> & {
+  replies: Pick<PetitionFieldReply, "content">[];
+  group_name?: Maybe<string>;
+  group_number?: number;
+};
 
 export class PetitionExcelExport {
   private wb: Excel.Workbook;
   private textRepliesTab!: TextRepliesExcelWorksheet;
   private fieldCommentsTab!: FieldCommentsExcelWorksheet;
+  private intl!: IntlShape;
 
   constructor(
     private locale: UserLocale,
@@ -19,10 +29,10 @@ export class PetitionExcelExport {
   }
 
   public async init() {
-    const intl = await this.context.i18n.getIntl(this.locale);
+    this.intl = await this.context.i18n.getIntl(this.locale);
 
     this.textRepliesTab = new TextRepliesExcelWorksheet(
-      intl.formatMessage({
+      this.intl.formatMessage({
         id: "petition-excel-export.replies",
         defaultMessage: "Replies",
       }),
@@ -32,7 +42,7 @@ export class PetitionExcelExport {
     await this.textRepliesTab.init(this.locale);
 
     this.fieldCommentsTab = new FieldCommentsExcelWorksheet(
-      intl.formatMessage({
+      this.intl.formatMessage({
         id: "petition-excel-export.comments",
         defaultMessage: "Comments",
       }),
@@ -42,23 +52,84 @@ export class PetitionExcelExport {
     await this.fieldCommentsTab.init(this.locale);
   }
 
-  public addPetitionFieldReply(field: PetitionField, replies: PetitionFieldReply[]) {
-    if (field.type === "DYNAMIC_SELECT") {
-      this.textRepliesTab.addDynamicSelectReply(field, replies);
-    } else if (["TEXT", "SHORT_TEXT", "SELECT"].includes(field.type)) {
-      this.textRepliesTab.addSimpleReply(field, replies);
-    } else if (field.type === "CHECKBOX") {
-      this.textRepliesTab.addCheckboxReply(field, replies);
-    } else if (["NUMBER", "PHONE"].includes(field.type)) {
-      this.textRepliesTab.addNumericReply(field, replies);
+  public addPetitionFieldReply(field: ComposedPetitionField) {
+    this.textRepliesTab.addReply(this.extractCellContents(field));
+  }
+
+  private extractDynamicSelectReply(field: ComposedPetitionField) {
+    return this.extractReplies(field, (r) =>
+      (r.content.value as [string, string | null][]).map(([, v]) => v).join(", "),
+    );
+  }
+
+  private extractSimpleReply(field: ComposedPetitionField) {
+    return this.extractReplies(field, (r) => r.content.value);
+  }
+
+  private extractDateReply(field: ComposedPetitionField, format: Intl.DateTimeFormatOptions) {
+    return this.extractReplies(field, (r) =>
+      this.intl.formatDate(r.content.value, { ...format, timeZone: "Etc/UTC" }),
+    );
+  }
+
+  private extractReplies(
+    field: ComposedPetitionField,
+    contentMapper: (reply: UnwrapArray<ComposedPetitionField["replies"]>) => string,
+  ) {
+    const replies = field.replies.map(contentMapper).join(";");
+
+    let fieldTitle =
+      field.title ??
+      this.intl.formatMessage({
+        id: "petition-excel-export.untitled-field",
+        defaultMessage: "Untitled field",
+      });
+
+    if (field.parent_petition_field_id) {
+      fieldTitle += ` [${
+        field.group_name ??
+        this.intl.formatMessage({
+          id: "petition-excel-export.untitled-group",
+          defaultMessage: "Reply",
+        })
+      } ${field.group_number?.toString() ?? ""}]`;
+    }
+
+    return {
+      title: fieldTitle,
+      answer:
+        replies ||
+        `[${this.intl.formatMessage({
+          id: "petition-excel-export.not-replied",
+          defaultMessage: "Not replied",
+        })}]`,
+      format: !replies
+        ? { font: { color: { argb: "FFA6A6A6" } } } // no replies on the field, color the row gray
+        : undefined,
+    };
+  }
+
+  private extractCellContents(field: ComposedPetitionField): {
+    title: string;
+    answer: string;
+    format?: { font: Partial<Excel.Font> };
+  } {
+    if (["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "PHONE", "CHECKBOX"].includes(field.type)) {
+      return this.extractSimpleReply(field);
+    } else if (field.type === "DYNAMIC_SELECT") {
+      return this.extractDynamicSelectReply(field);
     } else if (field.type === "DATE") {
-      this.textRepliesTab.addDateReply(field, replies);
+      return this.extractDateReply(field, FORMATS["L"]);
     } else if (field.type === "DATE_TIME") {
-      this.textRepliesTab.addDateTimeReply(field, replies);
+      return this.extractDateReply(field, FORMATS["L+LTS"]);
+    } else {
+      throw new Error(`Can't extract replies on field type ${field.type}`);
     }
   }
 
-  public async addPetitionFieldComments(fields: PetitionField[]) {
+  public async addPetitionFieldComments(
+    fields: Pick<PetitionField, "id" | "petition_id" | "title">[],
+  ) {
     await this.fieldCommentsTab.addFieldComments(fields);
   }
 

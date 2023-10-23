@@ -245,6 +245,16 @@ const SCHEMAS = {
     additionalProperties: false,
     properties: {},
   },
+  FIELD_GROUP: {
+    type: "object",
+    additionalProperties: false,
+    required: ["groupName"],
+    properties: {
+      groupName: {
+        type: ["string", "null"],
+      },
+    },
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -279,6 +289,8 @@ export function defaultFieldProperties(
       : type === "HEADING" // HEADING always false
       ? false
       : type === "DOW_JONES_KYC" // DOW_JONES_KYC always true
+      ? true
+      : type === "FIELD_GROUP" // FIELD_GROUP always true
       ? true
       : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
       ? false
@@ -397,6 +409,11 @@ export function defaultFieldProperties(
           },
         };
       }
+      case "FIELD_GROUP": {
+        return {
+          groupName: null,
+        };
+      }
       default:
         throw new Error();
     }
@@ -410,7 +427,9 @@ export function defaultFieldProperties(
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,
     require_approval:
-      type === "HEADING" || field?.is_internal ? false : field?.require_approval ?? true,
+      ["HEADING", "FIELD_GROUP"].includes(type) || field?.is_internal
+        ? false
+        : field?.require_approval ?? true,
     options,
   };
 }

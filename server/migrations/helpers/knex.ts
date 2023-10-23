@@ -11,3 +11,11 @@ export function sqlValues(tuples: readonly Knex.RawBinding[][], castAs?: string[
     [...tuples.flatMap((t) => t)],
   ] as const;
 }
+
+export function sqlIn(array: readonly Knex.RawBinding[], castAs?: string) {
+  const q = castAs ? `?::${castAs}` : "?";
+  if (array.length === 0) {
+    throw new Error("array can't be empty");
+  }
+  return [/* sql */ `(${array.map(() => q).join(", ")})`, [...array]] as const;
+}

@@ -12,11 +12,12 @@ export abstract class ExcelWorksheet<T> {
     this.page = wb.addWorksheet(worksheetName);
   }
 
-  protected addRows(rows: MaybeArray<T>, cellFont?: Partial<Excel.Font>) {
+  protected addRows(rows: MaybeArray<T>, format?: { font: Partial<Excel.Font> }) {
     unMaybeArray(rows).forEach((row) => {
       this.page.addRow(row, "n").eachCell((cell) => {
-        if (cellFont) {
-          cell.font = cellFont;
+        cell.alignment = { wrapText: true };
+        if (format?.font) {
+          cell.font = format.font;
         }
       });
     });

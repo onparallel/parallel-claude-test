@@ -32,6 +32,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
@@ -42,6 +43,7 @@ export interface RecipientViewPetitionFieldFileUploadProps
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (content: File[]) => void;
   onDownloadReply: (replyId: string) => void;
+  isInvalid?: boolean;
   isCacheOnly?: boolean;
 }
 
@@ -54,6 +56,7 @@ export function RecipientViewPetitionFieldFileUpload({
   onDownloadReply,
   onCommentsButtonClick,
   isCacheOnly,
+  isInvalid,
 }: RecipientViewPetitionFieldFileUploadProps) {
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
@@ -66,12 +69,21 @@ export function RecipientViewPetitionFieldFileUpload({
     [onDeleteReply],
   );
 
+  const fieldReplies = completedFieldReplies(field);
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
     >
+      <Text fontSize="sm" color="gray.600">
+        <FormattedMessage
+          id="component.recipient-view-petition-field-card.files-uploaded"
+          defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+          values={{ count: fieldReplies.length }}
+        />
+      </Text>
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
@@ -102,6 +114,7 @@ export function RecipientViewPetitionFieldFileUpload({
           isDisabled={isDisabled}
           field={field}
           onCreateReply={onCreateReply}
+          isInvalid={isInvalid}
         />
       </Box>
     </RecipientViewPetitionFieldLayout>
@@ -272,12 +285,14 @@ interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   isDisabled: boolean;
   field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
   onCreateReply: (files: File[]) => MaybePromise<void>;
+  isInvalid?: boolean;
 }
 
 function PetitionFieldFileUploadDropzone({
   field,
   isDisabled,
   onCreateReply,
+  isInvalid,
   ...props
 }: PetitionFieldFileUploadDropzoneProps) {
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
@@ -307,6 +322,7 @@ function PetitionFieldFileUploadDropzone({
         multiple={field.multiple}
         disabled={_isDisabled}
         maxSize={MAX_FILE_SIZE}
+        isInvalid={isInvalid}
       >
         {({ isDragActive, isDragReject }) => (
           <Box pointerEvents="none">

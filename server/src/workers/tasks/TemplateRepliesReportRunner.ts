@@ -1,7 +1,7 @@
 import { IntlShape } from "@formatjs/intl";
 import { formatInTimeZone } from "date-fns-tz";
 import Excel from "exceljs";
-import { isDefined, minBy, zip } from "remeda";
+import { isDefined, minBy, partition, sortBy } from "remeda";
 import { Readable } from "stream";
 import {
   PetitionField,
@@ -11,13 +11,13 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
-import { getFieldIndices } from "../../util/fieldIndices";
-import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { titleize } from "../../util/strings";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
+import { applyFieldLogic } from "../../util/fieldLogic";
 
 function getPetitionSignatureStatus({
   status,
@@ -84,7 +84,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     const [includePreviewUrl, template, templateFields, petitions] = await Promise.all([
       this.ctx.featureFlags.orgHasFeatureFlag(user.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
       this.ctx.readonlyPetitions.loadPetition(templateId),
-      this.ctx.readonlyPetitions.loadFieldsForPetition(templateId),
+      this.ctx.readonlyPetitions.loadAllFieldsByPetitionId(templateId),
       this.ctx.readonlyPetitions.getPetitionsForTemplateRepliesReport(
         templateId,
         startDate,
@@ -100,7 +100,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       const [
         petitionsAccesses,
         petitionsMessages,
-        petitionsFieldsWithReplies,
+        petitionsComposedFields,
         petitionsOwner,
         petitionsTags,
         petitionsEvents,
@@ -108,7 +108,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       ] = await Promise.all([
         this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.getPetitionFieldsWithReplies(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.getComposedPetitionFields(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
         this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
@@ -143,7 +143,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       );
 
       rows = petitions.map((petition, petitionIndex) => {
-        const petitionFields = petitionsFieldsWithReplies[petitionIndex];
+        const petitionFields = applyFieldLogic(petitionsComposedFields[petitionIndex]).filter(
+          (f) => f.type !== "HEADING",
+        );
 
         const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
         const petitionFirstMessage = petitionsFirstMessage[petitionIndex];
@@ -219,36 +221,109 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           }/app/petitions/${toGlobalId("Petition", petition.id)}/preview`;
         }
 
-        const fieldIndexes = getFieldIndices(petitionFields);
-        const visibilities = evaluateFieldVisibility(petitionFields);
-        zip(petitionFields, fieldIndexes)
-          .filter((_, i) => visibilities[i])
-          .forEach(([field]) => {
-            const columnId = `field-${field.from_petition_field_id ?? field.id}`;
-
-            // make sure header is defined on this field
-            const header = headers.find((h) => h.id === columnId);
-            if (!header) {
-              headers.push({
-                id: columnId,
-                title: (field.type === "DATE_TIME" ? field.title + " (UTC)" : field.title) ?? "",
+        function replyContent(r: Pick<PetitionFieldReply, "content" | "type">) {
+          switch (r.type) {
+            case "CHECKBOX":
+              return (r.content.value as string[]).join(", ");
+            case "DYNAMIC_SELECT":
+              return (r.content.value as string[][])
+                .map((value) => (value[1] !== null ? value.join(": ") : null))
+                .filter(isDefined)
+                .join(", ");
+            case "DATE_TIME":
+              return intl.formatDate(r.content.value, {
+                ...FORMATS["L+LT"],
+                timeZone: "Etc/UTC",
               });
-            }
+            default:
+              return r.content.value as string;
+          }
+        }
 
-            row[columnId] = !isFileTypeField(field.type)
-              ? field.replies
-                  .map((r) => this.replyContent({ ...r, type: field.type }, intl as IntlShape))
-                  .join("; ")
-              : field.replies.length > 0
-              ? intl.formatMessage(
+        function fillRow(
+          field: Pick<
+            PetitionField,
+            "id" | "from_petition_field_id" | "type" | "title" | "parent_petition_field_id"
+          > & {
+            reply_group_index?: number;
+          },
+          parent: Pick<PetitionField, "options" | "from_petition_field_id"> | null,
+          replies: Pick<PetitionFieldReply, "content" | "type">[],
+        ) {
+          const columnId = `field-${field.from_petition_field_id ?? field.id}`.concat(
+            isDefined(field.reply_group_index) ? `-${field.reply_group_index}` : "",
+          );
+
+          // make sure header is defined on this field
+          const header = headers.find((h) => h.id === columnId);
+          if (!header) {
+            const fieldTitle =
+              field.title ??
+              intl.formatMessage({
+                id: "export-template-report.column-header-untitled-field",
+                defaultMessage: "Untitled field",
+              });
+
+            const title = field.type === "DATE_TIME" ? fieldTitle + " (UTC)" : fieldTitle;
+            const header = {
+              id: columnId,
+              parent_petition_field_id: parent?.from_petition_field_id,
+              title: title.concat(
+                isDefined(parent) && isDefined(field.reply_group_index)
+                  ? ` [${titleize(
+                      parent.options.groupName ??
+                        intl.formatMessage({
+                          id: "export-template-report.column-header-untitled-group",
+                          defaultMessage: "Reply",
+                        }),
+                    )} ${field.reply_group_index + 1}]`
+                  : "",
+              ),
+            };
+
+            if (isDefined(parent?.from_petition_field_id)) {
+              // for FIELD_GROUP replies, insert new header after the last header of the group
+              // this way, 2nd to nth FIELD_GROUP reply will be just after the 1st one
+              const lastIndex = headers.findLastIndex(
+                (h) => h.parent_petition_field_id === parent?.from_petition_field_id,
+              );
+              headers.splice(lastIndex + 1, 0, header);
+            } else {
+              headers.push(header);
+            }
+          }
+
+          row[columnId] = !isFileTypeField(field.type)
+            ? replies.map((r) => replyContent({ ...r, type: field.type })).join("; ")
+            : replies.length > 0
+            ? intl.formatMessage(
+                {
+                  id: "export-template-report.file-cell-content",
+                  defaultMessage: "{count, plural, =1{1 file} other {# files}}",
+                },
+                { count: replies.length },
+              )
+            : "";
+        }
+
+        for (const field of petitionFields) {
+          if (field.type === "FIELD_GROUP") {
+            for (const groupReply of field.replies) {
+              for (const replyChild of groupReply.children ?? []) {
+                fillRow(
                   {
-                    id: "export-template-report.file-cell-content",
-                    defaultMessage: "{count, plural, =1{1 file} other {# files}}",
+                    ...replyChild.field,
+                    reply_group_index: field.replies.indexOf(groupReply),
                   },
-                  { count: field.replies.length },
-                )
-              : "";
-          });
+                  field,
+                  replyChild.replies,
+                );
+              }
+            }
+          } else {
+            fillRow(field, null, field.replies);
+          }
+        }
 
         return row;
       });
@@ -271,25 +346,6 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     return { temporary_file_id: tmpFile.id };
   }
 
-  private replyContent(r: Pick<PetitionFieldReply, "content" | "type">, intl: IntlShape) {
-    switch (r.type) {
-      case "CHECKBOX":
-        return (r.content.value as string[]).join(", ");
-      case "DYNAMIC_SELECT":
-        return (r.content.value as string[][])
-          .map((value) => (value[1] !== null ? value.join(": ") : null))
-          .filter(isDefined)
-          .join(", ");
-      case "DATE_TIME":
-        return intl.formatDate(r.content.value, {
-          ...FORMATS["L+LT"],
-          timeZone: "Etc/UTC",
-        });
-      default:
-        return r.content.value as string;
-    }
-  }
-
   private async exportToExcel(
     headers: { id: string; title: string }[],
     rows: Record<string, Maybe<string | Date>>[],
@@ -310,8 +366,12 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     return stream;
   }
 
-  private buildExcelHeaders(includePreviewUrl: boolean, fields: PetitionField[], intl: IntlShape) {
-    const headers = [
+  private buildExcelHeaders(
+    includePreviewUrl: boolean,
+    flattenedFields: PetitionField[],
+    intl: IntlShape,
+  ) {
+    const headers: { id: string; title: string; parent_petition_field_id?: number | null }[] = [
       {
         id: "parallel-id",
         title: intl.formatMessage({
@@ -415,10 +475,60 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       });
     }
 
-    for (const field of fields.filter((f) => f.type !== "HEADING")) {
+    const [fields, children] = partition(
+      flattenedFields,
+      (f) => f.parent_petition_field_id === null,
+    );
+
+    const headerFields: (PetitionField & {
+      group_name?: string | null;
+      reply_group_index?: number;
+    })[] = [];
+    for (const field of sortBy(
+      fields.filter((f) => f.type !== "HEADING"),
+      [(f) => f.position, "asc"],
+    )) {
+      if (field.type === "FIELD_GROUP") {
+        const childFields = children
+          .filter((c) => c.parent_petition_field_id === field.id)
+          .map((c) => ({
+            ...c,
+            group_name: field.options.groupName ?? null,
+            reply_group_index: 0,
+          }));
+
+        headerFields.push(...sortBy(childFields, [(f) => f.position, "asc"]));
+      } else {
+        headerFields.push(field);
+      }
+    }
+
+    for (const field of headerFields) {
+      const fieldTitle =
+        field.title ??
+        intl.formatMessage({
+          id: "export-template-report.column-header-untitled-field",
+          defaultMessage: "Untitled field",
+        });
+
+      const title = field.type === "DATE_TIME" ? fieldTitle + " (UTC)" : fieldTitle;
+
       headers.push({
-        id: `field-${field.id}`,
-        title: (field.type === "DATE_TIME" ? field.title + " (UTC)" : field.title) ?? "",
+        id: `field-${field.id}`.concat(
+          isDefined(field.reply_group_index) ? `-${field.reply_group_index}` : "",
+        ),
+        parent_petition_field_id: field.parent_petition_field_id,
+        title: title.concat(
+          field.group_name !== undefined
+            ? ` [${titleize(
+                field.group_name ??
+                  intl.formatMessage({
+                    id: "export-template-report.column-header-untitled-group",
+                    defaultMessage: "Reply",
+                  }),
+              )} 1]`
+            : "",
+        ),
       });
     }
 

@@ -12,11 +12,12 @@ interface PetitionFieldTypeSelectProps extends ThemingProps<"Select"> {
   type: PetitionFieldType;
   onChange: (type: PetitionFieldType) => void;
   isReadOnly?: boolean;
+  isFieldGroupChild?: boolean;
 }
 
 export const PetitionFieldTypeSelect = Object.assign(
   chakraForwardRef<"button", PetitionFieldTypeSelectProps>(function PetitionFieldTypeSelect(
-    { user, type, onChange, ...props },
+    { user, type, onChange, isFieldGroupChild, ...props },
     ref,
   ) {
     return (
@@ -29,6 +30,7 @@ export const PetitionFieldTypeSelect = Object.assign(
             onSelectFieldType={onChange}
             role="listbox"
             user={user}
+            isFieldGroupChild={isFieldGroupChild}
           />
         </Portal>
       </Menu>

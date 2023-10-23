@@ -1,8 +1,8 @@
-import { evaluateFieldVisibility } from "../fieldVisibility";
+import { evaluateFieldLogic } from "../fieldLogic";
 
 describe("fieldVisibility", () => {
   it("no conditions", () => {
-    const fields = evaluateFieldVisibility([
+    const fields = evaluateFieldLogic([
       {
         id: 1,
         type: "TEXT",
@@ -19,11 +19,11 @@ describe("fieldVisibility", () => {
       },
     ]);
 
-    expect(fields).toMatchObject([true, true]);
+    expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
   });
 
   it("should be case-insensitive", () => {
-    const fields = evaluateFieldVisibility([
+    const fields = evaluateFieldLogic([
       {
         id: 1,
         type: "TEXT",
@@ -51,12 +51,12 @@ describe("fieldVisibility", () => {
       },
     ]);
 
-    expect(fields).toMatchObject([true, true]);
+    expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
   });
 
   describe("simple conditions", () => {
     it("ANY EQUAL", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -84,11 +84,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true]);
+      expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
     });
 
     it("ANY CONTAIN", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -119,11 +119,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true]);
+      expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
     });
 
     it("ALL END_WITH", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -154,11 +154,11 @@ describe("fieldVisibility", () => {
           replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
-      expect(fields).toMatchObject([true, true]);
+      expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
     });
 
     it("NONE CONTAIN", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -189,11 +189,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, false]);
+      expect(fields).toMatchObject([true, false].map((isVisible) => ({ isVisible })));
     });
 
     it("NUMBER_OF_REPLIES", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -227,13 +227,13 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, false]);
+      expect(fields).toMatchObject([true, false].map((isVisible) => ({ isVisible })));
     });
   });
 
   describe("multiple conditions", () => {
     it("NONE CONTAIN AND NUMBER_OF_REPLIES", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -267,11 +267,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true]);
+      expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
     });
 
     it("ALL CONTAIN AND ANY START_WITH", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -310,11 +310,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true]);
+      expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
     });
 
     it("NUMBER_OF_REPLIES OR NONE END_WITH OR ANY START_WITH", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "TEXT",
@@ -371,11 +371,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true, true]);
+      expect(fields).toMatchObject([true, true, true].map((isVisible) => ({ isVisible })));
     });
 
     it("SHOW ONE TEXT AND HIDE OTHER WHEN CHECKBOX CONTAIN CHOICE 1", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "CHECKBOX",
@@ -428,11 +428,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true, false]);
+      expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
     });
 
     it("SHOW ONE TEXT AND HIDE OTHER WHEN CHECKBOX NOT CONTAIN CHOICE 1", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "CHECKBOX",
@@ -485,11 +485,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, false, true]);
+      expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
     });
 
     it("SHOW WHEN NUMBER_OF_SUBREPLIES CHECKBOX", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "CHECKBOX",
@@ -560,11 +560,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true, false, false]);
+      expect(fields).toMatchObject([true, true, false, false].map((isVisible) => ({ isVisible })));
     });
 
     it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX INCOMPLETED REPLY", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "CHECKBOX",
@@ -617,11 +617,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, false, true]);
+      expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
     });
 
     it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX COMPLETED REPLY", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "CHECKBOX",
@@ -676,11 +676,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true, false]);
+      expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
     });
 
     it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX INCOMPLETED REPLY RANGE", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "CHECKBOX",
@@ -733,11 +733,11 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, false, true]);
+      expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
     });
 
     it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX COMPLETED REPLY RANGE", () => {
-      const fields = evaluateFieldVisibility([
+      const fields = evaluateFieldLogic([
         {
           id: 1,
           type: "CHECKBOX",
@@ -792,7 +792,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([true, true, false]);
+      expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
     });
   });
 });

@@ -23,7 +23,7 @@ export const TwoPaneLayout = chakraForwardRef<"div", PaneWithFlyoutProps>(functi
         {children}
       </Box>
       <Box
-        width={{ base: "auto", lg: "495px" }}
+        width={{ base: "100%", lg: "495px" }}
         display={{ base: isSidePaneActive ? "block" : "none", lg: "block" }}
       >
         {sidePane ? (

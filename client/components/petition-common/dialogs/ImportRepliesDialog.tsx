@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { FetchResult, gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -20,15 +20,17 @@ import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/com
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
+  CreatePetitionFieldReplyInput,
   ImportRepliesDialog_createPetitionFieldRepliesDocument,
+  ImportRepliesDialog_createPetitionFieldRepliesMutation,
   ImportRepliesDialog_petitionDocument,
   ImportRepliesDialog_petitionQuery,
 } from "@parallel/graphql/__types";
 import { isReplyContentCompatible, mapReplyContents } from "@parallel/utils/petitionFieldsReplies";
-import { useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { groupBy, isDefined } from "remeda";
 
 export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ petitionId: string }>) {
   const {
@@ -58,6 +60,8 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
     },
   });
 
+  const [invalidGroups, setInvalidGroups] = useState<string[] | null>(null);
+
   const overwriteExisting = watch("overwriteExisting");
 
   const [getSelectedPetition, { data: selectedPetitionData }] = useLazyQuery(
@@ -74,6 +78,27 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
     ImportRepliesDialog_createPetitionFieldRepliesDocument,
   );
 
+  const petitionFields = petitionData?.petition?.fields ?? [];
+
+  const allFields = useMemo(
+    () => petitionFields.flatMap((f) => [f, ...(f.children ?? [])]),
+    [petitionData?.petition?.fields],
+  );
+
+  const allSelectedPetitionFields = useMemo(
+    () =>
+      (selectedPetitionData?.petition?.fields ?? [])
+        .flatMap((f) => [f, ...(f.children ?? [])])
+        .map((f) => ({
+          ...f,
+          replies:
+            f.type === "ES_TAX_DOCUMENTS"
+              ? f.replies.filter((r) => !isDefined(r.content.error))
+              : f.replies,
+        })),
+    [selectedPetitionData?.petition?.fields],
+  );
+
   const selectedPetitionFields = (selectedPetitionData?.petition?.fields ?? []).map((f) => ({
     ...f,
     replies:
@@ -82,21 +107,22 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         : f.replies,
   }));
 
-  const setInitialMapping = async (
+  const setInitialMapping = (
     sourcePetition: ImportRepliesDialog_petitionQuery | undefined | null,
   ) => {
     const mapping = {} as Record<string, string>;
 
-    const fields = petitionData?.petition?.fields ?? [];
-    const sourcePetitionFields = (sourcePetition?.petition?.fields ?? []).map((f) => ({
-      ...f,
-      replies:
-        f.type === "ES_TAX_DOCUMENTS"
-          ? f.replies.filter((r) => !isDefined(r.content.error))
-          : f.replies,
-    }));
+    const sourcePetitionFields = (sourcePetition?.petition?.fields ?? [])
+      .flatMap((f) => [f, ...(f.children ?? [])])
+      .map((f) => ({
+        ...f,
+        replies:
+          f.type === "ES_TAX_DOCUMENTS"
+            ? f.replies.filter((r) => !isDefined(r.content.error))
+            : f.replies,
+      }));
 
-    const filteredFields = fields.filter(
+    const filteredFields = allFields.filter(
       (f) => !excludedFieldsTarget.includes(f.type) && mapping[f.id] === undefined,
     );
     const filteredSourceFields = sourcePetitionFields.filter(
@@ -105,8 +131,13 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
 
     for (const field of filteredFields) {
       const replyIsApproved = field.replies.length === 1 && field.replies[0].status === "APPROVED";
-      const isFieldDisabled = (field.replies.length > 0 && !field.multiple) || replyIsApproved;
-      if (!isFieldDisabled && field.replies.length === 0) {
+      const isFieldReplied =
+        (field.replies.length > 0 &&
+          !field.multiple &&
+          field.parent?.id === undefined &&
+          field.type !== "FIELD_GROUP") ||
+        replyIsApproved;
+      if (!isFieldReplied) {
         const matchingField =
           (isDefined(field.alias) &&
             filteredSourceFields.find((f) => {
@@ -152,21 +183,86 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
           } else {
             const mappedFields = mapReplyContents({
               mapping: data.mapping,
-              fields: petitionData?.petition?.fields ?? [],
-              sourcePetitionFields: selectedPetitionFields,
+              fields: allFields,
+              sourcePetitionFields: allSelectedPetitionFields,
             });
-            if (mappedFields.length) {
-              await createPetitionFieldReplies({
-                variables: {
-                  petitionId,
-                  fields: mappedFields,
-                  overwriteExisting: data.overwriteExisting,
+
+            const fieldGroups = mappedFields.fields.filter(
+              (f) => Object.keys(f.content).length === 0,
+            );
+
+            const groupsWithoutChildren = fieldGroups.length
+              ? fieldGroups
+                  .filter(({ id }) => !mappedFields.children.some((ch) => ch.targetFieldId === id))
+                  .map((r) => r.id)
+              : [];
+
+            if (
+              (mappedFields.fields.length || mappedFields.children.length) &&
+              groupsWithoutChildren.length === 0
+            ) {
+              let res =
+                null as FetchResult<ImportRepliesDialog_createPetitionFieldRepliesMutation> | null;
+
+              if (mappedFields.fields.length) {
+                res = await createPetitionFieldReplies({
+                  variables: {
+                    petitionId,
+                    fields: mappedFields.fields,
+                    overwriteExisting: data.overwriteExisting,
+                  },
+                });
+              }
+
+              let childrenFields = [] as CreatePetitionFieldReplyInput[];
+
+              Object.entries(groupBy(mappedFields.children, (ch) => ch.targetFieldId)).forEach(
+                ([targetFieldId, childrenReplyInput]) => {
+                  const field =
+                    res?.data?.createPetitionFieldReplies.filter(
+                      (r) => r.field?.id === targetFieldId,
+                    )[0]?.field ?? petitionFields.find((f) => f.id === targetFieldId);
+
+                  const replies =
+                    field?.replies.filter(
+                      (reply) => reply.children?.every((child) => child.replies.length === 0),
+                    ) ?? [];
+
+                  childrenFields = childrenFields.concat(
+                    Object.values(groupBy(childrenReplyInput, (ch) => ch.replyParentId)).flatMap(
+                      (petitionFieldReplies, index) => {
+                        return petitionFieldReplies.map((reply) => {
+                          return {
+                            id: reply.id,
+                            content: reply.content,
+                            parentReplyId: replies?.[index]?.id,
+                          };
+                        });
+                      },
+                    ),
+                  );
                 },
-              });
+              );
+
+              if (childrenFields.length) {
+                await createPetitionFieldReplies({
+                  variables: {
+                    petitionId,
+                    fields: childrenFields,
+                    overwriteExisting: data.overwriteExisting,
+                  },
+                });
+              }
 
               props.onResolve();
             } else {
-              setError("mapping", { type: "invalid" });
+              if (groupsWithoutChildren.length) {
+                setInvalidGroups(groupsWithoutChildren);
+              } else {
+                setError("mapping", {
+                  type: "no_replies",
+                });
+              }
             }
           }
         }),
@@ -251,9 +347,13 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                       sourcePetitionFields={selectedPetitionFields}
                       overwriteExisting={overwriteExisting}
                       value={value}
-                      onChange={onChange}
+                      onChange={(props) => {
+                        setInvalidGroups(null);
+                        onChange(props);
+                      }}
                       maxHeight="400px"
                       isDisabled={isSubmitting}
+                      invalidGroups={invalidGroups}
                     />
                   );
                 }}
@@ -263,12 +363,29 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         )
       }
       alternative={
-        !!errors.mapping && currentStep === 1 ? (
+        (isDefined(errors.mapping) || invalidGroups) && currentStep === 1 ? (
           <Text color="red.600" aria-live="polite">
-            <FormattedMessage
-              id="component.import-replies-dialog.select-replies-import-error"
-              defaultMessage="Please, select at least one reply to import"
-            />
+            {invalidGroups ? (
+              <FormattedMessage
+                id="component.import-replies-dialog.select-replies-import-error-group"
+                defaultMessage="Please, select at least one reply to import in each {groupLabel}"
+                values={{
+                  groupLabel: (
+                    <Text as="span" textTransform="lowercase">
+                      <FormattedMessage
+                        id="generic.petition-field-type-field-group"
+                        defaultMessage="Questions group"
+                      />
+                    </Text>
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="component.import-replies-dialog.select-replies-import-error"
+                defaultMessage="Please, select at least one reply to import"
+              />
+            )}
           </Text>
         ) : null
       }
@@ -310,6 +427,27 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
   );
 }
 
+const _fragments = {
+  get PetitionField() {
+    return gql`
+      fragment ImportRepliesDialog_PetitionField on PetitionField {
+        id
+        replies {
+          id
+          children {
+            field {
+              id
+            }
+            replies {
+              id
+            }
+          }
+        }
+      }
+    `;
+  },
+};
+
 const _queries = [
   gql`
     query ImportRepliesDialog_petition($petitionId: GID!) {
@@ -318,11 +456,13 @@ const _queries = [
         fields {
           ...MapFieldsTable_PetitionField
           ...mapReplyContents_PetitionField
+          ...ImportRepliesDialog_PetitionField
         }
       }
     }
     ${mapReplyContents.fragments.PetitionField}
     ${MapFieldsTable.fragments.PetitionField}
+    ${_fragments.PetitionField}
   `,
 ];
 
@@ -339,8 +479,12 @@ const _mutations = [
         overwriteExisting: $overwriteExisting
       ) {
         id
+        field {
+          ...ImportRepliesDialog_PetitionField
+        }
       }
     }
+    ${_fragments.PetitionField}
   `,
 ];
 

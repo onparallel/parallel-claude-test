@@ -1,11 +1,16 @@
+import { GraphQLResolveInfo } from "graphql";
 import { core } from "nexus";
 import { ArgsValue } from "nexus/dist/core";
 import { groupBy, indexBy, isDefined, mapValues, pipe, uniq } from "remeda";
-import { fromGlobalId } from "../../util/globalId";
+import { ApiContext } from "../../context";
+import { PetitionField } from "../../db/__types";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { ValidateReplyContentError, validateReplyContent } from "../../util/validateReplyContent";
+import { NexusGenInputs } from "../__types";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
+import { keyBuilder } from "../../util/keyBuilder";
 
 export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(
   slugArg: (args: ArgsValue<TypeName, FieldName>) => string | null | undefined,
@@ -57,39 +62,24 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
-export function validateCreateReplyContent<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => { id: number; content?: any }[],
+export function validateCreatePetitionFieldReplyInput<
+  TypeName extends string,
+  FieldName extends string,
+>(
+  prop: (
+    args: core.ArgsValue<TypeName, FieldName>,
+  ) => NexusGenInputs["CreatePetitionFieldReplyInput"][],
   argName: string,
 ) {
   return (async (_, args, ctx, info) => {
     const fieldReplies = prop(args);
-    const fields = await ctx.petitions.loadField(fieldReplies.map((fr) => fr.id));
-    if (!fields.every(isDefined)) {
-      const index = fields.findIndex((f) => !isDefined(f));
-      throw new InvalidReplyError(
-        info,
-        argName + `[${index}].id`,
-        `Invalid PetitionField ID ${fieldReplies[index].id}`,
-      );
-    }
+    await validateCreateReplyInput(fieldReplies, argName, ctx, info);
+
+    const fields = (await ctx.petitions.loadField(
+      fieldReplies.map((fr) => fr.id),
+    )) as PetitionField[];
+
     const fieldsById = indexBy(fields, (f) => f.id);
-    const replyCountByFieldId = pipe(
-      fieldReplies,
-      groupBy((r) => r.id),
-      mapValues((r) => r.length),
-    );
-    // Validate that we are not creating more replies than allowed
-    for (const field of Object.values(fieldsById)) {
-      if (!field.multiple && replyCountByFieldId[field.id] > 1) {
-        const firstReplyIndex = fieldReplies.findIndex((r) => r.id === field.id);
-        const index = fieldReplies.slice(firstReplyIndex + 1).findIndex((r) => r.id === field.id);
-        throw new InvalidReplyError(
-          info,
-          argName + `[${index}].id`,
-          `PetitionField with ID ${field.id} only accepts one reply`,
-        );
-      }
-    }
     for (const [index, reply] of fieldReplies.entries()) {
       const field = fieldsById[reply.id];
       try {
@@ -120,7 +110,7 @@ export function validateCreateReplyContent<TypeName extends string, FieldName ex
         const hasAccess =
           isValid &&
           isDefined(ctx.user) &&
-          (await ctx.petitions.userhasAccessToPetitionFieldReply(
+          (await ctx.petitions.userHasAccessToPetitionFieldReply(
             petitionFieldReply.id,
             ctx.user.id,
           ));
@@ -137,8 +127,13 @@ export function validateCreateReplyContent<TypeName extends string, FieldName ex
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
-export function validateUpdateReplyContent<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => { id: number; content?: any }[],
+export function validateUpdatePetitionFieldReplyInput<
+  TypeName extends string,
+  FieldName extends string,
+>(
+  prop: (
+    args: core.ArgsValue<TypeName, FieldName>,
+  ) => NexusGenInputs["UpdatePetitionFieldReplyInput"][],
   argName: string,
 ) {
   return (async (_, args, ctx, info) => {
@@ -169,4 +164,100 @@ export function validateUpdateReplyContent<TypeName extends string, FieldName ex
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateCreateFileReplyInput<TypeName extends string, FieldName extends string>(
+  prop: (
+    args: core.ArgsValue<TypeName, FieldName>,
+  ) => Omit<NexusGenInputs["CreatePetitionFieldReplyInput"], "content">[],
+  argName: string,
+) {
+  return (async (_, args, ctx, info) => {
+    await validateCreateReplyInput(prop(args), argName, ctx, info);
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+async function validateCreateReplyInput(
+  fieldReplies: Omit<NexusGenInputs["CreatePetitionFieldReplyInput"], "content">[],
+  argName: string,
+  ctx: ApiContext,
+  info: GraphQLResolveInfo,
+) {
+  const fields = await ctx.petitions.loadField(fieldReplies.map((fr) => fr.id));
+
+  if (!fields.every(isDefined)) {
+    const index = fields.findIndex((f) => !isDefined(f));
+    throw new InvalidReplyError(
+      info,
+      argName + `[${index}].id`,
+      `Invalid PetitionField ${toGlobalId("PetitionField", fieldReplies[index].id)}`,
+    );
+  }
+
+  const parentReplyIds = uniq(
+    fieldReplies.filter((fr) => isDefined(fr.parentReplyId)).map((fr) => fr.parentReplyId!),
+  );
+  const parentReplies = await ctx.petitions.loadFieldReply(parentReplyIds);
+  if (!parentReplies.every(isDefined)) {
+    const index = parentReplies.findIndex((r) => !isDefined(r));
+    throw new InvalidReplyError(
+      info,
+      argName + `[${index}].parentReplyId`,
+      `Invalid PetitionFieldReply ${
+        isDefined(fieldReplies[index].parentReplyId)
+          ? toGlobalId("PetitionFieldReply", fieldReplies[index].parentReplyId!) // use globalIds as this messages are exposed on the API
+          : null
+      }`,
+    );
+  }
+
+  for (const fieldReply of fieldReplies) {
+    const field = fields.find((f) => f.id === fieldReply.id)!;
+    // if replying into a child field, make sure the parentReplyId is passed and references the parent field
+    if (isDefined(field.parent_petition_field_id) || isDefined(fieldReply.parentReplyId)) {
+      const parentReply = parentReplies.find((r) => r.id === fieldReply.parentReplyId);
+      if (
+        !isDefined(parentReply) ||
+        parentReply.petition_field_id !== field.parent_petition_field_id
+      ) {
+        const index = fieldReplies.findIndex((r) => r.id === fieldReply.id);
+        throw new InvalidReplyError(
+          info,
+          argName + `[${index}].parentReplyId`,
+          `Invalid PetitionFieldReply ${
+            isDefined(fieldReply.parentReplyId)
+              ? toGlobalId("PetitionFieldReply", fieldReply.parentReplyId!)
+              : null
+          }`,
+        );
+      }
+    }
+  }
+
+  const fieldsByIdParentReplyId = indexBy(
+    fieldReplies.map((fr) => ({
+      id: fr.id,
+      field: fields.find((f) => f.id === fr.id)!,
+      parentReplyId: fr.parentReplyId ?? null,
+    })),
+    keyBuilder(["id", "parentReplyId"]),
+  );
+  const replyCountByFieldIdParentReplyId = pipe(
+    fieldReplies,
+    groupBy(keyBuilder(["id", "parentReplyId"])),
+    mapValues((r) => r.length),
+  );
+  // Validate that we are not creating more replies than allowed
+  for (const { field, parentReplyId } of Object.values(fieldsByIdParentReplyId)) {
+    const key = [field.id, parentReplyId].join(",");
+    if (!field.multiple && replyCountByFieldIdParentReplyId[key] > 1) {
+      const firstReplyIndex = fieldReplies.findIndex((r) => r.id === field.id);
+      const index = fieldReplies.slice(firstReplyIndex + 1).findIndex((r) => r.id === field.id);
+      throw new InvalidReplyError(
+        info,
+        argName + `[${index}].id`,
+        `PetitionField ${toGlobalId("PetitionField", field.id)} only accepts one reply`,
+      );
+    }
+  }
 }

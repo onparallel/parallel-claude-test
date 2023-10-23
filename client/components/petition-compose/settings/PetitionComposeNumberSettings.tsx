@@ -22,9 +22,10 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { SettingsRowSwitch } from "../SettingsRowSwitch";
+
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
+import { SettingsRowSwitch } from "./SettingsRowSwitch";
 
 export function NumberSettings({
   field,

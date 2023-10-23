@@ -68,6 +68,9 @@ export interface FieldOptions {
   };
   DATE: {};
   DOW_JONES_KYC: {};
+  FIELD_GROUP: {
+    groupName?: Maybe<string>;
+  };
 }
 
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
@@ -76,68 +79,73 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
     switch (type) {
       case "FILE_UPLOAD":
         return intl.formatMessage({
-          id: "petition.field-type.file-upload",
+          id: "generic.petition-field-type-file-upload",
           defaultMessage: "Documents and files",
         });
       case "SHORT_TEXT":
         return intl.formatMessage({
-          id: "petition.field-type.short-text",
+          id: "generic.petition-field-type-short-text",
           defaultMessage: "Short replies",
         });
       case "TEXT":
         return intl.formatMessage({
-          id: "petition.field-type.text",
+          id: "generic.petition-field-type-text",
           defaultMessage: "Long replies",
         });
       case "NUMBER":
         return intl.formatMessage({
-          id: "petition.field-type.number",
+          id: "generic.petition-field-type-number",
           defaultMessage: "Numbers",
         });
       case "PHONE":
         return intl.formatMessage({
-          id: "petition.field-type.phone",
+          id: "generic.petition-field-type-phone",
           defaultMessage: "Phone number",
         });
       case "HEADING":
         return intl.formatMessage({
-          id: "petition.field-type.heading",
+          id: "generic.petition-field-type-heading",
           defaultMessage: "Text block",
         });
       case "SELECT":
         return intl.formatMessage({
-          id: "petition.field-type.select",
+          id: "generic.petition-field-type-select",
           defaultMessage: "Select",
         });
       case "DYNAMIC_SELECT":
         return intl.formatMessage({
-          id: "petition.field-type.conditional-select",
+          id: "generic.petition-field-type-conditional-select",
           defaultMessage: "Conditional select",
         });
       case "CHECKBOX":
         return intl.formatMessage({
-          id: "petition.field-type.checkbox",
+          id: "generic.petition-field-type-checkbox",
           defaultMessage: "Multiple choice",
         });
       case "DATE":
         return intl.formatMessage({
-          id: "petition.field-type.date",
+          id: "generic.petition-field-type-date",
           defaultMessage: "Date",
         });
       case "DATE_TIME":
         return intl.formatMessage({
-          id: "petition.field-type.date-and-time",
+          id: "generic.petition-field-type-date-and-time",
           defaultMessage: "Date and time",
         });
       case "ES_TAX_DOCUMENTS":
         return intl.formatMessage({
-          id: "petition.field-type.tax-documents",
+          id: "generic.petition-field-type-tax-documents",
           defaultMessage: "Tax documents",
         });
       case "DOW_JONES_KYC":
         return intl.formatMessage({
-          id: "petition.field-type.dow-jones-kyc-research",
+          id: "generic.petition-field-type-dow-jones-kyc-research",
           defaultMessage: "Search in Dow Jones",
+        });
+      case "FIELD_GROUP":
+        return intl.formatMessage({
+          id: "generic.petition-field-type-field-group",
+          defaultMessage: "Questions group",
         });
       default:
         throw new Error(`Missing PetitionFieldType "${type}"`);
@@ -162,6 +170,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       DATE_TIME: "#EB9753",
       ES_TAX_DOCUMENTS: theme.colors.teal[500],
       DOW_JONES_KYC: "#48A3D3",
+      FIELD_GROUP: theme.colors.blue[600],
     } as Record<PetitionFieldType, string>
   )[type];
 }

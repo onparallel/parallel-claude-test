@@ -4,7 +4,7 @@ import { usePetitionComposeFieldReorder_PetitionFieldFragment } from "@parallel/
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { indexBy, isDefined } from "remeda";
-import { PetitionFieldVisibility } from "./fieldVisibility/types";
+import { PetitionFieldVisibility } from "./fieldLogic/types";
 import { Maybe } from "./types";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
 import { useUpdatingRef } from "./useUpdatingRef";
@@ -14,9 +14,11 @@ export function usePetitionComposeFieldReorder<
 >({
   fields,
   onUpdateFieldPositions,
+  isFieldGroup,
 }: {
   fields: T[];
   onUpdateFieldPositions: (fieldIds: string[]) => void;
+  isFieldGroup?: boolean;
 }) {
   const [fieldIds, setFieldIds] = useState(fields.map((f) => f.id));
   useEffectSkipFirst(
@@ -60,13 +62,46 @@ export function usePetitionComposeFieldReorder<
           fieldsToCheck = fieldIds.slice(endIndex, endIndex + 1);
         }
 
+        const allFieldIds = fieldIds.flatMap((id) => {
+          return [id, ...(byId[id]?.children?.map((c) => c.id) ?? [])];
+        });
+
+        const allNewFieldIds = newFieldIds.flatMap((id) => {
+          return [id, ...(byId[id]?.children?.map((c) => c.id) ?? [])];
+        });
+
         // check that this order of fields is respecting that visibility only refers to previous fields
         for (const fieldId of fieldsToCheck) {
-          const position = fieldIds.indexOf(fieldId);
-          const visibility = byId[fieldId].visibility as Maybe<PetitionFieldVisibility>;
+          const position = allFieldIds.indexOf(fieldId);
+          const field = byId[fieldId];
+          const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
+
+          const hasFirstChildInternalError =
+            isDefined(field.parent) && !field.parent.isInternal && field.isInternal;
+          if ((isFieldGroup && position === 0 && visibility) || hasFirstChildInternalError) {
+            // The first field in a group cannot have visibility conditions
+            try {
+              setFieldIds(fields.map((f) => f.id));
+              await showError({
+                message: hasFirstChildInternalError ? (
+                  <FormattedMessage
+                    id="generic.first-child-is-internal-error"
+                    defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="generic.first-child-visibility-conditions-error"
+                    defaultMessage="You cannot set conditions for the first field in a group."
+                  />
+                ),
+              });
+            } catch {}
+            return;
+          }
+
           if (
             visibility &&
-            visibility.conditions.some((c) => newFieldIds.indexOf(c.fieldId) > position)
+            visibility.conditions.some((c) => allNewFieldIds.indexOf(c.fieldId) > position)
           ) {
             try {
               setFieldIds(fields.map((f) => f.id));
@@ -94,8 +129,21 @@ export function usePetitionComposeFieldReorder<
 usePetitionComposeFieldReorder.fragments = {
   PetitionField: gql`
     fragment usePetitionComposeFieldReorder_PetitionField on PetitionField {
+      ...usePetitionComposeFieldReorder_PetitionFieldData
+      children {
+        ...usePetitionComposeFieldReorder_PetitionFieldData
+        parent {
+          isInternal
+        }
+      }
+      parent {
+        isInternal
+      }
+    }
+    fragment usePetitionComposeFieldReorder_PetitionFieldData on PetitionField {
       id
       visibility
+      isInternal
     }
   `,
 };

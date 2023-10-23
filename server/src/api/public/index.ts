@@ -146,6 +146,7 @@ import {
   buildSubmittedReplyContent,
   buildTagsFilter,
   containsGraphQLError,
+  flattenPetitionFields,
   getTags,
   getTaskResultFileUrl,
   idParam,
@@ -207,9 +208,11 @@ import {
   Subscription,
   TagPetition,
   Template,
+  UpdateFileReply,
   UpdatePetition,
   UpdatePetitionField,
   UpdateProfileFieldValueFormDataBody,
+  UpdateReply,
   UserWithOrg,
 } from "./schemas";
 
@@ -1702,7 +1705,7 @@ const replyBodyDescription = outdent`
     - For \`NUMBER\` fields, the reply must be a number.
     - For \`CHECKBOX\` fields, the reply must be an array of strings containing all the chosen options.
     - For \`DYNAMIC_SELECT\` fields, the reply must be an array of strings in which each position in the array represents the selected option in the same level. 
-`;
+  `;
 
 api
   .path("/petitions/:petitionId/fields/:fieldId/replies", {
@@ -1717,7 +1720,10 @@ api
         Submits a reply on a given field of the parallel.
       `,
       body: Body([JsonBodyContent(SubmitReply), FormDataBodyContent(SubmitFileReply)], {
-        description: replyBodyDescription,
+        description: outdent`
+        ${replyBodyDescription}
+        - For \`FIELD_GROUP\` fields, you need to first create an 'empty' reply on the field. Then call this endpoint again, passing the id of the child field and the id of the empty reply as the \`parentReplyId\`. Every reply with the same \`parentReplyId\` will be grouped together.
+        `,
       }),
       responses: {
         201: SuccessResponse(PetitionFieldReply),
@@ -1733,9 +1739,14 @@ api
       const { petition } = await client.request(SubmitReply_petitionDocument, {
         petitionId: params.petitionId,
       });
-      const field = petition?.fields.find((f) => f.id === params.fieldId);
+
+      const fields = flattenPetitionFields(petition?.fields ?? []);
+      const field = fields?.find((f) => f.id === params.fieldId);
 
       try {
+        if (field?.isChild && !isDefined(body.parentReplyId)) {
+          throw new BadRequestError("You must specify a parentReplyId for this field");
+        }
         const fieldType = field?.type;
         let newReply;
 
@@ -1749,6 +1760,7 @@ api
           } = await client.request(SubmitReply_createFileUploadReplyDocument, {
             petitionId: params.petitionId,
             fieldId: params.fieldId,
+            parentReplyId: body.parentReplyId,
             file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
           });
 
@@ -1774,10 +1786,15 @@ api
             fields: [
               {
                 id: params.fieldId,
-                content: buildSubmittedReplyContent(petition, params.fieldId, body),
+                content: buildSubmittedReplyContent(fields, params.fieldId, body),
+                parentReplyId: body.parentReplyId,
               },
             ],
           }));
+        }
+
+        if (isDefined(body.status) && fieldType === "FIELD_GROUP") {
+          throw new BadRequestError("You can't set the status of a FIELD_GROUP reply");
         }
 
         if (isDefined(body.status)) {
@@ -1797,9 +1814,11 @@ api
         return Ok(mapReplyResponse(newReply));
       } catch (error) {
         if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-          const { subcode } = error.response.errors?.[0].extensions?.extra as { subcode: string };
+          const extra = error.response.errors?.[0].extensions?.extra as
+            | { subcode: string }
+            | undefined;
           throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
-            subcode,
+            subcode: extra?.subcode,
           });
         } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
           throw new BadRequestError(
@@ -1833,7 +1852,7 @@ api
         409: ErrorResponse({ description: "The reply cannot be updated." }),
       },
       tags: ["Parallel replies"],
-      body: Body([JsonBodyContent(SubmitReply), FormDataBodyContent(SubmitFileReply)], {
+      body: Body([JsonBodyContent(UpdateReply), FormDataBodyContent(UpdateFileReply)], {
         description: replyBodyDescription,
       }),
     },
@@ -1842,9 +1861,14 @@ api
         petitionId: params.petitionId,
       });
 
-      const field = petition?.fields.find((f) => f.replies.some((r) => r.id === params.replyId));
+      const fields = flattenPetitionFields(petition?.fields ?? []);
+      const field = fields.find((f) => f.replies.some((r) => r.id === params.replyId));
 
       try {
+        if (field?.type === "FIELD_GROUP") {
+          throw new BadRequestError("You can't update a FIELD_GROUP reply");
+        }
+
         const fieldType = field?.type;
         let updatedReply;
 
@@ -1884,7 +1908,7 @@ api
             replies: [
               {
                 id: params.replyId,
-                content: buildSubmittedReplyContent(petition, params.fieldId, body),
+                content: buildSubmittedReplyContent(fields, params.fieldId, body),
               },
             ],
           }));
@@ -1932,6 +1956,10 @@ api
       } catch (error) {
         if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
           throw new ConflictError("The reply is already approved and cannot be deleted.");
+        } else if (containsGraphQLError(error, "DELETE_FIELD_GROUP_REPLY_ERROR")) {
+          throw new ConflictError(
+            "You can't delete the last reply of a required FIELD_GROUP field",
+          );
         }
         throw error;
       }

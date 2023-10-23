@@ -2,8 +2,7 @@ import { gql } from "@apollo/client";
 import { usePetitionMessagePlaceholderOptions_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { zip } from "remeda";
-import { useFieldIndices } from "./fieldIndices";
+import { useFieldsWithIndices } from "./fieldIndices";
 import { isFileTypeField } from "./isFileTypeField";
 import { PlaceholderOption, createPlaceholderPlugin } from "./slate/PlaceholderPlugin";
 
@@ -13,62 +12,62 @@ export function usePetitionMessagePlaceholderOptions({
   petition: usePetitionMessagePlaceholderOptions_PetitionBaseFragment;
 }): PlaceholderOption[] {
   const intl = useIntl();
-  const indices = useFieldIndices(petition.fields);
+  const fieldsWithIndices = useFieldsWithIndices(petition.fields);
   return useMemo(() => {
     return [
       ...[
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.contact-first-name",
+            id: "util.use-petition-message-placeholder-options.contact-first-name",
             defaultMessage: "Recipient first name",
           }),
           key: "contact-first-name",
         },
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.contact-last-name",
+            id: "util.use-petition-message-placeholder-options.contact-last-name",
             defaultMessage: "Recipient last name",
           }),
           key: "contact-last-name",
         },
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.contact-full-name",
+            id: "util.use-petition-message-placeholder-options.contact-full-name",
             defaultMessage: "Recipient full name",
           }),
           key: "contact-full-name",
         },
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.contact-email",
+            id: "util.use-petition-message-placeholder-options.contact-email",
             defaultMessage: "Recipient email",
           }),
           key: "contact-email",
         },
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.user-first-name",
+            id: "util.use-petition-message-placeholder-options.user-first-name",
             defaultMessage: "My first name",
           }),
           key: "user-first-name",
         },
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.user-last-name",
+            id: "util.use-petition-message-placeholder-options.user-last-name",
             defaultMessage: "My last name",
           }),
           key: "user-last-name",
         },
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.user-full-name",
+            id: "util.use-petition-message-placeholder-options.user-full-name",
             defaultMessage: "My full name",
           }),
           key: "user-full-name",
         },
         {
           text: intl.formatMessage({
-            id: "petition-message.placeholder-option.parallel-title",
+            id: "util.use-petition-message-placeholder-options.parallel-title",
             defaultMessage: "Parallel title",
           }),
           key: "petition-title",
@@ -77,14 +76,20 @@ export function usePetitionMessagePlaceholderOptions({
         ...item,
         data: {
           group: intl.formatMessage({
-            id: "petition-message.placeholder-option.contact-information",
+            id: "util.use-petition-message-placeholder-options.group-contact-information",
             defaultMessage: "Contact Information",
           }),
         },
       })),
-      ...zip(petition.fields, indices)
-        .filter(([field]) => field.isInternal && !field.isReadOnly && !isFileTypeField(field.type))
-        .map(([field, index]) => ({
+      ...fieldsWithIndices
+        .filter(
+          ([field]) =>
+            field.isInternal &&
+            !field.isReadOnly &&
+            !isFileTypeField(field.type) &&
+            field.type !== "FIELD_GROUP", // don't include FIELD_GROUP nor any of its children
+        )
+        .map(([field, fieldIndex]) => ({
           key: field.id,
           text:
             field.title ??
@@ -92,9 +97,9 @@ export function usePetitionMessagePlaceholderOptions({
           data: {
             petition,
             field,
-            index,
+            index: fieldIndex,
             group: intl.formatMessage({
-              id: "petition-message.placeholder-option.references",
+              id: "util.use-petition-message-placeholder-options.group-references",
               defaultMessage: "References",
             }),
           },

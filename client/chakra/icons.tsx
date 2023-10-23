@@ -2577,3 +2577,46 @@ export const ColumnsIcon = createIcon({
     </g>
   ),
 });
+
+export const FieldGroupIcon = createIcon({
+  displayName: "FieldGroupIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m8.05718 5.65718h13.02852" />
+      <path d="m8.05718 12.5143h13.02852" />
+      <path d="m2.91429 2.91429v18.17141" />
+      <path d="m8.05718 19.3715h13.02852" />
+    </g>
+  ),
+});
+
+export const UnlinkIcon = createIcon({
+  displayName: "UnlinkIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2.1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m17.5062 12.6725c.386-.4 1.1045-1.2644 1.7459-2.1831.6936-.99349 1.2999-1.70329 1.2917-2.6517s-.4739-2.26424-1.2917-3.08257-1.9241-1.2825-3.0806-1.29256-2.2707.43481-3.1026 1.2388l-1.7378 1.79197" />
+      <path d="m6.4789 11.3486-2.24073 2.1715c-.80347.8324-1.24805 1.9473-1.238 3.1046.01005 1.1572.47393 2.2642 1.29173 3.0826.8178.8183 1.92409 1.2825 3.08059 1.2925 1.1565.0101 2.27068-.4348 3.10261-1.2388l1.5085-1.5094 1.1115-1.1652" />
+      <path d="m8.00732 5.45496v-2.45496" />
+      <g>
+        <path d="m8.00732 5.45496v-2.45496" />
+        <path d="m15.6787 20.7369v-2.4549" />
+        <path d="m5.53231 8.83032h-2.47469" />
+        <path d="m20.9996 15.5815h-2.4747" />
+      </g>
+    </g>
+  ),
+});

@@ -1,11 +1,12 @@
-import { countBy, zip } from "remeda";
+import { countBy } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionReminder from "../../emails/emails/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
-import { evaluateFieldVisibility } from "../../util/fieldVisibility";
+import { applyFieldLogic } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
 import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
+import { completedFieldReplies } from "../../util/completedFieldReplies";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -26,11 +27,12 @@ export async function petitionReminder(
         `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`,
       );
     }
-    const [petition, granterData, contact, fields, originalMessage] = await Promise.all([
+    const [petition, granterData, contact, [composedFields], originalMessage] = await Promise.all([
       context.petitions.loadPetition(access.petition_id),
       context.users.loadUserDataByUserId(access.granter_id),
       access.contact_id ? context.contacts.loadContact(access.contact_id) : null,
-      context.petitions.loadFieldsForPetition(access.petition_id),
+
+      context.petitions.getComposedPetitionFields([access.petition_id]),
       context.petitions.loadOriginalMessageByPetitionAccess(access.id, access.petition_id),
     ]);
     if (!petition) {
@@ -48,29 +50,34 @@ export async function petitionReminder(
       throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
     }
     const remindersSent = await context.petitions.loadReminderCountForAccess(access.id);
-    const fieldIds = fields.map((f) => f.id);
-    const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
-    const repliesByFieldId = Object.fromEntries(
-      fieldIds.map((id, index) => [id, fieldReplies[index]]),
-    );
-    const fieldsWithReplies = fields.map((f) => ({
-      ...f,
-      replies: repliesByFieldId[f.id],
-    }));
 
-    const repliableFields = zip(
-      fieldsWithReplies,
-      evaluateFieldVisibility(fieldsWithReplies),
-    ).filter(
-      ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.is_internal === false,
-    );
+    const repliableFields = applyFieldLogic(composedFields)
+      .filter((f) => f.type !== "HEADING" && !f.is_internal)
+      .flatMap((f) => {
+        if (f.type === "FIELD_GROUP") {
+          return f.replies.flatMap((reply) =>
+            reply
+              .children!.filter((childReply) => !childReply.field.is_internal)
+              .map((childReply) => ({
+                ...childReply.field,
+                children: [],
+                replies: childReply.replies.map((r) => ({ ...r, children: [] })),
+              })),
+          );
+        } else {
+          return [f];
+        }
+      });
 
     const orgId = petition.org_id;
     const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
       orgId,
       "REMOVE_WHY_WE_USE_PARALLEL",
     );
-    const missingFieldCount = countBy(repliableFields, ([field]) => field.replies.length === 0);
+    const missingFieldCount = countBy(
+      repliableFields,
+      (field) => completedFieldReplies(field).length === 0,
+    );
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
 

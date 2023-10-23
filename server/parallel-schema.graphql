@@ -219,6 +219,7 @@ input CreateContactInput {
 input CreatePetitionFieldReplyInput {
   content: JSON
   id: GID!
+  parentReplyId: GID
 }
 
 input CreateProfileTypeFieldInput {
@@ -399,6 +400,7 @@ enum FeatureFlag {
   DOW_JONES_KYC
   ES_TAX_DOCUMENTS_FIELD
   EXPORT_CUATRECASAS
+  FIELD_GROUP
   GHOST_LOGIN
   HIDE_RECIPIENT_VIEW_CONTENTS
   ON_BEHALF_OF
@@ -838,7 +840,12 @@ type Mutation {
   """
   Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document
   """
-  createDowJonesKycReply(fieldId: GID!, petitionId: GID!, profileId: ID!): PetitionFieldReply!
+  createDowJonesKycReply(
+    fieldId: GID!
+    parentReplyId: GID
+    petitionId: GID!
+    profileId: ID!
+  ): PetitionFieldReply!
 
   """
   Creates a task for downloading a PDF file with the profile of an entity in DowJones
@@ -877,6 +884,7 @@ type Mutation {
   createFileUploadReply(
     fieldId: GID!
     file: FileUploadInput!
+    parentReplyId: GID
     petitionId: GID!
   ): FileUploadReplyResponse!
 
@@ -953,7 +961,12 @@ type Mutation {
   """
   Creates a petition field
   """
-  createPetitionField(petitionId: GID!, position: Int, type: PetitionFieldType!): PetitionField!
+  createPetitionField(
+    parentFieldId: GID
+    petitionId: GID!
+    position: Int
+    type: PetitionFieldType!
+  ): PetitionField!
 
   """
   Generates and returns a signed url to upload a field attachment to AWS S3
@@ -1313,6 +1326,12 @@ type Mutation {
     orgId: GID
     userGroupIds: [GID!]
   ): User!
+  linkPetitionFieldChildren(
+    childrenFieldIds: [GID!]!
+    force: Boolean
+    parentFieldId: GID!
+    petitionId: GID!
+  ): PetitionField!
   loginAs(userId: GID!): Result!
 
   """
@@ -1462,6 +1481,7 @@ type Mutation {
     data: FileUploadInput!
     fieldId: GID!
     keycode: ID!
+    parentReplyId: GID
   ): PublicCreateFileUploadReply!
 
   """
@@ -1588,7 +1608,11 @@ type Mutation {
   """
   Starts the completion of an async field
   """
-  publicStartAsyncFieldCompletion(fieldId: GID!, keycode: ID!): AsyncFieldCompletionResponse!
+  publicStartAsyncFieldCompletion(
+    fieldId: GID!
+    keycode: ID!
+    parentReplyId: GID
+  ): AsyncFieldCompletionResponse!
 
   """
   Update a petition field comment.
@@ -1813,7 +1837,11 @@ type Mutation {
   """
   Starts the completion of an async field
   """
-  startAsyncFieldCompletion(fieldId: GID!, petitionId: GID!): AsyncFieldCompletionResponse!
+  startAsyncFieldCompletion(
+    fieldId: GID!
+    parentReplyId: GID
+    petitionId: GID!
+  ): AsyncFieldCompletionResponse!
   startSignatureRequest(message: String, petitionId: GID!): PetitionSignatureRequest!
   subscribeToProfile(profileIds: [GID!]!, userIds: [GID!]!): [Profile!]!
 
@@ -1852,6 +1880,12 @@ type Mutation {
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [PetitionBase!]!
   unarchiveProfileType(profileTypeIds: [GID!]!): [ProfileType!]!
+  unlinkPetitionFieldChildren(
+    childrenFieldIds: [GID!]!
+    force: Boolean
+    parentFieldId: GID!
+    petitionId: GID!
+  ): PetitionField!
   unsubscribeFromProfile(profileIds: [GID!]!, userIds: [GID!]!): [Profile!]!
 
   """
@@ -1900,9 +1934,9 @@ type Mutation {
   updateFeatureFlags(featureFlags: [InputFeatureFlagNameValue!]!, orgId: GID!): Organization!
 
   """
-  Updates the positions of the petition fields
+  Updates the positions of the petition fields. If parentFieldId is defined, it will update the positions of it's children fields.
   """
-  updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!
+  updateFieldPositions(fieldIds: [GID!]!, parentFieldId: GID, petitionId: GID!): PetitionBase!
 
   """
   Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation.
@@ -3300,6 +3334,11 @@ type PetitionField {
   A list of files attached to this field.
   """
   attachments: [PetitionFieldAttachment!]!
+
+  """
+  The children of this field.
+  """
+  children: [PetitionField!]
   commentCount: Int!
 
   """
@@ -3352,6 +3391,7 @@ type PetitionField {
   The options of the petition field.
   """
   options: JSONObject!
+  parent: PetitionField
   petition: PetitionBase!
   position: Int!
 
@@ -3482,6 +3522,14 @@ type PetitionFieldCommentUserMention {
   user: User
 }
 
+"""
+References the replies of a FIELD_GROUP field on a specific field and group
+"""
+type PetitionFieldGroupChildReply {
+  field: PetitionField!
+  replies: [PetitionFieldReply!]!
+}
+
 type PetitionFieldMini {
   """
   The ID of the petition field.
@@ -3533,6 +3581,8 @@ type PetitionFieldProgress {
 A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
+  children: [PetitionFieldGroupChildReply!]
+
   """
   The content of the reply.
   """
@@ -3568,11 +3618,12 @@ type PetitionFieldReply implements Timestamps {
   Metadata for this reply.
   """
   metadata: JSONObject!
+  parent: PetitionFieldReply
 
   """
   When the reply was created or last updated
   """
-  repliedAt: DateTime!
+  repliedAt: DateTime
 
   """
   The person that created the reply or the last person that edited the reply.
@@ -3648,6 +3699,11 @@ enum PetitionFieldType {
   A tax documents/info field.
   """
   ES_TAX_DOCUMENTS
+
+  """
+  A group of fields
+  """
+  FIELD_GROUP
 
   """
   A file upload field.
@@ -5131,6 +5187,11 @@ type PublicPetitionField {
   A list of files attached to this field.
   """
   attachments: [PetitionFieldAttachment!]!
+
+  """
+  The children of this field.
+  """
+  children: [PublicPetitionField!]
   commentCount: Int!
 
   """
@@ -5173,6 +5234,7 @@ type PublicPetitionField {
   The options of the petition field.
   """
   options: JSONObject!
+  parent: PublicPetitionField
   petition: PublicPetition!
 
   """
@@ -5235,6 +5297,14 @@ type PublicPetitionFieldComment {
 }
 
 """
+References the replies of a FIELD_GROUP field on a specific field and group
+"""
+type PublicPetitionFieldGroupChildReply {
+  field: PublicPetitionField!
+  replies: [PublicPetitionFieldReply!]!
+}
+
+"""
 The progress of a petition.
 """
 type PublicPetitionFieldProgress {
@@ -5258,6 +5328,8 @@ type PublicPetitionFieldProgress {
 A reply to a petition field
 """
 type PublicPetitionFieldReply implements Timestamps {
+  children: [PublicPetitionFieldGroupChildReply!]
+
   """
   The public content of the reply
   """
@@ -5274,6 +5346,7 @@ type PublicPetitionFieldReply implements Timestamps {
   """
   id: GID!
   isAnonymized: Boolean!
+  parent: PublicPetitionFieldReply
 
   """
   The status of the petition field reply.

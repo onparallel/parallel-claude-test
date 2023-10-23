@@ -42,7 +42,7 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useGetPageFields } from "@parallel/utils/useGetPageFields";
+import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
@@ -88,9 +88,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const { pages, visibility } = useGetPageFields(petition.fields, {
-    hideInternalFields: true,
-  });
+  const pages = useGetPetitionPages(petition.fields, { hideInternalFields: true });
   const fields = pages[currentPage - 1];
   const tone = petition.tone;
 
@@ -99,7 +97,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     (petition.completingMessageBody || petition.completingMessageSubject);
 
   const showErrorDialog = useErrorDialog();
-  const [finalized, setFinalized] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
   const showConfirmPetitionSignersDialog = useRecipientViewConfirmPetitionSignersDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
@@ -108,7 +106,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const handleFinalize = useCallback(
     async function () {
       try {
-        setFinalized(true);
+        setShowErrors(true);
         if (canFinalize) {
           let confirmSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
@@ -151,6 +149,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           router.push(
             `/petition/${keycode}/${field.page}?${new URLSearchParams({
               field: field.id,
+              ...(field.parentReplyId ? { parentReply: field.parentReplyId } : {}),
             })}`,
           );
         }
@@ -172,8 +171,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     [
       canFinalize,
       incompleteFields?.[0]?.id,
+      incompleteFields?.[0]?.parentReplyId,
       incompleteFields?.[0]?.page,
-      visibility,
       granter,
       router.query,
       pending,
@@ -292,16 +291,11 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                         return (
                           <RecipientViewPetitionField
                             key={field.id}
-                            petitionId={petition.id}
                             keycode={keycode}
                             access={access!}
                             field={field}
                             isDisabled={petition.status === "CLOSED"}
-                            isInvalid={
-                              finalized &&
-                              completedFieldReplies(field).length === 0 &&
-                              !field.optional
-                            }
+                            showErrors={showErrors && !canFinalize}
                           />
                         );
                       })}
@@ -437,7 +431,7 @@ const _fragments = {
         fields {
           id
           ...RecipientView_PublicPetitionField
-          ...useGetPageFields_PublicPetitionField
+          ...useGetPetitionPages_PublicPetitionField
         }
         signatureConfig {
           review
@@ -473,7 +467,7 @@ const _fragments = {
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
       ${RecipientViewFooter.fragments.PublicPetition}
-      ${useGetPageFields.fragments.PublicPetitionField}
+      ${useGetPetitionPages.fragments.PublicPetitionField}
       ${useLiquidScope.fragments.PublicPetition}
       ${useCompletingMessageDialog.fragments.PublicPetition}
       ${RecipientViewPetitionStatusAlert.fragments.PublicPetition}

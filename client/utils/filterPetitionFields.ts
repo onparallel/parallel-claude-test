@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 import { filterPetitionFields_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { zip } from "remeda";
 import { PetitionFieldIndex } from "./fieldIndices";
-import { zipX } from "./zipX";
+import { FieldLogic } from "./fieldLogic/useFieldLogic";
 import { isFileTypeField } from "./isFileTypeField";
 
 export type PetitionFieldFilterType =
@@ -19,6 +20,8 @@ type FilterPetitionFieldResult<T extends filterPetitionFields_PetitionFieldFragm
       type: "FIELD";
       field: T;
       fieldIndex: PetitionFieldIndex;
+      fieldLogic: FieldLogic | undefined;
+      childrenFieldIndices?: string[];
     }
   | { type: "HIDDEN"; count: number };
 
@@ -32,19 +35,17 @@ export const defaultFieldsFilter = {
 };
 
 export function filterPetitionFields<T extends filterPetitionFields_PetitionFieldFragment>(
-  fields: T[],
-  fieldIndices: PetitionFieldIndex[],
-  fieldVisibility: boolean[],
+  fieldsWithIndices: [field: T, fieldIndex: PetitionFieldIndex, childrenFieldIndices?: string[]][],
+  fieldLogic: FieldLogic[] | undefined,
   filter: PetitionFieldFilter = defaultFieldsFilter,
 ): FilterPetitionFieldResult<T>[] {
   const filtered = [] as FilterPetitionFieldResult<T>[];
-  for (const [field, fieldIndex, isVisible = true] of zipX(
-    fields,
-    fieldIndices,
-    fieldVisibility ?? [],
+  for (const [[field, fieldIndex, childrenFieldIndices], _fieldLogic] of zip(
+    fieldsWithIndices,
+    fieldLogic ?? fieldsWithIndices.map(() => undefined),
   )) {
     const last = filtered[filtered.length - 1];
-    if (!isVisible) {
+    if (!(_fieldLogic?.isVisible ?? true)) {
       if (last?.type === "HIDDEN") {
         last.count += 1;
       } else {
@@ -79,7 +80,13 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
         conditions.push(field.comments.length > 0);
       }
       if (conditions.every((x) => x)) {
-        filtered.push({ type: "FIELD", field, fieldIndex });
+        filtered.push({
+          type: "FIELD",
+          field,
+          fieldIndex,
+          childrenFieldIndices,
+          fieldLogic: _fieldLogic,
+        });
       }
     }
   }

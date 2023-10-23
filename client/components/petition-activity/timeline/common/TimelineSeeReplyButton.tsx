@@ -13,18 +13,27 @@ interface TimelineSeeReplyButton extends ButtonOptions, ThemingProps<"Button"> {
 
 export function TimelineSeeReplyButton({ field, replyId, ...props }: TimelineSeeReplyButton) {
   const buildUrlToSection = useBuildUrlToPetitionSection();
-  const hasReply = field?.replies.some((r) => r.id === replyId) ?? false;
+  const reply = field?.replies.find((r) => r.id === replyId);
 
   return isDefined(field) ? (
-    hasReply ? (
-      <NakedLink href={buildUrlToSection("replies", { field: field.id })}>
+    reply !== undefined ? (
+      <NakedLink
+        href={
+          reply!.parent?.id
+            ? buildUrlToSection("replies", { parentReply: reply.parent.id })
+            : buildUrlToSection("replies", { field: field.id })
+        }
+      >
         <Button as="a" size="sm" variant="outline" background="white" {...props}>
-          <FormattedMessage id="timeline.see" defaultMessage="See" />
+          <FormattedMessage id="component.timeline-see-reply-button.see" defaultMessage="See" />
         </Button>
       </NakedLink>
     ) : (
       <Text as="span" textStyle="hint">
-        <FormattedMessage id="timeline.reply-deleted" defaultMessage="Reply deleted" />
+        <FormattedMessage
+          id="component.timeline-see-reply-button.reply-deleted"
+          defaultMessage="Reply deleted"
+        />
       </Text>
     )
   ) : null;
@@ -35,13 +44,16 @@ TimelineSeeReplyButton.fragments = {
     fragment TimelineSeeReplyButton_PetitionField on PetitionField {
       id
       replies {
-        id
+        ...TimelineSeeReplyButton_PetitionFieldReply
       }
     }
   `,
   PetitionFieldReply: gql`
     fragment TimelineSeeReplyButton_PetitionFieldReply on PetitionFieldReply {
       id
+      parent {
+        id
+      }
     }
   `,
 };

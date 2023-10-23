@@ -20,24 +20,56 @@ export function TimelineReplyCreatedEvent({
   event: { createdBy, field, reply, createdAt },
   userId,
 }: TimelineReplyCreatedEventProps) {
+  const isChildren = field?.parent?.id !== undefined;
+
+  let message = isChildren ? (
+    <FormattedMessage
+      id="component.timeline-reply-created-event.description-children-of-group"
+      defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}"
+      values={{
+        userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
+        createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+        field: <PetitionFieldReference field={field} />,
+        parentField: <PetitionFieldReference field={field.parent!} />,
+        timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+      }}
+    />
+  ) : (
+    <FormattedMessage
+      id="component.timeline-reply-created-event.description"
+      defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
+      values={{
+        userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
+        createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+        field: <PetitionFieldReference field={field} />,
+        timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+      }}
+    />
+  );
+
+  if (field?.type === "FIELD_GROUP") {
+    message = (
+      <FormattedMessage
+        id="component.timeline-reply-created-event.description-field-group"
+        defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} added a group to the field {field} {timeAgo}"
+        values={{
+          userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
+          createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+
+          field: <PetitionFieldReference field={field} />,
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+        }}
+      />
+    );
+  }
+
   return (
     <TimelineItem
       icon={<TimelineIcon icon={PlusCircleIcon} color="gray.600" size="18px" />}
       paddingY={2}
     >
       <HStack spacing={2}>
-        <Text>
-          <FormattedMessage
-            id="timeline.reply-created-description"
-            defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
-            values={{
-              userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
-              createdBy: <UserOrContactReference userOrAccess={createdBy} />,
-              field: <PetitionFieldReference field={field} />,
-              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
-            }}
-          />
-        </Text>
+        <Text>{message}</Text>
         <TimelineSeeReplyButton field={field} replyId={reply?.id} />
       </HStack>
     </TimelineItem>
@@ -48,6 +80,13 @@ TimelineReplyCreatedEvent.fragments = {
   ReplyCreatedEvent: gql`
     fragment TimelineReplyCreatedEvent_ReplyCreatedEvent on ReplyCreatedEvent {
       field {
+        id
+        type
+        options
+        parent {
+          id
+          ...PetitionFieldReference_PetitionField
+        }
         ...TimelineSeeReplyButton_PetitionField
         ...PetitionFieldReference_PetitionField
       }

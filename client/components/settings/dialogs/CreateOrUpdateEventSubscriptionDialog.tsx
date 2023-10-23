@@ -38,18 +38,17 @@ import {
   PetitionEventType,
 } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, OptionProps, SingleValueProps } from "react-select";
 import Select from "react-select/async";
-import { isDefined, zip } from "remeda";
+import { isDefined } from "remeda";
 
 interface CreateOrUpdateEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment;
@@ -261,7 +260,6 @@ export function CreateOrUpdateEventSubscriptionDialog({
   });
 
   const fields = data?.petition?.fields ?? [];
-  const indices = useFieldIndices(fields);
 
   useEffectSkipFirst(() => {
     // reset fields when template changes
@@ -287,11 +285,6 @@ export function CreateOrUpdateEventSubscriptionDialog({
       }
     });
   }, [eventSubscription?.fromTemplateFields, fields]);
-
-  const { _fields, _indices } = useMemo(() => {
-    const x = zip(fields, indices).filter(([f]) => !f.isReadOnly);
-    return { _fields: x.map(([f]) => f), _indices: x.map(([, i]) => i) };
-  }, [fields, indices]);
 
   return (
     <ConfirmDialog
@@ -528,8 +521,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
                       <PetitionFieldSelect
                         isMulti
                         value={value}
-                        fields={_fields}
-                        indices={_indices}
+                        fields={fields}
                         onChange={onChange}
                         placeholder={intl.formatMessage({
                           id: "component.create-event-subscription-dialog.filter-fields-placeholder",

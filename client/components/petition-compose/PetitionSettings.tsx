@@ -76,8 +76,8 @@ import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
 } from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
-import { SettingsRowButton } from "./SettingsRowButton";
-import { SettingsRowSwitch } from "./SettingsRowSwitch";
+import { SettingsRowButton } from "./settings/SettingsRowButton";
+import { SettingsRowSwitch } from "./settings/SettingsRowSwitch";
 import {
   CompliancePeriodDialog,
   useCompliancePeriodDialog,

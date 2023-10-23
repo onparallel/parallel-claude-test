@@ -75,7 +75,7 @@ export const LandingTemplate = objectType({
     });
     t.boolean("hasConditionals", {
       resolve: async (o, _, ctx) => {
-        const fields = await ctx.petitions.loadFieldsForPetition(o.id);
+        const fields = await ctx.petitions.loadAllFieldsByPetitionId(o.id);
         return fields.some((f) => isDefined(f.visibility));
       },
     });

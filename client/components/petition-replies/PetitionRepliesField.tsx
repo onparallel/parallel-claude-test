@@ -11,8 +11,8 @@ import {
   ButtonOptions,
   Center,
   Grid,
-  Heading,
   HStack,
+  Heading,
   IconButton,
   Stack,
   Text,
@@ -30,16 +30,19 @@ import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   PetitionFieldReplyStatus,
-  PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
+  PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { PetitionFieldFilter, filterPetitionFields } from "@parallel/utils/filterPetitionFields";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { zip } from "remeda";
 import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -47,19 +50,22 @@ import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
+import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
 
-export interface PetitionRepliesFieldProps extends BoxProps {
+export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   petitionId: string;
   field: PetitionRepliesField_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
-  isVisible: boolean;
+  childrenFieldIndices: string[] | undefined;
   isActive: boolean;
+  filter: PetitionFieldFilter;
+  fieldLogic: FieldLogicResult;
   onAction: (
     action: PetitionRepliesFieldAction,
     reply: PetitionRepliesField_PetitionFieldReplyFragment,
   ) => void;
   onToggleComments: () => void;
-  onUpdateReplyStatus: (replyId: string, status: PetitionFieldReplyStatus) => void;
+  onUpdateReplyStatus: (fieldId: string, replyId: string, status: PetitionFieldReplyStatus) => void;
   isDisabled?: boolean;
 }
 
@@ -69,8 +75,10 @@ export const PetitionRepliesField = Object.assign(
       petitionId,
       field,
       fieldIndex,
-      isVisible,
+      childrenFieldIndices,
       isActive: isShowingComments,
+      filter,
+      fieldLogic,
       onAction,
       onToggleComments,
       onUpdateReplyStatus,
@@ -186,12 +194,271 @@ export const PetitionRepliesField = Object.assign(
           ) : null}
         </Box>
       </Grid>
+    ) : field.type === "FIELD_GROUP" ? (
+      <Box
+        display="flex"
+        position="relative"
+        flexDirection="column"
+        as="section"
+        ref={ref as any}
+        {...props}
+      >
+        <Grid
+          paddingLeft={{ base: 4, md: 6 }}
+          paddingRight={4}
+          paddingY={2}
+          templateColumns="32px 10px 1fr 8px auto"
+          gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
+          sx={{
+            "&:focus-within, &:hover": {
+              ".edit-field-button": {
+                opacity: 1,
+              },
+            },
+          }}
+        >
+          <Box gridArea="comments">
+            <CommentsButton
+              data-action="see-field-comments"
+              isActive={isShowingComments}
+              commentCount={field.comments.length}
+              hasUnreadComments={field.comments.some((c) => c.isUnread)}
+              onClick={onToggleComments}
+            />
+          </Box>
+          <Box position="relative" gridArea="index">
+            {!field.optional ? (
+              <Tooltip
+                placement="bottom"
+                label={intl.formatMessage({
+                  id: "generic.required-field",
+                  defaultMessage: "Required field",
+                })}
+              >
+                <Box
+                  paddingLeft={{ base: 2.5, md: 0 }}
+                  width={4}
+                  height={4}
+                  textAlign="center"
+                  fontSize="xl"
+                  color="red.600"
+                  userSelect="none"
+                  position="absolute"
+                  left={0}
+                  top={0}
+                  transform={{
+                    base: "translate(-1.25rem, 50%)",
+                    md: "translate(-1.125rem, 50%)",
+                  }}
+                >
+                  <Box position="relative" bottom={2} pointerEvents="none">
+                    *
+                  </Box>
+                </Box>
+              </Tooltip>
+            ) : null}
+            <PetitionFieldTypeIndicator
+              as="span"
+              marginTop="2px"
+              type={field.type}
+              fieldIndex={fieldIndex}
+              hideIcon
+            />
+          </Box>
+          <HStack gridArea="heading" alignItems="center">
+            <Heading
+              fontSize="md"
+              as="h4"
+              {...(field.title
+                ? { overflowWrap: "anywhere", fontWeight: 600 }
+                : { textStyle: "hint", whiteSpace: "nowrap" })}
+            >
+              {field.isInternal ? (
+                <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
+              ) : null}
+              {field.title || (
+                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+              )}
+            </Heading>
+            {goToComposeButton}
+          </HStack>
+
+          <Box gridArea="desc">
+            {field.description ? (
+              <FieldDescription
+                description={field.description}
+                marginTop={1}
+                color="gray.600"
+                fontSize="sm"
+                overflowWrap="anywhere"
+              />
+            ) : null}
+            {field.attachments.length ? (
+              <Box marginTop={2} paddingY={1}>
+                <PetitionRepliesFieldAttachments
+                  attachments={field.attachments}
+                  onAttachmentClick={handleAttachmentClick}
+                />
+              </Box>
+            ) : null}
+          </Box>
+        </Grid>
+        <Stack paddingLeft={10} spacing={3}>
+          {field.replies.length > 0 ? (
+            field.replies.map((reply, index) => {
+              return (
+                <Card
+                  id={`reply-${reply.id}`}
+                  key={reply.id}
+                  padding={4}
+                  paddingLeft={6}
+                  as={Stack}
+                  layerStyle="highlightable"
+                >
+                  <HStack spacing={3}>
+                    <Text>
+                      {`${
+                        field.options.groupName ??
+                        intl.formatMessage({
+                          id: "generic.group-name-fallback-reply",
+                          defaultMessage: "Reply",
+                        })
+                      } ${index + 1}`}
+                    </Text>
+                  </HStack>
+                  <Stack spacing={3}>
+                    {filterPetitionFields(
+                      zip(
+                        reply.children!.map(({ field, replies }) => ({
+                          ...field,
+                          childReplies: replies,
+                        })),
+                        childrenFieldIndices!,
+                      ),
+                      fieldLogic.groupChildrenLogic![index],
+                    ).map((x) => {
+                      return x.type === "FIELD" ? (
+                        <Stack key={x.field.id}>
+                          <Box>
+                            <Box position="relative">
+                              {x.field.optional ? null : (
+                                <Tooltip
+                                  placement="bottom"
+                                  label={intl.formatMessage({
+                                    id: "generic.required-field",
+                                    defaultMessage: "Required field",
+                                  })}
+                                >
+                                  <Box
+                                    paddingLeft={{ base: 2.5, md: 0 }}
+                                    width={4}
+                                    height={4}
+                                    textAlign="center"
+                                    fontSize="xl"
+                                    color="red.600"
+                                    userSelect="none"
+                                    position="absolute"
+                                    left={0}
+                                    top={0}
+                                    transform={{
+                                      base: "translate(-1.25rem, 25%)",
+                                      md: "translate(-1rem, 25%)",
+                                    }}
+                                  >
+                                    <Box position="relative" bottom={2} pointerEvents="none">
+                                      *
+                                    </Box>
+                                  </Box>
+                                </Tooltip>
+                              )}
+                              <Heading
+                                fontSize="md"
+                                as="h4"
+                                {...(x.field.title
+                                  ? { overflowWrap: "anywhere", fontWeight: 500 }
+                                  : { textStyle: "hint", whiteSpace: "nowrap" })}
+                              >
+                                {x.field.title || (
+                                  <FormattedMessage
+                                    id="generic.untitled-field"
+                                    defaultMessage="Untitled field"
+                                  />
+                                )}
+                              </Heading>
+                            </Box>
+                            <Box>
+                              {x.field.description ? (
+                                <FieldDescription
+                                  description={x.field.description}
+                                  marginTop={1}
+                                  color="gray.600"
+                                  fontSize="sm"
+                                  overflowWrap="anywhere"
+                                />
+                              ) : null}
+                              {x.field.attachments.length ? (
+                                <Box marginTop={2} paddingY={1}>
+                                  <PetitionRepliesFieldAttachments
+                                    attachments={x.field.attachments}
+                                    onAttachmentClick={handleAttachmentClick}
+                                  />
+                                </Box>
+                              ) : null}
+                            </Box>
+                          </Box>
+                          {x.field.type === "HEADING" ? null : (
+                            <Stack spacing={4}>
+                              {x.field.childReplies.length ? (
+                                x.field.childReplies.map((reply) => (
+                                  <PetitionRepliesFieldReply
+                                    key={reply.id}
+                                    reply={reply}
+                                    onAction={(action) => onAction(action, reply)}
+                                    onUpdateStatus={(status) =>
+                                      onUpdateReplyStatus(x.field.id, reply.id, status)
+                                    }
+                                    isDisabled={isDisabled}
+                                  />
+                                ))
+                              ) : (
+                                <Box paddingTop={3} paddingBottom={3}>
+                                  <Text textStyle="hint" textAlign="center">
+                                    <FormattedMessage
+                                      id="component.petition-replies-field.no-replies"
+                                      defaultMessage="There are no replies to this field yet"
+                                    />
+                                  </Text>
+                                </Box>
+                              )}
+                            </Stack>
+                          )}
+                        </Stack>
+                      ) : (
+                        <PetitionRepliesFilteredFields key={index} count={x.count} />
+                      );
+                    })}
+                  </Stack>
+                </Card>
+              );
+            })
+          ) : (
+            <Box paddingY={4}>
+              <Text textStyle="hint" textAlign="center">
+                <FormattedMessage
+                  id="component.petition-replies-field.no-replies"
+                  defaultMessage="There are no replies to this field yet"
+                />
+              </Text>
+            </Box>
+          )}
+        </Stack>
+      </Box>
     ) : (
       <Card
         ref={ref}
         layerStyle="highlightable"
         display="flex"
-        backgroundColor={isVisible ? "white" : "gray.50"}
+        backgroundColor="white"
         flexDirection="column"
         position="relative"
         paddingY={4}
@@ -239,7 +506,10 @@ export const PetitionRepliesField = Object.assign(
                   position="absolute"
                   left={0}
                   top={0}
-                  transform="translate(-1.125rem, 50%)"
+                  transform={{
+                    base: "translate(-1.25rem, 50%)",
+                    md: "translate(-1.125rem, 50%)",
+                  }}
                 >
                   <Box position="relative" bottom={2} pointerEvents="none">
                     *
@@ -319,27 +589,18 @@ export const PetitionRepliesField = Object.assign(
                   key={reply.id}
                   reply={reply}
                   onAction={(action) => onAction(action, reply)}
-                  onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
+                  onUpdateStatus={(status) => onUpdateReplyStatus(field.id, reply.id, status)}
                   isDisabled={isDisabled}
                 />
               ))}
             </Stack>
           </Box>
-        ) : isVisible ? (
+        ) : (
           <Box paddingY={4}>
             <Text textStyle="hint" textAlign="center">
               <FormattedMessage
                 id="component.petition-replies-field.no-replies"
                 defaultMessage="There are no replies to this field yet"
-              />
-            </Text>
-          </Box>
-        ) : (
-          <Box paddingY={4}>
-            <Text textStyle="hint" textAlign="center">
-              <FormattedMessage
-                id="component.petition-replies-field.conditions-not-met"
-                defaultMessage="Visibility conditions for this field are not met"
               />
             </Text>
           </Box>
@@ -376,9 +637,36 @@ export const PetitionRepliesField = Object.assign(
         fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
           id
           ...PetitionRepliesFieldReply_PetitionFieldReply
+          children {
+            field {
+              id
+              type
+              title
+              description
+              optional
+              options
+              isInternal
+              comments {
+                id
+                isUnread
+                createdAt
+              }
+              attachments {
+                id
+                file {
+                  ...FileAttachmentButton_FileUpload
+                }
+              }
+              ...filterPetitionFields_PetitionField
+            }
+            replies {
+              ...PetitionRepliesFieldReply_PetitionFieldReply
+            }
+          }
         }
         ${FileAttachmentButton.fragments.FileUpload}
         ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
+        ${filterPetitionFields.fragments.PetitionField}
       `,
     },
     mutations: [

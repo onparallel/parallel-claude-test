@@ -19,11 +19,11 @@ import {
   RecipientViewContentsCard_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
+import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -54,14 +54,15 @@ export const RecipientViewContentsCard = Object.assign(
     const router = useRouter();
     const { query } = router;
     const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
+    const allFields = useMemo(() => fields.flatMap((f) => [f, ...(f.children ?? [])]), [fields]);
 
     useEffect(() => {
       if (isDefined(router.query.field)) {
-        const fieldId = router.query.field;
-        const field = (fields as PetitionFieldSelection[]).find((f) => f.id === fieldId);
+        const { field: fieldId, parentReply: parentReplyId } = router.query;
 
+        const field = (allFields as PetitionFieldSelection[]).find((f) => f.id === fieldId);
         if (field) {
-          handleFocusField(field);
+          handleFocusField(field, parentReplyId as string | undefined);
         }
       }
     }, [router.query]);
@@ -82,17 +83,22 @@ export const RecipientViewContentsCard = Object.assign(
       }
     }, [router.query]);
 
-    const handleFocusField = (field: PetitionFieldSelection) => {
+    const handleFocusField = (field: PetitionFieldSelection, parentReplyId?: string) => {
       const replies =
         usePreviewReplies && field.__typename === "PetitionField"
-          ? field.previewReplies
-          : field.replies;
+          ? field.previewReplies.filter((r) => r.parent?.id === parentReplyId)
+          : field.replies.filter((r) => r.parent?.id === parentReplyId);
 
-      const focusFieldContainer = field.type === "HEADING" || isFileTypeField(field.type);
-      let id =
-        focusFieldContainer || field.type === "CHECKBOX"
-          ? `field-${field.id}`
-          : `reply-${field.id}-${replies[0]?.id ?? "new"}`;
+      const focusFieldContainer =
+        ["HEADING", "FIELD_GROUP"].includes(field.type) || isFileTypeField(field.type);
+      let id = "";
+      if (focusFieldContainer || field.type === "CHECKBOX") {
+        id = `field-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}`;
+      } else {
+        id = `reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}${
+          replies[0]?.id ? `-${replies[0].id}` : "-new"
+        }`;
+      }
 
       if (field.type === "DYNAMIC_SELECT" && replies.length) {
         id += "-0";
@@ -324,14 +330,17 @@ export const RecipientViewContentsCard = Object.assign(
             replies {
               id
               status
+              parent {
+                id
+              }
             }
             commentCount
             unreadCommentCount
             hasCommentsEnabled
-            ...useFieldVisibility_PublicPetitionField
+            ...useFieldLogic_PublicPetitionField
             ...completedFieldReplies_PublicPetitionField
           }
-          ${useFieldVisibility.fragments.PublicPetitionField}
+          ${useFieldLogic.fragments.PublicPetitionField}
           ${completedFieldReplies.fragments.PublicPetitionField}
         `;
       },
@@ -359,18 +368,24 @@ export const RecipientViewContentsCard = Object.assign(
             previewReplies @client {
               id
               status
+              parent {
+                id
+              }
             }
             replies {
               id
               status
+              parent {
+                id
+              }
             }
             commentCount
             unreadCommentCount
             hasCommentsEnabled
-            ...useFieldVisibility_PetitionField
+            ...useFieldLogic_PetitionField
             ...completedFieldReplies_PetitionField
           }
-          ${useFieldVisibility.fragments.PetitionField}
+          ${useFieldLogic.fragments.PetitionField}
           ${completedFieldReplies.fragments.PetitionField}
         `;
       },
@@ -425,9 +440,9 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
     currentFieldCommentCount: number;
     currentFieldHasUnreadComments: boolean;
   }[] = [];
-  const visibility = useFieldVisibility(fields, usePreviewReplies);
+  const logic = useFieldLogic(fields, usePreviewReplies);
   const _fields: T = [] as any;
-  for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
+  for (const [field, { isVisible }] of zip(fields as PetitionFieldSelection[], logic)) {
     const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
 
     if (

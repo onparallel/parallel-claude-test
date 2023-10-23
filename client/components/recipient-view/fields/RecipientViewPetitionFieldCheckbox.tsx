@@ -172,7 +172,7 @@ export function RecipientViewPetitionFieldCheckbox({
           <Checkbox
             key={index}
             data-value={option}
-            isInvalid={isRejected}
+            isInvalid={isRejected || isInvalid}
             isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
             isChecked={checkedItems.includes(option)}
             onChange={(e) => {

@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined, partition, uniq, zip } from "remeda";
+import { isDefined, partition, uniq, zip } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -187,31 +187,42 @@ export function fieldsAreNotInternal<
 export function fieldCanBeReplied<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
   TOverwrite extends Arg<TypeName, FieldName, boolean | null | undefined>,
 >(
-  fieldIdArg: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+  fieldsArg: (
+    args: core.ArgsValue<TypeName, FieldName>,
+  ) => MaybeArray<{ id: number; parentReplyId?: number | null }>,
   overWriteArg?: TOverwrite,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldIds = uniq(
-      unMaybeArray(
-        (typeof fieldIdArg === "function"
-          ? (fieldIdArg as any)(args)
-          : (args as any)[fieldIdArg]) as MaybeArray<number>,
-      ),
+    const _fields = unMaybeArray(fieldsArg(args));
+
+    const [_fieldsNoParent, _fieldsWithParent] = partition(
+      _fields,
+      (f) => !isDefined(f.parentReplyId),
     );
 
     const overwriteExisting = isDefined(overWriteArg)
       ? (args[overWriteArg] as boolean | null | undefined) ?? false
       : false;
 
-    const [fields, fieldsReplies] = await Promise.all([
-      ctx.petitions.loadField(fieldIds),
-      ctx.petitions.loadRepliesForField(fieldIds),
-    ]);
+    const [fieldsNoParent, fieldsNoParentReplies, fieldsWithParent, fieldsChildReplies] =
+      await Promise.all([
+        ctx.petitions.loadField(_fieldsNoParent.map((f) => f.id)),
+        ctx.petitions.loadRepliesForField(_fieldsNoParent.map((f) => f.id)),
+        ctx.petitions.loadField(_fieldsWithParent.map((f) => f.id)),
+        ctx.petitions.loadPetitionFieldGroupChildReplies.raw(
+          _fieldsWithParent.map((f) => ({
+            petitionFieldId: f.id,
+            parentPetitionFieldReplyId: f.parentReplyId!,
+          })),
+        ),
+      ]);
 
-    for (const [field, replies] of zip(fields, fieldsReplies)) {
+    for (const [field, replies] of [
+      ...zip(fieldsNoParent, fieldsNoParentReplies),
+      ...zip(fieldsWithParent, fieldsChildReplies),
+    ]) {
       if (!field || (!field.multiple && replies.length > 0 && !overwriteExisting)) {
         throw new ApolloError(
           "The field is already replied and does not accept multiple replies",
@@ -227,7 +238,7 @@ export function fieldCanBeReplied<
 export function fieldHasType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argFieldId: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
   fieldType: MaybeArray<PetitionFieldType>,
@@ -273,14 +284,19 @@ export function replyIsForFieldOfType<
       ),
     );
 
-    const fields = await ctx.petitions.loadFieldForReply(replyIds);
+    const [fields, replies] = await Promise.all([
+      ctx.petitions.loadFieldForReply(replyIds),
+      ctx.petitions.loadFieldReply(replyIds),
+    ]);
+
     const validFieldTypes = unMaybeArray(fieldType);
 
     const invalidField = fields.find((field) => !validFieldTypes.includes(field!.type));
+    const invalidReply = replies.find((reply) => !validFieldTypes.includes(reply!.type));
 
-    if (invalidField) {
+    if (invalidField || invalidReply) {
       throw new ApolloError(
-        `Expected ${validFieldTypes.join(" or ")}, got ${invalidField.type}`,
+        `Expected ${validFieldTypes.join(" or ")}, got ${(invalidField || invalidReply)!.type}`,
         "INVALID_FIELD_TYPE_ERROR",
       );
     }
@@ -376,6 +392,10 @@ export function repliesBelongsToPetition<
             : (args as any)[argNameReplyIds]) as MaybeArray<number>,
         ),
       );
+
+      if (replyIds.length === 0) {
+        return true;
+      }
 
       return await ctx.petitions.repliesBelongsToPetition(petitionId, replyIds);
     } catch {}
@@ -529,9 +549,22 @@ export function petitionHasRepliableFields<
   return async (_, args, ctx) => {
     try {
       const petitionId = args[argNamePetitionId] as unknown as number;
-      const fields = await ctx.petitions.loadFieldsForPetition(petitionId);
+      const fields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
 
-      if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
+      const [rootFields, childrenFields] = partition(
+        fields,
+        (f) => f.parent_petition_field_id === null,
+      );
+
+      // at least 1 field with type !== HEADING
+      if (rootFields.every((f) => f.type === "HEADING")) {
+        return false;
+      }
+
+      // every FIELD_GROUP must contain at least 1 child field
+      const fieldGroups = rootFields.filter((f) => f.type === "FIELD_GROUP");
+      const parentFieldIds = uniq(childrenFields.map((f) => f.parent_petition_field_id!));
+      if (fieldGroups.some((f) => !parentFieldIds.includes(f.id))) {
         return false;
       }
 
@@ -601,13 +634,60 @@ export function replyCanBeUpdated<
       return false;
     }
 
-    if (replies.some((r) => r!.status === "APPROVED" || r!.anonymized_at !== null)) {
+    const fieldGroupReplies = replies.filter(isDefined).filter((r) => r.type === "FIELD_GROUP");
+
+    const allReplies = replies;
+
+    if (fieldGroupReplies.length > 0) {
+      const childFields = await ctx.petitions.loadPetitionFieldChildren(
+        fieldGroupReplies.map((r) => r.petition_field_id),
+      );
+      if (childFields.length > 0) {
+        const fieldGroupChildReplies = (
+          await ctx.petitions.loadPetitionFieldGroupChildReplies.raw(
+            zip(fieldGroupReplies, childFields).flatMap(([reply, fields]) =>
+              fields.map((field) => ({
+                petitionFieldId: field.id,
+                parentPetitionFieldReplyId: reply.id,
+              })),
+            ),
+          )
+        ).flat();
+
+        allReplies.push(...fieldGroupChildReplies);
+      }
+    }
+
+    if (allReplies.some((r) => r!.status === "APPROVED" || r!.anonymized_at !== null)) {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR",
       );
     }
 
+    return true;
+  };
+}
+
+export function replyCanBeDeleted<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(argReplyId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const replyId = args[argReplyId] as unknown as number;
+
+    const field = (await ctx.petitions.loadFieldForReply(replyId))!;
+    if (field.type === "FIELD_GROUP" && !field.optional) {
+      const replies = await ctx.petitions.loadRepliesForField(field.id);
+      if (replies.length === 1 && replies[0].id === replyId) {
+        throw new ApolloError(
+          `You can't delete the last reply of a required FIELD_GROUP field`,
+          "DELETE_FIELD_GROUP_REPLY_ERROR",
+        );
+      }
+      ctx.petitions.loadRepliesForField.dataloader.clear(field.id);
+    }
     return true;
   };
 }
@@ -785,5 +865,108 @@ export function contextUserCanClonePetitions<
       (t.length === 0 || userPermissions.includes("PETITIONS:CREATE_TEMPLATES")) &&
       (p.length === 0 || userPermissions.includes("PETITIONS:CREATE_PETITIONS"))
     );
+  };
+}
+
+export function fieldHasParent<
+  TypeName extends string,
+  FieldName extends string,
+  TArgChildren extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TArgParent extends Arg<TypeName, FieldName, number>,
+>(
+  childrenFieldIdsArg: TArgChildren,
+  parentFieldIdArg?: TArgParent,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const parentFieldId = parentFieldIdArg ? (args[parentFieldIdArg] as unknown as number) : null;
+    const childrenFieldIds = unMaybeArray(
+      args[childrenFieldIdsArg] as unknown as MaybeArray<number>,
+    );
+
+    const fields = await ctx.petitions.loadField(childrenFieldIds);
+
+    return fields.every(
+      (f) =>
+        isDefined(f?.parent_petition_field_id) &&
+        (!isDefined(parentFieldId) || f!.parent_petition_field_id === parentFieldId),
+    );
+  };
+}
+
+export function fieldIsNotFirstChild<
+  TypeName extends string,
+  FieldName extends string,
+  TArgChild extends Arg<TypeName, FieldName, number>,
+>(childFieldIdArg: TArgChild): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const childFieldId = args[childFieldIdArg] as unknown as number;
+
+    const field = (await ctx.petitions.loadField(childFieldId))!;
+
+    return field.parent_petition_field_id === null || field.position !== 0;
+  };
+}
+
+export function firstChildHasType<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(
+  argFieldId: TArg,
+  fieldType: MaybeArray<PetitionFieldType>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const fieldId = args[argFieldId] as unknown as number;
+    const [firstChild] = await ctx.petitions.loadPetitionFieldChildren(fieldId);
+    const validFieldTypes = unMaybeArray(fieldType);
+
+    return isDefined(firstChild) && validFieldTypes.includes(firstChild.type);
+  };
+}
+
+export function fieldIsNotBeingReferencedByVisibilityCondition<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  petitionIdArg: TArgPetitionId,
+  fieldIdArg: TArgFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const ids = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
+
+    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
+    const targetFields = petitionFields.filter((f) => ids.includes(f.id));
+
+    const targetChildrenFields = targetFields.flatMap((target) => {
+      if (target.type === "FIELD_GROUP") {
+        return petitionFields.filter((f) => f.parent_petition_field_id === target.id);
+      }
+      return [];
+    });
+
+    const fieldIds = [...targetFields.map((f) => f.id), ...targetChildrenFields.map((c) => c.id)];
+
+    const referencingFields = petitionFields.filter(
+      (f) =>
+        (!isDefined(f.parent_petition_field_id) ||
+          !targetFields.map((f) => f.id).includes(f.parent_petition_field_id)) && // filter children of target fields
+        isDefined(f.visibility) &&
+        f.visibility.conditions.some((c: any) => fieldIds.includes(c.fieldId)),
+    );
+
+    if (referencingFields.length > 0) {
+      throw new ApolloError(
+        "The petition field is being referenced in another field.",
+        "FIELD_IS_REFERENCED_ERROR",
+        {
+          referencingFieldIds: referencingFields.map((f) => toGlobalId("PetitionField", f.id)),
+        },
+      );
+    }
+
+    return true;
   };
 }

@@ -1,51 +1,56 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { PetitionFieldSelect_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { FieldOptions, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
+import {
+  PetitionFieldSelect_PetitionFieldFragment,
+  PetitionFieldSelect_PetitionFieldInnerFragment,
+} from "@parallel/graphql/__types";
+import { PetitionFieldIndex, useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { If } from "@parallel/utils/types";
+import { UnwrapArray } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   ActionMeta,
-  components,
   CSSObjectWithLabel,
   MultiValueProps,
   OnChangeValue,
   OptionProps,
+  SingleValue as SV,
   SingleValueProps,
+  components,
 } from "react-select";
 import { isDefined, zip } from "remeda";
 
-type PetitionFieldSelectSelection = PetitionFieldSelect_PetitionFieldFragment;
+type PetitionFieldSelection = PetitionFieldSelect_PetitionFieldFragment;
+
+type ChildOf<T extends PetitionFieldSelection> = UnwrapArray<
+  Exclude<T["children"], null | undefined>
+>;
 
 export interface PetitionFieldSelectProps<
-  T extends PetitionFieldSelectSelection,
-  ExpandFields extends boolean = false,
+  OptionType extends PetitionFieldSelection,
   IsMulti extends boolean = false,
-> extends CustomSelectProps<If<ExpandFields, T | [T, number], T>, IsMulti, never> {
-  fields: T[];
-  indices: PetitionFieldIndex[];
-  expandFields?: ExpandFields;
+> extends CustomSelectProps<Exclude<OptionType, "children">, IsMulti, never> {
+  fields: OptionType[];
+  filterFields?: (field: OptionType | ChildOf<OptionType>) => boolean;
+  expandFieldGroups?: boolean;
 }
 
 export function PetitionFieldSelect<
-  OptionType extends PetitionFieldSelectSelection,
-  ExpandFields extends boolean = false,
+  OptionType extends PetitionFieldSelection,
   IsMulti extends boolean = false,
 >({
   value,
   onChange,
   fields,
-  indices,
   isMulti,
-  expandFields,
+  filterFields,
+  expandFieldGroups,
   ...props
-}: PetitionFieldSelectProps<OptionType, ExpandFields, IsMulti>) {
+}: PetitionFieldSelectProps<OptionType, IsMulti>) {
   const intl = useIntl();
   const rsProps = useReactSelectProps<PetitionFieldSelectOption<OptionType>, IsMulti, never>({
     placeholder: intl.formatMessage({
@@ -67,31 +72,30 @@ export function PetitionFieldSelect<
     },
   });
 
+  const fieldsWithIndices = useFieldsWithIndices(fields);
   const { options, _value } = useMemo(() => {
-    const options: PetitionFieldSelectOption<OptionType>[] = zip(fields, indices).flatMap(
-      ([field, fieldIndex]) => {
-        if (expandFields && field.type === "DYNAMIC_SELECT") {
-          const { labels } = field.options as FieldOptions["DYNAMIC_SELECT"];
-          return [
-            { type: "FIELD", field, fieldIndex },
-            ...labels.map((_, column) => ({
-              type: "DYNAMIC_SELECT_OPTION" as const,
-              field,
-              fieldIndex,
-              column,
-            })),
-          ];
-        } else {
-          return [{ type: "FIELD", field, fieldIndex }];
-        }
-      },
-    );
+    let options = fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
+      if (field.type === "FIELD_GROUP" && expandFieldGroups) {
+        return [
+          { field: field, fieldIndex },
+          ...zip(field.children!, childrenFieldIndices!).map(([field, fieldIndex]) => ({
+            field: field as ChildOf<OptionType>,
+            fieldIndex,
+          })),
+        ];
+      } else {
+        return { field, fieldIndex };
+      }
+    });
+    if (isDefined(filterFields)) {
+      options = options.filter(({ field }) => filterFields(field));
+    }
 
     const _value = isMulti
       ? (value as OptionType[]).map((v) => mapValue(v, options)!)
-      : mapValue(value as [OptionType, number] | OptionType | null, options);
+      : mapValue(value as OptionType | null, options);
     return { options, _value };
-  }, [fields, indices, expandFields, value]);
+  }, [fields, value]);
 
   const handleChange = useCallback(
     (
@@ -100,12 +104,14 @@ export function PetitionFieldSelect<
     ) => {
       if (isMulti) {
         onChange(
-          (value as PetitionFieldSelectOption<OptionType>[]).map(unMapValue) as any,
+          (value as PetitionFieldSelectOption<OptionType>[]).map(
+            (value) => value?.field ?? null,
+          ) as any,
           actionMeta as any,
         );
       } else {
         onChange(
-          unMapValue(value as PetitionFieldSelectOption<OptionType> | null) as any,
+          ((value as SV<PetitionFieldSelectOption<OptionType>>)?.field ?? null) as any,
           actionMeta as any,
         );
       }
@@ -130,140 +136,84 @@ export function PetitionFieldSelect<
 PetitionFieldSelect.fragments = {
   PetitionField: gql`
     fragment PetitionFieldSelect_PetitionField on PetitionField {
+      ...PetitionFieldSelect_PetitionFieldInner
+      children {
+        ...PetitionFieldSelect_PetitionFieldInner
+      }
+    }
+    fragment PetitionFieldSelect_PetitionFieldInner on PetitionField {
       id
       type
       title
       options
+      parent {
+        id
+      }
     }
   `,
 };
 
-type PetitionFieldSelectOption<T extends PetitionFieldSelectSelection> =
-  | {
-      type: "FIELD";
-      field: T;
-      fieldIndex: PetitionFieldIndex;
-    }
-  | {
-      type: "DYNAMIC_SELECT_OPTION";
-      field: T;
-      fieldIndex: PetitionFieldIndex;
-      column: number;
-    };
+interface PetitionFieldSelectOption<T extends PetitionFieldSelect_PetitionFieldInnerFragment> {
+  field: T;
+  fieldIndex: PetitionFieldIndex;
+}
 
 const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
-  T extends PetitionFieldSelectSelection,
->({ option, highlight }: { option: PetitionFieldSelectOption<T>; highlight?: string }) {
-  const color = usePetitionFieldTypeColor(option.field.type);
-  if (option.type === "FIELD") {
-    const { field, fieldIndex } = option;
-    return (
-      <>
-        <PetitionFieldTypeIndicator
-          as="div"
-          type={field.type}
-          fieldIndex={fieldIndex}
-          isTooltipDisabled
-          flexShrink={0}
-        />
-        <Box
-          fontSize="sm"
-          marginLeft={2}
-          paddingRight={1}
-          flex="1"
-          minWidth="0"
-          whiteSpace="nowrap"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {field.title ? (
-            <HighlightText as="span" search={highlight}>
-              {field.title}
-            </HighlightText>
-          ) : (
-            <Text as="span" textStyle="hint">
-              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-            </Text>
-          )}
-        </Box>
-      </>
-    );
-  } else {
-    const { field, fieldIndex, column } = option;
-    const options = field.options as FieldOptions["DYNAMIC_SELECT"];
-    const label = options.labels[column];
-    return (
-      <>
-        <Center
-          marginLeft="18px"
-          height="20px"
-          width="26px"
-          fontSize="xs"
-          borderRadius="sm"
-          border="1px solid"
-          borderColor={color}
-        >
-          {fieldIndex}
-          {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(column)}
-        </Center>
-        <HighlightText
-          as="div"
-          search={highlight}
-          fontSize="sm"
-          marginLeft={2}
-          paddingRight={1}
-          flex="1"
-          minWidth="0"
-          whiteSpace="nowrap"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {label}
-        </HighlightText>
-      </>
-    );
-  }
+  T extends PetitionFieldSelection,
+>({
+  option,
+  highlight,
+  indent,
+}: {
+  option: PetitionFieldSelectOption<T>;
+  highlight?: string;
+  indent?: boolean;
+}) {
+  const { field, fieldIndex } = option;
+  return (
+    <>
+      <PetitionFieldTypeIndicator
+        as="div"
+        type={field.type}
+        fieldIndex={fieldIndex}
+        isTooltipDisabled
+        flexShrink={0}
+        marginLeft={field.parent && indent ? 2 : 0}
+      />
+      <Box
+        fontSize="sm"
+        marginLeft={2}
+        paddingRight={1}
+        flex="1"
+        minWidth="0"
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+      >
+        {field.title ? (
+          <HighlightText as="span" search={highlight}>
+            {field.title}
+          </HighlightText>
+        ) : (
+          <Text as="span" textStyle="hint">
+            <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+          </Text>
+        )}
+      </Box>
+    </>
+  );
 });
 
 const getOptionValue = (option: PetitionFieldSelectOption<any>) => {
-  return option.type === "FIELD" ? option.field.id : `${option.field.id}-${option.column}`;
+  return option.field.id;
 };
 
 const getOptionLabel = (option: PetitionFieldSelectOption<any>) => {
-  if (option.type === "FIELD") {
-    return option.field.title ?? "";
-  } else {
-    const options = option.field.options as FieldOptions["DYNAMIC_SELECT"];
-    const label = options.labels[option.column];
-    return `${option.field.title ?? ""} ${label}`;
-  }
+  return option.field.title ?? "";
 };
 
-function mapValue<T extends PetitionFieldSelectSelection>(
-  value: [T, number] | T | null,
-  options: PetitionFieldSelectOption<T>[],
-) {
-  const [field, column]: [T | null | undefined] | [T, number | undefined] = (
-    Array.isArray(value) ? value : [value]
-  ) as any;
-  const _value = !field
-    ? null
-    : column !== undefined
-    ? options.find(
-        (o) => o.type === "DYNAMIC_SELECT_OPTION" && o.field.id === field.id && o.column === column,
-      ) ?? null
-    : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ?? null;
-  return _value;
-}
-
-function unMapValue<T extends PetitionFieldSelectSelection>(
-  value: PetitionFieldSelectOption<T> | null,
-) {
-  return isDefined(value)
-    ? value.type === "FIELD"
-      ? value.field
-      : ([value.field, value.column] as [T, number])
-    : null;
+function mapValue<T extends { field: { id: string } }>(value: { id: string } | null, options: T[]) {
+  return value ? options.find((o) => o.field.id === value.id) ?? null : null;
 }
 
 function SingleValue(props: SingleValueProps<PetitionFieldSelectOption<any>>) {
@@ -295,7 +245,11 @@ function MultiValueLabel({ children, ...props }: MultiValueProps<PetitionFieldSe
 function Option(props: OptionProps<PetitionFieldSelectOption<any>>) {
   return (
     <components.Option {...props}>
-      <PetitionFieldSelectItem option={props.data} highlight={props.selectProps.inputValue ?? ""} />
+      <PetitionFieldSelectItem
+        option={props.data}
+        highlight={props.selectProps.inputValue ?? ""}
+        indent
+      />
     </components.Option>
   );
 }

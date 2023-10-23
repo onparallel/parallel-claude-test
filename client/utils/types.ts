@@ -11,11 +11,11 @@ export function unMaybeArray<T>(items: MaybeArray<T>) {
   return Array.isArray(items) ? items : [items];
 }
 
-export type If<Condition extends boolean | undefined, Then, Else = never> = Condition extends true
-  ? Then
-  : Else;
+export type If<Condition, Then, Else = never> = Condition extends false | undefined ? Else : Then;
 
 export type UnionToArrayUnion<T> = T extends any ? T[] : never;
+
+export type ArrayUnionToUnion<T> = T extends (infer U)[] ? U : never;
 
 export type IsEmptyObject<T> = keyof T extends [never] ? true : false;
 

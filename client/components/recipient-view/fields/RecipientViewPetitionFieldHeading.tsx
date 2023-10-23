@@ -4,20 +4,24 @@ import { FileAttachmentButton } from "@parallel/components/common/FileAttachment
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldLayout_PetitionFieldSelection } from "./RecipientViewPetitionFieldLayout";
+import { isDefined } from "remeda";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 
 export interface RecipientViewPetitionFieldHeadingProps {
   field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
   onDownloadAttachment: (attachmentId: string) => void;
-  onCommentsButtonClick: () => Promise<void>;
+  onCommentsButtonClick?: () => Promise<void>;
 }
 
-export function RecipientViewPetitionFieldHeading({
-  field,
-  onDownloadAttachment,
-  onCommentsButtonClick,
-}: RecipientViewPetitionFieldHeadingProps) {
+export const RecipientViewPetitionFieldHeading = chakraForwardRef<
+  "div",
+  RecipientViewPetitionFieldHeadingProps
+>(function RecipientViewPetitionFieldHeading(
+  { field, onDownloadAttachment, onCommentsButtonClick, ...props },
+  ref,
+) {
   return (
-    <Stack as="header" id={`field-${field.id}`} spacing={1} paddingX={2} paddingY={2}>
+    <Stack as="header" id={`field-${field.id}`} spacing={1} padding={2} {...props} ref={ref}>
       <HStack alignItems="flex-start">
         <Box flex="1">
           <Heading size="md">
@@ -25,7 +29,8 @@ export function RecipientViewPetitionFieldHeading({
             {field.title ? field.title : null}
           </Heading>
         </Box>
-        {field.hasCommentsEnabled || field.__typename === "PetitionField" ? (
+        {(field.hasCommentsEnabled || field.__typename === "PetitionField") &&
+        isDefined(onCommentsButtonClick) ? (
           <Box paddingRight={2}>
             <CommentsButton
               commentCount={field.commentCount}
@@ -60,4 +65,4 @@ export function RecipientViewPetitionFieldHeading({
       ) : null}
     </Stack>
   );
-}
+});

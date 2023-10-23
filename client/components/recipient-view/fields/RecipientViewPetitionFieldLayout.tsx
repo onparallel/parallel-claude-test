@@ -10,11 +10,11 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplyFragment,
   RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragment,
-  Tone,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { CommentsButton } from "../CommentsButton";
 
 export type RecipientViewPetitionFieldLayout_PetitionFieldSelection =
@@ -34,7 +34,6 @@ export interface RecipientViewPetitionFieldLayoutProps {
   onDownloadAttachment: (attachmentId: string) => void;
   onCommentsButtonClick?: () => void;
   onMouseDownNewReply?: (event: MouseEvent<HTMLButtonElement>) => void;
-  tone?: Tone;
 }
 
 export function RecipientViewPetitionFieldLayout({
@@ -46,14 +45,13 @@ export function RecipientViewPetitionFieldLayout({
   children,
   onCommentsButtonClick,
   onMouseDownNewReply,
-  tone = "INFORMAL",
 }: RecipientViewPetitionFieldLayoutProps) {
   const intl = useIntl();
   const isPetitionField = field.__typename === "PetitionField";
-  const fieldReplies = completedFieldReplies(field);
+
   return (
     <>
-      <Flex alignItems="baseline">
+      <Flex alignItems="baseline" minHeight={6}>
         <Box flex="1" marginRight={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
             {field.isInternal ? <InternalFieldBadge marginRight={2.5} marginBottom={0.5} /> : null}
@@ -77,7 +75,7 @@ export function RecipientViewPetitionFieldLayout({
             )}
           </Heading>
         </Box>
-        {field.hasCommentsEnabled || isPetitionField ? (
+        {(field.hasCommentsEnabled || isPetitionField) && isDefined(onCommentsButtonClick) ? (
           <CommentsButton
             commentCount={field.commentCount}
             hasUnreadComments={field.unreadCommentCount > 0}
@@ -106,54 +104,6 @@ export function RecipientViewPetitionFieldLayout({
           ))}
         </Flex>
       ) : null}
-
-      {field.type !== "CHECKBOX" && field.type !== "NUMBER" ? (
-        <Text fontSize="sm" color="gray.600">
-          {field.type === "FILE_UPLOAD" ? (
-            <FormattedMessage
-              id="component.recipient-view-petition-field-card.files-uploaded"
-              defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-              values={{ count: fieldReplies.length }}
-            />
-          ) : field.type === "DOW_JONES_KYC" ? (
-            <>
-              {fieldReplies.length ? (
-                <FormattedMessage
-                  id="component.recipient-view-petition-field-card.profiles-uploaded"
-                  defaultMessage="{count, plural, =1 {1 profile uploaded} other {# profiles uploaded}}"
-                  values={{ count: fieldReplies.length }}
-                />
-              ) : null}
-            </>
-          ) : field.type === "ES_TAX_DOCUMENTS" ? (
-            <>
-              <FormattedMessage
-                id="component.recipient-view-petition-field-tax-documents.follow-steps-description"
-                defaultMessage="Follow the steps to upload the documentation you need."
-                values={{ tone }}
-              />
-              {fieldReplies.length ? (
-                <>
-                  {" ("}
-                  <FormattedMessage
-                    id="component.recipient-view-petition-field-card.files-uploaded"
-                    defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-                    values={{ count: fieldReplies.length }}
-                  />
-                  {")"}
-                </>
-              ) : null}
-            </>
-          ) : fieldReplies.length ? (
-            <FormattedMessage
-              id="component.recipient-view-petition-field-card.replies-submitted"
-              defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
-              values={{ count: fieldReplies.length }}
-            />
-          ) : null}
-        </Text>
-      ) : null}
-
       {children}
       {showAddNewReply ? (
         <Center marginTop={2}>
@@ -215,6 +165,9 @@ RecipientViewPetitionFieldLayout.fragments = {
         createdAt
         updatedAt
         isAnonymized
+        parent {
+          id
+        }
       }
     `;
   },
@@ -257,6 +210,9 @@ RecipientViewPetitionFieldLayout.fragments = {
         createdAt
         updatedAt
         isAnonymized
+        parent {
+          id
+        }
       }
     `;
   },

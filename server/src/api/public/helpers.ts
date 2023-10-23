@@ -31,7 +31,6 @@ import {
   PetitionFragment,
   PetitionTagFilter,
   ProfileFragment,
-  SubmitReply_petitionQuery,
   SubscriptionFragment,
   TagFragmentDoc,
   TaskFragment as TaskType,
@@ -108,12 +107,12 @@ export function containsGraphQLError(error: unknown, errorCode: string): error i
   return ((error.response.errors![0] as any).extensions.code as string) === errorCode;
 }
 
-function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
+function mapFieldReplyContent(fieldType: PetitionFieldType, content: any): any {
   switch (fieldType) {
     case "ES_TAX_DOCUMENTS":
     case "FILE_UPLOAD":
     case "DOW_JONES_KYC":
-      return content as {
+      return pick(content, ["filename", "contentType", "size"]) as {
         filename: string;
         contentType: string;
         size: number;
@@ -130,9 +129,38 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
         datetime: string;
         timezone: string;
       };
+    case "FIELD_GROUP":
+      return {};
     default:
       return content.value as string;
   }
+}
+
+function mapFieldReply(reply: PetitionFieldReplyFragment, type: PetitionFieldType) {
+  function mapReply(reply: PetitionFieldReplyFragment, type: PetitionFieldType) {
+    return {
+      ...pick(reply, [
+        "id",
+        "status",
+        // show metadata info only on FILE fields
+        ...(isFileTypeField(type) ? ["metadata" as keyof PetitionFieldReplyFragment] : []),
+        "content",
+        "createdAt",
+        "updatedAt",
+      ]),
+      content: mapFieldReplyContent(type, reply.content),
+    };
+  }
+  return {
+    ...mapReply(reply, type),
+    children:
+      reply.children?.map((child) => ({
+        field: pick(child.field, ["id", "type"]),
+        replies: child.replies.map((r) => ({
+          ...mapReply({ ...r, children: null }, child.field.type),
+        })),
+      })) ?? null,
+  };
 }
 
 export function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, "fields">>(
@@ -141,13 +169,8 @@ export function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, 
   return {
     ...petition,
     fields: petition.fields?.map((field) => ({
-      ...omit(field, ["options"]),
-      options: field.options.values ?? undefined,
-      replies: field.replies.map((reply) => ({
-        // show metadata info only on FILE fields
-        ...omit(reply, isFileTypeField(field.type) ? [] : ["metadata"]),
-        content: mapFieldReplyContent(field.type, reply.content),
-      })),
+      ...mapPetitionField(field),
+      replies: field.replies.map((reply) => mapFieldReply(reply, field.type)),
     })),
   };
 }
@@ -155,17 +178,29 @@ export function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, 
 function mapTemplateFields<T extends Pick<TemplateFragment, "fields">>(template: T) {
   return {
     ...template,
-    fields: template.fields?.map((field) => ({
-      ...omit(field, ["options"]),
-      options: field.options.values ?? undefined,
-    })),
+    fields: template.fields?.map(mapPetitionField),
   };
 }
 
 export function mapPetitionField<T extends PetitionFieldFragment>(field: T) {
+  function mapField(field: PetitionFieldFragment) {
+    return {
+      ...pick(field, [
+        "id",
+        "title",
+        "description",
+        "type",
+        "fromPetitionFieldId",
+        "alias",
+        "multiple",
+        "optional",
+      ]),
+      options: (field.options.values ?? []) as any[],
+    };
+  }
   return {
-    ...omit(field, ["options"]),
-    options: field.options.values ?? undefined,
+    ...mapField(field),
+    children: field.children?.map((f) => mapField({ ...f, children: null })) ?? null,
   };
 }
 
@@ -177,7 +212,7 @@ function mapPetitionTags<T extends Pick<PetitionFragment, "tags">>(petition: T) 
 }
 
 function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petition: T) {
-  function mapReplyContentsForAlias(field: UnwrapArray<PetitionFragment["replies"]>) {
+  function mapReplyContentsForAlias(field: UnwrapArray<PetitionFragment["replies"]>): any {
     const { type, replies } = field;
     switch (type) {
       case "TEXT":
@@ -223,6 +258,34 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
           return replies.map((r) => r.content);
         } else {
           return replies[0].content ?? null;
+        }
+      case "FIELD_GROUP":
+        if (replies.length > 1) {
+          return replies.map((r) =>
+            Object.fromEntries(
+              r.children
+                ?.filter((child) => isDefined(child.field.alias) && child.replies.length > 0)
+                .map((child) => [
+                  child.field.alias!,
+                  mapReplyContentsForAlias({
+                    ...child.field,
+                    replies: child.replies.map((r) => ({ ...r, children: null })),
+                  }),
+                ]) ?? [],
+            ),
+          );
+        } else {
+          return Object.fromEntries(
+            replies[0].children
+              ?.filter((child) => isDefined(child.field.alias) && child.replies.length > 0)
+              .map((child) => [
+                child.field.alias!,
+                mapReplyContentsForAlias({
+                  ...child.field,
+                  replies: child.replies.map((r) => ({ ...r, children: null })),
+                }),
+              ]) ?? [],
+          );
         }
       default:
         return null;
@@ -351,11 +414,9 @@ export async function uploadFile(file: File, presignedPostData: AWSPresignedPost
   });
 }
 
-export function mapReplyResponse(
-  reply: PetitionFieldReplyFragment & { field?: Maybe<{ id: string }> },
-) {
+export function mapReplyResponse(reply: PetitionFieldReplyFragment) {
   return {
-    ...omit(reply, ["field"]),
+    ...reply,
     content:
       Object.keys(reply.content).length > 1 ? reply.content : reply.content.value ?? reply.content,
   };
@@ -445,12 +506,23 @@ export function mapProfile<T extends Pick<ProfileFragment, "properties" | "prope
   return pipe(profile, mapProfileProperties);
 }
 
+export function flattenPetitionFields<T extends { children?: any[] | null }>(
+  fields: T[],
+): (Omit<T, "children"> & { isChild: boolean })[] {
+  return (
+    fields.flatMap((field) => [
+      { ...omit(field, ["children"]), isChild: false },
+      ...(field.children ?? []).map((c) => ({ ...c, isChild: true })),
+    ]) ?? []
+  );
+}
+
 export function buildSubmittedReplyContent(
-  petition: SubmitReply_petitionQuery["petition"],
+  fields: Pick<PetitionFieldFragment, "id" | "type" | "options">[],
   fieldId: string,
   body: any,
 ) {
-  const field = petition?.fields.find((f) => f.id === fieldId);
+  const field = fields.find((f) => f.id === fieldId);
   if (!field) {
     // let backend manage errors
     return {};
@@ -468,14 +540,16 @@ export function buildSubmittedReplyContent(
       replyContent = { value: body.reply };
       break;
     case "DYNAMIC_SELECT": {
-      const labels = (petition?.fields.find((f) => f.id === fieldId)?.options?.labels ??
-        []) as string[];
+      const labels = (fields.find((f) => f.id === fieldId)?.options?.labels ?? []) as string[];
       const replies = body.reply as Maybe<string>[];
       replyContent = { value: labels.map((label, i) => [label, replies[i]]) };
       break;
     }
     case "DATE_TIME":
       replyContent = body.reply;
+      break;
+    case "FIELD_GROUP":
+      replyContent = {};
       break;
     default:
       throw new Error(`Can't submit a reply for a field of type ${field?.type}`);

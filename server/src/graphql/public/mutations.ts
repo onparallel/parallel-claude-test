@@ -23,7 +23,7 @@ import {
   renderTextWithPlaceholders,
 } from "../../util/slate/placeholders";
 import { stallFor } from "../../util/promises/stallFor";
-import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
+import { and, chain, checkClientServerToken, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
@@ -33,7 +33,11 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validXor } from "../helpers/validators/validXor";
-import { fieldAttachmentBelongsToField, fieldsHaveCommentsEnabled } from "../petition/authorizers";
+import {
+  fieldAttachmentBelongsToField,
+  fieldHasParent,
+  fieldsHaveCommentsEnabled,
+} from "../petition/authorizers";
 import { tasksAreOfType } from "../task/authorizers";
 import {
   authenticatePublicAccess,
@@ -425,8 +429,12 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   type: "PublicPetitionFieldComment",
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(fieldBelongsToAccess("petitionFieldId"), fieldsHaveCommentsEnabled("petitionFieldId")),
-    validPetitionFieldCommentContent("content", "petitionFieldId"),
+    and(
+      fieldBelongsToAccess("petitionFieldId"),
+      fieldsHaveCommentsEnabled("petitionFieldId"),
+      validPetitionFieldCommentContent("content", "petitionFieldId"),
+      not(fieldHasParent("petitionFieldId")),
+    ),
   ),
   args: {
     keycode: nonNull(idArg()),

@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import { sqlIn } from "./knex";
 
 export async function addFieldType(knex: Knex, fieldName: string) {
   await knex.schema.raw(/* sql */ `
@@ -13,7 +14,44 @@ export async function removeFieldType(knex: Knex, fieldName: string) {
 
   await knex.from("petition_field_attachment").whereIn("petition_field_id", fieldIds).delete();
   await knex.from("petition_field_comment").whereIn("petition_field_id", fieldIds).delete();
+  await knex
+    .from("petition_field")
+    .whereIn("from_petition_field_id", fieldIds)
+    .update({ from_petition_field_id: null });
+
   await knex.from("petition_field").whereIn("id", fieldIds).delete();
+
+  if (fieldIds.length > 0) {
+    await knex
+      .from("petition_user_notification")
+      .where("type", "COMMENT_CREATED")
+      .whereRaw(/* sql */ `("data"->>'petition_field_id')::int in ?`, [
+        knex.raw(...sqlIn(fieldIds, "int")),
+      ])
+      .delete();
+
+    await knex
+      .from("petition_contact_notification")
+      .where("type", "COMMENT_CREATED")
+      .whereRaw(/* sql */ `("data"->>'petition_field_id')::int in ?`, [
+        knex.raw(...sqlIn(fieldIds, "int")),
+      ])
+      .delete();
+
+    await knex
+      .from("petition_event")
+      .whereIn("type", [
+        "REPLY_CREATED",
+        "REPLY_UPDATED",
+        "REPLY_DELETED",
+        "COMMENT_PUBLISHED",
+        "COMMENT_DELETED",
+        "REPLY_STATUS_CHANGED",
+      ])
+      .whereRaw(/* sql */ `("data"->>'petition_field_id')::int in ?`, [
+        knex.raw(...sqlIn(fieldIds, "int")),
+      ]);
+  }
 
   const { rows } = await knex.raw<{
     rows: { field_type: string }[];

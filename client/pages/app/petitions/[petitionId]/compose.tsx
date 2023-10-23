@@ -23,7 +23,6 @@ import { PetitionCompletedAlert } from "@parallel/components/petition-common/Pet
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
-import { PetitionComposeFieldRef } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
@@ -31,18 +30,25 @@ import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-c
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
+import { useConfirmLinkFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmLinkFieldDialog";
+import { useConfirmUnlinkFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmUnlinkFieldDialog";
 import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
-import { cleanPreviewFieldReplies } from "@parallel/components/petition-preview/clientMutations";
+import {
+  cleanPreviewFieldReplies,
+  updatePreviewFieldReplies,
+} from "@parallel/components/petition-preview/clientMutations";
 import {
   PetitionCompose_PetitionFieldFragment,
   PetitionCompose_changePetitionFieldTypeDocument,
   PetitionCompose_clonePetitionFieldDocument,
   PetitionCompose_createPetitionFieldDocument,
   PetitionCompose_deletePetitionFieldDocument,
+  PetitionCompose_linkPetitionFieldChildrenDocument,
   PetitionCompose_petitionDocument,
+  PetitionCompose_unlinkPetitionFieldChildrenDocument,
   PetitionCompose_updateFieldPositionsDocument,
   PetitionCompose_updatePetitionDocument,
   PetitionCompose_updatePetitionFieldDocument,
@@ -54,21 +60,21 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
+import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import {
+  PetitionFieldLogicCondition,
   PetitionFieldVisibility,
-  PetitionFieldVisibilityCondition,
-} from "@parallel/utils/fieldVisibility/types";
+} from "@parallel/utils/fieldLogic/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
-import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { zip } from "remeda";
+import { isDefined, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
@@ -93,24 +99,39 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     updateIsReadNotification({ isRead: true, filter: "SHARED", petitionIds: [petitionId] });
   }, []);
 
-  const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
+  const isTemplate = petition.__typename === "PetitionTemplate";
+
+  const isPublicTemplate = isTemplate && petition.isPublic;
 
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
-  const isSharedByLink =
-    (petition?.__typename === "PetitionTemplate" && petition.publicLink?.isActive) ?? false;
+  const isSharedByLink = (isTemplate && petition.publicLink?.isActive) ?? false;
 
-  const indices = useFieldIndices(petition.fields);
-  const petitionDataRef = useUpdatingRef({ fields: petition.fields, indices });
+  const fieldsWithIndices = useFieldsWithIndices(petition.fields);
+  const allFieldsWithIndices = useMemo(() => {
+    return fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
+      return [
+        [field, fieldIndex],
+        ...(isDefined(field.children) ? zip(field.children, childrenFieldIndices!) : []),
+      ] as unknown as [
+        FieldSelection | UnwrapArray<Exclude<FieldSelection["children"], null | undefined>>,
+        string,
+      ][];
+    });
+  }, [fieldsWithIndices]);
+  const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
+  const activeFieldWithIndex = useMemo(() => {
+    return isDefined(activeFieldId)
+      ? allFieldsWithIndices.find(([field]) => field.id === activeFieldId) ?? null
+      : null;
+  }, [allFieldsWithIndices, activeFieldId]);
+  const activeField = activeFieldWithIndex?.[0] ?? null;
+
+  const fieldsRef = useUpdatingRef({ allFieldsWithIndices, activeFieldId });
 
   const wrapper = usePetitionStateWrapper();
-  const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
 
   const [showErrors, setShowErrors] = useState(false);
-  const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
-  const activeField: Maybe<FieldSelection> = useMemo(() => {
-    return activeFieldId ? petition.fields?.find((f) => f.id === activeFieldId) ?? null : null;
-  }, [activeFieldId, petition.fields]);
 
   // 0 - Content
   // 1 - Petition/Template Settings
@@ -129,7 +150,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
 
-  useTempQueryParam("field", (fieldId) => {
+  useTempQueryParam("field", async (fieldId) => {
+    await waitFor(500);
     handleIndexFieldClick(fieldId);
   });
 
@@ -148,10 +170,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       if (hash.includes("#field-settings-")) {
         handleFieldSettingsClick(hash.replace("#field-settings-", ""));
       } else {
-        const { error, fieldsWithIndices } = validatePetitionFields(petition.fields);
+        const { error, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices);
         if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
           setShowErrors(true);
-          focusFieldTitle(fieldsWithIndices[0].field.id);
+          focusFieldTitle(fieldsWithIndices[0][0].id);
         }
       }
     }
@@ -172,8 +194,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const [updateFieldPositions] = useMutation(PetitionCompose_updateFieldPositionsDocument);
   const handleUpdateFieldPositions = useCallback(
-    wrapper(async function (fieldIds: string[]) {
-      await updateFieldPositions({ variables: { petitionId, fieldIds } });
+    wrapper(async function (fieldIds: string[], parentFieldId?: string) {
+      await updateFieldPositions({ variables: { petitionId, fieldIds, parentFieldId } });
     }),
     [petitionId],
   );
@@ -193,7 +215,48 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
   const confirmDelete = useConfirmDeleteFieldDialog();
-  const fieldsDataRef = useUpdatingRef({ fields: petition.fields, indices, active: activeField });
+
+  /** returns true if referencing fields have been fixed */
+  const tryFixReferencingFields = async (fieldId: string) => {
+    const { allFieldsWithIndices } = fieldsRef.current!;
+    // if this field is being referenced by any other field ask the user
+    // if they want to remove the conflicting conditions
+
+    const fieldToCheck = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
+    const referencing = allFieldsWithIndices.filter(
+      ([f]) =>
+        (f.visibility as PetitionFieldVisibility)?.conditions.some((c) =>
+          fieldToCheck.type === "FIELD_GROUP"
+            ? c.fieldId === fieldId || fieldToCheck.children?.some((f) => c.fieldId === f.id)
+            : c.fieldId === fieldId,
+        ),
+    );
+
+    if (referencing.length > 0) {
+      try {
+        await showReferencedFieldDialog({
+          type: "DELETING_FIELD",
+          fieldsWithIndices: referencing,
+        });
+      } catch {
+        return false;
+      }
+      for (const [field] of referencing) {
+        const visibility = field.visibility! as PetitionFieldVisibility;
+        const conditions = visibility.conditions.filter((c) =>
+          fieldToCheck.type === "FIELD_GROUP" && fieldToCheck.children?.length
+            ? c.fieldId !== fieldId && !fieldToCheck.children?.some((ch) => c.fieldId === ch.id)
+            : c.fieldId !== fieldId,
+        );
+
+        await _handleFieldEdit(field.id, {
+          visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
+        });
+      }
+      return true;
+    }
+  };
+
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
       setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : activeFieldId));
@@ -201,7 +264,24 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
       async function deleteField(force: boolean) {
         try {
-          await deletePetitionField({ variables: { petitionId, fieldId, force } });
+          const { allFieldsWithIndices } = fieldsRef.current;
+          const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
+          await deletePetitionField({
+            variables: { petitionId, fieldId, force },
+            update: (cache, { data }) => {
+              if (isTemplate && isDefined(field.parent) && isDefined(data)) {
+                updatePreviewFieldReplies(cache, field.parent.id, (replies) => {
+                  return replies.map((r) => {
+                    const children = [...r.children!].filter(({ field }) => field.id !== fieldId);
+                    return {
+                      ...r,
+                      children,
+                    };
+                  });
+                });
+              }
+            },
+          });
         } catch (e) {
           if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
             try {
@@ -211,36 +291,31 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             }
             await deleteField(true);
           } else if (isApolloError(e, "FIELD_IS_REFERENCED_ERROR")) {
-            const { fields, indices } = fieldsDataRef.current!;
-            // if this field is being referenced by any other field ask the user
-            // if they want to remove the conflicting conditions
-            const referencing = zip(fields, indices).filter(
-              ([f]) =>
-                (f.visibility as PetitionFieldVisibility)?.conditions.some(
-                  (c) => c.fieldId === fieldId,
-                ),
-            );
-            if (referencing.length > 0) {
-              try {
-                await showReferencedFieldDialog({
-                  type: "DELETING_FIELD",
-                  fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
-                    field,
-                    fieldIndex,
-                  })),
-                });
-              } catch {
-                return;
-              }
-              for (const [field] of referencing) {
-                const visibility = field.visibility! as PetitionFieldVisibility;
-                const conditions = visibility.conditions.filter((c) => c.fieldId !== fieldId);
-                await _handleFieldEdit(field.id, {
-                  visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
-                });
-              }
+            if (await tryFixReferencingFields(fieldId)) {
               await deleteField(false);
             }
+          } else if (isApolloError(e, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
+            await withError(
+              showErrorDialog({
+                message: (
+                  <FormattedMessage
+                    id="generic.first-child-visibility-conditions-error"
+                    defaultMessage="You cannot set conditions for the first field in a group."
+                  />
+                ),
+              }),
+            );
+          } else if (isApolloError(e, "FIRST_CHILD_IS_INTERNAL_ERROR")) {
+            await withError(
+              showErrorDialog({
+                message: (
+                  <FormattedMessage
+                    id="generic.first-child-is-internal-error"
+                    defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+                  />
+                ),
+              }),
+            );
           } else {
             // throw error to show compose generic error dialog
             throw e;
@@ -277,10 +352,32 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [updatePetitionField] = useMutation(PetitionCompose_updatePetitionFieldDocument);
   const _handleFieldEdit = useCallback(
     async function (fieldId: string, data: UpdatePetitionFieldInput, force?: boolean) {
-      const { fields, indices } = fieldsDataRef.current!;
+      const { allFieldsWithIndices } = fieldsRef.current!;
+
+      const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)?.[0];
+      if (
+        isDefined(data.isInternal) &&
+        data.isInternal === false &&
+        isDefined(field) &&
+        field.type === "FIELD_GROUP" &&
+        (field.children ?? []).length > 0 &&
+        field.children![0].type === "DOW_JONES_KYC"
+      ) {
+        await withError(
+          showErrorDialog({
+            message: (
+              <FormattedMessage
+                id="generic.dow-jones-kyc-external-error"
+                defaultMessage="A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again."
+              />
+            ),
+          }),
+        );
+        return;
+      }
       if (data.multiple === false) {
         // check no field is referencing with invalid NUMBER_OF_REPLIES condition
-        const validCondition = (c: PetitionFieldVisibilityCondition) => {
+        const validCondition = (c: PetitionFieldLogicCondition) => {
           if (c.fieldId === fieldId) {
             if (c.modifier === "NUMBER_OF_REPLIES") {
               return c.value === 0 && (c.operator === "EQUAL" || c.operator === "GREATER_THAN");
@@ -290,7 +387,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           }
           return true;
         };
-        const referencing = zip(fields, indices).filter(
+        const referencing = allFieldsWithIndices.filter(
           ([f]) =>
             (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => !validCondition(c)),
         );
@@ -298,10 +395,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           try {
             await showReferencedFieldDialog({
               type: "INVALID_CONDITION",
-              fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
-                field,
-                fieldIndex,
-              })),
+              fieldsWithIndices: referencing,
             });
             await Promise.all(
               referencing.map(async ([field]) => {
@@ -326,14 +420,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
           throw e;
         }
-        try {
-          if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
+        if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
+          try {
             await confirmChangeFormat();
             await updatePetitionField({
               variables: { petitionId, fieldId, data, force: true },
             });
-          }
-        } catch {}
+          } catch {}
+        }
       }
     },
     [petitionId],
@@ -345,9 +439,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [changePetitionFieldType] = useMutation(PetitionCompose_changePetitionFieldTypeDocument);
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
-      const { fields, indices } = petitionDataRef.current!;
-      const field = fields.find((f) => f.id === fieldId)!;
-      const referencing = zip(fields, indices).filter(
+      const { allFieldsWithIndices } = fieldsRef.current!;
+      const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
+      const referencing = allFieldsWithIndices.filter(
         ([f]) =>
           (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId),
       );
@@ -359,10 +453,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           try {
             await showReferencedFieldDialog({
               type: "INVALID_CONDITION",
-              fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
-                field,
-                fieldIndex,
-              })),
+              fieldsWithIndices: referencing,
             });
             for (const [field] of referencing) {
               const visibility = field.visibility! as PetitionFieldVisibility;
@@ -395,9 +486,28 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const [createPetitionField] = useMutation(PetitionCompose_createPetitionFieldDocument);
   const handleAddField = useCallback(
-    wrapper(async function (type: PetitionFieldType, position?: number) {
+    wrapper(async function (type: PetitionFieldType, position?: number, parentFieldId?: string) {
       const { data } = await createPetitionField({
-        variables: { petitionId, type, position },
+        variables: { petitionId, type, position, parentFieldId },
+        update: (cache, { data }) => {
+          if (isTemplate && isDefined(parentFieldId) && isDefined(data)) {
+            updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
+              return replies.map((r) => {
+                const children = [...r.children!];
+                children[0].__typename;
+                children.splice(position!, 0, {
+                  __typename: "PetitionFieldGroupChildReply",
+                  field: data.createPetitionField,
+                  replies: [],
+                });
+                return {
+                  ...r,
+                  children,
+                };
+              });
+            });
+          }
+        },
       });
 
       setActiveFieldId(data!.createPetitionField.id);
@@ -409,12 +519,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showErrorDialog = useErrorDialog();
   const showFieldErrorDialog = useFieldErrorDialog();
   const validPetitionFields = async () => {
-    const { error, message, fieldsWithIndices } = validatePetitionFields(petition.fields);
+    const { error, message, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices);
     if (error) {
       setShowErrors(true);
       if (fieldsWithIndices && fieldsWithIndices.length > 0) {
         await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
-        const firstId = fieldsWithIndices[0].field.id;
+        const firstId = fieldsWithIndices[0][0].id;
         const node = document.querySelector(`#field-${firstId}`);
         await scrollIntoView(node!, { block: "center", behavior: "smooth" });
       } else {
@@ -427,6 +537,134 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
     return true;
   };
+
+  const [linkPetitionFieldChild] = useMutation(PetitionCompose_linkPetitionFieldChildrenDocument);
+  const showConfirmLinkDialog = useConfirmLinkFieldDialog();
+  const handleLinkField = useCallback(
+    wrapper(async function (parentFieldId: string, childrenFieldIds: string[]) {
+      try {
+        await linkPetitionFieldChild({
+          variables: {
+            petitionId,
+            parentFieldId,
+            childrenFieldIds,
+          },
+        });
+      } catch (error) {
+        if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
+          try {
+            await showConfirmLinkDialog();
+            await linkPetitionFieldChild({
+              variables: {
+                petitionId,
+                parentFieldId,
+                childrenFieldIds,
+                force: true,
+              },
+            });
+          } catch {}
+        } else if (isApolloError(error, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
+          await withError(
+            showErrorDialog({
+              message: (
+                <FormattedMessage
+                  id="generic.first-child-visibility-conditions-error"
+                  defaultMessage="You cannot set conditions for the first field in a group."
+                />
+              ),
+            }),
+          );
+        } else if (isApolloError(error, "FIRST_CHILD_IS_INTERNAL_ERROR")) {
+          await withError(
+            showErrorDialog({
+              message: (
+                <FormattedMessage
+                  id="generic.first-child-is-internal-error"
+                  defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+                />
+              ),
+            }),
+          );
+        } else {
+          throw error;
+        }
+      }
+    }),
+    [petitionId],
+  );
+
+  const [unlinkPetitionFieldChild] = useMutation(
+    PetitionCompose_unlinkPetitionFieldChildrenDocument,
+  );
+  const showConfirmUnlinkFieldDialog = useConfirmUnlinkFieldDialog();
+  const handleUnlinkField = useCallback(
+    wrapper(async function (parentFieldId: string, childrenFieldIds: string[]) {
+      const fieldId = childrenFieldIds[0];
+      const unlinkChild = async (force?: boolean) => {
+        await unlinkPetitionFieldChild({
+          variables: {
+            petitionId,
+            parentFieldId,
+            childrenFieldIds,
+            force,
+          },
+          update: (cache, { data }) => {
+            if (isTemplate && isDefined(data))
+              for (const fieldId of childrenFieldIds) {
+                updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
+                  return replies.map((r) => {
+                    const children = [...r.children!].filter(({ field }) => field.id !== fieldId);
+                    return {
+                      ...r,
+                      children,
+                    };
+                  });
+                });
+              }
+          },
+        });
+      };
+      try {
+        await unlinkChild();
+      } catch (error) {
+        if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
+          try {
+            await showConfirmUnlinkFieldDialog();
+            await unlinkChild(true);
+          } catch {}
+        } else if (isApolloError(error, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
+          await withError(
+            showErrorDialog({
+              message: (
+                <FormattedMessage
+                  id="generic.first-child-visibility-conditions-error"
+                  defaultMessage="You cannot set conditions for the first field in a group."
+                />
+              ),
+            }),
+          );
+        } else if (isApolloError(error, "FIRST_CHILD_IS_INTERNAL_ERROR")) {
+          await withError(
+            showErrorDialog({
+              message: (
+                <FormattedMessage
+                  id="generic.first-child-is-internal-error"
+                  defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+                />
+              ),
+            }),
+          );
+        } else if (isApolloError(error, "FIELD_IS_REFERENCED_ERROR")) {
+          if (await tryFixReferencingFields(fieldId)) {
+            await unlinkChild();
+          }
+        } else {
+          throw error;
+        }
+      }
+    }),
+    [petitionId],
+  );
 
   const handleNextClick = useSendPetitionHandler(
     me,
@@ -514,7 +752,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       >
         <TwoPaneLayout
-          backgroundColor={petition?.__typename === "PetitionTemplate" ? "primary.50" : undefined}
+          backgroundColor={petition.__typename === "PetitionTemplate" ? "primary.50" : undefined}
           top={4}
           isSidePaneActive={Boolean(activeFieldId)}
           sidePane={
@@ -537,7 +775,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   petitionId={petition.id}
                   key={activeField.id}
                   field={activeField}
-                  fieldIndex={indices[activeField.position]}
+                  fieldIndex={activeFieldWithIndex![1]}
                   onFieldEdit={handleFieldEdit}
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
@@ -556,7 +794,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     <TabList marginX="-1px" marginTop="-1px" flex="none">
                       <Tab padding={4} lineHeight={5} fontWeight="bold">
                         <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
-                        <FormattedMessage id="petition.contents" defaultMessage="Contents" />
+                        <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                       </Tab>
                       <Tab
                         data-action="petition-settings"
@@ -567,7 +805,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                       >
                         <SettingsIcon fontSize="16px" marginRight={2} aria-hidden="true" />
                         <FormattedMessage
-                          id="petition-compose.settings"
+                          id="page.compose.petition-settings-header"
                           defaultMessage="Settings"
                         />
                       </Tab>
@@ -575,8 +813,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     <TabPanels {...extendFlexColumn}>
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
                         <PetitionContents
-                          fields={petition.fields}
-                          fieldIndices={indices}
+                          fieldsWithIndices={allFieldsWithIndices as any}
                           onFieldClick={handleIndexFieldClick}
                           showAliasButtons={true}
                           onFieldEdit={handleFieldEdit}
@@ -605,7 +842,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               user={me}
               petition={petition}
               activeFieldId={activeFieldId}
-              fieldRefs={fieldRefs}
               onAddField={handleAddField}
               onCloneField={handleCloneField}
               onDeleteField={handleDeleteField}
@@ -613,12 +849,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onFieldEdit={handleFieldEdit}
               onFieldSettingsClick={handleFieldSettingsClick}
               onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
+              onLinkField={handleLinkField}
+              onUnlinkField={handleUnlinkField}
               isReadOnly={isReadOnly}
             />
 
             <PetitionComposeAttachments petition={petition} isReadOnly={isReadOnly} marginTop="4" />
 
-            {petition?.__typename === "PetitionTemplate" ? (
+            {petition.__typename === "PetitionTemplate" ? (
               <PetitionTemplateDescriptionEdit
                 petitionId={petition.id}
                 marginTop="4"
@@ -632,13 +870,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
                 <Text>
                   <FormattedMessage
-                    id="petition.already-sent"
+                    id="page.compose.petition-already-sent"
                     defaultMessage="This parallel has already been sent."
                   />
                 </Text>
                 <Text>
                   <FormattedMessage
-                    id="petition.send-from-activity"
+                    id="page.compose.send-from-activity"
                     defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
                     values={{
                       a: (chunks: any) => (
@@ -711,10 +949,32 @@ const _fragments = {
   get PetitionField() {
     return gql`
       fragment PetitionCompose_PetitionField on PetitionField {
-        ...PetitionComposeFieldSettings_PetitionField
         ...PetitionContents_PetitionField
+        ...PetitionComposeFieldSettings_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
+        ...ReferencedFieldDialog_PetitionField
+        ...FieldErrorDialog_PetitionField
+        parent {
+          id
+          position
+        }
+        children {
+          id
+          ...PetitionContents_PetitionField
+          ...PetitionComposeFieldSettings_PetitionField
+          ...validatePetitionFields_PetitionField
+          ...FieldErrorDialog_PetitionField
+          ...ReferencedFieldDialog_PetitionField
+          ...FieldErrorDialog_PetitionField
+          parent {
+            id
+            position
+          }
+          children {
+            id
+          }
+        }
       }
       ${PetitionComposeFieldSettings.fragments.PetitionField}
       ${PetitionContents.fragments.PetitionField}
@@ -763,12 +1023,26 @@ const _mutations = [
     ${AddPetitionAccessDialog.fragments.Petition}
   `,
   gql`
-    mutation PetitionCompose_updateFieldPositions($petitionId: GID!, $fieldIds: [GID!]!) {
-      updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
+    mutation PetitionCompose_updateFieldPositions(
+      $petitionId: GID!
+      $fieldIds: [GID!]!
+      $parentFieldId: GID
+    ) {
+      updateFieldPositions(
+        petitionId: $petitionId
+        fieldIds: $fieldIds
+        parentFieldId: $parentFieldId
+      ) {
         id
         ...PetitionLayout_PetitionBase
         fields {
           id
+          position
+          children {
+            id
+            position
+            optional
+          }
         }
       }
     }
@@ -779,14 +1053,26 @@ const _mutations = [
       $petitionId: GID!
       $type: PetitionFieldType!
       $position: Int
+      $parentFieldId: GID
     ) {
-      createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
+      createPetitionField(
+        petitionId: $petitionId
+        type: $type
+        position: $position
+        parentFieldId: $parentFieldId
+      ) {
         id
         ...PetitionCompose_PetitionField
         petition {
           ...PetitionLayout_PetitionBase
           fields {
             id
+            children {
+              id
+            }
+            parent {
+              id
+            }
           }
         }
       }
@@ -803,6 +1089,12 @@ const _mutations = [
           ...PetitionLayout_PetitionBase
           fields {
             id
+            children {
+              id
+            }
+            parent {
+              id
+            }
           }
         }
       }
@@ -821,6 +1113,9 @@ const _mutations = [
         ...PetitionLayout_PetitionBase
         fields {
           id
+          children {
+            id
+          }
         }
       }
     }
@@ -868,6 +1163,57 @@ const _mutations = [
             status
           }
           updatedAt
+        }
+      }
+    }
+    ${_fragments.PetitionField}
+  `,
+  gql`
+    mutation PetitionCompose_linkPetitionFieldChildren(
+      $petitionId: GID!
+      $parentFieldId: GID!
+      $childrenFieldIds: [GID!]!
+      $force: Boolean
+    ) {
+      linkPetitionFieldChildren(
+        petitionId: $petitionId
+        parentFieldId: $parentFieldId
+        childrenFieldIds: $childrenFieldIds
+        force: $force
+      ) {
+        ...PetitionCompose_PetitionField
+        petition {
+          id
+          fields {
+            id
+          }
+        }
+      }
+    }
+    ${_fragments.PetitionField}
+  `,
+  gql`
+    mutation PetitionCompose_unlinkPetitionFieldChildren(
+      $petitionId: GID!
+      $parentFieldId: GID!
+      $childrenFieldIds: [GID!]!
+      $force: Boolean
+    ) {
+      unlinkPetitionFieldChildren(
+        petitionId: $petitionId
+        parentFieldId: $parentFieldId
+        childrenFieldIds: $childrenFieldIds
+        force: $force
+      ) {
+        ...PetitionCompose_PetitionField
+        petition {
+          id
+          fields {
+            id
+            parent {
+              id
+            }
+          }
         }
       }
     }

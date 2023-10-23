@@ -49,7 +49,7 @@ type ComboboxItemData =
       group: string;
       field: createPlaceholderPlugin_PetitionFieldFragment;
       petition: createPlaceholderPlugin_PetitionBaseFragment;
-      index: number;
+      index: string;
     };
 
 export type PlaceholderOption = TComboboxItem<ComboboxItemData>;

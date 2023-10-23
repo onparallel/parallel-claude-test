@@ -11,8 +11,8 @@ import {
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
-import { AliasOptionsMenu } from "@parallel/components/petition-common/AliasOptionsMenu";
-import { CopyAliasIconButton } from "@parallel/components/petition-common/CopyAliasIconButton";
+import { CopyLiquidReferenceButton } from "@parallel/components/petition-common/CopyLiquidReferenceButton";
+import { MoreLiquidReferencesButton } from "@parallel/components/petition-common/MoreLiquidReferencesButton";
 import {
   SettingsRowAlias_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -103,13 +103,13 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
             <Input value={alias} size="sm" onChange={handleAliasChange} maxLength={100} />
             {showAliasButtons ? (
               <>
-                <CopyAliasIconButton
+                <CopyLiquidReferenceButton
                   field={field}
                   isDisabled={!alias || Boolean(aliasError)}
                   size="sm"
                   variant="outline"
                 />
-                <AliasOptionsMenu
+                <MoreLiquidReferencesButton
                   field={field}
                   size="sm"
                   boxShadow="none"
@@ -155,10 +155,10 @@ SettingsRowAlias.fragments = {
       id
       type
       alias
-      ...CopyAliasIconButton_PetitionField
-      ...AliasOptionsMenu_PetitionField
+      ...CopyLiquidReferenceButton_PetitionField
+      ...MoreLiquidReferencesButton_PetitionField
     }
-    ${CopyAliasIconButton.fragments.PetitionField}
-    ${AliasOptionsMenu.fragments.PetitionField}
+    ${CopyLiquidReferenceButton.fragments.PetitionField}
+    ${MoreLiquidReferencesButton.fragments.PetitionField}
   `,
 };

@@ -55,6 +55,36 @@
     "context": "Hi, I would like more information about sending parallels on behalf of another user."
   },
   {
+    "term": "component.add-alias-to-field-dialog.body",
+    "definition": "Add the reference to a field description where you want it to be replaced by the reply.",
+    "context": "Add the reference to a field description where you want it to be replaced by the reply."
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.field-reference",
+    "definition": "Field reference",
+    "context": "Field reference"
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.header",
+    "definition": "Create reference",
+    "context": "Create reference"
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.reference-exists-error",
+    "definition": "This reference is already in use.",
+    "context": "This reference is already in use."
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.reference-invalid-error",
+    "definition": "Use only letters, numbers or _",
+    "context": "Use only letters, numbers or _"
+  },
+  {
+    "term": "component.add-field-button.label",
+    "definition": "Add field",
+    "context": "Add field"
+  },
+  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Add to team",
     "context": "Add to team"
@@ -895,6 +925,21 @@
     "context": "Keep draft"
   },
   {
+    "term": "component.confirm-link-field-dialog.body",
+    "definition": "This field contains collected replies. If you add this field you will lose those replies including uploaded files <b>forever</b>.",
+    "context": "This field contains collected replies. If you add this field you will lose those replies including uploaded files <b>forever</b>."
+  },
+  {
+    "term": "component.confirm-link-field-dialog.confirm",
+    "definition": "Add to group",
+    "context": "Add to group"
+  },
+  {
+    "term": "component.confirm-link-field-dialog.header",
+    "definition": "Add field to group",
+    "context": "Add field to group"
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
     "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
@@ -1120,6 +1165,21 @@
     "context": "Disable Forward Security"
   },
   {
+    "term": "component.confirm-unlink-field-dialog.body",
+    "definition": "This field contains collected replies. If you remove this field you will lose those replies including uploaded files <b>forever</b>.",
+    "context": "This field contains collected replies. If you remove this field you will lose those replies including uploaded files <b>forever</b>."
+  },
+  {
+    "term": "component.confirm-unlink-field-dialog.confirm",
+    "definition": "Remove from group",
+    "context": "Remove from group"
+  },
+  {
+    "term": "component.confirm-unlink-field-dialog.header",
+    "definition": "Remove field from group",
+    "context": "Remove field from group"
+  },
+  {
     "term": "component.contact-list-header.create-contact-button",
     "definition": "Create contact",
     "context": "Create contact"
@@ -1155,14 +1215,14 @@
     "context": "Search for existing contacts or enter a valid email."
   },
   {
-    "term": "component.copy-alias-button.copied-reference",
-    "definition": "Copied to clipboard!",
-    "context": "Copied to clipboard!"
-  },
-  {
-    "term": "component.copy-alias-button.copy-reference",
+    "term": "component.copy-liquid-reference-button.copy-reference",
     "definition": "Copy reference",
     "context": "Copy reference"
+  },
+  {
+    "term": "component.copy-liquid-reference-button.reference-copied",
+    "definition": "Copied to clipboard!",
+    "context": "Copied to clipboard!"
   },
   {
     "term": "component.copy-signature-config-dialog.body",
@@ -1488,31 +1548,6 @@
     "term": "component.create-profile-type-dialog.new-profile-type",
     "definition": "New profile type",
     "context": "New profile type"
-  },
-  {
-    "term": "component.create-reference-dialog.body",
-    "definition": "Add the reference to a field description where you want it to be replaced by the reply.",
-    "context": "Add the reference to a field description where you want it to be replaced by the reply."
-  },
-  {
-    "term": "component.create-reference-dialog.field-reference",
-    "definition": "Field reference",
-    "context": "Field reference"
-  },
-  {
-    "term": "component.create-reference-dialog.header",
-    "definition": "Create reference",
-    "context": "Create reference"
-  },
-  {
-    "term": "component.create-reference-dialog.reference-exists-error",
-    "definition": "This reference is already in use.",
-    "context": "This reference is already in use."
-  },
-  {
-    "term": "component.create-reference-dialog.reference-invalid-error",
-    "definition": "Use only letters, numbers or _",
-    "context": "Use only letters, numbers or _"
   },
   {
     "term": "component.date-range-picker-button.clear-range",
@@ -2625,6 +2660,11 @@
     "context": "Please, select at least one reply to import"
   },
   {
+    "term": "component.import-replies-dialog.select-replies-import-error-group",
+    "definition": "Please, select at least one reply to import in each {groupLabel}",
+    "context": "Please, select at least one reply to import in each {groupLabel}"
+  },
+  {
     "term": "component.import-replies-dialog.source-petition-label",
     "definition": "Select the parallel to import the replies from",
     "context": "Select the parallel to import the replies from"
@@ -2863,6 +2903,166 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}"
+  },
+  {
+    "term": "component.more-liquid-references-button.and",
+    "definition": "and",
+    "context": "and"
+  },
+  {
+    "term": "component.more-liquid-references-button.capitalize-first-letter",
+    "definition": "Capitalize first letter",
+    "context": "Capitalize first letter"
+  },
+  {
+    "term": "component.more-liquid-references-button.capitalize-first-letter-description",
+    "definition": "Displays the reply with the first letter capitalized.",
+    "context": "Displays the reply with the first letter capitalized."
+  },
+  {
+    "term": "component.more-liquid-references-button.conditional-text",
+    "definition": "Conditional text",
+    "context": "Conditional text"
+  },
+  {
+    "term": "component.more-liquid-references-button.conditional-text-description",
+    "definition": "Displays a sentence when an option is chosen.",
+    "context": "Displays a sentence when an option is chosen."
+  },
+  {
+    "term": "component.more-liquid-references-button.example-reply",
+    "definition": "Example reply",
+    "context": "Example reply"
+  },
+  {
+    "term": "component.more-liquid-references-button.formula-copied-alert",
+    "definition": "Formula copied to clipboard",
+    "context": "Formula copied to clipboard"
+  },
+  {
+    "term": "component.more-liquid-references-button.formulas",
+    "definition": "Formulas",
+    "context": "Formulas"
+  },
+  {
+    "term": "component.more-liquid-references-button.if-option-with-sentence",
+    "definition": "This sentence will be displayed when \"{option}\" is selected.",
+    "context": "This sentence will be displayed when \"{option}\" is selected."
+  },
+  {
+    "term": "component.more-liquid-references-button.list-of-replies",
+    "definition": "List of replies",
+    "context": "List of replies"
+  },
+  {
+    "term": "component.more-liquid-references-button.list-of-replies-description",
+    "definition": "Creates a list with each reply added.",
+    "context": "Creates a list with each reply added."
+  },
+  {
+    "term": "component.more-liquid-references-button.lowercase",
+    "definition": "Lowercase",
+    "context": "Lowercase"
+  },
+  {
+    "term": "component.more-liquid-references-button.lowercase-description",
+    "definition": "Displays a lowercase reply.",
+    "context": "Displays a lowercase reply."
+  },
+  {
+    "term": "component.more-liquid-references-button.number-of-replies",
+    "definition": "Number of replies",
+    "context": "Number of replies"
+  },
+  {
+    "term": "component.more-liquid-references-button.number-of-replies-description",
+    "definition": "Show the number of groups added.",
+    "context": "Show the number of groups added."
+  },
+  {
+    "term": "component.more-liquid-references-button.one-line-replies",
+    "definition": "One-line replies",
+    "context": "One-line replies"
+  },
+  {
+    "term": "component.more-liquid-references-button.one-line-replies-description",
+    "definition": "Displays all replies in one line.",
+    "context": "Displays all replies in one line."
+  },
+  {
+    "term": "component.more-liquid-references-button.percentage",
+    "definition": "Percentage",
+    "context": "Percentage"
+  },
+  {
+    "term": "component.more-liquid-references-button.percentage-description",
+    "definition": "Displays the reply as a percentage.",
+    "context": "Displays the reply as a percentage."
+  },
+  {
+    "term": "component.more-liquid-references-button.quantity",
+    "definition": "Quantity",
+    "context": "Quantity"
+  },
+  {
+    "term": "component.more-liquid-references-button.quantity-description",
+    "definition": "Displays the reply as a quantity.",
+    "context": "Displays the reply as a quantity."
+  },
+  {
+    "term": "component.more-liquid-references-button.round-up",
+    "definition": "Round up",
+    "context": "Round up"
+  },
+  {
+    "term": "component.more-liquid-references-button.round-up-description",
+    "definition": "Rounds the amount of a field.",
+    "context": "Rounds the amount of a field."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-for-option",
+    "definition": "This sentence will be displayed when \"{option}\" is selected.",
+    "context": "This sentence will be displayed when \"{option}\" is selected."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-for-other",
+    "definition": "This sentence will be displayed if none of the previous options is selected.",
+    "context": "This sentence will be displayed if none of the previous options is selected."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-no-reply",
+    "definition": "This sentence will be displayed if there are no added replies.",
+    "context": "This sentence will be displayed if there are no added replies."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-with-reply",
+    "definition": "This sentence will be displayed when the reply is \"{value}\".",
+    "context": "This sentence will be displayed when the reply is \"{value}\"."
+  },
+  {
+    "term": "component.more-liquid-references-button.table-of-results",
+    "definition": "Table of results",
+    "context": "Table of results"
+  },
+  {
+    "term": "component.more-liquid-references-button.table-of-results-description",
+    "definition": "Show the results formatted as a table.",
+    "context": "Show the results formatted as a table."
+  },
+  {
+    "term": "component.more-liquid-references-button.table-of-results-transposed",
+    "definition": "Table of results (transposed)",
+    "context": "Table of results (transposed)"
+  },
+  {
+    "term": "component.more-liquid-references-button.uppercase",
+    "definition": "Uppercase",
+    "context": "Uppercase"
+  },
+  {
+    "term": "component.more-liquid-references-button.uppercase-description",
+    "definition": "Displays the reply in capital letters.",
+    "context": "Displays the reply in capital letters."
   },
   {
     "term": "component.more-options-menu-profile.close-profile",
@@ -3515,9 +3715,89 @@
     "context": "Remove attachment"
   },
   {
+    "term": "component.petition-compose-field-group-children.add-field",
+    "definition": "Add field",
+    "context": "Add field"
+  },
+  {
+    "term": "component.petition-compose-field-group-children.drag-field-to-link-error",
+    "definition": "This field can not be added to a group",
+    "context": "This field can not be added to a group"
+  },
+  {
+    "term": "component.petition-compose-field-group-children.drag-field-to-link-text",
+    "definition": "Drag fields here to add them to the group",
+    "context": "Drag fields here to add them to the group"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.group-name",
+    "definition": "Group name",
+    "context": "Group name"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.group-name-description-1",
+    "definition": "Name your question groups for easier identification.",
+    "context": "Name your question groups for easier identification."
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.group-name-description-2",
+    "definition": "If you choose \"Relative\", groups will be labeled “Relative 1”, “Relative 2” and so on. If left unnamed, groups default to “Reply 1”, “Reply 2”, etc.",
+    "context": "If you choose \"Relative\", groups will be labeled “Relative 1”, “Relative 2” and so on. If left unnamed, groups default to “Reply 1”, “Reply 2”, etc."
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.input-group-name-placeholder",
+    "definition": "E.g., Family member",
+    "context": "E.g., Family member"
+  },
+  {
+    "term": "component.petition-compose-field-settings.advanced-options",
+    "definition": "Advanced options",
+    "context": "Advanced options"
+  },
+  {
     "term": "component.petition-compose-field-settings.alias-warning",
     "definition": "<b>Note:</b> Document fields cannot be used to replace content in descriptions.",
     "context": "<b>Note:</b> Document fields cannot be used to replace content in descriptions."
+  },
+  {
+    "term": "component.petition-compose-field-settings.file-multiple-description",
+    "definition": "Enabling this allows the recipient to upload multiple files to this field.",
+    "context": "Enabling this allows the recipient to upload multiple files to this field."
+  },
+  {
+    "term": "component.petition-compose-field-settings.file-multiple-label",
+    "definition": "Allow uploading more than one file",
+    "context": "Allow uploading more than one file"
+  },
+  {
+    "term": "component.petition-compose-field-settings.include-approval-description",
+    "definition": "Enabling this option will include the buttons for approving and rejecting replies.",
+    "context": "Enabling this option will include the buttons for approving and rejecting replies."
+  },
+  {
+    "term": "component.petition-compose-field-settings.internal-field-description",
+    "definition": "Enabling this will make the field invisible to the recipient.",
+    "context": "Enabling this will make the field invisible to the recipient."
+  },
+  {
+    "term": "component.petition-compose-field-settings.multiple-description",
+    "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
+    "context": "Enabling this allows the recipient to submit multiple answers to this field."
+  },
+  {
+    "term": "component.petition-compose-field-settings.multiple-label",
+    "definition": "Allow more than one reply",
+    "context": "Allow more than one reply"
+  },
+  {
+    "term": "component.petition-compose-field-settings.show-activity-pdf-description",
+    "definition": "Enabling this option will include who and when a reply and its approval were submitted in the PDF.",
+    "context": "Enabling this option will include who and when a reply and its approval were submitted in the PDF."
+  },
+  {
+    "term": "component.petition-compose-field-settings.show-in-pdf-description",
+    "definition": "Enabling this option will make the content appear in the exported PDF and the document to be signed.",
+    "context": "Enabling this option will make the content appear in the exported PDF and the document to be signed."
   },
   {
     "term": "component.petition-compose-field.add-attachment",
@@ -3528,6 +3808,11 @@
     "term": "component.petition-compose-field.add-condition",
     "definition": "Add condition",
     "context": "Add condition"
+  },
+  {
+    "term": "component.petition-compose-field.conditions-not-available-first-field-group",
+    "definition": "You cannot set conditions for the first field in a group. Reorder the fields or add a new one before it to set conditions between them.",
+    "context": "You cannot set conditions for the first field in a group. Reorder the fields or add a new one before it to set conditions between them."
   },
   {
     "term": "component.petition-compose-field.conditions-not-enough-fields",
@@ -3630,6 +3915,11 @@
     "context": "Remove condition"
   },
   {
+    "term": "component.petition-compose-field.required-label",
+    "definition": "Required",
+    "context": "Required"
+  },
+  {
     "term": "component.petition-compose-field.too-many-attachments",
     "definition": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field",
     "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
@@ -3638,6 +3928,16 @@
     "term": "component.petition-compose-field.too-many-attachments-header",
     "definition": "Too many attachments",
     "context": "Too many attachments"
+  },
+  {
+    "term": "component.petition-compose-field.unlink-button",
+    "definition": "Remove from group",
+    "context": "Remove from group"
+  },
+  {
+    "term": "component.petition-compose-field.unlink-question",
+    "definition": "Do you want to remove this field from the group?",
+    "context": "Do you want to remove this field from the group?"
   },
   {
     "term": "component.petition-compose-field.visibility-help",
@@ -3665,11 +3965,6 @@
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
   },
   {
-    "term": "component.petition-contents.reference-copied-alert",
-    "definition": "Reference copied to clipboard",
-    "context": "Reference copied to clipboard"
-  },
-  {
     "term": "component.petition-field-checkbox-settings.exact-number",
     "definition": "Exact number",
     "context": "Exact number"
@@ -3683,6 +3978,11 @@
     "term": "component.petition-field-checkbox-settings.unlimited",
     "definition": "Unlimited",
     "context": "Unlimited"
+  },
+  {
+    "term": "component.petition-field-logic-add-condition-button.add-condition",
+    "definition": "Add condition",
+    "context": "Add condition"
   },
   {
     "term": "component.petition-field-select.placeholder",
@@ -3728,6 +4028,11 @@
     "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
     "definition": "Drop-down menu that dynamically adapts its options based on the reply to the previous drop-down.",
     "context": "Drop-down menu that dynamically adapts its options based on the reply to the previous drop-down."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.field-group-description",
+    "definition": "Link fields to create a group that can be answered as many times as needed.",
+    "context": "Link fields to create a group that can be answered as many times as needed."
   },
   {
     "term": "component.petition-field-type-select-dropdown.file-upload-description",
@@ -3778,11 +4083,6 @@
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
     "definition": "Thumbnail for field type \"{type}\"",
     "context": "Thumbnail for field type \"{type}\""
-  },
-  {
-    "term": "component.petition-field-visibility-editor.add-condition",
-    "definition": "Add condition",
-    "context": "Add condition"
   },
   {
     "term": "component.petition-field-visibility-editor.all",
@@ -3848,11 +4148,6 @@
     "term": "component.petition-field-visibility-editor.have-reply",
     "definition": "has replies",
     "context": "has replies"
-  },
-  {
-    "term": "component.petition-field-visibility-editor.hide",
-    "definition": "Hide when",
-    "context": "Hide when"
   },
   {
     "term": "component.petition-field-visibility-editor.is-one-of-select",
@@ -3930,14 +4225,19 @@
     "context": "or"
   },
   {
-    "term": "component.petition-field-visibility-editor.show",
-    "definition": "Show when",
-    "context": "Show when"
-  },
-  {
     "term": "component.petition-field-visibility-editor.start-with-default",
     "definition": "{modifier, select, ALL {start with} other {starts with}}",
     "context": "{modifier, select, ALL {start with} other {starts with}}"
+  },
+  {
+    "term": "component.petition-field-visibility-type-select.hide",
+    "definition": "Hide when",
+    "context": "Hide when"
+  },
+  {
+    "term": "component.petition-field-visibility-type-select.show",
+    "definition": "Show when",
+    "context": "Show when"
   },
   {
     "term": "component.petition-from-template-dialog.body",
@@ -4290,14 +4590,24 @@
     "context": "Send every <days-input></days-input> days at <time-input></time-input> up to <limit-input></limit-input> reminders."
   },
   {
+    "term": "component.petition-replies-field-reply.approve",
+    "definition": "Approve",
+    "context": "Approve"
+  },
+  {
+    "term": "component.petition-replies-field-reply.file-incomplete",
+    "definition": "There was an error uploading the file. Please request a new upload.",
+    "context": "There was an error uploading the file. Please request a new upload."
+  },
+  {
+    "term": "component.petition-replies-field-reply.reject",
+    "definition": "Reject",
+    "context": "Reject"
+  },
+  {
     "term": "component.petition-replies-field.attachments",
     "definition": "{count, plural, =1 {1 file attached} other {# files attached}}",
     "context": "{count, plural, =1 {1 file attached} other {# files attached}}"
-  },
-  {
-    "term": "component.petition-replies-field.conditions-not-met",
-    "definition": "Visibility conditions for this field are not met",
-    "context": "Visibility conditions for this field are not met"
   },
   {
     "term": "component.petition-replies-field.edit-field",
@@ -4883,6 +5193,11 @@
     "term": "component.preview-dow-jones-permission-denied-dialog.title",
     "definition": "Permissions needed",
     "context": "Permissions needed"
+  },
+  {
+    "term": "component.preview-petition-field-group.review-reply",
+    "definition": "Review reply",
+    "context": "Review reply"
   },
   {
     "term": "component.preview-petition-field-kyc-research.do-another-search",
@@ -5865,6 +6180,31 @@
     "context": "You are using the time zone {timezone}."
   },
   {
+    "term": "component.recipient-view-petition-field-group.add-button",
+    "definition": "Add {groupName}",
+    "context": "Add {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.confirm-delete-group",
+    "definition": "Do you want to remove {groupName}?",
+    "context": "Do you want to remove {groupName}?"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.edit-field",
+    "definition": "Edit field",
+    "context": "Edit field"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-confirmation-button",
+    "definition": "Remove",
+    "context": "Remove"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-reply-button",
+    "definition": "Remove {groupName}",
+    "context": "Remove {groupName}"
+  },
+  {
     "term": "component.recipient-view-petition-field-number.only-numbers",
     "definition": "Numeric {multiple, select, true{answers} other {answer}}",
     "context": "Numeric {multiple, select, true{answers} other {answer}}"
@@ -6013,146 +6353,6 @@
     "term": "component.recover-profile-dialog.recover-button",
     "definition": "Recover",
     "context": "Recover"
-  },
-  {
-    "term": "component.reference-options-menu.and",
-    "definition": "and",
-    "context": "and"
-  },
-  {
-    "term": "component.reference-options-menu.capitalize-first-letter",
-    "definition": "Capitalize first letter",
-    "context": "Capitalize first letter"
-  },
-  {
-    "term": "component.reference-options-menu.capitalize-first-letter-description",
-    "definition": "Displays the reply with the first letter capitalized.",
-    "context": "Displays the reply with the first letter capitalized."
-  },
-  {
-    "term": "component.reference-options-menu.conditional-text",
-    "definition": "Conditional text",
-    "context": "Conditional text"
-  },
-  {
-    "term": "component.reference-options-menu.conditional-text-description",
-    "definition": "Displays a sentence when an option is chosen.",
-    "context": "Displays a sentence when an option is chosen."
-  },
-  {
-    "term": "component.reference-options-menu.example-reply",
-    "definition": "Example reply",
-    "context": "Example reply"
-  },
-  {
-    "term": "component.reference-options-menu.formula-copied-alert",
-    "definition": "Formula copied to clipboard",
-    "context": "Formula copied to clipboard"
-  },
-  {
-    "term": "component.reference-options-menu.formulas",
-    "definition": "Formulas",
-    "context": "Formulas"
-  },
-  {
-    "term": "component.reference-options-menu.if-option-with-sentence",
-    "definition": "This sentence will be displayed when \"{option}\" is selected.",
-    "context": "This sentence will be displayed when \"{option}\" is selected."
-  },
-  {
-    "term": "component.reference-options-menu.list-of-replies",
-    "definition": "List of replies",
-    "context": "List of replies"
-  },
-  {
-    "term": "component.reference-options-menu.list-of-replies-description",
-    "definition": "Creates a list with each reply added.",
-    "context": "Creates a list with each reply added."
-  },
-  {
-    "term": "component.reference-options-menu.loop-variable",
-    "definition": "reply",
-    "context": "reply"
-  },
-  {
-    "term": "component.reference-options-menu.lowercase",
-    "definition": "Lowercase",
-    "context": "Lowercase"
-  },
-  {
-    "term": "component.reference-options-menu.lowercase-description",
-    "definition": "Displays a lowercase reply.",
-    "context": "Displays a lowercase reply."
-  },
-  {
-    "term": "component.reference-options-menu.one-line-replies",
-    "definition": "One-line replies",
-    "context": "One-line replies"
-  },
-  {
-    "term": "component.reference-options-menu.one-line-replies-description",
-    "definition": "Displays all replies in one line.",
-    "context": "Displays all replies in one line."
-  },
-  {
-    "term": "component.reference-options-menu.percentage",
-    "definition": "Percentage",
-    "context": "Percentage"
-  },
-  {
-    "term": "component.reference-options-menu.percentage-description",
-    "definition": "Displays the reply as a percentage.",
-    "context": "Displays the reply as a percentage."
-  },
-  {
-    "term": "component.reference-options-menu.quantities",
-    "definition": "Quantities",
-    "context": "Quantities"
-  },
-  {
-    "term": "component.reference-options-menu.quantities-description",
-    "definition": "Displays the reply as quantity.",
-    "context": "Displays the reply as quantity."
-  },
-  {
-    "term": "component.reference-options-menu.round-up",
-    "definition": "Round up",
-    "context": "Round up"
-  },
-  {
-    "term": "component.reference-options-menu.round-up-description",
-    "definition": "Rounds the amount of a field.",
-    "context": "Rounds the amount of a field."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-for-option",
-    "definition": "This sentence will be displayed when \"{option}\" is selected.",
-    "context": "This sentence will be displayed when \"{option}\" is selected."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-for-other",
-    "definition": "This sentence will be displayed if none of the previous options is selected.",
-    "context": "This sentence will be displayed if none of the previous options is selected."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-no-reply",
-    "definition": "This sentence will be displayed if there are no added replies.",
-    "context": "This sentence will be displayed if there are no added replies."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-with-reply",
-    "definition": "This sentence will be displayed when the reply is \"{value}\".",
-    "context": "This sentence will be displayed when the reply is \"{value}\"."
-  },
-  {
-    "term": "component.reference-options-menu.uppercase",
-    "definition": "Uppercase",
-    "context": "Uppercase"
-  },
-  {
-    "term": "component.reference-options-menu.uppercase-description",
-    "definition": "Displays the reply in capital letters.",
-    "context": "Displays the reply in capital letters."
   },
   {
     "term": "component.referenced-field-dialog.confirm",
@@ -6815,6 +7015,16 @@
     "context": "Remove setting"
   },
   {
+    "term": "component.settings-row-placeholder.placeholder-description",
+    "definition": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
+    "context": "The placeholder is the subtle descriptive text that shows when the input field is empty."
+  },
+  {
+    "term": "component.settings-row-placeholder.placeholder-label",
+    "definition": "Placeholder",
+    "context": "Placeholder"
+  },
+  {
     "term": "component.share-button.petition-not-shared",
     "definition": "This parallel has not been shared yet.",
     "context": "This parallel has not been shared yet."
@@ -7368,6 +7578,56 @@
     "term": "component.test-signature-dialog.title",
     "definition": "Test signature",
     "context": "Test signature"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description",
+    "definition": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description-children-of-group",
+    "definition": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description-field-group",
+    "definition": "{userIsYou, select, true {You} other {{createdBy}}} added a group to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} added a group to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-deleted-event.description",
+    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-deleted-event.description--field-group",
+    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-deleted-event.description-children-of-group",
+    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description",
+    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description-children-of-group",
+    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-see-reply-button.reply-deleted",
+    "definition": "Reply deleted",
+    "context": "Reply deleted"
+  },
+  {
+    "term": "component.timeline-see-reply-button.see",
+    "definition": "See",
+    "context": "See"
   },
   {
     "term": "component.timeline-signature-started-event.signature-started-description",
@@ -8105,16 +8365,6 @@
     "context": "This option allows you to limit the number of options that the recipient can choose."
   },
   {
-    "term": "field-settings.file-multiple-description",
-    "definition": "Enabling this allows the recipient to upload multiple files to this field.",
-    "context": "Enabling this allows the recipient to upload multiple files to this field."
-  },
-  {
-    "term": "field-settings.file-multiple-label",
-    "definition": "Allow uploading more than one file",
-    "context": "Allow uploading more than one file"
-  },
-  {
     "term": "field-settings.heading-page-break-description",
     "definition": "Enabling this will create a new page and use this as the heading of the new page",
     "context": "Enabling this will create a new page and use this as the heading of the new page"
@@ -8130,26 +8380,6 @@
     "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
-    "term": "field-settings.include-approval-description",
-    "definition": "Enabling this option will include the buttons for approving and rejecting replies.",
-    "context": "Enabling this option will include the buttons for approving and rejecting replies."
-  },
-  {
-    "term": "field-settings.internal-field-description",
-    "definition": "Enabling this will make the field invisible to the recipient.",
-    "context": "Enabling this will make the field invisible to the recipient."
-  },
-  {
-    "term": "field-settings.multiple-description",
-    "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
-    "context": "Enabling this allows the recipient to submit multiple answers to this field."
-  },
-  {
-    "term": "field-settings.multiple-label",
-    "definition": "Allow more than one reply",
-    "context": "Allow more than one reply"
-  },
-  {
     "term": "field-settings.reference-exists-error",
     "definition": "This reference is already in use.",
     "context": "This reference is already in use."
@@ -8158,26 +8388,6 @@
     "term": "field-settings.reference-invalid-error",
     "definition": "Use only letters, numbers or _",
     "context": "Use only letters, numbers or _"
-  },
-  {
-    "term": "field-settings.show-activity-pdf-description",
-    "definition": "Enabling this option will include who and when a reply and its approval were submitted in the PDF.",
-    "context": "Enabling this option will include who and when a reply and its approval were submitted in the PDF."
-  },
-  {
-    "term": "field-settings.show-in-pdf-description",
-    "definition": "Enabling this option will make the content appear in the exported PDF and the document to be signed.",
-    "context": "Enabling this option will make the content appear in the exported PDF and the document to be signed."
-  },
-  {
-    "term": "field-settings.text-placeholder-description",
-    "definition": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
-    "context": "The placeholder is the subtle descriptive text that shows when the input field is empty."
-  },
-  {
-    "term": "field-settings.text-placeholder-label",
-    "definition": "Placeholder",
-    "context": "Placeholder"
   },
   {
     "term": "footer.slogan",
@@ -8375,6 +8585,11 @@
     "context": "Contact"
   },
   {
+    "term": "generic.contents",
+    "definition": "Contents",
+    "context": "Contents"
+  },
+  {
     "term": "generic.continue",
     "definition": "Continue",
     "context": "Continue"
@@ -8430,6 +8645,11 @@
     "context": "Default"
   },
   {
+    "term": "generic.default-group-name",
+    "definition": "Reply",
+    "context": "Reply"
+  },
+  {
     "term": "generic.delete",
     "definition": "Delete",
     "context": "Delete"
@@ -8478,6 +8698,11 @@
     "term": "generic.dont-show-message-again",
     "definition": "Do not show this message again",
     "context": "Do not show this message again"
+  },
+  {
+    "term": "generic.dow-jones-kyc-external-error",
+    "definition": "A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again.",
+    "context": "A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again."
   },
   {
     "term": "generic.download",
@@ -8588,6 +8813,16 @@
     "term": "generic.file-size",
     "definition": "File size",
     "context": "File size"
+  },
+  {
+    "term": "generic.first-child-is-internal-error",
+    "definition": "The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder.",
+    "context": "The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+  },
+  {
+    "term": "generic.first-child-visibility-conditions-error",
+    "definition": "You cannot set conditions for the first field in a group.",
+    "context": "You cannot set conditions for the first field in a group."
   },
   {
     "term": "generic.folder",
@@ -8755,6 +8990,11 @@
     "context": "Go to page {page}"
   },
   {
+    "term": "generic.group-name-fallback-reply",
+    "definition": "Reply",
+    "context": "Reply"
+  },
+  {
     "term": "generic.groups",
     "definition": "Teams",
     "context": "Teams"
@@ -8858,6 +9098,11 @@
     "term": "generic.legend",
     "definition": "Legend",
     "context": "Legend"
+  },
+  {
+    "term": "generic.liquid-loop-variable-name",
+    "definition": "reply",
+    "context": "reply"
   },
   {
     "term": "generic.more-options",
@@ -9058,6 +9303,76 @@
     "term": "generic.petition-count",
     "definition": "{count, plural, =1 {# parallel} other {# parallels}}",
     "context": "{count, plural, =1 {# parallel} other {# parallels}}"
+  },
+  {
+    "term": "generic.petition-field-type-checkbox",
+    "definition": "Multiple choice",
+    "context": "Multiple choice"
+  },
+  {
+    "term": "generic.petition-field-type-conditional-select",
+    "definition": "Conditional select",
+    "context": "Conditional select"
+  },
+  {
+    "term": "generic.petition-field-type-date",
+    "definition": "Date",
+    "context": "Date"
+  },
+  {
+    "term": "generic.petition-field-type-date-and-time",
+    "definition": "Date and time",
+    "context": "Date and time"
+  },
+  {
+    "term": "generic.petition-field-type-dow-jones-kyc-research",
+    "definition": "Search in Dow Jones",
+    "context": "Search in Dow Jones"
+  },
+  {
+    "term": "generic.petition-field-type-field-group",
+    "definition": "Questions group",
+    "context": "Questions group"
+  },
+  {
+    "term": "generic.petition-field-type-file-upload",
+    "definition": "Documents and files",
+    "context": "Documents and files"
+  },
+  {
+    "term": "generic.petition-field-type-heading",
+    "definition": "Text block",
+    "context": "Text block"
+  },
+  {
+    "term": "generic.petition-field-type-number",
+    "definition": "Numbers",
+    "context": "Numbers"
+  },
+  {
+    "term": "generic.petition-field-type-phone",
+    "definition": "Phone number",
+    "context": "Phone number"
+  },
+  {
+    "term": "generic.petition-field-type-select",
+    "definition": "Select",
+    "context": "Select"
+  },
+  {
+    "term": "generic.petition-field-type-short-text",
+    "definition": "Short replies",
+    "context": "Short replies"
+  },
+  {
+    "term": "generic.petition-field-type-tax-documents",
+    "definition": "Tax documents",
+    "context": "Tax documents"
+  },
+  {
+    "term": "generic.petition-field-type-text",
+    "definition": "Long replies",
+    "context": "Long replies"
   },
   {
     "term": "generic.plans.enterprise",
@@ -10230,6 +10545,21 @@
     "context": "{amount} years"
   },
   {
+    "term": "page.compose.petition-already-sent",
+    "definition": "This parallel has already been sent.",
+    "context": "This parallel has already been sent."
+  },
+  {
+    "term": "page.compose.petition-settings-header",
+    "definition": "Settings",
+    "context": "Settings"
+  },
+  {
+    "term": "page.compose.send-from-activity",
+    "definition": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
+    "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+  },
+  {
     "term": "page.group.no-results",
     "definition": "There's no users matching your search",
     "context": "There's no users matching your search"
@@ -10970,6 +11300,41 @@
     "context": "Profiles"
   },
   {
+    "term": "page.replies.associate-profile-button",
+    "definition": "Associate profile",
+    "context": "Associate profile"
+  },
+  {
+    "term": "page.replies.export-replies",
+    "definition": "Export",
+    "context": "Export"
+  },
+  {
+    "term": "page.replies.finalize-petition-button",
+    "definition": "Close parallel",
+    "context": "Close parallel"
+  },
+  {
+    "term": "page.replies.message-sent-toast-description",
+    "definition": "The message is on it's way",
+    "context": "The message is on it's way"
+  },
+  {
+    "term": "page.replies.message-sent-toast-header",
+    "definition": "Message sent",
+    "context": "Message sent"
+  },
+  {
+    "term": "page.replies.notify-petition-reviewed-button",
+    "definition": "Notify that it is correct",
+    "context": "Notify that it is correct"
+  },
+  {
+    "term": "page.replies.open-profile-button",
+    "definition": "Open profile",
+    "context": "Open profile"
+  },
+  {
     "term": "page.reports-overview.choose-date-range",
     "definition": "Choose the date range you need to view the results of your templates",
     "context": "Choose the date range you need to view the results of your templates"
@@ -11600,61 +11965,6 @@
     "context": "Pending"
   },
   {
-    "term": "petition-compose.settings",
-    "definition": "Settings",
-    "context": "Settings"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-email",
-    "definition": "Recipient email",
-    "context": "Recipient email"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-first-name",
-    "definition": "Recipient first name",
-    "context": "Recipient first name"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-full-name",
-    "definition": "Recipient full name",
-    "context": "Recipient full name"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-information",
-    "definition": "Contact Information",
-    "context": "Contact Information"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-last-name",
-    "definition": "Recipient last name",
-    "context": "Recipient last name"
-  },
-  {
-    "term": "petition-message.placeholder-option.parallel-title",
-    "definition": "Parallel title",
-    "context": "Parallel title"
-  },
-  {
-    "term": "petition-message.placeholder-option.references",
-    "definition": "References",
-    "context": "References"
-  },
-  {
-    "term": "petition-message.placeholder-option.user-first-name",
-    "definition": "My first name",
-    "context": "My first name"
-  },
-  {
-    "term": "petition-message.placeholder-option.user-full-name",
-    "definition": "My full name",
-    "context": "My full name"
-  },
-  {
-    "term": "petition-message.placeholder-option.user-last-name",
-    "definition": "My last name",
-    "context": "My last name"
-  },
-  {
     "term": "petition-permission-type.owner",
     "definition": "Owner",
     "context": "Owner"
@@ -11690,16 +12000,6 @@
     "context": "Your signature is on its way."
   },
   {
-    "term": "petition-replies.associate-profile.button",
-    "definition": "Associate profile",
-    "context": "Associate profile"
-  },
-  {
-    "term": "petition-replies.export-replies",
-    "definition": "Export",
-    "context": "Export"
-  },
-  {
     "term": "petition-replies.field-comments.disabled-comments-2",
     "definition": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab.",
     "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
@@ -11710,29 +12010,9 @@
     "context": "This field only accepts notes"
   },
   {
-    "term": "petition-replies.finalize-petition.button",
-    "definition": "Close parallel",
-    "context": "Close parallel"
-  },
-  {
     "term": "petition-replies.note-popover",
     "definition": "This note is only visible for people in your organization.",
     "context": "This note is only visible for people in your organization."
-  },
-  {
-    "term": "petition-replies.notify-petition-reviewed.button",
-    "definition": "Notify that it is correct",
-    "context": "Notify that it is correct"
-  },
-  {
-    "term": "petition-replies.open-profile.button",
-    "definition": "Open profile",
-    "context": "Open profile"
-  },
-  {
-    "term": "petition-replies.petition-field-reply.approve",
-    "definition": "Approve",
-    "context": "Approve"
   },
   {
     "term": "petition-replies.petition-field-reply.file-download",
@@ -11743,16 +12023,6 @@
     "term": "petition-replies.petition-field-reply.file-preview-download",
     "definition": "Preview file. ⇧ + click to download",
     "context": "Preview file. ⇧ + click to download"
-  },
-  {
-    "term": "petition-replies.petition-field-reply.file-upload.file-incomplete",
-    "definition": "There was an error uploading the file. Please request a new upload.",
-    "context": "There was an error uploading the file. Please request a new upload."
-  },
-  {
-    "term": "petition-replies.petition-field-reply.reject",
-    "definition": "Reject",
-    "context": "Reject"
   },
   {
     "term": "petition-sharing.confirm-edit.header",
@@ -11870,24 +12140,9 @@
     "context": "Add another field"
   },
   {
-    "term": "petition.add-field-button",
-    "definition": "Add field",
-    "context": "Add field"
-  },
-  {
     "term": "petition.add-recipient-button",
     "definition": "Add recipient",
     "context": "Add recipient"
-  },
-  {
-    "term": "petition.advanced-options",
-    "definition": "Advanced options",
-    "context": "Advanced options"
-  },
-  {
-    "term": "petition.already-sent",
-    "definition": "This parallel has already been sent.",
-    "context": "This parallel has already been sent."
   },
   {
     "term": "petition.confirm-cancel-scheduled-message.body",
@@ -11975,76 +12230,6 @@
     "context": "Delete theme"
   },
   {
-    "term": "petition.contents",
-    "definition": "Contents",
-    "context": "Contents"
-  },
-  {
-    "term": "petition.field-type.checkbox",
-    "definition": "Multiple choice",
-    "context": "Multiple choice"
-  },
-  {
-    "term": "petition.field-type.conditional-select",
-    "definition": "Conditional select",
-    "context": "Conditional select"
-  },
-  {
-    "term": "petition.field-type.date",
-    "definition": "Date",
-    "context": "Date"
-  },
-  {
-    "term": "petition.field-type.date-and-time",
-    "definition": "Date and time",
-    "context": "Date and time"
-  },
-  {
-    "term": "petition.field-type.dow-jones-kyc-research",
-    "definition": "Search in Dow Jones",
-    "context": "Search in Dow Jones"
-  },
-  {
-    "term": "petition.field-type.file-upload",
-    "definition": "Documents and files",
-    "context": "Documents and files"
-  },
-  {
-    "term": "petition.field-type.heading",
-    "definition": "Text block",
-    "context": "Text block"
-  },
-  {
-    "term": "petition.field-type.number",
-    "definition": "Numbers",
-    "context": "Numbers"
-  },
-  {
-    "term": "petition.field-type.phone",
-    "definition": "Phone number",
-    "context": "Phone number"
-  },
-  {
-    "term": "petition.field-type.select",
-    "definition": "Select",
-    "context": "Select"
-  },
-  {
-    "term": "petition.field-type.short-text",
-    "definition": "Short replies",
-    "context": "Short replies"
-  },
-  {
-    "term": "petition.field-type.tax-documents",
-    "definition": "Tax documents",
-    "context": "Tax documents"
-  },
-  {
-    "term": "petition.field-type.text",
-    "definition": "Long replies",
-    "context": "Long replies"
-  },
-  {
     "term": "petition.header.activity-tab",
     "definition": "Activity",
     "context": "Activity"
@@ -12083,16 +12268,6 @@
     "term": "petition.long-batch-send-dialog.message",
     "definition": "We are sending your parallels. It might take a little bit, please wait.",
     "context": "We are sending your parallels. It might take a little bit, please wait."
-  },
-  {
-    "term": "petition.message-sent.toast-description",
-    "definition": "The message is on it's way",
-    "context": "The message is on it's way"
-  },
-  {
-    "term": "petition.message-sent.toast-header",
-    "definition": "Message sent",
-    "context": "Message sent"
   },
   {
     "term": "petition.no-reminders-left-generic.toast-description",
@@ -12215,11 +12390,6 @@
     "context": "Error downloading {filename}"
   },
   {
-    "term": "petition.required-label",
-    "definition": "Required",
-    "context": "Required"
-  },
-  {
     "term": "petition.schedule-delivery.header",
     "definition": "Select date and time",
     "context": "Select date and time"
@@ -12228,11 +12398,6 @@
     "term": "petition.schedule-send-button",
     "definition": "Schedule send",
     "context": "Schedule send"
-  },
-  {
-    "term": "petition.send-from-activity",
-    "definition": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
-    "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
   },
   {
     "term": "petition.set-deadline",
@@ -13390,34 +13555,9 @@
     "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {other} {timeAgo}"
   },
   {
-    "term": "timeline.reply-created-description",
-    "definition": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.reply-deleted",
-    "definition": "Reply deleted",
-    "context": "Reply deleted"
-  },
-  {
-    "term": "timeline.reply-deleted-description",
-    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
-  },
-  {
     "term": "timeline.reply-status-changed-description",
     "definition": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.reply-updated-description",
-    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.see",
-    "definition": "See",
-    "context": "See"
   },
   {
     "term": "timeline.signature-cancelled-by-user.description",
@@ -13473,6 +13613,56 @@
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error",
     "definition": "You can only move fields so that visibility conditions refer only to previous fields.",
     "context": "You can only move fields so that visibility conditions refer only to previous fields."
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-email",
+    "definition": "Recipient email",
+    "context": "Recipient email"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-first-name",
+    "definition": "Recipient first name",
+    "context": "Recipient first name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-full-name",
+    "definition": "Recipient full name",
+    "context": "Recipient full name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-last-name",
+    "definition": "Recipient last name",
+    "context": "Recipient last name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.group-contact-information",
+    "definition": "Contact Information",
+    "context": "Contact Information"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.group-references",
+    "definition": "References",
+    "context": "References"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.parallel-title",
+    "definition": "Parallel title",
+    "context": "Parallel title"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.user-first-name",
+    "definition": "My first name",
+    "context": "My first name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.user-full-name",
+    "definition": "My full name",
+    "context": "My full name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.user-last-name",
+    "definition": "My last name",
+    "context": "My last name"
   },
   {
     "term": "util.use-short-text-formats.email",
@@ -13568,6 +13758,11 @@
     "term": "util.validate-petition-fields.dynamic-select-field-without-options-error",
     "definition": "Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}.",
     "context": "Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "util.validate-petition-fields.field-group-without-children-error",
+    "definition": "Please add at least one field to the following <em>group</em> {count, plural, one{field} other{fields}}.",
+    "context": "Please add at least one field to the following <em>group</em> {count, plural, one{field} other{fields}}."
   },
   {
     "term": "util.validate-petition-fields.fields-without-title-error",

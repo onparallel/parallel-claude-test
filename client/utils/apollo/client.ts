@@ -242,6 +242,16 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             },
           },
         },
+        PetitionFieldReply: {
+          fields: {
+            children: {
+              merge: false,
+              read(value) {
+                return value ?? [];
+              },
+            },
+          },
+        },
         PetitionFieldAttachment: {
           fields: {
             isUploading: {

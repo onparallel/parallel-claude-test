@@ -207,6 +207,7 @@ export type CreateContactInput = {
 export type CreatePetitionFieldReplyInput = {
   content?: InputMaybe<Scalars["JSON"]["input"]>;
   id: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type CreateProfileTypeFieldInput = {
@@ -358,6 +359,7 @@ export type FeatureFlag =
   | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
+  | "FIELD_GROUP"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
@@ -742,6 +744,7 @@ export type Mutation = {
   importPetitionFromJson: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   inviteUserToOrganization: User;
+  linkPetitionFieldChildren: PetitionField;
   loginAs: Result;
   /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
   markPetitionListViewAsDefault: User;
@@ -871,6 +874,7 @@ export type Mutation = {
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
   unarchiveProfileType: Array<ProfileType>;
+  unlinkPetitionFieldChildren: PetitionField;
   unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
@@ -882,7 +886,7 @@ export type Mutation = {
   updateFeatureFlag: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
-  /** Updates the positions of the petition fields */
+  /** Updates the positions of the petition fields. If parentFieldId is defined, it will update the positions of it's children fields. */
   updateFieldPositions: PetitionBase;
   /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation. */
   updateFileUploadReply: FileUploadReplyResponse;
@@ -1097,6 +1101,7 @@ export type MutationcreateDowJonesKycIntegrationArgs = {
 
 export type MutationcreateDowJonesKycReplyArgs = {
   fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   profileId: Scalars["ID"]["input"];
 };
@@ -1129,6 +1134,7 @@ export type MutationcreateExportRepliesTaskArgs = {
 export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -1170,6 +1176,7 @@ export type MutationcreatePetitionAttachmentUploadLinkArgs = {
 };
 
 export type MutationcreatePetitionFieldArgs = {
+  parentFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   position?: InputMaybe<Scalars["Int"]["input"]>;
   type: PetitionFieldType;
@@ -1438,6 +1445,13 @@ export type MutationinviteUserToOrganizationArgs = {
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
+export type MutationlinkPetitionFieldChildrenArgs = {
+  childrenFieldIds: Array<Scalars["GID"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationloginAsArgs = {
   userId: Scalars["GID"]["input"];
 };
@@ -1532,6 +1546,7 @@ export type MutationpublicCreateFileUploadReplyArgs = {
   data: FileUploadInput;
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type MutationpublicCreatePetitionFieldCommentArgs = {
@@ -1624,6 +1639,7 @@ export type MutationpublicSendVerificationCodeArgs = {
 export type MutationpublicStartAsyncFieldCompletionArgs = {
   fieldId: Scalars["GID"]["input"];
   keycode: Scalars["ID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
@@ -1777,6 +1793,7 @@ export type MutationsignedPetitionDownloadLinkArgs = {
 
 export type MutationstartAsyncFieldCompletionArgs = {
   fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -1814,6 +1831,13 @@ export type MutationtransferPetitionOwnershipArgs = {
 
 export type MutationunarchiveProfileTypeArgs = {
   profileTypeIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationunlinkPetitionFieldChildrenArgs = {
+  childrenFieldIds: Array<Scalars["GID"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationunsubscribeFromProfileArgs = {
@@ -1854,6 +1878,7 @@ export type MutationupdateFeatureFlagsArgs = {
 
 export type MutationupdateFieldPositionsArgs = {
   fieldIds: Array<Scalars["GID"]["input"]>;
+  parentFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -2761,6 +2786,8 @@ export type PetitionField = {
   alias: Maybe<Scalars["String"]["output"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
+  /** The children of this field. */
+  children: Maybe<Array<PetitionField>>;
   commentCount: Scalars["Int"]["output"];
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
@@ -2783,6 +2810,7 @@ export type PetitionField = {
   optional: Scalars["Boolean"]["output"];
   /** The options of the petition field. */
   options: Scalars["JSONObject"]["output"];
+  parent: Maybe<PetitionField>;
   petition: PetitionBase;
   position: Scalars["Int"]["output"];
   /** The replies to the petition field */
@@ -2856,6 +2884,12 @@ export type PetitionFieldCommentUserMention = {
   user: Maybe<User>;
 };
 
+/** References the replies of a FIELD_GROUP field on a specific field and group */
+export type PetitionFieldGroupChildReply = {
+  field: PetitionField;
+  replies: Array<PetitionFieldReply>;
+};
+
 export type PetitionFieldMini = {
   /** The ID of the petition field. */
   id: Scalars["GID"]["output"];
@@ -2881,6 +2915,7 @@ export type PetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
+  children: Maybe<Array<PetitionFieldGroupChildReply>>;
   /** The content of the reply. */
   content: Scalars["JSONObject"]["output"];
   /** Time when the resource was created. */
@@ -2896,8 +2931,9 @@ export type PetitionFieldReply = Timestamps & {
   lastReviewedBy: Maybe<User>;
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"]["output"];
+  parent: Maybe<PetitionFieldReply>;
   /** When the reply was created or last updated */
-  repliedAt: Scalars["DateTime"]["output"];
+  repliedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The person that created the reply or the last person that edited the reply. */
   repliedBy: Maybe<UserOrPetitionAccess>;
   /** The status of the reply. */
@@ -2931,6 +2967,8 @@ export type PetitionFieldType =
   | "DYNAMIC_SELECT"
   /** A tax documents/info field. */
   | "ES_TAX_DOCUMENTS"
+  /** A group of fields */
+  | "FIELD_GROUP"
   /** A file upload field. */
   | "FILE_UPLOAD"
   /** A heading field. */
@@ -3874,6 +3912,8 @@ export type PublicPetitionField = {
   alias: Maybe<Scalars["String"]["output"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
+  /** The children of this field. */
+  children: Maybe<Array<PublicPetitionField>>;
   commentCount: Scalars["Int"]["output"];
   /** The comments for this field. */
   comments: Array<PublicPetitionFieldComment>;
@@ -3892,6 +3932,7 @@ export type PublicPetitionField = {
   optional: Scalars["Boolean"]["output"];
   /** The options of the petition field. */
   options: Scalars["JSONObject"]["output"];
+  parent: Maybe<PublicPetitionField>;
   petition: PublicPetition;
   /** The replies to the petition field */
   replies: Array<PublicPetitionFieldReply>;
@@ -3922,6 +3963,12 @@ export type PublicPetitionFieldComment = {
   isUnread: Scalars["Boolean"]["output"];
 };
 
+/** References the replies of a FIELD_GROUP field on a specific field and group */
+export type PublicPetitionFieldGroupChildReply = {
+  field: PublicPetitionField;
+  replies: Array<PublicPetitionFieldReply>;
+};
+
 /** The progress of a petition. */
 export type PublicPetitionFieldProgress = {
   /** Number of optional fields not replied or approved */
@@ -3934,6 +3981,7 @@ export type PublicPetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PublicPetitionFieldReply = Timestamps & {
+  children: Maybe<Array<PublicPetitionFieldGroupChildReply>>;
   /** The public content of the reply */
   content: Scalars["JSONObject"]["output"];
   /** Time when the resource was created. */
@@ -3942,6 +3990,7 @@ export type PublicPetitionFieldReply = Timestamps & {
   /** The ID of the petition field reply. */
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
+  parent: Maybe<PublicPetitionFieldReply>;
   /** The status of the petition field reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
@@ -5118,6 +5167,18 @@ export type PetitionAccessFragment = {
   } | null;
 };
 
+export type _PetitionFieldFragment = {
+  id: string;
+  title: string | null;
+  description: string | null;
+  type: PetitionFieldType;
+  fromPetitionFieldId: string | null;
+  alias: string | null;
+  options: { [key: string]: any };
+  optional: boolean;
+  multiple: boolean;
+};
+
 export type PetitionFieldFragment = {
   id: string;
   title: string | null;
@@ -5126,7 +5187,28 @@ export type PetitionFieldFragment = {
   fromPetitionFieldId: string | null;
   alias: string | null;
   options: { [key: string]: any };
+  optional: boolean;
   multiple: boolean;
+  children: Array<{
+    id: string;
+    title: string | null;
+    description: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+  }> | null;
+};
+
+export type _PetitionFieldReplyFragment = {
+  id: string;
+  content: { [key: string]: any };
+  status: PetitionFieldReplyStatus;
+  metadata: { [key: string]: any };
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type PetitionFieldReplyFragment = {
@@ -5136,6 +5218,17 @@ export type PetitionFieldReplyFragment = {
   metadata: { [key: string]: any };
   createdAt: string;
   updatedAt: string;
+  children: Array<{
+    field: { id: string; type: PetitionFieldType };
+    replies: Array<{
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
+  }> | null;
 };
 
 export type PetitionFieldWithRepliesFragment = {
@@ -5146,6 +5239,7 @@ export type PetitionFieldWithRepliesFragment = {
   fromPetitionFieldId: string | null;
   alias: string | null;
   options: { [key: string]: any };
+  optional: boolean;
   multiple: boolean;
   replies: Array<{
     id: string;
@@ -5154,7 +5248,29 @@ export type PetitionFieldWithRepliesFragment = {
     metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
+    children: Array<{
+      field: { id: string; type: PetitionFieldType };
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }> | null;
   }>;
+  children: Array<{
+    id: string;
+    title: string | null;
+    description: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+  }> | null;
 };
 
 export type TagFragment = { id: string; name: string };
@@ -5202,6 +5318,7 @@ export type PetitionFragment = {
     fromPetitionFieldId: string | null;
     alias: string | null;
     options: { [key: string]: any };
+    optional: boolean;
     multiple: boolean;
     replies: Array<{
       id: string;
@@ -5210,7 +5327,29 @@ export type PetitionFragment = {
       metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      children: Array<{
+        field: { id: string; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
+          metadata: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }> | null;
     }>;
+    children: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      optional: boolean;
+      multiple: boolean;
+    }> | null;
   }>;
   replies: Array<{
     id: string;
@@ -5220,6 +5359,14 @@ export type PetitionFragment = {
       id: string;
       content: { [key: string]: any };
       metadata: { [key: string]: any };
+      children: Array<{
+        field: { id: string; alias: string | null; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          metadata: { [key: string]: any };
+        }>;
+      }> | null;
     }>;
   }>;
   tags?: Array<{ id: string; name: string }>;
@@ -5247,7 +5394,19 @@ export type TemplateFragment = {
     fromPetitionFieldId: string | null;
     alias: string | null;
     options: { [key: string]: any };
+    optional: boolean;
     multiple: boolean;
+    children: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      optional: boolean;
+      multiple: boolean;
+    }> | null;
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
@@ -5507,6 +5666,7 @@ export type GetPetitions_petitionsQuery = {
             fromPetitionFieldId: string | null;
             alias: string | null;
             options: { [key: string]: any };
+            optional: boolean;
             multiple: boolean;
             replies: Array<{
               id: string;
@@ -5515,7 +5675,29 @@ export type GetPetitions_petitionsQuery = {
               metadata: { [key: string]: any };
               createdAt: string;
               updatedAt: string;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
             }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
           }>;
           replies: Array<{
             id: string;
@@ -5525,6 +5707,14 @@ export type GetPetitions_petitionsQuery = {
               id: string;
               content: { [key: string]: any };
               metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
             }>;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -5598,6 +5788,7 @@ export type CreatePetition_petitionMutation = {
           fromPetitionFieldId: string | null;
           alias: string | null;
           options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           replies: Array<{
             id: string;
@@ -5606,7 +5797,29 @@ export type CreatePetition_petitionMutation = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
           }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
         }>;
         replies: Array<{
           id: string;
@@ -5616,6 +5829,14 @@ export type CreatePetition_petitionMutation = {
             id: string;
             content: { [key: string]: any };
             metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
           }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -5686,6 +5907,7 @@ export type GetPetition_petitionQuery = {
           fromPetitionFieldId: string | null;
           alias: string | null;
           options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           replies: Array<{
             id: string;
@@ -5694,7 +5916,29 @@ export type GetPetition_petitionQuery = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
           }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
         }>;
         replies: Array<{
           id: string;
@@ -5704,6 +5948,14 @@ export type GetPetition_petitionQuery = {
             id: string;
             content: { [key: string]: any };
             metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
           }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -5809,6 +6061,7 @@ export type UpdatePetition_updatePetitionMutation = {
           fromPetitionFieldId: string | null;
           alias: string | null;
           options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           replies: Array<{
             id: string;
@@ -5817,7 +6070,29 @@ export type UpdatePetition_updatePetitionMutation = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
           }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
         }>;
         replies: Array<{
           id: string;
@@ -5827,6 +6102,14 @@ export type UpdatePetition_updatePetitionMutation = {
             id: string;
             content: { [key: string]: any };
             metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
           }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -5903,6 +6186,7 @@ export type ClosePetition_closePetitionMutation = {
       fromPetitionFieldId: string | null;
       alias: string | null;
       options: { [key: string]: any };
+      optional: boolean;
       multiple: boolean;
       replies: Array<{
         id: string;
@@ -5911,7 +6195,29 @@ export type ClosePetition_closePetitionMutation = {
         metadata: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
+        children: Array<{
+          field: { id: string; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }> | null;
       }>;
+      children: Array<{
+        id: string;
+        title: string | null;
+        description: string | null;
+        type: PetitionFieldType;
+        fromPetitionFieldId: string | null;
+        alias: string | null;
+        options: { [key: string]: any };
+        optional: boolean;
+        multiple: boolean;
+      }> | null;
     }>;
     replies: Array<{
       id: string;
@@ -5921,6 +6227,14 @@ export type ClosePetition_closePetitionMutation = {
         id: string;
         content: { [key: string]: any };
         metadata: { [key: string]: any };
+        children: Array<{
+          field: { id: string; alias: string | null; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }> | null;
       }>;
     }>;
     tags?: Array<{ id: string; name: string }>;
@@ -5989,6 +6303,7 @@ export type ReopenPetition_reopenPetitionMutation = {
       fromPetitionFieldId: string | null;
       alias: string | null;
       options: { [key: string]: any };
+      optional: boolean;
       multiple: boolean;
       replies: Array<{
         id: string;
@@ -5997,7 +6312,29 @@ export type ReopenPetition_reopenPetitionMutation = {
         metadata: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
+        children: Array<{
+          field: { id: string; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }> | null;
       }>;
+      children: Array<{
+        id: string;
+        title: string | null;
+        description: string | null;
+        type: PetitionFieldType;
+        fromPetitionFieldId: string | null;
+        alias: string | null;
+        options: { [key: string]: any };
+        optional: boolean;
+        multiple: boolean;
+      }> | null;
     }>;
     replies: Array<{
       id: string;
@@ -6007,6 +6344,14 @@ export type ReopenPetition_reopenPetitionMutation = {
         id: string;
         content: { [key: string]: any };
         metadata: { [key: string]: any };
+        children: Array<{
+          field: { id: string; alias: string | null; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }> | null;
       }>;
     }>;
     tags?: Array<{ id: string; name: string }>;
@@ -6090,6 +6435,7 @@ export type TagPetition_tagPetitionMutation = {
           fromPetitionFieldId: string | null;
           alias: string | null;
           options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           replies: Array<{
             id: string;
@@ -6098,7 +6444,29 @@ export type TagPetition_tagPetitionMutation = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
           }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
         }>;
         replies: Array<{
           id: string;
@@ -6108,6 +6476,14 @@ export type TagPetition_tagPetitionMutation = {
             id: string;
             content: { [key: string]: any };
             metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
           }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -6265,6 +6641,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
         fromPetitionFieldId: string | null;
         alias: string | null;
         options: { [key: string]: any };
+        optional: boolean;
         multiple: boolean;
         replies: Array<{
           id: string;
@@ -6273,7 +6650,29 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           metadata: { [key: string]: any };
           createdAt: string;
           updatedAt: string;
+          children: Array<{
+            field: { id: string; type: PetitionFieldType };
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+            }>;
+          }> | null;
         }>;
+        children: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          multiple: boolean;
+        }> | null;
       }>;
       replies: Array<{
         id: string;
@@ -6283,6 +6682,14 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           id: string;
           content: { [key: string]: any };
           metadata: { [key: string]: any };
+          children: Array<{
+            field: { id: string; alias: string | null; type: PetitionFieldType };
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+            }>;
+          }> | null;
         }>;
       }>;
       tags?: Array<{ id: string; name: string }>;
@@ -6460,6 +6867,7 @@ export type PetitionReplies_repliesQuery = {
           fromPetitionFieldId: string | null;
           alias: string | null;
           options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           replies: Array<{
             id: string;
@@ -6468,7 +6876,29 @@ export type PetitionReplies_repliesQuery = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
           }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
         }>;
       }
     | {
@@ -6480,6 +6910,7 @@ export type PetitionReplies_repliesQuery = {
           fromPetitionFieldId: string | null;
           alias: string | null;
           options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
           replies: Array<{
             id: string;
@@ -6488,7 +6919,29 @@ export type PetitionReplies_repliesQuery = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
           }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
         }>;
       }
     | null;
@@ -6510,7 +6963,19 @@ export type UpdatePetitionField_updatePetitionFieldMutation = {
     fromPetitionFieldId: string | null;
     alias: string | null;
     options: { [key: string]: any };
+    optional: boolean;
     multiple: boolean;
+    children: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      optional: boolean;
+      multiple: boolean;
+    }> | null;
   };
 };
 
@@ -6971,7 +7436,19 @@ export type GetTemplates_templatesQuery = {
             fromPetitionFieldId: string | null;
             alias: string | null;
             options: { [key: string]: any };
+            optional: boolean;
             multiple: boolean;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
         }
@@ -7003,7 +7480,19 @@ export type GetTemplate_templateQuery = {
           fromPetitionFieldId: string | null;
           alias: string | null;
           options: { [key: string]: any };
+          optional: boolean;
           multiple: boolean;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
       }
@@ -8192,12 +8681,24 @@ export type SubmitReply_createPetitionFieldRepliesMutation = {
     metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
+    children: Array<{
+      field: { id: string; type: PetitionFieldType };
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }> | null;
   }>;
 };
 
 export type SubmitReply_createFileUploadReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
   file: FileUploadInput;
 }>;
 
@@ -8211,6 +8712,17 @@ export type SubmitReply_createFileUploadReplyMutation = {
       metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      children: Array<{
+        field: { id: string; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
+          metadata: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }> | null;
     };
   };
 };
@@ -8228,6 +8740,17 @@ export type SubmitReply_createFileUploadReplyCompleteMutation = {
     metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
+    children: Array<{
+      field: { id: string; type: PetitionFieldType };
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }> | null;
   };
 };
 
@@ -8248,6 +8771,17 @@ export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation = {
       createdAt: string;
       updatedAt: string;
       field: { id: string } | null;
+      children: Array<{
+        field: { id: string; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
+          metadata: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }> | null;
     }>;
   };
 };
@@ -8266,6 +8800,17 @@ export type UpdateReply_updatePetitionFieldRepliesMutation = {
     createdAt: string;
     updatedAt: string;
     field: { id: string } | null;
+    children: Array<{
+      field: { id: string; type: PetitionFieldType };
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }> | null;
   }>;
 };
 
@@ -8285,6 +8830,17 @@ export type UpdateReply_updateFileUploadReplyMutation = {
       metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      children: Array<{
+        field: { id: string; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
+          metadata: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }> | null;
     };
   };
 };
@@ -8303,6 +8859,17 @@ export type UpdateReply_updateFileUploadReplyCompleteMutation = {
     createdAt: string;
     updatedAt: string;
     field: { id: string } | null;
+    children: Array<{
+      field: { id: string; type: PetitionFieldType };
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }> | null;
   };
 };
 
@@ -8362,6 +8929,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
       fromPetitionFieldId: string | null;
       alias: string | null;
       options: { [key: string]: any };
+      optional: boolean;
       multiple: boolean;
       replies: Array<{
         id: string;
@@ -8370,7 +8938,29 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         metadata: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
+        children: Array<{
+          field: { id: string; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }> | null;
       }>;
+      children: Array<{
+        id: string;
+        title: string | null;
+        description: string | null;
+        type: PetitionFieldType;
+        fromPetitionFieldId: string | null;
+        alias: string | null;
+        options: { [key: string]: any };
+        optional: boolean;
+        multiple: boolean;
+      }> | null;
     }>;
     replies: Array<{
       id: string;
@@ -8380,6 +8970,14 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         id: string;
         content: { [key: string]: any };
         metadata: { [key: string]: any };
+        children: Array<{
+          field: { id: string; alias: string | null; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }> | null;
       }>;
     }>;
     tags?: Array<{ id: string; name: string }>;
@@ -8405,6 +9003,12 @@ export type UpdateReply_petitionQuery = {
           type: PetitionFieldType;
           options: { [key: string]: any };
           replies: Array<{ id: string }>;
+          children: Array<{
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            replies: Array<{ id: string }>;
+          }> | null;
         }>;
       }
     | {
@@ -8413,6 +9017,12 @@ export type UpdateReply_petitionQuery = {
           type: PetitionFieldType;
           options: { [key: string]: any };
           replies: Array<{ id: string }>;
+          children: Array<{
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            replies: Array<{ id: string }>;
+          }> | null;
         }>;
       }
     | null;
@@ -8424,8 +9034,30 @@ export type SubmitReply_petitionQueryVariables = Exact<{
 
 export type SubmitReply_petitionQuery = {
   petition:
-    | { fields: Array<{ id: string; type: PetitionFieldType; options: { [key: string]: any } }> }
-    | { fields: Array<{ id: string; type: PetitionFieldType; options: { [key: string]: any } }> }
+    | {
+        fields: Array<{
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          children: Array<{
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+          }> | null;
+        }>;
+      }
+    | {
+        fields: Array<{
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          children: Array<{
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+          }> | null;
+        }>;
+      }
     | null;
 };
 
@@ -8480,8 +9112,8 @@ export const PetitionAccessFragmentDoc = gql`
   ${ContactFragmentDoc}
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionAccessFragment, unknown>;
-export const PetitionFieldFragmentDoc = gql`
-  fragment PetitionField on PetitionField {
+export const _PetitionFieldFragmentDoc = gql`
+  fragment _PetitionField on PetitionField {
     id
     title
     description
@@ -8489,11 +9121,21 @@ export const PetitionFieldFragmentDoc = gql`
     fromPetitionFieldId
     alias
     options
+    optional
     multiple
   }
+` as unknown as DocumentNode<_PetitionFieldFragment, unknown>;
+export const PetitionFieldFragmentDoc = gql`
+  fragment PetitionField on PetitionField {
+    ..._PetitionField
+    children {
+      ..._PetitionField
+    }
+  }
+  ${_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionFieldFragment, unknown>;
-export const PetitionFieldReplyFragmentDoc = gql`
-  fragment PetitionFieldReply on PetitionFieldReply {
+export const _PetitionFieldReplyFragmentDoc = gql`
+  fragment _PetitionFieldReply on PetitionFieldReply {
     id
     content
     status
@@ -8501,6 +9143,21 @@ export const PetitionFieldReplyFragmentDoc = gql`
     createdAt
     updatedAt
   }
+` as unknown as DocumentNode<_PetitionFieldReplyFragment, unknown>;
+export const PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionFieldReply on PetitionFieldReply {
+    ..._PetitionFieldReply
+    children {
+      field {
+        id
+        type
+      }
+      replies {
+        ..._PetitionFieldReply
+      }
+    }
+  }
+  ${_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionFieldReplyFragment, unknown>;
 export const PetitionFieldWithRepliesFragmentDoc = gql`
   fragment PetitionFieldWithReplies on PetitionField {
@@ -8547,6 +9204,18 @@ export const PetitionFragmentDoc = gql`
         id
         content
         metadata
+        children {
+          field {
+            id
+            alias
+            type
+          }
+          replies {
+            id
+            content
+            metadata
+          }
+        }
       }
     }
     tags @include(if: $includeTags) {
@@ -9945,9 +10614,15 @@ export const SubmitReply_createFileUploadReplyDocument = gql`
   mutation SubmitReply_createFileUploadReply(
     $petitionId: GID!
     $fieldId: GID!
+    $parentReplyId: GID
     $file: FileUploadInput!
   ) {
-    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+    createFileUploadReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      parentReplyId: $parentReplyId
+      file: $file
+    ) {
       presignedPostData {
         ...AWSPresignedPostData
       }
@@ -10082,6 +10757,14 @@ export const UpdateReply_petitionDocument = gql`
         replies {
           id
         }
+        children {
+          id
+          type
+          options
+          replies {
+            id
+          }
+        }
       }
     }
   }
@@ -10093,6 +10776,11 @@ export const SubmitReply_petitionDocument = gql`
         id
         type
         options
+        children {
+          id
+          type
+          options
+        }
       }
     }
   }

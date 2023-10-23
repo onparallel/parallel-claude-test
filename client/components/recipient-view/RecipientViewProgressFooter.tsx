@@ -21,12 +21,13 @@ import {
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { generateCssStripe } from "@parallel/utils/css";
-import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
+import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { zip } from "remeda";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { useTone } from "../common/ToneProvider";
+import { ArrayUnionToUnion, UnwrapArray } from "@parallel/utils/types";
 
 type PetitionSelection =
   | RecipientViewProgressFooter_PublicPetitionFragment
@@ -35,6 +36,12 @@ type PetitionSelection =
 type PetitionFieldSelection =
   | RecipientViewProgressFooter_PublicPetitionFieldFragment
   | RecipientViewProgressFooter_PetitionFieldFragment;
+
+type PetitionFieldReplySelection = ArrayUnionToUnion<PetitionFieldSelection["replies"]>;
+
+type PetitionFieldGroupChildReplySelection = UnwrapArray<
+  Exclude<PetitionFieldSelection["replies"][0]["children"], null | undefined>
+>;
 
 export interface RecipientViewProgressFooterProps {
   petition: PetitionSelection;
@@ -47,24 +54,49 @@ export const RecipientViewProgressFooter = Object.assign(
     { petition: { status, fields, signatureConfig }, onFinalize, isDisabled, ...props },
     ref,
   ) {
-    const visibility = useFieldVisibility(fields);
+    const fieldLogic = useFieldLogic(fields);
     const [poppoverClosed, setPoppoverClosed] = useState(false);
     const { replied, optional, total } = useMemo(() => {
       let replied = 0;
       let optional = 0;
       let total = 0;
-      for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
-        const fieldReplies = completedFieldReplies(field);
-
+      for (const [field, logic] of zip(fields as PetitionFieldSelection[], fieldLogic)) {
         const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
-        if (isVisible && !field.isReadOnly && !isHiddenToPublic) {
-          replied += fieldReplies.length ? 1 : 0;
-          optional += field.optional && !fieldReplies.length ? 1 : 0;
-          total += 1;
+        if (logic.isVisible && !field.isReadOnly && !isHiddenToPublic) {
+          if (field.type === "FIELD_GROUP") {
+            if (field.replies.length === 0) {
+              optional += field.optional ? 1 : 0;
+              total += 1;
+            } else {
+              for (const [groupReply, replyLogic] of zip(
+                field.replies as PetitionFieldReplySelection[],
+                logic.groupChildrenLogic!,
+              )) {
+                for (const [{ field, replies }, logic] of zip(
+                  groupReply.children! as PetitionFieldGroupChildReplySelection[],
+                  replyLogic,
+                )) {
+                  const isHiddenToPublic =
+                    field.__typename === "PublicPetitionField" && field.isInternal;
+                  const fieldReplies = completedFieldReplies({ ...field, replies } as any);
+                  if (logic.isVisible && !field.isReadOnly && !isHiddenToPublic) {
+                    replied += fieldReplies.length > 0 ? 1 : 0;
+                    optional += field.optional && fieldReplies.length === 0 ? 1 : 0;
+                    total += 1;
+                  }
+                }
+              }
+            }
+          } else {
+            const fieldReplies = completedFieldReplies(field);
+            replied += fieldReplies.length > 0 ? 1 : 0;
+            optional += field.optional && fieldReplies.length === 0 ? 1 : 0;
+            total += 1;
+          }
         }
       }
       return { replied, optional, total };
-    }, [fields, visibility]);
+    }, [fields, fieldLogic]);
 
     const tone = useTone();
 
@@ -193,12 +225,26 @@ export const RecipientViewProgressFooter = Object.assign(
             isReadOnly
             replies {
               id
+              children {
+                field {
+                  id
+                  optional
+                  isInternal
+                  isReadOnly
+                  ...completedFieldReplies_PetitionField
+                }
+                replies {
+                  id
+                  ...completedFieldReplies_PetitionFieldReply
+                }
+              }
             }
-            ...useFieldVisibility_PetitionField
+            ...useFieldLogic_PetitionField
             ...completedFieldReplies_PetitionField
           }
-          ${useFieldVisibility.fragments.PetitionField}
+          ${useFieldLogic.fragments.PetitionField}
           ${completedFieldReplies.fragments.PetitionField}
+          ${completedFieldReplies.fragments.PetitionFieldReply}
         `;
       },
       get PublicPetition() {
@@ -226,12 +272,26 @@ export const RecipientViewProgressFooter = Object.assign(
             isReadOnly
             replies {
               id
+              children {
+                field {
+                  id
+                  optional
+                  isInternal
+                  isReadOnly
+                  ...completedFieldReplies_PublicPetitionField
+                }
+                replies {
+                  id
+                  ...completedFieldReplies_PublicPetitionFieldReply
+                }
+              }
             }
-            ...useFieldVisibility_PublicPetitionField
+            ...useFieldLogic_PublicPetitionField
             ...completedFieldReplies_PublicPetitionField
           }
-          ${useFieldVisibility.fragments.PublicPetitionField}
+          ${useFieldLogic.fragments.PublicPetitionField}
           ${completedFieldReplies.fragments.PublicPetitionField}
+          ${completedFieldReplies.fragments.PublicPetitionFieldReply}
         `;
       },
     },

@@ -29,6 +29,7 @@ import {
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 import { useMetadata } from "@parallel/utils/withMetadata";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 interface FieldDateTimeReply {
   datetime: string;
@@ -44,6 +45,8 @@ export interface RecipientViewPetitionFieldDateTimeProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: FieldDateTimeReply) => Promise<void>;
   onCreateReply: (content: FieldDateTimeReply) => Promise<string | undefined>;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 export function RecipientViewPetitionFieldDateTime({
@@ -54,6 +57,8 @@ export function RecipientViewPetitionFieldDateTime({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  isInvalid,
+  parentReplyId,
 }: RecipientViewPetitionFieldDateTimeProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState("");
@@ -147,10 +152,11 @@ export function RecipientViewPetitionFieldDateTime({
   );
 
   const inputProps = {
-    id: `reply-${field.id}-new`,
+    id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef as any,
     paddingRight: 3,
     isDisabled,
+    isInvalid,
     value,
     // This removes the reset button on Firefox
     required: true,
@@ -182,6 +188,9 @@ export function RecipientViewPetitionFieldDateTime({
       setValue(event.target.value);
     },
   };
+
+  const fieldReplies = completedFieldReplies(field);
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
@@ -192,6 +201,15 @@ export function RecipientViewPetitionFieldDateTime({
       onDownloadAttachment={onDownloadAttachment}
       onMouseDownNewReply={handleMouseDownNewReply}
     >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
@@ -278,7 +296,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
 
   const props = {
     type: reply.isAnonymized ? "text" : "datetime-local",
-    id: `reply-${field.id}-${reply.id}`,
+    id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref: ref as any,
     paddingRight: 3,
     value,

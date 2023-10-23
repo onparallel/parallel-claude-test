@@ -8,10 +8,13 @@ import {
   Input,
   List,
   Stack,
+  Text,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
@@ -24,9 +27,9 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ComponentProps,
-  forwardRef,
   KeyboardEvent,
   MouseEvent,
+  forwardRef,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -42,7 +45,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
@@ -53,6 +55,8 @@ export interface RecipientViewPetitionFieldShortTextProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 export function RecipientViewPetitionFieldShortText({
@@ -63,6 +67,8 @@ export function RecipientViewPetitionFieldShortText({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  isInvalid,
+  parentReplyId,
 }: RecipientViewPetitionFieldShortTextProps) {
   const intl = useIntl();
 
@@ -187,11 +193,11 @@ export function RecipientViewPetitionFieldShortText({
   const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
 
   const inputProps = {
-    id: `reply-${field.id}-new`,
+    id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef,
     paddingRight: 10,
     isDisabled: isDisabled,
-    isInvalid: isInvalidReply[field.id],
+    isInvalid: isInvalidReply[field.id] || isInvalid,
     maxLength: field.options.maxLength ?? undefined,
     value,
     onKeyDown: async (event: KeyboardEvent) => {
@@ -253,6 +259,7 @@ export function RecipientViewPetitionFieldShortText({
   };
 
   const isInvalidValue = value.length === 0 || (format?.validate ? !format.validate(value) : false);
+  const fieldReplies = completedFieldReplies(field);
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -264,6 +271,15 @@ export function RecipientViewPetitionFieldShortText({
       onDownloadAttachment={onDownloadAttachment}
       onMouseDownNewReply={handleMouseDownNewReply}
     >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
@@ -349,7 +365,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
   const formats = useShortTextFormats();
   const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
   const props: ComponentProps<typeof ShortTextInput> = {
-    id: `reply-${field.id}-${reply.id}`,
+    id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     ref,
     paddingRight: 10,
     value,

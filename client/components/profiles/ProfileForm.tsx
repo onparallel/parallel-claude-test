@@ -38,7 +38,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { discriminator } from "@parallel/utils/discriminator";
-import { useFieldWithIndices } from "@parallel/utils/fieldIndices";
+import { useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { withError } from "@parallel/utils/promises/withError";
 import { MaybePromise } from "@parallel/utils/types";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
@@ -154,7 +154,7 @@ export const ProfileForm = Object.assign(
 
     const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isDefined(f)).length;
 
-    const fieldsWithIndices = useFieldWithIndices(petitionFields ?? []);
+    const fieldsWithIndices = useAllFieldsWithIndices(petitionFields ?? []);
 
     const propertiesWithSuggestedFields = useMemo(
       () =>
@@ -568,8 +568,15 @@ export const ProfileForm = Object.assign(
           fragment ProfileForm_PetitionField on PetitionField {
             id
             alias
+            ...useAllFieldsWithIndices_PetitionField
             ...ProfileField_PetitionField
+            children {
+              id
+              alias
+              ...ProfileField_PetitionField
+            }
           }
+          ${useAllFieldsWithIndices.fragments.PetitionField}
           ${ProfileField.fragments.PetitionField}
         `;
       },

@@ -1,9 +1,7 @@
-import { PetitionFieldType } from "../db/__types";
+import { PetitionField, PetitionFieldReply } from "../db/__types";
 
-interface PartialField {
-  type: PetitionFieldType;
-  options: any;
-  replies: { content: any; anonymized_at: Date | null }[];
+interface PartialField extends Pick<PetitionField, "type" | "options"> {
+  replies: Pick<PetitionFieldReply, "content" | "anonymized_at">[];
 }
 
 // ALERT: Same logic in completedFieldReplies in client side
@@ -25,6 +23,9 @@ export function completedFieldReplies(field: PartialField) {
           return reply.content.value.length >= field.options.limit.min;
         }
       });
+    case "FIELD_GROUP":
+      // we don't verify that every field of a FIELD_GROUP reply is completed
+      return field.replies;
     default:
       return field.replies;
   }

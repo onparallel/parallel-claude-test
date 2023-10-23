@@ -8,6 +8,7 @@ export function useHighlightElement() {
         scrollMode: "if-needed",
         behavior: "smooth",
       });
+
       element.setAttribute("data-highlighted", "true");
       setTimeout(() => {
         element.removeAttribute("data-highlighted");

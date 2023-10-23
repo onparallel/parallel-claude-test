@@ -1,7 +1,6 @@
 import { HStack, Text, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
-import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import {
   useProfileTypeFieldTypeColor,
   useProfileTypeFieldTypeLabel,
@@ -10,7 +9,7 @@ import { ProfileTypeFieldTypeIcon } from "./ProfileTypeFieldTypeIcon";
 
 export interface ProfileTypeFieldTypeIndicatorProps {
   type: ProfileTypeFieldType;
-  fieldIndex: PetitionFieldIndex;
+  fieldIndex: number;
   isTooltipDisabled?: boolean;
   hideIcon?: boolean;
 }

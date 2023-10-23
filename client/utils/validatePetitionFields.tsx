@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 import { validatePetitionFields_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { countBy, isDefined, zip } from "remeda";
-import { getFieldIndices, PetitionFieldIndex } from "./fieldIndices";
+import { isDefined } from "remeda";
+import { PetitionFieldIndex } from "./fieldIndices";
 import { FieldOptions } from "./petitionFields";
 
 type PartialField = validatePetitionFields_PetitionFieldFragment;
@@ -15,20 +15,19 @@ interface ValidationResult<T extends PartialField> {
     | "SELECT_WITHOUT_OPTIONS"
     | "CHECKBOX_WITHOUT_OPTIONS"
     | "NUMBER_INVALID_LIMITS"
+    | "FIELD_GROUP_WITHOUT_CHILDREN"
     | null;
-  fieldsWithIndices?: { fieldIndex: PetitionFieldIndex; field: T }[];
+  fieldsWithIndices?: [field: T, fieldIndex: PetitionFieldIndex][];
   message?: ReactNode;
 }
 
 /**
  * validates if the petition fields contains every required information before sending to recipients.
  */
-export function validatePetitionFields<T extends PartialField>(fields: T[]): ValidationResult<T> {
-  const fieldsWithIndices = zip(fields, getFieldIndices(fields)).map(([field, fieldIndex]) => ({
-    field,
-    fieldIndex,
-  }));
-  if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
+export function validatePetitionFields<T extends PartialField>(
+  fieldsWithIndices: [T, PetitionFieldIndex][],
+): ValidationResult<T> {
+  if (fieldsWithIndices.every(([field]) => field.isReadOnly)) {
     return {
       error: "NO_REPLIABLE_FIELDS",
       message: (
@@ -39,8 +38,28 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       ),
     };
   }
+  const fieldGroupsWithoutChildren = fieldsWithIndices.filter(
+    ([field]) => field.type === "FIELD_GROUP" && (field.children ?? []).length === 0,
+  );
+
+  if (fieldGroupsWithoutChildren.length > 0) {
+    return {
+      error: "FIELD_GROUP_WITHOUT_CHILDREN",
+      fieldsWithIndices: fieldGroupsWithoutChildren,
+      message: (
+        <FormattedMessage
+          id="util.validate-petition-fields.field-group-without-children-error"
+          defaultMessage="Please add at least one field to the following <em>group</em> {count, plural, one{field} other{fields}}."
+          values={{
+            count: fieldGroupsWithoutChildren.length,
+            em: (chunks: any) => <em>{chunks}</em>,
+          }}
+        />
+      ),
+    };
+  }
   const fieldsWithoutTitle = fieldsWithIndices.filter(
-    ({ field }) => field.type !== "HEADING" && !field.title,
+    ([field]) => field.type !== "HEADING" && !field.title,
   );
   if (fieldsWithoutTitle.length > 0) {
     return {
@@ -56,7 +75,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
     };
   }
 
-  const selectFieldsWithoutOptions = fieldsWithIndices.filter(({ field }) => {
+  const selectFieldsWithoutOptions = fieldsWithIndices.filter(([field]) => {
     if (field.type === "SELECT") {
       const { values } = field.options as FieldOptions["SELECT"];
       return !values || !Array.isArray(values) || values.length < 2;
@@ -80,7 +99,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
     };
   }
 
-  const checkboxFieldsWithoutOptions = fieldsWithIndices.filter(({ field }) => {
+  const checkboxFieldsWithoutOptions = fieldsWithIndices.filter(([field]) => {
     if (field.type === "CHECKBOX") {
       const { values } = field.options as FieldOptions["CHECKBOX"];
       return !values || !Array.isArray(values) || values.length < 1;
@@ -104,7 +123,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
     };
   }
 
-  const dynamicSelectFieldsWithoutOptions = fieldsWithIndices.filter(({ field }) => {
+  const dynamicSelectFieldsWithoutOptions = fieldsWithIndices.filter(([field]) => {
     if (field.type === "DYNAMIC_SELECT") {
       const { file } = field.options as FieldOptions["DYNAMIC_SELECT"];
       return !isDefined(file);
@@ -128,7 +147,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
     };
   }
 
-  const numberFieldsWithInvalidLimits = fieldsWithIndices.filter(({ field }) => {
+  const numberFieldsWithInvalidLimits = fieldsWithIndices.filter(([field]) => {
     if (field.type === "NUMBER") {
       const { range } = field.options as FieldOptions["NUMBER"];
       return isDefined(range.min) && isDefined(range.max) && range.min > range.max;
@@ -161,7 +180,11 @@ validatePetitionFields.fragments = {
       id
       title
       type
+      isReadOnly
       options
+      children {
+        id
+      }
     }
   `,
 };

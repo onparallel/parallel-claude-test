@@ -175,6 +175,11 @@
     "context": "Annex {n}"
   },
   {
+    "term": "document.petition-export.default-group-name",
+    "definition": "Respuesta",
+    "context": "Reply"
+  },
+  {
     "term": "document.petition-export.file-not-found",
     "definition": "(No encontrado)",
     "context": "(Not found)"
@@ -208,6 +213,16 @@
     "term": "document.petition-export.view-replies-in-nd",
     "definition": "Ver respuestas en ND",
     "context": "See answers in ND"
+  },
+  {
+    "term": "export-template-report.column-header-untitled-field",
+    "definition": "Campo sin nombre",
+    "context": "Untitled field"
+  },
+  {
+    "term": "export-template-report.column-header-untitled-group",
+    "definition": "Respuesta",
+    "context": "Reply"
   },
   {
     "term": "export-template-report.column-header.parallel-closed-at",
@@ -740,9 +755,24 @@
     "context": "Comments"
   },
   {
+    "term": "petition-excel-export.not-replied",
+    "definition": "No cumplimentado",
+    "context": "Not replied"
+  },
+  {
     "term": "petition-excel-export.replies",
     "definition": "Respuestas",
     "context": "Replies"
+  },
+  {
+    "term": "petition-excel-export.untitled-field",
+    "definition": "Campo sin nombre",
+    "context": "Untitled field"
+  },
+  {
+    "term": "petition-excel-export.untitled-group",
+    "definition": "Respuesta",
+    "context": "Reply"
   },
   {
     "term": "petition-message-bounced.access-click-link",
@@ -1103,11 +1133,6 @@
     "term": "text-replies-excel-worksheet.field",
     "definition": "Campo",
     "context": "Field"
-  },
-  {
-    "term": "text-replies-excel-worksheet.no-answer",
-    "definition": "No cumplimentado",
-    "context": "Not replied"
   },
   {
     "term": "text-replies-excel-worksheet.reply",

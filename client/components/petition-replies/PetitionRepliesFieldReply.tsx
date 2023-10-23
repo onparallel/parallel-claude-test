@@ -114,7 +114,7 @@ export function PetitionRepliesFieldReply({
                         defaultMessage: "File name",
                       })}
                     </VisuallyHidden>
-                    <Text as="span">
+                    <Text as="span" wordBreak="break-all">
                       {content.filename}
                       {" - "}
                       <Text
@@ -205,7 +205,7 @@ export function PetitionRepliesFieldReply({
             reply.content.uploadComplete === false ? (
               <Text color="red.500">
                 <FormattedMessage
-                  id="petition-replies.petition-field-reply.file-upload.file-incomplete"
+                  id="component.petition-replies-field-reply.file-incomplete"
                   defaultMessage="There was an error uploading the file. Please request a new upload."
                 />
               </Text>
@@ -262,7 +262,7 @@ export function PetitionRepliesFieldReply({
             data-action="approve-reply"
             icon={<CheckIcon />}
             label={intl.formatMessage({
-              id: "petition-replies.petition-field-reply.approve",
+              id: "component.petition-replies-field-reply.approve",
               defaultMessage: "Approve",
             })}
             size="xs"
@@ -277,7 +277,7 @@ export function PetitionRepliesFieldReply({
             data-action="reject-reply"
             icon={<CloseIcon />}
             label={intl.formatMessage({
-              id: "petition-replies.petition-field-reply.reject",
+              id: "component.petition-replies-field-reply.reject",
               defaultMessage: "Reject",
             })}
             size="xs"

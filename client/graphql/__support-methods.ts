@@ -786,6 +786,7 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
+      { name: "FIELD_GROUP", description: null, isDeprecated: false, deprecationReason: null },
       { name: "GHOST_LOGIN", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "HIDE_RECIPIENT_VIEW_CONTENTS",

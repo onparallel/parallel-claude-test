@@ -28,6 +28,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { countBy, pick } from "remeda";
 import { useExportFailedDialog } from "./ExportFailedDialog";
+import { assert } from "ts-essentials";
 
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
@@ -48,7 +49,6 @@ export function ExportRepliesProgressDialog({
     variables: { petitionId },
   });
   const isRunning = useRef(false);
-  const placeholdersRename = useFilenamePlaceholdersRename();
 
   const { current: abort } = useRef(new AbortController());
 
@@ -58,16 +58,28 @@ export function ExportRepliesProgressDialog({
 
   const showExportFailedDialog = useExportFailedDialog();
 
+  const petition = data!.petition!;
+  assert(petition.__typename === "Petition", "Invalid petition type");
+
+  const rename = useFilenamePlaceholdersRename(petition.fields);
+
   useEffect(() => {
     async function exportReplies() {
-      const petition = data!.petition!;
       if (petition.__typename !== "Petition") {
         return;
       }
-      const rename = placeholdersRename(petition.fields);
-      const replies = petition.fields.flatMap((field) =>
-        field.replies.map((reply) => ({ reply, field })),
-      );
+      // extract every reply of fields and FIELD_GROUP children. In this case we don't need to group replies by parentReplyId
+      const replies = petition.fields.flatMap((field) => {
+        if (field.type === "FIELD_GROUP") {
+          return (
+            field.children?.flatMap((child) =>
+              child.replies.map((reply) => ({ reply, field: child })),
+            ) ?? []
+          );
+        } else {
+          return field.replies.map((reply) => ({ reply, field }));
+        }
+      });
 
       const hasTextReplies = !!replies.find((r) => !isFileTypeField(r.field.type));
 
@@ -181,7 +193,7 @@ export function ExportRepliesProgressDialog({
       isRunning.current = true;
       exportReplies().then();
     }
-  }, [data, placeholdersRename]);
+  }, [data, rename]);
 
   return (
     <BaseDialog
@@ -308,12 +320,22 @@ ExportRepliesProgressDialog.fragments = {
         ...useFilenamePlaceholdersRename_PetitionField
         replies {
           ...useFilenamePlaceholdersRename_PetitionFieldReply
+          ...useCuatrecasasExport_PetitionFieldReply
+        }
+        children {
+          id
+          ...useFilenamePlaceholdersRename_PetitionField
+          replies {
+            ...useFilenamePlaceholdersRename_PetitionFieldReply
+            ...useCuatrecasasExport_PetitionFieldReply
+          }
         }
       }
     }
     ${useCuatrecasasExport.fragments.Petition}
     ${useFilenamePlaceholdersRename.fragments.PetitionField}
     ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
+    ${useCuatrecasasExport.fragments.PetitionFieldReply}
   `,
 };
 

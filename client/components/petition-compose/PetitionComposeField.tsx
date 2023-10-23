@@ -8,13 +8,10 @@ import {
   FormLabel,
   IconButton,
   Input,
-  List,
-  ListItem,
   Stack,
   Switch,
   Text,
   Tooltip,
-  usePrevious,
 } from "@chakra-ui/react";
 import {
   ChevronRightIcon,
@@ -24,16 +21,20 @@ import {
   DragHandleIcon,
   PaperclipIcon,
   SettingsIcon,
+  UnlinkIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
   PetitionComposeField_PetitionBaseFragment,
   PetitionComposeField_PetitionFieldFragment,
+  PetitionComposeField_UserFragment,
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   PetitionComposeField_deletePetitionFieldAttachmentDocument,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
+  PetitionField,
+  PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
@@ -49,11 +50,11 @@ import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
 import pMap from "p-map";
-import { RefObject, useCallback, useImperativeHandle, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { XYCoord, useDrag, useDrop } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit, takeWhile } from "remeda";
+import { isDefined, omit, sumBy, takeWhile } from "remeda";
 import { ConfimationPopover } from "../common/ConfirmationPopover";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
@@ -70,7 +71,7 @@ import {
   PetitionFieldOptionsListEditor,
   PetitionFieldOptionsListEditorRef,
 } from "./PetitionFieldOptionsListEditor";
-import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
+import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
 
 import {
   Accordion,
@@ -81,15 +82,24 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { ChevronFilledIcon } from "@parallel/chakra/icons";
+import { useConstant } from "@parallel/utils/useConstant";
+import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
+import usePrevious from "@react-hook/previous";
+import { NativeTypes } from "react-dnd-html5-backend";
 import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
+import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 
 export interface PetitionComposeFieldProps {
+  user: PetitionComposeField_UserFragment;
   petition: PetitionComposeField_PetitionBaseFragment;
   field: PetitionComposeField_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
+  childrenFieldIndices?: string[] | undefined;
+  fieldRefs?: MultipleRefObject<PetitionComposeFieldRef>;
   index: number;
   isActive: boolean;
+  activeChildFieldId?: string | null;
   showError: boolean;
   onMove: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
@@ -100,7 +110,24 @@ export interface PetitionComposeFieldProps {
   onDeleteClick: () => void;
   onFocusNextField: () => void;
   onFocusPrevField: () => void;
-  onAddField: () => void;
+  onAddField: (type?: PetitionFieldType, position?: number, parentFieldId?: string) => void;
+  fieldProps?: (
+    fieldId: string,
+  ) => Pick<
+    PetitionComposeFieldProps,
+    | "onCloneField"
+    | "onSettingsClick"
+    | "onTypeIndicatorClick"
+    | "onDeleteClick"
+    | "onFieldEdit"
+    | "onFieldVisibilityClick"
+    | "onFocusPrevField"
+    | "onFocusNextField"
+    | "onAddField"
+  >;
+  onUpdateFieldPositions: (fieldIds: string[], parentFieldId?: string) => void;
+  onUnlinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
+  onLinkField?: (parentFieldId: string, childrenFieldIds: string[]) => void;
   isReadOnly?: boolean;
 }
 
@@ -116,11 +143,15 @@ const _PetitionComposeField = chakraForwardRef<
   PetitionComposeFieldRef
 >(function PetitionComposeField(
   {
+    user,
     petition,
     field,
     fieldIndex,
     index,
+    childrenFieldIndices,
+    fieldRefs,
     isActive,
+    activeChildFieldId,
     showError,
     onMove,
     onFocus,
@@ -133,17 +164,23 @@ const _PetitionComposeField = chakraForwardRef<
     onFocusNextField,
     onFocusPrevField,
     onAddField,
+    fieldProps,
+    onUpdateFieldPositions,
+    onLinkField,
+    onUnlinkField,
     isReadOnly,
     ...props
   },
   ref,
 ) {
   const intl = useIntl();
-  const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
+  const isChildren = field.parent?.id !== undefined;
+  const { elementRef, dragRef, previewRef, isDragging, isOverCurrent } = useDragAndDrop(
     field.id,
     index,
     onMove,
-    field.isFixed ? "FIXED_FIELD" : "FIELD",
+    field.isFixed ? "FIXED_FIELD" : isChildren ? "CHILDREN_FIELD" : "FIELD",
+    field.type,
   );
 
   const canChangeVisibility =
@@ -197,7 +234,8 @@ const _PetitionComposeField = chakraForwardRef<
   const showErrorDialog = useErrorDialog();
   const maxAttachmentSize = 100 * 1024 * 1024;
   const [draggedFiles, setDraggedFiles] = useState<(File | DataTransferItem)[]>([]);
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+
+  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     maxSize: maxAttachmentSize,
     onDropRejected: async () => {
       await withError(
@@ -219,6 +257,7 @@ const _PetitionComposeField = chakraForwardRef<
       );
     },
     onDrop: async (files: File[], _, event) => {
+      event.stopPropagation();
       if (field.attachments.length + files.length > 10) {
         // on drop event already shows a message on the dropzone, type="change" means the
         // file is coming from the "Add attachment" button which doesn't provide any feedback
@@ -324,189 +363,315 @@ const _PetitionComposeField = chakraForwardRef<
   ]);
   const rootRef = useMergedRef(_rootProps.ref, elementRef);
 
+  const { sx, ...restProps } = props;
+
+  const [isVisible, setIsVisible] = useState(
+    petition.fields.length < 40 || index < 20 ? true : false,
+  );
+  // approximate height for lazy loading
+  const height = useConstant(() => approximateFieldHeight(field));
+  useEffect(() => {
+    if (!isVisible) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        },
+        {
+          root: document.getElementById("petition-layout-body"),
+          rootMargin: "2000px 0px",
+        },
+      );
+      const target = elementRef.current!;
+      observer.observe(target);
+      return () => observer.unobserve(target);
+    }
+  }, []);
+
   return (
     <Box
       ref={rootRef}
-      borderY="1px solid"
-      borderColor="gray.200"
-      marginY="-1px"
-      aria-current={isActive ? "true" : "false"}
-      position="relative"
+      id={`field-${field.id}`}
+      data-section="compose-field"
+      data-testid="compose-field"
       sx={{
         ...(isDragging && generateCssStripe({ size: "1rem", color: "gray.50" })),
+        "> *": {
+          opacity: isVisible ? 1 : 0,
+          transition: "opacity 0.125s ease-in",
+        },
       }}
+      borderTop={index === 0 ? undefined : "1px solid"}
+      borderColor="gray.200"
+      aria-current={isActive ? "true" : "false"}
+      position="relative"
       onFocus={onFocus}
       {...dropzoneRootProps}
-      {...props}
+      {...restProps}
     >
-      <input type="file" {...getInputProps()} />
-      {isDragActive ? (
-        <PetitionComposeDragActiveIndicator
-          showErrorMessage={field.attachments.length + draggedFiles.length > 10}
-          message={
-            <FormattedMessage
-              id="component.petition-compose-field.drop-files-to-attach"
-              defaultMessage="Drop here your files to attach them to this field"
+      {isVisible ? (
+        <Box>
+          <input type="file" {...getInputProps()} />
+          {isDragActive && isOverCurrent ? (
+            <PetitionComposeDragActiveIndicator
+              showErrorMessage={field.attachments.length + draggedFiles.length > 10}
+              message={
+                <FormattedMessage
+                  id="component.petition-compose-field.drop-files-to-attach"
+                  defaultMessage="Drop here your files to attach them to this field"
+                />
+              }
+              errorMessage={
+                <FormattedMessage
+                  id="component.petition-compose-field.too-many-attachments"
+                  defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+                  values={{ count: 10 }}
+                />
+              }
             />
-          }
-          errorMessage={
-            <FormattedMessage
-              id="component.petition-compose-field.too-many-attachments"
-              defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
-              values={{ count: 10 }}
-            />
-          }
-        />
-      ) : null}
-      <Box
-        ref={previewRef}
-        display="flex"
-        flexDirection="row"
-        opacity={isDragging ? 0 : 1}
-        data-active={isActive ? true : undefined}
-        backgroundColor="white"
-        sx={{
-          "[draggable]": {
-            opacity: 0,
-            transition: "opacity 150ms",
-          },
-          ".field-actions": {
-            display: "none",
-          },
-          "&:hover [draggable]": {
-            opacity: 1,
-          },
-          _active: {
-            backgroundColor: "primary.50",
-            ".field-actions": {
-              display: "flex",
-            },
-          },
-          _hover: {
-            backgroundColor: "gray.50",
-            ".field-actions": {
-              display: "flex",
-            },
-            _active: {
-              backgroundColor: "primary.50",
-            },
-          },
-        }}
-      >
-        {field.isFixed || isReadOnly ? (
-          <Box width="32px" />
-        ) : (
+          ) : null}
           <Box
-            ref={dragRef}
-            data-testid="compose-field-drag-handle"
+            ref={previewRef}
+            className={isChildren ? "petition-compose-field-children" : "petition-compose-field"}
             display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            padding={2}
-            width="32px"
-            cursor={field.isFixed ? "unset" : "grab"}
-            color="gray.400"
-            _hover={{
-              color: "gray.700",
+            flexDirection="row"
+            opacity={isDragging ? 0 : 1}
+            data-active={isActive ? true : undefined}
+            backgroundColor="white"
+            sx={{
+              "[draggable]": {
+                opacity: 0,
+                transition: "opacity 150ms",
+              },
+              ".field-actions": {
+                display: "none",
+              },
+              _active: {
+                backgroundColor: "primary.50",
+                ".field-actions": {
+                  display: "flex",
+                },
+              },
+              _hover: {
+                "[draggable]": {
+                  opacity: 1,
+                },
+                ".petition-compose-field-children [draggable]": {
+                  opacity: 0,
+                },
+                backgroundColor: "gray.50",
+                ".field-actions": {
+                  display: "flex",
+                },
+                _active: {
+                  backgroundColor: "primary.50",
+                },
+              },
+              ...(sx ?? {}),
             }}
-            aria-label={intl.formatMessage({
-              id: "component.petition-compose-field.drag-to-sort-label",
-              defaultMessage: "Drag to sort this parallel fields",
-            })}
           >
-            <DragHandleIcon role="presentation" />
-          </Box>
-        )}
-        {field.optional ? null : (
-          <Box marginX={-2} position="relative">
-            <Tooltip
-              placement="bottom"
-              label={intl.formatMessage({
-                id: "generic.required-field",
-                defaultMessage: "Required field",
-              })}
-            >
+            {field.isFixed || isReadOnly ? (
+              <Box width="32px" />
+            ) : (
               <Box
-                width={4}
-                height={4}
-                textAlign="center"
-                marginTop="13px"
-                fontSize="xl"
-                color="red.600"
-                userSelect="none"
+                ref={dragRef}
+                data-testid="compose-field-drag-handle"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                padding={2}
+                width="32px"
+                cursor={field.isFixed ? "unset" : "grab"}
+                color="gray.400"
+                _hover={{
+                  color: "gray.700",
+                }}
+                aria-label={intl.formatMessage({
+                  id: "component.petition-compose-field.drag-to-sort-label",
+                  defaultMessage: "Drag to sort this parallel fields",
+                })}
               >
-                <Box position="relative" bottom="4px" pointerEvents="none">
-                  *
-                </Box>
+                <DragHandleIcon role="presentation" />
               </Box>
-            </Tooltip>
+            )}
+            {field.optional ? null : (
+              <Box marginX={-2} position="relative">
+                <Tooltip
+                  placement="bottom"
+                  label={intl.formatMessage({
+                    id: "generic.required-field",
+                    defaultMessage: "Required field",
+                  })}
+                >
+                  <Box
+                    width={4}
+                    height={4}
+                    textAlign="center"
+                    marginTop="13px"
+                    fontSize="xl"
+                    color="red.600"
+                    userSelect="none"
+                  >
+                    <Box position="relative" bottom="4px" pointerEvents="none">
+                      *
+                    </Box>
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
+            <Stack spacing={1} flex="1">
+              <Box position="relative">
+                <PetitionComposeFieldInner
+                  ref={ref}
+                  flex="1"
+                  paddingLeft={3}
+                  paddingTop={2}
+                  paddingBottom={10}
+                  paddingRight={4}
+                  user={user}
+                  petition={petition}
+                  field={field}
+                  index={index}
+                  fieldIndex={fieldIndex}
+                  showError={showError}
+                  attachmentUploadProgress={attachmentUploadProgress}
+                  onFieldEdit={onFieldEdit}
+                  onFocusNextField={onFocusNextField}
+                  onFocusPrevField={onFocusPrevField}
+                  onAddField={onAddField}
+                  onRemoveAttachment={handleRemoveAttachment}
+                  onDownloadAttachment={handleDownloadAttachment}
+                  onTypeIndicatorClick={onTypeIndicatorClick}
+                  onCloneField={onCloneField}
+                  onDeleteClick={onDeleteClick}
+                  onFieldVisibilityClick={onFieldVisibilityClick}
+                  onSettingsClick={onSettingsClick}
+                  isReadOnly={isReadOnly}
+                  fieldProps={fieldProps}
+                  onUpdateFieldPositions={onUpdateFieldPositions}
+                />
+                <PetitionComposeFieldActions
+                  field={field}
+                  isActive={isActive}
+                  canChangeVisibility={
+                    isChildren ? canChangeVisibility && index > 0 : canChangeVisibility
+                  }
+                  onCloneField={onCloneField}
+                  onSettingsClick={onSettingsClick}
+                  onDeleteClick={onDeleteClick}
+                  onVisibilityClick={onFieldVisibilityClick}
+                  onAttachmentClick={open}
+                  className={isChildren ? "field-actions-children" : "field-actions"}
+                  position="absolute"
+                  bottom={0}
+                  right={2}
+                  onUnlinkField={onUnlinkField}
+                  isReadOnly={isReadOnly}
+                />
+              </Box>
+
+              {field.type === "FIELD_GROUP" ? (
+                <PetitionComposeFieldGroupChildren
+                  isReadOnly={isReadOnly}
+                  showError={showError}
+                  field={field}
+                  user={user}
+                  childrenFieldIndices={childrenFieldIndices!}
+                  fieldRefs={fieldRefs!}
+                  petition={petition}
+                  activeChildFieldId={activeChildFieldId}
+                  fieldProps={fieldProps}
+                  onAddField={onAddField}
+                  onUpdateFieldPositions={onUpdateFieldPositions}
+                  onLinkField={onLinkField}
+                  onUnlinkField={onUnlinkField}
+                />
+              ) : null}
+            </Stack>
           </Box>
-        )}
-        <Box marginLeft={3}>
-          <PetitionFieldTypeIndicator
-            type={field.type}
-            fieldIndex={fieldIndex}
-            as="button"
-            onClick={onTypeIndicatorClick}
-            marginTop="10px"
-            alignSelf="flex-start"
-          />
         </Box>
-        <PetitionComposeFieldInner
-          ref={ref}
-          flex="1"
-          paddingLeft={3}
-          paddingTop={2}
-          paddingBottom={10}
-          paddingRight={4}
-          petition={petition}
-          field={field}
-          fieldIndex={fieldIndex}
-          showError={showError}
-          attachmentUploadProgress={attachmentUploadProgress}
-          onFieldEdit={onFieldEdit}
-          onFocusNextField={onFocusNextField}
-          onFocusPrevField={onFocusPrevField}
-          onAddField={onAddField}
-          onRemoveAttachment={handleRemoveAttachment}
-          onDownloadAttachment={handleDownloadAttachment}
-          isReadOnly={isReadOnly}
-        />
-        <PetitionComposeFieldActions
-          field={field}
-          isActive={isActive}
-          canChangeVisibility={canChangeVisibility}
-          onCloneField={onCloneField}
-          onSettingsClick={onSettingsClick}
-          onDeleteClick={onDeleteClick}
-          onVisibilityClick={onFieldVisibilityClick}
-          onAttachmentClick={open}
-          className="field-actions"
-          position="absolute"
-          bottom={0}
-          right={2}
-          isReadOnly={isReadOnly}
-        />
-      </Box>
+      ) : (
+        <Box height={`${height}px`} />
+      )}
     </Box>
   );
 });
 
+function approximateFieldHeight(
+  field: Pick<PetitionField, "type" | "description" | "options" | "visibility"> & {
+    attachments: any[];
+    children?:
+      | (Pick<PetitionField, "type" | "description" | "options" | "visibility"> & {
+          attachments: any[];
+        })[]
+      | null;
+  },
+): number {
+  return (
+    8 +
+    // title
+    24 +
+    4 +
+    // description
+    (1 + 19 * approxTextareaLines(field.description ?? "")) +
+    (field.attachments.length > 0 ? 8 + 32 : 0) +
+    // descriptive text
+    (field.type === "CHECKBOX" ? 4 + 18 : 0) +
+    // values max at 200px
+    (field.type === "CHECKBOX" || field.type === "SELECT"
+      ? 4 + Math.min(200, Math.max(1, (field.options.values ?? []).length) * 21)
+      : 0) +
+    (field.type === "DYNAMIC_SELECT"
+      ? 8 + 21 + (field.options.file ? 4 + 24 + (field.options.labels.length - 1) * (4 + 24) : 0)
+      : 0) +
+    // visibility
+    (field.visibility ? 4 + 37 : 0) +
+    40 +
+    // FIELD_GROUP
+    (field.type === "FIELD_GROUP"
+      ? 4 +
+        (field.children!.length > 0 ? 1 + sumBy(field.children!, approximateFieldHeight) + 48 : 136)
+      : 0)
+  );
+}
+
+function approxTextareaLines(text: string) {
+  let lines = 1;
+  let current = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === "\n" || ++current > 112) {
+      lines++;
+      current = 0;
+    }
+  }
+  return lines;
+}
+
 interface PetitionComposeFieldInnerProps
   extends Pick<
     PetitionComposeFieldProps,
+    | "user"
     | "field"
     | "fieldIndex"
     | "petition"
     | "showError"
+    | "onTypeIndicatorClick"
     | "onFieldEdit"
     | "onFocusNextField"
     | "onFocusPrevField"
     | "onAddField"
+    | "onCloneField"
+    | "onSettingsClick"
+    | "onDeleteClick"
+    | "onFieldVisibilityClick"
+    | "fieldProps"
+    | "onUpdateFieldPositions"
   > {
   attachmentUploadProgress: Record<string, number>;
   onRemoveAttachment: (attachmentId: string) => void;
   onDownloadAttachment: (attachmentId: string) => void;
+  index: number;
   isReadOnly?: boolean;
 }
 
@@ -518,23 +683,33 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   PetitionComposeFieldRef
 >(function PetitionComposeFieldInner(
   {
+    user,
     field,
     fieldIndex,
     petition,
     showError,
     attachmentUploadProgress,
     onFieldEdit,
+    onTypeIndicatorClick,
     onFocusNextField,
     onFocusPrevField,
     onAddField,
     onDownloadAttachment,
     onRemoveAttachment,
+    onCloneField,
+    onSettingsClick,
+    onDeleteClick,
+    onFieldVisibilityClick,
+    fieldProps,
+    onUpdateFieldPositions,
+    index,
     isReadOnly,
     ...props
   },
   ref,
 ) {
   const intl = useIntl();
+  const isChildren = field.parent?.id !== undefined;
   const [title, setTitle] = useState(field.title);
   const titleRef = useRef<HTMLInputElement>(null);
   const focusTitle = useCallback((atStart?: boolean) => {
@@ -571,22 +746,26 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         focusFromNext: () => {
           if (field.type === "SELECT" || field.type === "CHECKBOX") {
             focusFieldOptions(true);
-          } else if (field.description) {
-            focusDescription(true);
           } else {
-            focusTitle(true);
+            focusDescription(true);
           }
         },
       }) as PetitionComposeFieldRef,
-    [field],
+    [field.id, field.type, (field.description ?? "").length > 0],
   );
 
   const letter = letters();
   const previousVisibility = usePrevious(field.visibility);
 
   return (
-    <Stack ref={elementRef} spacing={1} {...props}>
-      <Stack direction="row" spacing={2} alignItems="center">
+    <Stack spacing={1} ref={elementRef} {...props}>
+      <Stack direction="row" spacing={2.5} alignItems="center">
+        <PetitionFieldTypeIndicator
+          type={field.type}
+          fieldIndex={fieldIndex}
+          as="button"
+          onClick={onTypeIndicatorClick}
+        />
         {field.isInternal ? <InternalFieldBadge /> : null}
         <Box flex={1}>
           <Input
@@ -636,13 +815,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               switch (event.key) {
                 case "ArrowDown":
                   event.preventDefault();
-                  if (field.description) {
-                    focusDescription(true);
-                  } else if (field.type === "SELECT" || field.type === "CHECKBOX") {
-                    focusFieldOptions(true);
-                  } else {
-                    onFocusNextField();
-                  }
+                  focusDescription(true);
                   break;
                 case "ArrowUp":
                   event.preventDefault();
@@ -662,7 +835,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         </Box>
         {field.isReadOnly ? null : (
           <FormControl
-            className="field-actions"
+            className={isChildren ? "field-actions-children" : "field-actions"}
             display="flex"
             alignItems="center"
             width="auto"
@@ -670,7 +843,10 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             isDisabled={isReadOnly}
           >
             <FormLabel htmlFor={`field-required-${field.id}`} fontWeight="normal" marginBottom="0">
-              <FormattedMessage id="petition.required-label" defaultMessage="Required" />
+              <FormattedMessage
+                id="component.petition-compose-field.required-label"
+                defaultMessage="Required"
+              />
             </FormLabel>
             <Switch
               data-testid="compose-field-required"
@@ -701,80 +877,80 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   onFieldEdit({ optional: !event.target.checked });
                 }
               }}
-              isDisabled={isReadOnly}
+              isDisabled={isReadOnly || index === 0}
             />
           </FormControl>
         )}
       </Stack>
-      {!description && isReadOnly ? null : (
-        <GrowingTextarea
-          ref={descriptionRef}
-          id={`field-description-${field.id}`}
-          data-testid="compose-field-description"
-          className={"field-description"}
-          placeholder={
-            field.type === "HEADING"
-              ? intl.formatMessage({
-                  id: "component.petition-compose-field.heading-description-placeholder",
-                  defaultMessage: "Enter the text that you need...",
-                })
-              : intl.formatMessage({
-                  id: "component.petition-compose-field.field-description-placeholder",
-                  defaultMessage: "Add a description...",
-                })
-          }
-          aria-label={intl.formatMessage({
-            id: "component.petition-compose-field.field-description-label",
-            defaultMessage: "Field description",
-          })}
-          fontSize="sm"
-          background="transparent"
-          value={description ?? ""}
-          maxLength={10000}
-          border="none"
-          height="20px"
-          padding={0}
-          minHeight={0}
-          rows={1}
-          _focus={{
-            boxShadow: "none",
-          }}
-          onChange={(event) => setDescription(event.target.value ?? null)}
-          onBlur={() => {
-            const trimmed = description?.trim() ?? null;
-            setNativeValue(descriptionRef.current!, trimmed ?? "");
-            if (field.description !== trimmed) {
-              onFieldEdit({ description: trimmed });
+      <Stack paddingLeft={14}>
+        {!description && isReadOnly ? null : (
+          <GrowingTextarea
+            ref={descriptionRef}
+            id={`field-description-${field.id}`}
+            data-testid="compose-field-description"
+            className={"field-description"}
+            placeholder={
+              field.type === "HEADING"
+                ? intl.formatMessage({
+                    id: "component.petition-compose-field.heading-description-placeholder",
+                    defaultMessage: "Enter the text that you need...",
+                  })
+                : intl.formatMessage({
+                    id: "component.petition-compose-field.field-description-placeholder",
+                    defaultMessage: "Add a description...",
+                  })
             }
-          }}
-          onKeyDown={(event) => {
-            const textarea = event.target as HTMLTextAreaElement;
-            const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
-            const beforeCursor = textarea.value.substr(0, textarea.selectionStart);
-            const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
-            switch (event.key) {
-              case "ArrowDown":
-                if (currentLine === totalLines - 1) {
-                  if (field.type === "SELECT") {
-                    event.preventDefault();
-                    focusFieldOptions(true);
-                  } else {
-                    onFocusNextField();
+            aria-label={intl.formatMessage({
+              id: "component.petition-compose-field.field-description-label",
+              defaultMessage: "Field description",
+            })}
+            fontSize="sm"
+            background="transparent"
+            value={description ?? ""}
+            maxLength={10000}
+            border="none"
+            height="20px"
+            padding={0}
+            minHeight={0}
+            rows={1}
+            _focus={{
+              boxShadow: "none",
+            }}
+            onChange={(event) => setDescription(event.target.value ?? null)}
+            onBlur={() => {
+              const trimmed = description?.trim() ?? null;
+              setNativeValue(descriptionRef.current!, trimmed ?? "");
+              if (field.description !== trimmed) {
+                onFieldEdit({ description: trimmed });
+              }
+            }}
+            onKeyDown={(event) => {
+              const textarea = event.target as HTMLTextAreaElement;
+              const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
+              const beforeCursor = textarea.value.substr(0, textarea.selectionStart);
+              const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
+              switch (event.key) {
+                case "ArrowDown":
+                  if (currentLine === totalLines - 1) {
+                    if (field.type === "SELECT") {
+                      event.preventDefault();
+                      focusFieldOptions(true);
+                    } else {
+                      onFocusNextField();
+                    }
                   }
-                }
-                break;
-              case "ArrowUp":
-                if (currentLine === 0) {
-                  focusTitle();
-                }
-                break;
-            }
-          }}
-          isDisabled={isReadOnly}
-        />
-      )}
-      {field.attachments.length ? (
-        <Box>
+                  break;
+                case "ArrowUp":
+                  if (currentLine === 0) {
+                    focusTitle();
+                  }
+                  break;
+              }
+            }}
+            isDisabled={isReadOnly}
+          />
+        )}
+        {field.attachments.length ? (
           <Flex flexWrap="wrap" gridGap={2}>
             {field.attachments.map((attachment) => (
               <PetitionComposeFieldAttachment
@@ -787,77 +963,77 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               />
             ))}
           </Flex>
-        </Box>
-      ) : null}
-      {field.type === "CHECKBOX" ? (
-        <CheckboxTypeLabel
-          options={field.options}
-          fontSize="xs"
-          color={isReadOnly ? undefined : "gray.600"}
-          textStyle={isReadOnly ? "muted" : undefined}
-        />
-      ) : null}
-      {field.type === "SELECT" || field.type === "CHECKBOX" ? (
-        <PetitionFieldOptionsListEditor
-          ref={fieldOptionsRef}
-          id={`field-options-list-${field.id}`}
-          data-testid="compose-field-options"
-          field={field}
-          onFieldEdit={onFieldEdit}
-          showError={showError}
-          onFocusNextField={onFocusNextField}
-          onFocusDescription={focusDescription}
-          isReadOnly={isReadOnly}
-        />
-      ) : field.type === "DYNAMIC_SELECT" ? (
-        <Box textStyle={isReadOnly ? "muted" : undefined}>
-          {field.options.labels?.length ? (
-            <>
-              <Text as="h6" fontSize="sm">
+        ) : null}
+        {field.type === "CHECKBOX" ? (
+          <CheckboxTypeLabel
+            options={field.options}
+            fontSize="xs"
+            color={isReadOnly ? undefined : "gray.600"}
+            textStyle={isReadOnly ? "muted" : undefined}
+          />
+        ) : null}
+        {field.type === "SELECT" || field.type === "CHECKBOX" ? (
+          <PetitionFieldOptionsListEditor
+            ref={fieldOptionsRef}
+            id={`field-options-list-${field.id}`}
+            data-testid="compose-field-options"
+            field={field}
+            onFieldEdit={onFieldEdit}
+            showError={showError}
+            onFocusNextField={onFocusNextField}
+            onFocusDescription={focusDescription}
+            isReadOnly={isReadOnly}
+          />
+        ) : field.type === "DYNAMIC_SELECT" ? (
+          <Box textStyle={isReadOnly ? "muted" : undefined}>
+            {field.options.labels?.length ? (
+              <>
+                <Text as="h6" fontSize="sm">
+                  <FormattedMessage
+                    id="component.petition-compose-field.dynamic-select-labels-header"
+                    defaultMessage="Uploaded lists:"
+                  />
+                </Text>
+                <Stack as="ol" spacing={1} marginTop={1}>
+                  {((field.options.labels ?? []) as string[]).map((label, index) => (
+                    <HStack as="li" key={index} alignItems="center">
+                      <Center
+                        height="20px"
+                        width="26px"
+                        fontSize="xs"
+                        borderRadius="sm"
+                        border="1px solid"
+                        borderColor={color}
+                      >
+                        {`${fieldIndex}${letter.next().value}`}
+                      </Center>
+                      <Text as="span">{label}</Text>
+                    </HStack>
+                  ))}
+                </Stack>
+              </>
+            ) : (
+              <Text color={showError ? "red.500" : "gray.600"} fontSize="sm">
                 <FormattedMessage
-                  id="component.petition-compose-field.dynamic-select-labels-header"
-                  defaultMessage="Uploaded lists:"
+                  id="component.petition-compose-field.dynamic-select-not-configured"
+                  defaultMessage="Click on field settings to configure this field"
                 />
+                <Text as="span" marginLeft={1} position="relative" top="-1px">
+                  (<SettingsIcon />)
+                </Text>
               </Text>
-              <List as={Stack} spacing={1} marginTop={1}>
-                {((field.options.labels ?? []) as string[]).map((label, index) => (
-                  <ListItem key={index} as={Stack} direction="row" alignItems="center">
-                    <Center
-                      height="20px"
-                      width="26px"
-                      fontSize="xs"
-                      borderRadius="sm"
-                      border="1px solid"
-                      borderColor={color}
-                    >
-                      {`${fieldIndex}${letter.next().value}`}
-                    </Center>
-                    <Text as="span">{label}</Text>
-                  </ListItem>
-                ))}
-              </List>
-            </>
-          ) : (
-            <Text color={showError ? "red.500" : "gray.600"} fontSize="sm">
-              <FormattedMessage
-                id="component.petition-compose-field.dynamic-select-not-configured"
-                defaultMessage="Click on field settings to configure this field"
-              />
-              <Text as="span" marginLeft={1} position="relative" top="-1px">
-                (<SettingsIcon />)
-              </Text>
-            </Text>
-          )}
-        </Box>
-      ) : null}
+            )}
+          </Box>
+        ) : null}
+      </Stack>
+
       {field.visibility ? (
         <Box paddingTop={1}>
           <PetitionComposeFieldVisibilityAccordion isOpen={previousVisibility === null}>
             <PetitionFieldVisibilityEditor
-              showError={showError}
-              fieldId={field.id}
-              visibility={field.visibility as any}
-              fields={petition.fields}
+              field={field}
+              petition={petition}
+              showErrors={showError}
               onVisibilityEdit={(visibility) => onFieldEdit({ visibility })}
               isReadOnly={isReadOnly}
             />
@@ -871,8 +1047,9 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 interface PetitionComposeFieldActionsProps
   extends Pick<
     PetitionComposeFieldProps,
-    "field" | "isActive" | "onCloneField" | "onSettingsClick" | "onDeleteClick"
+    "field" | "onCloneField" | "onSettingsClick" | "onDeleteClick" | "onUnlinkField"
   > {
+  isActive: boolean;
   canChangeVisibility: boolean;
   onVisibilityClick: () => void;
   onAttachmentClick: () => void;
@@ -889,6 +1066,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       onCloneField,
       onSettingsClick,
       onDeleteClick,
+      onUnlinkField,
       isReadOnly,
       isActive,
       ...props
@@ -896,6 +1074,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
     ref,
   ) {
     const intl = useIntl();
+    const isChildren = field.parent?.id !== undefined;
     const hasCondition = field.visibility;
     const buildUrlToSection = useBuildUrlToPetitionSection();
     return (
@@ -931,10 +1110,17 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             closeDelay={0}
             content={
               <Text fontSize="sm">
-                <FormattedMessage
-                  id="component.petition-compose-field.conditions-not-enough-fields"
-                  defaultMessage="You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
-                />
+                {isChildren ? (
+                  <FormattedMessage
+                    id="component.petition-compose-field.conditions-not-available-first-field-group"
+                    defaultMessage="You cannot set conditions for the first field in a group. Reorder the fields or add a new one before it to set conditions between them."
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.petition-compose-field.conditions-not-enough-fields"
+                    defaultMessage="You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
+                  />
+                )}
               </Text>
             }
           >
@@ -1025,36 +1211,82 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             })}
           />
         </ConfimationPopover>
-        <NakedLink href={buildUrlToSection("preview", { field: field.id })}>
-          <IconButtonWithTooltip
-            as="a"
-            icon={<ChevronRightIcon boxSize={6} />}
-            size="sm"
-            variant="ghost"
-            placement="bottom"
-            color="gray.600"
-            label={intl.formatMessage({
-              id: "component.petition-compose-field.field-preview",
-              defaultMessage: "Preview",
-            })}
-          />
-        </NakedLink>
+        {isChildren ? (
+          <ConfimationPopover
+            description={
+              <FormattedMessage
+                id="component.petition-compose-field.unlink-question"
+                defaultMessage="Do you want to remove this field from the group?"
+              />
+            }
+            confirm={
+              <Button
+                onClick={() => onUnlinkField(field.parent!.id, [field.id])}
+                size="sm"
+                colorScheme="red"
+              >
+                <FormattedMessage
+                  id="component.petition-compose-field.unlink-button"
+                  defaultMessage="Remove from group"
+                />
+              </Button>
+            }
+          >
+            <IconButtonWithTooltip
+              icon={<UnlinkIcon boxSize={4} />}
+              onClick={onSettingsClick}
+              isDisabled={isReadOnly}
+              size="sm"
+              variant="ghost"
+              placement="bottom"
+              color="gray.600"
+              label={intl.formatMessage({
+                id: "component.petition-compose-field.unlink-button",
+                defaultMessage: "Remove from group",
+              })}
+            />
+          </ConfimationPopover>
+        ) : (
+          <NakedLink href={buildUrlToSection("preview", { field: field.id })}>
+            <IconButtonWithTooltip
+              as="a"
+              icon={<ChevronRightIcon boxSize={6} />}
+              size="sm"
+              variant="ghost"
+              placement="bottom"
+              color="gray.600"
+              label={intl.formatMessage({
+                id: "component.petition-compose-field.field-preview",
+                defaultMessage: "Preview",
+              })}
+            />
+          </NakedLink>
+        )}
       </Stack>
     );
   },
 );
 
 const fragments = {
+  get User() {
+    return gql`
+      fragment PetitionComposeField_User on User {
+        id
+        ...PetitionComposeFieldGroupChildren_User
+      }
+      ${PetitionComposeFieldGroupChildren.fragments.User}
+    `;
+  },
   get PetitionBase() {
     return gql`
       fragment PetitionComposeField_PetitionBase on PetitionBase {
         id
         fields {
           isReadOnly
-          ...PetitionFieldVisibilityEditor_PetitionField
         }
+        ...PetitionFieldVisibilityEditor_PetitionBase
       }
-      ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+      ${PetitionFieldVisibilityEditor.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -1070,13 +1302,29 @@ const fragments = {
         isInternal
         isReadOnly
         visibility
+        children {
+          type
+          description
+          options
+          visibility
+          attachments {
+            id
+          }
+        }
         attachments {
           ...PetitionComposeField_PetitionFieldAttachment
         }
+        parent {
+          id
+        }
         ...PetitionFieldOptionsListEditor_PetitionField
+        ...PetitionComposeFieldGroupChildren_PetitionField
+        ...PetitionFieldVisibilityEditor_PetitionField
       }
       ${this.PetitionFieldAttachment}
       ${PetitionFieldOptionsListEditor.fragments.PetitionField}
+      ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+      ${PetitionComposeFieldGroupChildren.fragments.PetitionField}
     `;
   },
   get PetitionFieldAttachment() {
@@ -1190,6 +1438,8 @@ interface DragItem {
   index: number;
   id: string;
   type: string;
+  fieldType: PetitionFieldType;
+  files?: any;
 }
 
 function useDragAndDrop(
@@ -1197,12 +1447,21 @@ function useDragAndDrop(
   index: number,
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void,
   type = "FIELD",
+  fieldType?: PetitionFieldType,
 ) {
   const elementRef = useRef<HTMLDivElement>(null);
 
-  const [, drop] = useDrop<DragItem, unknown, any>({
-    accept: "FIELD",
+  const acceptedType = type === "CHILDREN_FIELD" ? "CHILDREN_FIELD" : "FIELD";
+
+  const [{ isOverCurrent }, drop] = useDrop<DragItem, unknown, any>({
+    accept: [acceptedType, NativeTypes.FILE],
+    collect: (monitor) => ({
+      isOverCurrent: monitor.isOver({ shallow: true }),
+    }),
     hover(item, monitor) {
+      // if is dragging files over do nothing
+      if (isDefined(item.files)) return;
+
       if (!elementRef.current) {
         return;
       }
@@ -1229,21 +1488,27 @@ function useDragAndDrop(
       // Only perform the move when the mouse has crossed half of the items height
       // When dragging downwards, only move when the cursor is below 50%
       // When dragging upwards, only move when the cursor is above 50%
+      // If the target is a field group, only move when the cursor is above 25px or below 25px
+      const hasReachedBottom =
+        fieldType === "FIELD_GROUP"
+          ? hoverClientY < hoverBoundingRect.bottom - hoverBoundingRect.top - 25
+          : hoverClientY < hoverMiddleY;
+      const hasReachedTop =
+        fieldType === "FIELD_GROUP" ? hoverClientY > 25 : hoverClientY > hoverMiddleY;
 
       // Dragging downwards
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+      if (dragIndex < hoverIndex && hasReachedBottom) {
         return;
       }
 
       // Dragging upwards
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+      if (dragIndex > hoverIndex && hasReachedTop) {
         return;
       }
 
-      if (type === "FIELD") {
+      if (type === acceptedType) {
         // Time to actually perform the action
         onMove?.(dragIndex, hoverIndex);
-
         // Note: we're mutating the monitor item here!
         // Generally it's better to avoid mutations,
         // but it's good here for the sake of performance
@@ -1254,9 +1519,9 @@ function useDragAndDrop(
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
-    type: "FIELD",
-    item: { type, id, index },
-    canDrag: () => type === "FIELD",
+    type: acceptedType,
+    item: { type, id, index, fieldType },
+    canDrag: () => type === acceptedType,
     collect: (monitor: any) => {
       return {
         isDragging: monitor.isDragging(),
@@ -1269,7 +1534,7 @@ function useDragAndDrop(
   });
 
   drop(elementRef);
-  return { elementRef, dragRef, previewRef, isDragging };
+  return { elementRef, dragRef, previewRef, isDragging, isOverCurrent };
 }
 
 interface PetitionComposeFieldVisibilityAccordionProps {

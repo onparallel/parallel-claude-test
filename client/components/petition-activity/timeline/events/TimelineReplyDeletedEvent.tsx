@@ -18,14 +18,38 @@ export function TimelineReplyDeletedEvent({
   event: { deletedBy, field, createdAt },
   userId,
 }: TimelineReplyDeletedEventProps) {
-  return (
-    <TimelineItem
-      icon={<TimelineIcon icon={XCircleIcon} color="gray.600" size="18px" />}
-      paddingY={2}
-    >
+  const isChildren = field?.parent?.id !== undefined;
+
+  let message = isChildren ? (
+    <FormattedMessage
+      id="component.timeline-reply-deleted-event.description-children-of-group"
+      defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
+      values={{
+        userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
+        deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
+        field: <PetitionFieldReference field={field} />,
+        parentField: <PetitionFieldReference field={field.parent!} />,
+        timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+      }}
+    />
+  ) : (
+    <FormattedMessage
+      id="component.timeline-reply-deleted-event.description"
+      defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+      values={{
+        userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
+        deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
+        field: <PetitionFieldReference field={field} />,
+        timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+      }}
+    />
+  );
+
+  if (field?.type === "FIELD_GROUP") {
+    message = (
       <FormattedMessage
-        id="timeline.reply-deleted-description"
-        defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+        id="component.timeline-reply-deleted-event.description--field-group"
+        defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}"
         values={{
           userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
           deletedBy: <UserOrContactReference userOrAccess={deletedBy} />,
@@ -33,6 +57,15 @@ export function TimelineReplyDeletedEvent({
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
       />
+    );
+  }
+
+  return (
+    <TimelineItem
+      icon={<TimelineIcon icon={XCircleIcon} color="gray.600" size="18px" />}
+      paddingY={2}
+    >
+      {message}
     </TimelineItem>
   );
 }
@@ -41,7 +74,11 @@ TimelineReplyDeletedEvent.fragments = {
   ReplyDeletedEvent: gql`
     fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
       field {
+        type
         ...PetitionFieldReference_PetitionField
+        parent {
+          ...PetitionFieldReference_PetitionField
+        }
       }
       deletedBy {
         ...UserOrContactReference_UserOrPetitionAccess

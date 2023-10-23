@@ -50,8 +50,14 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
       args.petitionId ? this.petitions.loadFieldsForPetition(args.petitionId) : null,
     ]);
 
+    const validFields =
+      fields?.filter(
+        (f) =>
+          !["HEADING", "FIELD_GROUP"].includes(f.type) && !isFileTypeField(f.type) && f.is_internal,
+      ) ?? [];
+
     const replies = pipe(
-      await this.petitions.loadRepliesForField(fields?.map((f) => f.id) ?? []),
+      await this.petitions.loadRepliesForField(validFields.map((f) => f.id)),
       flatten(),
       groupBy((r) => r.petition_field_id),
       mapValues((replies) => replies?.[0]),
@@ -74,9 +80,6 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
         if (!isDefined(reply)) {
           return "";
         } else {
-          if (isFileTypeField(reply.type)) {
-            return "";
-          }
           switch (reply.type) {
             case "NUMBER":
               return intl.formatNumber(reply.content.value as number);
@@ -96,8 +99,14 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
                 (reply.content.value as [prop: string, value: string][]).map(([, value]) => value),
                 { type: "unit", style: "short" },
               );
-            default:
+            case "TEXT":
+            case "SHORT_TEXT":
+            case "SELECT":
               return reply.content.value;
+            default:
+              throw new Error(
+                `Field type ${reply.type} can't be used for references on PetitionMessageContextService`,
+              );
           }
         }
       }

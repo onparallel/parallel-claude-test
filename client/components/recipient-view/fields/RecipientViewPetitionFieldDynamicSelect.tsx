@@ -1,4 +1,4 @@
-import { Box, Center, Flex, FormControl, FormLabel, List, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, FormControl, FormLabel, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, toSimpleSelectOption } from "@parallel/components/common/SimpleSelect";
@@ -31,6 +31,8 @@ export interface RecipientViewPetitionFieldDynamicSelectProps
   onDeleteReply: (reply: string) => void;
   onUpdateReply: (replyId: string, content: { value: DynamicSelectValue }) => Promise<void>;
   onCreateReply: (content: { value: DynamicSelectValue }) => Promise<string | undefined>;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 type SelectInstance = _SelectInstance<{ label: string; value: string }, false, never>;
@@ -43,6 +45,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  isInvalid,
+  parentReplyId,
 }: RecipientViewPetitionFieldDynamicSelectProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -89,17 +93,26 @@ export function RecipientViewPetitionFieldDynamicSelect({
 
   const showAddNewReply = !isDisabled && field.multiple;
 
+  const fieldReplies = completedFieldReplies(field);
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={showAddNewReply}
-      addNewReplyIsDisabled={
-        showNewReply || completedFieldReplies(field).length !== field.replies.length
-      }
+      addNewReplyIsDisabled={showNewReply || fieldReplies.length !== field.replies.length}
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={1} spacing={8}>
           <AnimatePresence initial={false}>
@@ -130,6 +143,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
             level={0}
             onChange={handleCreateReply}
             isDisabled={isDisabled}
+            isInvalid={isInvalid}
+            parentReplyId={parentReplyId}
           />
         </Box>
       ) : null}
@@ -220,6 +235,8 @@ interface RecipientViewPetitionFieldReplyDynamicSelectLevelProps {
   isDisabled?: boolean;
   onChange: (value: string) => Promise<void>;
   onDeleteReply?: () => void;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
@@ -234,6 +251,8 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     isDisabled,
     onChange,
     onDeleteReply,
+    isInvalid,
+    parentReplyId,
   }: RecipientViewPetitionFieldReplyDynamicSelectLevelProps,
   ref,
 ) {
@@ -258,7 +277,9 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     ).map((value) => toSimpleSelectOption(value)!);
   }, [fieldOptions, reply?.content.value, level]);
 
-  const id = `reply-${field.id}-${reply?.id ? `${reply.id}-${level}` : "new"}`;
+  const id = `reply-${field.id}${
+    parentReplyId ? `-${parentReplyId}` : reply?.parent ? `-${reply.parent.id}` : ""
+  }-${reply?.id ? `${reply.id}-${level}` : "new"}`;
 
   return (
     <FormControl id={id} isDisabled={isDisabled}>
@@ -276,7 +297,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
                 (reply && reply.content.value[level][0] !== field.options.labels[level])) ??
               false
             }
-            isInvalid={reply?.status === "REJECTED"}
+            isInvalid={reply?.status === "REJECTED" || isInvalid}
             value={
               optimistic
                 ? toSimpleSelectOption(optimistic)

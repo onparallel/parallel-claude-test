@@ -1,16 +1,16 @@
 diff --git a/node_modules/@types/segment-analytics/index.d.ts b/node_modules/@types/segment-analytics/index.d.ts
-index 17c1831..ad3a494 100755
+index 1be4a82..220121a 100644
 --- a/node_modules/@types/segment-analytics/index.d.ts
 +++ b/node_modules/@types/segment-analytics/index.d.ts
-@@ -206,9 +206,6 @@ declare namespace SegmentAnalytics {
-   }
+@@ -192,9 +192,6 @@ declare namespace SegmentAnalytics {
+     }
  }
  
 -declare var analytics: SegmentAnalytics.AnalyticsJS;
 -
--declare module '@segment/analytics.js-core' {
--  var analytics: SegmentAnalytics.AnalyticsJS;
--  export default analytics;
+-declare module "@segment/analytics.js-core" {
+-    var analytics: SegmentAnalytics.AnalyticsJS;
+-    export default analytics;
 +declare interface Window {
-+  analytics: SegmentAnalytics.AnalyticsJS | undefined;
++    analytics: SegmentAnalytics.AnalyticsJS | undefined;
  }

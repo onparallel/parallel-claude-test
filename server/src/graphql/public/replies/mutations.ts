@@ -1,9 +1,8 @@
 import { booleanArg, idArg, list, mutationField, nonNull, objectType } from "nexus";
-import { uniq } from "remeda";
+import { isDefined, uniq } from "remeda";
 import { CreatePetitionFieldReply } from "../../../db/__types";
 import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { toGlobalId } from "../../../util/globalId";
-import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
 import { RESULT } from "../../helpers/Result";
 import { and, chain } from "../../helpers/authorize";
@@ -14,10 +13,15 @@ import { validFileUploadInput } from "../../helpers/validators/validFileUploadIn
 import {
   fieldCanBeReplied,
   fieldHasType,
+  replyCanBeDeleted,
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../../petition/authorizers";
-import { validateCreateReplyContent, validateUpdateReplyContent } from "../../petition/validations";
+import {
+  validateCreateFileReplyInput,
+  validateCreatePetitionFieldReplyInput,
+  validateUpdatePetitionFieldReplyInput,
+} from "../../petition/validations";
 import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
@@ -50,14 +54,20 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
           "DATE",
           "DATE_TIME",
           "CHECKBOX",
+          "FIELD_GROUP",
         ],
       ),
-      fieldCanBeReplied((args) => args.fields.map((f) => f.id)),
+      fieldCanBeReplied((args) => args.fields),
+      replyIsForFieldOfType(
+        (args) => args.fields.map((f) => f.parentReplyId).filter(isDefined),
+        "FIELD_GROUP",
+      ),
+      replyBelongsToAccess((args) => args.fields.map((f) => f.parentReplyId).filter(isDefined)),
     ),
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.fields, "fields"),
-    validateCreateReplyContent((args) => args.fields, "fields"),
+    validateCreatePetitionFieldReplyInput((args) => args.fields, "fields"),
   ),
   resolve: async (_, args, ctx) => {
     const fields = await ctx.petitions.loadField(uniq(args.fields.map((field) => field.id)));
@@ -67,6 +77,7 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
       return {
         content: fieldReplyContent(field.type, fieldReply.content),
         petition_field_id: fieldReply.id,
+        parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
         type: field.type,
         petition_access_id: ctx.access!.id,
       };
@@ -111,7 +122,7 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.replies, "replies"),
-    validateUpdateReplyContent((args) => args.replies, "replies"),
+    validateUpdatePetitionFieldReplyInput((args) => args.replies, "replies"),
   ),
   resolve: async (_, args, ctx) => {
     const replyIds = uniq(args.replies.map((r) => r.id));
@@ -144,6 +155,7 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
     replyBelongsToAccess("replyId"),
     replyBelongsToExternalField("replyId"),
     replyCanBeUpdated("replyId"),
+    replyCanBeDeleted("replyId"),
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -168,10 +180,7 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
     replyIsForFieldOfType("replyId", "FILE_UPLOAD"),
   ),
   resolve: async (_, args, ctx) => {
-    const reply = await ctx.petitions.loadFieldReply(args.replyId);
-    if (reply?.type !== "FILE_UPLOAD") {
-      throw new Error("Invalid");
-    }
+    const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
     const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
     // Try to get metadata
     await ctx.storage.fileUploads.getFileMetadata(file!.path);
@@ -196,6 +205,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     keycode: nonNull(idArg()),
     fieldId: nonNull(globalIdArg("PetitionField")),
     data: nonNull("FileUploadInput"),
+    parentReplyId: globalIdArg("PetitionFieldReply"),
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
@@ -203,13 +213,15 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
       fieldBelongsToAccess("fieldId"),
       fieldIsExternal("fieldId"),
       fieldHasType("fieldId", "FILE_UPLOAD"),
-      fieldCanBeReplied("fieldId"),
+      fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     ),
   ),
-  validateArgs: validFileUploadInput(
-    (args) => args.data,
-    { maxSizeBytes: 50 * 1024 * 1024 },
-    "data",
+  validateArgs: validateAnd(
+    validFileUploadInput((args) => args.data, { maxSizeBytes: 50 * 1024 * 1024 }, "data"),
+    validateCreateFileReplyInput(
+      (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
+      "fieldId",
+    ),
   ),
   resolve: async (_, args, ctx) => {
     const key = random(16);
@@ -232,6 +244,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
           petition_access_id: ctx.access!.id,
           type: "FILE_UPLOAD",
           content: { file_upload_id: file.id },
+          parent_petition_field_reply_id: args.parentReplyId ?? null,
         },
         `Contact:${ctx.contact!.id}`,
       ),
@@ -247,7 +260,11 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     type: "FileUploadDownloadLinkResult",
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      and(replyBelongsToAccess("replyId"), replyBelongsToExternalField("replyId")),
+      and(
+        replyBelongsToAccess("replyId"),
+        replyBelongsToExternalField("replyId"),
+        replyIsForFieldOfType("replyId", ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"]),
+      ),
     ),
     args: {
       keycode: nonNull(idArg()),
@@ -258,10 +275,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     },
     resolve: async (_, args, ctx) => {
       try {
-        const reply = await ctx.petitions.loadFieldReply(args.replyId);
-        if (!isFileTypeField(reply!.type)) {
-          throw new Error("Invalid field type");
-        }
+        const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
         const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
         if (!file) {
           throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
@@ -302,6 +316,7 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
   args: {
     keycode: nonNull(idArg()),
     fieldId: nonNull(globalIdArg("PetitionField")),
+    parentReplyId: globalIdArg("PetitionFieldReply"),
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
@@ -309,16 +324,19 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       fieldBelongsToAccess("fieldId"),
       fieldIsExternal("fieldId"),
       fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-      fieldCanBeReplied("fieldId"),
+      fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     ),
   ),
-  resolve: async (_, { fieldId }, ctx) => {
+  resolve: async (_, { fieldId, parentReplyId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
     const session = await ctx.bankflip.createSession({
       petitionId: toGlobalId("Petition", petition!.id),
       orgId: toGlobalId("Organization", petition!.org_id),
       fieldId: toGlobalId("PetitionField", fieldId),
       accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+      parentReplyId: isDefined(parentReplyId)
+        ? toGlobalId("PetitionFieldReply", parentReplyId)
+        : null,
     });
 
     return {

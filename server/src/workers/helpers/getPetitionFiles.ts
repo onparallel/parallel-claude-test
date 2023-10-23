@@ -1,49 +1,51 @@
-import { indexBy, isDefined, zip } from "remeda";
+import { indexBy, isDefined } from "remeda";
 import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
 import { WorkerContext } from "../../context";
 import { UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
-import { evaluateFieldVisibility } from "../../util/fieldVisibility";
+import { getAllFieldsWithIndices } from "../../util/fieldIndices";
+import { applyFieldLogic } from "../../util/fieldLogic";
 import { isFileTypeField } from "../../util/isFileTypeField";
-import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
+import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
+import { Maybe, UnwrapArray } from "../../util/types";
+
+interface GetPetitionFilesOptions {
+  locale: UserLocale;
+  pattern?: string;
+  xlsxOnly?: boolean;
+  onProgress?: (value: number) => Promise<void>;
+}
 
 export async function* getPetitionFiles(
   petitionId: number,
-  options: {
-    locale: UserLocale;
-    pattern?: string;
-    xlsxOnly?: boolean;
-    onProgress?: (value: number) => Promise<void>;
-  },
+  options: GetPetitionFilesOptions,
   ctx: WorkerContext,
 ) {
-  const fields = await ctx.petitions.loadFieldsForPetition(petitionId);
-  const fieldIds = fields.map((f) => f.id);
-  const fieldReplies = await ctx.petitions.loadRepliesForField(fieldIds);
-  const repliesByFieldId = Object.fromEntries(
-    fieldIds.map((id, index) => [id, fieldReplies[index]]),
+  const [composedFields] = await ctx.petitions.getComposedPetitionFields([petitionId]);
+
+  const indices = Object.fromEntries(
+    getAllFieldsWithIndices(composedFields).map(([field, fieldIndex]) => [field.id, fieldIndex]),
   );
-  const fieldsWithReplies = fields.map((f) => ({
-    ...f,
-    replies: repliesByFieldId[f.id],
-  }));
+  const visibleFields = applyFieldLogic(composedFields);
+  const allReplies = visibleFields
+    .flatMap((f) => [
+      ...f.replies,
+      ...f.replies.flatMap((r) => r.children?.flatMap((c) => c.replies) ?? []),
+    ])
+    .filter((r) => r.type !== "FIELD_GROUP");
 
-  const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
-    .filter(([, isVisible]) => isVisible)
-    .map(([field]) => field);
+  const fileReplies = allReplies.filter(
+    (r) =>
+      isFileTypeField(r.type) && isDefined(r.content.file_upload_id) && !isDefined(r.content.error),
+  );
 
-  const fileReplies = fieldReplies
-    .flat()
-    .filter((r) => isFileTypeField(r.type) && isDefined(r.content["file_upload_id"]));
+  const textReplies = allReplies.filter((r) => !isFileTypeField(r.type));
 
   const files = await ctx.files.loadFileUpload(
     fileReplies.map((reply) => reply.content["file_upload_id"]),
   );
-  const filesById = indexBy(
-    files.filter((f) => f !== null),
-    (f) => f!.id,
-  );
+  const filesById = indexBy(files.filter(isDefined), (f) => f.id);
 
   const latestPetitionSignature =
     await ctx.petitions.loadLatestPetitionSignatureByPetitionId(petitionId);
@@ -51,10 +53,7 @@ export async function* getPetitionFiles(
   const totalFiles = options.xlsxOnly
     ? 1
     : Math.max(
-        Math.min(
-          visibleFields.filter((f) => f.type !== "HEADING" && !isFileTypeField(f.type)).length,
-          1,
-        ) +
+        (textReplies.length > 0 ? 1 : 0) + // text replies excel
           fileReplies.length +
           Number(isDefined(latestPetitionSignature?.file_upload_id)) +
           Number(isDefined(latestPetitionSignature?.file_upload_audit_trail_id)),
@@ -65,11 +64,33 @@ export async function* getPetitionFiles(
   const excelWorkbook = new PetitionExcelExport(options.locale, ctx);
   await excelWorkbook.init();
   const seen = new Set<string>();
-  let headingCount = 0;
 
-  for (const field of visibleFields) {
+  async function* processField(
+    field: UnwrapArray<typeof visibleFields> & {
+      group_name?: Maybe<string>;
+      group_number?: number;
+    },
+    options: GetPetitionFilesOptions,
+  ): AsyncGenerator<ZipFileInput> {
     if (field.type === "HEADING") {
-      headingCount++;
+      // do nothing
+    } else if (field.type === "FIELD_GROUP") {
+      for (const groupReply of field.replies) {
+        const groupIndex = field.replies.indexOf(groupReply);
+        // process every child field on every reply group
+        for (const child of groupReply.children ?? []) {
+          yield* processField(
+            {
+              ...child.field,
+              children: [],
+              replies: child.replies.map((r) => ({ ...r, children: [] })),
+              group_number: groupIndex + 1,
+              group_name: field.options.groupName ?? null,
+            },
+            options,
+          );
+        }
+      }
     } else if (isFileTypeField(field.type) && !options.xlsxOnly) {
       for (const reply of field.replies) {
         const file = filesById[reply.content["file_upload_id"]];
@@ -80,7 +101,7 @@ export async function* getPetitionFiles(
             (placeholder) => {
               switch (placeholder) {
                 case "field-number":
-                  return `${field.position + 1 - headingCount}`;
+                  return `${indices[field.id]}`;
                 case "field-title":
                   return field.title ?? "";
                 case "file-name":
@@ -105,8 +126,12 @@ export async function* getPetitionFiles(
         }
       }
     } else if (!isFileTypeField(field.type)) {
-      excelWorkbook.addPetitionFieldReply(field, field.replies);
+      excelWorkbook.addPetitionFieldReply(field);
     }
+  }
+
+  for (const field of visibleFields) {
+    yield* processField(field, options);
   }
 
   await excelWorkbook.addPetitionFieldComments(visibleFields);

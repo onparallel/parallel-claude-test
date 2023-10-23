@@ -12,9 +12,7 @@ export type Replace<T, U extends Partial<Record<keyof T, any>>> = Omit<T, keyof 
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-export type If<Condition extends boolean | undefined, Then, Else = never> = Condition extends true
-  ? Then
-  : Else;
+export type If<Condition, Then, Else = never> = Condition extends false | undefined ? Else : Then;
 
 export type KeysOfTypeExact<T, U> = {
   [P in keyof T]-?: [U] extends [T[P]] ? ([T[P]] extends [U] ? P : never) : never;

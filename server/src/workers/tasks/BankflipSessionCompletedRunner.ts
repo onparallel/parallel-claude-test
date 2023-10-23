@@ -21,6 +21,9 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     );
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
+    const parentReplyId = isDefined(metadata.parentReplyId)
+      ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
+      : null;
 
     const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
     const petitionAccessId =
@@ -45,6 +48,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         replyContents.map((content) => ({
           petition_field_id: fieldId,
           type: "ES_TAX_DOCUMENTS",
+          parent_petition_field_reply_id: parentReplyId,
           content: { ...content, bankflip_session_id: sessionId },
           user_id: userId,
           petition_access_id: petitionAccessId,
@@ -63,6 +67,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
           {
             petition_field_id: fieldId,
             type: "ES_TAX_DOCUMENTS",
+            parent_petition_field_reply_id: parentReplyId,
             content: {
               file_upload_id: null,
               request: summary.modelRequestOutcomes[0].modelRequest,

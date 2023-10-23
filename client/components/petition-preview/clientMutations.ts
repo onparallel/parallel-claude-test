@@ -8,6 +8,8 @@ import {
   PreviewPetitionFieldMutations_updatePetitionFieldRepliesDocument,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
+  PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment,
+  PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
   useCreatePetitionFieldReply_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
@@ -33,6 +35,20 @@ const _deletePetitionReply = gql`
           status
         }
       }
+      parent {
+        id
+        replies {
+          id
+          children {
+            field {
+              id
+            }
+            replies {
+              id
+            }
+          }
+        }
+      }
       replies {
         id
       }
@@ -51,17 +67,34 @@ export function useDeletePetitionReply() {
       petitionId,
       fieldId,
       replyId,
+      parentReplyId,
       isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       replyId: string;
+      parentReplyId?: string;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
         updatePreviewFieldReplies(client, fieldId, (replies) =>
           replies.filter(({ id }) => id !== replyId),
         );
+        if (parentReplyId) {
+          updatePreviewFieldReply(client, parentReplyId, (reply) => {
+            return {
+              ...(reply ?? {}),
+              children: reply?.children?.map((child) => {
+                return child.field.id !== fieldId
+                  ? child
+                  : {
+                      ...child,
+                      replies: child.replies.filter(({ id }) => id !== replyId),
+                    };
+              }),
+            } as PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment;
+          });
+        }
       } else {
         await deletePetitionReply({
           variables: { petitionId, replyId },
@@ -119,6 +152,12 @@ export function useUpdatePetitionFieldReply() {
           fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
             id
             type
+            children {
+              id
+              replies {
+                id
+              }
+            }
           }
         `,
         id: fieldId,
@@ -160,6 +199,11 @@ const _createPetitionFieldReplies = gql`
   ) {
     createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
       ...RecipientViewPetitionFieldLayout_PetitionFieldReply
+      children {
+        field {
+          id
+        }
+      }
       field {
         id
         petition {
@@ -170,6 +214,17 @@ const _createPetitionFieldReplies = gql`
         }
         replies {
           id
+          parent {
+            id
+            children {
+              field {
+                id
+              }
+              replies {
+                id
+              }
+            }
+          }
         }
       }
     }
@@ -188,11 +243,13 @@ export function useCreatePetitionFieldReply() {
       petitionId,
       fieldId,
       content,
+      parentReplyId,
       isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       content: any;
+      parentReplyId?: string;
       isCacheOnly?: boolean;
     }) {
       const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
@@ -200,6 +257,12 @@ export function useCreatePetitionFieldReply() {
           fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
             id
             type
+            children {
+              id
+              replies {
+                id
+              }
+            }
           }
         `,
         id: fieldId,
@@ -209,11 +272,20 @@ export function useCreatePetitionFieldReply() {
         const { zonedTimeToUtc } = await import("date-fns-tz");
 
         const id = `${fieldId}-${getRandomId()}`;
+
         updatePreviewFieldReplies(client, fieldId, (replies) => [
           ...(replies ?? []),
           {
             id,
             __typename: "PetitionFieldReply",
+            children:
+              field?.type === "FIELD_GROUP"
+                ? field.children?.map((field) => ({
+                    field,
+                    replies: [],
+                    __typename: "PetitionFieldGroupChildReply",
+                  }))
+                : null,
             status: "PENDING",
             content:
               field?.type === "DATE_TIME"
@@ -225,14 +297,53 @@ export function useCreatePetitionFieldReply() {
             isAnonymized: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            parent: parentReplyId ? { id: parentReplyId } : null,
           },
         ]);
+
+        if (parentReplyId) {
+          updatePreviewFieldReply(client, parentReplyId, (reply) => {
+            return {
+              ...(reply ?? {}),
+              children: reply?.children?.map((child) => {
+                return child.field.id !== fieldId
+                  ? child
+                  : {
+                      ...child,
+                      replies: [
+                        ...child.replies,
+                        {
+                          id,
+                          __typename: "PetitionFieldReply",
+                          status: "PENDING",
+                          content:
+                            field?.type === "DATE_TIME"
+                              ? {
+                                  ...content,
+                                  value: zonedTimeToUtc(
+                                    content.datetime,
+                                    content.timezone,
+                                  ).toISOString(),
+                                }
+                              : content,
+                          isAnonymized: false,
+                          createdAt: new Date().toISOString(),
+                          updatedAt: new Date().toISOString(),
+                          parent: { id: parentReplyId },
+                        },
+                      ],
+                    };
+              }),
+            } as PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment;
+          });
+        }
+
         return { id, __typename: "PetitionFieldReply" };
       } else {
         const { data } = await createPetitionFieldReplies({
           variables: {
             petitionId,
-            fields: [{ id: fieldId, content }],
+            fields: [{ id: fieldId, content, parentReplyId }],
           },
         });
         return data?.createPetitionFieldReplies?.[0];
@@ -247,8 +358,14 @@ const _createFileUploadReply = gql`
     $petitionId: GID!
     $fieldId: GID!
     $file: FileUploadInput!
+    $parentReplyId: GID
   ) {
-    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+    createFileUploadReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      file: $file
+      parentReplyId: $parentReplyId
+    ) {
       presignedPostData {
         ...uploadFile_AWSPresignedPostData
       }
@@ -264,6 +381,17 @@ const _createFileUploadReply = gql`
           }
           replies {
             id
+            parent {
+              id
+              children {
+                field {
+                  id
+                }
+                replies {
+                  id
+                }
+              }
+            }
           }
         }
       }
@@ -302,12 +430,14 @@ export function useCreateFileUploadReply() {
       fieldId,
       content,
       uploads,
+      parentReplyId,
       isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       content: File[];
       uploads: MutableRefObject<Record<string, AbortController>>;
+      parentReplyId?: string;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
@@ -328,8 +458,42 @@ export function useCreateFileUploadReply() {
               isAnonymized: false,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
+              parent: parentReplyId ? { id: parentReplyId } : null,
             },
           ]);
+
+          if (parentReplyId) {
+            updatePreviewFieldReply(apollo, parentReplyId, (reply) => {
+              return {
+                ...(reply ?? {}),
+                children: reply?.children?.map((child) => {
+                  return child.field.id !== fieldId
+                    ? child
+                    : {
+                        ...child,
+                        replies: [
+                          ...child.replies,
+                          {
+                            id,
+                            __typename: "PetitionFieldReply",
+                            status: "PENDING",
+                            content: {
+                              filename: file.name,
+                              size: file.size,
+                              contentType: file.type,
+                              uploadComplete: true,
+                            },
+                            isAnonymized: false,
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
+                            parent: { id: parentReplyId },
+                          },
+                        ],
+                      };
+                }),
+              } as PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment;
+            });
+          }
         }
       } else {
         await pMap(
@@ -344,6 +508,7 @@ export function useCreateFileUploadReply() {
                   size: file.size,
                   contentType: file.type,
                 },
+                parentReplyId,
               },
               update(cache, { data }) {
                 const reply = data!.createFileUploadReply.reply;
@@ -394,8 +559,13 @@ const _startAsyncFieldCompletion = gql`
   mutation PreviewPetitionFieldMutations_startAsyncFieldCompletion(
     $petitionId: GID!
     $fieldId: GID!
+    $parentReplyId: GID
   ) {
-    startAsyncFieldCompletion(petitionId: $petitionId, fieldId: $fieldId) {
+    startAsyncFieldCompletion(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      parentReplyId: $parentReplyId
+    ) {
       type
       url
     }
@@ -413,10 +583,12 @@ export function useStartAsyncFieldCompletion() {
     async function _startAsyncFieldCompletion({
       petitionId,
       fieldId,
+      parentReplyId,
       isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
+      parentReplyId?: string;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
@@ -437,10 +609,43 @@ export function useStartAsyncFieldCompletion() {
             updatedAt: new Date().toISOString(),
           },
         ]);
+
+        if (parentReplyId) {
+          updatePreviewFieldReply(apollo, parentReplyId, (reply) => {
+            return {
+              ...(reply ?? {}),
+              children: reply?.children?.map((child) => {
+                return child.field.id !== fieldId
+                  ? child
+                  : {
+                      ...child,
+                      replies: [
+                        ...child.replies,
+                        {
+                          id,
+                          __typename: "PetitionFieldReply",
+                          status: "PENDING",
+                          content: {
+                            filename: "DatosFiscales.pdf",
+                            size: 25000,
+                            contentType: "application/pdf",
+                            uploadComplete: true,
+                          },
+                          isAnonymized: false,
+                          createdAt: new Date().toISOString(),
+                          updatedAt: new Date().toISOString(),
+                        },
+                      ],
+                    };
+              }),
+            } as PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment;
+          });
+        }
+
         return { type: "CACHE", url: "" };
       } else {
         const { data } = await startAsyncFieldCompletion({
-          variables: { petitionId, fieldId: fieldId },
+          variables: { petitionId, fieldId: fieldId, parentReplyId },
         });
         return data!.startAsyncFieldCompletion;
       }
@@ -451,7 +656,7 @@ export function useStartAsyncFieldCompletion() {
 
 // CACHE UPDATES
 
-function updatePreviewFieldReplies(
+export function updatePreviewFieldReplies(
   proxy: DataProxy,
   fieldId: string,
   updateFn: (
@@ -467,6 +672,21 @@ function updatePreviewFieldReplies(
       replies: [],
       previewReplies: updateFn(cached!.previewReplies),
     }),
+  });
+}
+
+function updatePreviewFieldReply(
+  proxy: DataProxy,
+  replyId: string,
+  updateFn: (
+    cached: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment | null,
+  ) => PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment,
+) {
+  updateFragment(proxy, {
+    id: replyId,
+    fragment: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc,
+    fragmentName: "PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply",
+    data: (cached) => updateFn(cached),
   });
 }
 
@@ -493,6 +713,20 @@ updatePreviewFieldReplies.fragments = {
         isAnonymized
         createdAt
         updatedAt
+        parent {
+          id
+        }
+        children {
+          field {
+            id
+            replies {
+              id
+            }
+          }
+          replies {
+            id
+          }
+        }
       }
     `;
   },

@@ -571,6 +571,7 @@ export const PetitionFieldType = enumType({
     { name: "PHONE", description: "A phone formatted field." },
     { name: "ES_TAX_DOCUMENTS", description: "A tax documents/info field." },
     { name: "DOW_JONES_KYC", description: "A saerch in Dow Jones field." },
+    { name: "FIELD_GROUP", description: "A group of fields" },
   ],
 });
 
@@ -602,6 +603,7 @@ export const PetitionField = objectType({
     });
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
+      resolve: ({ multiple, type }) => multiple || type === "FIELD_GROUP",
     });
     t.boolean("isFixed", {
       description: "Determines if the field can be moved or deleted.",
@@ -617,7 +619,7 @@ export const PetitionField = objectType({
     });
     t.boolean("showActivityInPdf", {
       description: "Determines if the field last activity is visible in PDF export.",
-      resolve: (o) => o.type !== "DOW_JONES_KYC" && o.show_activity_in_pdf,
+      resolve: (o) => !["DOW_JONES_KYC", "FIELD_GROUP"].includes(o.type) && o.show_activity_in_pdf,
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
@@ -625,7 +627,7 @@ export const PetitionField = objectType({
     });
     t.boolean("requireApproval", {
       description: "Determines if the field requires approval.",
-      resolve: (f) => f.type !== "HEADING" && f.require_approval,
+      resolve: (f) => !["HEADING", "FIELD_GROUP"].includes(f.type) && f.require_approval,
     });
     t.list.nonNull.field("replies", {
       type: "PetitionFieldReply",
@@ -698,6 +700,25 @@ export const PetitionField = objectType({
     });
     t.nonNull.boolean("hasCommentsEnabled", {
       resolve: (o) => o.has_comments_enabled,
+    });
+    t.nullable.list.nonNull.field("children", {
+      type: "PetitionField",
+      description: "The children of this field.",
+      resolve: async (o, _, ctx) => {
+        if (o.type !== "FIELD_GROUP") {
+          return null;
+        }
+        return await ctx.petitions.loadPetitionFieldChildren(o.id);
+      },
+    });
+    t.nullable.field("parent", {
+      type: "PetitionField",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.parent_petition_field_id)) {
+          return await ctx.petitions.loadField(o.parent_petition_field_id);
+        }
+        return null;
+      },
     });
   },
   sourceType: "db.PetitionField",
@@ -1031,7 +1052,11 @@ export const PetitionFieldReply = objectType({
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
           (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED",
-        )!;
+        );
+
+        if (!event) {
+          return null;
+        }
 
         if (isDefined(event.data.user_id)) {
           const user = await ctx.users.loadUser(event.data.user_id);
@@ -1042,13 +1067,17 @@ export const PetitionFieldReply = objectType({
         }
       },
     });
-    t.datetime("repliedAt", {
+    t.nullable.datetime("repliedAt", {
       description: "When the reply was created or last updated",
       resolve: async (root, _, ctx) => {
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
           (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED",
-        )!;
+        );
+
+        if (!event) {
+          return null;
+        }
         return event.created_at;
       },
     });
@@ -1086,9 +1115,57 @@ export const PetitionFieldReply = objectType({
         return event.created_at;
       },
     });
-
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
+    t.nullable.field("parent", {
+      type: "PetitionFieldReply",
+      resolve: async (o, _, ctx) => {
+        if (isDefined(o.parent_petition_field_reply_id)) {
+          return await ctx.petitions.loadFieldReply(o.parent_petition_field_reply_id);
+        }
+        return null;
+      },
+    });
+    t.nullable.list.nonNull.field("children", {
+      type: "PetitionFieldGroupChildReply",
+      resolve: async (o, _, ctx) => {
+        if (o.type !== "FIELD_GROUP") {
+          return null;
+        }
+
+        const childrenFields = await ctx.petitions.loadPetitionFieldChildren(o.petition_field_id);
+        return childrenFields.map((field) => ({
+          petition_field_id: field.id,
+          parent_petition_field_reply_id: o.id,
+        }));
+      },
+    });
   },
+});
+
+export const PetitionFieldGroupChildReply = objectType({
+  name: "PetitionFieldGroupChildReply",
+  description: "References the replies of a FIELD_GROUP field on a specific field and group",
+  definition(t) {
+    t.nonNull.field("field", {
+      type: "PetitionField",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.petitions.loadField(o.petition_field_id))!;
+      },
+    });
+    t.nonNull.list.nonNull.field("replies", {
+      type: "PetitionFieldReply",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldGroupChildReplies({
+          parentPetitionFieldReplyId: o.parent_petition_field_reply_id,
+          petitionFieldId: o.petition_field_id,
+        });
+      },
+    });
+  },
+  sourceType: /* ts */ `{
+    parent_petition_field_reply_id: number;
+    petition_field_id: number;
+  }`,
 });
 
 export const FileUploadDownloadLinkResult = objectType({

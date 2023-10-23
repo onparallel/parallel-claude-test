@@ -17,32 +17,32 @@ import {
   SignatureOrgIntegrationEnvironment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { PetitionFieldFilter, filterPetitionFields } from "@parallel/utils/filterPetitionFields";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
+import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { ComponentType, MouseEvent, ReactNode, createElement } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { ComponentType, ReactNode, createElement } from "react";
+import { FormattedMessage } from "react-intl";
 import { Divider } from "../common/Divider";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
-import { AliasOptionsMenu } from "./AliasOptionsMenu";
-import { CopyAliasIconButton, useBuildAliasInterpolation } from "./CopyAliasIconButton";
-import { useCreateReferenceDialog } from "./dialogs/CreateReferenceDialog";
+import { CopyLiquidReferenceButton } from "./CopyLiquidReferenceButton";
+import { MoreLiquidReferencesButton } from "./MoreLiquidReferencesButton";
+import { AddAliasToFieldDialog, useAddAliasToFieldDialog } from "./dialogs/AddAliasToFieldDialog";
+import { isDefined } from "remeda";
 
 interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
   field: T;
 }
 
 export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldFragment> {
-  fields: T[];
-  fieldIndices: PetitionFieldIndex[];
+  fieldsWithIndices: [field: T, fieldIndex: PetitionFieldIndex, childrenFieldIndices?: string[]][];
   showAliasButtons: boolean;
-  fieldVisibility?: boolean[];
+  fieldLogic?: FieldLogicResult[];
   onFieldClick: (fieldId: string) => void;
-  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   filter?: PetitionFieldFilter;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
   signatureStatus?: PetitionSignatureStatusFilter;
@@ -52,11 +52,10 @@ export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldF
 }
 
 export function PetitionContents<T extends PetitionContents_PetitionFieldFragment>({
-  fields,
+  fieldsWithIndices,
   filter,
-  fieldIndices,
   showAliasButtons,
-  fieldVisibility,
+  fieldLogic,
   onFieldClick,
   onFieldEdit,
   fieldIndicators,
@@ -78,26 +77,31 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
           onClick={onSignatureStatusClick}
         />
       ) : null}
-      {filterPetitionFields(fields, fieldIndices, fieldVisibility ?? [], filter).map((x, index) =>
-        x.type === "FIELD" ? (
-          <PetitionContentsItem
-            key={x.field.id}
-            field={x.field}
-            isVisible={true}
-            fieldIndex={x.fieldIndex}
-            onFieldClick={handleFieldClick(x.field.id)}
-            onFieldEdit={onFieldEdit}
-            fieldIndicators={fieldIndicators}
-            showAliasButtons={
-              x.field.type === "HEADING" ||
-              x.field.type === "DYNAMIC_SELECT" ||
-              isFileTypeField(x.field.type)
-                ? false
-                : showAliasButtons
-            }
-            isReadOnly={isReadOnly}
-          />
-        ) : (
+      {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) => {
+        if (x.type === "FIELD") {
+          return (
+            <PetitionContentsItem
+              isChildField={isDefined(x.field.parent)}
+              key={x.field.id}
+              field={x.field}
+              isVisible={true}
+              fieldIndex={x.fieldIndex}
+              onFieldClick={handleFieldClick(x.field.id)}
+              onFieldEdit={onFieldEdit}
+              fieldIndicators={fieldIndicators}
+              showAliasButtons={
+                x.field.type === "HEADING" ||
+                x.field.type === "DYNAMIC_SELECT" ||
+                isFileTypeField(x.field.type)
+                  ? false
+                  : showAliasButtons
+              }
+              isReadOnly={isReadOnly}
+            />
+          );
+        }
+
+        return (
           <PetitionContentsDivider key={index} isDashed>
             <Flex alignItems="center">
               <EyeOffIcon marginRight={1} />
@@ -108,8 +112,8 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
               />
             </Flex>
           </PetitionContentsDivider>
-        ),
-      )}
+        );
+      })}
     </Stack>
   );
 }
@@ -155,13 +159,18 @@ PetitionContents.fragments = {
       options
       isInternal
       alias
+      parent {
+        id
+      }
       ...filterPetitionFields_PetitionField
-      ...AliasOptionsMenu_PetitionField
-      ...CopyAliasIconButton_PetitionField
+      ...MoreLiquidReferencesButton_PetitionField
+      ...CopyLiquidReferenceButton_PetitionField
+      ...AddAliasToFieldDialog_PetitionField
     }
     ${filterPetitionFields.fragments.PetitionField}
-    ${AliasOptionsMenu.fragments.PetitionField}
-    ${CopyAliasIconButton.fragments.PetitionField}
+    ${MoreLiquidReferencesButton.fragments.PetitionField}
+    ${CopyLiquidReferenceButton.fragments.PetitionField}
+    ${AddAliasToFieldDialog.fragments.PetitionField}
   `,
 };
 
@@ -170,10 +179,11 @@ interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFrag
   fieldIndex: PetitionFieldIndex;
   isVisible: boolean;
   onFieldClick: () => void;
-  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   showAliasButtons: boolean;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
   isReadOnly?: boolean;
+  isChildField?: boolean;
 }
 
 function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>({
@@ -185,31 +195,12 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
   showAliasButtons,
   fieldIndicators,
   isReadOnly,
+  isChildField,
 }: PetitionContentsItemProps<T>) {
-  const intl = useIntl();
-
-  const copyReference = useClipboardWithToast({
-    text: intl.formatMessage({
-      id: "component.petition-contents.reference-copied-alert",
-      defaultMessage: "Reference copied to clipboard",
-    }),
-  });
-
-  const handleCreateAlias = async () => {
-    return await showCreateReferenceDialog({ field, fieldIndex, onFieldEdit });
+  const showAddAliasToFieldDialog = useAddAliasToFieldDialog();
+  const handleAddAliasToField = async () => {
+    return await showAddAliasToFieldDialog({ field, fieldIndex, onFieldEdit });
   };
-
-  const showCreateReferenceDialog = useCreateReferenceDialog();
-  const buildAliasInterpolation = useBuildAliasInterpolation(field);
-  const handleAddReferenceClick = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
-    try {
-      const alias = await handleCreateAlias();
-      copyReference({ value: buildAliasInterpolation(alias) });
-    } catch {}
-  };
-
   return (
     <>
       {field.type === "HEADING" && field.options.hasPageBreak ? (
@@ -227,7 +218,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           height="auto"
           paddingX={2}
           paddingY={1}
-          paddingLeft={field.type === "HEADING" ? 2 : 4}
+          paddingLeft={field.type === "HEADING" ? 2 : isChildField ? 8 : 4}
           fontWeight={field.type === "HEADING" ? "medium" : "normal"}
           textAlign="left"
           onClick={onFieldClick}
@@ -275,7 +266,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}
           {showAliasButtons ? (
             <>
-              <CopyAliasIconButton
+              <CopyLiquidReferenceButton
                 className="alias-button"
                 field={field}
                 background="white"
@@ -284,9 +275,9 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
                   boxShadow: "lg",
                 }}
                 isDisabled={!field.alias && isReadOnly}
-                onClick={field.alias || isReadOnly ? undefined : handleAddReferenceClick}
+                onAddAliasToField={handleAddAliasToField}
               />
-              <AliasOptionsMenu
+              <MoreLiquidReferencesButton
                 className="alias-button"
                 field={field}
                 background="white"
@@ -295,7 +286,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
                   boxShadow: "lg",
                 }}
                 isDisabled={!field.alias && isReadOnly}
-                onCreateAlias={handleCreateAlias}
+                onAddAliasToField={handleAddAliasToField}
               />
             </>
           ) : null}

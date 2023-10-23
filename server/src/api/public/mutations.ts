@@ -20,9 +20,15 @@ gql`
   mutation SubmitReply_createFileUploadReply(
     $petitionId: GID!
     $fieldId: GID!
+    $parentReplyId: GID
     $file: FileUploadInput!
   ) {
-    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+    createFileUploadReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      parentReplyId: $parentReplyId
+      file: $file
+    ) {
       presignedPostData {
         ...AWSPresignedPostData
       }

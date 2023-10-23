@@ -1,12 +1,13 @@
 import { arg, booleanArg, mutationField, nonNull } from "nexus";
 import { collectMentionsFromSlate } from "../../../util/slate/mentions";
-import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
+import { and, authenticateAnd, ifArgEquals, not } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg } from "../../helpers/scalars/JSON";
 import { validPetitionFieldCommentContent } from "../../public/authorizers";
 import {
   commentsBelongsToPetition,
+  fieldHasParent,
   fieldsAreNotInternal,
   fieldsBelongsToPetition,
   fieldsHaveCommentsEnabled,
@@ -37,6 +38,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     petitionIsNotAnonymized("petitionId"),
     validPetitionFieldCommentContent("content", "petitionFieldId", true),
+    not(fieldHasParent("petitionFieldId")),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

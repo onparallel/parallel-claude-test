@@ -2312,6 +2312,173 @@ describe("GraphQL/Petitions", () => {
         },
       ]);
     });
+
+    it("clones FIELD_GROUP children when cloning the petition", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const fields = await mocks.createRandomPetitionFields(petition.id, 4, (i) => ({
+        type: ["HEADING", "FIELD_GROUP", "TEXT", "SHORT_TEXT"][i] as PetitionFieldType,
+      }));
+      await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        parent_petition_field_id: fields[1].id,
+        position: i,
+        type: ["PHONE", "NUMBER"][i] as PetitionFieldType,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            clonePetitions(petitionIds: [$petitionId]) {
+              fieldCount
+              fields {
+                type
+                position
+                children {
+                  type
+                  position
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitions).toEqual([
+        {
+          fieldCount: 4,
+          fields: [
+            {
+              type: "HEADING",
+              position: 0,
+              children: null,
+            },
+            {
+              type: "FIELD_GROUP",
+              position: 1,
+              children: [
+                {
+                  type: "PHONE",
+                  position: 0,
+                },
+                {
+                  type: "NUMBER",
+                  position: 1,
+                },
+              ],
+            },
+            {
+              type: "TEXT",
+              position: 2,
+              children: null,
+            },
+            {
+              type: "SHORT_TEXT",
+              position: 3,
+              children: null,
+            },
+          ],
+        },
+      ]);
+    });
+
+    it("creates empty FIELD_GROUP replies for each required FIELD_GROUP field when cloning the petition", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const [, requiredFieldGroup] = await mocks.createRandomPetitionFields(
+        petition.id,
+        3,
+        (i) => ({
+          type: ["HEADING", "FIELD_GROUP", "FIELD_GROUP"][i] as PetitionFieldType,
+          optional: i === 2,
+        }),
+      );
+
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        position: 0,
+        type: "TEXT",
+        parent_petition_field_id: requiredFieldGroup.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            clonePetitions(petitionIds: [$petitionId]) {
+              fieldCount
+              fields {
+                id
+                type
+                position
+                children {
+                  type
+                  position
+                }
+                replies {
+                  id
+                  children {
+                    field {
+                      id
+                    }
+                    replies {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        { petitionId: toGlobalId("Petition", petition.id) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitions).toEqual([
+        {
+          fieldCount: 3,
+          fields: [
+            {
+              id: expect.any(String),
+              type: "HEADING",
+              position: 0,
+              children: null,
+              replies: [],
+            },
+            {
+              id: expect.any(String),
+              type: "FIELD_GROUP",
+              position: 1,
+              children: [
+                {
+                  type: "TEXT",
+                  position: 0,
+                },
+              ],
+              replies: [
+                {
+                  id: expect.any(String),
+                  children: [
+                    {
+                      field: {
+                        id: expect.any(String),
+                      },
+                      replies: [],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              id: expect.any(String),
+              type: "FIELD_GROUP",
+              position: 2,
+              children: [],
+              replies: [],
+            },
+          ],
+        },
+      ]);
+    });
   });
 
   describe("deletePetitions", () => {
@@ -3917,6 +4084,8 @@ describe("GraphQL/Petitions", () => {
     it("bulk sends should correctly set petition names and match field placeholders", async () => {
       // make sure petition has no name set so email subject with placeholders will be used
       await mocks.knex.from("petition").where("id", petition.id).update({ name: null });
+      // only internal fields are used as placeholders
+      await mocks.knex.from("petition_field").where("id", field.id).update({ is_internal: true });
 
       await mocks.createRandomTextReply(field.id, undefined, 1, () => ({
         user_id: sessionUser.id,
@@ -3963,6 +4132,37 @@ describe("GraphQL/Petitions", () => {
           },
         })),
       );
+    });
+
+    it("sends error if sending a petition with a FIELD_GROUP and no children", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        type: ["HEADING", "FIELD_GROUP"][i] as PetitionFieldType,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIdGroups: [$contactIds]
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[1].id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 

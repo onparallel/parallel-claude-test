@@ -29,25 +29,29 @@ import {
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
-import { TemplateDetailsModal_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import {
+  PetitionFieldTitleContent_PetitionFieldFragment,
+  TemplateDetailsModal_PetitionTemplateFragment,
+} from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { FORMATS } from "@parallel/utils/dates";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
+import { PetitionFieldIndex, useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
-import { MouseEvent } from "react";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { Fragment, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { usePetitionSharingDialog } from "./PetitionSharingDialog";
-import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 
 export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> {
   template: TemplateDetailsModal_PetitionTemplateFragment;
@@ -66,11 +70,7 @@ export function TemplateDetailsModal({
       ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType),
   );
 
-  const filteredFields = template.fields.filter((field) =>
-    field.type === "HEADING" && !field.title ? false : true,
-  );
-
-  const indices = useFieldIndices(filteredFields);
+  const fieldsWithIndices = useFieldsWithIndices(template.fields);
 
   const myId = useGetMyId();
   const userCanClone = useHasPermission("PETITIONS:CREATE_TEMPLATES");
@@ -378,30 +378,43 @@ export function TemplateDetailsModal({
                 </AccordionButton>
 
                 <AccordionPanel paddingLeft={7} paddingBottom={3}>
-                  {zip(filteredFields, indices).map(([field, index]) => {
-                    return field.type === "HEADING" ? (
-                      <Text key={field.id} fontWeight="bold" marginBottom={2}>
-                        {index}.{" "}
-                        <Text as="span" fontWeight="bold">
-                          {field.title}
-                        </Text>
-                      </Text>
-                    ) : (
-                      <Text key={field.id} marginLeft={4} marginBottom={2}>
-                        {index}.{" "}
-                        {field.title ? (
-                          <Text as="span" aria-label={field.title}>
-                            {field.title}
+                  {fieldsWithIndices.map(([field, fieldIndex, childrenFieldIndices]) => {
+                    if (field.type === "HEADING") {
+                      if (!field.title) {
+                        return null;
+                      } else {
+                        return (
+                          <Text key={field.id} fontWeight="bold" marginBottom={2}>
+                            {fieldIndex}.{" "}
+                            <Text as="span" fontWeight="bold">
+                              {field.title}
+                            </Text>
                           </Text>
-                        ) : (
-                          <Text as="span" textStyle="hint">
-                            <FormattedMessage
-                              id="generic.untitled-field"
-                              defaultMessage="Untitled field"
-                            />
-                          </Text>
-                        )}
-                      </Text>
+                        );
+                      }
+                    }
+                    return (
+                      <Fragment key={field.id}>
+                        <PetitionFieldTitleContent
+                          field={field}
+                          index={fieldIndex}
+                          marginLeft={4}
+                          marginBottom={2}
+                        />
+                        {field.type === "FIELD_GROUP" && field.children?.length
+                          ? zip(field.children!, childrenFieldIndices!).map(
+                              ([field, fieldIndex]) => (
+                                <PetitionFieldTitleContent
+                                  key={field.id}
+                                  field={field}
+                                  index={fieldIndex}
+                                  marginLeft={7}
+                                  marginBottom={2}
+                                />
+                              ),
+                            )
+                          : null}
+                      </Fragment>
                     );
                   })}
                 </AccordionPanel>
@@ -413,6 +426,43 @@ export function TemplateDetailsModal({
     </Modal>
   );
 }
+
+export interface PetitionFieldTitleContentProps {
+  index: string | PetitionFieldIndex;
+  field: PetitionFieldTitleContent_PetitionFieldFragment;
+}
+
+export const PetitionFieldTitleContent = Object.assign(
+  chakraForwardRef<"p", PetitionFieldTitleContentProps>(function PetitionFieldTitleContent(
+    { index, field, ...props },
+    ref,
+  ) {
+    return (
+      <Text {...props} ref={ref}>
+        {index}.{" "}
+        {field.title ? (
+          <Text as="span" aria-label={field.title}>
+            {field.title}
+          </Text>
+        ) : (
+          <Text as="span" textStyle="hint">
+            <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+          </Text>
+        )}
+      </Text>
+    );
+  }),
+  {
+    fragments: {
+      PetitionField: gql`
+        fragment PetitionFieldTitleContent_PetitionField on PetitionField {
+          id
+          title
+        }
+      `,
+    },
+  },
+);
 
 TemplateDetailsModal.fragments = {
   PetitionTemplate: gql`
@@ -438,6 +488,11 @@ TemplateDetailsModal.fragments = {
         title
         type
         options
+        ...PetitionFieldTitleContent_PetitionField
+        children {
+          ...PetitionFieldTitleContent_PetitionField
+          type
+        }
       }
       owner {
         id
@@ -459,6 +514,7 @@ TemplateDetailsModal.fragments = {
       ...TemplateActiveSettingsIcons_PetitionTemplate
       updatedAt
     }
+    ${PetitionFieldTitleContent.fragments.PetitionField}
     ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
   `,
 };

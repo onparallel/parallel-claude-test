@@ -34,6 +34,7 @@ const POLYFILLS = [
   "Array.prototype.flatMap",
   "Object.fromEntries",
   "String.prototype.replaceAll",
+  "IntersectionObserver",
 ];
 
 const POLYFILLS_INTL = [

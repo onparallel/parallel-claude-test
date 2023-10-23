@@ -4,10 +4,12 @@ import { Knex } from "knex";
 import pMap from "p-map";
 import {
   countBy,
+  filter,
   findLast,
   groupBy,
   indexBy,
   isDefined,
+  map,
   mapValues,
   omit,
   partition,
@@ -18,16 +20,18 @@ import {
   zip,
 } from "remeda";
 import { RESULT } from "../../graphql";
+import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldVisibility";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
+import { PetitionFieldVisibility, applyFieldLogic } from "../../util/fieldLogic";
 import { fieldReplyContent } from "../../util/fieldReplyContent";
-import { PetitionFieldVisibility, evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { isValueCompatible } from "../../util/isValueCompatible";
 import { keyBuilder } from "../../util/keyBuilder";
+import { petitionIsCompleted } from "../../util/petitionIsCompleted";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -39,7 +43,7 @@ import {
   replacePlaceholdersInText,
 } from "../../util/slate/placeholders";
 import { SlateNode } from "../../util/slate/render";
-import { hashString, random } from "../../util/token";
+import { random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
 import { validateReplyContent } from "../../util/validateReplyContent";
 import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
@@ -106,7 +110,6 @@ import {
   PetitionUserNotification,
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
-import { OrganizationRepository } from "./OrganizationRepository";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 
@@ -204,7 +207,6 @@ export class PetitionRepository extends BaseRepository {
     @inject(QUEUES_SERVICE) private queues: QueuesService,
     @inject(LOGGER) private logger: ILogger,
     @inject(FileRepository) private files: FileRepository,
-    @inject(OrganizationRepository) private organizations: OrganizationRepository,
   ) {
     super(knex);
   }
@@ -864,18 +866,18 @@ export class PetitionRepository extends BaseRepository {
     };
   }
 
-  readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>
-    q.whereNull("deleted_at").orderBy("position"),
-  );
-
-  readonly loadFieldsForPetitionWithNullVisibility = this.buildLoadMultipleBy(
+  readonly loadAllFieldsByPetitionId = this.buildLoadMultipleBy(
     "petition_field",
     "petition_id",
-    (q) => q.where({ deleted_at: null, visibility: null }).orderBy("position"),
+    (q) => q.whereNull("deleted_at"),
+  );
+
+  readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>
+    q.whereNull("deleted_at").whereNull("parent_petition_field_id").orderBy("position"),
   );
 
   readonly loadFieldCountForPetition = this.buildLoadCountBy("petition_field", "petition_id", (q) =>
-    q.whereNull("deleted_at"),
+    q.whereNull("deleted_at").whereNull("parent_petition_field_id"),
   );
 
   readonly loadPetitionProgress = this.buildLoader<
@@ -895,64 +897,91 @@ export class PetitionRepository extends BaseRepository {
       };
     }
   >(async (petitionIds) => {
-    const fieldsWithRepliesByPetitionId = await this.getPetitionFieldsWithReplies(
-      petitionIds as number[],
-    );
+    const composedFields = await this.getComposedPetitionFields(petitionIds as number[]);
 
-    return fieldsWithRepliesByPetitionId.map((fieldsWithReplies) => {
-      const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
-        .filter(([field, isVisible]) => isVisible && !field.is_internal)
-        .map(([field]) => field);
+    return composedFields
+      .map((fields) => fields.filter((f) => f.type !== "HEADING"))
+      .map((fields) => {
+        const visibleFields = applyFieldLogic(fields);
 
-      const visibleInternalFields = zip(
-        fieldsWithReplies,
-        evaluateFieldVisibility(fieldsWithReplies),
-      )
-        .filter(([field, isVisible]) => isVisible && field.is_internal)
-        .map(([field]) => field);
+        const visibleExternalFields = visibleFields
+          .filter((f) => !f.is_internal)
+          .flatMap((f) => {
+            if (f.type === "FIELD_GROUP") {
+              return f.replies.flatMap((reply) =>
+                reply
+                  .children!.filter((childReply) => !childReply.field.is_internal)
+                  .map((childReply) => ({
+                    ...childReply.field,
+                    children: [],
+                    replies: childReply.replies.map((r) => ({ ...r, children: [] })),
+                  })),
+              );
+            } else {
+              return [f];
+            }
+          });
 
-      const validatedExternal = countBy(
-        visibleFields,
-        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
-      );
+        const visibleInternalFields = visibleFields
+          .filter((f) => f.is_internal)
+          .flatMap((f) => {
+            if (f.type === "FIELD_GROUP") {
+              return f.replies.flatMap((reply) =>
+                reply
+                  .children!.filter((childReply) => childReply.field.is_internal)
+                  .map((childReply) => ({
+                    ...childReply.field,
+                    children: [],
+                    replies: childReply.replies.map((r) => ({ ...r, children: [] })),
+                  })),
+              );
+            } else {
+              return [f];
+            }
+          });
 
-      const validatedInternal = countBy(
-        visibleInternalFields,
-        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
-      );
+        const validatedExternal = countBy(
+          visibleExternalFields,
+          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
+        );
 
-      return {
-        external: {
-          approved: validatedExternal,
-          replied: countBy(
-            visibleFields,
-            (f) =>
-              completedFieldReplies(f).length > 0 &&
-              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
-          ),
-          optional: countBy(
-            visibleFields,
-            (f) => f.optional && completedFieldReplies(f).length === 0,
-          ),
-          total: visibleFields.length,
-        },
-        internal: {
-          validated: validatedInternal,
-          approved: validatedInternal,
-          replied: countBy(
-            visibleInternalFields,
-            (f) =>
-              completedFieldReplies(f).length > 0 &&
-              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
-          ),
-          optional: countBy(
-            visibleInternalFields,
-            (f) => f.optional && completedFieldReplies(f).length === 0,
-          ),
-          total: visibleInternalFields.length,
-        },
-      };
-    });
+        const validatedInternal = countBy(
+          visibleInternalFields,
+          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
+        );
+
+        return {
+          external: {
+            approved: validatedExternal,
+            replied: countBy(
+              visibleExternalFields,
+              (f) =>
+                completedFieldReplies(f).length > 0 &&
+                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
+            ),
+            optional: countBy(
+              visibleExternalFields,
+              (f) => f.optional && completedFieldReplies(f).length === 0,
+            ),
+            total: visibleExternalFields.length,
+          },
+          internal: {
+            validated: validatedInternal,
+            approved: validatedInternal,
+            replied: countBy(
+              visibleInternalFields,
+              (f) =>
+                completedFieldReplies(f).length > 0 &&
+                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
+            ),
+            optional: countBy(
+              visibleInternalFields,
+              (f) => f.optional && completedFieldReplies(f).length === 0,
+            ),
+            total: visibleInternalFields.length,
+          },
+        };
+      });
   });
 
   readonly loadPublicPetitionProgress = this.buildLoader<
@@ -963,24 +992,38 @@ export class PetitionRepository extends BaseRepository {
       total: number;
     }
   >(async (petitionIds) => {
-    const fieldsWithRepliesByPetitionId = await this.getPetitionFieldsWithReplies(
-      petitionIds as number[],
-    );
+    const composedFields = await this.getComposedPetitionFields(petitionIds as number[]);
 
-    return fieldsWithRepliesByPetitionId.map((fieldsWithReplies) => {
-      const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
-        .filter(([field, isVisible]) => isVisible && !field.is_internal)
-        .map(([field]) => field);
+    return composedFields
+      .map((fields) => fields.filter((f) => f.type !== "HEADING"))
+      .map((fields) => {
+        const visibleFields = applyFieldLogic(fields)
+          .filter((f) => !f.is_internal)
+          .flatMap((f) => {
+            if (f.type === "FIELD_GROUP") {
+              return f.replies.flatMap((reply) =>
+                reply
+                  .children!.filter((childReply) => !childReply.field.is_internal)
+                  .map((childReply) => ({
+                    ...childReply.field,
+                    children: [],
+                    replies: childReply.replies.map((r) => ({ ...r, children: [] })),
+                  })),
+              );
+            } else {
+              return [f];
+            }
+          });
 
-      return {
-        replied: countBy(visibleFields, (f) => completedFieldReplies(f).length > 0),
-        optional: countBy(
-          visibleFields,
-          (f) => f.optional && completedFieldReplies(f).length === 0,
-        ),
-        total: visibleFields.length,
-      };
-    });
+        return {
+          replied: countBy(visibleFields, (f) => completedFieldReplies(f).length > 0),
+          optional: countBy(
+            visibleFields,
+            (f) => f.optional && completedFieldReplies(f).length === 0,
+          ),
+          total: visibleFields.length,
+        };
+      });
   });
 
   readonly loadAccess = this.buildLoadBy("petition_access", "id");
@@ -999,7 +1042,7 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("id"),
   );
 
-  async createAccesses(
+  private async createAccesses(
     petitionId: number,
     data: Pick<
       CreatePetitionAccess,
@@ -1115,7 +1158,7 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("created_at", "asc"),
   );
 
-  async createMessages(
+  private async createMessages(
     petitionId: number,
     scheduledAt: Date | null,
     data: Pick<
@@ -1244,7 +1287,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async anonymizeAccesses(
+  private async anonymizeAccesses(
     petitionId: number,
     accessIds: number[],
     updatedBy: string,
@@ -1557,12 +1600,16 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async updateFieldPositions(petitionId: number, fieldIds: number[], user: User) {
-    const fields = await this.from("petition_field")
-      .where("petition_id", petitionId)
-      .whereNull("deleted_at")
-      .select("id", "is_fixed", "position", "visibility")
-      .orderBy("position", "asc");
+  private validateFieldReorder(
+    allFields: PetitionField[],
+    fieldIds: number[],
+    parentFieldId: Maybe<number> = null,
+  ) {
+    const _fields = allFields.filter(
+      (f) => f.parent_petition_field_id === parentFieldId || f.id === parentFieldId,
+    );
+
+    const [[parent], fields] = partition(_fields, (f) => f.id === parentFieldId);
 
     // check only valid fieldIds and not repeated
     const _fieldIds = uniq(fieldIds);
@@ -1583,63 +1630,119 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("INVALID_PETITION_FIELD_IDS");
     }
 
-    // check visibility conditions fields refer to previous fields
-    const positions = Object.fromEntries(
-      Array.from(fieldIds.entries()).map(([index, id]) => [id, index]),
-    );
-    for (const field of fields) {
-      const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
-      if (visibility?.conditions.some((c) => positions[c.fieldId] >= positions[field.id])) {
-        throw new Error("INVALID_FIELD_CONDITIONS_ORDER");
+    // first child must not have visibility conditions after reorder
+    if (isDefined(parent)) {
+      const firstChild = fields.find((f) => f.id === fieldIds[0]);
+      if (isDefined(firstChild?.visibility)) {
+        throw new Error("FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR");
+      }
+      // first child of an external field must be external
+      if (!parent.is_internal && firstChild?.is_internal) {
+        throw new Error("FIRST_CHILD_IS_INTERNAL_ERROR");
       }
     }
 
+    try {
+      // check that reordered fields respect visibility conditions
+      // build fields array with positions as it will be after reordering
+      const reorderedFields = allFields.map((field) => {
+        if (fieldIds.includes(field.id)) {
+          return { ...field, position: fieldIds.indexOf(field.id) };
+        }
+        return field;
+      });
+
+      for (const field of reorderedFields.filter(
+        (f) => f.parent_petition_field_id === parentFieldId && isDefined(f.visibility),
+      )) {
+        for (const condition of (field.visibility as PetitionFieldVisibility).conditions) {
+          const referencedField = reorderedFields.find((f) => f.id === condition.fieldId)!;
+          validateReferencingFieldsPositions(field, referencedField, reorderedFields);
+        }
+      }
+    } catch {
+      throw new Error("INVALID_FIELD_CONDITIONS_ORDER");
+    }
+  }
+
+  async updateFieldPositions(
+    petitionId: number,
+    fieldIds: number[],
+    parentFieldId: Maybe<number>,
+    updatedBy: string,
+    t?: Knex.Transaction,
+  ) {
     await this.withTransaction(async (t) => {
-      await this.raw(
-        /* sql */ `select pg_advisory_xact_lock(?)`,
-        [hashString(`updateFieldPositions(${petitionId})`)],
-        t,
-      );
-      await this.raw(
-        /* sql */ `
+      await this.transactionLock(`reorderPetitionFields(${petitionId})`, t);
+      const allFields = await this.from("petition_field", t)
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .orderBy("position", "asc")
+        .orderBy("id", "asc")
+        .select("*");
+
+      this.validateFieldReorder(allFields, fieldIds, parentFieldId);
+
+      const parent = isDefined(parentFieldId)
+        ? allFields.find((f) => f.id === parentFieldId)
+        : undefined;
+
+      // [id, position]
+      // filter all fields that will not change its position
+      const fieldsToUpdate = pipe(
+        allFields,
+        filter((f) => f.parent_petition_field_id === parentFieldId),
+        sortBy([(f) => f.position, "asc"]),
+      )
+        .map((f, i) => (fieldIds[i] === f.id ? null : [f.id, fieldIds.indexOf(f.id)]))
+        .filter(isDefined);
+
+      if (fieldsToUpdate.length > 0) {
+        await this.raw(
+          /* sql */ `
         update petition_field as pf set
           position = t.position,
+          optional = (
+            -- first child is always required
+            case when (t.position = 0 and pf.parent_petition_field_id is not null) then false else pf.optional end
+          ),
+          is_internal = (
+            -- children of internal field will always be internal
+            case when (pf.parent_petition_field_id is not null and ?) then true else pf.is_internal end
+          ),
           updated_at = NOW(),
           updated_by = ?
         from (?) as t (id, position)
         where t.id = pf.id and pf.position != t.position;
       `,
-        [
-          `User:${user.id}`,
-          this.sqlValues(
-            fieldIds.map((id, i) => [id, i]),
-            ["int", "int"],
-          ),
-        ],
-        t,
-      );
-    });
+          [parent?.is_internal ?? false, updatedBy, this.sqlValues(fieldsToUpdate, ["int", "int"])],
+          t,
+        );
+      }
+    }, t);
 
-    const [petition] = await this.from("petition")
-      .where("id", petitionId)
-      .update(
-        {
-          updated_at: this.now(),
-          updated_by: `User:${user.id}`,
-        },
-        "*",
-      );
+    const [petition] = await this.from("petition", t).where("id", petitionId).update(
+      {
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      },
+      "*",
+    );
     return petition;
   }
 
   async clonePetitionField(petitionId: number, fieldId: number, user: User) {
-    const [field] = await this.from("petition_field")
-      .where({ id: fieldId, petition_id: petitionId })
-      .whereNull("deleted_at");
+    const [field] = await this.from("petition_field").where({
+      id: fieldId,
+      petition_id: petitionId,
+      deleted_at: null,
+    });
+
     if (!field) {
       throw new Error("invalid fieldId: " + fieldId);
     }
-    return await this.createPetitionFieldAtPosition(
+
+    const [cloned] = await this.createPetitionFieldsAtPosition(
       petitionId,
       omit(field, [
         "id",
@@ -1651,22 +1754,76 @@ export class PetitionRepository extends BaseRepository {
         "from_petition_field_id",
         "alias",
       ]),
+      field.parent_petition_field_id,
       field.position + 1,
       user,
     );
+
+    if (field.type === "FIELD_GROUP") {
+      const children = await this.loadPetitionFieldChildren(field.id);
+      if (children.length) {
+        await this.createPetitionFieldsAtPosition(
+          petitionId,
+          children.map((child) =>
+            omit(child, [
+              "id",
+              "petition_id",
+              "position",
+              "created_at",
+              "updated_at",
+              "is_fixed",
+              "from_petition_field_id",
+              "alias",
+            ]),
+          ),
+          cloned.id,
+          0,
+          user,
+        );
+      }
+    }
+
+    return cloned;
   }
 
-  async createPetitionFieldAtPosition(
+  async updatePetitionToPendingStatus(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
+    return await this.from("petition", t)
+      .where("id", petitionId)
+      .update(
+        {
+          status: this.knex.raw(/* sql */ `
+            case status 
+              when 'COMPLETED' then 'PENDING'
+              when 'CLOSED' then 'PENDING'
+              else status
+            end`) as any,
+          closed_at: null,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*",
+      );
+  }
+
+  async createPetitionFieldsAtPosition(
     petitionId: number,
-    data: Omit<CreatePetitionField, "petition_id" | "position">,
+    data: MaybeArray<
+      Omit<CreatePetitionField, "petition_id" | "position" | "parent_petition_field_id">
+    >,
+    parentFieldId: number | null,
     position: number,
     user: User,
     t?: Knex.Transaction<any, any>,
   ) {
-    return await this.withTransaction(async (t) => {
+    const dataArr = unMaybeArray(data);
+    if (dataArr.length === 0) {
+      return [];
+    }
+    const { fields, petition } = await this.withTransaction(async (t) => {
       const [{ max }] = await this.from("petition_field", t)
         .where({
           petition_id: petitionId,
+          parent_petition_field_id: parentFieldId,
           deleted_at: null,
         })
         .max("position");
@@ -1677,185 +1834,186 @@ export class PetitionRepository extends BaseRepository {
       }
 
       await this.from("petition_field", t)
-        .where("petition_id", petitionId)
-        .whereNull("deleted_at")
+        .where({
+          petition_id: petitionId,
+          parent_petition_field_id: parentFieldId,
+          deleted_at: null,
+        })
         .where("position", ">=", position)
         .update(
           {
-            position: this.knex.raw(`position + 1`),
+            position: this.knex.raw(`position + ?`, [dataArr.length]),
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
           },
           "id",
         );
 
-      const [[field]] = await Promise.all([
+      const [fields, [petition]] = await Promise.all([
         this.insert(
           "petition_field",
-          {
+          dataArr.map((field) => ({
+            ...field,
+            parent_petition_field_id: parentFieldId,
             petition_id: petitionId,
-            position,
-            ...data,
+            position: position++,
             created_by: `User:${user.id}`,
             updated_by: `User:${user.id}`,
-          },
+          })),
           t,
         ),
-        this.from("petition", t)
-          .where("id", petitionId)
-          .update(
-            {
-              status: this.knex.raw(/* sql */ `
-                case status 
-                  when 'COMPLETED' then 'PENDING'
-                  when 'CLOSED' then 'PENDING'
-                  else status
-                end`) as any,
-              closed_at: null,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*",
-          ),
+        this.updatePetitionToPendingStatus(petitionId, `User:${user.id}`, t),
       ]);
 
-      return field;
+      return { fields, petition };
     }, t);
+
+    if (!petition.is_template) {
+      // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
+      await this.createEmptyFieldGroupReply(
+        fields.filter((f) => f.type === "FIELD_GROUP" && !f.optional).map((f) => f.id),
+        user,
+        t,
+      );
+    }
+
+    return fields;
   }
 
-  async deletePetitionFieldReplies(fieldIds: number[], user: User, t?: Knex.Transaction) {
-    await this.from("petition_field_reply", t)
-      .update({
-        deleted_at: this.now(),
-        deleted_by: `User:${user.id}`,
-      })
-      .whereIn("petition_field_id", fieldIds)
-      .whereNull("deleted_at");
+  /**
+   * deletes all replies on passed field ids and their respective child fields.
+   * if parentReplyId is not null, it only deletes the replies for the field on that field group reply.
+   */
+  async deletePetitionFieldReplies(
+    fields: { id: number; parentReplyId?: number | null }[],
+    user: User,
+    t?: Knex.Transaction,
+  ) {
+    await this.raw(
+      /* sql */ `
+      with fields as (
+        select * from (?) as t(field_id, parent_reply_id)
+      )
+      update "petition_field_reply" as pfr
+      set
+        deleted_at = NOW(),
+        deleted_by = ?
+      from fields f
+      join petition_field pf on (pf.id = f.field_id or pf.parent_petition_field_id = f.field_id)
+      where 
+        (f.parent_reply_id is null or pfr.parent_petition_field_reply_id = f.parent_reply_id)
+        and pfr.petition_field_id = pf.id
+        and pfr.deleted_at is null
+        and pf.deleted_at is null;
+    `,
+      [
+        this.sqlValues(
+          fields.map((f) => [f.id, f.parentReplyId ?? null]),
+          ["int", "int"],
+        ),
+        `User:${user.id}`,
+      ],
+      t,
+    );
   }
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
     return await this.withTransaction(async (t) => {
-      const [field] = await this.from("petition_field", t)
+      const fields = await this.from("petition_field", t)
         .update(
           {
             deleted_at: this.now(),
             deleted_by: `User:${user.id}`,
           },
-          ["id", "position"],
+          ["id", "position", "parent_petition_field_id"],
         )
         .where({
           petition_id: petitionId,
-          id: fieldId,
           deleted_at: null,
           is_fixed: false,
+        })
+        .andWhere((q) => {
+          q.where("id", fieldId).orWhere("parent_petition_field_id", fieldId);
         });
+
+      const field = fields.find((f) => f.id === fieldId);
 
       if (!field) {
         throw new Error("Invalid petition field id");
       }
 
-      await Promise.all([
-        this.from("petition_field_reply", t)
-          .update({
-            deleted_at: this.now(),
-            deleted_by: `User:${user.id}`,
-          })
-          .where({
-            petition_field_id: fieldId,
-            deleted_at: null,
-          }),
-        this.from("petition_field_comment", t)
-          .update({
-            deleted_at: this.now(),
-            deleted_by: `User:${user.id}`,
-          })
-          .where({
-            petition_field_id: fieldId,
-            deleted_at: null,
-          }),
-      ]);
+      // update position of every posterior field
+      await this.from("petition_field", t)
+        .update({
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+          position: this.knex.raw(`"position" - 1`) as any,
+        })
+        .where({
+          petition_id: petitionId,
+          parent_petition_field_id: field.parent_petition_field_id,
+          deleted_at: null,
+        })
+        .where("position", ">", field.position);
 
-      const [[petition]] = await Promise.all([
-        this.from("petition", t).where("id", petitionId).select("*"),
-        this.from("petition_field", t)
-          .update({
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`,
-            position: this.knex.raw(`"position" - 1`) as any,
-          })
-          .where({
-            petition_id: petitionId,
-            deleted_at: null,
-          })
-          .where("position", ">", field.position),
-        // safe-delete attachments on this field (same attachment can be linked to another field)
-        this.deletePetitionFieldAttachmentByFieldId(fieldId, user, t),
-        // delete user notifications related to this petition field
-        this.from("petition_user_notification", t)
-          .where({ petition_id: petitionId, type: "COMMENT_CREATED" })
-          .whereRaw("data ->> 'petition_field_id' = ?", fieldId)
-          .delete(),
-        // delete contact notifications related to this petition field
-        this.from("petition_contact_notification", t)
-          .where({ petition_id: petitionId, type: "COMMENT_CREATED" })
-          .whereRaw("data ->> 'petition_field_id' = ?", fieldId)
-          .delete(),
-      ]);
+      // safe-delete attachments on this field (same attachment can be linked to another field)
+      await this.deletePetitionFieldAttachmentByFieldId(
+        fields.map((f) => f.id),
+        user,
+        t,
+      );
+
+      // delete replies on the fields
+      await this.deletePetitionFieldRepliesByFieldIds(
+        fields.map((f) => f.id),
+        `User:${user.id}`,
+        t,
+      );
+
+      // delete comments on the fields and their notifications
+      await this.deletePetitionFieldCommentsByFieldIds(
+        petitionId,
+        fields.map((f) => f.id),
+        `User:${user.id}`,
+        t,
+      );
+
+      const [petition] = await this.from("petition", t).where("id", petitionId).select("*");
+
       return petition;
     });
   }
 
   async updatePetitionField(
     petitionId: number,
-    fieldId: number,
+    fieldId: MaybeArray<number>,
     data: Partial<CreatePetitionField>,
-    user: User,
+    updatedBy: string,
     t?: Knex.Transaction<any, any>,
   ) {
+    const fieldIds = unMaybeArray(fieldId);
+    if (fieldIds.length === 0) {
+      return [];
+    }
     return this.withTransaction(async (t) => {
-      const [field] = await this.from("petition_field", t)
-        .where({ id: fieldId, petition_id: petitionId })
+      const fields = await this.from("petition_field", t)
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .whereIn("id", fieldIds)
         .update(
           {
             ...data,
             updated_at: this.now(),
-            updated_by: `User:${user.id}`,
+            updated_by: updatedBy,
           },
           "*",
         );
-      if (field.is_fixed && data.type !== undefined) {
+
+      if (data.type !== undefined && fields.some((field) => field.is_fixed)) {
         throw new Error("UPDATE_FIXED_FIELD_ERROR");
       }
 
-      // update petition status if changing anything other than title and description
-      if (Object.keys(omit(data, ["title", "description"])).length > 0) {
-        await this.from("petition", t)
-          .where({
-            id: petitionId,
-          })
-          .update(
-            {
-              status: this.knex.raw(/* sql */ `
-                case is_template 
-                when false then 
-                  (case status 
-                    when 'COMPLETED' then 'PENDING'
-                    when 'CLOSED' then 'PENDING'
-                    else status
-                  end) 
-                else
-                  NULL
-                end
-              `) as any,
-              closed_at: null,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*",
-          );
-      }
-
-      return field;
+      return fields;
     }, t);
   }
 
@@ -1895,6 +2053,9 @@ export class PetitionRepository extends BaseRepository {
     createdBy: string,
   ) {
     const dataArray = unMaybeArray(data);
+    if (dataArray.length === 0) {
+      return [];
+    }
 
     const fieldIds = uniq(dataArray.map((d) => d.petition_field_id));
     const fields = await this.loadField(fieldIds);
@@ -2068,10 +2229,6 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("Petition field reply not found");
     }
 
-    if (isFileTypeField(reply.type)) {
-      await this.files.deleteFileUpload(reply.content["file_upload_id"], deletedBy);
-    }
-
     if (!field.is_internal) {
       await this.updatePetition(
         field.petition_id,
@@ -2085,13 +2242,15 @@ export class PetitionRepository extends BaseRepository {
       this.loadPetition.dataloader.clear(field.petition_id);
     }
 
-    await Promise.all([
+    const [deletedReplies] = await Promise.all([
       this.from("petition_field_reply")
         .update({
           deleted_at: this.now(),
           deleted_by: deletedBy,
         })
-        .where("id", replyId),
+        .whereNull("deleted_at")
+        .where((q) => q.where("id", replyId).orWhere("parent_petition_field_reply_id", replyId))
+        .returning("*"),
       this.createEventWithDelay(
         {
           type: "REPLY_DELETED",
@@ -2106,10 +2265,32 @@ export class PetitionRepository extends BaseRepository {
       ),
     ]);
 
+    const fileUploadIds = deletedReplies
+      .filter((r) => isFileTypeField(r.type))
+      .map((r) => r.content["file_upload_id"] as number);
+
+    if (fileUploadIds.length > 0) {
+      await this.files.deleteFileUpload(fileUploadIds, deletedBy);
+    }
+
     return field;
   }
 
-  public async reopenPetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
+  async deletePetitionFieldRepliesByFieldIds(
+    fieldIds: number[],
+    deletedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    await this.from("petition_field_reply", t)
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      })
+      .whereNull("deleted_at")
+      .whereIn("petition_field_id", fieldIds);
+  }
+
+  async reopenPetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
     await this.from("petition", t)
       .where({ id: petitionId, deleted_at: null })
       .whereIn("status", ["COMPLETED", "CLOSED"])
@@ -2129,7 +2310,7 @@ export class PetitionRepository extends BaseRepository {
     status: PetitionFieldReplyStatus,
     updater: User,
   ) {
-    const fields = await this.loadFieldsForPetition(petitionId);
+    const fields = await this.loadAllFieldsByPetitionId(petitionId);
     // only update reply status on fields that have require_approval set to true
     const fieldIds = fields.filter((f) => f.require_approval).map((f) => f.id);
 
@@ -2139,6 +2320,7 @@ export class PetitionRepository extends BaseRepository {
 
     const replies = await this.from("petition_field_reply")
       .whereIn("petition_field_id", fieldIds)
+      .whereNot("type", "FIELD_GROUP")
       .andWhere("status", "PENDING")
       .andWhere("deleted_at", null)
       .update(
@@ -2217,17 +2399,45 @@ export class PetitionRepository extends BaseRepository {
           | "options"
           | "visibility"
           | "optional"
+          | "parent_petition_field_id"
         > & {
-          replies: Pick<PetitionFieldReply, "status" | "content" | "anonymized_at">[];
+          replies: Pick<
+            PetitionFieldReply,
+            | "id"
+            | "type"
+            | "status"
+            | "content"
+            | "anonymized_at"
+            | "petition_field_id"
+            | "parent_petition_field_reply_id"
+          >[];
         }
       >(
         /* sql */ `
         select
-          pf.petition_id, pf.id, pf.title, pf.from_petition_field_id, pf.is_internal, pf.position, pf.type, pf.options, pf.visibility, pf.optional,
+          pf.petition_id,
+          pf.id,
+          pf.title,
+          pf.from_petition_field_id,
+          pf.is_internal,
+          pf.position,
+          pf.type,
+          pf.options,
+          pf.visibility,
+          pf.optional,
+          pf.parent_petition_field_id,
           coalesce( -- jsonb_agg filter (where ...) will return null if no rows match
             case when count(*) filter (where pfr.id is not null) > 0 then
               jsonb_agg(
-                jsonb_build_object('content', pfr.content, 'status', pfr.status, 'anonymized_at', pfr.anonymized_at) order by pfr.created_at asc
+                jsonb_build_object(
+                  'id', pfr.id,
+                  'type', pfr.type,
+                  'content', pfr.content,
+                  'status', pfr.status,
+                  'anonymized_at', pfr.anonymized_at,
+                  'petition_field_id', pfr.petition_field_id,
+                  'parent_petition_field_reply_id', pfr.parent_petition_field_reply_id  
+                ) order by pfr.created_at asc
               ) filter (
                 -- when file field types, filter replies with upload_complete
                 where
@@ -2244,7 +2454,6 @@ export class PetitionRepository extends BaseRepository {
           on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC') and (pfr.content->>'file_upload_id')::int = fu.id
         where
           pf.petition_id in ?
-          and pf.type != 'HEADING'
           and pf.deleted_at is null
 
         group by pf.id; 
@@ -2262,6 +2471,51 @@ export class PetitionRepository extends BaseRepository {
     return petitionIds.map((id) => fieldsByPetition[id] ?? []);
   }
 
+  async getComposedPetitionFields(petitionIds: number[]) {
+    const fieldsWithRepliesByPetition = await this.getPetitionFieldsWithReplies(petitionIds);
+
+    return fieldsWithRepliesByPetition.map((fieldsWithReplies) => {
+      const [fields, children] = partition(
+        fieldsWithReplies,
+        (f) => f.parent_petition_field_id === null,
+      );
+
+      return sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
+        const fieldChildren =
+          field.type === "FIELD_GROUP"
+            ? pipe(
+                children,
+                filter((c) => c.parent_petition_field_id! === field.id),
+                sortBy([(f) => f.position, "asc"]),
+                map((child) => ({
+                  ...child,
+                  parent: field,
+                })),
+              )
+            : [];
+
+        const fieldReplies = field.replies.map((reply) => ({
+          ...reply,
+          children:
+            field.type === "FIELD_GROUP"
+              ? fieldChildren.map((child) => ({
+                  field: child,
+                  replies: child.replies.filter(
+                    (cr) => cr.parent_petition_field_reply_id === reply.id,
+                  ),
+                }))
+              : null,
+        }));
+
+        return {
+          ...field,
+          children: field.type === "FIELD_GROUP" ? fieldChildren : null,
+          replies: fieldReplies,
+        };
+      });
+    });
+  }
+
   async completePetition(
     petitionId: number,
     userOrAccess: User | PetitionAccess,
@@ -2271,16 +2525,8 @@ export class PetitionRepository extends BaseRepository {
     const isAccess = "keycode" in userOrAccess;
     const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
 
-    const [fieldsWithReplies] = await this.getPetitionFieldsWithReplies([petitionId]);
-
-    const canComplete = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies)).every(
-      ([field, isVisible]) =>
-        (isAccess ? field.is_internal : false) ||
-        field.type === "HEADING" ||
-        field.optional ||
-        field.replies.length > 0 ||
-        !isVisible,
-    );
+    const [composedFields] = await this.getComposedPetitionFields([petitionId]);
+    const canComplete = petitionIsCompleted(composedFields, isAccess);
 
     if (canComplete) {
       const petition = await this.withTransaction(async (t) => {
@@ -2433,7 +2679,8 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
 
-      const fields = await this.loadFieldsForPetition(petitionId);
+      const fields = await this.loadAllFieldsByPetitionId(petitionId);
+
       const clonedFields =
         fields.length === 0
           ? []
@@ -2458,6 +2705,41 @@ export class PetitionRepository extends BaseRepository {
               }),
               t,
             ).returning("*");
+
+      if (!cloned.is_template) {
+        // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
+        await this.createEmptyFieldGroupReply(
+          clonedFields.filter((f) => f.type === "FIELD_GROUP" && !f.optional).map((f) => f.id),
+          owner,
+          t,
+        );
+      }
+
+      // update parent_petition_field_id of new cloned children fields
+      const clonedChildren = clonedFields.filter((f) => isDefined(f.parent_petition_field_id));
+      if (clonedChildren.length > 0) {
+        await this.raw<PetitionField>(
+          /* sql */ `
+          update petition_field as pf set
+            parent_petition_field_id = t.parent_petition_field_id
+          from (?) as t (id, parent_petition_field_id)
+          where t.id = pf.id
+          returning *;
+        `,
+          [
+            this.sqlValues(
+              clonedChildren.map((child) => {
+                const [, newParentField] = zip(fields, clonedFields).find(([field]) => {
+                  return field.id === child.parent_petition_field_id;
+                })!;
+                return [child.id, newParentField.id];
+              }),
+              ["int", "int"],
+            ),
+          ],
+          t,
+        );
+      }
 
       if (options?.insertPermissions ?? true) {
         // copy permissions
@@ -2513,7 +2795,7 @@ export class PetitionRepository extends BaseRepository {
       const newFieldIds = Object.fromEntries(
         zip(
           fields.map((f) => f.id),
-          sortBy(clonedFields, (f) => f.position).map((f) => f.id),
+          clonedFields.map((f) => f.id),
         ),
       );
 
@@ -2839,11 +3121,6 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
-  async loadPetitionEvent(eventId: number) {
-    const [event] = await this.from("petition_event").where("id", eventId).select("*");
-    return event;
-  }
-
   readonly loadPetitionEventsByPetitionId = this.buildLoadMultipleBy(
     "petition_event",
     "petition_id",
@@ -2994,7 +3271,7 @@ export class PetitionRepository extends BaseRepository {
     return petitionEvents;
   }
 
-  async getLatestEventForPetitionId(petitionId: number) {
+  private async getLatestEventForPetitionId(petitionId: number) {
     const [event] = await this.raw<PetitionEvent | null>(
       /* sql */ `
       select * from petition_event where id in (
@@ -3125,7 +3402,7 @@ export class PetitionRepository extends BaseRepository {
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) },
   );
 
-  loadContactHasUnreadCommentsInPetition = this.buildLoader<
+  readonly loadContactHasUnreadCommentsInPetition = this.buildLoader<
     {
       contactId: number;
       petitionId: number;
@@ -3742,6 +4019,7 @@ export class PetitionRepository extends BaseRepository {
   private async deletePetitionFieldComment(petitionFieldCommentId: number, deletedBy: string) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
+      .whereNull("deleted_at")
       .update(
         {
           deleted_at: this.now(),
@@ -3750,21 +4028,55 @@ export class PetitionRepository extends BaseRepository {
         "*",
       );
 
-    await Promise.all([
-      this.from("petition_user_notification")
-        .where({ petition_id: comment.petition_id, type: "COMMENT_CREATED" })
-        .whereRaw("data ->> 'petition_field_id' = ?", comment.petition_field_id)
-        .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id)
-        .delete(),
-
-      this.from("petition_contact_notification")
-        .where({ petition_id: comment.petition_id, type: "COMMENT_CREATED" })
-        .whereRaw("data ->> 'petition_field_id' = ?", comment.petition_field_id)
-        .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id)
-        .delete(),
-    ]);
+    await this.deleteCommentCreatedNotifications(comment.petition_id, [comment.id]);
 
     return comment;
+  }
+
+  private async deletePetitionFieldCommentsByFieldIds(
+    petitionId: number,
+    fieldIds: number[],
+    deletedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    const comments = await this.from("petition_field_comment", t)
+      .update(
+        {
+          deleted_at: this.now(),
+          deleted_by: deletedBy,
+        },
+        "*",
+      )
+      .whereNull("deleted_at")
+      .whereIn("petition_field_id", fieldIds);
+
+    await this.deleteCommentCreatedNotifications(
+      petitionId,
+      comments.map((c) => c.id),
+      t,
+    );
+  }
+
+  private async deleteCommentCreatedNotifications(
+    petitionId: number,
+    commentIds: number[],
+    t?: Knex.Transaction,
+  ) {
+    if (commentIds.length === 0) {
+      return;
+    }
+    await Promise.all([
+      // delete user notifications related to this petition field
+      this.from("petition_user_notification", t)
+        .where({ petition_id: petitionId, type: "COMMENT_CREATED" })
+        .whereRaw("data ->> 'petition_field_comment_id' in ?", this.sqlIn(commentIds))
+        .delete(),
+      // delete contact notifications related to this petition field
+      this.from("petition_contact_notification", t)
+        .where({ petition_id: petitionId, type: "COMMENT_CREATED" })
+        .whereRaw("data ->> 'petition_field_comment_id' in ?", this.sqlIn(commentIds))
+        .delete(),
+    ]);
   }
 
   async updatePetitionFieldCommentFromUser(
@@ -3855,9 +4167,16 @@ export class PetitionRepository extends BaseRepository {
     user: User,
   ) {
     return this.withTransaction(async (t) => {
-      const [field] = (await this.from("petition_field", t).where({
-        id: fieldId,
-      })) as PetitionField[];
+      const [field] = await this.from("petition_field", t)
+        .where({
+          id: fieldId,
+          deleted_at: null,
+        })
+        .select("*");
+
+      if (field.type === type) {
+        return field;
+      }
 
       if (isValueCompatible(field.type, type)) {
         await this.from("petition_field_reply", t)
@@ -3883,16 +4202,23 @@ export class PetitionRepository extends BaseRepository {
           });
       }
 
-      return await this.updatePetitionField(
+      if (field.type === "FIELD_GROUP") {
+        await this.unlinkPetitionFieldChildren(petitionId, field.id, null, `User:${user.id}`, t);
+        this.loadFieldsForPetition.dataloader.clear(petitionId);
+      }
+
+      const [updated] = await this.updatePetitionField(
         petitionId,
         fieldId,
         {
           type,
           ...defaultFieldProperties(type, field),
         },
-        user,
+        `User:${user.id}`,
         t,
       );
+
+      return updated;
     });
   }
 
@@ -5144,15 +5470,16 @@ export class PetitionRepository extends BaseRepository {
   }
 
   private async deletePetitionFieldAttachmentByFieldId(
-    petitionFieldId: number,
+    petitionFieldIds: number[],
     user: User,
     t?: Knex.Transaction,
   ) {
+    if (petitionFieldIds.length === 0) {
+      return;
+    }
     const deletedAttachments = await this.from("petition_field_attachment", t)
-      .where({
-        deleted_at: null,
-        petition_field_id: petitionFieldId,
-      })
+      .whereNull("deleted_at")
+      .whereIn("petition_field_id", petitionFieldIds)
       .update({
         deleted_at: this.now(),
         deleted_by: `User:${user.id}`,
@@ -5626,6 +5953,8 @@ export class PetitionRepository extends BaseRepository {
               content || jsonb_build_object('file_upload_id', null, 'entity', null)
             when 'ES_TAX_DOCUMENTS' then
               content || jsonb_build_object('file_upload_id', null, 'json_contents', null)
+            when 'FIELD_GROUP' then 
+              '{}'::jsonb
             else 
               content || jsonb_build_object('value', null)
             end
@@ -6224,13 +6553,13 @@ export class PetitionRepository extends BaseRepository {
    * If the reply is invalid given the field options, it will be ignored.
    */
   async prefillPetition(petitionId: number, prefill: Record<string, any>, owner: User) {
-    const fields = await this.loadFieldsForPetition(petitionId, { refresh: true });
-    const replies = await this.parsePrefillReplies(prefill, fields);
+    const fields = await this.loadAllFieldsByPetitionId(petitionId);
+    const parsedReplies = await this.parsePrefillReplies(prefill, fields);
 
-    if (replies.length > 0) {
-      await this.createPetitionFieldReply(
+    if (parsedReplies.length > 0) {
+      const replies = await this.createPetitionFieldReply(
         petitionId,
-        replies.map((reply) => ({
+        parsedReplies.map((reply) => ({
           user_id: owner.id,
           petition_field_id: reply.fieldId,
           content: fieldReplyContent(reply.fieldType, reply.content),
@@ -6238,60 +6567,99 @@ export class PetitionRepository extends BaseRepository {
         })),
         `User:${owner.id}`,
       );
+
+      for (const [parentReply, { childrenReplies }] of zip(replies, parsedReplies)) {
+        if (isDefined(childrenReplies) && childrenReplies.length > 0) {
+          await this.createPetitionFieldReply(
+            petitionId,
+            childrenReplies.map((reply) => ({
+              user_id: owner.id,
+              petition_field_id: reply.fieldId,
+              content: fieldReplyContent(reply.fieldType, reply.content),
+              type: reply.fieldType,
+              parent_petition_field_reply_id: parentReply.id,
+            })),
+            `User:${owner.id}`,
+          );
+        }
+      }
     }
 
     return (await this.loadPetition(petitionId))!;
   }
 
-  private async parsePrefillReplies(prefill: Record<string, any>, fields: PetitionField[]) {
+  private async parsePrefillReplies(
+    prefill: Record<string, any>,
+    fields: Pick<PetitionField, "id" | "type" | "alias" | "options" | "parent_petition_field_id">[],
+    parentFieldId: number | null = null,
+  ) {
     const entries = Object.entries(prefill);
     const result: {
       fieldId: number;
       fieldType: PetitionFieldType;
       content: any;
+      childrenReplies?: {
+        fieldId: number;
+        fieldType: PetitionFieldType;
+        content: any;
+      }[];
     }[] = [];
 
-    for (let i = 0; i < entries.length; i++) {
-      const [alias, value] = entries[i];
-      const field = fields.find((f) => f.alias === alias);
-      if (!field || isFileTypeField(field.type) || field.type === "HEADING") {
+    const rootFields = fields.filter((f) => f.parent_petition_field_id === parentFieldId);
+
+    for (const [alias, value] of entries) {
+      const field = rootFields.find((f) => f.alias === alias);
+      if (!field || isFileTypeField(field.type) || ["HEADING"].includes(field.type)) {
         continue;
       }
 
       const fieldReplies = unMaybeArray(value);
-      const singleReplies = [];
+      const singleReplies: {
+        content: any;
+        childrenReplies?: { fieldId: number; fieldType: PetitionFieldType; content: any }[];
+      }[] = [];
 
       if (field.type === "CHECKBOX") {
         // for CHECKBOX fields, a single reply can contain more than 1 option, so each reply is a string[]
         if (fieldReplies.every((r) => typeof r === "string")) {
-          singleReplies.push({ value: uniq(fieldReplies) });
+          singleReplies.push({ content: { value: uniq(fieldReplies) } });
         } else if (fieldReplies.every((r) => Array.isArray(r))) {
-          singleReplies.push(...fieldReplies.map((r) => ({ value: uniq(r) })));
+          singleReplies.push(...fieldReplies.map((r) => ({ content: { value: uniq(r) } })));
         }
       } else if (field.type === "DYNAMIC_SELECT") {
         // for DYNAMIC_SELECT field, a single reply is like ["Cataluña", "Barcelona"]. each element on the array is a selection of that level.
         // here we need to add the label for sending it to the backend with correct format. e.g.: [["Comunidad Autónoma", "Cataluña"], ["Provincia", "Barcelona"]]
         if (fieldReplies.every((r) => typeof r === "string")) {
           singleReplies.push({
-            value: fieldReplies.map((value, i) => [field.options.labels[i], value]),
+            content: { value: fieldReplies.map((value, i) => [field.options.labels[i], value]) },
           });
         } else if (fieldReplies.every((r) => Array.isArray(r))) {
           singleReplies.push(
             ...fieldReplies.map((reply: string[]) => ({
-              value: reply.map((value, i) => [field.options.labels[i], value]),
+              content: { value: reply.map((value, i) => [field.options.labels[i], value]) },
             })),
           );
         }
       } else if (field.type === "DATE_TIME") {
-        singleReplies.push(...fieldReplies); // DATE_TIME replies already are objects with { datetime, timezone } format
+        singleReplies.push(...fieldReplies.map((r) => ({ content: r }))); // DATE_TIME replies already are objects with { datetime, timezone } format
+      } else if (field.type === "FIELD_GROUP") {
+        // for FIELD_GROUP field, a single reply is an object with the child field alias as key and the reply as value
+        if (typeof value === "object") {
+          singleReplies.push(
+            ...(await pMap(fieldReplies, async (childPrefill) => ({
+              content: {},
+              childrenReplies: await this.parsePrefillReplies(childPrefill, fields, field.id),
+            }))),
+          );
+        }
       } else {
-        singleReplies.push(...fieldReplies.map((value) => ({ value })));
+        singleReplies.push(...fieldReplies.map((value) => ({ content: { value } })));
       }
 
-      for (const content of singleReplies) {
+      for (const { content, childrenReplies } of singleReplies) {
         try {
           await validateReplyContent(field, content);
-          result.push({ fieldId: field.id, fieldType: field.type, content });
+          result.push({ fieldId: field.id, fieldType: field.type, content, childrenReplies });
         } catch {}
       }
     }
@@ -6364,7 +6732,7 @@ export class PetitionRepository extends BaseRepository {
     return null;
   }
 
-  async userhasAccessToPetitionFieldReply(petitionFieldReplyId: number, userId: number) {
+  async userHasAccessToPetitionFieldReply(petitionFieldReplyId: number, userId: number) {
     const [reply, field] = await Promise.all([
       this.loadFieldReply(petitionFieldReplyId),
       this.loadFieldForReply(petitionFieldReplyId),
@@ -6375,5 +6743,302 @@ export class PetitionRepository extends BaseRepository {
     }
 
     return await this.userHasAccessToPetitions(userId, [field.petition_id]);
+  }
+
+  readonly loadPetitionFieldChildren = this.buildLoadMultipleBy(
+    "petition_field",
+    "parent_petition_field_id",
+    (q) => {
+      q.whereNull("deleted_at").whereNotNull("parent_petition_field_id").orderBy("position", "asc");
+    },
+  );
+
+  async linkPetitionFieldChildren(
+    petitionId: number,
+    parentFieldId: number,
+    childrenFieldIds: number[],
+    updatedBy: string,
+  ) {
+    await this.withTransaction(async (t) => {
+      await this.transactionLock(`reorderPetitionFields(${petitionId})`, t);
+
+      const allFields = await this.from("petition_field", t)
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .orderBy("position", "asc")
+        .orderBy("id", "asc")
+        .select("*");
+
+      const rootFields = allFields.filter((f) => f.parent_petition_field_id === null);
+      const currentChildren = allFields.filter((f) => f.parent_petition_field_id === parentFieldId);
+      const parent = allFields.find((f) => f.id === parentFieldId)!;
+
+      const newRootFields = rootFields.filter((f) => !childrenFieldIds.includes(f.id));
+
+      const newChildrenFields = [
+        ...currentChildren,
+        ...childrenFieldIds.map((id) => allFields.find((f) => f.id === id)!), // insert new children below current ones
+      ];
+
+      const allUpdatedFields: PetitionField[] = [
+        // update position and parent_id of new root fields after unlink
+        ...newRootFields.map((f, i) => ({ ...f, position: i, parent_petition_field_id: null })),
+        // update positions and parent_id of new children of parent
+        ...newChildrenFields.map((f, i) => ({
+          ...f,
+          position: i,
+          parent_petition_field_id: parentFieldId,
+        })),
+        // also pass every child of other FIELD_GROUP's so we can validate reorder
+        ...allFields.filter(
+          (f) =>
+            isDefined(f.parent_petition_field_id) && f.parent_petition_field_id !== parentFieldId,
+        ),
+      ];
+
+      this.validateFieldReorder(
+        allUpdatedFields,
+        newRootFields.map((f) => f.id),
+      );
+
+      this.validateFieldReorder(
+        allUpdatedFields,
+        newChildrenFields.map((f) => f.id),
+        parentFieldId,
+      );
+
+      // [id, position, parent_petition_field_id]
+      // filter all fields that will not change its position nor parent
+      const fieldsToUpdate = allFields
+        .map((field) => {
+          const updatedField = allUpdatedFields.find((f) => f.id === field.id)!;
+          return updatedField.position === field.position &&
+            updatedField.parent_petition_field_id === field.parent_petition_field_id
+            ? null
+            : [updatedField.id, updatedField.position, updatedField.parent_petition_field_id];
+        })
+        .filter(isDefined);
+
+      if (fieldsToUpdate.length > 0) {
+        await this.raw(
+          /* sql */ `
+        update petition_field pf
+        set
+          position = t.position,
+          parent_petition_field_id = t.parent_petition_field_id,
+          optional = (
+            -- first child is always required
+            case when (t.position = 0 and t.parent_petition_field_id is not null) then false else pf.optional end
+          ),
+          is_internal = (
+            -- children of internal field will always be internal
+            case when (t.parent_petition_field_id is not null and ?) then true else pf.is_internal end
+          ),
+          updated_at = now(),
+          updated_by = ?
+        from (?) as t (id, position, parent_petition_field_id)
+        where pf.id = t.id
+          and pf.petition_id = ?
+          and pf.deleted_at is null
+      `,
+          [
+            parent.is_internal,
+            updatedBy,
+            this.sqlValues(fieldsToUpdate, ["int", "int", "int"]),
+            petitionId,
+          ],
+          t,
+        );
+      }
+    });
+
+    await this.deletePetitionFieldRepliesByFieldIds(childrenFieldIds, updatedBy);
+    await this.deletePetitionFieldCommentsByFieldIds(petitionId, childrenFieldIds, updatedBy);
+  }
+
+  async unlinkPetitionFieldChildren(
+    petitionId: number,
+    parentFieldId: number,
+    childrenFieldIds: Maybe<number[]>,
+    updatedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    if (isDefined(childrenFieldIds) && childrenFieldIds.length === 0) {
+      throw new Error("childrenFieldIds can't be empty");
+    }
+
+    const unlinkedChildrenIds = await this.withTransaction(async (t) => {
+      await this.transactionLock(`reorderPetitionFields(${petitionId})`, t);
+
+      const allFields = await this.from("petition_field", t)
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .orderBy("position", "asc")
+        .orderBy("id", "asc")
+        .select("*");
+
+      const rootFields = allFields.filter((f) => f.parent_petition_field_id === null);
+      const rootFieldIds = rootFields.map((f) => f.id);
+      const currentChildren = allFields.filter((f) => f.parent_petition_field_id === parentFieldId);
+      const parent = allFields.find((f) => f.id === parentFieldId)!;
+
+      const childrenIdsToUnlink = childrenFieldIds ?? currentChildren.map((f) => f.id);
+
+      const newChildrenFields = currentChildren.filter((f) => !childrenIdsToUnlink.includes(f.id));
+
+      const parentFieldIndex = rootFieldIds.indexOf(parentFieldId);
+      const newRootFields = [
+        ...rootFieldIds.slice(0, parentFieldIndex + 1),
+        ...childrenIdsToUnlink, // insert new fields below parent field
+        ...rootFieldIds.slice(parentFieldIndex + 1),
+      ].map((id) => allFields.find((f) => f.id === id)!);
+
+      const allUpdatedFields: PetitionField[] = [
+        // update position and parent_id of new root fields after unlink
+        ...newRootFields.map((f, i) => ({ ...f, position: i, parent_petition_field_id: null })),
+        // update positions and parent_id of new children of parent
+        ...newChildrenFields.map((f, i) => ({
+          ...f,
+          position: i,
+          parent_petition_field_id: parentFieldId,
+        })),
+        // also pass every child of other FIELD_GROUP's so we can validate reorder
+        ...allFields.filter(
+          (f) =>
+            isDefined(f.parent_petition_field_id) && f.parent_petition_field_id !== parentFieldId,
+        ),
+      ];
+
+      this.validateFieldReorder(
+        allUpdatedFields,
+        newRootFields.map((f) => f.id),
+      );
+
+      this.validateFieldReorder(
+        allUpdatedFields,
+        newChildrenFields.map((f) => f.id),
+        parentFieldId,
+      );
+
+      // [id, position, parent_petition_field_id]
+      // filter all fields that will not change its position nor parent
+      const fieldsToUpdate = allFields
+        .map((field) => {
+          const updatedField = allUpdatedFields.find((f) => f.id === field.id)!;
+          return updatedField.position === field.position &&
+            updatedField.parent_petition_field_id === field.parent_petition_field_id
+            ? null
+            : [updatedField.id, updatedField.position, updatedField.parent_petition_field_id];
+        })
+        .filter(isDefined);
+
+      if (fieldsToUpdate.length > 0) {
+        await this.raw(
+          /* sql */ `
+        update petition_field pf
+        set
+          position = t.position,
+          parent_petition_field_id = t.parent_petition_field_id,
+          optional = (
+            -- first child is always required
+            case when (t.position = 0 and t.parent_petition_field_id is not null) then false else pf.optional end
+          ),
+          is_internal = (
+            -- children of internal field will always be internal
+            case when (t.parent_petition_field_id is not null and ?) then true else pf.is_internal end
+          ),
+          updated_at = now(),
+          updated_by = ?
+        from (?) as t (id, position, parent_petition_field_id)
+        where pf.id = t.id
+          and pf.petition_id = ?
+          and pf.deleted_at is null
+      `,
+          [
+            parent.is_internal,
+            updatedBy,
+            this.sqlValues(fieldsToUpdate, ["int", "int", "int"]),
+            petitionId,
+          ],
+          t,
+        );
+      }
+      return childrenIdsToUnlink;
+    }, t);
+
+    await this.deletePetitionFieldRepliesByFieldIds(unlinkedChildrenIds, updatedBy);
+    await this.deletePetitionFieldCommentsByFieldIds(petitionId, unlinkedChildrenIds, updatedBy);
+  }
+
+  readonly loadPetitionFieldGroupChildReplies = this.buildLoader<
+    { parentPetitionFieldReplyId: number; petitionFieldId: number },
+    PetitionFieldReply[],
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_field_reply", t)
+        .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereIn(
+          "parent_petition_field_reply_id",
+          uniq(keys.map((x) => x.parentPetitionFieldReplyId)),
+        )
+        .whereNotNull("parent_petition_field_reply_id")
+        .whereNull("deleted_at")
+        .orderBy("created_at")
+        .select("*");
+
+      const results = groupBy(
+        rows,
+        keyBuilder(["parent_petition_field_reply_id", "petition_field_id"]),
+      );
+      return keys
+        .map(keyBuilder(["parentPetitionFieldReplyId", "petitionFieldId"]))
+        .map((key) => results[key] ?? []);
+    },
+    { cacheKeyFn: keyBuilder(["parentPetitionFieldReplyId", "petitionFieldId"]) },
+  );
+
+  async deleteEmptyFieldGroupReplies(fieldId: number, deletedBy: string) {
+    await this.raw(
+      /* sql */ `
+      update petition_field_reply pfr
+      set
+        deleted_at = NOW(),
+        deleted_by = ?
+      where 
+        type = 'FIELD_GROUP'
+        and petition_field_id = ?
+        and deleted_at is null
+        and not exists (
+          select 
+            id 
+          from 
+            petition_field_reply
+          where
+            parent_petition_field_reply_id = pfr.id
+            and deleted_at is null
+        )
+    `,
+      [deletedBy, fieldId],
+    );
+  }
+  async createEmptyFieldGroupReply(fieldIds: number[], user: User, t?: Knex.Transaction) {
+    if (fieldIds.length === 0) {
+      return;
+    }
+
+    await this.insert(
+      "petition_field_reply",
+      fieldIds.map((fieldId) => ({
+        petition_field_id: fieldId,
+        user_id: user.id,
+        type: "FIELD_GROUP",
+        content: {},
+        status: "PENDING",
+        created_by: `User:${user.id}`,
+        updated_by: `User:${user.id}`,
+      })),
+      t,
+    );
   }
 }

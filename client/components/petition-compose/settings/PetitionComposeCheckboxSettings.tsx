@@ -130,7 +130,7 @@ export function CheckboxSettings({
         isDisabled={isReadOnly}
         label={
           <FormattedMessage
-            id="field-settings.multiple-label"
+            id="component.petition-compose-field-settings.multiple-label"
             defaultMessage="Allow more than one reply"
           />
         }

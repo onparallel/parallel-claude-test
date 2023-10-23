@@ -149,6 +149,9 @@ export function replyBelongsToAccess<
             : (args as any)[argReplyId]) as MaybeArray<number>,
         ),
       );
+      if (replyIds.length === 0) {
+        return true;
+      }
       return await ctx.petitions.repliesBelongsToPetition(ctx.access!.petition_id, replyIds);
     } catch {}
     return false;

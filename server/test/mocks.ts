@@ -1,12 +1,18 @@
+import { faker } from "@faker-js/faker/locale/af_ZA";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
+import { User } from "../src/db/__types";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
-import { User } from "../src/db/__types";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
 import { IAnalyticsService } from "../src/services/AnalyticsService";
 import { IAuth } from "../src/services/AuthService";
+import {
+  IDowJonesClient,
+  RiskEntityProfilePdfResult,
+  RiskEntityProfileResult,
+} from "../src/services/DowJonesClient";
 import { IEmailsService } from "../src/services/EmailsService";
 import { IFetchService } from "../src/services/FetchService";
 import { IQueuesService } from "../src/services/QueuesService";
@@ -117,7 +123,7 @@ export class MockQueuesService implements IQueuesService {
 
 class MockStorageImpl implements IStorageImpl {
   async uploadFile() {
-    return {} as any;
+    return { ContentLength: 0 } as any;
   }
   async downloadFile() {
     return {} as any;
@@ -151,5 +157,41 @@ export class MockStorage implements IStorageService {
 export class MockFetchService implements IFetchService {
   async fetch() {
     return new Response("OK", { status: 200 });
+  }
+}
+
+@injectable()
+export class MockDowJonesClient implements IDowJonesClient {
+  async riskEntitySearch() {
+    return { meta: { total_count: 0 }, data: [] };
+  }
+  async riskEntityProfile(): Promise<RiskEntityProfileResult> {
+    return {
+      data: {
+        id: faker.string.uuid(),
+        attributes: {
+          basic: {
+            type: "Person",
+            name_details: {
+              primary_name: {
+                name: faker.person.fullName(),
+                first_name: faker.person.firstName(),
+                surname: faker.person.lastName(),
+              },
+            },
+          },
+        },
+      },
+    };
+  }
+  async riskEntityProfilePdf(): Promise<RiskEntityProfilePdfResult> {
+    return {
+      mime_type: "application/pdf",
+      binary_encoding: "base64",
+      binary_stream: "",
+    };
+  }
+  entityFullName() {
+    return "Mocked FullName";
   }
 }

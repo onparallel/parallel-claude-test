@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { useTone } from "@parallel/components/common/ToneProvider";
 import { usePreviewDowJonesPermissionDeniedDialog } from "@parallel/components/petition-preview/dialogs/PreviewDowJonesPermissionDeniedDialog";
 import { FormattedMessage } from "react-intl";
 import {
@@ -7,7 +6,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
 } from "../../recipient-view/fields/RecipientViewPetitionFieldLayout";
-
 import {
   Box,
   Button,
@@ -33,6 +31,7 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
 import { PreviewPetitionFieldKyc_PetitionBaseFragment } from "@parallel/graphql/__types";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
@@ -52,6 +51,7 @@ export interface PreviewPetitionFieldKycProps
   onDeleteReply: (replyId: string) => void;
   onDownloadReply: (replyId: string) => void;
   onRefreshField: () => void;
+  isInvalid?: boolean;
   isCacheOnly?: boolean;
 }
 
@@ -59,7 +59,7 @@ export function PreviewPetitionFieldKyc({
   field,
   petition,
   isDisabled,
-
+  isInvalid,
   onDeleteReply,
   onDownloadReply,
   onDownloadAttachment,
@@ -67,7 +67,6 @@ export function PreviewPetitionFieldKyc({
   onRefreshField,
   isCacheOnly,
 }: PreviewPetitionFieldKycProps) {
-  const tone = useTone();
   const intl = useIntl();
   const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -125,13 +124,24 @@ export function PreviewPetitionFieldKyc({
     browserTabRef.current?.close();
   };
 
+  const fieldReplies = completedFieldReplies(field);
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
-      tone={tone}
     >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.profiles-uploaded"
+            defaultMessage="{count, plural, =1 {1 profile uploaded} other {# profiles uploaded}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
+
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
@@ -161,6 +171,7 @@ export function PreviewPetitionFieldKyc({
         onClick={handleStart}
         isDisabled={isDisabled || state === "FETCHING"}
         marginTop={3}
+        outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
       >
         {field.replies.length ? (
           <FormattedMessage

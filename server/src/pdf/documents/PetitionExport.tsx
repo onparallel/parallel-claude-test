@@ -1,16 +1,18 @@
-import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import ReactPDF, { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import gql from "graphql-tag";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, sortBy, sumBy, zip } from "remeda";
+import { isDefined, pick, sortBy, sumBy } from "remeda";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { FORMATS, prettifyTimezone } from "../../util/dates";
-import { evaluateFieldVisibility } from "../../util/fieldVisibility";
+import { applyFieldLogic } from "../../util/fieldLogic";
 import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { titleize } from "../../util/strings";
 import {
   PetitionExport_PetitionBaseFragment,
   PetitionExport_PetitionFieldFragment,
+  PetitionExport_PetitionFieldReplyFragment,
   PetitionExport_petitionDocument,
 } from "../__types";
 import { FieldActivity } from "../components/FieldActivity";
@@ -113,20 +115,81 @@ export default function PetitionExport({
     },
   });
 
-  const visibility = evaluateFieldVisibility(petition.fields as any);
-  const pages = groupFieldsByPages(petition.fields as any, visibility);
+  function mapField(field: PetitionExport_PetitionFieldFragment) {
+    return pick(field, [
+      "id",
+      "type",
+      "title",
+      "description",
+      "options",
+      "visibility",
+      "showInPdf",
+      "showActivityInPdf",
+      "children",
+    ]);
+  }
+
+  function mapReply(reply: PetitionExport_PetitionFieldReplyFragment) {
+    return pick(reply, [
+      "id",
+      "content",
+      "status",
+      "metadata",
+      "isAnonymized",
+      "repliedAt",
+      "repliedBy",
+      "lastReviewedAt",
+      "lastReviewedBy",
+      "field",
+    ]);
+  }
+
+  const fields = applyFieldLogic(
+    petition.fields.map((f) => ({
+      ...mapField(f),
+      children:
+        f.children?.map((child) => ({
+          ...mapField({ ...child, children: null }),
+          parent: child.parent,
+          replies: child.replies.map((reply) => ({
+            ...mapReply({ ...reply, children: null }),
+            anonymized_at: reply.isAnonymized ? new Date() : null,
+          })),
+        })) ?? null,
+      replies: f.replies.map((reply) => ({
+        ...mapReply(reply),
+        anonymized_at: reply.isAnonymized ? new Date() : null,
+        children:
+          reply.children?.map((child) => ({
+            field: mapField(child.field),
+            replies: child.replies.map((r) => ({
+              ...mapReply({ ...r, children: null }),
+              anonymized_at: r.isAnonymized ? new Date() : null,
+            })),
+          })) ?? null,
+      })),
+    })),
+  );
+  const pages = groupFieldsByPages(fields);
   const scope = useLiquidScope(petition);
 
-  const simpleRepliesNetdocumentsExternalId = pages
-    .flat()
+  const simpleRepliesNetDocumentsField = fields
+    .flatMap((f) => [f, ...(f.children ?? [])])
     .find(
-      (field) =>
-        field.type !== "HEADING" &&
-        !isFileTypeField(field.type) &&
-        field.replies.some((r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS),
-    )?.replies[0].metadata.EXTERNAL_ID_CUATRECASAS;
+      (f) =>
+        f.type !== "HEADING" &&
+        f.type !== "FIELD_GROUP" &&
+        !isFileTypeField(f.type) &&
+        f.replies.some((r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS),
+    );
 
-  function notEmptyHeading(field: PetitionExport_PetitionFieldFragment) {
+  const simpleRepliesNetdocumentsExternalId = simpleRepliesNetDocumentsField?.replies.find(
+    (r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS,
+  )?.metadata.EXTERNAL_ID_CUATRECASAS as string | undefined;
+
+  function notEmptyHeading(
+    field: Pick<PetitionExport_PetitionFieldFragment, "type" | "title" | "description">,
+  ) {
     return !(field.type === "HEADING" && !field.title && !field.description);
   }
 
@@ -166,6 +229,7 @@ export default function PetitionExport({
                     <PetitionExportField
                       key={i}
                       field={field}
+                      replies={field.replies}
                       theme={petition.selectedDocumentTheme.data as PdfDocumentTheme}
                       isPetition={petition.__typename === "Petition"}
                       includeNetDocumentsLinks={includeNetDocumentsLinks}
@@ -201,15 +265,19 @@ export default function PetitionExport({
 interface PetitionExportFieldProps {
   theme: PdfDocumentTheme;
   field: PetitionExport_PetitionFieldFragment;
+  replies: PetitionExport_PetitionFieldReplyFragment[];
   includeNetDocumentsLinks?: boolean;
   isPetition: boolean;
+  styles?: ReactPDF.Styles;
 }
 
 function PetitionExportField({
   includeNetDocumentsLinks,
   theme,
   field,
+  replies,
   isPetition,
+  styles: stylesOverwrite,
 }: PetitionExportFieldProps) {
   const intl = useIntl();
   const styles = StyleSheet.create({
@@ -248,23 +316,26 @@ function PetitionExportField({
       textAlign: "justify",
       opacity: 0.7,
     },
+    groupName: {
+      fontWeight: 400,
+      marginBottom: "2mm",
+    },
+    ...stylesOverwrite,
   });
 
   const liquidRender = useLiquidRender();
   const approxNumberLines =
     (field.description ? approxTextHeight(liquidRender(field.description)) : 0) +
-    sumBy(field.replies, (r) =>
-      field.type === "TEXT" ? approxTextHeight(r.content.value ?? "") : 1,
-    ) +
+    sumBy(replies, (r) => (field.type === "TEXT" ? approxTextHeight(r.content.value ?? "") : 1)) +
     // more space for activity
-    sumBy(field.replies, () => (field.showActivityInPdf ? 3 : 0)) +
+    sumBy(replies, () => (field.showActivityInPdf ? 3 : 0)) +
     // space for separation between replies
-    (field.replies.length > 1 ? (field.replies.length - 1) * 1 : 0);
+    (replies.length > 1 ? (replies.length - 1) * 1 : 0);
 
   // move FILE replies with errors to the bottom of the card
   const orderedReplies = isFileTypeField(field.type)
-    ? sortBy(field.replies, (r) => isDefined(r.content.error))
-    : field.replies;
+    ? sortBy(replies, (r) => isDefined(r.content.error))
+    : replies;
 
   return (
     <View style={{ marginBottom: "5mm" }}>
@@ -288,7 +359,10 @@ function PetitionExportField({
           ) : null}
         </View>
       ) : (
-        <View style={styles.field} wrap={approxNumberLines > 25 ? true : false}>
+        <View
+          style={field.type === "FIELD_GROUP" ? undefined : styles.field}
+          wrap={field.type === "FIELD_GROUP" || approxNumberLines > 25 ? true : false}
+        >
           {field.title ? (
             <Text style={[styles.text, styles.fieldTitle]}>{cleanupText(field.title)}</Text>
           ) : null}
@@ -298,7 +372,7 @@ function PetitionExportField({
             </View>
           ) : null}
           <View style={styles.fieldReplies}>
-            {orderedReplies.map((reply) => (
+            {orderedReplies.map((reply, replyNumber) => (
               <View key={reply.id}>
                 {isFileTypeField(field.type) ? (
                   !isDefined(reply.content.error) ? (
@@ -386,6 +460,31 @@ function PetitionExportField({
                   </Text>
                 ) : field.type === "PHONE" ? (
                   <Text style={[styles.text]}>{reply.content.value}</Text>
+                ) : field.type === "FIELD_GROUP" ? (
+                  <View style={{ ...styles.field, marginBottom: "5mm" }}>
+                    <Text style={[styles.text, styles.groupName]}>
+                      {titleize(field.options.groupName ?? "") ||
+                        intl.formatMessage({
+                          id: "document.petition-export.default-group-name",
+                          defaultMessage: "Reply",
+                        })}{" "}
+                      {replyNumber + 1}
+                    </Text>
+                    {(reply.children ?? []).map((child) => (
+                      <PetitionExportField
+                        key={`${field.id}-${child.field.id}`}
+                        styles={{ field: { border: "unset" } }}
+                        field={child.field}
+                        replies={child.replies.map((r) => ({
+                          ...r,
+                          children: null,
+                        }))}
+                        isPetition={isPetition}
+                        theme={theme}
+                        includeNetDocumentsLinks={includeNetDocumentsLinks}
+                      />
+                    ))}
+                  </View>
                 ) : (
                   <Text style={[styles.text]}>{reply.content.value}</Text>
                 )}
@@ -394,7 +493,7 @@ function PetitionExportField({
                 ) : null}
               </View>
             ))}
-            {field.replies.length === 0 ? (
+            {replies.length === 0 ? (
               <Text style={[styles.text, styles.noReplies]}>
                 {isFileTypeField(field.type) ? (
                   <FormattedMessage
@@ -428,13 +527,12 @@ function approxTextHeight(text: string) {
   return lines;
 }
 
-function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
-  fields: T[],
-  visibility: boolean[],
-): T[][] {
+function groupFieldsByPages<
+  T extends Pick<PetitionExport_PetitionFieldFragment, "showInPdf" | "options" | "type">,
+>(fields: T[]): T[][] {
   const pages: T[][] = [];
   let page: T[] = [];
-  for (const [field, isVisible] of zip(fields, visibility)) {
+  for (const field of fields) {
     if (field.showInPdf) {
       if (field.type === "HEADING" && field.options!.hasPageBreak) {
         if (page.length > 0) {
@@ -442,9 +540,7 @@ function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
           page = [];
         }
       }
-      if (isVisible) {
-        page.push(field);
-      }
+      page.push(field);
     }
   }
   pages.push(page);
@@ -459,6 +555,9 @@ PetitionExport.fragments = {
         name
         fields {
           ...PetitionExport_PetitionField
+          replies {
+            ...PetitionExport_PetitionFieldReply
+          }
         }
         organization {
           name
@@ -481,14 +580,14 @@ PetitionExport.fragments = {
         __typename
       }
       ${this.PetitionField}
-
+      ${this.PetitionFieldReply}
       ${SignaturesBlock.fragments.SignatureConfig}
       ${useLiquidScope.fragments.PetitionBase}
     `;
   },
-  get PetitionField() {
+  get PetitionFieldInner() {
     return gql`
-      fragment PetitionExport_PetitionField on PetitionField {
+      fragment PetitionExport_PetitionFieldInner on PetitionField {
         id
         type
         title
@@ -498,15 +597,55 @@ PetitionExport.fragments = {
         showActivityInPdf
         visibility
         options
-        replies {
-          id
-          status
-          content
-          metadata
-          ...FieldActivity_PetitionFieldReply
-        }
+      }
+    `;
+  },
+  get PetitionFieldReplyInner() {
+    return gql`
+      fragment PetitionExport_PetitionFieldReplyInner on PetitionFieldReply {
+        id
+        status
+        content
+        metadata
+        isAnonymized
+        ...FieldActivity_PetitionFieldReply
       }
       ${FieldActivity.fragments.PetitionFieldReply}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment PetitionExport_PetitionField on PetitionField {
+        ...PetitionExport_PetitionFieldInner
+        children {
+          ...PetitionExport_PetitionFieldInner
+          parent {
+            id
+          }
+          replies {
+            ...PetitionExport_PetitionFieldReplyInner
+          }
+        }
+      }
+      ${this.PetitionFieldInner}
+      ${this.PetitionFieldReplyInner}
+    `;
+  },
+  get PetitionFieldReply() {
+    return gql`
+      fragment PetitionExport_PetitionFieldReply on PetitionFieldReply {
+        ...PetitionExport_PetitionFieldReplyInner
+        children {
+          field {
+            ...PetitionExport_PetitionField
+          }
+          replies {
+            ...PetitionExport_PetitionFieldReplyInner
+          }
+        }
+      }
+      ${this.PetitionFieldReplyInner}
+      ${this.PetitionField}
     `;
   },
 };

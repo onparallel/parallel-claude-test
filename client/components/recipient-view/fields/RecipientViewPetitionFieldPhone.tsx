@@ -1,7 +1,8 @@
-import { Center, Flex, List, Stack } from "@chakra-ui/react";
+import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
@@ -11,14 +12,14 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ComponentProps,
-  forwardRef,
   KeyboardEvent,
   MouseEvent,
+  forwardRef,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
@@ -37,6 +38,8 @@ export interface RecipientViewPetitionFieldPhoneProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 export function RecipientViewPetitionFieldPhone({
@@ -47,6 +50,8 @@ export function RecipientViewPetitionFieldPhone({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  isInvalid,
+  parentReplyId,
 }: RecipientViewPetitionFieldPhoneProps) {
   const options = field.options as FieldOptions["PHONE"];
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
@@ -145,11 +150,11 @@ export function RecipientViewPetitionFieldPhone({
   );
 
   const props: ComponentProps<typeof PhoneInputLazy> = {
-    id: `reply-${field.id}-new`,
+    id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     inputRef: newReplyRef,
     paddingRight: 10,
     isDisabled: isDisabled,
-    isInvalid: isInvalidValue,
+    isInvalid: isInvalidValue || isInvalid,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
@@ -165,6 +170,8 @@ export function RecipientViewPetitionFieldPhone({
     placeholder: options.placeholder ?? undefined,
   };
 
+  const fieldReplies = completedFieldReplies(field);
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
@@ -177,6 +184,15 @@ export function RecipientViewPetitionFieldPhone({
       onDownloadAttachment={onDownloadAttachment}
       onMouseDownNewReply={handleMouseDownNewReply}
     >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
@@ -271,7 +287,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
   );
 
   const props: ComponentProps<typeof PhoneInputLazy> = {
-    id: `reply-${field.id}-${reply.id}`,
+    id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
     inputRef: ref,
     paddingRight: 10,
     isDisabled: isDisabled || reply.status === "APPROVED",

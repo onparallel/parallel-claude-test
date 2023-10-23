@@ -1,6 +1,6 @@
 import { Box, Collapse, Switch } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import { SettingsRow, SettingsRowProps } from "./settings/SettingsRow";
+import { SettingsRow, SettingsRowProps } from "./SettingsRow";
 
 export interface SwitchSettingProps extends Omit<SettingsRowProps, "children" | "onChange"> {
   icon?: ReactNode;

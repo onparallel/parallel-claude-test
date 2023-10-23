@@ -4,7 +4,7 @@ import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
 import pMap from "p-map";
 import { resolve } from "path";
-import { isDefined, zip } from "remeda";
+import { isDefined } from "remeda";
 import sanitizeFilename from "sanitize-filename";
 import {
   FileUpload,
@@ -15,7 +15,6 @@ import {
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { ChildProcessNonSuccessError, spawn } from "../util/spawn";
@@ -24,6 +23,7 @@ import { MaybePromise } from "../util/types";
 import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
 import { IStorageService, STORAGE_SERVICE } from "./StorageService";
+import { applyFieldLogic } from "../util/fieldLogic";
 
 function isPrintableContentType(contentType: string) {
   return ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType);
@@ -277,34 +277,40 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async getPrintableFiles(petitionId: number) {
-    const fields = await this.petitions.loadFieldsForPetition(petitionId);
-    const replies = await this.petitions.loadRepliesForField(fields.map((f) => f.id));
-    const fieldsWithReplies = zip(fields, replies).map(([field, replies]) => ({
-      ...field,
-      replies,
-    }));
+    const [composedFields] = await this.petitions.getComposedPetitionFields([petitionId]);
+    const visibleFields = applyFieldLogic(composedFields);
+    const fileTypeFields = visibleFields
+      .flatMap((f) => [f, ...(f.children ?? [])])
+      .filter((f) => isFileTypeField(f.type) && !!f.options.attachToPdf);
 
-    const visibleFieldWithReplies = zip(
-      fieldsWithReplies,
-      evaluateFieldVisibility(fieldsWithReplies),
-    )
-      .filter(
-        ([field, isVisible]) =>
-          isVisible && isFileTypeField(field.type) && !!field.options.attachToPdf,
+    const fileUploadIds = fileTypeFields
+      .flatMap((field) =>
+        field.replies.filter(
+          (r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id),
+        ),
       )
-      .map(([field]) => field);
+      .map((r) => r.content.file_upload_id);
 
-    return pFlatMap(visibleFieldWithReplies, async ({ replies, ...field }) => {
+    const files = await this.files.loadFileUpload(fileUploadIds);
+
+    return fileTypeFields.flatMap(({ replies, ...field }) => {
       const fileUploadIds: number[] = replies
-        .map((r) => r.content.file_upload_id)
-        .filter(isDefined);
+        .filter((r) => !isDefined(r.content.error) && isDefined(r.content.file_upload_id))
+        .map((r) => r.content.file_upload_id);
+
       if (fileUploadIds.length === 0) {
         return [];
       }
-      const files = await this.files.loadFileUpload(fileUploadIds);
+
       const printable = files
         .filter(isDefined)
-        .filter((f) => f.upload_complete && isPrintableContentType(f.content_type));
+        .filter(
+          (file) =>
+            fileUploadIds.includes(file.id) &&
+            file.upload_complete &&
+            isPrintableContentType(file.content_type),
+        );
+
       return printable.length > 0 ? [[field, printable] as const] : [];
     });
   }

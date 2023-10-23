@@ -18,6 +18,7 @@ import {
   PetitionSignatureConfigSigner,
 } from "../repositories/PetitionRepository";
 import type * as db from "../__types";
+import { hashString } from "../../util/token";
 
 export interface TableTypes
   extends Replace<
@@ -284,6 +285,10 @@ export class BaseRepository {
     return transaction
       ? await transactionScope(transaction)
       : await this.knex.transaction(transactionScope);
+  }
+
+  protected async transactionLock(lockName: string, t: Knex.Transaction) {
+    await this.raw(/* sql */ `select pg_advisory_xact_lock(?)`, [hashString(lockName)], t);
   }
 
   protected sqlIn(array: readonly Knex.RawBinding[], castAs?: string) {

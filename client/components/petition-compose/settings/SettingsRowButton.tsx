@@ -2,9 +2,9 @@ import { Box, Button, HStack, Stack } from "@chakra-ui/react";
 import { DeleteIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { PaddedCollapse } from "../common/PaddedCollapse";
-import { SettingsRow, SettingsRowProps } from "./settings/SettingsRow";
+import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
+import { PaddedCollapse } from "../../common/PaddedCollapse";
+import { SettingsRow, SettingsRowProps } from "./SettingsRow";
 
 interface SettingsRowButtonProps extends Omit<SettingsRowProps, "children" | "onChange"> {
   icon?: ReactNode;

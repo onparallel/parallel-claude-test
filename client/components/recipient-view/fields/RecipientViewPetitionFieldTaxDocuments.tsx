@@ -14,6 +14,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyFileUpload } from "./RecipientViewPetitionFieldFileUpload";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface RecipientViewPetitionFieldTaxDocumentsProps
   extends Omit<
@@ -26,6 +27,7 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
   isCacheOnly?: boolean;
   onStartAsyncFieldCompletion: () => Promise<{ type: string; url: string }>;
   onRefreshField: () => void;
+  isInvalid?: boolean;
 }
 
 export function RecipientViewPetitionFieldTaxDocuments({
@@ -37,6 +39,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
   onCommentsButtonClick,
   onStartAsyncFieldCompletion,
   onRefreshField,
+  isInvalid,
   isCacheOnly,
 }: RecipientViewPetitionFieldTaxDocumentsProps) {
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -137,14 +140,35 @@ export function RecipientViewPetitionFieldTaxDocuments({
     setState("IDLE");
     popupRef.current?.close();
   };
+  const fieldReplies = completedFieldReplies(field);
 
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
-      tone={tone}
     >
+      <Text fontSize="sm" color="gray.600">
+        <>
+          <FormattedMessage
+            id="component.recipient-view-petition-field-tax-documents.follow-steps-description"
+            defaultMessage="Follow the steps to upload the documentation you need."
+            values={{ tone }}
+          />
+          {fieldReplies.length ? (
+            <>
+              {" ("}
+              <FormattedMessage
+                id="component.recipient-view-petition-field-card.files-uploaded"
+                defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+                values={{ count: fieldReplies.length }}
+              />
+              {")"}
+            </>
+          ) : null}
+        </>
+      </Text>
+
       {field.replies.length ? (
         <List as={Stack} paddingY={1}>
           <AnimatePresence initial={false}>
@@ -193,6 +217,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
             width="min-content"
             onClick={handleStart}
             isDisabled={state === "FETCHING" || isDisabled}
+            outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
           >
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.start-button"

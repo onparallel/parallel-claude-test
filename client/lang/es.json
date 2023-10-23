@@ -55,6 +55,36 @@
     "context": "Hi, I would like more information about sending parallels on behalf of another user."
   },
   {
+    "term": "component.add-alias-to-field-dialog.body",
+    "definition": "Inserta la referencia en la descripción de un campo donde quieras que se sustituya por la respuesta.",
+    "context": "Add the reference to a field description where you want it to be replaced by the reply."
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.field-reference",
+    "definition": "Referencia del campo",
+    "context": "Field reference"
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.header",
+    "definition": "Crear referencia",
+    "context": "Create reference"
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.reference-exists-error",
+    "definition": "Esta referencia ya está siendo utilizada.",
+    "context": "This reference is already in use."
+  },
+  {
+    "term": "component.add-alias-to-field-dialog.reference-invalid-error",
+    "definition": "Utiliza solo letras, números o _",
+    "context": "Use only letters, numbers or _"
+  },
+  {
+    "term": "component.add-field-button.label",
+    "definition": "Añadir campo",
+    "context": "Add field"
+  },
+  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Añadir al equipo",
     "context": "Add to team"
@@ -895,6 +925,21 @@
     "context": "Keep draft"
   },
   {
+    "term": "component.confirm-link-field-dialog.body",
+    "definition": "Este campo contiene respuestas. Si añades este campo perderás <b>de forma definitiva</b> estas respuestas incluido archivos subidos.",
+    "context": "This field contains collected replies. If you add this field you will lose those replies including uploaded files <b>forever</b>."
+  },
+  {
+    "term": "component.confirm-link-field-dialog.confirm",
+    "definition": "Añadir campo",
+    "context": "Add to group"
+  },
+  {
+    "term": "component.confirm-link-field-dialog.header",
+    "definition": "Añadir campo al grupo",
+    "context": "Add field to group"
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
     "definition": "Si esta opción está desactivada, solo podrán firmar el documento las personas indicadas.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
@@ -1120,6 +1165,21 @@
     "context": "Disable Forward Security"
   },
   {
+    "term": "component.confirm-unlink-field-dialog.body",
+    "definition": "Este campo contiene respuestas. Si quitas este campo perderás <b>de forma definitiva</b> estas respuestas incluido archivos subidos.",
+    "context": "This field contains collected replies. If you remove this field you will lose those replies including uploaded files <b>forever</b>."
+  },
+  {
+    "term": "component.confirm-unlink-field-dialog.confirm",
+    "definition": "Quitar del grupo",
+    "context": "Remove from group"
+  },
+  {
+    "term": "component.confirm-unlink-field-dialog.header",
+    "definition": "Quitar campo del grupo",
+    "context": "Remove field from group"
+  },
+  {
     "term": "component.contact-list-header.create-contact-button",
     "definition": "Crear contacto",
     "context": "Create contact"
@@ -1155,14 +1215,14 @@
     "context": "Search for existing contacts or enter a valid email."
   },
   {
-    "term": "component.copy-alias-button.copied-reference",
-    "definition": "¡Copiada al portapapeles!",
-    "context": "Copied to clipboard!"
-  },
-  {
-    "term": "component.copy-alias-button.copy-reference",
+    "term": "component.copy-liquid-reference-button.copy-reference",
     "definition": "Copiar referencia",
     "context": "Copy reference"
+  },
+  {
+    "term": "component.copy-liquid-reference-button.reference-copied",
+    "definition": "¡Copiada al portapapeles!",
+    "context": "Copied to clipboard!"
   },
   {
     "term": "component.copy-signature-config-dialog.body",
@@ -1488,31 +1548,6 @@
     "term": "component.create-profile-type-dialog.new-profile-type",
     "definition": "Nuevo tipo de perfil",
     "context": "New profile type"
-  },
-  {
-    "term": "component.create-reference-dialog.body",
-    "definition": "Inserta la referencia en la descripción de un campo donde quieras que se sustituya por la respuesta.",
-    "context": "Add the reference to a field description where you want it to be replaced by the reply."
-  },
-  {
-    "term": "component.create-reference-dialog.field-reference",
-    "definition": "Referencia del campo",
-    "context": "Field reference"
-  },
-  {
-    "term": "component.create-reference-dialog.header",
-    "definition": "Crear referencia",
-    "context": "Create reference"
-  },
-  {
-    "term": "component.create-reference-dialog.reference-exists-error",
-    "definition": "Esta referencia ya está siendo utilizada.",
-    "context": "This reference is already in use."
-  },
-  {
-    "term": "component.create-reference-dialog.reference-invalid-error",
-    "definition": "Utiliza solo letras, números o _",
-    "context": "Use only letters, numbers or _"
   },
   {
     "term": "component.date-range-picker-button.clear-range",
@@ -2625,6 +2660,11 @@
     "context": "Please, select at least one reply to import"
   },
   {
+    "term": "component.import-replies-dialog.select-replies-import-error-group",
+    "definition": "Por favor, seleccione al menos una respuesta para importar en cada {groupLabel}",
+    "context": "Please, select at least one reply to import in each {groupLabel}"
+  },
+  {
     "term": "component.import-replies-dialog.source-petition-label",
     "definition": "Selecciona un parallel del que importar sus respuestas",
     "context": "Select the parallel to import the replies from"
@@ -2863,6 +2903,166 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "El correo electrónico fue abierto el {date}",
     "context": "The email was opened on {date}"
+  },
+  {
+    "term": "component.more-liquid-references-button.and",
+    "definition": "y",
+    "context": "and"
+  },
+  {
+    "term": "component.more-liquid-references-button.capitalize-first-letter",
+    "definition": "Capitalizar primera letra",
+    "context": "Capitalize first letter"
+  },
+  {
+    "term": "component.more-liquid-references-button.capitalize-first-letter-description",
+    "definition": "Muestra la respuesta con la primera letra en mayúscula.",
+    "context": "Displays the reply with the first letter capitalized."
+  },
+  {
+    "term": "component.more-liquid-references-button.conditional-text",
+    "definition": "Texto condicionado",
+    "context": "Conditional text"
+  },
+  {
+    "term": "component.more-liquid-references-button.conditional-text-description",
+    "definition": "Muestra una frase según la respuesta",
+    "context": "Displays a sentence when an option is chosen."
+  },
+  {
+    "term": "component.more-liquid-references-button.example-reply",
+    "definition": "Ejemplo de respuesta",
+    "context": "Example reply"
+  },
+  {
+    "term": "component.more-liquid-references-button.formula-copied-alert",
+    "definition": "Fórmula copiada al portapapeles",
+    "context": "Formula copied to clipboard"
+  },
+  {
+    "term": "component.more-liquid-references-button.formulas",
+    "definition": "Fórmulas",
+    "context": "Formulas"
+  },
+  {
+    "term": "component.more-liquid-references-button.if-option-with-sentence",
+    "definition": "Esta es la frase que se mostrará cuando se escoja {option}.",
+    "context": "This sentence will be displayed when \"{option}\" is selected."
+  },
+  {
+    "term": "component.more-liquid-references-button.list-of-replies",
+    "definition": "Lista de respuestas",
+    "context": "List of replies"
+  },
+  {
+    "term": "component.more-liquid-references-button.list-of-replies-description",
+    "definition": "Crea una lista con cada respuesta añadida.",
+    "context": "Creates a list with each reply added."
+  },
+  {
+    "term": "component.more-liquid-references-button.lowercase",
+    "definition": "Minúsculas",
+    "context": "Lowercase"
+  },
+  {
+    "term": "component.more-liquid-references-button.lowercase-description",
+    "definition": "Muestra una respuesta en minúscula.",
+    "context": "Displays a lowercase reply."
+  },
+  {
+    "term": "component.more-liquid-references-button.number-of-replies",
+    "definition": "Número de respuestas",
+    "context": "Number of replies"
+  },
+  {
+    "term": "component.more-liquid-references-button.number-of-replies-description",
+    "definition": "Muestra el número de grupos añadidos.",
+    "context": "Show the number of groups added."
+  },
+  {
+    "term": "component.more-liquid-references-button.one-line-replies",
+    "definition": "Respuestas en una línea",
+    "context": "One-line replies"
+  },
+  {
+    "term": "component.more-liquid-references-button.one-line-replies-description",
+    "definition": "Muestra todas las respuestas en una línea.",
+    "context": "Displays all replies in one line."
+  },
+  {
+    "term": "component.more-liquid-references-button.percentage",
+    "definition": "Porcentaje",
+    "context": "Percentage"
+  },
+  {
+    "term": "component.more-liquid-references-button.percentage-description",
+    "definition": "Muestra la respuesta como porcentaje.",
+    "context": "Displays the reply as a percentage."
+  },
+  {
+    "term": "component.more-liquid-references-button.quantity",
+    "definition": "Cantidades",
+    "context": "Quantity"
+  },
+  {
+    "term": "component.more-liquid-references-button.quantity-description",
+    "definition": "Muestra la respuesta como cantidad.",
+    "context": "Displays the reply as a quantity."
+  },
+  {
+    "term": "component.more-liquid-references-button.round-up",
+    "definition": "Redondear",
+    "context": "Round up"
+  },
+  {
+    "term": "component.more-liquid-references-button.round-up-description",
+    "definition": "Redondea la cantidad de un campo.",
+    "context": "Rounds the amount of a field."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-for-option",
+    "definition": "Esta frase se mostrará cuando se seleccione  \"{option}\".",
+    "context": "This sentence will be displayed when \"{option}\" is selected."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-for-other",
+    "definition": "Esta frase se mostrará si no se selecciona ninguna de las opciones anteriores.",
+    "context": "This sentence will be displayed if none of the previous options is selected."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-no-reply",
+    "definition": "Esta frase se mostrará si no hay respuestas añadidas.",
+    "context": "This sentence will be displayed if there are no added replies."
+  },
+  {
+    "term": "component.more-liquid-references-button.sentence-with-reply",
+    "definition": "Esta es la frase que se mostrará cuando la respuesta respuesta sea \"{value}\".",
+    "context": "This sentence will be displayed when the reply is \"{value}\"."
+  },
+  {
+    "term": "component.more-liquid-references-button.table-of-results",
+    "definition": "Tabla de resultados",
+    "context": "Table of results"
+  },
+  {
+    "term": "component.more-liquid-references-button.table-of-results-description",
+    "definition": "Muestra los resultados formateados como una tabla",
+    "context": "Show the results formatted as a table."
+  },
+  {
+    "term": "component.more-liquid-references-button.table-of-results-transposed",
+    "definition": "Tabla de resultados (traspuesta)",
+    "context": "Table of results (transposed)"
+  },
+  {
+    "term": "component.more-liquid-references-button.uppercase",
+    "definition": "Mayúsculas",
+    "context": "Uppercase"
+  },
+  {
+    "term": "component.more-liquid-references-button.uppercase-description",
+    "definition": "Muestra la respuesta en mayúscula.",
+    "context": "Displays the reply in capital letters."
   },
   {
     "term": "component.more-options-menu-profile.close-profile",
@@ -3515,9 +3715,89 @@
     "context": "Remove attachment"
   },
   {
+    "term": "component.petition-compose-field-group-children.add-field",
+    "definition": "Añadir campo",
+    "context": "Add field"
+  },
+  {
+    "term": "component.petition-compose-field-group-children.drag-field-to-link-error",
+    "definition": "Este campo no se puede añadir a un grupo",
+    "context": "This field can not be added to a group"
+  },
+  {
+    "term": "component.petition-compose-field-group-children.drag-field-to-link-text",
+    "definition": "Arrastra campos aquí para añadirlos al grupo",
+    "context": "Drag fields here to add them to the group"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.group-name",
+    "definition": "Nombre del grupo",
+    "context": "Group name"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.group-name-description-1",
+    "definition": "Dale un nombre a los grupos de preguntas para facilitar su identificación.",
+    "context": "Name your question groups for easier identification."
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.group-name-description-2",
+    "definition": "Por ejemplo, si el nombre es \"Familiar\", los grupos se llamarán Familiar 1, Familiar 2, etc. Si lo dejas por defecto, los grupos serán \"Respuesta 1\", \"Respuesta 2\", etc.",
+    "context": "If you choose \"Relative\", groups will be labeled “Relative 1”, “Relative 2” and so on. If left unnamed, groups default to “Reply 1”, “Reply 2”, etc."
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.input-group-name-placeholder",
+    "definition": "Ej: Familiar",
+    "context": "E.g., Family member"
+  },
+  {
+    "term": "component.petition-compose-field-settings.advanced-options",
+    "definition": "Opciones avanzadas",
+    "context": "Advanced options"
+  },
+  {
     "term": "component.petition-compose-field-settings.alias-warning",
     "definition": "<b>Aviso:</b> Los campos de documentos no pueden utilizarse para reemplazar contenido en las descripciones.",
     "context": "<b>Note:</b> Document fields cannot be used to replace content in descriptions."
+  },
+  {
+    "term": "component.petition-compose-field-settings.file-multiple-description",
+    "definition": "Activar esta opción permitirá al destinatario subir más de un archivo a este campo.",
+    "context": "Enabling this allows the recipient to upload multiple files to this field."
+  },
+  {
+    "term": "component.petition-compose-field-settings.file-multiple-label",
+    "definition": "Permitir subir más de un archivo",
+    "context": "Allow uploading more than one file"
+  },
+  {
+    "term": "component.petition-compose-field-settings.include-approval-description",
+    "definition": "Al activar esta opción se incluirán los botones de aprovar y rechazar respuestas.",
+    "context": "Enabling this option will include the buttons for approving and rejecting replies."
+  },
+  {
+    "term": "component.petition-compose-field-settings.internal-field-description",
+    "definition": "Al activar esta opción, este campo no será visible para el destinatario.",
+    "context": "Enabling this will make the field invisible to the recipient."
+  },
+  {
+    "term": "component.petition-compose-field-settings.multiple-description",
+    "definition": "Activar esta opción permitirá al destinatario responder más de una vez a este campo.",
+    "context": "Enabling this allows the recipient to submit multiple answers to this field."
+  },
+  {
+    "term": "component.petition-compose-field-settings.multiple-label",
+    "definition": "Permitir más de una respuesta",
+    "context": "Allow more than one reply"
+  },
+  {
+    "term": "component.petition-compose-field-settings.show-activity-pdf-description",
+    "definition": "Al activar esta opción se incluirá la actividad de quién y cuándo añadió cada respuesta y su aprobación en el PDF.",
+    "context": "Enabling this option will include who and when a reply and its approval were submitted in the PDF."
+  },
+  {
+    "term": "component.petition-compose-field-settings.show-in-pdf-description",
+    "definition": "Esta opción muestra el contenido en la exportación de PDF y en el documento a firmar.",
+    "context": "Enabling this option will make the content appear in the exported PDF and the document to be signed."
   },
   {
     "term": "component.petition-compose-field.add-attachment",
@@ -3528,6 +3808,11 @@
     "term": "component.petition-compose-field.add-condition",
     "definition": "Añadir condición",
     "context": "Add condition"
+  },
+  {
+    "term": "component.petition-compose-field.conditions-not-available-first-field-group",
+    "definition": "El primer campo de un grupo no puede tener condiciones. Reordena los campos o añade uno antes para poder establecer condiciones.",
+    "context": "You cannot set conditions for the first field in a group. Reorder the fields or add a new one before it to set conditions between them."
   },
   {
     "term": "component.petition-compose-field.conditions-not-enough-fields",
@@ -3630,6 +3915,11 @@
     "context": "Remove condition"
   },
   {
+    "term": "component.petition-compose-field.required-label",
+    "definition": "Obligatorio",
+    "context": "Required"
+  },
+  {
     "term": "component.petition-compose-field.too-many-attachments",
     "definition": "Se pueden añadir a un campo hasta un máximo de {count, plural, =1 {un adjunto} other {# adjuntos}}.",
     "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
@@ -3638,6 +3928,16 @@
     "term": "component.petition-compose-field.too-many-attachments-header",
     "definition": "Demasiados archivos adjuntos",
     "context": "Too many attachments"
+  },
+  {
+    "term": "component.petition-compose-field.unlink-button",
+    "definition": "Quitar del grupo",
+    "context": "Remove from group"
+  },
+  {
+    "term": "component.petition-compose-field.unlink-question",
+    "definition": "¿Quieres quitar este campo del grupo?",
+    "context": "Do you want to remove this field from the group?"
   },
   {
     "term": "component.petition-compose-field.visibility-help",
@@ -3665,11 +3965,6 @@
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
   },
   {
-    "term": "component.petition-contents.reference-copied-alert",
-    "definition": "Referencia copiada al portapapeles",
-    "context": "Reference copied to clipboard"
-  },
-  {
     "term": "component.petition-field-checkbox-settings.exact-number",
     "definition": "Número exacto",
     "context": "Exact number"
@@ -3683,6 +3978,11 @@
     "term": "component.petition-field-checkbox-settings.unlimited",
     "definition": "Ilimitado",
     "context": "Unlimited"
+  },
+  {
+    "term": "component.petition-field-logic-add-condition-button.add-condition",
+    "definition": "Añadir condición",
+    "context": "Add condition"
   },
   {
     "term": "component.petition-field-select.placeholder",
@@ -3728,6 +4028,11 @@
     "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
     "definition": "Menús desplegables que adaptan sus opciones dinámicamente según la respuesta del destinatario al desplegable anterior.",
     "context": "Drop-down menu that dynamically adapts its options based on the reply to the previous drop-down."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.field-group-description",
+    "definition": "Enlaza campos para crear un grupo que pueda responderse tantas veces como se necesite.",
+    "context": "Link fields to create a group that can be answered as many times as needed."
   },
   {
     "term": "component.petition-field-type-select-dropdown.file-upload-description",
@@ -3778,11 +4083,6 @@
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
     "definition": "Previsualización del tipo de campo \"{type}\"",
     "context": "Thumbnail for field type \"{type}\""
-  },
-  {
-    "term": "component.petition-field-visibility-editor.add-condition",
-    "definition": "Añadir condición",
-    "context": "Add condition"
   },
   {
     "term": "component.petition-field-visibility-editor.all",
@@ -3848,11 +4148,6 @@
     "term": "component.petition-field-visibility-editor.have-reply",
     "definition": "tiene respuestas",
     "context": "has replies"
-  },
-  {
-    "term": "component.petition-field-visibility-editor.hide",
-    "definition": "Ocultar si",
-    "context": "Hide when"
   },
   {
     "term": "component.petition-field-visibility-editor.is-one-of-select",
@@ -3930,14 +4225,19 @@
     "context": "or"
   },
   {
-    "term": "component.petition-field-visibility-editor.show",
-    "definition": "Mostrar si",
-    "context": "Show when"
-  },
-  {
     "term": "component.petition-field-visibility-editor.start-with-default",
     "definition": "{modifier, select, ALL {comienzan} other {comienza}} por",
     "context": "{modifier, select, ALL {start with} other {starts with}}"
+  },
+  {
+    "term": "component.petition-field-visibility-type-select.hide",
+    "definition": "Ocultar si",
+    "context": "Hide when"
+  },
+  {
+    "term": "component.petition-field-visibility-type-select.show",
+    "definition": "Mostrar si",
+    "context": "Show when"
   },
   {
     "term": "component.petition-from-template-dialog.body",
@@ -4290,14 +4590,24 @@
     "context": "Send every <days-input></days-input> days at <time-input></time-input> up to <limit-input></limit-input> reminders."
   },
   {
+    "term": "component.petition-replies-field-reply.approve",
+    "definition": "Aprobar",
+    "context": "Approve"
+  },
+  {
+    "term": "component.petition-replies-field-reply.file-incomplete",
+    "definition": "Hubo un error al subir el archivo. Por favor, solicita que se suba de nuevo.",
+    "context": "There was an error uploading the file. Please request a new upload."
+  },
+  {
+    "term": "component.petition-replies-field-reply.reject",
+    "definition": "Rechazar",
+    "context": "Reject"
+  },
+  {
     "term": "component.petition-replies-field.attachments",
     "definition": "{count, plural, =1 {1 archivo adjunto} other {# archivo adjuntos}}",
     "context": "{count, plural, =1 {1 file attached} other {# files attached}}"
-  },
-  {
-    "term": "component.petition-replies-field.conditions-not-met",
-    "definition": "No se cumplen las condiciones de visibilidad de este campo",
-    "context": "Visibility conditions for this field are not met"
   },
   {
     "term": "component.petition-replies-field.edit-field",
@@ -4883,6 +5193,11 @@
     "term": "component.preview-dow-jones-permission-denied-dialog.title",
     "definition": "Permisos para realizar esta acción",
     "context": "Permissions needed"
+  },
+  {
+    "term": "component.preview-petition-field-group.review-reply",
+    "definition": "Revisar respuesta",
+    "context": "Review reply"
   },
   {
     "term": "component.preview-petition-field-kyc-research.do-another-search",
@@ -5865,6 +6180,31 @@
     "context": "You are using the time zone {timezone}."
   },
   {
+    "term": "component.recipient-view-petition-field-group.add-button",
+    "definition": "Añadir {groupName}",
+    "context": "Add {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.confirm-delete-group",
+    "definition": "{tone, select, INFORMAL {¿Quieres} other {¿Desea}} borrar {groupName}?",
+    "context": "Do you want to remove {groupName}?"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.edit-field",
+    "definition": "Editar campo",
+    "context": "Edit field"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-confirmation-button",
+    "definition": "Borrar",
+    "context": "Remove"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-reply-button",
+    "definition": "Borrar {groupName}",
+    "context": "Remove {groupName}"
+  },
+  {
     "term": "component.recipient-view-petition-field-number.only-numbers",
     "definition": "{multiple, select, true{Respuestas numéricas} other {Respuesta numérica}}",
     "context": "Numeric {multiple, select, true{answers} other {answer}}"
@@ -6013,146 +6353,6 @@
     "term": "component.recover-profile-dialog.recover-button",
     "definition": "Recuperar",
     "context": "Recover"
-  },
-  {
-    "term": "component.reference-options-menu.and",
-    "definition": "y",
-    "context": "and"
-  },
-  {
-    "term": "component.reference-options-menu.capitalize-first-letter",
-    "definition": "Capitalizar primera letra",
-    "context": "Capitalize first letter"
-  },
-  {
-    "term": "component.reference-options-menu.capitalize-first-letter-description",
-    "definition": "Muestra la respuesta con la primera letra en mayúscula.",
-    "context": "Displays the reply with the first letter capitalized."
-  },
-  {
-    "term": "component.reference-options-menu.conditional-text",
-    "definition": "Texto condicionado",
-    "context": "Conditional text"
-  },
-  {
-    "term": "component.reference-options-menu.conditional-text-description",
-    "definition": "Muestra una frase según la respuesta",
-    "context": "Displays a sentence when an option is chosen."
-  },
-  {
-    "term": "component.reference-options-menu.example-reply",
-    "definition": "Ejemplo de respuesta",
-    "context": "Example reply"
-  },
-  {
-    "term": "component.reference-options-menu.formula-copied-alert",
-    "definition": "Fórmula copiada al portapapeles",
-    "context": "Formula copied to clipboard"
-  },
-  {
-    "term": "component.reference-options-menu.formulas",
-    "definition": "Fórmulas",
-    "context": "Formulas"
-  },
-  {
-    "term": "component.reference-options-menu.if-option-with-sentence",
-    "definition": "Esta es la frase que se mostrará cuando se escoja {option}.",
-    "context": "This sentence will be displayed when \"{option}\" is selected."
-  },
-  {
-    "term": "component.reference-options-menu.list-of-replies",
-    "definition": "Lista de respuestas",
-    "context": "List of replies"
-  },
-  {
-    "term": "component.reference-options-menu.list-of-replies-description",
-    "definition": "Crea una lista con cada respuesta añadida.",
-    "context": "Creates a list with each reply added."
-  },
-  {
-    "term": "component.reference-options-menu.loop-variable",
-    "definition": "respuesta",
-    "context": "reply"
-  },
-  {
-    "term": "component.reference-options-menu.lowercase",
-    "definition": "Minúsculas",
-    "context": "Lowercase"
-  },
-  {
-    "term": "component.reference-options-menu.lowercase-description",
-    "definition": "Muestra una respuesta en minúscula.",
-    "context": "Displays a lowercase reply."
-  },
-  {
-    "term": "component.reference-options-menu.one-line-replies",
-    "definition": "Respuestas en una línea",
-    "context": "One-line replies"
-  },
-  {
-    "term": "component.reference-options-menu.one-line-replies-description",
-    "definition": "Muestra todas las respuestas en una línea.",
-    "context": "Displays all replies in one line."
-  },
-  {
-    "term": "component.reference-options-menu.percentage",
-    "definition": "Porcentaje",
-    "context": "Percentage"
-  },
-  {
-    "term": "component.reference-options-menu.percentage-description",
-    "definition": "Muestra la respuesta como porcentaje.",
-    "context": "Displays the reply as a percentage."
-  },
-  {
-    "term": "component.reference-options-menu.quantities",
-    "definition": "Cantidades",
-    "context": "Quantities"
-  },
-  {
-    "term": "component.reference-options-menu.quantities-description",
-    "definition": "Muestra la respuesta como cantidad.",
-    "context": "Displays the reply as quantity."
-  },
-  {
-    "term": "component.reference-options-menu.round-up",
-    "definition": "Redondear",
-    "context": "Round up"
-  },
-  {
-    "term": "component.reference-options-menu.round-up-description",
-    "definition": "Redondea la cantidad de un campo.",
-    "context": "Rounds the amount of a field."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-for-option",
-    "definition": "Esta frase se mostrará cuando se seleccione  \"{option}\".",
-    "context": "This sentence will be displayed when \"{option}\" is selected."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-for-other",
-    "definition": "Esta frase se mostrará si no se selecciona ninguna de las opciones anteriores.",
-    "context": "This sentence will be displayed if none of the previous options is selected."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-no-reply",
-    "definition": "Esta frase se mostrará si no hay respuestas añadidas.",
-    "context": "This sentence will be displayed if there are no added replies."
-  },
-  {
-    "term": "component.reference-options-menu.sentence-with-reply",
-    "definition": "Esta es la frase que se mostrará cuando la respuesta respuesta sea \"{value}\".",
-    "context": "This sentence will be displayed when the reply is \"{value}\"."
-  },
-  {
-    "term": "component.reference-options-menu.uppercase",
-    "definition": "Mayúsculas",
-    "context": "Uppercase"
-  },
-  {
-    "term": "component.reference-options-menu.uppercase-description",
-    "definition": "Muestra la respuesta en mayúscula.",
-    "context": "Displays the reply in capital letters."
   },
   {
     "term": "component.referenced-field-dialog.confirm",
@@ -6815,6 +7015,16 @@
     "context": "Remove setting"
   },
   {
+    "term": "component.settings-row-placeholder.placeholder-description",
+    "definition": "El placeholder es un sutil texto descriptivo que aparece cuando el campo de texto está vacío.",
+    "context": "The placeholder is the subtle descriptive text that shows when the input field is empty."
+  },
+  {
+    "term": "component.settings-row-placeholder.placeholder-label",
+    "definition": "Placeholder",
+    "context": "Placeholder"
+  },
+  {
     "term": "component.share-button.petition-not-shared",
     "definition": "Este parallel no se ha compartido todavía.",
     "context": "This parallel has not been shared yet."
@@ -7368,6 +7578,56 @@
     "term": "component.test-signature-dialog.title",
     "definition": "Firma de prueba",
     "context": "Test signature"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description",
+    "definition": "{userIsYou, select, true {Respondiste} other {{createdBy} respondió}} al campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description-children-of-group",
+    "definition": "{userIsYou, select, true {Respondiste} other {{createdBy} respondió}} al campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description-field-group",
+    "definition": "{userIsYou, select, true {Añadiste} other {{createdBy} añadió}} un grupo al campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} added a group to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-deleted-event.description",
+    "definition": "{userIsYou, select, true {Eliminaste} other {{deletedBy} eliminó}} una respuesta al campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-deleted-event.description--field-group",
+    "definition": "{userIsYou, select, true {Eliminaste} other {{deletedBy} eliminó}} un grupo del campo {field} y todas sus respuestas {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-deleted-event.description-children-of-group",
+    "definition": "{userIsYou, select, true {Eliminaste} other {{deletedBy} eliminó}} una respuesta al campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description",
+    "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una respuesta al campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description-children-of-group",
+    "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una respuesta al campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-see-reply-button.reply-deleted",
+    "definition": "Respuesta borrada",
+    "context": "Reply deleted"
+  },
+  {
+    "term": "component.timeline-see-reply-button.see",
+    "definition": "Ver",
+    "context": "See"
   },
   {
     "term": "component.timeline-signature-started-event.signature-started-description",
@@ -8105,16 +8365,6 @@
     "context": "This option allows you to limit the number of options that the recipient can choose."
   },
   {
-    "term": "field-settings.file-multiple-description",
-    "definition": "Activar esta opción permitirá al destinatario subir más de un archivo a este campo.",
-    "context": "Enabling this allows the recipient to upload multiple files to this field."
-  },
-  {
-    "term": "field-settings.file-multiple-label",
-    "definition": "Permitir subir más de un archivo",
-    "context": "Allow uploading more than one file"
-  },
-  {
     "term": "field-settings.heading-page-break-description",
     "definition": "Activar esta opción creará una nueva página que usará este campo como encabezado.",
     "context": "Enabling this will create a new page and use this as the heading of the new page"
@@ -8130,26 +8380,6 @@
     "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
-    "term": "field-settings.include-approval-description",
-    "definition": "Al activar esta opción se incluirán los botones de aprobar y rechazar respuestas.",
-    "context": "Enabling this option will include the buttons for approving and rejecting replies."
-  },
-  {
-    "term": "field-settings.internal-field-description",
-    "definition": "Al activar esta opción, este campo no será visible para el destinatario.",
-    "context": "Enabling this will make the field invisible to the recipient."
-  },
-  {
-    "term": "field-settings.multiple-description",
-    "definition": "Activar esta opción permitirá al destinatario responder más de una vez a este campo.",
-    "context": "Enabling this allows the recipient to submit multiple answers to this field."
-  },
-  {
-    "term": "field-settings.multiple-label",
-    "definition": "Permitir más de una respuesta",
-    "context": "Allow more than one reply"
-  },
-  {
     "term": "field-settings.reference-exists-error",
     "definition": "Esta referencia ya está siendo utilizada.",
     "context": "This reference is already in use."
@@ -8158,26 +8388,6 @@
     "term": "field-settings.reference-invalid-error",
     "definition": "Utiliza solo letras, números o _",
     "context": "Use only letters, numbers or _"
-  },
-  {
-    "term": "field-settings.show-activity-pdf-description",
-    "definition": "Al activar esta opción se incluirá la actividad de quién y cuándo añadió cada respuesta y su aprobación en el PDF.",
-    "context": "Enabling this option will include who and when a reply and its approval were submitted in the PDF."
-  },
-  {
-    "term": "field-settings.show-in-pdf-description",
-    "definition": "Esta opción muestra el contenido en la exportación de PDF y en el documento a firmar.",
-    "context": "Enabling this option will make the content appear in the exported PDF and the document to be signed."
-  },
-  {
-    "term": "field-settings.text-placeholder-description",
-    "definition": "El placeholder es un sutil texto descriptivo que aparece cuando el campo de texto está vacío.",
-    "context": "The placeholder is the subtle descriptive text that shows when the input field is empty."
-  },
-  {
-    "term": "field-settings.text-placeholder-label",
-    "definition": "Placeholder",
-    "context": "Placeholder"
   },
   {
     "term": "footer.slogan",
@@ -8375,6 +8585,11 @@
     "context": "Contact"
   },
   {
+    "term": "generic.contents",
+    "definition": "Contenido",
+    "context": "Contents"
+  },
+  {
     "term": "generic.continue",
     "definition": "Continuar",
     "context": "Continue"
@@ -8430,6 +8645,11 @@
     "context": "Default"
   },
   {
+    "term": "generic.default-group-name",
+    "definition": "Respuesta",
+    "context": "Reply"
+  },
+  {
     "term": "generic.delete",
     "definition": "Eliminar",
     "context": "Delete"
@@ -8478,6 +8698,11 @@
     "term": "generic.dont-show-message-again",
     "definition": "No volver a mostrar este mensaje",
     "context": "Do not show this message again"
+  },
+  {
+    "term": "generic.dow-jones-kyc-external-error",
+    "definition": "Un campo de Dow Jones no puede ser externo. Elimínalo del grupo o muévelo a otra posición e inténtalo de nuevo.",
+    "context": "A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again."
   },
   {
     "term": "generic.download",
@@ -8588,6 +8813,16 @@
     "term": "generic.file-size",
     "definition": "Tamaño de archivo",
     "context": "File size"
+  },
+  {
+    "term": "generic.first-child-is-internal-error",
+    "definition": "El primer campo de un grupo no puede ser interno si el grupo no lo es. Desactiva esta configuración para poder reordenar.",
+    "context": "The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+  },
+  {
+    "term": "generic.first-child-visibility-conditions-error",
+    "definition": "El primer campo de un grupo no puede tener condiciones.",
+    "context": "You cannot set conditions for the first field in a group."
   },
   {
     "term": "generic.folder",
@@ -8755,6 +8990,11 @@
     "context": "Go to page {page}"
   },
   {
+    "term": "generic.group-name-fallback-reply",
+    "definition": "Respuesta",
+    "context": "Reply"
+  },
+  {
     "term": "generic.groups",
     "definition": "Equipos",
     "context": "Teams"
@@ -8858,6 +9098,11 @@
     "term": "generic.legend",
     "definition": "Leyenda",
     "context": "Legend"
+  },
+  {
+    "term": "generic.liquid-loop-variable-name",
+    "definition": "respuesta",
+    "context": "reply"
   },
   {
     "term": "generic.more-options",
@@ -9058,6 +9303,76 @@
     "term": "generic.petition-count",
     "definition": "{count, plural, =1 {# parallel} other {# parallels}}",
     "context": "{count, plural, =1 {# parallel} other {# parallels}}"
+  },
+  {
+    "term": "generic.petition-field-type-checkbox",
+    "definition": "Opciones",
+    "context": "Multiple choice"
+  },
+  {
+    "term": "generic.petition-field-type-conditional-select",
+    "definition": "Desplegable condicional",
+    "context": "Conditional select"
+  },
+  {
+    "term": "generic.petition-field-type-date",
+    "definition": "Fecha",
+    "context": "Date"
+  },
+  {
+    "term": "generic.petition-field-type-date-and-time",
+    "definition": "Fecha y hora",
+    "context": "Date and time"
+  },
+  {
+    "term": "generic.petition-field-type-dow-jones-kyc-research",
+    "definition": "Buscar en Dow Jones",
+    "context": "Search in Dow Jones"
+  },
+  {
+    "term": "generic.petition-field-type-field-group",
+    "definition": "Grupo de preguntas",
+    "context": "Questions group"
+  },
+  {
+    "term": "generic.petition-field-type-file-upload",
+    "definition": "Documentos y archivos",
+    "context": "Documents and files"
+  },
+  {
+    "term": "generic.petition-field-type-heading",
+    "definition": "Bloque de texto",
+    "context": "Text block"
+  },
+  {
+    "term": "generic.petition-field-type-number",
+    "definition": "Números",
+    "context": "Numbers"
+  },
+  {
+    "term": "generic.petition-field-type-phone",
+    "definition": "Teléfono",
+    "context": "Phone number"
+  },
+  {
+    "term": "generic.petition-field-type-select",
+    "definition": "Desplegable",
+    "context": "Select"
+  },
+  {
+    "term": "generic.petition-field-type-short-text",
+    "definition": "Respuestas cortas",
+    "context": "Short replies"
+  },
+  {
+    "term": "generic.petition-field-type-tax-documents",
+    "definition": "Documentos fiscales",
+    "context": "Tax documents"
+  },
+  {
+    "term": "generic.petition-field-type-text",
+    "definition": "Respuestas largas",
+    "context": "Long replies"
   },
   {
     "term": "generic.plans.enterprise",
@@ -10230,6 +10545,21 @@
     "context": "{amount} years"
   },
   {
+    "term": "page.compose.petition-already-sent",
+    "definition": "Este parallel ya ha sido enviado.",
+    "context": "This parallel has already been sent."
+  },
+  {
+    "term": "page.compose.petition-settings-header",
+    "definition": "Ajustes",
+    "context": "Settings"
+  },
+  {
+    "term": "page.compose.send-from-activity",
+    "definition": "Si quieres enviarle el parallel a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
+    "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+  },
+  {
     "term": "page.group.no-results",
     "definition": "No hay usuarios que coincidan con su búsqueda",
     "context": "There's no users matching your search"
@@ -10970,6 +11300,41 @@
     "context": "Profiles"
   },
   {
+    "term": "page.replies.associate-profile-button",
+    "definition": "Asociar perfil",
+    "context": "Associate profile"
+  },
+  {
+    "term": "page.replies.export-replies",
+    "definition": "Exportar",
+    "context": "Export"
+  },
+  {
+    "term": "page.replies.finalize-petition-button",
+    "definition": "Cerrar parallel",
+    "context": "Close parallel"
+  },
+  {
+    "term": "page.replies.message-sent-toast-description",
+    "definition": "El mensaje está en camino",
+    "context": "The message is on it's way"
+  },
+  {
+    "term": "page.replies.message-sent-toast-header",
+    "definition": "Mensaje enviado",
+    "context": "Message sent"
+  },
+  {
+    "term": "page.replies.notify-petition-reviewed-button",
+    "definition": "Notificar que está correcto",
+    "context": "Notify that it is correct"
+  },
+  {
+    "term": "page.replies.open-profile-button",
+    "definition": "Abrir perfil",
+    "context": "Open profile"
+  },
+  {
     "term": "page.reports-overview.choose-date-range",
     "definition": "Elige el rango de fechas que necesites para ver los resultados de tus plantillas",
     "context": "Choose the date range you need to view the results of your templates"
@@ -11600,61 +11965,6 @@
     "context": "Pending"
   },
   {
-    "term": "petition-compose.settings",
-    "definition": "Ajustes",
-    "context": "Settings"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-email",
-    "definition": "Email del destinatario",
-    "context": "Recipient email"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-first-name",
-    "definition": "Nombre del destinatario",
-    "context": "Recipient first name"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-full-name",
-    "definition": "Nombre completo del destinatario",
-    "context": "Recipient full name"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-information",
-    "definition": "Información de contacto",
-    "context": "Contact Information"
-  },
-  {
-    "term": "petition-message.placeholder-option.contact-last-name",
-    "definition": "Apellido del destinatario",
-    "context": "Recipient last name"
-  },
-  {
-    "term": "petition-message.placeholder-option.parallel-title",
-    "definition": "Título del parallel",
-    "context": "Parallel title"
-  },
-  {
-    "term": "petition-message.placeholder-option.references",
-    "definition": "Referencias",
-    "context": "References"
-  },
-  {
-    "term": "petition-message.placeholder-option.user-first-name",
-    "definition": "Mi nombre",
-    "context": "My first name"
-  },
-  {
-    "term": "petition-message.placeholder-option.user-full-name",
-    "definition": "Mi nombre completo",
-    "context": "My full name"
-  },
-  {
-    "term": "petition-message.placeholder-option.user-last-name",
-    "definition": "Mi apellido",
-    "context": "My last name"
-  },
-  {
     "term": "petition-permission-type.owner",
     "definition": "Propietario",
     "context": "Owner"
@@ -11690,16 +12000,6 @@
     "context": "Your signature is on its way."
   },
   {
-    "term": "petition-replies.associate-profile.button",
-    "definition": "Asociar perfil",
-    "context": "Associate profile"
-  },
-  {
-    "term": "petition-replies.export-replies",
-    "definition": "Exportar",
-    "context": "Export"
-  },
-  {
     "term": "petition-replies.field-comments.disabled-comments-2",
     "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
     "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
@@ -11710,29 +12010,9 @@
     "context": "This field only accepts notes"
   },
   {
-    "term": "petition-replies.finalize-petition.button",
-    "definition": "Cerrar parallel",
-    "context": "Close parallel"
-  },
-  {
     "term": "petition-replies.note-popover",
     "definition": "Esta nota es visible solamente para personas dentro de tu organización.",
     "context": "This note is only visible for people in your organization."
-  },
-  {
-    "term": "petition-replies.notify-petition-reviewed.button",
-    "definition": "Notificar que está correcto",
-    "context": "Notify that it is correct"
-  },
-  {
-    "term": "petition-replies.open-profile.button",
-    "definition": "Abrir perfil",
-    "context": "Open profile"
-  },
-  {
-    "term": "petition-replies.petition-field-reply.approve",
-    "definition": "Aprobar",
-    "context": "Approve"
   },
   {
     "term": "petition-replies.petition-field-reply.file-download",
@@ -11743,16 +12023,6 @@
     "term": "petition-replies.petition-field-reply.file-preview-download",
     "definition": "Previsualizar archivo. ⇧ + click para descargar",
     "context": "Preview file. ⇧ + click to download"
-  },
-  {
-    "term": "petition-replies.petition-field-reply.file-upload.file-incomplete",
-    "definition": "Hubo un error al subir el archivo. Por favor, solicita que se suba de nuevo.",
-    "context": "There was an error uploading the file. Please request a new upload."
-  },
-  {
-    "term": "petition-replies.petition-field-reply.reject",
-    "definition": "Rechazar",
-    "context": "Reject"
   },
   {
     "term": "petition-sharing.confirm-edit.header",
@@ -11870,24 +12140,9 @@
     "context": "Add another field"
   },
   {
-    "term": "petition.add-field-button",
-    "definition": "Añadir campo",
-    "context": "Add field"
-  },
-  {
     "term": "petition.add-recipient-button",
     "definition": "Añadir destinatario",
     "context": "Add recipient"
-  },
-  {
-    "term": "petition.advanced-options",
-    "definition": "Opciones avanzadas",
-    "context": "Advanced options"
-  },
-  {
-    "term": "petition.already-sent",
-    "definition": "Este parallel ya ha sido enviado.",
-    "context": "This parallel has already been sent."
   },
   {
     "term": "petition.confirm-cancel-scheduled-message.body",
@@ -11975,76 +12230,6 @@
     "context": "Delete theme"
   },
   {
-    "term": "petition.contents",
-    "definition": "Contenido",
-    "context": "Contents"
-  },
-  {
-    "term": "petition.field-type.checkbox",
-    "definition": "Opciones",
-    "context": "Multiple choice"
-  },
-  {
-    "term": "petition.field-type.conditional-select",
-    "definition": "Desplegable condicional",
-    "context": "Conditional select"
-  },
-  {
-    "term": "petition.field-type.date",
-    "definition": "Fecha",
-    "context": "Date"
-  },
-  {
-    "term": "petition.field-type.date-and-time",
-    "definition": "Fecha y hora",
-    "context": "Date and time"
-  },
-  {
-    "term": "petition.field-type.dow-jones-kyc-research",
-    "definition": "Buscar en Dow Jones",
-    "context": "Search in Dow Jones"
-  },
-  {
-    "term": "petition.field-type.file-upload",
-    "definition": "Documentos y archivos",
-    "context": "Documents and files"
-  },
-  {
-    "term": "petition.field-type.heading",
-    "definition": "Bloque de texto",
-    "context": "Text block"
-  },
-  {
-    "term": "petition.field-type.number",
-    "definition": "Números",
-    "context": "Numbers"
-  },
-  {
-    "term": "petition.field-type.phone",
-    "definition": "Teléfono",
-    "context": "Phone number"
-  },
-  {
-    "term": "petition.field-type.select",
-    "definition": "Desplegable",
-    "context": "Select"
-  },
-  {
-    "term": "petition.field-type.short-text",
-    "definition": "Respuestas cortas",
-    "context": "Short replies"
-  },
-  {
-    "term": "petition.field-type.tax-documents",
-    "definition": "Documentos fiscales",
-    "context": "Tax documents"
-  },
-  {
-    "term": "petition.field-type.text",
-    "definition": "Respuestas largas",
-    "context": "Long replies"
-  },
-  {
     "term": "petition.header.activity-tab",
     "definition": "Actividad",
     "context": "Activity"
@@ -12083,16 +12268,6 @@
     "term": "petition.long-batch-send-dialog.message",
     "definition": "Estamos enviando tus parallels. Puede que tardemos unos instantes, por favor espere.",
     "context": "We are sending your parallels. It might take a little bit, please wait."
-  },
-  {
-    "term": "petition.message-sent.toast-description",
-    "definition": "El mensaje está en camino",
-    "context": "The message is on it's way"
-  },
-  {
-    "term": "petition.message-sent.toast-header",
-    "definition": "Mensaje enviado",
-    "context": "Message sent"
   },
   {
     "term": "petition.no-reminders-left-generic.toast-description",
@@ -12215,11 +12390,6 @@
     "context": "Error downloading {filename}"
   },
   {
-    "term": "petition.required-label",
-    "definition": "Obligatorio",
-    "context": "Required"
-  },
-  {
     "term": "petition.schedule-delivery.header",
     "definition": "Escoge fecha y hora",
     "context": "Select date and time"
@@ -12228,11 +12398,6 @@
     "term": "petition.schedule-send-button",
     "definition": "Programar envío",
     "context": "Schedule send"
-  },
-  {
-    "term": "petition.send-from-activity",
-    "definition": "Si quieres enviarle el parallel a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
-    "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
   },
   {
     "term": "petition.set-deadline",
@@ -13390,34 +13555,9 @@
     "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {other} {timeAgo}"
   },
   {
-    "term": "timeline.reply-created-description",
-    "definition": "{userIsYou, select, true {Respondiste} other {{createdBy} respondió}} al campo {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.reply-deleted",
-    "definition": "Respuesta borrada",
-    "context": "Reply deleted"
-  },
-  {
-    "term": "timeline.reply-deleted-description",
-    "definition": "{userIsYou, select, true {Eliminaste} other {{deletedBy} eliminó}} una respuesta al campo {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
-  },
-  {
     "term": "timeline.reply-status-changed-description",
     "definition": "{userIsYou, select, true {{status, select, APPROVED{Aprobaste} REJECTED{Rechazaste} other{Modificaste a pendiente}}} other {{updatedBy} {status, select, APPROVED{aprobó} REJECTED{rechazó} other{modificó a pendiente}}}} {multiple, select, true{una de las respuestas} other {la respuesta}} al campo {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.reply-updated-description",
-    "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una respuesta al campo {field} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
-  },
-  {
-    "term": "timeline.see",
-    "definition": "Ver",
-    "context": "See"
   },
   {
     "term": "timeline.signature-cancelled-by-user.description",
@@ -13473,6 +13613,56 @@
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error",
     "definition": "Solo se pueden mover campos de manera que las condiciones de visibilidad hagan referencia únicamente a campos anteriores.",
     "context": "You can only move fields so that visibility conditions refer only to previous fields."
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-email",
+    "definition": "Email del destinatario",
+    "context": "Recipient email"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-first-name",
+    "definition": "Nombre del destinatario",
+    "context": "Recipient first name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-full-name",
+    "definition": "Nombre completo del destinatario",
+    "context": "Recipient full name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.contact-last-name",
+    "definition": "Apellido del destinatario",
+    "context": "Recipient last name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.group-contact-information",
+    "definition": "Información de contacto",
+    "context": "Contact Information"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.group-references",
+    "definition": "Referencias",
+    "context": "References"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.parallel-title",
+    "definition": "Título del parallel",
+    "context": "Parallel title"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.user-first-name",
+    "definition": "Mi nombre",
+    "context": "My first name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.user-full-name",
+    "definition": "Mi nombre completo",
+    "context": "My full name"
+  },
+  {
+    "term": "util.use-petition-message-placeholder-options.user-last-name",
+    "definition": "Mi apellido",
+    "context": "My last name"
   },
   {
     "term": "util.use-short-text-formats.email",
@@ -13568,6 +13758,11 @@
     "term": "util.validate-petition-fields.dynamic-select-field-without-options-error",
     "definition": "Por favor, configure las opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>desplegable condicional</em>.",
     "context": "Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "util.validate-petition-fields.field-group-without-children-error",
+    "definition": "Por favor, añada al menos un campo en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>grupo</em>.",
+    "context": "Please add at least one field to the following <em>group</em> {count, plural, one{field} other{fields}}."
   },
   {
     "term": "util.validate-petition-fields.fields-without-title-error",

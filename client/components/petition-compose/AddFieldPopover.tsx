@@ -7,11 +7,12 @@ import { PetitionFieldTypeSelectDropdown } from "./PetitionFieldTypeSelectDropdo
 export interface AddFieldPopoverProps extends Pick<MenuProps, "onOpen" | "onClose"> {
   user: AddFieldPopover_UserFragment;
   onSelectFieldType: (type: PetitionFieldType) => void;
+  isFieldGroupChild?: boolean;
 }
 
 export const AddFieldPopover = Object.assign(
   chakraForwardRef<"button", AddFieldPopoverProps>(function AddFieldPopover(
-    { id, user, onSelectFieldType, onOpen, onClose, ...props },
+    { id, user, onSelectFieldType, onOpen, onClose, isFieldGroupChild, ...props },
     ref,
   ) {
     return (
@@ -23,6 +24,7 @@ export const AddFieldPopover = Object.assign(
             showHeader
             onSelectFieldType={onSelectFieldType}
             user={user}
+            isFieldGroupChild={isFieldGroupChild}
           />
         </Portal>
       </Menu>

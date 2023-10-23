@@ -10,6 +10,14 @@ gql`
         replies {
           id
         }
+        children {
+          id
+          type
+          options
+          replies {
+            id
+          }
+        }
       }
     }
   }
@@ -22,6 +30,11 @@ gql`
         id
         type
         options
+        children {
+          id
+          type
+          options
+        }
       }
     }
   }

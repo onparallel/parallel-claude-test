@@ -1,8 +1,7 @@
 import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import { ApiContext, WorkerContext } from "../../context";
-import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
-import { FORMATS } from "../../util/dates";
+import { UserLocale } from "../../db/__types";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
@@ -42,110 +41,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     ];
   }
 
-  public addSimpleReply(field: PetitionField, replies: PetitionFieldReply[]) {
-    if (replies.length > 0) {
-      this.addRows(
-        replies.map((r, i) => ({
-          title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          answer: r.content.value,
-        })),
-      );
-    } else {
-      this.addEmptyReply(field);
-    }
-  }
-
-  public addNumericReply(field: PetitionField, replies: PetitionFieldReply[]) {
-    if (replies.length > 0) {
-      this.addRows(
-        replies.map((r, i) => ({
-          title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          answer: r.content.value,
-        })),
-      );
-    } else {
-      this.addEmptyReply(field);
-    }
-  }
-
-  public addDateReply(field: PetitionField, replies: PetitionFieldReply[]) {
-    if (replies.length > 0) {
-      this.addRows(
-        replies.map((r, i) => ({
-          title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          answer: this.intl.formatDate(r.content.value, { ...FORMATS["L"], timeZone: "Etc/UTC" }),
-        })),
-      );
-    } else {
-      this.addEmptyReply(field);
-    }
-  }
-
-  public addDateTimeReply(field: PetitionField, replies: PetitionFieldReply[]) {
-    if (replies.length > 0) {
-      this.addRows(
-        replies.map((r, i) => ({
-          title: field.title?.concat(field.multiple ? ` [${i + 1}] (UTC)` : " (UTC)") || " (UTC)",
-          answer: this.intl.formatDate(r.content.value, {
-            ...FORMATS["L+LTS"],
-            timeZone: "Etc/UTC",
-          }),
-        })),
-      );
-    } else {
-      this.addEmptyReply(field);
-    }
-  }
-
-  public addDynamicSelectReply(field: PetitionField, replies: PetitionFieldReply[]) {
-    if (replies.length > 0) {
-      this.addRows(
-        replies.flatMap((r, i) =>
-          (r.content.value as [string, string | null][]).map(([label, value]) => ({
-            title: field.title?.concat(` (${label})`, field.multiple ? ` [${i + 1}]` : "") || "",
-            answer:
-              value ??
-              `[${this.intl.formatMessage({
-                id: "text-replies-excel-worksheet.no-answer",
-                defaultMessage: "Not replied",
-              })}]`,
-          })),
-        ),
-      );
-    } else {
-      this.addEmptyReply(field);
-    }
-  }
-
-  public addCheckboxReply(field: PetitionField, replies: PetitionFieldReply[]) {
-    if (replies.length > 0) {
-      this.addRows(
-        replies.flatMap((r, i) =>
-          (r.content.value as [string]).map((value) => ({
-            title: field.title || "",
-            answer: value,
-          })),
-        ),
-      );
-    } else {
-      this.addEmptyReply(field);
-    }
-  }
-
-  private addEmptyReply(data: Omit<TextReplyRow, "answer">) {
-    this.addRows(
-      [
-        {
-          title: data.title || "",
-          answer: `[${this.intl.formatMessage({
-            id: "text-replies-excel-worksheet.no-answer",
-            defaultMessage: "Not replied",
-          })}]`,
-        },
-      ],
-      {
-        color: { argb: "FFA6A6A6" },
-      },
-    );
+  public addReply(reply: TextReplyRow & { format?: { font: Partial<Excel.Font> } }) {
+    this.addRows(reply, reply.format);
   }
 }

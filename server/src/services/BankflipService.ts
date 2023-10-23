@@ -21,6 +21,7 @@ export type SessionMetadata = {
   petitionId: string;
   fieldId: string;
   orgId: string;
+  parentReplyId?: string | null;
 } & ({ userId: string } | { accessId: string });
 
 /** When the Session is completed. (every requested model has been extracted) */

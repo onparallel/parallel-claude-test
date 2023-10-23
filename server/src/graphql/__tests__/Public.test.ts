@@ -2,12 +2,15 @@ import { serialize as serializeCookie } from "cookie";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import {
+  Contact,
   Organization,
   OrganizationUsageLimit,
   PetitionAccess,
   PetitionField,
   PetitionFieldReply,
+  Petition,
   Task,
+  User,
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
@@ -35,6 +38,8 @@ describe("GraphQL/Public", () => {
   let access: PetitionAccess;
   let fields: PetitionField[];
   let org: Organization;
+  let user: User;
+  let contact: Contact;
   let limit: OrganizationUsageLimit;
 
   beforeAll(async () => {
@@ -47,36 +52,12 @@ describe("GraphQL/Public", () => {
       status: "DEV",
     }));
 
-    const [signatureIntegration] = await mocks.createOrgIntegration({
-      org_id: org.id,
-      provider: "SIGNATURIT",
-      type: "SIGNATURE",
-      is_enabled: true,
-      name: "SIGNATURIT TEST",
-      settings: {
-        CREDENTIALS: {
-          API_KEY: "SHARED_PRODUCTION_APIKEY",
-        },
-      },
-    });
-
     limit = await mocks.createOrganizationUsageLimit(org.id, "SIGNATURIT_SHARED_APIKEY", 10);
     await mocks.createOrganizationUsageLimit(org.id, "PETITION_SEND", 10);
 
-    const [user] = await mocks.createRandomUsers(org.id, 1);
-    const [contact] = await mocks.createRandomContacts(org.id, 1);
-    const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
-      status: "DRAFT",
-      signature_config: {
-        review: false,
-        orgIntegrationId: signatureIntegration.id,
-        signersInfo: [
-          { firstName: "Mariano", lastName: "Rodriguez", email: "mariano@onparallel.com" },
-        ],
-        timezone: "Europe/Madrid",
-        title: "sign this!",
-      },
-    }));
+    [user] = await mocks.createRandomUsers(org.id, 1);
+    [contact] = await mocks.createRandomContacts(org.id, 1);
+    const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
     fields = await mocks.createRandomPetitionFields(
       petition.id,
       3,
@@ -1435,6 +1416,327 @@ describe("GraphQL/Public", () => {
           }
         });
       });
+
+      describe("FIELD_GROUP", () => {
+        let fieldGroup: PetitionField;
+        let fieldGroup2: PetitionField;
+        let children: PetitionField[];
+
+        beforeAll(async () => {
+          [fieldGroup, fieldGroup2] = await mocks.createRandomPetitionFields(
+            access.petition_id,
+            2,
+            (i) => ({
+              type: "FIELD_GROUP",
+              multiple: false,
+            }),
+          );
+          children = await mocks.createRandomPetitionFields(access.petition_id, 2, (i) => ({
+            type: "SHORT_TEXT",
+            parent_petition_field_id: fieldGroup.id,
+            position: i,
+            multiple: i === 0,
+          }));
+        });
+
+        it("creates a new FIELD_GROUP reply", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  id
+                  content
+                  children {
+                    field {
+                      id
+                    }
+                    replies {
+                      id
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", fieldGroup.id),
+                  content: {},
+                },
+              ],
+            },
+          );
+          expect(errors).toBeUndefined();
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              id: expect.any(String),
+              content: {},
+              children: [
+                {
+                  field: { id: toGlobalId("PetitionField", children[0].id) },
+                  replies: [],
+                },
+                {
+                  field: { id: toGlobalId("PetitionField", children[1].id) },
+                  replies: [],
+                },
+              ],
+            },
+          ]);
+        });
+
+        it("creates a subreply inside a FIELD_GROUP reply", async () => {
+          const [fieldGroupReply] = await mocks.createFieldGroupReply(fieldGroup.id, access.id, 1);
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  id
+                  parent {
+                    id
+                    children {
+                      field {
+                        id
+                        type
+                      }
+                      replies {
+                        id
+                        content
+                      }
+                    }
+                  }
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", children[0].id),
+                  parentReplyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+                  content: { value: "My SHORT_TEXT reply" },
+                },
+              ],
+            },
+          );
+          expect(errors).toBeUndefined();
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              id: expect.any(String),
+              parent: {
+                id: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+                children: [
+                  {
+                    field: {
+                      id: toGlobalId("PetitionField", children[0].id),
+                      type: "SHORT_TEXT",
+                    },
+                    replies: [
+                      {
+                        id: expect.any(String),
+                        content: { value: "My SHORT_TEXT reply" },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      id: toGlobalId("PetitionField", children[1].id),
+                      type: "SHORT_TEXT",
+                    },
+                    replies: [],
+                  },
+                ],
+              },
+              content: { value: "My SHORT_TEXT reply" },
+            },
+          ]);
+        });
+
+        it("sends error if trying to create a second subreply inside the same non-multiple field", async () => {
+          const [parentReply] = await mocks.createFieldGroupReply(fieldGroup.id, access.id, 1);
+          await mocks.createRandomTextReply(children[1].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: parentReply.id,
+          }));
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  id
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", children[1].id),
+                  parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+                  content: { value: "My SHORT_TEXT reply" },
+                },
+              ],
+            },
+          );
+          expect(errors).toContainGraphQLError("FIELD_ALREADY_REPLIED_ERROR");
+          expect(data).toBeNull();
+        });
+
+        it("creates a field reply on a second reply group", async () => {
+          const parentReplies = await mocks.createFieldGroupReply(fieldGroup.id, access.id, 2);
+          await mocks.createRandomTextReply(children[1].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: parentReplies[0].id,
+          }));
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  id
+                  parent {
+                    id
+                    children {
+                      field {
+                        id
+                        type
+                      }
+                      replies {
+                        id
+                        content
+                      }
+                    }
+                  }
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", children[1].id),
+                  parentReplyId: toGlobalId("PetitionFieldReply", parentReplies[1].id),
+                  content: { value: "My SHORT_TEXT second reply" },
+                },
+              ],
+            },
+          );
+          expect(errors).toBeUndefined();
+          expect(data?.publicCreatePetitionFieldReplies).toEqual([
+            {
+              id: expect.any(String),
+              parent: {
+                id: toGlobalId("PetitionFieldReply", parentReplies[1].id),
+                children: [
+                  {
+                    field: {
+                      id: toGlobalId("PetitionField", children[0].id),
+                      type: "SHORT_TEXT",
+                    },
+                    replies: [],
+                  },
+                  {
+                    field: {
+                      id: toGlobalId("PetitionField", children[1].id),
+                      type: "SHORT_TEXT",
+                    },
+                    replies: [
+                      {
+                        id: expect.any(String),
+                        content: { value: "My SHORT_TEXT second reply" },
+                      },
+                    ],
+                  },
+                ],
+              },
+              content: { value: "My SHORT_TEXT second reply" },
+            },
+          ]);
+        });
+
+        it("sends error if field is not a child of the parent reply group", async () => {
+          const [phone] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+            type: "PHONE",
+            optional: true,
+          }));
+          const [parentReply] = await mocks.createFieldGroupReply(fieldGroup.id, access.id, 1);
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  id
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", phone.id),
+                  parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+                  content: { value: "My SHORT_TEXT reply" },
+                },
+              ],
+            },
+          );
+          expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+          expect(data).toBeNull();
+        });
+
+        it("sends error if passing child field id with no parentReplyId", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  id
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", children[0].id),
+                  content: { value: "My SHORT_TEXT reply" },
+                },
+              ],
+            },
+          );
+          expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+          expect(data).toBeNull();
+        });
+
+        it("sends error if passing child field id with invalid parentReplyId", async () => {
+          const [invalidParentReply] = await mocks.createFieldGroupReply(
+            fieldGroup2.id,
+            access.id,
+            1,
+          );
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  id
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", children[0].id),
+                  parentReplyId: toGlobalId("PetitionFieldReply", invalidParentReply.id),
+                  content: { value: "My SHORT_TEXT reply" },
+                },
+              ],
+            },
+          );
+          expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+          expect(data).toBeNull();
+        });
+      });
     });
 
     describe("publicUpdatePetitionFieldReplies", () => {
@@ -2346,6 +2648,86 @@ describe("GraphQL/Public", () => {
           expect(data).toBeNull();
         });
       });
+
+      describe("FIELD_GROUP", () => {
+        let fieldGroupReply: PetitionFieldReply;
+        let childReply: PetitionFieldReply;
+
+        beforeAll(async () => {
+          const [fieldGroupField] = await mocks.createRandomPetitionFields(
+            access.petition_id,
+            1,
+            () => ({
+              type: "FIELD_GROUP",
+            }),
+          );
+          const children = await mocks.createRandomPetitionFields(access.petition_id, 2, (i) => ({
+            type: "TEXT",
+            parent_petition_field_id: fieldGroupField.id,
+            position: i,
+          }));
+          [fieldGroupReply] = await mocks.createFieldGroupReply(fieldGroupField.id, access.id, 1);
+          [childReply] = await mocks.createRandomTextReply(children[0].id, access.id, 1, () => ({
+            parent_petition_field_reply_id: fieldGroupReply.id,
+          }));
+        });
+
+        it("sends error if trying to update a FIELD_GROUP reply", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
+                  id
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+                  content: {},
+                },
+              ],
+            },
+          );
+          expect(errors).toContainGraphQLError("INVALID_FIELD_TYPE_ERROR");
+          expect(data).toBeNull();
+        });
+
+        it("updates a subreply on a FIELD_GROUP reply", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
+                  id
+                  content
+                  field {
+                    id
+                  }
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", childReply.id),
+                  content: { value: "Hello there" },
+                },
+              ],
+            },
+          );
+          expect(errors).toBeUndefined();
+          expect(data?.publicUpdatePetitionFieldReplies).toEqual([
+            {
+              id: toGlobalId("PetitionFieldReply", childReply.id),
+              content: { value: "Hello there" },
+              field: { id: toGlobalId("PetitionField", childReply.petition_field_id) },
+            },
+          ]);
+        });
+      });
     });
 
     describe("publicDeletePetitionFieldReply", () => {
@@ -2498,16 +2880,328 @@ describe("GraphQL/Public", () => {
         expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
         expect(data).toBeNull();
       });
+
+      it("deletes a FIELD_GROUP reply with all its subreplies", async () => {
+        const [fieldGroupField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          1,
+          () => ({
+            type: "FIELD_GROUP",
+            optional: true, // don't want to trigger DELETE_FIELD_GROUP_REPLY_ERROR
+          }),
+        );
+        const children = await mocks.createRandomPetitionFields(access.petition_id, 2, (i) => ({
+          type: "SHORT_TEXT",
+          parent_petition_field_id: fieldGroupField.id,
+          position: i,
+        }));
+
+        const [fieldGroupReply] = await mocks.createFieldGroupReply(
+          fieldGroupField.id,
+          access.id,
+          1,
+        );
+
+        await mocks.createRandomTextReply(children[0].id, access.id, 2, () => ({
+          parent_petition_field_reply_id: fieldGroupReply.id,
+        }));
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+                children {
+                  id
+                }
+                replies {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicDeletePetitionFieldReply).toEqual({
+          id: toGlobalId("PetitionField", fieldGroupField.id),
+          children: [
+            { id: toGlobalId("PetitionField", children[0].id) },
+            { id: toGlobalId("PetitionField", children[1].id) },
+          ],
+          replies: [],
+        });
+
+        const dbReplies = await mocks.knex
+          .from("petition_field_reply")
+          .where("id", fieldGroupReply.id)
+          .orWhere("parent_petition_field_reply_id", fieldGroupReply.id)
+          .select("deleted_at");
+
+        expect(dbReplies).toHaveLength(3);
+        expect(dbReplies[0].deleted_at).not.toBeNull();
+        expect(dbReplies[1].deleted_at).not.toBeNull();
+        expect(dbReplies[2].deleted_at).not.toBeNull();
+      });
+
+      it("deletes a single subreply on a FIELD_GROUP reply", async () => {
+        const [fieldGroupField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          1,
+          () => ({
+            type: "FIELD_GROUP",
+          }),
+        );
+        const children = await mocks.createRandomPetitionFields(access.petition_id, 2, (i) => ({
+          type: "SHORT_TEXT",
+          parent_petition_field_id: fieldGroupField.id,
+          position: i,
+        }));
+
+        const [fieldGroupReply] = await mocks.createFieldGroupReply(
+          fieldGroupField.id,
+          access.id,
+          1,
+        );
+
+        const childReplies = await mocks.createRandomTextReply(
+          children[0].id,
+          access.id,
+          2,
+          () => ({
+            parent_petition_field_reply_id: fieldGroupReply.id,
+          }),
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+                children {
+                  id
+                }
+                replies {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", childReplies[0].id),
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicDeletePetitionFieldReply).toEqual({
+          id: toGlobalId("PetitionField", children[0].id),
+          children: null,
+          replies: [{ id: toGlobalId("PetitionFieldReply", childReplies[1].id) }],
+        });
+      });
+
+      it("deletes all file uploads when deleting a FIELD_GROUP reply", async () => {
+        const [fieldGroupField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          1,
+          () => ({
+            type: "FIELD_GROUP",
+            optional: true, // don't want to trigger DELETE_FIELD_GROUP_REPLY_ERROR
+          }),
+        );
+        const children = await mocks.createRandomPetitionFields(access.petition_id, 2, (i) => ({
+          type: "FILE_UPLOAD",
+          parent_petition_field_id: fieldGroupField.id,
+          position: i,
+        }));
+
+        const [fieldGroupReply] = await mocks.createFieldGroupReply(
+          fieldGroupField.id,
+          access.id,
+          1,
+        );
+
+        const children0Replies = await mocks.createRandomFileUploadReply(
+          children[0].id,
+          access.id,
+          2,
+          () => ({
+            parent_petition_field_reply_id: fieldGroupReply.id,
+          }),
+        );
+        const children1Replies = await mocks.createRandomFileUploadReply(
+          children[1].id,
+          access.id,
+          3,
+          () => ({
+            parent_petition_field_reply_id: fieldGroupReply.id,
+          }),
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+                children {
+                  id
+                }
+                replies {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicDeletePetitionFieldReply).toEqual({
+          id: toGlobalId("PetitionField", fieldGroupField.id),
+          children: [
+            { id: toGlobalId("PetitionField", children[0].id) },
+            { id: toGlobalId("PetitionField", children[1].id) },
+          ],
+          replies: [],
+        });
+
+        const fileUploadIds = [
+          ...children0Replies.map((r) => r.content.file_upload_id),
+          ...children1Replies.map((r) => r.content.file_upload_id),
+        ] as number[];
+
+        const dbReplies = await mocks.knex
+          .from("file_upload")
+          .whereIn("id", fileUploadIds)
+          .select("deleted_at");
+
+        expect(dbReplies).toHaveLength(5);
+        expect(dbReplies[0].deleted_at).not.toBeNull();
+        expect(dbReplies[1].deleted_at).not.toBeNull();
+        expect(dbReplies[2].deleted_at).not.toBeNull();
+        expect(dbReplies[3].deleted_at).not.toBeNull();
+        expect(dbReplies[4].deleted_at).not.toBeNull();
+      });
+
+      it("sends error if deleting a FIELD_GROUP reply but the field is required and has no other replies", async () => {
+        const [fieldGroupField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          1,
+          () => ({
+            type: "FIELD_GROUP",
+            optional: false,
+          }),
+        );
+
+        const [fieldGroupReply] = await mocks.createFieldGroupReply(
+          fieldGroupField.id,
+          access.id,
+          1,
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+                children {
+                  id
+                }
+                replies {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+          },
+        );
+
+        expect(errors).toContainGraphQLError("DELETE_FIELD_GROUP_REPLY_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("allows to delete last reply of an optional FIELD_GROUP", async () => {
+        const [fieldGroupField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          1,
+          () => ({
+            type: "FIELD_GROUP",
+            optional: true,
+          }),
+        );
+
+        const [fieldGroupReply] = await mocks.createFieldGroupReply(
+          fieldGroupField.id,
+          access.id,
+          1,
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+                children {
+                  id
+                }
+                replies {
+                  id
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicDeletePetitionFieldReply).toEqual({
+          id: toGlobalId("PetitionField", fieldGroupField.id),
+          children: [],
+          replies: [],
+        });
+      });
     });
 
     describe("publicCreateFileUploadReply", () => {
       let fileUploadField: PetitionField;
       let fileUploadReplyId: string;
+
+      let fieldGroupField: PetitionField;
+      let child: PetitionField;
+
+      let fieldGroupReply: PetitionFieldReply;
       beforeAll(async () => {
         [fileUploadField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
           type: "FILE_UPLOAD",
           optional: true,
         }));
+
+        [fieldGroupField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "FIELD_GROUP",
+          optional: true,
+        }));
+
+        [child] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "FILE_UPLOAD",
+          parent_petition_field_id: fieldGroupField.id,
+          position: 0,
+        }));
+
+        [fieldGroupReply] = await mocks.createFieldGroupReply(fieldGroupField.id, access.id, 1);
       });
 
       it("should return an AWS upload endpoint and a reply with incomplete upload", async () => {
@@ -2608,9 +3302,218 @@ describe("GraphQL/Public", () => {
           status: "PENDING",
         });
       });
+
+      it("creates a file reply on a FIELD_GROUP field", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $data: FileUploadInput!, $parentReplyId: GID) {
+              publicCreateFileUploadReply(
+                keycode: $keycode
+                fieldId: $fieldId
+                data: $data
+                parentReplyId: $parentReplyId
+              ) {
+                reply {
+                  parent {
+                    field {
+                      id
+                    }
+                    children {
+                      field {
+                        id
+                      }
+                      replies {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", child.id),
+            data: {
+              contentType: "text/plain",
+              filename: "file.txt",
+              size: 500,
+            },
+            parentReplyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicCreateFileUploadReply).toEqual({
+          reply: {
+            parent: {
+              field: { id: toGlobalId("PetitionField", fieldGroupField.id) },
+              children: [
+                {
+                  field: { id: toGlobalId("PetitionField", child.id) },
+                  replies: [
+                    {
+                      id: expect.any(String),
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        });
+      });
+    });
+
+    describe("publicFileUploadReplyDownloadLink", () => {
+      let fileReply: PetitionFieldReply;
+      let textReply: PetitionFieldReply;
+      beforeAll(async () => {
+        [fileReply] = await mocks.createRandomFileUploadReply(
+          fields[2].id,
+          access.id,
+          1,
+          undefined,
+          () => ({
+            content_type: "text/plain",
+            filename: "file.txt",
+            size: "500",
+            upload_complete: true,
+          }),
+        );
+
+        [textReply] = await mocks.createRandomTextReply(fields[1].id, access.id, 1);
+      });
+
+      it("generates a download link for a file type reply", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($replyId: GID!, $keycode: ID!) {
+              publicFileUploadReplyDownloadLink(replyId: $replyId, keycode: $keycode) {
+                result
+                url
+                file {
+                  contentType
+                  filename
+                  isComplete
+                  size
+                }
+              }
+            }
+          `,
+          {
+            replyId: toGlobalId("PetitionFieldReply", fileReply.id),
+            keycode: access.keycode,
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicFileUploadReplyDownloadLink).toEqual({
+          result: "SUCCESS",
+          url: "",
+          file: {
+            contentType: "text/plain",
+            filename: "file.txt",
+            isComplete: true,
+            size: 500,
+          },
+        });
+      });
+
+      it("sends error if reply belongs to an internal field", async () => {
+        await mocks.knex.from("petition_field").where("id", fields[2].id).update({
+          is_internal: true,
+        });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($replyId: GID!, $keycode: ID!) {
+              publicFileUploadReplyDownloadLink(replyId: $replyId, keycode: $keycode) {
+                result
+              }
+            }
+          `,
+          {
+            replyId: toGlobalId("PetitionFieldReply", fileReply.id),
+            keycode: access.keycode,
+          },
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+
+        await mocks.knex.from("petition_field").where("id", fields[2].id).update({
+          is_internal: false,
+        });
+      });
+
+      it("sends error if reply is not a file type", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($replyId: GID!, $keycode: ID!) {
+              publicFileUploadReplyDownloadLink(replyId: $replyId, keycode: $keycode) {
+                result
+                url
+                file {
+                  contentType
+                  filename
+                  isComplete
+                  size
+                }
+              }
+            }
+          `,
+          {
+            replyId: toGlobalId("PetitionFieldReply", textReply.id),
+            keycode: access.keycode,
+          },
+        );
+
+        expect(errors).toContainGraphQLError("INVALID_FIELD_TYPE_ERROR");
+        expect(data).toBeNull();
+      });
     });
 
     describe("publicCompletePetition", () => {
+      let petition: Petition;
+
+      beforeAll(async () => {
+        const [signatureIntegration] = await mocks.createOrgIntegration({
+          org_id: org.id,
+          provider: "SIGNATURIT",
+          type: "SIGNATURE",
+          is_enabled: true,
+          name: "SIGNATURIT TEST",
+          settings: {
+            CREDENTIALS: {
+              API_KEY: "SHARED_PRODUCTION_APIKEY",
+            },
+          },
+        });
+        [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
+          status: "DRAFT",
+          signature_config: {
+            review: false,
+            orgIntegrationId: signatureIntegration.id,
+            signersInfo: [
+              { firstName: "Mariano", lastName: "Rodriguez", email: "mariano@onparallel.com" },
+            ],
+            timezone: "Europe/Madrid",
+            title: "sign this!",
+          },
+        }));
+        await mocks.createRandomPetitionFields(
+          petition.id,
+          3,
+          (i) =>
+            [
+              { type: "HEADING", is_fixed: true },
+              { type: "TEXT", optional: true },
+              { type: "FILE_UPLOAD", optional: true },
+            ][i] as Partial<PetitionField>,
+        );
+        [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
+      });
+
       it("when using our shared apiKey and usage reached limit, complete anyways but don't start signature", async () => {
         await mocks
           .knex("organization_usage_limit")

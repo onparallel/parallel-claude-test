@@ -3,11 +3,16 @@ import {
   CreatePetitionFieldReplyInput,
   PetitionFieldType,
   isReplyContentCompatible_PetitionFieldFragment,
-  mapReplyContents_PetitionFieldFragment,
+  mapReplyContents_PetitionFieldDataFragment,
 } from "@parallel/graphql/__types";
-import { difference, isDefined } from "remeda";
+import { difference, groupBy, isDefined } from "remeda";
 import { isFileTypeField } from "./isFileTypeField";
 import { FieldOptions } from "./petitionFields";
+
+interface CreatePetitionFieldReplyInputWithParent extends CreatePetitionFieldReplyInput {
+  replyParentId?: string;
+  targetFieldId?: string;
+}
 
 export const mapReplyContents = ({
   mapping: mapping,
@@ -15,88 +20,138 @@ export const mapReplyContents = ({
   sourcePetitionFields: sourcePetitionFields,
 }: {
   mapping: { [key: string]: string };
-  fields: mapReplyContents_PetitionFieldFragment[];
-  sourcePetitionFields: mapReplyContents_PetitionFieldFragment[];
+  fields: mapReplyContents_PetitionFieldDataFragment[];
+  sourcePetitionFields: mapReplyContents_PetitionFieldDataFragment[];
 }) => {
-  let result = [] as CreatePetitionFieldReplyInput[];
+  let fieldsReplyInput = [] as CreatePetitionFieldReplyInputWithParent[];
+  let childrenReplyInput = [] as CreatePetitionFieldReplyInputWithParent[];
 
   for (const [targetId, originId] of Object.entries(mapping)) {
     const targetField = fields.find((field) => field.id === targetId);
     const originField = sourcePetitionFields.find((field) => field.id === originId);
 
     if (isDefined(targetField) && isDefined(originField)) {
-      const replies = targetField.multiple ? originField.replies : [originField.replies[0]];
+      const originIsChild = originField.parent?.id;
+
+      //if origin is child whe need to get all replies to groupBy parent (field group) and then map to target
+      const replies =
+        targetField.multiple || originIsChild ? originField.replies : [originField.replies[0]];
+
+      const emptyReplyIds =
+        targetField.type === "FIELD_GROUP"
+          ? targetField?.replies
+              .filter((reply) => reply.children?.every((child) => child.replies.length === 0))
+              .map((reply) => reply.id) ?? []
+          : [];
+
+      const groupedReplies = groupBy(replies ?? [], (r) => r?.parent?.id ?? "");
 
       if (replies.length) {
-        const mappedReplies = replies
-          .filter((r) => isDefined(r) && !isDefined(r.content.error))
-          .flatMap((reply) => {
-            if (isFileTypeField(originField.type)) {
+        const mappedReplies = Object.values(groupedReplies).flatMap((replies) => {
+          return replies
+            .filter((r) => isDefined(r) && !isDefined(r.content.error))
+            .flatMap((reply, index) => {
+              if (originIsChild && originField.multiple && !targetField.multiple && index > 0) {
+                return null;
+              }
+
+              const common = {
+                replyParentId: reply.parent?.id,
+                targetFieldId: targetField.parent?.id,
+              };
+
+              if (isFileTypeField(originField.type)) {
+                return {
+                  id: targetField.id,
+                  content: { petitionFieldReplyId: reply.id },
+                  ...common,
+                };
+              }
+
+              if (
+                ["TEXT", "SHORT_TEXT", "SELECT"].includes(targetField.type) &&
+                ["CHECKBOX"].includes(originField.type)
+              ) {
+                const values = targetField.multiple
+                  ? reply.content?.value
+                  : [reply.content?.value[0]];
+                return values.map((value: string) => ({
+                  id: targetField.id,
+                  content: { value },
+                  ...common,
+                }));
+              }
+
+              if (targetField.type === "DATE_TIME") {
+                return {
+                  id: targetField.id,
+                  content: {
+                    datetime: reply.content.datetime,
+                    timezone: reply.content.timezone,
+                  },
+                  ...common,
+                };
+              }
+
+              if (targetField.type === "NUMBER") {
+                return {
+                  id: targetField.id,
+                  content: { value: reply.content?.value },
+                  ...common,
+                };
+              }
+
+              if (targetField.type === "CHECKBOX") {
+                return {
+                  id: targetField.id,
+                  content: {
+                    value:
+                      originField.type === "CHECKBOX"
+                        ? reply.content?.value
+                        : [String(reply.content?.value)],
+                  },
+                  ...common,
+                };
+              }
+
+              if (targetField.type === "FIELD_GROUP") {
+                if (index >= replies.length - emptyReplyIds.length) return null;
+                return { id: targetField.id, content: {} };
+              }
+
               return {
                 id: targetField.id,
-                content: { petitionFieldReplyId: reply.id },
+                content: { value: String(reply.content?.value) },
+                ...common,
               };
-            }
+            });
+        });
 
-            if (
-              ["TEXT", "SHORT_TEXT", "SELECT"].includes(targetField.type) &&
-              ["CHECKBOX"].includes(originField.type)
-            ) {
-              const values = targetField.multiple
-                ? reply.content?.value
-                : [reply.content?.value[0]];
-              return values.map((value: string) => ({
-                id: targetField.id,
-                content: { value },
-              }));
-            }
-
-            if (targetField.type === "DATE_TIME") {
-              return {
-                id: targetField.id,
-                content: {
-                  datetime: reply.content.datetime,
-                  timezone: reply.content.timezone,
-                },
-              };
-            }
-
-            if (targetField.type === "NUMBER") {
-              return {
-                id: targetField.id,
-                content: { value: reply.content?.value },
-              };
-            }
-
-            if (targetField.type === "CHECKBOX") {
-              return {
-                id: targetField.id,
-                content: {
-                  value:
-                    originField.type === "CHECKBOX"
-                      ? reply.content?.value
-                      : [String(reply.content?.value)],
-                },
-              };
-            }
-
-            return {
-              id: targetField.id,
-              content: { value: String(reply.content?.value) },
-            };
-          });
-
-        result = result.concat(mappedReplies);
+        if (originIsChild) {
+          childrenReplyInput = childrenReplyInput.concat(mappedReplies.filter(isDefined));
+        } else {
+          fieldsReplyInput = fieldsReplyInput.concat(mappedReplies.filter(isDefined));
+        }
       }
     }
   }
-  return result;
+
+  return {
+    fields: fieldsReplyInput,
+    children: childrenReplyInput,
+  };
 };
 
 mapReplyContents.fragments = {
   get PetitionField() {
     return gql`
       fragment mapReplyContents_PetitionField on PetitionField {
+        ...mapReplyContents_PetitionFieldData
+        children {
+          ...mapReplyContents_PetitionFieldData
+        }
+      }
+      fragment mapReplyContents_PetitionFieldData on PetitionField {
         id
         type
         options
@@ -104,6 +159,23 @@ mapReplyContents.fragments = {
         replies {
           id
           content
+          parent {
+            id
+          }
+          children {
+            field {
+              id
+            }
+            replies {
+              id
+            }
+          }
+        }
+        parent {
+          id
+          replies {
+            id
+          }
         }
       }
     `;
@@ -118,6 +190,13 @@ export const isReplyContentCompatible = (
   const replies = target.multiple ? origin.replies : [origin.replies[0]];
 
   switch (target.type) {
+    case "FIELD_GROUP": {
+      const compatibleFields = ["FIELD_GROUP"] as PetitionFieldType[];
+      if (compatibleFields.includes(origin.type)) {
+        isCompatible = true;
+      }
+      break;
+    }
     case "TEXT": {
       const compatibleFields = [
         "TEXT",

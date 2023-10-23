@@ -12,9 +12,11 @@ import {
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
 import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
 import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
+import { FieldGroupSettings } from "./PetitionComposeFieldGroupSettings";
 import { FileUploadSettings } from "./PetitionComposeFileUploadSettings";
 import { HeadingSettings } from "./PetitionComposeHeadingSettings";
 import { NumberSettings } from "./PetitionComposeNumberSettings";
@@ -57,11 +59,23 @@ export const PetitionComposeFieldSettings = Object.assign(
       const intl = useIntl();
 
       const isOnlyInternal = field.type === "DOW_JONES_KYC";
+      const isFieldGroupChild = isDefined(field.parent?.id) ? true : false;
+
+      const showInPdf = isFieldGroupChild ? field.parent!.showInPdf : field.showInPdf;
+
+      const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
+
+      const isInternalFieldDisabled =
+        isReadOnly ||
+        field.isFixed ||
+        isOnlyInternal ||
+        parentIsInternal ||
+        (isFieldGroupChild && field.position === 0);
 
       const commonSettings = (
         <>
           <SettingsRow
-            isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
+            isDisabled={isInternalFieldDisabled}
             label={
               <FormattedMessage
                 id="component.petition-settings.petition-internal-field"
@@ -70,7 +84,7 @@ export const PetitionComposeFieldSettings = Object.assign(
             }
             description={
               <FormattedMessage
-                id="field-settings.internal-field-description"
+                id="component.petition-compose-field-settings.internal-field-description"
                 defaultMessage="Enabling this will make the field invisible to the recipient."
               />
             }
@@ -97,41 +111,44 @@ export const PetitionComposeFieldSettings = Object.assign(
                 onChange={(event) =>
                   onFieldEdit(field.id, {
                     isInternal: event.target.checked,
-                    showInPdf: !event.target.checked,
-                    requireApproval: field.type === "HEADING" ? undefined : !event.target.checked,
                   })
                 }
-                isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
+                isDisabled={isInternalFieldDisabled}
               />
             </RestrictedFeaturePopover>
           </SettingsRow>
-          {isOnlyInternal ? null : (
-            <SettingsRow
-              isDisabled={isReadOnly || field.isInternal}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.petition-comments-enable"
-                  defaultMessage="Allow comments"
-                />
-              }
-              controlId="enable-comments"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="enable-comments"
-                color="green"
-                isChecked={field.isInternal ? false : field.hasCommentsEnabled}
-                onChange={(event) =>
-                  onFieldEdit(field.id, {
-                    hasCommentsEnabled: event.target.checked,
-                  })
-                }
-                isDisabled={isReadOnly || field.isInternal}
-              />
-            </SettingsRow>
+          {isFieldGroupChild ? null : (
+            <>
+              {isOnlyInternal ? null : (
+                <SettingsRow
+                  isDisabled={isReadOnly || field.isInternal}
+                  label={
+                    <FormattedMessage
+                      id="component.petition-settings.petition-comments-enable"
+                      defaultMessage="Allow comments"
+                    />
+                  }
+                  controlId="enable-comments"
+                >
+                  <Switch
+                    height="20px"
+                    display="block"
+                    id="enable-comments"
+                    color="green"
+                    isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+                    onChange={(event) =>
+                      onFieldEdit(field.id, {
+                        hasCommentsEnabled: event.target.checked,
+                      })
+                    }
+                    isDisabled={isReadOnly || field.isInternal}
+                  />
+                </SettingsRow>
+              )}
+            </>
           )}
-          {!["HEADING"].includes(field.type) && (
+
+          {!["HEADING", "FIELD_GROUP"].includes(field.type) && (
             <SettingsRow
               isDisabled={isReadOnly}
               label={
@@ -142,7 +159,7 @@ export const PetitionComposeFieldSettings = Object.assign(
               }
               description={
                 <FormattedMessage
-                  id="field-settings.include-approval-description"
+                  id="component.petition-compose-field-settings.include-approval-description"
                   defaultMessage="Enabling this option will include the buttons for approving and rejecting replies."
                 />
               }
@@ -163,92 +180,93 @@ export const PetitionComposeFieldSettings = Object.assign(
               />
             </SettingsRow>
           )}
-          {isOnlyInternal ? null : (
-            <>
-              <SettingsRow
-                isDisabled={isReadOnly}
-                label={
-                  <FormattedMessage
-                    id="component.petition-settings.petition-shown-in-pdf"
-                    defaultMessage="Show in PDF"
-                  />
-                }
-                description={
-                  <>
-                    <FormattedMessage
-                      id="field-settings.show-in-pdf-description"
-                      defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
-                    />
-                    <Image
-                      marginTop={2}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
-                    />
-                  </>
-                }
-                controlId="show-in-pdf"
-              >
-                <Switch
-                  height="20px"
-                  display="block"
-                  id="show-in-pdf"
-                  color="green"
-                  isChecked={field.showInPdf}
-                  onChange={(event) =>
-                    onFieldEdit(field.id, {
-                      showInPdf: event.target.checked,
-                    })
-                  }
-                  isDisabled={isReadOnly}
+          {isFieldGroupChild || isOnlyInternal ? null : (
+            <SettingsRow
+              isDisabled={isReadOnly}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.petition-shown-in-pdf"
+                  defaultMessage="Show in PDF"
                 />
-              </SettingsRow>
-              {field.showInPdf && field.type !== "HEADING" ? (
-                <SettingsRow
-                  isDisabled={isReadOnly}
-                  label={
-                    <FormattedMessage
-                      id="component.petition-settings.petition-show-activity-pdf"
-                      defaultMessage="Show reply activity"
-                    />
-                  }
-                  description={
-                    <FormattedMessage
-                      id="field-settings.show-activity-pdf-description"
-                      defaultMessage="Enabling this option will include who and when a reply and its approval were submitted in the PDF."
-                    />
-                  }
-                  controlId="show-activity-in-pdf"
-                >
-                  <Switch
-                    height="20px"
-                    display="block"
-                    id="show-activity-in-pdf"
-                    color="green"
-                    isChecked={field.showActivityInPdf}
-                    onChange={(event) =>
-                      onFieldEdit(field.id, {
-                        showActivityInPdf: event.target.checked,
-                      })
-                    }
-                    isDisabled={isReadOnly}
+              }
+              description={
+                <>
+                  <FormattedMessage
+                    id="component.petition-compose-field-settings.show-in-pdf-description"
+                    defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
                   />
-                </SettingsRow>
-              ) : null}
-            </>
+                  <Image
+                    marginTop={2}
+                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
+                  />
+                </>
+              }
+              controlId="show-in-pdf"
+            >
+              <Switch
+                height="20px"
+                display="block"
+                id="show-in-pdf"
+                color="green"
+                isChecked={showInPdf}
+                onChange={(event) =>
+                  onFieldEdit(field.id, {
+                    showInPdf: event.target.checked,
+                  })
+                }
+                isDisabled={isReadOnly}
+              />
+            </SettingsRow>
           )}
 
+          {!isOnlyInternal && showInPdf && !["HEADING", "FIELD_GROUP"].includes(field.type) ? (
+            <SettingsRow
+              isDisabled={isReadOnly}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.petition-show-activity-pdf"
+                  defaultMessage="Show reply activity"
+                />
+              }
+              description={
+                <FormattedMessage
+                  id="component.petition-compose-field-settings.show-activity-pdf-description"
+                  defaultMessage="Enabling this option will include who and when a reply and its approval were submitted in the PDF."
+                />
+              }
+              controlId="show-activity-in-pdf"
+            >
+              <Switch
+                height="20px"
+                display="block"
+                id="show-activity-in-pdf"
+                color="green"
+                isChecked={field.showActivityInPdf}
+                onChange={(event) =>
+                  onFieldEdit(field.id, {
+                    showActivityInPdf: event.target.checked,
+                  })
+                }
+                isDisabled={isReadOnly}
+              />
+            </SettingsRow>
+          ) : null}
+
           {!field.isReadOnly &&
-            !["CHECKBOX", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"].includes(field.type) && (
+            !["CHECKBOX", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC", "FIELD_GROUP"].includes(
+              field.type,
+            ) && (
               <SettingsRow
                 isDisabled={isReadOnly}
                 label={
                   field.type === "FILE_UPLOAD" ? (
                     <FormattedMessage
-                      id="field-settings.file-multiple-label"
+                      id="component.petition-compose-field-settings.file-multiple-label"
                       defaultMessage="Allow uploading more than one file"
                     />
                   ) : (
                     <FormattedMessage
-                      id="field-settings.multiple-label"
+                      id="component.petition-compose-field-settings.multiple-label"
                       defaultMessage="Allow more than one reply"
                     />
                   )
@@ -256,12 +274,12 @@ export const PetitionComposeFieldSettings = Object.assign(
                 description={
                   field.type === "FILE_UPLOAD" ? (
                     <FormattedMessage
-                      id="field-settings.file-multiple-description"
+                      id="component.petition-compose-field-settings.file-multiple-description"
                       defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
                     />
                   ) : (
                     <FormattedMessage
-                      id="field-settings.multiple-description"
+                      id="component.petition-compose-field-settings.multiple-description"
                       defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
                     />
                   )
@@ -298,18 +316,21 @@ export const PetitionComposeFieldSettings = Object.assign(
           </CloseableCardHeader>
           <Stack padding={4} spacing={4} flex={1} minHeight={0} overflow="auto">
             <Stack spacing={4} direction="column">
-              <Box>
-                <PetitionFieldTypeSelect
-                  type={field.type}
-                  onChange={(type) => {
-                    if (type !== field.type) {
-                      onFieldTypeChange(field.id, type);
-                    }
-                  }}
-                  isDisabled={isReadOnly || field.isFixed}
-                  user={user}
-                />
-              </Box>
+              {field.type === "FIELD_GROUP" ? null : (
+                <Box>
+                  <PetitionFieldTypeSelect
+                    type={field.type}
+                    onChange={(type) => {
+                      if (type !== field.type) {
+                        onFieldTypeChange(field.id, type);
+                      }
+                    }}
+                    isDisabled={isReadOnly || field.isFixed}
+                    user={user}
+                    isFieldGroupChild={isFieldGroupChild}
+                  />
+                </Box>
+              )}
               {field.type !== "SHORT_TEXT" ? commonSettings : null}
               {field.type === "HEADING" ? (
                 <HeadingSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
@@ -350,6 +371,12 @@ export const PetitionComposeFieldSettings = Object.assign(
                   onFieldEdit={onFieldEdit}
                   isReadOnly={isReadOnly}
                 />
+              ) : field.type === "FIELD_GROUP" ? (
+                <FieldGroupSettings
+                  field={field}
+                  onFieldEdit={onFieldEdit}
+                  isReadOnly={isReadOnly}
+                />
               ) : null}
             </Stack>
             {field.type !== "HEADING" ? (
@@ -362,7 +389,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                   textStyle={isReadOnly ? "muted" : undefined}
                 >
                   <FormattedMessage
-                    id="petition.advanced-options"
+                    id="component.petition-compose-field-settings.advanced-options"
                     defaultMessage="Advanced options"
                   />
                 </Heading>
@@ -400,6 +427,15 @@ export const PetitionComposeFieldSettings = Object.assign(
           alias
           hasCommentsEnabled
           requireApproval
+          parent {
+            id
+            showInPdf
+            isInternal
+            children {
+              id
+              type
+            }
+          }
           ...SettingsRowAlias_PetitionField
         }
         ${SettingsRowAlias.fragments.PetitionField}

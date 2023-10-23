@@ -10,7 +10,7 @@ import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 
 export interface PetitionFieldTypeIndicatorProps {
   type: PetitionFieldType;
-  fieldIndex: PetitionFieldIndex;
+  fieldIndex?: PetitionFieldIndex;
   isTooltipDisabled?: boolean;
   isFixedWidth?: boolean;
   hideIcon?: boolean;
@@ -48,16 +48,18 @@ export const PetitionFieldTypeIndicator = chakraForwardRef<
         {...props}
       >
         {hideIcon ? null : <PetitionFieldTypeIcon type={type} boxSize="16px" role="presentation" />}
-        <Text
-          width={isFixedWidth ? 5 : undefined}
-          contentEditable={false}
-          as="span"
-          fontSize="xs"
-          marginLeft={hideIcon ? 0 : 0.5}
-          textAlign="center"
-        >
-          {fieldIndex}
-        </Text>
+        {fieldIndex ? (
+          <Text
+            width={isFixedWidth ? 5 : undefined}
+            contentEditable={false}
+            as="span"
+            fontSize="xs"
+            marginLeft={hideIcon ? 0 : 0.5}
+            textAlign="center"
+          >
+            {fieldIndex}
+          </Text>
+        ) : null}
       </Button>
     </Tooltip>
   );

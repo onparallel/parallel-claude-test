@@ -19,10 +19,10 @@ export interface FieldErrorDialogProps
     Partial<Pick<ConfirmDialogProps<void>, "header" | "confirm">> {
   message: ReactNode;
   showCancel?: boolean;
-  fieldsWithIndices: {
-    fieldIndex: PetitionFieldIndex;
-    field: FieldErrorDialog_PetitionFieldFragment;
-  }[];
+  fieldsWithIndices: (
+    | [field: FieldErrorDialog_PetitionFieldFragment, fieldIndex: PetitionFieldIndex]
+    | { field: FieldErrorDialog_PetitionFieldFragment; fieldIndex: PetitionFieldIndex }
+  )[];
 }
 
 export function FieldErrorDialog({
@@ -56,20 +56,25 @@ export function FieldErrorDialog({
         <Stack>
           <Box>{message}</Box>
           <List>
-            {fieldsWithIndices.slice(0, 5).map(({ field, fieldIndex }) => (
-              <ListItem as={HStack} key={field.id}>
-                <PetitionFieldTypeIndicator
-                  as="div"
-                  type={field.type}
-                  fieldIndex={fieldIndex}
-                  isTooltipDisabled
-                  flexShrink={0}
-                />
-                <OverflownText>
-                  <PetitionFieldReference field={field} as="span" />
-                </OverflownText>
-              </ListItem>
-            ))}
+            {fieldsWithIndices.slice(0, 5).map((fieldWithIndex) => {
+              const [field, fieldIndex] = Array.isArray(fieldWithIndex)
+                ? fieldWithIndex
+                : ([fieldWithIndex.field, fieldWithIndex.fieldIndex] as const);
+              return (
+                <ListItem as={HStack} key={field.id}>
+                  <PetitionFieldTypeIndicator
+                    as="div"
+                    type={field.type}
+                    fieldIndex={fieldIndex}
+                    isTooltipDisabled
+                    flexShrink={0}
+                  />
+                  <OverflownText>
+                    <PetitionFieldReference field={field} as="span" />
+                  </OverflownText>
+                </ListItem>
+              );
+            })}
             {fieldsWithIndices.length > 5 ? (
               <ListItem textAlign="center" fontSize="sm" fontStyle="italic">
                 ...{" "}

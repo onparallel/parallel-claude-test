@@ -175,6 +175,11 @@
     "context": "Annex {n}"
   },
   {
+    "term": "document.petition-export.default-group-name",
+    "definition": "Reply",
+    "context": "Reply"
+  },
+  {
     "term": "document.petition-export.file-not-found",
     "definition": "(Not found)",
     "context": "(Not found)"
@@ -208,6 +213,16 @@
     "term": "document.petition-export.view-replies-in-nd",
     "definition": "See answers in ND",
     "context": "See answers in ND"
+  },
+  {
+    "term": "export-template-report.column-header-untitled-field",
+    "definition": "Untitled field",
+    "context": "Untitled field"
+  },
+  {
+    "term": "export-template-report.column-header-untitled-group",
+    "definition": "Reply",
+    "context": "Reply"
   },
   {
     "term": "export-template-report.column-header.parallel-closed-at",
@@ -740,9 +755,24 @@
     "context": "Comments"
   },
   {
+    "term": "petition-excel-export.not-replied",
+    "definition": "Not replied",
+    "context": "Not replied"
+  },
+  {
     "term": "petition-excel-export.replies",
     "definition": "Replies",
     "context": "Replies"
+  },
+  {
+    "term": "petition-excel-export.untitled-field",
+    "definition": "Untitled field",
+    "context": "Untitled field"
+  },
+  {
+    "term": "petition-excel-export.untitled-group",
+    "definition": "Reply",
+    "context": "Reply"
   },
   {
     "term": "petition-message-bounced.access-click-link",
@@ -1103,11 +1133,6 @@
     "term": "text-replies-excel-worksheet.field",
     "definition": "Field",
     "context": "Field"
-  },
-  {
-    "term": "text-replies-excel-worksheet.no-answer",
-    "definition": "Not replied",
-    "context": "Not replied"
   },
   {
     "term": "text-replies-excel-worksheet.reply",

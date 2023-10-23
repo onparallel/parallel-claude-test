@@ -25,12 +25,12 @@ import {
   GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataDocument,
   GeneratePrefilledPublicLinkDialog_PetitionTemplateFragmentDoc,
 } from "@parallel/graphql/__types";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
+import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { toCanvas } from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined, noop, zip } from "remeda";
+import { isDefined, noop } from "remeda";
 
 export function GeneratePrefilledPublicLinkDialog({
   petitionId,
@@ -58,8 +58,7 @@ export function GeneratePrefilledPublicLinkDialog({
     } catch {}
   };
 
-  const indices = useFieldIndices(data!.fields);
-  const fieldsWithIndices = zip(data!.fields, indices).filter(
+  const fieldsWithIndices = useFieldsWithIndices(data!.fields).filter(
     ([field]) =>
       isDefined(field.alias) &&
       !isFileTypeField(field.type) &&

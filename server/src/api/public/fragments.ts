@@ -64,7 +64,7 @@ export const PetitionAccessFragment = gql`
 `;
 
 export const PetitionFieldFragment = gql`
-  fragment PetitionField on PetitionField {
+  fragment _PetitionField on PetitionField {
     id
     title
     description
@@ -72,18 +72,37 @@ export const PetitionFieldFragment = gql`
     fromPetitionFieldId
     alias
     options
+    optional
     multiple
+  }
+  fragment PetitionField on PetitionField {
+    ..._PetitionField
+    children {
+      ..._PetitionField
+    }
   }
 `;
 
 export const PetitionFieldReplyFragment = gql`
-  fragment PetitionFieldReply on PetitionFieldReply {
+  fragment _PetitionFieldReply on PetitionFieldReply {
     id
     content
     status
     metadata
     createdAt
     updatedAt
+  }
+  fragment PetitionFieldReply on PetitionFieldReply {
+    ..._PetitionFieldReply
+    children {
+      field {
+        id
+        type
+      }
+      replies {
+        ..._PetitionFieldReply
+      }
+    }
   }
 `;
 
@@ -134,6 +153,18 @@ export const PetitionFragment = gql`
         id
         content
         metadata
+        children {
+          field {
+            id
+            alias
+            type
+          }
+          replies {
+            id
+            content
+            metadata
+          }
+        }
       }
     }
     tags @include(if: $includeTags) {

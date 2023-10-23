@@ -28,13 +28,18 @@ import {
   fieldsBelongsToPetition,
   petitionIsNotAnonymized,
   repliesBelongsToPetition,
+  replyCanBeDeleted,
   replyCanBeUpdated,
   replyIsForFieldOfType,
   userHasAccessToPetitions,
   userHasEnabledIntegration,
   userHasFeatureFlag,
 } from "../authorizers";
-import { validateCreateReplyContent, validateUpdateReplyContent } from "../validations";
+import {
+  validateCreateFileReplyInput,
+  validateCreatePetitionFieldReplyInput,
+  validateUpdatePetitionFieldReplyInput,
+} from "../validations";
 
 export const FileUploadReplyResponse = objectType({
   name: "FileUploadReplyResponse",
@@ -53,18 +58,21 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     file: nonNull("FileUploadInput"),
+    parentReplyId: globalIdArg("PetitionFieldReply"),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
-    fieldCanBeReplied("fieldId"),
+    fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
   ),
-  validateArgs: validFileUploadInput(
-    (args) => args.file,
-    { maxSizeBytes: 50 * 1024 * 1024 },
-    "file",
+  validateArgs: validateAnd(
+    validFileUploadInput((args) => args.file, { maxSizeBytes: 50 * 1024 * 1024 }, "file"),
+    validateCreateFileReplyInput(
+      (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
+      "fieldId",
+    ),
   ),
   resolve: async (_, args, ctx) => {
     const key = random(16);
@@ -92,6 +100,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
             user_id: ctx.user!.id,
             type: "FILE_UPLOAD",
             content: { file_upload_id: file.id },
+            parent_petition_field_reply_id: args.parentReplyId ?? null,
             status: "PENDING",
           },
           `User:${ctx.user!.id}`,
@@ -248,6 +257,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyCanBeUpdated("replyId"),
+    replyCanBeDeleted("replyId"),
     petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
@@ -261,19 +271,27 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
+    parentReplyId: globalIdArg("PetitionFieldReply"),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-    fieldCanBeReplied("fieldId"),
+    fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
   ),
-  resolve: async (_, { petitionId, fieldId }, ctx) => {
+  validateArgs: validateCreateFileReplyInput(
+    (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
+    "fieldId",
+  ),
+  resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
     const session = await ctx.bankflip.createSession({
       petitionId: toGlobalId("Petition", petitionId),
       orgId: toGlobalId("Organization", ctx.user!.org_id),
       fieldId: toGlobalId("PetitionField", fieldId),
       userId: toGlobalId("User", ctx.user!.id),
+      parentReplyId: isDefined(parentReplyId)
+        ? toGlobalId("PetitionFieldReply", parentReplyId)
+        : null,
     });
 
     return {
@@ -318,6 +336,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     profileId: nonNull(idArg()),
+    parentReplyId: globalIdArg("PetitionFieldReply"),
   },
   authorize: authenticateAnd(
     userHasEnabledIntegration("DOW_JONES_KYC"),
@@ -325,8 +344,12 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DOW_JONES_KYC"]),
-    fieldCanBeReplied("fieldId"),
+    fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
+  ),
+  validateArgs: validateCreateFileReplyInput(
+    (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
+    "fieldId",
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -365,6 +388,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
           petition_field_id: args.fieldId,
           user_id: ctx.user!.id,
           type: "DOW_JONES_KYC",
+          parent_petition_field_reply_id: args.parentReplyId ?? null,
           content: {
             file_upload_id: fileUpload.id,
             entity: {
@@ -405,12 +429,19 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", (args) => args.fields.map((field) => field.id)),
-    fieldCanBeReplied((args) => args.fields.map((field) => field.id), "overwriteExisting"),
+    fieldCanBeReplied((args) => args.fields, "overwriteExisting"),
+    replyIsForFieldOfType(
+      (args) => args.fields.map((field) => field.parentReplyId).filter(isDefined),
+      "FIELD_GROUP",
+    ),
+    repliesBelongsToPetition("petitionId", (args) =>
+      args.fields.map((field) => field.parentReplyId).filter(isDefined),
+    ),
     petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.fields, "fields"),
-    validateCreateReplyContent((args) => args.fields, "fields"),
+    validateCreatePetitionFieldReplyInput((args) => args.fields, "fields"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -421,6 +452,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
             name: "CreatePetitionFieldReplyInput",
             definition(t) {
               t.nonNull.globalId("id", { prefixName: "PetitionField" });
+              t.nullable.globalId("parentReplyId", { prefixName: "PetitionFieldReply" });
               t.nullable.json("content");
             },
           }),
@@ -447,10 +479,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
           : [];
 
       if (args.overwriteExisting) {
-        await ctx.petitions.deletePetitionFieldReplies(
-          args.fields.map((field) => field.id),
-          ctx.user!,
-        );
+        await ctx.petitions.deletePetitionFieldReplies(args.fields, ctx.user!);
       }
 
       const data: CreatePetitionFieldReply[] = await pMap(
@@ -468,6 +497,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
             return {
               content: { file_upload_id: fileUpload.id },
               petition_field_id: field.id,
+              parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
               type: field.type,
               user_id: ctx.user!.id,
               status: "PENDING",
@@ -476,6 +506,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
             return {
               content: fieldReplyContent(field.type, fieldReply.content),
               petition_field_id: field.id,
+              parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
               type: field.type,
               user_id: ctx.user!.id,
               status: "PENDING",
@@ -545,7 +576,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.replies, "replies"),
-    validateUpdateReplyContent((args) => args.replies, "replies"),
+    validateUpdatePetitionFieldReplyInput((args) => args.replies, "replies"),
   ),
   resolve: async (_, args, ctx) => {
     const replyIds = uniq(args.replies.map((r) => r.id));

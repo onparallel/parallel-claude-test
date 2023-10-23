@@ -5,6 +5,7 @@ import { Knex } from "knex";
 import { isDefined, pick, range, sortBy } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
+import { random } from "../../../util/token";
 import {
   Contact,
   Organization,
@@ -12,6 +13,7 @@ import {
   PetitionAccess,
   PetitionContactNotification,
   PetitionField,
+  PetitionFieldReply,
   PetitionFieldType,
   PetitionFieldTypeValues,
   PetitionUserNotification,
@@ -22,7 +24,6 @@ import { EmailLogRepository } from "../EmailLogRepository";
 import { FileRepository } from "../FileRepository";
 import { PetitionRepository } from "../PetitionRepository";
 import { Mocks } from "./mocks";
-import { random } from "../../../util/token";
 
 describe("repositories/PetitionRepository", () => {
   let container: Container;
@@ -153,7 +154,7 @@ describe("repositories/PetitionRepository", () => {
     let petition1: Petition, petition2: Petition;
     let fields: PetitionField[], deleted: PetitionField[], foreignField: PetitionField;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       [petition1, petition2] = await mocks.createRandomPetitions(organization.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6);
       // add some random deleted fields
@@ -166,10 +167,15 @@ describe("repositories/PetitionRepository", () => {
     test("fails if the ids passed do not match with the petition field ids", async () => {
       const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
       await expect(
-        petitions.updateFieldPositions(petition1.id, [id2, id5, id6], user),
+        petitions.updateFieldPositions(petition1.id, [id2, id5, id6], null, `User:${user.id}`),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
       await expect(
-        petitions.updateFieldPositions(petition1.id, [id1, id2, id3, id4, id5, id6, id6], user),
+        petitions.updateFieldPositions(
+          petition1.id,
+          [id1, id2, id3, id4, id5, id6, id6],
+          null,
+          `User:${user.id}`,
+        ),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
@@ -180,7 +186,8 @@ describe("repositories/PetitionRepository", () => {
         petitions.updateFieldPositions(
           petition1.id,
           [id1, id2, id3, deleted[2].id, id5, id6, id6],
-          user,
+          null,
+          `User:${user.id}`,
         ),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
@@ -192,14 +199,20 @@ describe("repositories/PetitionRepository", () => {
         petitions.updateFieldPositions(
           petition1.id,
           [id1, id2, id3, foreignField.id, id5, id6, id6],
-          user,
+          null,
+          `User:${user.id}`,
         ),
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
     test("updates the positions", async () => {
       const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
-      await petitions.updateFieldPositions(petition1.id, [id2, id5, id6, id3, id1, id4], user);
+      await petitions.updateFieldPositions(
+        petition1.id,
+        [id2, id5, id6, id3, id1, id4],
+        null,
+        `User:${user.id}`,
+      );
       const result1 = await petitions.loadFieldsForPetition(petition1.id, {
         refresh: true,
       });
@@ -210,7 +223,12 @@ describe("repositories/PetitionRepository", () => {
           deleted_at: null,
         })),
       );
-      await petitions.updateFieldPositions(petition1.id, [id6, id5, id4, id3, id2, id1], user);
+      await petitions.updateFieldPositions(
+        petition1.id,
+        [id6, id5, id4, id3, id2, id1],
+        null,
+        `User:${user.id}`,
+      );
       const result2 = await petitions.loadFieldsForPetition(petition1.id, {
         refresh: true,
       });
@@ -221,6 +239,28 @@ describe("repositories/PetitionRepository", () => {
           deleted_at: null,
         })),
       );
+    });
+
+    it("only updates fields that changed positions", async () => {
+      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
+      await petitions.updateFieldPositions(
+        petition1.id,
+        [id1, id2, id5, id4, id3, id6],
+        null,
+        `User:${user.id}`,
+      );
+      const result = await petitions.loadFieldsForPetition(petition1.id, {
+        refresh: true,
+      });
+
+      expect(sortBy(result, (f) => f.position)).toMatchObject([
+        { id: id1, position: 0, updated_by: null },
+        { id: id2, position: 1, updated_by: null },
+        { id: id5, position: 2, updated_by: expect.any(String) },
+        { id: id4, position: 3, updated_by: null },
+        { id: id3, position: 4, updated_by: expect.any(String) },
+        { id: id6, position: 5, updated_by: null },
+      ]);
     });
   });
 
@@ -298,15 +338,28 @@ describe("repositories/PetitionRepository", () => {
         user.id,
       );
       const [fieldToDelete] = await mocks.createRandomPetitionFields(petition1.id, 1);
+      const [userComment] = await mocks.createRandomCommentsFromUser(
+        user.id,
+        fieldToDelete.id,
+        petition1.id,
+        1,
+      );
       await mocks.knex.from<PetitionUserNotification>("petition_user_notification").insert({
         type: "COMMENT_CREATED",
-        data: { petition_field_comment_id: 1, petition_field_id: fieldToDelete.id },
+        data: { petition_field_comment_id: userComment.id, petition_field_id: fieldToDelete.id },
         petition_id: petition1.id,
         user_id: user.id,
       });
+
+      const [accessComment] = await mocks.createRandomCommentsFromAccess(
+        access.id,
+        fieldToDelete.id,
+        petition1.id,
+        1,
+      );
       await mocks.knex.from<PetitionContactNotification>("petition_contact_notification").insert({
         type: "COMMENT_CREATED",
-        data: { petition_field_comment_id: 1, petition_field_id: fieldToDelete.id },
+        data: { petition_field_comment_id: accessComment.id, petition_field_id: fieldToDelete.id },
         petition_id: petition1.id,
         petition_access_id: access.id,
       });
@@ -1309,20 +1362,15 @@ describe("repositories/PetitionRepository", () => {
   describe("prefillPetition", () => {
     let petition: Petition;
     let fields: PetitionField[];
+    let children: PetitionField[];
 
     function fieldId(fields: PetitionField[], alias: string) {
       return fields.find((f) => f.alias === alias)!.id;
     }
 
-    beforeAll(async () => {
-      [petition] = await mocks.createRandomPetitions(organization.id, user.id);
-    });
-
     beforeEach(async () => {
-      await mocks.knex
-        .from("petition_field")
-        .where("petition_id", petition.id)
-        .update({ deleted_at: new Date() });
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id);
+
       fields = await mocks.createRandomPetitionFields(
         petition.id,
         PetitionFieldTypeValues.length,
@@ -1331,6 +1379,16 @@ describe("repositories/PetitionRepository", () => {
           alias: PetitionFieldTypeValues[i],
         }),
       );
+
+      const childTypes = ["TEXT", "NUMBER", "SHORT_TEXT", "FILE_UPLOAD"] as PetitionFieldType[];
+
+      children = await mocks.createRandomPetitionFields(petition.id, 4, (i) => ({
+        multiple: true,
+        parent_petition_field_id: fieldId(fields, "FIELD_GROUP"),
+        type: childTypes[i],
+        alias: `CHILD_${childTypes[i]}`,
+        position: i,
+      }));
 
       const selectField = fields.find((f) => f.type === "SELECT")!;
       const checkboxField = fields.find((f) => f.type === "CHECKBOX")!;
@@ -1380,7 +1438,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates single replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(13);
+      expect(PetitionFieldTypeValues).toHaveLength(14);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1460,7 +1518,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates multiple replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(13);
+      expect(PetitionFieldTypeValues).toHaveLength(14);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1496,7 +1554,6 @@ describe("repositories/PetitionRepository", () => {
 
       const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
 
-      // expect(replies).toHaveLength(17);
       expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
         {
           type: "TEXT",
@@ -1596,7 +1653,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("ignores a reply if it does not match with field options", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(13);
+      expect(PetitionFieldTypeValues).toHaveLength(14);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1629,6 +1686,172 @@ describe("repositories/PetitionRepository", () => {
             timezone: "Europe/Madrid",
           },
           petition_field_id: fieldId(fields, "DATE_TIME"),
+        },
+      ]);
+    });
+
+    it("creates empty FIELD_GROUP replies", async () => {
+      await petitions.prefillPetition(petition.id, { FIELD_GROUP: [{}, {}] }, user);
+
+      const replies = (await petitions.loadRepliesForField(fieldId(fields, "FIELD_GROUP"))).flat();
+
+      const childReplies = await mocks.knex
+        .from("petition_field_reply")
+        .where({ deleted_at: null })
+        .whereIn(
+          "parent_petition_field_reply_id",
+          replies.map((r) => r.id),
+        );
+
+      expect(replies).toMatchObject([
+        {
+          type: "FIELD_GROUP",
+          content: {},
+          petition_field_id: fieldId(fields, "FIELD_GROUP"),
+          deleted_at: null,
+        },
+        {
+          type: "FIELD_GROUP",
+          content: {},
+          petition_field_id: fieldId(fields, "FIELD_GROUP"),
+          deleted_at: null,
+        },
+      ]);
+      expect(childReplies).toHaveLength(0);
+    });
+
+    it("creates FIELD_GROUP replies with children", async () => {
+      await petitions.prefillPetition(
+        petition.id,
+        {
+          FIELD_GROUP: [
+            {
+              CHILD_TEXT: ["first text reply", "second text reply"],
+              CHILD_NUMBER: 100,
+            },
+            {
+              CHILD_TEXT: "reply on second reply group",
+              UNKNOWN: "hello!",
+            },
+            {
+              CHILD_TEXT: "text reply",
+              CHILD_SHORT_TEXT: "short text reply",
+              CHILD_FILE_UPLOAD: "should be ignored",
+              CHILD_NUMBER: [1, 2, 3],
+            },
+          ],
+        },
+        user,
+      );
+
+      const fieldGroupReplies = (
+        await petitions.loadRepliesForField(fieldId(fields, "FIELD_GROUP"))
+      ).flat();
+      expect(fieldGroupReplies).toMatchObject([
+        { type: "FIELD_GROUP", content: {} },
+        { type: "FIELD_GROUP", content: {} },
+        { type: "FIELD_GROUP", content: {} },
+      ]);
+
+      const firstGroupReplies = (
+        await petitions.loadPetitionFieldGroupChildReplies(
+          children.map((child) => ({
+            parentPetitionFieldReplyId: fieldGroupReplies[0].id,
+            petitionFieldId: child.id,
+          })),
+        )
+      ).flat();
+
+      expect(
+        firstGroupReplies.map((r) =>
+          pick(r, ["type", "content", "petition_field_id", "parent_petition_field_reply_id"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          type: "TEXT",
+          content: { value: "first text reply" },
+          petition_field_id: fieldId(children, "CHILD_TEXT"),
+          parent_petition_field_reply_id: fieldGroupReplies[0].id,
+        },
+        {
+          type: "TEXT",
+          content: { value: "second text reply" },
+          petition_field_id: fieldId(children, "CHILD_TEXT"),
+          parent_petition_field_reply_id: fieldGroupReplies[0].id,
+        },
+        {
+          type: "NUMBER",
+          content: { value: 100 },
+          petition_field_id: fieldId(children, "CHILD_NUMBER"),
+          parent_petition_field_reply_id: fieldGroupReplies[0].id,
+        },
+      ]);
+
+      const secondGroupReplies = (
+        await petitions.loadPetitionFieldGroupChildReplies(
+          children.map((child) => ({
+            parentPetitionFieldReplyId: fieldGroupReplies[1].id,
+            petitionFieldId: child.id,
+          })),
+        )
+      ).flat();
+
+      expect(
+        secondGroupReplies.map((r) =>
+          pick(r, ["type", "content", "petition_field_id", "parent_petition_field_reply_id"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          type: "TEXT",
+          content: { value: "reply on second reply group" },
+          petition_field_id: fieldId(children, "CHILD_TEXT"),
+          parent_petition_field_reply_id: fieldGroupReplies[1].id,
+        },
+      ]);
+
+      const thirdGroupReplies = (
+        await petitions.loadPetitionFieldGroupChildReplies(
+          children.map((child) => ({
+            parentPetitionFieldReplyId: fieldGroupReplies[2].id,
+            petitionFieldId: child.id,
+          })),
+        )
+      ).flat();
+
+      expect(
+        thirdGroupReplies.map((r) =>
+          pick(r, ["type", "content", "petition_field_id", "parent_petition_field_reply_id"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          type: "TEXT",
+          content: { value: "text reply" },
+          petition_field_id: fieldId(children, "CHILD_TEXT"),
+          parent_petition_field_reply_id: fieldGroupReplies[2].id,
+        },
+        {
+          type: "SHORT_TEXT",
+          content: { value: "short text reply" },
+          petition_field_id: fieldId(children, "CHILD_SHORT_TEXT"),
+          parent_petition_field_reply_id: fieldGroupReplies[2].id,
+        },
+        {
+          type: "NUMBER",
+          content: { value: 1 },
+          petition_field_id: fieldId(children, "CHILD_NUMBER"),
+          parent_petition_field_reply_id: fieldGroupReplies[2].id,
+        },
+        {
+          type: "NUMBER",
+          content: { value: 2 },
+          petition_field_id: fieldId(children, "CHILD_NUMBER"),
+          parent_petition_field_reply_id: fieldGroupReplies[2].id,
+        },
+        {
+          type: "NUMBER",
+          content: { value: 3 },
+          petition_field_id: fieldId(children, "CHILD_NUMBER"),
+          parent_petition_field_reply_id: fieldGroupReplies[2].id,
         },
       ]);
     });
@@ -1715,6 +1938,7 @@ describe("repositories/PetitionRepository", () => {
   describe("getPetitionFieldsWithReplies", () => {
     let petition: Petition;
 
+    let heading: PetitionField;
     let shortText: PetitionField;
     let number: PetitionField;
     let phone: PetitionField;
@@ -1722,25 +1946,47 @@ describe("repositories/PetitionRepository", () => {
     let fileUpload: PetitionField;
     let bankflip: PetitionField;
     let bankflipWithError: PetitionField;
+    let fieldGroup: PetitionField;
+    let fieldGroupChildren: PetitionField[];
 
+    let fieldGroupReplies: PetitionFieldReply[];
     beforeEach(async () => {
       [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
 
-      [, shortText, number, phone, date, fileUpload, bankflip, bankflipWithError] =
-        await mocks.createRandomPetitionFields(petition.id, 8, (i) => ({
-          type: [
-            "HEADING",
-            "SHORT_TEXT",
-            "NUMBER",
-            "PHONE",
-            "DATE",
-            "FILE_UPLOAD",
-            "ES_TAX_DOCUMENTS",
-            "ES_TAX_DOCUMENTS",
-          ][i] as PetitionFieldType,
-        }));
+      [
+        heading,
+        shortText,
+        number,
+        phone,
+        date,
+        fileUpload,
+        bankflip,
+        bankflipWithError,
+        fieldGroup,
+      ] = await mocks.createRandomPetitionFields(petition.id, 9, (i) => ({
+        type: [
+          "HEADING",
+          "SHORT_TEXT",
+          "NUMBER",
+          "PHONE",
+          "DATE",
+          "FILE_UPLOAD",
+          "ES_TAX_DOCUMENTS",
+          "ES_TAX_DOCUMENTS",
+          "FIELD_GROUP",
+        ][i] as PetitionFieldType,
+      }));
 
-      await mocks.createRandomTextReply(shortText.id, undefined, 2, () => ({ user_id: user.id }));
+      fieldGroupChildren = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        type: ["TEXT", "PHONE"][i] as PetitionFieldType,
+        position: i,
+        parent_petition_field_id: fieldGroup.id,
+      }));
+
+      await mocks.createRandomTextReply(shortText.id, undefined, 2, () => ({
+        user_id: user.id,
+        type: "SHORT_TEXT",
+      }));
       await mocks.createRandomNumberReply(number.id, undefined, 1, () => ({ user_id: user.id }));
       await mocks.createRandomPhoneReply(phone.id, undefined, 1, () => ({ user_id: user.id }));
       await mocks.createRandomDateReply(date.id, undefined, 1, () => ({ user_id: user.id }));
@@ -1763,29 +2009,70 @@ describe("repositories/PetitionRepository", () => {
             }
           : {}),
       }));
+
+      fieldGroupReplies = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 2, () => ({
+        user_id: user.id,
+      }));
+
+      await mocks.createRandomTextReply(fieldGroupChildren[0].id, undefined, 1, () => ({
+        parent_petition_field_reply_id: fieldGroupReplies[0].id,
+        user_id: user.id,
+      }));
+
+      await mocks.createRandomPhoneReply(fieldGroupChildren[1].id, undefined, 1, () => ({
+        parent_petition_field_reply_id: fieldGroupReplies[0].id,
+        user_id: user.id,
+      }));
     });
 
     it("returns a list of fields with replies", async () => {
-      const [result] = await petitions.getPetitionFieldsWithReplies([petition.id]);
+      const [fields] = await petitions.getPetitionFieldsWithReplies([petition.id]);
 
-      expect(
-        result.map((f) => pick(f, ["id", "petition_id", "position", "type", "replies"])),
-      ).toEqual([
+      expect(fields).toIncludeSameMembers([
+        {
+          id: heading.id,
+          petition_id: petition.id,
+          position: 0,
+          type: "HEADING",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
+          replies: [],
+        },
         {
           id: shortText.id,
           petition_id: petition.id,
           position: 1,
           type: "SHORT_TEXT",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "SHORT_TEXT",
+              petition_field_id: shortText.id,
               content: { value: expect.any(String) },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
             {
+              id: expect.any(Number),
+              type: "SHORT_TEXT",
+              petition_field_id: shortText.id,
               content: { value: expect.any(String) },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1794,11 +2081,22 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 2,
           type: "NUMBER",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "NUMBER",
+              petition_field_id: number.id,
               content: { value: expect.any(Number) },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1807,11 +2105,22 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 3,
           type: "PHONE",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "PHONE",
+              petition_field_id: phone.id,
               content: { value: expect.any(String) },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1820,11 +2129,22 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 4,
           type: "DATE",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "DATE",
+              petition_field_id: date.id,
               content: { value: expect.any(String) },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1833,20 +2153,35 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 5,
           type: "FILE_UPLOAD",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "FILE_UPLOAD",
+              petition_field_id: fileUpload.id,
               content: {
                 file_upload_id: expect.any(Number),
               },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
             {
+              id: expect.any(Number),
+              type: "FILE_UPLOAD",
+              petition_field_id: fileUpload.id,
               content: {
                 file_upload_id: expect.any(Number),
               },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1855,8 +2190,18 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 6,
           type: "ES_TAX_DOCUMENTS",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "ES_TAX_DOCUMENTS",
+              petition_field_id: bankflip.id,
               content: {
                 file_upload_id: expect.any(Number),
                 bankflip_session_id: expect.any(String),
@@ -1865,6 +2210,7 @@ describe("repositories/PetitionRepository", () => {
               },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1873,8 +2219,18 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 7,
           type: "ES_TAX_DOCUMENTS",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "ES_TAX_DOCUMENTS",
+              petition_field_id: bankflipWithError.id,
               content: {
                 file_upload_id: expect.any(Number),
                 bankflip_session_id: expect.any(String),
@@ -1883,6 +2239,88 @@ describe("repositories/PetitionRepository", () => {
               },
               status: "PENDING",
               anonymized_at: null,
+              parent_petition_field_reply_id: null,
+            },
+          ],
+        },
+        {
+          id: fieldGroup.id,
+          petition_id: petition.id,
+          position: 8,
+          type: "FIELD_GROUP",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
+          replies: [
+            {
+              id: expect.any(Number),
+              type: "FIELD_GROUP",
+              petition_field_id: fieldGroup.id,
+              content: {},
+              status: "PENDING",
+              anonymized_at: null,
+              parent_petition_field_reply_id: null,
+            },
+            {
+              id: expect.any(Number),
+              type: "FIELD_GROUP",
+              petition_field_id: fieldGroup.id,
+              content: {},
+              status: "PENDING",
+              anonymized_at: null,
+              parent_petition_field_reply_id: null,
+            },
+          ],
+        },
+        {
+          id: fieldGroupChildren[0].id,
+          petition_id: petition.id,
+          position: 0,
+          type: "TEXT",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: fieldGroup.id,
+          replies: [
+            {
+              id: expect.any(Number),
+              type: "TEXT",
+              petition_field_id: fieldGroupChildren[0].id,
+              content: { value: expect.any(String) },
+              status: "PENDING",
+              anonymized_at: null,
+              parent_petition_field_reply_id: fieldGroupReplies[0].id,
+            },
+          ],
+        },
+        {
+          id: fieldGroupChildren[1].id,
+          petition_id: petition.id,
+          position: 1,
+          type: "PHONE",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: fieldGroup.id,
+          replies: [
+            {
+              id: expect.any(Number),
+              type: "PHONE",
+              petition_field_id: fieldGroupChildren[1].id,
+              content: { value: expect.any(String) },
+              status: "PENDING",
+              anonymized_at: null,
+              parent_petition_field_reply_id: fieldGroupReplies[0].id,
             },
           ],
         },
@@ -1892,26 +2330,53 @@ describe("repositories/PetitionRepository", () => {
     it("returns a list of fields with replies on anonymized petition", async () => {
       await petitions.anonymizePetition(petition.id);
 
-      const [result] = await petitions.getPetitionFieldsWithReplies([petition.id]);
+      const [fields] = await petitions.getPetitionFieldsWithReplies([petition.id]);
 
-      expect(
-        result.map((f) => pick(f, ["id", "petition_id", "position", "type", "replies"])),
-      ).toEqual([
+      expect(fields).toIncludeSameMembers([
+        {
+          id: heading.id,
+          petition_id: petition.id,
+          position: 0,
+          type: "HEADING",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
+          replies: [],
+        },
         {
           id: shortText.id,
           petition_id: petition.id,
           position: 1,
           type: "SHORT_TEXT",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "SHORT_TEXT",
+              petition_field_id: shortText.id,
               content: { value: null },
               status: "PENDING",
               anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: null,
             },
             {
+              id: expect.any(Number),
+              type: "SHORT_TEXT",
+              petition_field_id: shortText.id,
               content: { value: null },
               status: "PENDING",
               anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1920,11 +2385,22 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 2,
           type: "NUMBER",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "NUMBER",
+              petition_field_id: number.id,
               content: { value: null },
               status: "PENDING",
               anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1933,11 +2409,22 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 3,
           type: "PHONE",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "PHONE",
+              petition_field_id: phone.id,
               content: { value: null },
               status: "PENDING",
               anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1946,11 +2433,22 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 4,
           type: "DATE",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [
             {
+              id: expect.any(Number),
+              type: "DATE",
+              petition_field_id: date.id,
               content: { value: null },
               status: "PENDING",
               anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: null,
             },
           ],
         },
@@ -1959,6 +2457,13 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 5,
           type: "FILE_UPLOAD",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [],
         },
         {
@@ -1966,6 +2471,13 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 6,
           type: "ES_TAX_DOCUMENTS",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [],
         },
         {
@@ -1973,7 +2485,95 @@ describe("repositories/PetitionRepository", () => {
           petition_id: petition.id,
           position: 7,
           type: "ES_TAX_DOCUMENTS",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
           replies: [],
+        },
+        {
+          id: fieldGroup.id,
+          petition_id: petition.id,
+          position: 8,
+          type: "FIELD_GROUP",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: null,
+          replies: [
+            {
+              id: expect.any(Number),
+              type: "FIELD_GROUP",
+              petition_field_id: fieldGroup.id,
+              content: {},
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: null,
+            },
+            {
+              id: expect.any(Number),
+              type: "FIELD_GROUP",
+              petition_field_id: fieldGroup.id,
+              content: {},
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: null,
+            },
+          ],
+        },
+        {
+          id: fieldGroupChildren[0].id,
+          petition_id: petition.id,
+          position: 0,
+          type: "TEXT",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: fieldGroup.id,
+          replies: [
+            {
+              id: expect.any(Number),
+              type: "TEXT",
+              petition_field_id: fieldGroupChildren[0].id,
+              content: { value: null },
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: fieldGroupReplies[0].id,
+            },
+          ],
+        },
+        {
+          id: fieldGroupChildren[1].id,
+          petition_id: petition.id,
+          position: 1,
+          type: "PHONE",
+          title: expect.any(String),
+          options: expect.any(Object),
+          from_petition_field_id: null,
+          is_internal: false,
+          visibility: null,
+          optional: false,
+          parent_petition_field_id: fieldGroup.id,
+          replies: [
+            {
+              id: expect.any(Number),
+              type: "PHONE",
+              petition_field_id: fieldGroupChildren[1].id,
+              content: { value: null },
+              status: "PENDING",
+              anonymized_at: expect.any(String),
+              parent_petition_field_reply_id: fieldGroupReplies[0].id,
+            },
+          ],
         },
       ]);
     });

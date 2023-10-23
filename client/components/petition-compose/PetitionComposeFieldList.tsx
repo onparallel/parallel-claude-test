@@ -6,7 +6,6 @@ import {
   ButtonOptions,
   Flex,
   HTMLChakraProps,
-  IconButton,
   ThemingProps,
 } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
@@ -28,32 +27,34 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
-import { useFieldIndices } from "@parallel/utils/fieldIndices";
-import { defaultCondition } from "@parallel/utils/fieldVisibility/conditions";
-import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
+import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import { defaultFieldCondition } from "@parallel/utils/fieldLogic/conditions";
+import { PetitionFieldVisibility } from "@parallel/utils/fieldLogic/types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { Maybe } from "@parallel/utils/types";
-import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { Fragment, memo, useCallback, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { intersection, zip } from "remeda";
+import { Fragment, memo, useCallback, useMemo, useRef, useState } from "react";
+import { FormattedMessage } from "react-intl";
+import { intersection, isDefined } from "remeda";
+import { AddFieldButton } from "../petition-common/AddFieldButton";
 
 export interface PetitionComposeFieldListProps extends BoxProps {
   user: PetitionComposeFieldList_UserFragment;
   activeFieldId: Maybe<string>;
   petition: PetitionComposeFieldList_PetitionBaseFragment;
   showErrors: boolean;
-  fieldRefs: MultipleRefObject<PetitionComposeFieldRef>;
-  onUpdateFieldPositions: (fieldIds: string[]) => void;
+  onUpdateFieldPositions: (fieldIds: string[], parentFieldId?: string) => void;
   onCloneField: (fieldId: string) => void;
   onFieldSettingsClick: (fieldId: string) => void;
   onFieldTypeIndicatorClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => Promise<void>;
-  onAddField: (type: PetitionFieldType, position?: number) => void;
+  onAddField: (type: PetitionFieldType, position?: number, parentFieldId?: string) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
+  onUnlinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
+  onLinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
   isReadOnly?: boolean;
 }
 
@@ -63,7 +64,6 @@ export const PetitionComposeFieldList = Object.assign(
     petition,
     activeFieldId,
     showErrors,
-    fieldRefs,
     onUpdateFieldPositions,
     onCloneField,
     onFieldSettingsClick,
@@ -71,18 +71,28 @@ export const PetitionComposeFieldList = Object.assign(
     onDeleteField,
     onAddField,
     onFieldEdit,
+    onLinkField,
+    onUnlinkField,
     isReadOnly,
     ...props
   }: PetitionComposeFieldListProps) {
+    const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
+
     const { fields, onFieldMove } = usePetitionComposeFieldReorder({
       fields: petition.fields,
       onUpdateFieldPositions,
     });
 
-    const indices = useFieldIndices(fields);
+    const fieldsWithIndices = useFieldsWithIndices(fields);
+
+    const allFields = useMemo(
+      () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
+      [petition.fields],
+    );
 
     // Memoize field callbacks
-    const fieldsDataRef = useUpdatingRef({ fields, active: activeFieldId });
+    const allFieldsDataRef = useUpdatingRef({ fields: allFields, active: activeFieldId });
+    const fieldsDataRef = useUpdatingRef({ fields: petition.fields, active: activeFieldId });
     const fieldProps = useMemoFactory(
       (
         fieldId: string,
@@ -103,7 +113,7 @@ export const PetitionComposeFieldList = Object.assign(
         onTypeIndicatorClick: () => onFieldTypeIndicatorClick(fieldId),
         onDeleteClick: async () => onDeleteField(fieldId),
         onFieldEdit: async (data) => {
-          const { fields } = fieldsDataRef.current!;
+          const { fields } = allFieldsDataRef.current!;
           const field = fields.find((f) => f.id === fieldId)!;
 
           await onFieldEdit(fieldId, data);
@@ -157,28 +167,32 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onFieldVisibilityClick: () => {
-          const { fields } = fieldsDataRef.current!;
+          const { fields } = allFieldsDataRef.current!;
           const field = fields.find((f) => f.id === fieldId)!;
+
           if (field.visibility) {
             onFieldEdit(fieldId, { visibility: null });
           } else {
             const index = fields.findIndex((f) => f.id === field.id);
-            const prevField = fields[index - 1];
+            const prevField = isDefined(field.parent)
+              ? fields[index - 1]
+              : fields.slice(0, index).findLast((f) => !isDefined(f.parent) && !f.isReadOnly)!;
             // if the previous field has a visibility setting copy it
             if (prevField.visibility) {
               onFieldEdit(fieldId, { visibility: prevField.visibility });
             } else {
               // create a factible condition based on the previous field
-              const field = fields
-                .slice(0, index)
-                .reverse()
-                .find((f) => !f.isReadOnly)!;
+              const referencedField =
+                fields
+                  .slice(0, index)
+                  .findLast((f) => !f.isReadOnly && f.parent === field.parent) ??
+                fields.slice(0, index).findLast((f) => !f.isReadOnly)!;
 
-              const condition = defaultCondition(
-                field.type === "DYNAMIC_SELECT" &&
-                  (field.options as FieldOptions["DYNAMIC_SELECT"]).labels?.length
-                  ? [field, 0]
-                  : field,
+              const condition = defaultFieldCondition(
+                referencedField.type === "DYNAMIC_SELECT" &&
+                  (referencedField.options as FieldOptions["DYNAMIC_SELECT"]).labels?.length
+                  ? [referencedField, 0]
+                  : referencedField,
               );
               onFieldEdit(fieldId, {
                 visibility: {
@@ -191,7 +205,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onFocusPrevField: () => {
-          const { fields } = fieldsDataRef.current!;
+          const { fields } = allFieldsDataRef.current!;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index > 0) {
             const prevId = fields[index - 1].id;
@@ -199,27 +213,33 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onFocusNextField: () => {
-          const { fields } = fieldsDataRef.current!;
+          const { fields } = allFieldsDataRef.current!;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index < fields.length - 1) {
             const nextId = fields[index + 1].id;
             fieldRefs[nextId].current!.focusFromPrevious();
           }
         },
-        onAddField: () => {
-          const { fields } = fieldsDataRef.current!;
-          const index = fields.findIndex((f) => f.id === fieldId);
-          if (index === fields.length - 1) {
-            document.querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")?.click();
+        onAddField: (type?: PetitionFieldType, position?: number, parentFieldId?: string) => {
+          if (type) {
+            onAddField(type, position, parentFieldId);
           } else {
-            setHoveredFieldId(fieldId);
-            setTimeout(() => {
+            const { fields } = fieldsDataRef.current!;
+            const index = fields.findIndex((f) => f.id === fieldId);
+            if (index === fields.length - 1) {
               document
-                .querySelector<HTMLButtonElement>(
-                  `#field-${fieldId} + .add-field-button-wrapper  button`,
-                )!
-                .click();
-            });
+                .querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")
+                ?.click();
+            } else {
+              setHoveredFieldId(fieldId);
+              setTimeout(() => {
+                document
+                  .querySelector<HTMLButtonElement>(
+                    `#field-${fieldId} + .add-field-button-wrapper  button`,
+                  )!
+                  .click();
+              });
+            }
           }
         },
       }),
@@ -251,6 +271,7 @@ export const PetitionComposeFieldList = Object.assign(
       (fieldId) =>
         ({
           onFocus(e) {
+            e.stopPropagation();
             // see comment for onBlur below
             clearTimeout(timeoutRef.current);
             if (fieldId !== focusedFieldIdRef.current) {
@@ -265,6 +286,7 @@ export const PetitionComposeFieldList = Object.assign(
               !e.target.classList.contains("field-settings-button")
             ) {
               const field = fields.find((f) => f.id === fieldId)!;
+
               if (field.type === "HEADING" && field.isFixed) {
                 // pass
               } else {
@@ -354,7 +376,7 @@ export const PetitionComposeFieldList = Object.assign(
           }}
           {...props}
         >
-          {zip(fields, indices).map(([field, index], i) => {
+          {fieldsWithIndices.map(([field, fieldIndex, childrenFieldIndices], i) => {
             const nextFieldId = i < fields.length - 1 ? fields[i + 1].id : null;
             const showAddFieldButton = [field.id, nextFieldId].some(
               (id) => id === hoveredFieldId || id === focusedFieldId,
@@ -363,19 +385,28 @@ export const PetitionComposeFieldList = Object.assign(
               <Fragment key={field.id}>
                 <PetitionComposeField
                   ref={fieldRefs[field.id]}
-                  id={`field-${field.id}`}
-                  data-section="compose-field"
-                  data-testid="compose-field"
                   onMove={onFieldMove}
+                  user={user}
                   field={field}
+                  childrenFieldIndices={childrenFieldIndices}
+                  fieldRefs={fieldRefs}
                   petition={petition}
-                  fieldIndex={index}
+                  fieldIndex={fieldIndex}
                   index={i}
-                  isActive={activeFieldId === field.id}
+                  isActive={field.id === activeFieldId}
+                  activeChildFieldId={
+                    isDefined(field.children) && field.children.some((f) => f.id === activeFieldId)
+                      ? activeFieldId
+                      : null
+                  }
                   showError={showErrors}
                   isReadOnly={isReadOnly}
                   {...fieldProps(field.id)}
                   {...fieldMouseHandlers(field.id)}
+                  fieldProps={fieldProps}
+                  onUpdateFieldPositions={onUpdateFieldPositions}
+                  onLinkField={onLinkField}
+                  onUnlinkField={onUnlinkField}
                 />
                 {nextFieldId && !isReadOnly ? (
                   <Box
@@ -405,6 +436,7 @@ export const PetitionComposeFieldList = Object.assign(
         {!isReadOnly ? (
           <Flex marginTop={4} justifyContent="center">
             <BigAddFieldButton
+              id="big-add-field-button"
               data-action="big-add-field"
               data-testid="big-add-field-button"
               onSelectFieldType={onAddField}
@@ -421,8 +453,10 @@ export const PetitionComposeFieldList = Object.assign(
       User: gql`
         fragment PetitionComposeFieldList_User on User {
           ...AddFieldPopover_User
+          ...PetitionComposeField_User
         }
         ${AddFieldPopover.fragments.User}
+        ${PetitionComposeField.fragments.User}
       `,
       PetitionBase: gql`
         fragment PetitionComposeFieldList_PetitionBase on PetitionBase {
@@ -443,40 +477,6 @@ export const PetitionComposeFieldList = Object.assign(
       `,
     },
   },
-);
-
-interface AddFieldButtonProps extends ButtonOptions, ThemingProps<"Button">, AddFieldPopoverProps {}
-
-const AddFieldButton = memo(
-  chakraForwardRef<"button", AddFieldButtonProps>(function AddFieldButton(props, ref) {
-    const intl = useIntl();
-    return (
-      <AddFieldPopover
-        ref={ref as any}
-        as={IconButton}
-        label={intl.formatMessage({
-          id: "petition.add-field-button",
-          defaultMessage: "Add field",
-        })}
-        icon={<AddIcon />}
-        autoFocus={false}
-        size="xs"
-        variant="outline"
-        rounded="full"
-        backgroundColor="white"
-        borderColor="gray.200"
-        color="gray.500"
-        _hover={{
-          borderColor: "gray.300",
-          color: "gray.800",
-        }}
-        _active={{
-          backgroundColor: "gray.50",
-        }}
-        {...props}
-      />
-    );
-  }),
 );
 
 interface BigAddFieldButtonProps

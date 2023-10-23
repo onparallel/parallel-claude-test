@@ -2,27 +2,28 @@ import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
   PetitionPermissionType,
   PreviewPetitionField_PetitionBaseFragment,
-  PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   PreviewPetitionField_PetitionFieldDocument,
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
+  PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTone } from "../common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
+import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
+import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
+import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
+import { RecipientViewPetitionFieldDateTime } from "../recipient-view/fields/RecipientViewPetitionFieldDateTime";
+import { RecipientViewPetitionFieldDynamicSelect } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
+import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
+import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
-import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
-import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
-import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
-import { RecipientViewPetitionFieldDynamicSelect } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
-import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
-import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldNumber } from "../recipient-view/fields/RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldPhone } from "../recipient-view/fields/RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "../recipient-view/fields/RecipientViewPetitionFieldSelect";
@@ -40,8 +41,9 @@ import {
   PreviewPetitionFieldCommentsDialog,
   usePreviewPetitionFieldCommentsDialog,
 } from "./dialogs/PreviewPetitionFieldCommentsDialog";
-import { RecipientViewPetitionFieldDateTime } from "../recipient-view/fields/RecipientViewPetitionFieldDateTime";
-import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
+import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
+import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -51,9 +53,9 @@ export interface PreviewPetitionFieldProps
   petition: PreviewPetitionField_PetitionBaseFragment;
   field: PreviewPetitionField_PetitionFieldFragment;
   isDisabled: boolean;
-  isInvalid: boolean;
   isCacheOnly: boolean;
   myEffectivePermission: PetitionPermissionType;
+  showErrors: boolean;
 }
 
 export function PreviewPetitionField({
@@ -62,12 +64,27 @@ export function PreviewPetitionField({
   isCacheOnly,
   isDisabled,
   myEffectivePermission,
+  showErrors,
   ...props
 }: PreviewPetitionFieldProps) {
   const petitionId = petition.id;
   const uploads = useRef<Record<string, AbortController>>({});
   const fieldId = field.id;
   const tone = useTone();
+
+  const isInvalid = showErrors && !field.optional && completedFieldReplies(field).length === 0;
+
+  useEffect(() => {
+    if (
+      isCacheOnly &&
+      field.type === "FIELD_GROUP" &&
+      !field.optional &&
+      field.previewReplies.length === 0
+    ) {
+      handleCreatePetitionFieldReply({}, field.id);
+    }
+  }, []);
+
   const [petitionFieldAttachmentDownloadLink] = useMutation(
     PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   );
@@ -103,7 +120,7 @@ export function PreviewPetitionField({
 
   const deletePetitionReply = useDeletePetitionReply();
   const handleDeletePetitionReply = useCallback(
-    async (replyId: string) => {
+    async (replyId: string, _fieldId?: string, parentReplyId?: string) => {
       try {
         if (replyId in uploads.current) {
           uploads.current[replyId].abort();
@@ -111,8 +128,9 @@ export function PreviewPetitionField({
         }
         await deletePetitionReply({
           petitionId,
-          fieldId,
+          fieldId: _fieldId ?? fieldId,
           replyId,
+          parentReplyId,
           isCacheOnly,
         });
       } catch {}
@@ -122,10 +140,10 @@ export function PreviewPetitionField({
 
   const updatePetitionFieldReply = useUpdatePetitionFieldReply();
   const handleUpdatePetitionFieldReply = useCallback(
-    async (replyId: string, content: any) => {
+    async (replyId: string, content: any, _fieldId?: string) => {
       await updatePetitionFieldReply({
         petitionId,
-        fieldId,
+        fieldId: _fieldId ?? fieldId,
         replyId,
         content,
         isCacheOnly,
@@ -136,11 +154,12 @@ export function PreviewPetitionField({
 
   const createPetitionFieldReply = useCreatePetitionFieldReply();
   const handleCreatePetitionFieldReply = useCallback(
-    async (content: any) => {
+    async (content: any, _fieldId?: string, parentReplyId?: string) => {
       const res = await createPetitionFieldReply({
         petitionId,
-        fieldId,
+        fieldId: _fieldId ?? fieldId,
         content,
+        parentReplyId,
         isCacheOnly,
       });
       return res?.id;
@@ -150,13 +169,14 @@ export function PreviewPetitionField({
 
   const createFileUploadReply = useCreateFileUploadReply();
   const handleCreateFileUploadReply = useCallback(
-    async (content: File[]) => {
+    async (content: File[], _fieldId?: string, parentReplyId?: string) => {
       try {
         await createFileUploadReply({
           petitionId,
-          fieldId,
+          fieldId: _fieldId ?? fieldId,
           content,
           uploads,
+          parentReplyId,
           isCacheOnly,
         });
       } catch {}
@@ -198,10 +218,11 @@ export function PreviewPetitionField({
 
   const startAsyncFieldCompletion = useStartAsyncFieldCompletion();
 
-  const handleStartAsyncFieldCompletion = async () => {
+  const handleStartAsyncFieldCompletion = async (_fieldId?: string, parentReplyId?: string) => {
     return await startAsyncFieldCompletion({
-      fieldId: field.id,
+      fieldId: _fieldId ?? fieldId,
       petitionId,
+      parentReplyId,
       isCacheOnly,
     });
   };
@@ -217,7 +238,6 @@ export function PreviewPetitionField({
 
   const commonProps = {
     field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
-    petitionId,
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
     onDeleteReply: handleDeletePetitionReply,
@@ -227,11 +247,31 @@ export function PreviewPetitionField({
   };
 
   if (field.type === "HEADING") {
-    return <RecipientViewPetitionFieldHeading {...props} {...commonProps} />;
+    return (
+      <RecipientViewPetitionFieldHeading
+        field={field}
+        onDownloadAttachment={handleDownloadAttachment}
+        onCommentsButtonClick={handleCommentsButtonClick}
+      />
+    );
+  } else if (field.type === "FIELD_GROUP") {
+    return (
+      <PreviewPetitionFieldGroup
+        {...props}
+        {...commonProps}
+        onCreateFileReply={handleCreateFileUploadReply}
+        onDownloadFileUploadReply={handleDownloadFileUploadReply}
+        onRefreshField={handleRefreshAsyncField}
+        onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+        isCacheOnly={isCacheOnly}
+        petition={petition}
+        showErrors={showErrors}
+      />
+    );
   }
 
   return (
-    <RecipientViewPetitionFieldCard isInvalid={props.isInvalid} field={field}>
+    <RecipientViewPetitionFieldCard isInvalid={isInvalid} field={field}>
       {field.type === "TEXT" ? (
         <RecipientViewPetitionFieldText {...props} {...commonProps} />
       ) : field.type === "SHORT_TEXT" ? (
@@ -285,22 +325,34 @@ PreviewPetitionField.fragments = {
   PetitionBase: gql`
     fragment PreviewPetitionField_PetitionBase on PetitionBase {
       ...PreviewPetitionFieldKyc_PetitionBase
+      ...PreviewPetitionFieldGroup_PetitionBase
     }
     ${PreviewPetitionFieldKyc.fragments.PetitionBase}
+    ${PreviewPetitionFieldGroup.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldLayout_PetitionField
       ...RecipientViewPetitionFieldCard_PetitionField
       ...PreviewPetitionFieldCommentsDialog_PetitionField
+      ...PreviewPetitionFieldGroup_PetitionField
+      replies {
+        ...RecipientViewPetitionFieldLayout_PetitionFieldReply
+      }
       previewReplies @client {
         ...RecipientViewPetitionFieldLayout_PetitionFieldReply
       }
+      parent {
+        id
+      }
+      ...completedFieldReplies_PetitionField
     }
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
     ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
+    ${PreviewPetitionFieldGroup.fragments.PetitionField}
+    ${completedFieldReplies.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {

@@ -58,7 +58,7 @@ function useCreateLiquid() {
         if (!isDefined(format) || !["LL", "L"].includes(format)) {
           format = "LL";
         }
-        const _value = value instanceof DateLiquidValue ? value.value : value;
+        const _value = value instanceof DateLiquidValue ? value.content.value : value;
         const intl = (this.context.globals as any)["intl"] as IntlShape;
         return intl.formatDate(_value, {
           timeZone: "UTC",
@@ -76,8 +76,8 @@ function useCreateLiquid() {
         if (!isDefined(format) || !["LLL", "L+LT", "L+LTS"].includes(format)) {
           format = "LLL";
         }
-        const _value = value instanceof DateTimeLiquidValue ? value.value : value;
-        const timezone = value instanceof DateTimeLiquidValue ? value.timezone : "UTC";
+        const _value = value instanceof DateTimeLiquidValue ? value.content.value : value;
+        const timezone = value instanceof DateTimeLiquidValue ? value.content.timezone : "UTC";
         const intl = (this.context.globals as any)["intl"] as IntlShape;
 
         return `${intl.formatDate(_value, {

@@ -1,5 +1,5 @@
 diff --git a/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js b/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js
-index caa4038..9ef2655 100644
+index 9d5c5c7..7a4f90b 100644
 --- a/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js
 +++ b/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js
 @@ -15,6 +15,7 @@ const defaultPropIncludePattern = [

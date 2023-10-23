@@ -6,6 +6,7 @@ import {
   FieldDateTimeIcon,
   FieldDynamicSelectIcon,
   FieldFileUploadIcon,
+  FieldGroupIcon,
   FieldHeadingIcon,
   FieldNumberIcon,
   FieldPhoneIcon,
@@ -39,6 +40,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIc
         PHONE: FieldPhoneIcon,
         ES_TAX_DOCUMENTS: FieldTaxDocumentsIcon,
         DOW_JONES_KYC: DowJonesIcon,
+        FIELD_GROUP: FieldGroupIcon,
       } as Record<PetitionFieldType, ElementType>
     )[type];
     return <Icon as={icon} {...(props as any)} ref={ref} />;

@@ -408,7 +408,7 @@ export class Mocks {
           const type = data.type ?? randomPetitionFieldType();
           return {
             petition_id: petitionId,
-            position: (count as number) + index,
+            position: data.position ?? (count as number) + index,
             title: faker.word.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
@@ -566,6 +566,27 @@ export class Mocks {
             petition_field_id: fieldId,
             content: { file_upload_id: fileUploads[index].id },
             type: "FILE_UPLOAD",
+            petition_access_id: accessId,
+            ...builder?.(index),
+          };
+        }),
+      )
+      .returning("*");
+  }
+
+  async createFieldGroupReply(
+    fieldId: number,
+    accessId?: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>,
+  ) {
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: fieldId,
+            content: {},
+            type: "FIELD_GROUP",
             petition_access_id: accessId,
             ...builder?.(index),
           };

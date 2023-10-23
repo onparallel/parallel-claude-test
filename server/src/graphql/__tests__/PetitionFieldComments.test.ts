@@ -532,6 +532,46 @@ describe("GraphQL/Petition Fields Comments", () => {
         { user_id: joey.id, type: "READ" },
       ]);
     });
+
+    it("sends error if trying to submit comment on a child field", async () => {
+      const [parent] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+      }));
+      const [child] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+        parent_petition_field_id: parent.id,
+        position: 0,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: JSON!
+            $isInternal: Boolean!
+          ) {
+            createPetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              content: $content
+              isInternal: $isInternal
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", child.id),
+          content: mocks.createRandomCommentContent(),
+          isInternal: false,
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updatePetitionFieldComment", () => {

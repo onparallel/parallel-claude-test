@@ -28,26 +28,28 @@ export function FieldActivity({
         },
       ]}
     >
-      <Text>
-        <FormattedMessage
-          id="document.petition-export.reply-updated-by"
-          defaultMessage="Reply by {name} on {date}"
-          values={{
-            name: (
-              <UserOrContactReference
-                userOrAccess={reply.repliedBy}
-                _deleted={{ textTransform: "lowercase" }}
-              />
-            ),
-            date: (
-              <DateTime
-                value={reply.repliedAt}
-                format={{ timeZone: "UTC", timeZoneName: "short", ...FORMATS.LLL }}
-              />
-            ),
-          }}
-        />
-      </Text>
+      {isDefined(reply.repliedAt) ? (
+        <Text>
+          <FormattedMessage
+            id="document.petition-export.reply-updated-by"
+            defaultMessage="Reply by {name} on {date}"
+            values={{
+              name: (
+                <UserOrContactReference
+                  userOrAccess={reply.repliedBy}
+                  _deleted={{ textTransform: "lowercase" }}
+                />
+              ),
+              date: (
+                <DateTime
+                  value={reply.repliedAt}
+                  format={{ timeZone: "UTC", timeZoneName: "short", ...FORMATS.LLL }}
+                />
+              ),
+            }}
+          />
+        </Text>
+      ) : null}
       {isDefined(reply.lastReviewedBy) &&
       reply.status === "APPROVED" &&
       reply.field?.requireApproval ? (

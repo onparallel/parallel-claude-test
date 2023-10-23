@@ -18,13 +18,16 @@ export function SettingsRowPlaceholder({
     <SettingsRow
       isDisabled={isReadOnly}
       label={
-        <FormattedMessage id="field-settings.text-placeholder-label" defaultMessage="Placeholder" />
+        <FormattedMessage
+          id="component.settings-row-placeholder.placeholder-label"
+          defaultMessage="Placeholder"
+        />
       }
       description={
         <>
           <Text fontSize="sm">
             <FormattedMessage
-              id="field-settings.text-placeholder-description"
+              id="component.settings-row-placeholder.placeholder-description"
               defaultMessage="The placeholder is the subtle descriptive text that shows when the input field is empty."
             />
           </Text>
