@@ -59,7 +59,8 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   const { updateLastSaved } = useLastSaved();
   const tone = useTone();
 
-  const isInvalid = !props.field.optional && completedFieldReplies(props.field).length === 0;
+  const isInvalid =
+    props.showErrors && !props.field.optional && completedFieldReplies(props.field).length === 0;
 
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
