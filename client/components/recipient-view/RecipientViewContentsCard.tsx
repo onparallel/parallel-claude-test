@@ -19,7 +19,7 @@ import {
   RecipientViewContentsCard_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldLogicResult, useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
 import { useRouter } from "next/router";
@@ -53,7 +53,11 @@ export const RecipientViewContentsCard = Object.assign(
   ) {
     const router = useRouter();
     const { query } = router;
-    const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
+    const { pages, fields, fieldLogic } = useGetPagesAndFields(
+      petition.fields,
+      currentPage,
+      usePreviewReplies,
+    );
     const allFields = useMemo(() => fields.flatMap((f) => [f, ...(f.children ?? [])]), [fields]);
 
     useEffect(() => {
@@ -121,15 +125,15 @@ export const RecipientViewContentsCard = Object.assign(
       }
     };
 
-    const filteredFields = (fields as PetitionFieldSelection[])
-      .filter((field) =>
+    const filteredFields = zip(fields as PetitionFieldSelection[], fieldLogic)
+      .filter(([field, fieldLogic]) =>
         (field.__typename === "PublicPetitionField" && field.isInternal) ||
         (field.type === "HEADING" && !field.title)
           ? false
           : true,
       )
       // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
-      .slice(fields[0].title ? 1 : 0) as typeof fields;
+      .slice(fields[0].title ? 1 : 0);
 
     const showCommentsCount = (field: PetitionFieldSelection) => {
       return (
@@ -222,7 +226,7 @@ export const RecipientViewContentsCard = Object.assign(
                   </Text>
                   {index + 1 === currentPage ? (
                     <Stack as={List} spacing={1}>
-                      {filteredFields.map((field) => {
+                      {filteredFields.map(([field, fieldLogic]) => {
                         const replies =
                           usePreviewReplies && field.__typename === "PetitionField"
                             ? field.previewReplies
@@ -255,8 +259,11 @@ export const RecipientViewContentsCard = Object.assign(
                                     ? {
                                         color: replies.some((r) => r.status === "REJECTED")
                                           ? "red.600"
-                                          : completedFieldReplies(field, usePreviewReplies)
-                                              .length !== 0
+                                          : completedFieldReplies(
+                                              field,
+                                              usePreviewReplies,
+                                              fieldLogic,
+                                            ).length !== 0
                                           ? "gray.400"
                                           : "inherit",
                                       }
@@ -442,7 +449,8 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
   }[] = [];
   const logic = useFieldLogic(fields, usePreviewReplies);
   const _fields: T = [] as any;
-  for (const [field, { isVisible }] of zip(fields as PetitionFieldSelection[], logic)) {
+  const _fieldLogic: FieldLogicResult[] = [];
+  for (const [field, fieldLogic] of zip(fields as PetitionFieldSelection[], logic)) {
     const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
 
     if (
@@ -464,11 +472,12 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
       currentPage.commentCount += field.commentCount;
     }
 
-    if (page === 0 && isVisible) {
+    if (page === 0 && fieldLogic.isVisible) {
       _fields.push(field as any);
+      _fieldLogic.push(fieldLogic);
     } else {
       continue;
     }
   }
-  return { fields: _fields, pages };
+  return { fields: _fields, fieldLogic: _fieldLogic, pages };
 }

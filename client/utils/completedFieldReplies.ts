@@ -1,17 +1,34 @@
 import { gql } from "@apollo/client";
 import {
+  PetitionField,
+  PetitionFieldReply,
+  PublicPetitionField,
+  PublicPetitionFieldReply,
   completedFieldReplies_PetitionFieldFragment,
   completedFieldReplies_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
+import { isDefined, zip } from "remeda";
+import { FieldLogicResult } from "./fieldLogic/useFieldLogic";
+import { ArrayUnionToUnion } from "./types";
 
 type PetitionFieldSelection =
   | completedFieldReplies_PetitionFieldFragment
   | completedFieldReplies_PublicPetitionFieldFragment;
 
+type PetitionFieldReplySelection = ArrayUnionToUnion<PetitionFieldSelection["replies"]>;
+
+type PetitionFieldChildReplySelection = ArrayUnionToUnion<
+  Exclude<ArrayUnionToUnion<PetitionFieldSelection["replies"]>["children"], null | undefined>
+>;
+
 // ALERT: Same logic in completedFieldReplies in server side
 /** returns the field replies that are fully completed */
 // @usePreviewReplies is used only in client side to work with preview replies
-export function completedFieldReplies(field: PetitionFieldSelection, usePreviewReplies?: boolean) {
+export function completedFieldReplies(
+  field: PetitionFieldSelection,
+  usePreviewReplies?: boolean,
+  fieldLogic?: FieldLogicResult,
+) {
   const replies =
     usePreviewReplies && field.__typename === "PetitionField"
       ? field.previewReplies
@@ -19,6 +36,31 @@ export function completedFieldReplies(field: PetitionFieldSelection, usePreviewR
   if (replies.every((r) => r.isAnonymized)) {
     return replies;
   }
+  switch (field.type) {
+    case "FIELD_GROUP":
+      if (isDefined(fieldLogic)) {
+        return zip(replies as PetitionFieldReplySelection[], fieldLogic!.groupChildrenLogic!)
+          .filter(([reply, childLogic]) =>
+            zip(reply.children! as PetitionFieldChildReplySelection[], childLogic)
+              .filter(([, { isVisible }]) => isVisible)
+              .every(
+                ([{ field, replies }]) =>
+                  field.optional || _completedFieldReplies(field, replies).length > 0,
+              ),
+          )
+          .map(([r]) => r);
+      } else {
+        return replies;
+      }
+    default:
+      return _completedFieldReplies(field, replies);
+  }
+}
+
+function _completedFieldReplies(
+  field: Pick<PetitionField | PublicPetitionField, "type" | "options">,
+  replies: Pick<PetitionFieldReply | PublicPetitionFieldReply, "content" | "isAnonymized">[],
+) {
   switch (field.type) {
     case "DYNAMIC_SELECT":
       return replies.filter((reply) =>
@@ -36,9 +78,6 @@ export function completedFieldReplies(field: PetitionFieldSelection, usePreviewR
     case "ES_TAX_DOCUMENTS":
     case "DOW_JONES_KYC":
       return replies.filter((reply) => reply.content.uploadComplete);
-    case "FIELD_GROUP":
-      // we don't verify that every field of a FIELD_GROUP reply is completed
-      return replies;
     default:
       return replies;
   }
@@ -52,9 +91,29 @@ completedFieldReplies.fragments = {
         options
         previewReplies @client {
           ...completedFieldReplies_PetitionFieldReply
+          children {
+            field {
+              type
+              options
+              optional
+            }
+            replies {
+              ...completedFieldReplies_PetitionFieldReply
+            }
+          }
         }
         replies {
           ...completedFieldReplies_PetitionFieldReply
+          children {
+            field {
+              type
+              options
+              optional
+            }
+            replies {
+              ...completedFieldReplies_PetitionFieldReply
+            }
+          }
         }
       }
       ${this.PetitionFieldReply}
@@ -75,6 +134,16 @@ completedFieldReplies.fragments = {
         options
         replies {
           ...completedFieldReplies_PublicPetitionFieldReply
+          children {
+            field {
+              type
+              options
+              optional
+            }
+            replies {
+              ...completedFieldReplies_PublicPetitionFieldReply
+            }
+          }
         }
       }
       ${this.PublicPetitionFieldReply}
