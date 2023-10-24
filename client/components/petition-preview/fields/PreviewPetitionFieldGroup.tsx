@@ -29,9 +29,9 @@ import {
   PreviewPetitionFieldGroup_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
+import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
-import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 
 export interface PreviewPetitionFieldGroupProps
   extends Omit<
@@ -143,6 +143,7 @@ export function PreviewPetitionFieldGroup({
               })}
               {petition.__typename === "PetitionTemplate" ? null : (
                 <Center
+                  display={{ base: "none", xl: "flex" }}
                   position="absolute"
                   top="0px"
                   right="-48px"

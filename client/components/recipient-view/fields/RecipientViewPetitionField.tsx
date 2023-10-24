@@ -59,8 +59,10 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   const { updateLastSaved } = useLastSaved();
   const tone = useTone();
 
+  const { showErrors, ...rest } = props;
+
   const isInvalid =
-    props.showErrors && !props.field.optional && completedFieldReplies(props.field).length === 0;
+    showErrors && !props.field.optional && completedFieldReplies(props.field).length === 0;
 
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
@@ -229,8 +231,6 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [refetch, props.field.id, props.keycode],
   );
 
-  const { showErrors } = props;
-
   const commonProps = {
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
@@ -256,7 +256,6 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         onCreateFileReply={handleCreateFileUploadReply}
         onDownloadFileUploadReply={handleDownloadFileUploadReply}
         onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
-        showErrors={showErrors}
         petition={props.access.petition}
       />
     );
@@ -265,33 +264,33 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   return (
     <RecipientViewPetitionFieldCard isInvalid={isInvalid} field={props.field}>
       {props.field.type === "TEXT" ? (
-        <RecipientViewPetitionFieldText {...props} {...commonProps} />
+        <RecipientViewPetitionFieldText {...rest} {...commonProps} />
       ) : props.field.type === "SHORT_TEXT" ? (
-        <RecipientViewPetitionFieldShortText {...props} {...commonProps} />
+        <RecipientViewPetitionFieldShortText {...rest} {...commonProps} />
       ) : props.field.type === "SELECT" ? (
-        <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
+        <RecipientViewPetitionFieldSelect {...rest} {...commonProps} />
       ) : props.field.type === "FILE_UPLOAD" ? (
         <RecipientViewPetitionFieldFileUpload
-          {...props}
+          {...rest}
           {...commonProps}
           onCreateReply={handleCreateFileUploadReply}
           onDownloadReply={handleDownloadFileUploadReply}
         />
       ) : props.field.type === "DYNAMIC_SELECT" ? (
-        <RecipientViewPetitionFieldDynamicSelect {...props} {...commonProps} />
+        <RecipientViewPetitionFieldDynamicSelect {...rest} {...commonProps} />
       ) : props.field.type === "CHECKBOX" ? (
-        <RecipientViewPetitionFieldCheckbox {...props} {...commonProps} />
+        <RecipientViewPetitionFieldCheckbox {...rest} {...commonProps} />
       ) : props.field.type === "NUMBER" ? (
-        <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
+        <RecipientViewPetitionFieldNumber {...rest} {...commonProps} />
       ) : props.field.type === "DATE" ? (
-        <RecipientViewPetitionFieldDate {...props} {...commonProps} />
+        <RecipientViewPetitionFieldDate {...rest} {...commonProps} />
       ) : props.field.type === "DATE_TIME" ? (
-        <RecipientViewPetitionFieldDateTime {...props} {...commonProps} />
+        <RecipientViewPetitionFieldDateTime {...rest} {...commonProps} />
       ) : props.field.type === "PHONE" ? (
-        <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
+        <RecipientViewPetitionFieldPhone {...rest} {...commonProps} />
       ) : props.field.type === "ES_TAX_DOCUMENTS" ? (
         <RecipientViewPetitionFieldTaxDocuments
-          {...props}
+          {...rest}
           {...commonProps}
           onDownloadReply={handleDownloadFileUploadReply}
           onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}

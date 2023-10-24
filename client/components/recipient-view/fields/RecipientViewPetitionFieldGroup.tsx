@@ -30,6 +30,7 @@ import {
   RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldGroup_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
+import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -37,7 +38,6 @@ import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
-import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -314,6 +314,7 @@ export function RecipientViewPetitionFieldGroupLayout({
 
         {isPetitionField && composeUrl ? (
           <Center
+            display={{ base: "none", xl: "flex" }}
             position="absolute"
             top="0px"
             right="-48px"

@@ -11985,17 +11985,17 @@
     "context": "Editor"
   },
   {
-    "term": "petition-preview.completed-petition.toast-description",
+    "term": "page.preview.toast-description-parallel-completed",
     "definition": "Comprueba que esté todo bien para cerrar el parallel.",
     "context": "Check that everything is OK to close the parallel."
   },
   {
-    "term": "petition-preview.completed-petition.toast-description-check-signature",
+    "term": "page.preview.toast-description-review-send-signature",
     "definition": "Revisa las respuestas y envía la firma para cerrar el parallel.",
     "context": "Review the replies and send the signature to close the parallel."
   },
   {
-    "term": "petition-preview.signature-sent.toast-description",
+    "term": "page.preview.toast-description-signature-sent",
     "definition": "Tu firma está en camino.",
     "context": "Your signature is on its way."
   },
@@ -12985,7 +12985,7 @@
     "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
   },
   {
-    "term": "recipient-view.completed-petition.toast-title",
+    "term": "page.preview.toast-title-parallel-completed",
     "definition": "¡Parallel completado!",
     "context": "Parallel completed!"
   },
@@ -13185,7 +13185,7 @@
     "context": "Send verification code"
   },
   {
-    "term": "recipient-view.signature-sent.toast-title",
+    "term": "page.preview.toast-title-signature-sent",
     "definition": "Firma enviada",
     "context": "Signature sent"
   },

@@ -8,7 +8,6 @@ import {
   Flex,
   Stack,
   Text,
-  useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
@@ -263,11 +262,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               toast({
                 id: "petition-completed-toast",
                 title: intl.formatMessage({
-                  id: "recipient-view.completed-petition.toast-title",
+                  id: "page.preview.toast-title-parallel-completed",
                   defaultMessage: "Parallel completed!",
                 }),
                 description: intl.formatMessage({
-                  id: "petition-preview.completed-petition.toast-description",
+                  id: "page.preview.toast-description-parallel-completed",
                   defaultMessage: "Check that everything is OK to close the parallel.",
                 }),
                 status: "success",
@@ -280,11 +279,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               toast({
                 id: "petition-completed-toast",
                 title: intl.formatMessage({
-                  id: "recipient-view.completed-petition.toast-title",
+                  id: "page.preview.toast-title-parallel-completed",
                   defaultMessage: "Parallel completed!",
                 }),
                 description: intl.formatMessage({
-                  id: "petition-preview.completed-petition.toast-description-check-signature",
+                  id: "page.preview.toast-description-review-send-signature",
                   defaultMessage:
                     "Review the replies and send the signature to close the parallel.",
                 }),
@@ -298,11 +297,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               toast({
                 id: "petition-completed-signature-sent-toast",
                 title: intl.formatMessage({
-                  id: "recipient-view.signature-sent.toast-title",
+                  id: "page.preview.toast-title-signature-sent",
                   defaultMessage: "Signature sent",
                 }),
                 description: intl.formatMessage({
-                  id: "petition-preview.signature-sent.toast-description",
+                  id: "page.preview.toast-description-signature-sent",
                   defaultMessage: "Your signature is on its way.",
                 }),
                 status: "success",
@@ -338,8 +337,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     me.organization.isPetitionUsageLimitReached && isPetition && petition.status === "DRAFT";
 
   const scope = useLiquidScope(petition, petition.__typename === "PetitionTemplate");
-
-  const showQuickAccessButtons = useBreakpointValue({ base: false, xl: true });
 
   const showGeneratePrefilledPublicLinkButton =
     me.hasPublicLinkPrefill &&
@@ -506,8 +503,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                             myEffectivePermission={myEffectivePermission}
                             showErrors={showErrors && !canFinalize}
                           />
-                          {field.type !== "FIELD_GROUP" && showQuickAccessButtons ? (
+                          {field.type !== "FIELD_GROUP" ? (
                             <Center
+                              display={{ base: "none", xl: "flex" }}
                               position="absolute"
                               top="0px"
                               right="-48px"
