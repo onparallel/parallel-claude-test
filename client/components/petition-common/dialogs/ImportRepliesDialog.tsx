@@ -185,6 +185,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
               mapping: data.mapping,
               fields: allFields,
               sourcePetitionFields: allSelectedPetitionFields,
+              overwriteExisting: data.overwriteExisting,
             });
 
             const fieldGroups = mappedFields.fields.filter(

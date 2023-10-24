@@ -15,13 +15,15 @@ interface CreatePetitionFieldReplyInputWithParent extends CreatePetitionFieldRep
 }
 
 export const mapReplyContents = ({
-  mapping: mapping,
-  fields: fields,
-  sourcePetitionFields: sourcePetitionFields,
+  mapping,
+  fields,
+  sourcePetitionFields,
+  overwriteExisting,
 }: {
   mapping: { [key: string]: string };
   fields: mapReplyContents_PetitionFieldDataFragment[];
   sourcePetitionFields: mapReplyContents_PetitionFieldDataFragment[];
+  overwriteExisting: boolean;
 }) => {
   let fieldsReplyInput = [] as CreatePetitionFieldReplyInputWithParent[];
   let childrenReplyInput = [] as CreatePetitionFieldReplyInputWithParent[];
@@ -38,7 +40,7 @@ export const mapReplyContents = ({
         targetField.multiple || originIsChild ? originField.replies : [originField.replies[0]];
 
       const emptyReplyIds =
-        targetField.type === "FIELD_GROUP"
+        targetField.type === "FIELD_GROUP" && !overwriteExisting
           ? targetField?.replies
               .filter((reply) => reply.children?.every((child) => child.replies.length === 0))
               .map((reply) => reply.id) ?? []
