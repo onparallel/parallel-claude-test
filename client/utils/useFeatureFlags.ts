@@ -334,6 +334,25 @@ export function useFeatureFlags() {
                 "Grants access to the API endpoint for modifying petition custom properties",
             }),
           },
+          {
+            name: "FIELD_GROUP",
+            title: intl.formatMessage({
+              id: "generic.petition-field-type-field-group",
+              defaultMessage: "Questions group",
+            }),
+            description: intl.formatMessage(
+              {
+                id: "component.feature-flag-descriptions.field-group-description",
+                defaultMessage: "Grants access to field {fieldName}",
+              },
+              {
+                fieldName: intl.formatMessage({
+                  id: "generic.petition-field-type-field-group",
+                  defaultMessage: "Questions group",
+                }),
+              },
+            ),
+          },
         ],
       },
     ],

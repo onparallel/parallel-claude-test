@@ -2295,6 +2295,11 @@
     "context": "Export Cuatrecasas"
   },
   {
+    "term": "component.feature-flag-descriptions.field-group-description",
+    "definition": "Da acceso al campo {fieldName}",
+    "context": "Grants access to field {fieldName}"
+  },
+  {
     "term": "component.feature-flag-descriptions.ghost-login-description",
     "definition": "Permite a los admin de la organización acceder como usuarios de su org (ghost login)",
     "context": "Allows the admins to login as users from their organization."
@@ -11190,6 +11195,31 @@
     "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
   },
   {
+    "term": "page.preview.toast-description-parallel-completed",
+    "definition": "Comprueba que esté todo bien para cerrar el parallel.",
+    "context": "Check that everything is OK to close the parallel."
+  },
+  {
+    "term": "page.preview.toast-description-review-send-signature",
+    "definition": "Revisa las respuestas y envía la firma para cerrar el parallel.",
+    "context": "Review the replies and send the signature to close the parallel."
+  },
+  {
+    "term": "page.preview.toast-description-signature-sent",
+    "definition": "Tu firma está en camino.",
+    "context": "Your signature is on its way."
+  },
+  {
+    "term": "page.preview.toast-title-parallel-completed",
+    "definition": "¡Parallel completado!",
+    "context": "Parallel completed!"
+  },
+  {
+    "term": "page.preview.toast-title-signature-sent",
+    "definition": "Firma enviada",
+    "context": "Signature sent"
+  },
+  {
     "term": "page.profile-details.hidden-properties",
     "definition": "Propiedades ocultas",
     "context": "Hidden properties"
@@ -11983,21 +12013,6 @@
     "term": "petition-permission-type.write",
     "definition": "Editor",
     "context": "Editor"
-  },
-  {
-    "term": "page.preview.toast-description-parallel-completed",
-    "definition": "Comprueba que esté todo bien para cerrar el parallel.",
-    "context": "Check that everything is OK to close the parallel."
-  },
-  {
-    "term": "page.preview.toast-description-review-send-signature",
-    "definition": "Revisa las respuestas y envía la firma para cerrar el parallel.",
-    "context": "Review the replies and send the signature to close the parallel."
-  },
-  {
-    "term": "page.preview.toast-description-signature-sent",
-    "definition": "Tu firma está en camino.",
-    "context": "Your signature is on its way."
   },
   {
     "term": "petition-replies.field-comments.disabled-comments-2",
@@ -12985,11 +13000,6 @@
     "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
   },
   {
-    "term": "page.preview.toast-title-parallel-completed",
-    "definition": "¡Parallel completado!",
-    "context": "Parallel completed!"
-  },
-  {
     "term": "recipient-view.contents-header",
     "definition": "Contenido",
     "context": "Contents"
@@ -13183,11 +13193,6 @@
     "term": "recipient-view.send-code",
     "definition": "Enviar código de verificación",
     "context": "Send verification code"
-  },
-  {
-    "term": "page.preview.toast-title-signature-sent",
-    "definition": "Firma enviada",
-    "context": "Signature sent"
   },
   {
     "term": "recipient-view.submit-and-sign-button-short",
