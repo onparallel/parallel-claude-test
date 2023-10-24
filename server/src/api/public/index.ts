@@ -2308,10 +2308,17 @@ api
         }
         userIds.push(...ids);
       }
+
+      const userGroupIds = body.userGroupIds ?? [];
+
+      if (userIds.length === 0 && userGroupIds.length === 0) {
+        throw new BadRequestError("You must provide at least one user or user group");
+      }
+
       const result = await client.request(SharePetition_addPetitionPermissionDocument, {
         petitionId: params.petitionId,
         userIds: userIds.length > 0 ? uniq(userIds) : undefined,
-        userGroupIds: body.userGroupIds,
+        userGroupIds: userGroupIds.length > 0 ? uniq(userGroupIds) : undefined,
       });
 
       return Ok(result.addPetitionPermission[0].permissions);
