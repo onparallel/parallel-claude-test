@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isDefined, maxBy } from "remeda";
 import { WorkerContext } from "../../context";
 import {
   AccessActivatedEvent,
@@ -71,12 +71,13 @@ async function loadUserDataByUserId(userId: number, ctx: WorkerContext) {
 }
 
 async function loadUserStats(userId: number, ctx: WorkerContext) {
-  const [logins, stats] = await Promise.all([
-    ctx.system.loadUserLoggedInEventsCount(userId),
+  const [loginEvents, stats] = await Promise.all([
+    ctx.system.loadUserLoggedInEvents(userId),
     ctx.petitions.loadPetitionStatsForUser(userId),
   ]);
   return {
-    logins,
+    logins: loginEvents.length,
+    latest_login_at: maxBy(loginEvents, (e) => e.created_at.getTime())?.created_at ?? null,
     ...stats,
   };
 }

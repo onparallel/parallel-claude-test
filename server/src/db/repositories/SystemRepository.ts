@@ -26,13 +26,11 @@ export class SystemRepository extends BaseRepository {
     return systemEvents;
   }
 
-  async loadUserLoggedInEventsCount(userId: number): Promise<number> {
-    const [{ count }] = await this.from("system_event")
+  async loadUserLoggedInEvents(userId: number) {
+    return await this.from("system_event")
       .where({ type: "USER_LOGGED_IN" })
       .whereRaw(/* sql */ `(("data" ->> 'user_id')::int) = ?`, [userId])
-      .select<{ count: number }[]>(this.count());
-
-    return count;
+      .select("*");
   }
 
   async markEventAsProcessed(id: number, processedBy: string) {
