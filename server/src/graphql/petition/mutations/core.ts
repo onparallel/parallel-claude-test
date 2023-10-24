@@ -2624,7 +2624,6 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
     force: booleanArg(),
   },
   authorize: authenticateAnd(
-    userHasFeatureFlag("FIELD_GROUP"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -2690,7 +2689,6 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
     force: booleanArg(),
   },
   authorize: authenticateAnd(
-    userHasFeatureFlag("FIELD_GROUP"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
