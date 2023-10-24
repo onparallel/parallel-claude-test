@@ -3,9 +3,9 @@ import { useTone } from "@parallel/components/common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
-  RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment,
   RecipientViewPetitionField_PublicPetitionAccessFragment,
   RecipientViewPetitionField_PublicPetitionFieldDocument,
+  RecipientViewPetitionField_PublicPetitionFieldFragment,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
   RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument,
   RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument,
@@ -13,6 +13,7 @@ import {
   RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument,
   RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument,
 } from "@parallel/graphql/__types";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useCallback, useRef } from "react";
@@ -40,14 +41,13 @@ import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFiel
 import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 import { useCreateFileUploadReply } from "./clientMutations";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
-  field: RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment;
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   keycode: string;
   access: RecipientViewPetitionField_PublicPetitionAccessFragment;
   isDisabled: boolean;
