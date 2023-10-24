@@ -62,6 +62,7 @@ export function GeneratePrefilledPublicLinkDialog({
     ([field]) =>
       isDefined(field.alias) &&
       !isFileTypeField(field.type) &&
+      field.type !== "FIELD_GROUP" &&
       !field.isReadOnly &&
       field.previewReplies.length > 0,
   );
