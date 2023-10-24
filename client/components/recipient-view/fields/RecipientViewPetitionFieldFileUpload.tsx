@@ -96,7 +96,7 @@ export function RecipientViewPetitionFieldFileUpload({
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
               >
                 <RecipientViewPetitionFieldReplyFileUpload
-                  id={`reply-${field.id}-${reply.id}`}
+                  id={`reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`}
                   type="FILE_UPLOAD"
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}

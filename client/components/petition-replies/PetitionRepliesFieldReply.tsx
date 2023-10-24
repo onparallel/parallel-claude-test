@@ -57,7 +57,9 @@ export function PetitionRepliesFieldReply({
       <NakedLink
         href={buildUrlToSection("preview", {
           field: reply.field!.id,
-          reply: `${reply.field!.id}-${reply.id}${idSuffix}`,
+          reply: `${reply.field!.id}${reply.parent ? `-${reply.parent.id}` : ""}-${
+            reply.id
+          }${idSuffix}`,
         })}
       >
         <IconButtonWithTooltip
@@ -307,6 +309,9 @@ PetitionRepliesFieldReply.fragments = {
         type
         requireApproval
         ...getReplyContents_PetitionField
+      }
+      parent {
+        id
       }
       updatedBy {
         ...UserOrContactReference_UserOrPetitionAccess

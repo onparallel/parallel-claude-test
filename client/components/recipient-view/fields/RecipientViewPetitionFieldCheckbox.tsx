@@ -124,7 +124,11 @@ export function RecipientViewPetitionFieldCheckbox({
       showAddNewReply={false}
       onDownloadAttachment={onDownloadAttachment}
     >
-      <Stack>
+      <Stack
+        id={`reply-${field.id}${reply?.parent ? `-${reply!.parent.id}` : ""}${
+          reply?.id ? `-${reply.id}` : ""
+        }`}
+      >
         <HStack wrap="wrap" color="gray.600" fontSize="sm" gridGap={2} spacing={0}>
           <CheckboxTypeLabel as="span" options={field.options} />
           {reply?.isAnonymized ? (
