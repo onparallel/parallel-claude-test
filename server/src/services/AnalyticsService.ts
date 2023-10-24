@@ -44,7 +44,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
   PETITION_CREATED: {
     petition_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     user_id: number;
     type: "PETITION" | "TEMPLATE";
   };
@@ -52,21 +53,24 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   PETITION_CLONED: {
     petition_id: number;
     new_petition_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     user_id: number;
     type: "PETITION" | "TEMPLATE";
   };
   /** User deletes a petition */
   PETITION_DELETED: {
     petition_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     user_id: number;
     status: PetitionStatus;
   };
   /** User uses a template to create a petition */
   TEMPLATE_USED: {
     user_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     template_id: number;
     new_petition_id: number;
   };
@@ -74,7 +78,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   PETITION_SENT: {
     petition_id: number;
     petition_access_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     user_id: number;
     from_public_link: boolean;
     same_domain: boolean;
@@ -83,7 +88,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User closes the petition */
   PETITION_CLOSED: {
     petition_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     user_id: number;
   };
   /**
@@ -91,7 +97,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
    */
   PETITION_COMPLETED: {
     petition_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     requires_signature: boolean;
     same_domain: boolean;
     // either a petition_access or user completed the petition
@@ -99,12 +106,18 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     user_id?: number;
   };
   /** User logs in */
-  USER_LOGGED_IN: { user_id: number; email: string; org_id: number };
+  USER_LOGGED_IN: {
+    user_id: number;
+    email: string;
+    org_id: string;
+    company_id: string;
+  };
   /** a petition reminder is sent */
   REMINDER_EMAIL_SENT: {
     user_id: number;
     petition_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     petition_access_id: number;
     sent_count: number;
     type: "AUTOMATIC" | "MANUAL";
@@ -117,7 +130,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
    */
   USER_CREATED: {
     user_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
     email: string;
     industry?: string;
     position?: string;
@@ -128,7 +142,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   ACCESS_OPENED: {
     contact_id: number;
     petition_id: number;
-    org_id: number;
+    org_id: string;
+    company_id: string;
   };
   EMAIL_VERIFIED: {
     email: string;
@@ -184,7 +199,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     test_mode?: boolean;
   };
   ORGANIZATION_LIMIT_REACHED: {
-    org_id: number;
+    org_id: string;
+    company_id: string;
     limit_name: OrganizationUsageLimitName;
     used: number;
     total: number;

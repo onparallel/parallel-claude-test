@@ -28,6 +28,7 @@ import {
   UserLoggedInEvent,
 } from "../../db/events/SystemEvent";
 import { listener } from "../helpers/EventProcessor";
+import { toGlobalId } from "../../util/globalId";
 
 async function loadPetitionOwner(petitionId: number, ctx: WorkerContext) {
   const user = await ctx.petitions.loadPetitionOwner(petitionId);
@@ -88,7 +89,8 @@ async function trackPetitionCreatedEvent(event: PetitionCreatedEvent, ctx: Worke
     user_id: event.data.user_id,
     data: {
       petition_id: event.petition_id,
-      org_id: petition.org_id,
+      org_id: toGlobalId("Organization", petition.org_id),
+      company_id: toGlobalId("Organization", petition.org_id),
       type: petition.is_template ? "TEMPLATE" : "PETITION",
       user_id: event.data.user_id,
     },
@@ -104,7 +106,11 @@ async function trackPetitionClonedEvent(event: PetitionClonedEvent, ctx: WorkerC
     user_id: event.data.user_id,
     data: {
       petition_id: event.petition_id,
-      ...event.data,
+      new_petition_id: event.data.new_petition_id,
+      type: event.data.type,
+      user_id: event.data.user_id,
+      org_id: toGlobalId("Organization", event.data.org_id),
+      company_id: toGlobalId("Organization", event.data.org_id),
     },
   });
 }
@@ -118,7 +124,8 @@ async function trackPetitionClosedEvent(event: PetitionClosedEvent, ctx: WorkerC
     user_id: event.data.user_id,
     data: {
       user_id: event.data.user_id,
-      org_id: petition.org_id,
+      org_id: toGlobalId("Organization", petition.org_id),
+      company_id: toGlobalId("Organization", petition.org_id),
       petition_id: event.petition_id,
     },
   });
@@ -145,7 +152,8 @@ async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: Worke
     data: {
       petition_access_id: event.data.petition_access_id,
       user_id: event.data.user_id,
-      org_id: petition.org_id,
+      org_id: toGlobalId("Organization", petition.org_id),
+      company_id: toGlobalId("Organization", petition.org_id),
       petition_id: event.petition_id,
       from_public_link: false,
       same_domain: userData.email.split("@")[1] === contact.email.split("@")[1],
@@ -174,7 +182,8 @@ async function trackAccessActivatedFromPublicLinkEvent(
     data: {
       petition_access_id: event.data.petition_access_id,
       user_id: user.id,
-      org_id: petition.org_id,
+      org_id: toGlobalId("Organization", petition.org_id),
+      company_id: toGlobalId("Organization", petition.org_id),
       petition_id: event.petition_id,
       from_public_link: true,
       same_domain: userData.email.split("@")[1] === contact.email.split("@")[1],
@@ -208,7 +217,8 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
       ...(isDefined(event.data.petition_access_id)
         ? { petition_access_id: event.data.petition_access_id }
         : { user_id: event.data.user_id! }),
-      org_id: owner.org_id,
+      org_id: toGlobalId("Organization", owner.org_id),
+      company_id: toGlobalId("Organization", owner.org_id),
       petition_id: event.petition_id,
       requires_signature: isDefined(petition.signature_config),
       same_domain: ownerData.email.split("@")[1] === completedByEmail.split("@")[1],
@@ -227,7 +237,8 @@ async function trackPetitionDeletedEvent(event: PetitionDeletedEvent, ctx: Worke
       status: event.data.status,
       user_id: event.data.user_id,
       petition_id: event.petition_id,
-      org_id: petition.org_id,
+      org_id: toGlobalId("Organization", petition.org_id),
+      company_id: toGlobalId("Organization", petition.org_id),
     },
   });
 }
@@ -245,7 +256,8 @@ async function trackUserLoggedInEvent(event: UserLoggedInEvent, ctx: WorkerConte
     data: {
       user_id: user.id,
       email: userData.email,
-      org_id: user.org_id,
+      org_id: toGlobalId("Organization", user.org_id),
+      company_id: toGlobalId("Organization", user.org_id),
     },
   });
 }
@@ -265,7 +277,8 @@ async function trackReminderSentEvent(event: ReminderSentEvent, ctx: WorkerConte
     user_id: access.granter_id,
     data: {
       petition_id: access.petition_id,
-      org_id: petition.org_id,
+      org_id: toGlobalId("Organization", petition.org_id),
+      company_id: toGlobalId("Organization", petition.org_id),
       user_id: access.granter_id,
       petition_access_id: access.id,
       sent_count: (access?.reminders_config?.limit ?? 10) - access.reminders_left + 1,
@@ -283,7 +296,10 @@ async function trackTemplateUsedEvent(event: TemplateUsedEvent, ctx: WorkerConte
     user_id: event.data.user_id,
     data: {
       template_id: event.petition_id,
-      ...event.data,
+      new_petition_id: event.data.new_petition_id,
+      user_id: event.data.user_id,
+      org_id: toGlobalId("Organization", event.data.org_id),
+      company_id: toGlobalId("Organization", event.data.org_id),
     },
   });
 }
@@ -299,7 +315,8 @@ async function trackUserCreatedEvent(event: UserCreatedEvent, ctx: WorkerContext
     user_id: event.data.user_id,
     data: {
       user_id: event.data.user_id,
-      org_id: user.org_id,
+      org_id: toGlobalId("Organization", user.org_id),
+      company_id: toGlobalId("Organization", user.org_id),
       email: userData.email,
       industry: userData.details?.industry ?? null,
       position: userData.details?.position ?? null,
@@ -320,7 +337,8 @@ async function trackAccessOpenedEvent(event: AccessOpenedEvent, ctx: WorkerConte
     user_id: access.granter_id,
     data: {
       contact_id: access.contact_id!,
-      org_id: petition.org_id,
+      org_id: toGlobalId("Organization", petition.org_id),
+      company_id: toGlobalId("Organization", petition.org_id),
       petition_id: event.petition_id,
     },
   });
@@ -532,7 +550,15 @@ async function trackOrganizationLimitReachedEvent(
     await ctx.analytics.trackEvent({
       type: "ORGANIZATION_LIMIT_REACHED",
       user_id: owner.id,
-      data: event.data,
+      data: {
+        org_id: toGlobalId("Organization", event.data.org_id),
+        company_id: toGlobalId("Organization", event.data.org_id),
+        limit_name: event.data.limit_name,
+        period_start_date: event.data.period_start_date,
+        period_end_date: event.data.period_end_date,
+        total: event.data.total,
+        used: event.data.used,
+      },
     });
   }
 }
