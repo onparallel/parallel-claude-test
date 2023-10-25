@@ -55,6 +55,7 @@ export function NewSignatureRequestRow({
 
       await onUpdateConfig({
         ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+        timezone: petition.signatureConfig!.timezone,
         orgIntegrationId: petition.signatureConfig!.integration!.id,
         allowAdditionalSigners: allowMoreSigners,
         signersInfo,

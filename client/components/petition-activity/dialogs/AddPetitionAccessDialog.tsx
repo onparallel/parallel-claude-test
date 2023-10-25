@@ -221,6 +221,7 @@ export function AddPetitionAccessDialog({
             "integration",
             "__typename",
           ]),
+          timezone: signatureConfig!.timezone,
           orgIntegrationId: signatureConfig!.integration!.id,
           signersInfo: signers,
           allowAdditionalSigners,
@@ -604,7 +605,9 @@ AddPetitionAccessDialog.fragments = {
           ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
         }
         signatureConfig {
+          timezone
           ...AddPetitionAccessDialog_SignatureConfig
+          ...ConfirmPetitionSignersDialog_SignatureConfig
         }
         remindersConfig {
           ...PetitionRemindersConfig_RemindersConfig
@@ -629,6 +632,7 @@ AddPetitionAccessDialog.fragments = {
         ...MessageEmailSubjectFormControl_PetitionBase
       }
       ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
+      ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
       ${this.SignatureConfig}
       ${PetitionRemindersConfig.fragments.RemindersConfig}
       ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}

@@ -242,6 +242,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 data: {
                   signatureConfig: {
                     ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+                    timezone: petition.signatureConfig!.timezone,
                     orgIntegrationId: petition.signatureConfig!.integration!.id,
                     signersInfo: completeSignerInfoData!.signers,
                   },
@@ -613,11 +614,7 @@ const _fragments = {
         ...RecipientViewProgressFooter_Petition
         ...useSendPetitionHandler_Petition
         signatureRequests {
-          signatureConfig {
-            signers {
-              ...ConfirmPetitionSignersDialog_PetitionSigner
-            }
-          }
+          ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
         }
       }
       ... on PetitionTemplate {
@@ -657,10 +654,8 @@ const _fragments = {
         }
       }
       signatureConfig {
-        allowAdditionalSigners
         review
         timezone
-        title
         signers {
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
@@ -676,6 +671,7 @@ const _fragments = {
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
     ${RecipientViewProgressFooter.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
     ${RecipientViewContentsCard.fragments.PetitionBase}

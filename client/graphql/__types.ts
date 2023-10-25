@@ -31999,13 +31999,13 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
-    title?: string | null;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    allowAdditionalSigners: boolean;
+    title?: string | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -32414,13 +32414,12 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
-    title?: string | null;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
+    allowAdditionalSigners: boolean;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -32898,13 +32897,13 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title?: string | null;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
+          allowAdditionalSigners: boolean;
+          title?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -33312,13 +33311,12 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title?: string | null;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
+          allowAdditionalSigners: boolean;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -33746,13 +33744,13 @@ export type PetitionPreview_completePetitionMutation = {
     }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
-      allowAdditionalSigners: boolean;
       review: boolean;
       timezone: string;
-      title?: string | null;
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
+      allowAdditionalSigners: boolean;
+      title?: string | null;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -34204,13 +34202,13 @@ export type PetitionPreview_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title?: string | null;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
+          allowAdditionalSigners: boolean;
+          title?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -34618,13 +34616,12 @@ export type PetitionPreview_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title?: string | null;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
+          allowAdditionalSigners: boolean;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -46320,6 +46317,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
     }
     signatureConfig {
       ...AddPetitionAccessDialog_SignatureConfig
+      ...ConfirmPetitionSignersDialog_SignatureConfig
     }
     remindersConfig {
       ...PetitionRemindersConfig_RemindersConfig
@@ -46345,6 +46343,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   }
   ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
   ${AddPetitionAccessDialog_SignatureConfigFragmentDoc}
+  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
   ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
   ${AddPetitionAccessDialog_DelegateUserFragmentDoc}
@@ -47896,11 +47895,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       ...RecipientViewProgressFooter_Petition
       ...useSendPetitionHandler_Petition
       signatureRequests {
-        signatureConfig {
-          signers {
-            ...ConfirmPetitionSignersDialog_PetitionSigner
-          }
-        }
+        ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
       }
     }
     ... on PetitionTemplate {
@@ -47940,10 +47935,8 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       }
     }
     signatureConfig {
-      allowAdditionalSigners
       review
       timezone
-      title
       signers {
         ...ConfirmPetitionSignersDialog_PetitionSigner
       }
@@ -47959,7 +47952,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
   ${RecipientViewProgressFooter_PetitionFragmentDoc}
   ${useSendPetitionHandler_PetitionFragmentDoc}
-  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
   ${GeneratePrefilledPublicLinkDialog_PetitionTemplateFragmentDoc}
   ${useAllFieldsWithIndices_PetitionFieldFragmentDoc}
   ${PreviewPetitionField_PetitionFieldFragmentDoc}
@@ -47968,6 +47961,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
   ${completedFieldReplies_PetitionFieldFragmentDoc}
   ${HiddenFieldDialog_PetitionFieldFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
   ${RecipientViewContentsCard_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
