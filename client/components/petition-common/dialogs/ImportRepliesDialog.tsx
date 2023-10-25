@@ -153,6 +153,9 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
           null;
         if (isDefined(matchingField)) {
           mapping[field.id] = matchingField.id;
+          if (isDefined(field.parent) && isDefined(matchingField.parent)) {
+            mapping[field.parent.id] = matchingField.parent.id;
+          }
         }
       }
     }
