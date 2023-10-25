@@ -552,6 +552,31 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             parentFieldId,
             childrenFieldIds,
           },
+          update: (cache, { data }) => {
+            if (isTemplate && isDefined(data)) {
+              for (const fieldId of childrenFieldIds) {
+                updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
+                  return replies.map((r) => {
+                    return {
+                      ...r,
+                      children: [
+                        ...(r.children ?? []),
+                        {
+                          field: {
+                            __typename: "PetitionField",
+                            id: fieldId,
+                            replies: [],
+                          },
+                          replies: [],
+                          __typename: "PetitionFieldGroupChildReply",
+                        },
+                      ],
+                    };
+                  });
+                });
+              }
+            }
+          },
         });
       } catch (error) {
         if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
@@ -563,6 +588,31 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 parentFieldId,
                 childrenFieldIds,
                 force: true,
+              },
+              update: (cache, { data }) => {
+                if (isTemplate && isDefined(data)) {
+                  for (const fieldId of childrenFieldIds) {
+                    updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
+                      return replies.map((r) => {
+                        return {
+                          ...r,
+                          children: [
+                            ...(r.children ?? []),
+                            {
+                              field: {
+                                __typename: "PetitionField",
+                                id: fieldId,
+                                replies: [],
+                              },
+                              replies: [],
+                              __typename: "PetitionFieldGroupChildReply",
+                            },
+                          ],
+                        };
+                      });
+                    });
+                  }
+                }
               },
             });
           } catch {}

@@ -9970,8 +9970,8 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    review: boolean;
     timezone: string;
+    review: boolean;
     title?: string | null;
     allowAdditionalSigners: boolean;
     minSigners: number;
@@ -10077,8 +10077,8 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
       }>;
       signatureConfig?: {
         __typename?: "SignatureConfig";
-        review: boolean;
         timezone: string;
+        review: boolean;
         title?: string | null;
         allowAdditionalSigners: boolean;
         minSigners: number;
@@ -12636,8 +12636,8 @@ export type useSendPetitionHandler_PetitionFragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    review: boolean;
     timezone: string;
+    review: boolean;
     title?: string | null;
     allowAdditionalSigners: boolean;
     minSigners: number;
@@ -12773,8 +12773,8 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          review: boolean;
           timezone: string;
+          review: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
           minSigners: number;
@@ -26093,8 +26093,8 @@ export type PetitionActivity_PetitionFragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    review: boolean;
     timezone: string;
+    review: boolean;
     title?: string | null;
     allowAdditionalSigners: boolean;
     minSigners: number;
@@ -27201,8 +27201,8 @@ export type PetitionActivity_updatePetitionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          review: boolean;
           timezone: string;
+          review: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
           minSigners: number;
@@ -28337,8 +28337,8 @@ export type PetitionActivity_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          review: boolean;
           timezone: string;
+          review: boolean;
           title?: string | null;
           allowAdditionalSigners: boolean;
           minSigners: number;
@@ -28494,13 +28494,13 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
+    timezone: string;
     title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
-    timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       environment: SignatureOrgIntegrationEnvironment;
@@ -29166,13 +29166,13 @@ export type PetitionCompose_updatePetitionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
+          timezone: string;
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
-          timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -30395,13 +30395,13 @@ export type PetitionCompose_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
+          timezone: string;
           title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
-          timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             environment: SignatureOrgIntegrationEnvironment;
@@ -46316,6 +46316,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
     }
     signatureConfig {
+      timezone
       ...AddPetitionAccessDialog_SignatureConfig
       ...ConfirmPetitionSignersDialog_SignatureConfig
     }
