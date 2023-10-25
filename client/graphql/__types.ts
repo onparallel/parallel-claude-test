@@ -5831,6 +5831,7 @@ export type PetitionSignatureCellContent_PetitionFragment = {
     review: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
@@ -19612,6 +19613,7 @@ export type ProfilePetitionsTable_PetitionFragment = {
     review: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
@@ -19702,6 +19704,7 @@ export type ProfilePetitionsTable_petitionsQuery = {
           review: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
         } | null;
@@ -23039,6 +23042,7 @@ export type Contact_ContactFragment = {
           review: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
         } | null;
@@ -23119,6 +23123,7 @@ export type Contact_PetitionAccessFragment = {
       review: boolean;
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         environment: SignatureOrgIntegrationEnvironment;
       } | null;
     } | null;
@@ -23185,6 +23190,7 @@ export type Contact_PetitionFragment = {
     review: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
@@ -23325,6 +23331,7 @@ export type Contact_contactQuery = {
             review: boolean;
             integration?: {
               __typename?: "SignatureOrgIntegration";
+              id: string;
               environment: SignatureOrgIntegrationEnvironment;
             } | null;
           } | null;
@@ -35097,8 +35104,8 @@ export type PetitionReplies_PetitionFragment = {
     timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
-      environment: SignatureOrgIntegrationEnvironment;
       id: string;
+      environment: SignatureOrgIntegrationEnvironment;
       name: string;
       provider: SignatureOrgIntegrationProvider;
       isDefault: boolean;
@@ -35865,8 +35872,8 @@ export type PetitionReplies_closePetitionMutation = {
       timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
-        environment: SignatureOrgIntegrationEnvironment;
         id: string;
+        environment: SignatureOrgIntegrationEnvironment;
         name: string;
         provider: SignatureOrgIntegrationProvider;
         isDefault: boolean;
@@ -36295,8 +36302,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
-        environment: SignatureOrgIntegrationEnvironment;
         id: string;
+        environment: SignatureOrgIntegrationEnvironment;
         name: string;
         provider: SignatureOrgIntegrationProvider;
         isDefault: boolean;
@@ -36897,8 +36904,8 @@ export type PetitionReplies_petitionQuery = {
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
-            environment: SignatureOrgIntegrationEnvironment;
             id: string;
+            environment: SignatureOrgIntegrationEnvironment;
             name: string;
             provider: SignatureOrgIntegrationProvider;
             isDefault: boolean;
@@ -37049,6 +37056,7 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
     review: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
@@ -37359,6 +37367,7 @@ export type Petitions_petitionsQuery = {
             review: boolean;
             integration?: {
               __typename?: "SignatureOrgIntegration";
+              id: string;
               environment: SignatureOrgIntegrationEnvironment;
             } | null;
           } | null;
@@ -40937,6 +40946,7 @@ export type getPetitionSignatureEnvironment_PetitionFragment = {
     __typename?: "SignatureConfig";
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
@@ -42668,6 +42678,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     review: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
@@ -44300,6 +44311,7 @@ export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
     }
     signatureConfig {
       integration {
+        id
         environment
       }
     }

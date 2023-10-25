@@ -23,6 +23,7 @@ getPetitionSignatureEnvironment.fragments = {
       }
       signatureConfig {
         integration {
+          id
           environment
         }
       }
