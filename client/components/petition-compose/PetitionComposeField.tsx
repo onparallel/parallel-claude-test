@@ -257,7 +257,7 @@ const _PetitionComposeField = chakraForwardRef<
       );
     },
     onDrop: async (files: File[], _, event) => {
-      event.stopPropagation();
+      event?.stopPropagation();
       if (field.attachments.length + files.length > 10) {
         // on drop event already shows a message on the dropzone, type="change" means the
         // file is coming from the "Add attachment" button which doesn't provide any feedback
