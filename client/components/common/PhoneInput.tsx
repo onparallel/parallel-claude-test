@@ -149,6 +149,4 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   );
 });
 
-export type PhoneInputType = typeof PhoneInput;
-
 export default PhoneInput;
