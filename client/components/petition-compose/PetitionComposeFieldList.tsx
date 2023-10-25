@@ -458,22 +458,27 @@ export const PetitionComposeFieldList = Object.assign(
         ${AddFieldPopover.fragments.User}
         ${PetitionComposeField.fragments.User}
       `,
+      PetitionField: gql`
+        fragment PetitionComposeFieldList_PetitionField on PetitionField {
+          id
+          type
+          options
+          visibility
+          isReadOnly
+          isFixed
+          ...PetitionComposeField_PetitionField
+          ...usePetitionComposeFieldReorder_PetitionField
+        }
+        ${PetitionComposeField.fragments.PetitionField}
+        ${usePetitionComposeFieldReorder.fragments.PetitionField}
+      `,
       PetitionBase: gql`
         fragment PetitionComposeFieldList_PetitionBase on PetitionBase {
           id
           fields {
-            id
-            type
-            options
-            visibility
-            isReadOnly
-            isFixed
-            ...PetitionComposeField_PetitionField
-            ...usePetitionComposeFieldReorder_PetitionField
+            ...PetitionComposeFieldList_PetitionField
           }
         }
-        ${PetitionComposeField.fragments.PetitionField}
-        ${usePetitionComposeFieldReorder.fragments.PetitionField}
       `,
     },
   },

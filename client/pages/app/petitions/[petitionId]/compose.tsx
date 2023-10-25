@@ -34,7 +34,10 @@ import { useConfirmLinkFieldDialog } from "@parallel/components/petition-compose
 import { useConfirmUnlinkFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmUnlinkFieldDialog";
 import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
-import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
+import {
+  ReferencedFieldDialog,
+  useReferencedFieldDialog,
+} from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import {
   cleanPreviewFieldReplies,
@@ -949,12 +952,12 @@ const _fragments = {
   get PetitionField() {
     return gql`
       fragment PetitionCompose_PetitionField on PetitionField {
+        ...PetitionComposeFieldList_PetitionField
         ...PetitionContents_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         ...ReferencedFieldDialog_PetitionField
-        ...FieldErrorDialog_PetitionField
         parent {
           id
           position
@@ -966,7 +969,6 @@ const _fragments = {
           ...validatePetitionFields_PetitionField
           ...FieldErrorDialog_PetitionField
           ...ReferencedFieldDialog_PetitionField
-          ...FieldErrorDialog_PetitionField
           parent {
             id
             position
@@ -976,10 +978,12 @@ const _fragments = {
           }
         }
       }
+      ${PetitionComposeFieldList.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
       ${PetitionContents.fragments.PetitionField}
       ${validatePetitionFields.fragments.PetitionField}
       ${FieldErrorDialog.fragments.PetitionField}
+      ${ReferencedFieldDialog.fragments.PetitionField}
     `;
   },
   get Query() {
