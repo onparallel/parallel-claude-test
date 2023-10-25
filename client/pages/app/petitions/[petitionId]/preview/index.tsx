@@ -139,12 +139,16 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       return Number(query.page);
     }
     if (fieldId) {
-      page = pages.findIndex((fields) => fields.some((f) => f.id === fieldId));
+      page = pages.findIndex((fields) =>
+        fields.some((f) => f.id === fieldId || f.children?.some((c) => c.id === fieldId)),
+      );
     }
 
     if (replyId && typeof replyId === "string") {
       const id = replyId.split("-")[0];
-      page = pages.findIndex((fields) => fields.some((f) => f.id === id));
+      page = pages.findIndex((fields) =>
+        fields.some((f) => f.id === id || f.children?.some((c) => c.id === id)),
+      );
     }
 
     return Math.max(page + 1, 1);
