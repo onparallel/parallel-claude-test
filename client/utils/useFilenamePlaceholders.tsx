@@ -103,7 +103,7 @@ export function useFilenamePlaceholdersRename(
       seen.add(filename);
       return filename;
     },
-    [placeholders],
+    [placeholders, indicesById],
   );
 }
 

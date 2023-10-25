@@ -28,7 +28,6 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { countBy, pick } from "remeda";
 import { useExportFailedDialog } from "./ExportFailedDialog";
-import { assert } from "ts-essentials";
 
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
@@ -58,13 +57,13 @@ export function ExportRepliesProgressDialog({
 
   const showExportFailedDialog = useExportFailedDialog();
 
-  const petition = data!.petition!;
-  assert(petition.__typename === "Petition", "Invalid petition type");
-
-  const rename = useFilenamePlaceholdersRename(petition.fields);
+  const rename = useFilenamePlaceholdersRename(
+    data?.petition?.__typename === "Petition" ? data.petition.fields : [],
+  );
 
   useEffect(() => {
     async function exportReplies() {
+      const petition = data!.petition!;
       if (petition.__typename !== "Petition") {
         return;
       }
