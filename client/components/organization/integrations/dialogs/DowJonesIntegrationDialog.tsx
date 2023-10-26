@@ -101,7 +101,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
             <Input autoComplete="off" {...clientIdProps} />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.field-required-error"
+                id="generic.field-required-error"
                 defaultMessage="This field is required"
               />
             </FormErrorMessage>
@@ -122,7 +122,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.field-required-error"
+                id="generic.field-required-error"
                 defaultMessage="This field is required"
               />
             </FormErrorMessage>
@@ -141,7 +141,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.field-required-error"
+                id="generic.field-required-error"
                 defaultMessage="This field is required"
               />
             </FormErrorMessage>

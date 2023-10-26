@@ -263,7 +263,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.field-required-error"
+                id="generic.field-required-error"
                 defaultMessage="This field is required"
               />
             </FormErrorMessage>
@@ -293,7 +293,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
             />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.field-required-error"
+                id="generic.field-required-error"
                 defaultMessage="This field is required"
               />
             </FormErrorMessage>

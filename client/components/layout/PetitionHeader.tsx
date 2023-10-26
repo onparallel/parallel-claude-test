@@ -15,6 +15,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  Stack,
   Text,
   useToast,
 } from "@chakra-ui/react";
@@ -29,6 +30,7 @@ import {
   LockClosedIcon,
   ProfilesIcon,
   TableIcon,
+  TagIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -52,10 +54,10 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -65,9 +67,12 @@ import { NakedLink } from "../common/Link";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathName } from "../common/PathName";
 import { PetitionStatusLabel } from "../common/PetitionStatusLabel";
+import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 import { SmallPopover } from "../common/SmallPopover";
+import { Tag } from "../common/Tag";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { useAssociateProfileToPetitionDialog } from "../petition-common/dialogs/AssociateProfileToPetitionDialog";
+import { useEditTagsDialog } from "../petition-common/dialogs/EditTagsDialog";
 import { useImportRepliesDialog } from "../petition-common/dialogs/ImportRepliesDialog";
 import { useMoveToFolderDialog } from "../petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
@@ -75,7 +80,6 @@ import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/Conf
 import { HeaderNameEditable, HeaderNameEditableInstance } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
 import { PetitionSection } from "./PetitionLayout";
-import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   petition: PetitionHeader_PetitionBaseFragment;
@@ -405,6 +409,16 @@ export const PetitionHeader = Object.assign(
       } catch {}
     };
 
+    const showEditTagsDialog = useEditTagsDialog();
+
+    const handleEditTags = async () => {
+      try {
+        await showEditTagsDialog({
+          petitionId: petition.id,
+        });
+      } catch {}
+    };
+
     return (
       <Grid
         backgroundColor="white"
@@ -511,6 +525,48 @@ export const PetitionHeader = Object.assign(
                 </Button>
               </>
             ) : null}
+            <Divider isVertical height={3.5} color="gray.500" />
+            <SmallPopover
+              width="auto"
+              content={
+                petition.tags.length ? (
+                  <Stack alignItems="flex-start" maxWidth="300px">
+                    {petition.tags.map((tag) => (
+                      <Tag key={tag.id} tag={tag} maxWidth="100%" />
+                    ))}
+                  </Stack>
+                ) : (
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.petition-header.add-tags"
+                      defaultMessage="Add tags"
+                    />
+                  </Text>
+                )
+              }
+            >
+              <Button
+                leftIcon={<TagIcon boxSize={4} />}
+                color="gray.600"
+                size="xs"
+                variant="ghost"
+                paddingX={1.5}
+                fontSize="sm"
+                fontWeight="normal"
+                onClick={handleEditTags}
+                isDisabled={isAnonymized}
+              >
+                <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                  <FormattedMessage
+                    id="component.petition-header.x-tags"
+                    defaultMessage="{count, plural, =1 {# tag} other {# tags}}"
+                    values={{
+                      count: petition.tags.length,
+                    }}
+                  />
+                </Box>
+              </Button>
+            </SmallPopover>
           </HStack>
         </GridItem>
         <GridItem area="c" as={List} display="flex" alignItems="stretch" justifyContent="center">
@@ -777,6 +833,7 @@ export const PetitionHeader = Object.assign(
               isSubscribed
               permissionType
             }
+
             ...HeaderNameEditable_PetitionBase
             ...useDeletePetitions_PetitionBase
           }
@@ -809,7 +866,14 @@ export const PetitionHeader = Object.assign(
             ... on PetitionTemplate {
               ...PetitionHeader_PetitionTemplate
             }
+            tags {
+              id
+              ...Tag_Tag
+            }
+            ...useEditTagsDialog_PetitionBase
           }
+          ${useEditTagsDialog.fragments.PetitionBase}
+          ${Tag.fragments.Tag}
           ${this.Petition}
           ${this.PetitionTemplate}
         `;

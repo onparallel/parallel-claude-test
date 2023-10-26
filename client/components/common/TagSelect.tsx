@@ -13,10 +13,10 @@ import {
 } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
 import {
-  TagEditDialog_updateTagDocument,
-  TagSelect_createTagDocument,
+  ManageTagsDialog_updateTagDocument,
   TagSelect_TagFragment,
   TagSelect_TagFragmentDoc,
+  TagSelect_createTagDocument,
   TagSelect_tagsDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -29,14 +29,15 @@ import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
   DependencyList,
   ForwardedRef,
-  forwardRef,
   ReactElement,
   ReactNode,
   RefAttributes,
+  forwardRef,
   useCallback,
   useEffect,
   useRef,
@@ -45,7 +46,6 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  components,
   CSSObjectWithLabel,
   MenuListProps,
   MultiValueProps,
@@ -54,16 +54,16 @@ import {
   SelectComponentsConfig,
   SelectInstance,
   SingleValueProps,
+  components,
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { indexBy, isDefined, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { ConfirmDialog } from "./dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { Tag } from "./Tag";
 import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { ConfirmDialog } from "./dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 
 type TagSelection = TagSelect_TagFragment;
 
@@ -392,9 +392,9 @@ function MenuList(props: MenuListProps<TagSelection> & { selectProps: ReactSelec
   const {
     selectProps: { canUpdateTags },
   } = props;
-  const showTagEditDialog = useTagEditDialog();
+  const showManageTagsDialog = useManageTagsDialog();
   const handleEditTags = async () => {
-    await withError(showTagEditDialog());
+    await withError(showManageTagsDialog());
   };
   return (
     <components.MenuList {...props}>
@@ -409,7 +409,7 @@ function MenuList(props: MenuListProps<TagSelection> & { selectProps: ReactSelec
             leftIcon={<EditIcon position="relative" top="-1px" />}
             onClick={handleEditTags}
           >
-            <FormattedMessage id="component.tag-select.edit-tags" defaultMessage="Edit tags" />
+            <FormattedMessage id="component.tag-select.manage-tags" defaultMessage="Manage tags" />
           </Button>
         </Box>
       ) : null}
@@ -490,15 +490,15 @@ function useGetTagValues<IsMulti extends boolean = false>(
   );
 }
 
-interface TagEditDialogData {
+interface ManageTagsDialogData {
   tagId: string | null;
   name: string;
   color: string | null;
 }
 
-interface TagEditDialogProps extends DialogProps {}
+interface ManageTagsDialogProps extends DialogProps {}
 
-export function TagEditDialog({ ...props }: TagEditDialogProps) {
+export function ManageTagsDialog({ ...props }: ManageTagsDialogProps) {
   const {
     handleSubmit,
     register,
@@ -507,7 +507,7 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
     watch,
     setError,
     formState: { errors, isDirty },
-  } = useForm<TagEditDialogData>({
+  } = useForm<ManageTagsDialogData>({
     mode: "onSubmit",
     defaultValues: {
       tagId: null,
@@ -517,7 +517,7 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
   });
 
   const canDeleteTags = useHasPermission("TAGS:DELETE_TAGS");
-  const [updateTag, { loading: isUpdating }] = useMutation(TagEditDialog_updateTagDocument);
+  const [updateTag, { loading: isUpdating }] = useMutation(ManageTagsDialog_updateTagDocument);
   const tagId = watch("tagId");
 
   const [selectedTag, setSelectedTag] = useState<TagSelect_TagFragment | null>(null);
@@ -565,7 +565,10 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
         <Stack direction="row" alignItems="center">
           <EditIcon position="relative" />
           <Text as="div" flex="1">
-            <FormattedMessage id="component.tag-edit-dialog.header" defaultMessage="Edit tags" />
+            <FormattedMessage
+              id="component.manage-tags-dialog.header"
+              defaultMessage="Manage tags"
+            />
           </Text>
         </Stack>
       }
@@ -573,7 +576,7 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
         <Box>
           <FormControl>
             <FormLabel>
-              <FormattedMessage id="component.tag-edit-dialog.tag-label" defaultMessage="Tag" />
+              <FormattedMessage id="component.manage-tags-dialog.tag-label" defaultMessage="Tag" />
             </FormLabel>
             <Controller
               name="tagId"
@@ -592,19 +595,22 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
           <Grid gridTemplateColumns="auto 1fr" alignItems="center" gridRowGap={2} marginTop={4}>
             <FormControl as={NoElement} isDisabled={!isDefined(tagId)} isInvalid={!!errors.name}>
               <FormLabel marginBottom="0">
-                <FormattedMessage id="component.tag-edit-dialog.rename" defaultMessage="Rename" />
+                <FormattedMessage
+                  id="component.manage-tags-dialog.rename"
+                  defaultMessage="Rename"
+                />
               </FormLabel>
               <Input {...register("name", { required: true, validate: { isNotEmptyText } })} />
 
               <FormErrorMessage gridColumn="2" marginTop={0}>
                 {errors.name?.type === "unavailable" ? (
                   <FormattedMessage
-                    id="component.tag-edit-dialog.existing-tag"
+                    id="component.manage-tags-dialog.existing-tag"
                     defaultMessage="A tag with the same name already exists"
                   />
                 ) : (
                   <FormattedMessage
-                    id="generic.forms.field-required-error"
+                    id="generic.field-required-error"
                     defaultMessage="This field is required"
                   />
                 )}
@@ -613,7 +619,7 @@ export function TagEditDialog({ ...props }: TagEditDialogProps) {
             <FormControl as={NoElement} isDisabled={!isDefined(tagId)}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
-                  id="component.tag-edit-dialog.color-label"
+                  id="component.manage-tags-dialog.color-label"
                   defaultMessage="Color"
                 />
               </FormLabel>
@@ -654,9 +660,9 @@ function NoElement({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-TagEditDialog.mutations = [
+ManageTagsDialog.mutations = [
   gql`
-    mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
+    mutation ManageTagsDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
       updateTag(id: $id, data: $data) {
         ...TagSelect_Tag
       }
@@ -665,6 +671,6 @@ TagEditDialog.mutations = [
   `,
 ];
 
-export function useTagEditDialog() {
-  return useDialog(TagEditDialog);
+export function useManageTagsDialog() {
+  return useDialog(ManageTagsDialog);
 }

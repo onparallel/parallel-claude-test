@@ -1980,6 +1980,11 @@
     "context": "Visibility"
   },
   {
+    "term": "component.edit-tags-dialog.header",
+    "definition": "Edit tags",
+    "context": "Edit tags"
+  },
+  {
     "term": "component.email-verification-required-alert.body",
     "definition": "Please activate your account through the activation link that was sent to your email and try again.",
     "context": "Please activate your account through the activation link that was sent to your email and try again."
@@ -2798,6 +2803,31 @@
     "term": "component.localizable-user-text-input.translated-badge",
     "definition": "Translated",
     "context": "Translated"
+  },
+  {
+    "term": "component.manage-tags-dialog.color-label",
+    "definition": "Color",
+    "context": "Color"
+  },
+  {
+    "term": "component.manage-tags-dialog.existing-tag",
+    "definition": "A tag with the same name already exists",
+    "context": "A tag with the same name already exists"
+  },
+  {
+    "term": "component.manage-tags-dialog.header",
+    "definition": "Manage tags",
+    "context": "Manage tags"
+  },
+  {
+    "term": "component.manage-tags-dialog.rename",
+    "definition": "Rename",
+    "context": "Rename"
+  },
+  {
+    "term": "component.manage-tags-dialog.tag-label",
+    "definition": "Tag",
+    "context": "Tag"
   },
   {
     "term": "component.map-fields-table.and-n-more",
@@ -4260,6 +4290,11 @@
     "context": "Edit parallel"
   },
   {
+    "term": "component.petition-header.add-tags",
+    "definition": "Add tags",
+    "context": "Add tags"
+  },
+  {
     "term": "component.petition-header.associate-profile",
     "definition": "Associate profile",
     "context": "Associate profile"
@@ -4353,6 +4388,11 @@
     "term": "component.petition-header.x-profiles",
     "definition": "{count, plural, =1 {# profile} other {# profiles}}",
     "context": "{count, plural, =1 {# profile} other {# profiles}}"
+  },
+  {
+    "term": "component.petition-header.x-tags",
+    "definition": "{count, plural, =1 {# tag} other {# tags}}",
+    "context": "{count, plural, =1 {# tag} other {# tags}}"
   },
   {
     "term": "component.petition-limit-reached-alert.title",
@@ -7380,34 +7420,9 @@
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
   },
   {
-    "term": "component.tag-edit-dialog.color-label",
-    "definition": "Color",
-    "context": "Color"
-  },
-  {
-    "term": "component.tag-edit-dialog.existing-tag",
-    "definition": "A tag with the same name already exists",
-    "context": "A tag with the same name already exists"
-  },
-  {
-    "term": "component.tag-edit-dialog.header",
-    "definition": "Edit tags",
-    "context": "Edit tags"
-  },
-  {
-    "term": "component.tag-edit-dialog.rename",
-    "definition": "Rename",
-    "context": "Rename"
-  },
-  {
-    "term": "component.tag-edit-dialog.tag-label",
-    "definition": "Tag",
-    "context": "Tag"
-  },
-  {
-    "term": "component.tag-select.edit-tags",
-    "definition": "Edit tags",
-    "context": "Edit tags"
+    "term": "component.tag-select.manage-tags",
+    "definition": "Manage tags",
+    "context": "Manage tags"
   },
   {
     "term": "component.tag-select.no-options-1",
@@ -8825,6 +8840,11 @@
     "context": "Export"
   },
   {
+    "term": "generic.field-required-error",
+    "definition": "This field is required",
+    "context": "This field is required"
+  },
+  {
     "term": "generic.file-name",
     "definition": "File name",
     "context": "File name"
@@ -8903,11 +8923,6 @@
     "term": "generic.forms.email-sso-enabled-error",
     "definition": "This domain has SSO enabled. Please, contact your administrator to register.",
     "context": "This domain has SSO enabled. Please, contact your administrator to register."
-  },
-  {
-    "term": "generic.forms.field-required-error",
-    "definition": "This field is required",
-    "context": "This field is required"
   },
   {
     "term": "generic.forms.first-name-label",

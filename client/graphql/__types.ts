@@ -6140,12 +6140,12 @@ export type TagSelect_createTagMutation = {
   createTag: { __typename?: "Tag"; id: string; name: string; color: string };
 };
 
-export type TagEditDialog_updateTagMutationVariables = Exact<{
+export type ManageTagsDialog_updateTagMutationVariables = Exact<{
   id: Scalars["GID"]["input"];
   data: UpdateTagInput;
 }>;
 
-export type TagEditDialog_updateTagMutation = {
+export type ManageTagsDialog_updateTagMutation = {
   updateTag: { __typename?: "Tag"; id: string; name: string; color: string };
 };
 
@@ -6647,6 +6647,7 @@ export type PetitionHeader_PetitionBase_Petition_Fragment = {
   isAnonymized: boolean;
   name?: string | null;
   updatedAt: string;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -6664,6 +6665,7 @@ export type PetitionHeader_PetitionBase_PetitionTemplate_Fragment = {
   isRestricted: boolean;
   name?: string | null;
   updatedAt: string;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -6762,6 +6764,7 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   isRestricted: boolean;
   isAnonymized: boolean;
   updatedAt: string;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -6779,6 +6782,7 @@ export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   isRestricted: boolean;
   updatedAt: string;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -11281,6 +11285,86 @@ export type CreateFolderDialog_petitionsQuery = {
         }
     >;
   };
+};
+
+export type useEditTagsDialog_TagFragment = {
+  __typename?: "Tag";
+  id: string;
+  name: string;
+  color: string;
+};
+
+export type useEditTagsDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+};
+
+export type useEditTagsDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+};
+
+export type useEditTagsDialog_PetitionBaseFragment =
+  | useEditTagsDialog_PetitionBase_Petition_Fragment
+  | useEditTagsDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type useEditTagsDialog_tagPetitionMutationVariables = Exact<{
+  tagId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type useEditTagsDialog_tagPetitionMutation = {
+  tagPetition:
+    | {
+        __typename?: "Petition";
+        id: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+      };
+};
+
+export type useEditTagsDialog_untagPetitionMutationVariables = Exact<{
+  tagId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type useEditTagsDialog_untagPetitionMutation = {
+  untagPetition:
+    | {
+        __typename?: "Petition";
+        id: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+      };
+};
+
+export type useEditTagsDialog_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type useEditTagsDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+      }
+    | null;
 };
 
 export type GenericFolderDialog_foldersQueryVariables = Exact<{
@@ -26276,6 +26360,7 @@ export type PetitionActivity_PetitionFragment = {
       };
     }>;
   }>;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
 export type PetitionActivity_QueryFragment = {
@@ -27408,6 +27493,7 @@ export type PetitionActivity_updatePetitionMutation = {
             };
           }>;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -28568,6 +28654,7 @@ export type PetitionActivity_petitionQuery = {
             };
           }>;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | { __typename?: "PetitionTemplate" }
     | null;
@@ -28871,6 +28958,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     fullName?: string | null;
     email: string;
   } | null;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
 };
 
@@ -29062,6 +29150,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
   };
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title?: string | null;
@@ -29389,6 +29478,7 @@ export type PetitionCompose_updatePetitionMutation = {
           fullName?: string | null;
           email: string;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         fields: Array<{
           __typename?: "PetitionField";
@@ -29446,6 +29536,7 @@ export type PetitionCompose_updatePetitionMutation = {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -29504,6 +29595,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
             optional: boolean;
           }> | null;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -29531,6 +29623,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
             optional: boolean;
           }> | null;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -29583,6 +29676,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
+          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -29605,6 +29699,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
+          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             permissionType: PetitionPermissionType;
@@ -29748,6 +29843,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
+          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -29770,6 +29866,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
+          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             permissionType: PetitionPermissionType;
@@ -29894,6 +29991,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
           id: string;
           children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -29915,6 +30013,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
           id: string;
           children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -30787,6 +30886,7 @@ export type PetitionCompose_petitionQuery = {
           fullName?: string | null;
           email: string;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
@@ -30992,6 +31092,7 @@ export type PetitionCompose_petitionQuery = {
             };
           }>;
         };
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title?: string | null;
@@ -31042,6 +31143,7 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
   isRestricted: boolean;
   isAnonymized: boolean;
   updatedAt: string;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -31086,6 +31188,7 @@ export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
     alias?: string | null;
     replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
   }>;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
 export type PetitionMessages_PetitionBaseFragment =
@@ -31195,6 +31298,7 @@ export type PetitionMessages_petitionQuery = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -31238,6 +31342,7 @@ export type PetitionMessages_petitionQuery = {
           alias?: string | null;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | null;
 };
@@ -31260,6 +31365,7 @@ export type PetitionMessages_updatePetitionMutation = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -31303,6 +31409,7 @@ export type PetitionMessages_updatePetitionMutation = {
           alias?: string | null;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         }>;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       };
 };
 
@@ -32202,6 +32309,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     fullName?: string | null;
     email: string;
   } | null;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
 };
 
@@ -32590,6 +32698,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       isPreset: boolean;
     } | null>;
   } | null;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
 export type PetitionPreview_PetitionBaseFragment =
@@ -33100,6 +33209,7 @@ export type PetitionPreview_updatePetitionMutation = {
           fullName?: string | null;
           email: string;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
@@ -33487,6 +33597,7 @@ export type PetitionPreview_updatePetitionMutation = {
             isPreset: boolean;
           } | null>;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       };
 };
 
@@ -33947,6 +34058,7 @@ export type PetitionPreview_completePetitionMutation = {
       fullName?: string | null;
       email: string;
     } | null;
+    tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
     profiles: Array<{ __typename?: "Profile"; id: string }>;
   };
 };
@@ -34405,6 +34517,7 @@ export type PetitionPreview_petitionQuery = {
           fullName?: string | null;
           email: string;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
@@ -34792,6 +34905,7 @@ export type PetitionPreview_petitionQuery = {
             isPreset: boolean;
           } | null>;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | null;
 };
@@ -35274,6 +35388,7 @@ export type PetitionReplies_PetitionFragment = {
       fullName: string;
     } | null>;
   } | null;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
 export type PetitionReplies_PetitionFieldFragment = {
@@ -35593,6 +35708,7 @@ export type PetitionReplies_updatePetitionMutation = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -35609,6 +35725,7 @@ export type PetitionReplies_updatePetitionMutation = {
         isPublic: boolean;
         isRestricted: boolean;
         updatedAt: string;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -36042,6 +36159,7 @@ export type PetitionReplies_closePetitionMutation = {
         fullName: string;
       } | null>;
     } | null;
+    tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   };
 };
 
@@ -36472,6 +36590,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         fullName: string;
       } | null>;
     } | null;
+    tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   };
 };
 
@@ -37074,6 +37193,7 @@ export type PetitionReplies_petitionQuery = {
             fullName: string;
           } | null>;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | { __typename?: "PetitionTemplate" }
     | null;
@@ -45309,6 +45429,30 @@ export const PetitionHeader_PetitionTemplateFragmentDoc = gql`
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
   ${useDeletePetitions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionHeader_PetitionTemplateFragment, unknown>;
+export const TagSelect_TagFragmentDoc = gql`
+  fragment TagSelect_Tag on Tag {
+    id
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
+` as unknown as DocumentNode<TagSelect_TagFragment, unknown>;
+export const useEditTagsDialog_TagFragmentDoc = gql`
+  fragment useEditTagsDialog_Tag on Tag {
+    id
+    ...TagSelect_Tag
+  }
+  ${TagSelect_TagFragmentDoc}
+` as unknown as DocumentNode<useEditTagsDialog_TagFragment, unknown>;
+export const useEditTagsDialog_PetitionBaseFragmentDoc = gql`
+  fragment useEditTagsDialog_PetitionBase on PetitionBase {
+    id
+    tags {
+      id
+      ...useEditTagsDialog_Tag
+    }
+  }
+  ${useEditTagsDialog_TagFragmentDoc}
+` as unknown as DocumentNode<useEditTagsDialog_PetitionBaseFragment, unknown>;
 export const PetitionHeader_PetitionBaseFragmentDoc = gql`
   fragment PetitionHeader_PetitionBase on PetitionBase {
     id
@@ -45319,9 +45463,16 @@ export const PetitionHeader_PetitionBaseFragmentDoc = gql`
     ... on PetitionTemplate {
       ...PetitionHeader_PetitionTemplate
     }
+    tags {
+      id
+      ...Tag_Tag
+    }
+    ...useEditTagsDialog_PetitionBase
   }
   ${PetitionHeader_PetitionFragmentDoc}
   ${PetitionHeader_PetitionTemplateFragmentDoc}
+  ${Tag_TagFragmentDoc}
+  ${useEditTagsDialog_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionHeader_PetitionBaseFragment, unknown>;
 export const PetitionLayout_PetitionBaseFragmentDoc = gql`
   fragment PetitionLayout_PetitionBase on PetitionBase {
@@ -48780,13 +48931,6 @@ export const useDeletePetitions_PetitionBaseOrFolderFragmentDoc = gql`
   ${useDeletePetitions_PetitionBaseFragmentDoc}
   ${useDeletePetitions_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<useDeletePetitions_PetitionBaseOrFolderFragment, unknown>;
-export const TagSelect_TagFragmentDoc = gql`
-  fragment TagSelect_Tag on Tag {
-    id
-    ...Tag_Tag
-  }
-  ${Tag_TagFragmentDoc}
-` as unknown as DocumentNode<TagSelect_TagFragment, unknown>;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
     id
@@ -50330,16 +50474,16 @@ export const TagSelect_createTagDocument = gql`
   }
   ${TagSelect_TagFragmentDoc}
 ` as unknown as DocumentNode<TagSelect_createTagMutation, TagSelect_createTagMutationVariables>;
-export const TagEditDialog_updateTagDocument = gql`
-  mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
+export const ManageTagsDialog_updateTagDocument = gql`
+  mutation ManageTagsDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
     updateTag(id: $id, data: $data) {
       ...TagSelect_Tag
     }
   }
   ${TagSelect_TagFragmentDoc}
 ` as unknown as DocumentNode<
-  TagEditDialog_updateTagMutation,
-  TagEditDialog_updateTagMutationVariables
+  ManageTagsDialog_updateTagMutation,
+  ManageTagsDialog_updateTagMutationVariables
 >;
 export const UserGroupMembersPopover_getMembersDocument = gql`
   query UserGroupMembersPopover_getMembers($userGroupId: ID!) {
@@ -50817,6 +50961,39 @@ export const CreateFolderDialog_petitionsDocument = gql`
 ` as unknown as DocumentNode<
   CreateFolderDialog_petitionsQuery,
   CreateFolderDialog_petitionsQueryVariables
+>;
+export const useEditTagsDialog_tagPetitionDocument = gql`
+  mutation useEditTagsDialog_tagPetition($tagId: GID!, $petitionId: GID!) {
+    tagPetition(tagId: $tagId, petitionId: $petitionId) {
+      ...useEditTagsDialog_PetitionBase
+    }
+  }
+  ${useEditTagsDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  useEditTagsDialog_tagPetitionMutation,
+  useEditTagsDialog_tagPetitionMutationVariables
+>;
+export const useEditTagsDialog_untagPetitionDocument = gql`
+  mutation useEditTagsDialog_untagPetition($tagId: GID!, $petitionId: GID!) {
+    untagPetition(tagId: $tagId, petitionId: $petitionId) {
+      ...useEditTagsDialog_PetitionBase
+    }
+  }
+  ${useEditTagsDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  useEditTagsDialog_untagPetitionMutation,
+  useEditTagsDialog_untagPetitionMutationVariables
+>;
+export const useEditTagsDialog_petitionDocument = gql`
+  query useEditTagsDialog_petition($id: GID!) {
+    petition(id: $id) {
+      ...useEditTagsDialog_PetitionBase
+    }
+  }
+  ${useEditTagsDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  useEditTagsDialog_petitionQuery,
+  useEditTagsDialog_petitionQueryVariables
 >;
 export const GenericFolderDialog_foldersDocument = gql`
   query GenericFolderDialog_folders($type: PetitionBaseType!, $currentPath: String) {
