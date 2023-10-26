@@ -36,8 +36,8 @@ export type FeatureFlagName =
   | "PROFILES"
   | "COPY_PETITION_REPLIES"
   | "PERMISSION_MANAGEMENT"
-  | "FIELD_GROUP"
-  | "CUSTOM_PROPERTIES";
+  | "CUSTOM_PROPERTIES"
+  | "FIELD_GROUP";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -62,8 +62,8 @@ export const FeatureFlagNameValues = [
   "PROFILES",
   "COPY_PETITION_REPLIES",
   "PERMISSION_MANAGEMENT",
-  "FIELD_GROUP",
   "CUSTOM_PROPERTIES",
+  "FIELD_GROUP",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";
@@ -157,7 +157,9 @@ export type PetitionEventType =
   | "REPLY_STATUS_CHANGED"
   | "PROFILE_ASSOCIATED"
   | "PROFILE_DISASSOCIATED"
-  | "SIGNATURE_DELIVERED";
+  | "SIGNATURE_DELIVERED"
+  | "PETITION_TAGGED"
+  | "PETITION_UNTAGGED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -203,6 +205,8 @@ export const PetitionEventTypeValues = [
   "PROFILE_ASSOCIATED",
   "PROFILE_DISASSOCIATED",
   "SIGNATURE_DELIVERED",
+  "PETITION_TAGGED",
+  "PETITION_UNTAGGED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";

@@ -2760,6 +2760,8 @@ export type PetitionEventType =
   | "PETITION_MESSAGE_BOUNCED"
   | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
+  | "PETITION_TAGGED"
+  | "PETITION_UNTAGGED"
   | "PROFILE_ASSOCIATED"
   | "PROFILE_DISASSOCIATED"
   | "RECIPIENT_SIGNED"
@@ -3348,6 +3350,16 @@ export type PetitionTagFilterLineOperator = "CONTAINS" | "DOES_NOT_CONTAIN" | "I
 
 export type PetitionTagFilterLogicalOperator = "AND" | "OR";
 
+export type PetitionTaggedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<Petition>;
+  tag: Maybe<Tag>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
   /** How many months to wait since the petition is closed to anonymize. */
@@ -3439,6 +3451,16 @@ export type PetitionTemplate = PetitionBase & {
 /** A petition template */
 export type PetitionTemplateimageUrlArgs = {
   options?: InputMaybe<ImageOptions>;
+};
+
+export type PetitionUntaggedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<Petition>;
+  tag: Maybe<Tag>;
+  type: PetitionEventType;
+  user: Maybe<User>;
 };
 
 /** The permission for a petition and user group */

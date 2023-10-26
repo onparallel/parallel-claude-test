@@ -192,6 +192,16 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
     profile_id: number;
   };
+  PETITION_TAGGED: {
+    user_id: number;
+    tag_ids: number[];
+    tag_names: string[];
+  };
+  PETITION_UNTAGGED: {
+    user_id: number;
+    tag_ids: number[];
+    tag_names: string[];
+  };
 }[TType];
 
 export type GenericPetitionEvent<
@@ -385,6 +395,16 @@ export type ProfileDisassociatedEvent<IsCreate extends boolean = false> = Generi
   IsCreate
 >;
 
+export type PetitionTaggedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_TAGGED",
+  IsCreate
+>;
+
+export type PetitionUntaggedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_UNTAGGED",
+  IsCreate
+>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -428,6 +448,8 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionAnonymizedEvent<IsCreate>
   | ReplyStatusChangedEvent<IsCreate>
   | ProfileAssociatedEvent<IsCreate>
-  | ProfileDisassociatedEvent<IsCreate>;
+  | ProfileDisassociatedEvent<IsCreate>
+  | PetitionTaggedEvent<IsCreate>
+  | PetitionUntaggedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;

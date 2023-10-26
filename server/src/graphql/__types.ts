@@ -879,7 +879,9 @@ export interface NexusGenObjects {
     email: string;
     isPreset?: boolean;
   };
+  PetitionTaggedEvent: petitionEvents.PetitionTaggedEvent;
   PetitionTemplate: db.Petition;
+  PetitionUntaggedEvent: petitionEvents.PetitionUntaggedEvent;
   PetitionUserGroupPermission: db.PetitionPermission;
   PetitionUserPermission: db.PetitionPermission;
   Profile: db.Profile;
@@ -2278,6 +2280,16 @@ export interface NexusGenFieldTypes {
     isPreset: boolean; // Boolean!
     lastName: string | null; // String
   };
+  PetitionTaggedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    tags: Array<NexusGenRootTypes["Tag"] | null>; // [Tag]!
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
   PetitionTemplate: {
     // field return type
     anonymizeAfterMonths: number | null; // Int
@@ -2327,6 +2339,16 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PetitionUntaggedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    tags: Array<NexusGenRootTypes["Tag"] | null>; // [Tag]!
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionUserGroupPermission: {
     // field return type
@@ -4452,6 +4474,16 @@ export interface NexusGenFieldTypeNames {
     isPreset: "Boolean";
     lastName: "String";
   };
+  PetitionTaggedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "Petition";
+    tags: "Tag";
+    type: "PetitionEventType";
+    user: "User";
+  };
   PetitionTemplate: {
     // field return type name
     anonymizeAfterMonths: "Int";
@@ -4501,6 +4533,16 @@ export interface NexusGenFieldTypeNames {
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
+  };
+  PetitionUntaggedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "Petition";
+    tags: "Tag";
+    type: "PetitionEventType";
+    user: "User";
   };
   PetitionUserGroupPermission: {
     // field return type name
@@ -7065,6 +7107,8 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionMessageBouncedEvent"
     | "PetitionReminderBouncedEvent"
     | "PetitionReopenedEvent"
+    | "PetitionTaggedEvent"
+    | "PetitionUntaggedEvent"
     | "ProfileAssociatedEvent"
     | "ProfileDisassociatedEvent"
     | "RecipientSignedEvent"
@@ -7173,7 +7217,9 @@ export interface NexusGenTypeInterfaces {
   PetitionReopenedEvent: "PetitionEvent";
   PetitionSharedUserNotification: "PetitionUserNotification";
   PetitionSignatureRequest: "Timestamps";
+  PetitionTaggedEvent: "PetitionEvent";
   PetitionTemplate: "PetitionBase";
+  PetitionUntaggedEvent: "PetitionEvent";
   PetitionUserGroupPermission: "PetitionPermission" | "Timestamps";
   PetitionUserPermission: "PetitionPermission" | "Timestamps";
   Profile: "Timestamps";

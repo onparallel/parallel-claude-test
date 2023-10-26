@@ -1,6 +1,6 @@
 import { booleanArg, inputObjectType, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
-import { countBy, uniq, zip } from "remeda";
+import { countBy, isDefined, uniq, zip } from "remeda";
 import { CreateTag } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { RESULT } from "../helpers/Result";
@@ -177,11 +177,27 @@ export const deleteTag = mutationField("deleteTag", {
         return [view.id, { ...view.data, tagsFilters }] as [number, any];
       });
 
-      await ctx.tags.withTransaction(async (t) => {
+      const tag = (await ctx.tags.loadTag(id))!;
+
+      const untaggedPetitionIds = await ctx.tags.withTransaction(async (t) => {
         await ctx.views.updatePetitionListViewData(input, ctx.user!, t);
-        await ctx.tags.untagPetition(id, undefined, t);
+        const petitionTags = await ctx.tags.untagPetition(id, undefined, t);
         await ctx.tags.deleteTag(id, ctx.user!, t);
+
+        return uniq(petitionTags.map((pt) => pt.petition_id));
       });
+
+      for (const petitionId of untaggedPetitionIds) {
+        await ctx.petitions.createEvent({
+          type: "PETITION_UNTAGGED",
+          petition_id: petitionId,
+          data: {
+            user_id: ctx.user!.id,
+            tag_ids: [id],
+            tag_names: [tag.name],
+          },
+        });
+      }
 
       return RESULT.SUCCESS;
     } catch {
@@ -203,7 +219,21 @@ export const tagPetition = mutationField("tagPetition", {
     petitionsAreNotPublicTemplates("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
-    await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
+    const [petitionTag] = await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
+
+    if (isDefined(petitionTag)) {
+      const tag = (await ctx.tags.loadTag(petitionTag.tag_id))!;
+      await ctx.petitions.createEvent({
+        petition_id: args.petitionId,
+        type: "PETITION_TAGGED",
+        data: {
+          user_id: ctx.user!.id,
+          tag_ids: [petitionTag.tag_id],
+          tag_names: [tag.name],
+        },
+      });
+    }
+
     return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });
@@ -221,7 +251,20 @@ export const untagPetition = mutationField("untagPetition", {
     petitionsAreNotPublicTemplates("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
-    await ctx.tags.untagPetition(args.tagId, args.petitionId);
+    const [petitionTag] = await ctx.tags.untagPetition(args.tagId, args.petitionId);
+
+    if (isDefined(petitionTag)) {
+      const tag = (await ctx.tags.loadTag(petitionTag.tag_id))!;
+      await ctx.petitions.createEvent({
+        petition_id: args.petitionId,
+        type: "PETITION_UNTAGGED",
+        data: {
+          user_id: ctx.user!.id,
+          tag_ids: [petitionTag.tag_id],
+          tag_names: [tag.name],
+        },
+      });
+    }
     return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });

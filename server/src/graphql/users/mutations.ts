@@ -7,7 +7,7 @@ import {
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { difference, isDefined, partition, uniq, zip } from "remeda";
+import { difference, groupBy, isDefined, partition, uniq, zip } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { withError } from "../../util/promises/withError";
@@ -321,7 +321,22 @@ export const deactivateUser = mutationField("deactivateUser", {
           await ctx.petitions.transferPublicLinkOwnership(userId, transferToUserId, ctx.user!, t);
 
           if (isDefined(tagIds) && ownedPetitionIds.length > 0) {
-            await ctx.tags.tagPetition(tagIds, ownedPetitionIds, ctx.user!, t);
+            const petitionTags = await ctx.tags.tagPetition(tagIds, ownedPetitionIds, ctx.user!, t);
+            if (petitionTags.length > 0) {
+              const petitionTagsByPetitionId = groupBy(petitionTags, (pt) => pt.petition_id);
+              for (const [petitionId, pTags] of Object.entries(petitionTagsByPetitionId)) {
+                const tags = await ctx.tags.loadTag(pTags.map((pt) => pt.tag_id));
+                await ctx.petitions.createEvent({
+                  type: "PETITION_TAGGED",
+                  petition_id: parseInt(petitionId),
+                  data: {
+                    user_id: ctx.user!.id,
+                    tag_ids: pTags.map((t) => t.tag_id),
+                    tag_names: tags.map((t) => t!.name),
+                  },
+                });
+              }
+            }
           }
 
           if (!includeDrafts && draftsIds.length > 0) {

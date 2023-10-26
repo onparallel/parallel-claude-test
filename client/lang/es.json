@@ -7585,6 +7585,16 @@
     "context": "Test signature"
   },
   {
+    "term": "component.timeline-petition-tagged-event.description",
+    "definition": "{userIsYou, select, true {Etiquetaste} other {{user} etiquetó}} este parallel con {tagList} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} tagged this parallel with {tagList} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-untagged-event.description",
+    "definition": "{userIsYou, select, true {Quitaste} other {{user} quitó}} {tagCount, plural, =1{la etiqueta} other{las etiquetas}} {tagList} de este parallel {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} removed {tagCount, plural, =1{tag} other{tags}} {tagList} from this parallel {timeAgo}"
+  },
+  {
     "term": "component.timeline-reply-created-event.description",
     "definition": "{userIsYou, select, true {Respondiste} other {{createdBy} respondió}} al campo {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
@@ -8673,6 +8683,11 @@
     "term": "generic.deleted-profile",
     "definition": "Perfil eliminado",
     "context": "Deleted profile"
+  },
+  {
+    "term": "generic.deleted-tag",
+    "definition": "Etiqueta eliminada",
+    "context": "Deleted tag"
   },
   {
     "term": "generic.deleted-user",

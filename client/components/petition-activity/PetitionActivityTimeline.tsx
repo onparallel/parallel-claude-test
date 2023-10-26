@@ -42,6 +42,8 @@ import { TimelineSignatureStartedEvent } from "./timeline/events/TimelineSignatu
 import { TimelineUserPermissionAddedEvent } from "./timeline/events/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/events/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/events/TimelineUserPermissionRemovedEvent";
+import { TimelinePetitionTaggedEvent } from "./timeline/events/TimelinePetitionTaggedEvent";
+import { TimelinePetitionUntaggedEvent } from "./timeline/events/TimelinePetitionUntaggedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -140,6 +142,10 @@ export function PetitionActivityTimeline({
               <TimelineProfileAssociatedEvent event={event} />
             ) : event.__typename === "ProfileDisassociatedEvent" ? (
               <TimelineProfileDisassociatedEvent event={event} />
+            ) : event.__typename === "PetitionTaggedEvent" ? (
+              <TimelinePetitionTaggedEvent event={event} userId={userId} />
+            ) : event.__typename === "PetitionUntaggedEvent" ? (
+              <TimelinePetitionUntaggedEvent event={event} userId={userId} />
             ) : null}
           </Box>
         ))}
@@ -282,6 +288,12 @@ PetitionActivityTimeline.fragments = {
       ... on ProfileDisassociatedEvent {
         ...TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent
       }
+      ... on PetitionTaggedEvent {
+        ...TimelinePetitionTaggedEvent_PetitionTaggedEvent
+      }
+      ... on PetitionUntaggedEvent {
+        ...TimelinePetitionUntaggedEvent_PetitionUntaggedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -324,5 +336,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineReplyStatusChangedEvent.fragments.ReplyStatusChangedEvent}
     ${TimelineProfileAssociatedEvent.fragments.ProfileAssociatedEvent}
     ${TimelineProfileDisassociatedEvent.fragments.ProfileDisassociatedEvent}
+    ${TimelinePetitionTaggedEvent.fragments.PetitionTaggedEvent}
+    ${TimelinePetitionUntaggedEvent.fragments.PetitionUntaggedEvent}
   `,
 };

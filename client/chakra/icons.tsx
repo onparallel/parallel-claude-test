@@ -2620,3 +2620,20 @@ export const UnlinkIcon = createIcon({
     </g>
   ),
 });
+
+export const TagIcon = createIcon({
+  displayName: "TagIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="M21.4236 14.3079L14.3178 21.4137C14.1337 21.598 13.9151 21.7442 13.6745 21.8439C13.4339 21.9437 13.1759 21.995 12.9155 21.995C12.655 21.995 12.3971 21.9437 12.1564 21.8439C11.9158 21.7442 11.6972 21.598 11.5131 21.4137L3 12.9105V3H12.9105L21.4236 11.5131C21.7928 11.8845 22 12.3869 22 12.9105C22 13.4341 21.7928 13.9365 21.4236 14.3079Z" />
+      <path d="M7.95526 7.95508H7.96526" />
+    </g>
+  ),
+});

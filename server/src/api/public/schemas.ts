@@ -1995,6 +1995,49 @@ const PetitionEventSchemas = {
       },
     },
   },
+  PETITION_TAGGED: {
+    description: "A user tagged a parallel",
+    properties: {
+      userId: {
+        description: "The ID of the user that tagged the parallel",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      tagIds: {
+        description: "The recently added tag ids",
+        type: "array",
+        items: { type: "string" },
+        example: [toGlobalId("Tag", 1), toGlobalId("Tag", 2)],
+      },
+      tagNames: {
+        description: "The label of the tags at the moment of tagging",
+        type: "array",
+        items: { type: "string" },
+        example: ["KYC", "Risk"],
+      },
+    },
+  },
+  PETITION_UNTAGGED: {
+    description: "A user untagged a parallel",
+    properties: {
+      userId: {
+        description: "The ID of the user that untagged the parallel",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      tagIds: {
+        description: "The recently removed tag ids",
+        type: "array",
+        items: { type: "string" },
+        example: [toGlobalId("Tag", 1), toGlobalId("Tag", 2)],
+      },
+      tagNames: {
+        description: "The label of the tags at the moment of untagging",
+        type: "string",
+        example: ["KYC", "Risk"],
+      },
+    },
+  },
 } as Record<PetitionEventType, JsonSchema>;
 
 export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];

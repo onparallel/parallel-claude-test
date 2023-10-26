@@ -3300,6 +3300,8 @@ enum PetitionEventType {
   PETITION_MESSAGE_BOUNCED
   PETITION_REMINDER_BOUNCED
   PETITION_REOPENED
+  PETITION_TAGGED
+  PETITION_UNTAGGED
   PROFILE_ASSOCIATED
   PROFILE_DISASSOCIATED
   RECIPIENT_SIGNED
@@ -4308,6 +4310,16 @@ enum PetitionTagFilterLogicalOperator {
   OR
 }
 
+type PetitionTaggedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  tags: [Tag]!
+  type: PetitionEventType!
+  user: User
+}
+
 """
 A petition template
 """
@@ -4486,6 +4498,16 @@ type PetitionTemplate implements PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type PetitionUntaggedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  tags: [Tag]!
+  type: PetitionEventType!
+  user: User
 }
 
 """

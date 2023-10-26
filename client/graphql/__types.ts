@@ -2835,6 +2835,8 @@ export type PetitionEventType =
   | "PETITION_MESSAGE_BOUNCED"
   | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
+  | "PETITION_TAGGED"
+  | "PETITION_UNTAGGED"
   | "PROFILE_ASSOCIATED"
   | "PROFILE_DISASSOCIATED"
   | "RECIPIENT_SIGNED"
@@ -3455,6 +3457,17 @@ export type PetitionTagFilterLineOperator = "CONTAINS" | "DOES_NOT_CONTAIN" | "I
 
 export type PetitionTagFilterLogicalOperator = "AND" | "OR";
 
+export interface PetitionTaggedEvent extends PetitionEvent {
+  __typename?: "PetitionTaggedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition?: Maybe<Petition>;
+  tags: Array<Maybe<Tag>>;
+  type: PetitionEventType;
+  user?: Maybe<User>;
+}
+
 /** A petition template */
 export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
@@ -3547,6 +3560,17 @@ export interface PetitionTemplate extends PetitionBase {
 /** A petition template */
 export interface PetitionTemplateimageUrlArgs {
   options?: InputMaybe<ImageOptions>;
+}
+
+export interface PetitionUntaggedEvent extends PetitionEvent {
+  __typename?: "PetitionUntaggedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition?: Maybe<Petition>;
+  tags: Array<Maybe<Tag>>;
+  type: PetitionEventType;
+  user?: Maybe<User>;
 }
 
 /** The permission for a petition and user group */
@@ -8773,6 +8797,30 @@ export type PetitionActivityTimeline_PetitionFragment = {
           } | null;
         }
       | {
+          __typename?: "PetitionTaggedEvent";
+          id: string;
+          createdAt: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          } | null;
+          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+        }
+      | {
+          __typename?: "PetitionUntaggedEvent";
+          id: string;
+          createdAt: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          } | null;
+          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+        }
+      | {
           __typename?: "ProfileAssociatedEvent";
           id: string;
           createdAt: string;
@@ -9470,6 +9518,22 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragmen
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
 };
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionTaggedEvent_Fragment = {
+  __typename?: "PetitionTaggedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+};
+
+export type PetitionActivityTimeline_PetitionEvent_PetitionUntaggedEvent_Fragment = {
+  __typename?: "PetitionUntaggedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragment = {
   __typename?: "ProfileAssociatedEvent";
   id: string;
@@ -9789,6 +9853,8 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionTaggedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionUntaggedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ProfileDisassociatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment
@@ -9871,6 +9937,8 @@ export type PetitionProfilesTable_PetitionFragment = {
     }>;
   }>;
 };
+
+export type TagReference_TagFragment = { __typename?: "Tag"; name: string; color: string };
 
 export type UserGroupReference_UserGroupFragment = {
   __typename?: "UserGroup";
@@ -10575,6 +10643,20 @@ export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
   __typename?: "PetitionReopenedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
+export type TimelinePetitionTaggedEvent_PetitionTaggedEventFragment = {
+  __typename?: "PetitionTaggedEvent";
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+};
+
+export type TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragment = {
+  __typename?: "PetitionUntaggedEvent";
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
 };
 
 export type TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment = {
@@ -25717,6 +25799,30 @@ export type PetitionActivity_PetitionFragment = {
           } | null;
         }
       | {
+          __typename?: "PetitionTaggedEvent";
+          id: string;
+          createdAt: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          } | null;
+          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+        }
+      | {
+          __typename?: "PetitionUntaggedEvent";
+          id: string;
+          createdAt: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          } | null;
+          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+        }
+      | {
           __typename?: "ProfileAssociatedEvent";
           id: string;
           createdAt: string;
@@ -26777,6 +26883,30 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
+              }
+            | {
+                __typename?: "PetitionTaggedEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                } | null;
+                tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+              }
+            | {
+                __typename?: "PetitionUntaggedEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                } | null;
+                tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
               }
             | {
                 __typename?: "ProfileAssociatedEvent";
@@ -27913,6 +28043,30 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
+              }
+            | {
+                __typename?: "PetitionTaggedEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                } | null;
+                tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+              }
+            | {
+                __typename?: "PetitionUntaggedEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                } | null;
+                tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
               }
             | {
                 __typename?: "ProfileAssociatedEvent";
@@ -46005,6 +46159,38 @@ export const TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment
   TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment,
   unknown
 >;
+export const TagReference_TagFragmentDoc = gql`
+  fragment TagReference_Tag on Tag {
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
+` as unknown as DocumentNode<TagReference_TagFragment, unknown>;
+export const TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc = gql`
+  fragment TimelinePetitionTaggedEvent_PetitionTaggedEvent on PetitionTaggedEvent {
+    user {
+      ...UserReference_User
+    }
+    tags {
+      ...TagReference_Tag
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${TagReference_TagFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionTaggedEvent_PetitionTaggedEventFragment, unknown>;
+export const TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc = gql`
+  fragment TimelinePetitionUntaggedEvent_PetitionUntaggedEvent on PetitionUntaggedEvent {
+    user {
+      ...UserReference_User
+    }
+    tags {
+      ...TagReference_Tag
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${TagReference_TagFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragment, unknown>;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -46131,6 +46317,12 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on ProfileDisassociatedEvent {
       ...TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent
     }
+    ... on PetitionTaggedEvent {
+      ...TimelinePetitionTaggedEvent_PetitionTaggedEvent
+    }
+    ... on PetitionUntaggedEvent {
+      ...TimelinePetitionUntaggedEvent_PetitionUntaggedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -46173,6 +46365,8 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc}
   ${TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc}
   ${TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc}
+  ${TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc}
+  ${TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {

@@ -339,6 +339,20 @@ export function mapEventPayload(event: PetitionEvent) {
         profileId: toGlobalId("Profile", event.data.profile_id),
       };
     }
+    case "PETITION_TAGGED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        tagIds: event.data.tag_ids.map((tagId) => toGlobalId("Tag", tagId)),
+        tagNames: event.data.tag_names,
+      };
+    }
+    case "PETITION_UNTAGGED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        tagIds: event.data.tag_ids.map((tagId) => toGlobalId("Tag", tagId)),
+        tagNames: event.data.tag_names,
+      };
+    }
     default:
       return {};
   }

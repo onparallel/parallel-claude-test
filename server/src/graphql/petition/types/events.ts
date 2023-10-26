@@ -111,6 +111,10 @@ export const PetitionEvent = interfaceType({
         return "ProfileAssociatedEvent";
       case "PROFILE_DISASSOCIATED":
         return "ProfileDisassociatedEvent";
+      case "PETITION_TAGGED":
+        return "PetitionTaggedEvent";
+      case "PETITION_UNTAGGED":
+        return "PetitionUntaggedEvent";
     }
   },
   sourceType: "petitionEvents.PetitionEvent",
@@ -756,5 +760,31 @@ export const ProfileDisassociatedEvent = createPetitionEvent("ProfileDisassociat
     resolve: async (root, _, ctx) => {
       return await ctx.profiles.loadProfile(root.data.profile_id);
     },
+  });
+});
+
+export const PetitionTaggedEvent = createPetitionEvent("PetitionTaggedEvent", (t) => {
+  t.nullable.field("user", {
+    type: "User",
+    resolve: async (root, _, ctx) => {
+      return await ctx.users.loadUser(root.data.user_id);
+    },
+  });
+  t.nonNull.list.nullable.field("tags", {
+    type: "Tag",
+    resolve: async (root, _, ctx) => await ctx.tags.loadTag(root.data.tag_ids),
+  });
+});
+
+export const PetitionUntaggedEvent = createPetitionEvent("PetitionUntaggedEvent", (t) => {
+  t.nullable.field("user", {
+    type: "User",
+    resolve: async (root, _, ctx) => {
+      return await ctx.users.loadUser(root.data.user_id);
+    },
+  });
+  t.nonNull.list.nullable.field("tags", {
+    type: "Tag",
+    resolve: async (root, _, ctx) => await ctx.tags.loadTag(root.data.tag_ids),
   });
 });

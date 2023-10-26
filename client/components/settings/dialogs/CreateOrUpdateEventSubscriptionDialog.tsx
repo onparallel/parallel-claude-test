@@ -123,6 +123,8 @@ const EVENT_TYPES: PetitionEventType[] = [
   "REPLY_STATUS_CHANGED",
   "PROFILE_ASSOCIATED",
   "PROFILE_DISASSOCIATED",
+  "PETITION_TAGGED",
+  "PETITION_UNTAGGED",
 ];
 
 const FIELD_EVENTS: PetitionEventType[] = [

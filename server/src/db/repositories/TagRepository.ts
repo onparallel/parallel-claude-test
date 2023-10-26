@@ -5,7 +5,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateTag, Tag, User } from "../__types";
+import { CreateTag, PetitionTag, Tag, User } from "../__types";
 
 @injectable()
 export class TagRepository extends BaseRepository {
@@ -80,21 +80,21 @@ export class TagRepository extends BaseRepository {
     user: User,
     t?: Knex.Transaction,
   ) {
-    const petitionIdArr = unMaybeArray(petitionId);
-    const tagIdArr = unMaybeArray(tagId);
+    const petitionIds = unMaybeArray(petitionId);
+    const tagIds = unMaybeArray(tagId);
 
-    if (petitionIdArr.length === 0 || tagIdArr.length === 0) {
-      return;
+    if (petitionIds.length === 0 || tagIds.length === 0) {
+      return [];
     }
 
-    await this.raw(
+    return await this.raw<PetitionTag>(
       /* sql */ `
-    ? on conflict do nothing;
+    ? on conflict do nothing returning *;
     `,
       [
         this.from("petition_tag").insert(
-          petitionIdArr.flatMap((petitionId) =>
-            tagIdArr.map((tagId) => ({
+          petitionIds.flatMap((petitionId) =>
+            tagIds.map((tagId) => ({
               tag_id: tagId,
               petition_id: petitionId,
               created_by: `User:${user.id}`,
@@ -107,13 +107,14 @@ export class TagRepository extends BaseRepository {
   }
 
   async untagPetition(tagId: number, petitionId?: number, t?: Knex.Transaction) {
-    await this.from("petition_tag", t)
+    return await this.from("petition_tag", t)
       .where({ tag_id: tagId })
       .mmodify((q) => {
         if (petitionId) {
           q.where({ petition_id: petitionId });
         }
       })
-      .delete();
+      .delete()
+      .returning("*");
   }
 }
