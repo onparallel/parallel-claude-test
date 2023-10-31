@@ -129,6 +129,21 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             },
           ]
+        : ["zas25KHxAByKXKJNo2z"].includes(templateId)
+        ? [
+            {
+              fullName: "D. Álvaro Gámez Serracarbassa",
+              signatureImageUrl:
+                "https://static.onparallel.com/static/images/signatures/alvaro-gamez-serracarbassa-broseta.png",
+              date,
+            },
+            {
+              fullName: "D. Claudio Aguiló Casanova",
+              signatureImageUrl:
+                "https://static.onparallel.com/static/images/signatures/claudio-aguilo-casanova-broseta.png",
+              date,
+            },
+          ]
         : []
       : []),
     ...signatureConfig.signers!.map((signer, i) => ({
