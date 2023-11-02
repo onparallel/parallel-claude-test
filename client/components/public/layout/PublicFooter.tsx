@@ -2,8 +2,8 @@ import { Box, BoxProps, HStack } from "@chakra-ui/react";
 import { LinkedInIcon, TwitterIcon, YoutubeIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { PublicContainer } from "./PublicContainer";
 import { untranslated } from "@parallel/utils/untranslated";
+import { PublicContainer } from "./PublicContainer";
 
 export function PublicFooter(props: BoxProps) {
   return (
@@ -37,7 +37,7 @@ export function PublicFooter(props: BoxProps) {
             color="primary.800"
             _hover={{ color: "primary.500" }}
           >
-            <TwitterIcon role="presentation" boxSize={6} />
+            <TwitterIcon role="presentation" boxSize={5} />
           </NormalLink>
 
           <NormalLink

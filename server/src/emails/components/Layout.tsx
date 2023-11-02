@@ -167,6 +167,9 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
                       name="twitter-noshare"
                       href="https://twitter.com/onparallelHQ"
                       backgroundColor={theme.colors.primary[500]}
+                      src={`${assetsUrl}/static/logos/twitter-x.png`}
+                      iconPadding="4px"
+                      iconSize="14px"
                     />
                   </MjmlSocial>
                 )}
