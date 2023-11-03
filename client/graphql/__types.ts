@@ -17791,8 +17791,8 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
-    updatedAt: string;
     metadata: { [key: string]: any };
+    repliedAt?: string | null;
     lastReviewedAt?: string | null;
     isAnonymized: boolean;
     children?: Array<{
@@ -17835,8 +17835,8 @@ export type PetitionRepliesField_PetitionFieldFragment = {
         id: string;
         content: { [key: string]: any };
         status: PetitionFieldReplyStatus;
-        updatedAt: string;
         metadata: { [key: string]: any };
+        repliedAt?: string | null;
         lastReviewedAt?: string | null;
         isAnonymized: boolean;
         field?: {
@@ -17847,7 +17847,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
           options: { [key: string]: any };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        updatedBy?:
+        repliedBy?:
           | {
               __typename?: "PetitionAccess";
               contact?: {
@@ -17882,7 +17882,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
       options: { [key: string]: any };
     } | null;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-    updatedBy?:
+    repliedBy?:
       | {
           __typename?: "PetitionAccess";
           contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
@@ -17927,8 +17927,8 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
-  updatedAt: string;
   metadata: { [key: string]: any };
+  repliedAt?: string | null;
   lastReviewedAt?: string | null;
   isAnonymized: boolean;
   children?: Array<{
@@ -17971,8 +17971,8 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
       id: string;
       content: { [key: string]: any };
       status: PetitionFieldReplyStatus;
-      updatedAt: string;
       metadata: { [key: string]: any };
+      repliedAt?: string | null;
       lastReviewedAt?: string | null;
       isAnonymized: boolean;
       field?: {
@@ -17983,7 +17983,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
         options: { [key: string]: any };
       } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-      updatedBy?:
+      repliedBy?:
         | {
             __typename?: "PetitionAccess";
             contact?: {
@@ -18018,7 +18018,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
     options: { [key: string]: any };
   } | null;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-  updatedBy?:
+  repliedBy?:
     | {
         __typename?: "PetitionAccess";
         contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
@@ -18202,8 +18202,8 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
-  updatedAt: string;
   metadata: { [key: string]: any };
+  repliedAt?: string | null;
   lastReviewedAt?: string | null;
   isAnonymized: boolean;
   field?: {
@@ -18214,7 +18214,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
     options: { [key: string]: any };
   } | null;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-  updatedBy?:
+  repliedBy?:
     | {
         __typename?: "PetitionAccess";
         contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
@@ -35037,8 +35037,8 @@ export type PetitionReplies_PetitionFragment = {
       id: string;
       status: PetitionFieldReplyStatus;
       isAnonymized: boolean;
-      updatedAt: string;
       metadata: { [key: string]: any };
+      repliedAt?: string | null;
       lastReviewedAt?: string | null;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
@@ -35118,8 +35118,8 @@ export type PetitionReplies_PetitionFragment = {
           isAnonymized: boolean;
           id: string;
           status: PetitionFieldReplyStatus;
-          updatedAt: string;
           metadata: { [key: string]: any };
+          repliedAt?: string | null;
           lastReviewedAt?: string | null;
           field?: {
             __typename?: "PetitionField";
@@ -35129,7 +35129,7 @@ export type PetitionReplies_PetitionFragment = {
             options: { [key: string]: any };
           } | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          updatedBy?:
+          repliedBy?:
             | {
                 __typename?: "PetitionAccess";
                 contact?: {
@@ -35164,7 +35164,7 @@ export type PetitionReplies_PetitionFragment = {
         options: { [key: string]: any };
       } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-      updatedBy?:
+      repliedBy?:
         | {
             __typename?: "PetitionAccess";
             contact?: {
@@ -35412,8 +35412,8 @@ export type PetitionReplies_PetitionFieldFragment = {
     id: string;
     status: PetitionFieldReplyStatus;
     isAnonymized: boolean;
-    updatedAt: string;
     metadata: { [key: string]: any };
+    repliedAt?: string | null;
     lastReviewedAt?: string | null;
     children?: Array<{
       __typename?: "PetitionFieldGroupChildReply";
@@ -35456,8 +35456,8 @@ export type PetitionReplies_PetitionFieldFragment = {
         content: { [key: string]: any };
         isAnonymized: boolean;
         status: PetitionFieldReplyStatus;
-        updatedAt: string;
         metadata: { [key: string]: any };
+        repliedAt?: string | null;
         lastReviewedAt?: string | null;
         field?: {
           __typename?: "PetitionField";
@@ -35467,7 +35467,7 @@ export type PetitionReplies_PetitionFieldFragment = {
           options: { [key: string]: any };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        updatedBy?:
+        repliedBy?:
           | {
               __typename?: "PetitionAccess";
               contact?: {
@@ -35502,7 +35502,7 @@ export type PetitionReplies_PetitionFieldFragment = {
       options: { [key: string]: any };
     } | null;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-    updatedBy?:
+    repliedBy?:
       | {
           __typename?: "PetitionAccess";
           contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
@@ -35808,8 +35808,8 @@ export type PetitionReplies_closePetitionMutation = {
         id: string;
         status: PetitionFieldReplyStatus;
         isAnonymized: boolean;
-        updatedAt: string;
         metadata: { [key: string]: any };
+        repliedAt?: string | null;
         lastReviewedAt?: string | null;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
@@ -35889,8 +35889,8 @@ export type PetitionReplies_closePetitionMutation = {
             isAnonymized: boolean;
             id: string;
             status: PetitionFieldReplyStatus;
-            updatedAt: string;
             metadata: { [key: string]: any };
+            repliedAt?: string | null;
             lastReviewedAt?: string | null;
             field?: {
               __typename?: "PetitionField";
@@ -35900,7 +35900,7 @@ export type PetitionReplies_closePetitionMutation = {
               options: { [key: string]: any };
             } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            updatedBy?:
+            repliedBy?:
               | {
                   __typename?: "PetitionAccess";
                   contact?: {
@@ -35935,7 +35935,7 @@ export type PetitionReplies_closePetitionMutation = {
           options: { [key: string]: any };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        updatedBy?:
+        repliedBy?:
           | {
               __typename?: "PetitionAccess";
               contact?: {
@@ -36239,8 +36239,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         id: string;
         status: PetitionFieldReplyStatus;
         isAnonymized: boolean;
-        updatedAt: string;
         metadata: { [key: string]: any };
+        repliedAt?: string | null;
         lastReviewedAt?: string | null;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
@@ -36320,8 +36320,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
             isAnonymized: boolean;
             id: string;
             status: PetitionFieldReplyStatus;
-            updatedAt: string;
             metadata: { [key: string]: any };
+            repliedAt?: string | null;
             lastReviewedAt?: string | null;
             field?: {
               __typename?: "PetitionField";
@@ -36331,7 +36331,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
               options: { [key: string]: any };
             } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            updatedBy?:
+            repliedBy?:
               | {
                   __typename?: "PetitionAccess";
                   contact?: {
@@ -36366,7 +36366,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           options: { [key: string]: any };
         } | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        updatedBy?:
+        repliedBy?:
           | {
               __typename?: "PetitionAccess";
               contact?: {
@@ -36627,8 +36627,8 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
       id: string;
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
-      updatedAt: string;
       metadata: { [key: string]: any };
+      repliedAt?: string | null;
       lastReviewedAt?: string | null;
       isAnonymized: boolean;
       field?: {
@@ -36639,7 +36639,7 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
         options: { [key: string]: any };
       } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-      updatedBy?:
+      repliedBy?:
         | {
             __typename?: "PetitionAccess";
             contact?: {
@@ -36837,8 +36837,8 @@ export type PetitionReplies_petitionQuery = {
             id: string;
             status: PetitionFieldReplyStatus;
             isAnonymized: boolean;
-            updatedAt: string;
             metadata: { [key: string]: any };
+            repliedAt?: string | null;
             lastReviewedAt?: string | null;
             children?: Array<{
               __typename?: "PetitionFieldGroupChildReply";
@@ -36918,8 +36918,8 @@ export type PetitionReplies_petitionQuery = {
                 isAnonymized: boolean;
                 id: string;
                 status: PetitionFieldReplyStatus;
-                updatedAt: string;
                 metadata: { [key: string]: any };
+                repliedAt?: string | null;
                 lastReviewedAt?: string | null;
                 field?: {
                   __typename?: "PetitionField";
@@ -36929,7 +36929,7 @@ export type PetitionReplies_petitionQuery = {
                   options: { [key: string]: any };
                 } | null;
                 parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                updatedBy?:
+                repliedBy?:
                   | {
                       __typename?: "PetitionAccess";
                       contact?: {
@@ -36964,7 +36964,7 @@ export type PetitionReplies_petitionQuery = {
               options: { [key: string]: any };
             } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            updatedBy?:
+            repliedBy?:
               | {
                   __typename?: "PetitionAccess";
                   contact?: {
@@ -48368,7 +48368,6 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     id
     content
     status
-    updatedAt
     metadata
     field {
       id
@@ -48379,7 +48378,8 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     parent {
       id
     }
-    updatedBy {
+    repliedAt
+    repliedBy {
       ...UserOrContactReference_UserOrPetitionAccess
       ... on User {
         isMe

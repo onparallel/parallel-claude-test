@@ -223,13 +223,13 @@ export function PetitionRepliesFieldReply({
               divider={<Text as="span">{"·"}</Text>}
             >
               <Text color="gray.500">
-                {reply.updatedBy?.__typename === "User" && reply.updatedBy.isMe ? (
+                {reply.repliedBy?.__typename === "User" && reply.repliedBy.isMe ? (
                   <FormattedMessage id="generic.you" defaultMessage="You" />
                 ) : (
-                  <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
+                  <UserOrContactReference userOrAccess={reply.repliedBy} isLink={false} />
                 )}
                 {", "}
-                <DateTime as="span" value={reply.updatedAt} format={FORMATS.LLL} />
+                <DateTime as="span" value={reply.repliedAt!} format={FORMATS.LLL} />
               </Text>
               {reply.lastReviewedAt && reply.lastReviewedBy && reply.status !== "PENDING" ? (
                 <HStack>
@@ -302,7 +302,6 @@ PetitionRepliesFieldReply.fragments = {
       id
       content
       status
-      updatedAt
       metadata
       field {
         id
@@ -313,7 +312,8 @@ PetitionRepliesFieldReply.fragments = {
       parent {
         id
       }
-      updatedBy {
+      repliedAt
+      repliedBy {
         ...UserOrContactReference_UserOrPetitionAccess
         ... on User {
           isMe
