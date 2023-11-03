@@ -110,6 +110,18 @@ export type BulkCreateContactsReturnType = {
   errors: Maybe<Array<Scalars["JSON"]["output"]>>;
 };
 
+export type BulkPetitionSendTaskDataInput = {
+  contacts: Array<BulkPetitionSendTaskDataInputContact>;
+  prefill?: InputMaybe<Scalars["JSONObject"]["input"]>;
+};
+
+export type BulkPetitionSendTaskDataInputContact = {
+  email?: InputMaybe<Scalars["String"]["input"]>;
+  firstName?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<Scalars["GID"]["input"]>;
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
@@ -350,6 +362,7 @@ export type EventSubscriptionSignatureKey = {
 
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
+  | "BULK_PETITION_SEND_TASK"
   | "CLIENT_PORTAL"
   | "COPY_PETITION_REPLIES"
   | "CUSTOM_HOST_UI"
@@ -372,6 +385,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY"
+  | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
 
 /** A feature flag name with his value */
@@ -624,6 +638,8 @@ export type Mutation = {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /** Creates a Task for creating, prefilling and sending petitions from a templateId */
+  createBulkPetitionSendTask: Task;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a new Dow Jones KYC integration on the user's organization */
@@ -678,6 +694,8 @@ export type Mutation = {
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
   createTag: Tag;
+  /** Creates a Task for generating a CSV file with the replies of a template */
+  createTemplateRepliesCsvExportTask: Task;
   /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
@@ -1088,6 +1106,11 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateBulkPetitionSendTaskArgs = {
+  data: Array<BulkPetitionSendTaskDataInput>;
+  templateId: Scalars["GID"]["input"];
+};
+
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1262,6 +1285,10 @@ export type MutationcreateSignaturitIntegrationArgs = {
 export type MutationcreateTagArgs = {
   color: Scalars["String"]["input"];
   name: Scalars["String"]["input"];
+};
+
+export type MutationcreateTemplateRepliesCsvExportTaskArgs = {
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateTemplateRepliesReportTaskArgs = {
@@ -3355,7 +3382,7 @@ export type PetitionTaggedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
-  tag: Maybe<Tag>;
+  tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -3458,7 +3485,7 @@ export type PetitionUntaggedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
-  tag: Maybe<Tag>;
+  tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4789,11 +4816,13 @@ export type Task = {
 
 export type TaskName =
   | "BANKFLIP_SESSION_COMPLETED"
+  | "BULK_PETITION_SEND"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"
+  | "TEMPLATE_REPLIES_CSV_EXPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
 
@@ -5464,7 +5493,12 @@ export type SubscriptionFragment = {
   fromTemplate: { id: string } | null;
 };
 
-export type TaskFragment = { id: string; progress: number | null; status: TaskStatus };
+export type TaskFragment = {
+  id: string;
+  progress: number | null;
+  status: TaskStatus;
+  output: any | null;
+};
 
 export type ProfileTypeFieldFragment = {
   id: string;
@@ -5593,7 +5627,7 @@ export type waitForTask_TaskQueryVariables = Exact<{
 }>;
 
 export type waitForTask_TaskQuery = {
-  task: { id: string; progress: number | null; status: TaskStatus };
+  task: { id: string; progress: number | null; status: TaskStatus; output: any | null };
 };
 
 export type getTaskResultFileUrl_getTaskResultFileMutationVariables = Exact<{
@@ -5601,6 +5635,27 @@ export type getTaskResultFileUrl_getTaskResultFileMutationVariables = Exact<{
 }>;
 
 export type getTaskResultFileUrl_getTaskResultFileMutation = { getTaskResultFile: { url: string } };
+
+export type CreatePetitionRecipients_contactQueryVariables = Exact<{
+  email: Scalars["String"]["input"];
+}>;
+
+export type CreatePetitionRecipients_contactQuery = {
+  contacts: Array<{ id: string; firstName: string; lastName: string | null } | null>;
+};
+
+export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
+  contactId: Scalars["GID"]["input"];
+  data: UpdateContactInput;
+}>;
+
+export type CreatePetitionRecipients_updateContactMutation = { updateContact: { id: string } };
+
+export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
+  data: CreateContactInput;
+}>;
+
+export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
 
 export type GetMe_userQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -6568,27 +6623,6 @@ export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation = 
   modifyPetitionCustomProperty: { id: string } | { id: string };
 };
 
-export type CreatePetitionRecipients_contactQueryVariables = Exact<{
-  email: Scalars["String"]["input"];
-}>;
-
-export type CreatePetitionRecipients_contactQuery = {
-  contacts: Array<{ id: string; firstName: string; lastName: string | null } | null>;
-};
-
-export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
-  contactId: Scalars["GID"]["input"];
-  data: UpdateContactInput;
-}>;
-
-export type CreatePetitionRecipients_updateContactMutation = { updateContact: { id: string } };
-
-export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
-  data: CreateContactInput;
-}>;
-
-export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
-
 export type CreatePetitionRecipients_petitionQueryVariables = Exact<{
   id: Scalars["GID"]["input"];
 }>;
@@ -7023,7 +7057,12 @@ export type ExportPetitionReplies_createExportRepliesTaskMutationVariables = Exa
 }>;
 
 export type ExportPetitionReplies_createExportRepliesTaskMutation = {
-  createExportRepliesTask: { id: string; progress: number | null; status: TaskStatus };
+  createExportRepliesTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
 };
 
 export type ExportPetitionReplies_createPrintPdfTaskMutationVariables = Exact<{
@@ -7031,7 +7070,12 @@ export type ExportPetitionReplies_createPrintPdfTaskMutationVariables = Exact<{
 }>;
 
 export type ExportPetitionReplies_createPrintPdfTaskMutation = {
-  createPrintPdfTask: { id: string; progress: number | null; status: TaskStatus };
+  createPrintPdfTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
 };
 
 export type GetPermissions_permissionsQueryVariables = Exact<{
@@ -8704,6 +8748,54 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
   }>;
 };
 
+export type BulkSendTemplate_createBulkPetitionSendTaskMutationVariables = Exact<{
+  templateId: Scalars["GID"]["input"];
+  data: Array<BulkPetitionSendTaskDataInput> | BulkPetitionSendTaskDataInput;
+}>;
+
+export type BulkSendTemplate_createBulkPetitionSendTaskMutation = {
+  createBulkPetitionSendTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
+};
+
+export type ExportTemplate_createTemplateRepliesCsvExportTaskMutationVariables = Exact<{
+  templateId: Scalars["GID"]["input"];
+}>;
+
+export type ExportTemplate_createTemplateRepliesCsvExportTaskMutation = {
+  createTemplateRepliesCsvExportTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
+};
+
+export type Task_TaskStatusQueryVariables = Exact<{
+  taskId: Scalars["GID"]["input"];
+}>;
+
+export type Task_TaskStatusQuery = {
+  task: {
+    id: string;
+    name: TaskName;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
+};
+
+export type Task_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"]["input"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type Task_getTaskResultFileMutation = { getTaskResultFile: { url: string } };
+
 export type SubmitReply_createPetitionFieldRepliesMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   fields: Array<CreatePetitionFieldReplyInput> | CreatePetitionFieldReplyInput;
@@ -9342,6 +9434,7 @@ export const TaskFragmentDoc = gql`
     id
     progress
     status
+    output
   }
 ` as unknown as DocumentNode<TaskFragment, unknown>;
 export const ProfileTypeFragmentDoc = gql`
@@ -9457,6 +9550,38 @@ export const getTaskResultFileUrl_getTaskResultFileDocument = gql`
 ` as unknown as DocumentNode<
   getTaskResultFileUrl_getTaskResultFileMutation,
   getTaskResultFileUrl_getTaskResultFileMutationVariables
+>;
+export const CreatePetitionRecipients_contactDocument = gql`
+  query CreatePetitionRecipients_contact($email: String!) {
+    contacts: contactsByEmail(emails: [$email]) {
+      id
+      firstName
+      lastName
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_contactQuery,
+  CreatePetitionRecipients_contactQueryVariables
+>;
+export const CreatePetitionRecipients_updateContactDocument = gql`
+  mutation CreatePetitionRecipients_updateContact($contactId: GID!, $data: UpdateContactInput!) {
+    updateContact(id: $contactId, data: $data) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_updateContactMutation,
+  CreatePetitionRecipients_updateContactMutationVariables
+>;
+export const CreatePetitionRecipients_createContactDocument = gql`
+  mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
+    createContact(data: $data) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_createContactMutation,
+  CreatePetitionRecipients_createContactMutationVariables
 >;
 export const GetMe_userDocument = gql`
   query GetMe_user {
@@ -9732,38 +9857,6 @@ export const DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument =
 ` as unknown as DocumentNode<
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables
->;
-export const CreatePetitionRecipients_contactDocument = gql`
-  query CreatePetitionRecipients_contact($email: String!) {
-    contacts: contactsByEmail(emails: [$email]) {
-      id
-      firstName
-      lastName
-    }
-  }
-` as unknown as DocumentNode<
-  CreatePetitionRecipients_contactQuery,
-  CreatePetitionRecipients_contactQueryVariables
->;
-export const CreatePetitionRecipients_updateContactDocument = gql`
-  mutation CreatePetitionRecipients_updateContact($contactId: GID!, $data: UpdateContactInput!) {
-    updateContact(id: $contactId, data: $data) {
-      id
-    }
-  }
-` as unknown as DocumentNode<
-  CreatePetitionRecipients_updateContactMutation,
-  CreatePetitionRecipients_updateContactMutationVariables
->;
-export const CreatePetitionRecipients_createContactDocument = gql`
-  mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
-    createContact(data: $data) {
-      id
-    }
-  }
-` as unknown as DocumentNode<
-  CreatePetitionRecipients_createContactMutation,
-  CreatePetitionRecipients_createContactMutationVariables
 >;
 export const CreatePetitionRecipients_petitionDocument = gql`
   query CreatePetitionRecipients_petition($id: GID!) {
@@ -10631,6 +10724,52 @@ export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
 ` as unknown as DocumentNode<
   UnsubscribeFromProfile_unsubscribeFromProfileMutation,
   UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables
+>;
+export const BulkSendTemplate_createBulkPetitionSendTaskDocument = gql`
+  mutation BulkSendTemplate_createBulkPetitionSendTask(
+    $templateId: GID!
+    $data: [BulkPetitionSendTaskDataInput!]!
+  ) {
+    createBulkPetitionSendTask(templateId: $templateId, data: $data) {
+      ...Task
+    }
+  }
+  ${TaskFragmentDoc}
+` as unknown as DocumentNode<
+  BulkSendTemplate_createBulkPetitionSendTaskMutation,
+  BulkSendTemplate_createBulkPetitionSendTaskMutationVariables
+>;
+export const ExportTemplate_createTemplateRepliesCsvExportTaskDocument = gql`
+  mutation ExportTemplate_createTemplateRepliesCsvExportTask($templateId: GID!) {
+    createTemplateRepliesCsvExportTask(templateId: $templateId) {
+      ...Task
+    }
+  }
+  ${TaskFragmentDoc}
+` as unknown as DocumentNode<
+  ExportTemplate_createTemplateRepliesCsvExportTaskMutation,
+  ExportTemplate_createTemplateRepliesCsvExportTaskMutationVariables
+>;
+export const Task_TaskStatusDocument = gql`
+  query Task_TaskStatus($taskId: GID!) {
+    task(id: $taskId) {
+      id
+      name
+      progress
+      status
+      output
+    }
+  }
+` as unknown as DocumentNode<Task_TaskStatusQuery, Task_TaskStatusQueryVariables>;
+export const Task_getTaskResultFileDocument = gql`
+  mutation Task_getTaskResultFile($taskId: GID!, $preview: Boolean) {
+    getTaskResultFile(taskId: $taskId, preview: $preview) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  Task_getTaskResultFileMutation,
+  Task_getTaskResultFileMutationVariables
 >;
 export const SubmitReply_createPetitionFieldRepliesDocument = gql`
   mutation SubmitReply_createPetitionFieldReplies(

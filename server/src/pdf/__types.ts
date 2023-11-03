@@ -110,6 +110,18 @@ export type BulkCreateContactsReturnType = {
   errors: Maybe<Array<Scalars["JSON"]["output"]>>;
 };
 
+export type BulkPetitionSendTaskDataInput = {
+  contacts: Array<BulkPetitionSendTaskDataInputContact>;
+  prefill?: InputMaybe<Scalars["JSONObject"]["input"]>;
+};
+
+export type BulkPetitionSendTaskDataInputContact = {
+  email?: InputMaybe<Scalars["String"]["input"]>;
+  firstName?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<Scalars["GID"]["input"]>;
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
@@ -350,6 +362,7 @@ export type EventSubscriptionSignatureKey = {
 
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
+  | "BULK_PETITION_SEND_TASK"
   | "CLIENT_PORTAL"
   | "COPY_PETITION_REPLIES"
   | "CUSTOM_HOST_UI"
@@ -372,6 +385,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY"
+  | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
 
 /** A feature flag name with his value */
@@ -624,6 +638,8 @@ export type Mutation = {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /** Creates a Task for creating, prefilling and sending petitions from a templateId */
+  createBulkPetitionSendTask: Task;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a new Dow Jones KYC integration on the user's organization */
@@ -678,6 +694,8 @@ export type Mutation = {
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
   createTag: Tag;
+  /** Creates a Task for generating a CSV file with the replies of a template */
+  createTemplateRepliesCsvExportTask: Task;
   /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
@@ -1088,6 +1106,11 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateBulkPetitionSendTaskArgs = {
+  data: Array<BulkPetitionSendTaskDataInput>;
+  templateId: Scalars["GID"]["input"];
+};
+
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1262,6 +1285,10 @@ export type MutationcreateSignaturitIntegrationArgs = {
 export type MutationcreateTagArgs = {
   color: Scalars["String"]["input"];
   name: Scalars["String"]["input"];
+};
+
+export type MutationcreateTemplateRepliesCsvExportTaskArgs = {
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateTemplateRepliesReportTaskArgs = {
@@ -3355,7 +3382,7 @@ export type PetitionTaggedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
-  tag: Maybe<Tag>;
+  tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -3458,7 +3485,7 @@ export type PetitionUntaggedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
-  tag: Maybe<Tag>;
+  tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4789,11 +4816,13 @@ export type Task = {
 
 export type TaskName =
   | "BANKFLIP_SESSION_COMPLETED"
+  | "BULK_PETITION_SEND"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"
+  | "TEMPLATE_REPLIES_CSV_EXPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
 

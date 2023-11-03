@@ -178,79 +178,11 @@ export const createPetition = mutationField("createPetition", {
     const isTemplate = type === "TEMPLATE";
     let petition: Petition;
     if (petitionId) {
-      const original = (await ctx.petitions.loadPetition(petitionId))!;
-
-      const isCreatingFromSameOrgTemplate =
-        original.is_template && original.org_id === ctx.user!.org_id;
-
-      const defaultPermissions = await ctx.petitions.loadTemplateDefaultPermissions(original.id);
-
-      const hasCustomOwner =
-        isCreatingFromSameOrgTemplate &&
-        (defaultPermissions.find((p) => p.type === "OWNER")?.user_id ?? ctx.user!.id) !==
-          ctx.user!.id;
-
-      petition = await ctx.petitions.clonePetition(
+      petition = await ctx.petitions.createPetitionFromId(
         petitionId,
+        { isTemplate, name },
         ctx.user!,
-        {
-          is_template: isTemplate,
-          status: isTemplate ? null : "DRAFT",
-          name: original.is_template && !isTemplate ? name : original.name,
-        },
-        { insertPermissions: !hasCustomOwner },
       );
-
-      if (hasCustomOwner && !defaultPermissions.find((p) => p.user_id === ctx.user!.id)) {
-        // if the template has a custom template_default_permission OWNER and no permissions set for session user,
-        // we have to give them WRITE permissions
-        // OWNER will be set inside createPermissionsFromTemplateDefaultPermissions
-        await ctx.petitions.addPetitionPermissions(
-          [petition.id],
-          [
-            {
-              id: ctx.user!.id,
-              type: "User",
-              isSubscribed: true,
-              permissionType: "WRITE",
-            },
-          ],
-          "User",
-          ctx.user!.id,
-        );
-      }
-
-      if (isCreatingFromSameOrgTemplate) {
-        await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
-          petition.id,
-          original.id,
-          "User",
-          ctx.user!.id,
-        );
-      }
-
-      if (original.is_template && !isTemplate) {
-        await ctx.petitions.createEvent({
-          type: "TEMPLATE_USED",
-          petition_id: original.id,
-          data: {
-            new_petition_id: petition.id,
-            org_id: ctx.user!.org_id,
-            user_id: ctx.user!.id,
-          },
-        });
-      } else if (!original.is_template) {
-        await ctx.petitions.createEvent({
-          type: "PETITION_CLONED",
-          petition_id: original.id,
-          data: {
-            new_petition_id: petition.id,
-            org_id: petition.org_id,
-            user_id: ctx.user!.id,
-            type: petition.is_template ? "TEMPLATE" : "PETITION",
-          },
-        });
-      }
     } else {
       const intl = await ctx.i18n.getIntl(locale!);
       petition = await ctx.petitions.createPetition(
@@ -1801,7 +1733,8 @@ export const sendPetition = mutationField("sendPetition", {
 
       const sender = isDefined(args.senderId) ? await ctx.users.loadUser(args.senderId) : null;
 
-      // we chunk petitions in chunks of less than 20 contactIds
+      // we chunk petitions in chunks of less than 100 contactIds
+      // this way we can schedule the PetitionMessages in batches of 100 emails per 5 minutes
       const petitionChunks = chunkWhile(
         pipe(
           [petition, ...clonedPetitions],
@@ -1811,8 +1744,8 @@ export const sendPetition = mutationField("sendPetition", {
         (currentChunk, item) =>
           // current chunk is empty, or
           currentChunk.length === 0 ||
-          // (number of contactIds in the accumulated chunk) + (number of contactIds in the current item) <= 20
-          sumBy(currentChunk, (x) => x.contactIds.length) + item.contactIds.length <= 20,
+          // (number of contactIds in the accumulated chunk) + (number of contactIds in the current item) <= 100
+          sumBy(currentChunk, (x) => x.contactIds.length) + item.contactIds.length <= 100,
       );
 
       const baseDate = new Date();

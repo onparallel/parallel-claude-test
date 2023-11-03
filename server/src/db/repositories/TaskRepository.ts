@@ -56,6 +56,20 @@ export type TaskInput<TName extends TaskName> = {
     bankflip_session_id: string;
     org_id: number;
   };
+  /**
+   * creates, prefills and sends petitions from a template_id.
+   * Each element in data array corresponds to one "send", and contains the contacts and optional prefill data.
+   */
+  BULK_PETITION_SEND: {
+    template_id: number;
+    data: {
+      contacts: (number | { email: string; first_name: string; last_name?: string | null })[];
+      prefill?: Maybe<Record<string, any>>;
+    }[];
+  };
+  TEMPLATE_REPLIES_CSV_EXPORT: {
+    template_id: number;
+  };
 }[TName];
 
 export interface PetitionReportStatusCount {
@@ -132,6 +146,16 @@ export type TaskOutput<TName extends TaskName> = {
   BANKFLIP_SESSION_COMPLETED: {
     success: boolean;
     error?: any;
+  };
+  BULK_PETITION_SEND: {
+    results: {
+      success: boolean;
+      petition_id: Maybe<string>;
+      error?: string;
+    }[];
+  };
+  TEMPLATE_REPLIES_CSV_EXPORT: {
+    temporary_file_id: number;
   };
 }[TName];
 

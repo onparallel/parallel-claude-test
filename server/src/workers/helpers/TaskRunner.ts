@@ -7,6 +7,7 @@ import { random } from "../../util/token";
 
 export abstract class TaskRunner<T extends TaskName> {
   private abort!: AbortController;
+  private previousProgress = 0;
 
   constructor(
     protected ctx: WorkerContext,
@@ -48,14 +49,18 @@ export abstract class TaskRunner<T extends TaskName> {
     if (value < 0 || value > 100) {
       throw new Error("value must be between 0 and 100");
     }
-    await this.ctx.tasks.updateTask(
-      this.task.id,
-      {
-        status: "PROCESSING",
-        progress: Math.round(value),
-      },
-      this.ctx.config.instanceName,
-    );
+    const progress = Math.round(value);
+    if (progress !== this.previousProgress) {
+      this.previousProgress = progress;
+      await this.ctx.tasks.updateTask(
+        this.task.id,
+        {
+          status: "PROCESSING",
+          progress,
+        },
+        this.ctx.config.instanceName,
+      );
+    }
   }
 
   protected async uploadTemporaryFile({

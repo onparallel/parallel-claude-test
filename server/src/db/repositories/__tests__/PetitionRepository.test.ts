@@ -1855,6 +1855,76 @@ describe("repositories/PetitionRepository", () => {
         },
       ]);
     });
+
+    it("uses empty FIELD_GROUP replies instead of creating new ones", async () => {
+      const emptyFieldGroupReplies = await mocks.createFieldGroupReply(
+        fieldId(fields, "FIELD_GROUP"),
+        undefined,
+        2,
+        () => ({
+          user_id: user.id,
+        }),
+      );
+
+      await petitions.prefillPetition(
+        petition.id,
+        {
+          FIELD_GROUP: [
+            { CHILD_TEXT: "hello!", CHILD_NUMBER: 123 },
+            { CHILD_NUMBER: 1000 },
+            { CHILD_SHORT_TEXT: "short text reply" },
+          ],
+        },
+        user,
+      );
+
+      const replies = await petitions.loadRepliesForField(fieldId(fields, "FIELD_GROUP"));
+
+      expect(replies).toMatchObject([
+        { id: emptyFieldGroupReplies[0].id }, // previously created empty reply
+        { id: emptyFieldGroupReplies[1].id }, // previously created empty reply
+        { id: expect.any(Number) }, // new empty reply created on prefill
+      ]);
+
+      const childReplies = await mocks.knex
+        .from("petition_field_reply")
+        .where({ deleted_at: null })
+        .whereIn(
+          "parent_petition_field_reply_id",
+          replies.map((r) => r.id),
+        );
+
+      expect(
+        childReplies.map((r) =>
+          pick(r, ["type", "content", "petition_field_id", "parent_petition_field_reply_id"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          type: "TEXT",
+          content: { value: "hello!" },
+          petition_field_id: fieldId(children, "CHILD_TEXT"),
+          parent_petition_field_reply_id: emptyFieldGroupReplies[1].id,
+        },
+        {
+          type: "NUMBER",
+          content: { value: 123 },
+          petition_field_id: fieldId(children, "CHILD_NUMBER"),
+          parent_petition_field_reply_id: emptyFieldGroupReplies[1].id,
+        },
+        {
+          type: "NUMBER",
+          content: { value: 1000 },
+          petition_field_id: fieldId(children, "CHILD_NUMBER"),
+          parent_petition_field_reply_id: emptyFieldGroupReplies[0].id,
+        },
+        {
+          type: "SHORT_TEXT",
+          content: { value: "short text reply" },
+          petition_field_id: fieldId(children, "CHILD_SHORT_TEXT"),
+          parent_petition_field_reply_id: expect.any(Number),
+        },
+      ]);
+    });
   });
 
   describe("loadPetitionProgress", () => {
@@ -2041,6 +2111,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [],
         },
         {
@@ -2055,6 +2126,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2088,6 +2160,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2112,6 +2185,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2136,6 +2210,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2160,6 +2235,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2197,6 +2273,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2226,6 +2303,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2255,6 +2333,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2288,6 +2367,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: fieldGroup.id,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2312,6 +2392,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: fieldGroup.id,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2345,6 +2426,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [],
         },
         {
@@ -2359,6 +2441,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2392,6 +2475,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2416,6 +2500,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2440,6 +2525,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2464,6 +2550,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [],
         },
         {
@@ -2478,6 +2565,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [],
         },
         {
@@ -2492,6 +2580,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [],
         },
         {
@@ -2506,6 +2595,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: null,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2539,6 +2629,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: fieldGroup.id,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),
@@ -2563,6 +2654,7 @@ describe("repositories/PetitionRepository", () => {
           visibility: null,
           optional: false,
           parent_petition_field_id: fieldGroup.id,
+          alias: null,
           replies: [
             {
               id: expect.any(Number),

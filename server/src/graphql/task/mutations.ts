@@ -1,13 +1,28 @@
 import { differenceInDays } from "date-fns";
-import { booleanArg, idArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
+import {
+  booleanArg,
+  idArg,
+  inputObjectType,
+  list,
+  mutationField,
+  nonNull,
+  nullable,
+  objectType,
+  stringArg,
+} from "nexus";
 import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
 import { isValidTimezone } from "../../util/time";
+import { userHasAccessToContacts } from "../contact/authorizers";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
+import { validateAnd, validateIf } from "../helpers/validateArgs";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
 import {
+  petitionHasRepliableFields,
   petitionIsNotAnonymized,
   petitionsAreOfTypeTemplate,
   userHasAccessToPetitions,
@@ -16,7 +31,6 @@ import {
 } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
-import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   description: "Creates a task for printing a PDF of the petition and sends it to the queue",
@@ -238,6 +252,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       "EXPORT_EXCEL",
       "TEMPLATE_REPLIES_REPORT",
       "DOW_JONES_PROFILE_DOWNLOAD",
+      "TEMPLATE_REPLIES_CSV_EXPORT",
     ]),
   ),
   args: {
@@ -250,7 +265,8 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       | Task<"PRINT_PDF">
       | Task<"EXPORT_EXCEL">
       | Task<"TEMPLATE_REPLIES_REPORT">
-      | Task<"DOW_JONES_PROFILE_DOWNLOAD">;
+      | Task<"DOW_JONES_PROFILE_DOWNLOAD">
+      | Task<"TEMPLATE_REPLIES_CSV_EXPORT">;
 
     const file = isDefined(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
@@ -277,3 +293,128 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
     };
   },
 });
+
+export const createBulkPetitionSendTask = mutationField("createBulkPetitionSendTask", {
+  description: "Creates a Task for creating, prefilling and sending petitions from a templateId",
+  type: "Task",
+  authorize: authenticateAnd(
+    contextUserHasPermission("PETITIONS:CREATE_PETITIONS"),
+    userHasFeatureFlag("BULK_PETITION_SEND_TASK"),
+    userHasAccessToPetitions("templateId"),
+    petitionIsNotAnonymized("templateId"),
+    petitionsAreOfTypeTemplate("templateId"),
+    petitionHasRepliableFields("templateId"),
+    userHasAccessToContacts((args) =>
+      args.data.flatMap((d) => d.contacts.filter((c) => isDefined(c.id)).map((c) => c.id!)),
+    ),
+  ),
+  args: {
+    templateId: nonNull(globalIdArg("Petition")),
+    data: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "BulkPetitionSendTaskDataInput",
+            definition(t) {
+              t.nonNull.list.nonNull.field("contacts", {
+                type: inputObjectType({
+                  name: "BulkPetitionSendTaskDataInputContact",
+                  definition(t) {
+                    t.globalId("id", { prefixName: "Contact" });
+                    t.string("email");
+                    t.string("firstName");
+                    t.string("lastName");
+                  },
+                }),
+              });
+              t.nullable.jsonObject("prefill");
+            },
+          }).asArg(),
+        ),
+      ),
+    ),
+  },
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.data, "data"),
+    validateIf(
+      (args) =>
+        args.data.some(
+          (d) =>
+            d.contacts.length === 0 ||
+            !d.contacts.every(
+              (c) => isDefined(c.id) || (isDefined(c.email) && isDefined(c.firstName)),
+            ),
+        ),
+      (_, args, ctx, info) => {
+        throw new ArgValidationError(
+          info,
+          "data.contacts",
+          `Every element in array must contain at least 1 id or a combination of email, firstName and lastName.`,
+        );
+      },
+    ),
+  ),
+  resolve: async (_, { templateId, data }, ctx) => {
+    const usageLimit = await ctx.organizations.loadCurrentOrganizationUsageLimit(
+      ctx.user!.org_id,
+      "PETITION_SEND",
+    );
+
+    if (!usageLimit || usageLimit.used + data.length > usageLimit.limit) {
+      throw new ApolloError(
+        "You don't have enough credits to send all the petitions",
+        "PETITION_SEND_LIMIT_REACHED",
+      );
+    }
+
+    return await ctx.tasks.createTask(
+      {
+        name: "BULK_PETITION_SEND",
+        user_id: ctx.user!.id,
+        input: {
+          template_id: templateId,
+          data: data.map((d) => ({
+            contacts: d.contacts.map((c) => {
+              if (isDefined(c.id)) {
+                return c.id;
+              } else {
+                return { email: c.email!, first_name: c.firstName!, last_name: c.lastName };
+              }
+            }),
+            prefill: d.prefill,
+          })),
+        },
+      },
+      `User:${ctx.user!.id}`,
+    );
+  },
+});
+
+export const createTemplateRepliesCsvExportTask = mutationField(
+  "createTemplateRepliesCsvExportTask",
+  {
+    description: "Creates a Task for generating a CSV file with the replies of a template",
+    type: "Task",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("TEMPLATE_REPLIES_CSV_EXPORT_TASK"),
+      userHasAccessToPetitions("templateId"),
+      petitionIsNotAnonymized("templateId"),
+      petitionsAreOfTypeTemplate("templateId"),
+    ),
+    args: {
+      templateId: nonNull(globalIdArg("Petition")),
+    },
+    resolve: async (_, { templateId }, ctx) => {
+      return await ctx.tasks.createTask(
+        {
+          name: "TEMPLATE_REPLIES_CSV_EXPORT",
+          user_id: ctx.user!.id,
+          input: {
+            template_id: templateId,
+          },
+        },
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);

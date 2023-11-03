@@ -2,17 +2,26 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
+import { core } from "nexus";
+import { uniq } from "remeda";
 
 export function userHasAccessToContacts<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number> | null>,
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const contactIds = unMaybeArray(
-        (args[argName] as unknown as MaybeArray<number> | null) ?? [],
+      const contactIds = uniq(
+        unMaybeArray(
+          (typeof prop === "function"
+            ? (prop as any)(args)
+            : (args as any)[prop]) as MaybeArray<number>,
+        ),
       );
+
       if (contactIds.length === 0) {
         return true;
       }

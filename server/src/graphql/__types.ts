@@ -116,6 +116,18 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  BulkPetitionSendTaskDataInput: {
+    // input type
+    contacts: NexusGenInputs["BulkPetitionSendTaskDataInputContact"][]; // [BulkPetitionSendTaskDataInputContact!]!
+    prefill?: NexusGenScalars["JSONObject"] | null; // JSONObject
+  };
+  BulkPetitionSendTaskDataInputContact: {
+    // input type
+    email?: string | null; // String
+    firstName?: string | null; // String
+    id?: NexusGenScalars["GID"] | null; // GID
+    lastName?: string | null; // String
+  };
   CreateContactInput: {
     // input type
     email: string; // String!
@@ -1533,6 +1545,7 @@ export interface NexusGenFieldTypes {
     closeProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
+    createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -1562,6 +1575,7 @@ export interface NexusGenFieldTypes {
     createPublicPetitionLinkPrefillData: string; // String!
     createSignaturitIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
+    createTemplateRepliesCsvExportTask: NexusGenRootTypes["Task"]; // Task!
     createTemplateRepliesReportTask: NexusGenRootTypes["Task"]; // Task!
     createTemplateStatsReportTask: NexusGenRootTypes["Task"]; // Task!
     createTemplatesOverviewReportTask: NexusGenRootTypes["Task"]; // Task!
@@ -3727,6 +3741,7 @@ export interface NexusGenFieldTypeNames {
     closeProfile: "Profile";
     completePetition: "Petition";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
+    createBulkPetitionSendTask: "Task";
     createContact: "Contact";
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
@@ -3756,6 +3771,7 @@ export interface NexusGenFieldTypeNames {
     createPublicPetitionLinkPrefillData: "String";
     createSignaturitIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
+    createTemplateRepliesCsvExportTask: "Task";
     createTemplateRepliesReportTask: "Task";
     createTemplateStatsReportTask: "Task";
     createTemplatesOverviewReportTask: "Task";
@@ -5673,6 +5689,11 @@ export interface NexusGenArgTypes {
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
+    createBulkPetitionSendTask: {
+      // args
+      data: NexusGenInputs["BulkPetitionSendTaskDataInput"][]; // [BulkPetitionSendTaskDataInput!]!
+      templateId: NexusGenScalars["GID"]; // GID!
+    };
     createContact: {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
@@ -5848,6 +5869,10 @@ export interface NexusGenArgTypes {
       // args
       color: string; // String!
       name: string; // String!
+    };
+    createTemplateRepliesCsvExportTask: {
+      // args
+      templateId: NexusGenScalars["GID"]; // GID!
     };
     createTemplateRepliesReportTask: {
       // args

@@ -4,6 +4,8 @@ import { TaskName } from "../db/__types";
 import { Task } from "../db/repositories/TaskRepository";
 import { TaskRunner } from "./helpers/TaskRunner";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
+import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
@@ -11,7 +13,7 @@ import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
-import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
+import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -22,6 +24,8 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   DOW_JONES_PROFILE_DOWNLOAD: DowJonesProfileDownloadRunner,
   TEMPLATES_OVERVIEW_REPORT: TemplatesOverviewReportRunner,
   BANKFLIP_SESSION_COMPLETED: BankflipSessionCompletedRunner,
+  BULK_PETITION_SEND: BulkPetitionSendRunner,
+  TEMPLATE_REPLIES_CSV_EXPORT: TemplateRepliesCsvExportRunner,
 };
 
 export interface TaskWorkerPayload {

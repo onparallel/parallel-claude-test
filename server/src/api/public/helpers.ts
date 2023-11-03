@@ -3,7 +3,7 @@ import { createReadStream } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import { performance } from "perf_hooks";
-import { isDefined, omit, pick, pipe } from "remeda";
+import { isDefined, omit, pick, pipe, uniq } from "remeda";
 import { promisify } from "util";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -23,6 +23,9 @@ import {
 } from "../rest/params";
 import {
   AWSPresignedPostDataFragment,
+  CreatePetitionRecipients_contactDocument,
+  CreatePetitionRecipients_createContactDocument,
+  CreatePetitionRecipients_updateContactDocument,
   getTags_tagsDocument,
   getTaskResultFileUrl_getTaskResultFileDocument,
   PetitionFieldFragment,
@@ -38,6 +41,7 @@ import {
   waitForTask_TaskDocument,
 } from "./__types";
 import { TaskFragment } from "./fragments";
+import pMap from "p-map";
 
 export function paginationParams() {
   return {
@@ -376,7 +380,7 @@ export async function waitForTask(client: GraphQLClient, task: TaskType) {
       case "FAILED":
         throw new InternalError("Failed generating file");
       case "COMPLETED":
-        return;
+        return result;
     }
   }
   throw new InternalError("Timeout while generating file");
@@ -556,4 +560,77 @@ export function buildSubmittedReplyContent(
   }
 
   return replyContent;
+}
+
+export async function resolveContacts(
+  client: GraphQLClient,
+  contacts: (
+    | string
+    | {
+        lastName?: string | null;
+        email: string;
+        firstName: string;
+      }
+  )[],
+) {
+  const contactIds = await pMap(
+    contacts,
+    async (item) => {
+      if (typeof item === "string") {
+        return item;
+      } else {
+        const { email, ...data } = item;
+        const _query = gql`
+          query CreatePetitionRecipients_contact($email: String!) {
+            contacts: contactsByEmail(emails: [$email]) {
+              id
+              firstName
+              lastName
+            }
+          }
+        `;
+        const result = await client.request(CreatePetitionRecipients_contactDocument, {
+          email,
+        });
+        const contact = result.contacts[0];
+        if (contact) {
+          if (
+            (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
+            (contact.lastName !== data.lastName && isDefined(data.lastName))
+          ) {
+            const _mutation = gql`
+              mutation CreatePetitionRecipients_updateContact(
+                $contactId: GID!
+                $data: UpdateContactInput!
+              ) {
+                updateContact(id: $contactId, data: $data) {
+                  id
+                }
+              }
+            `;
+            await client.request(CreatePetitionRecipients_updateContactDocument, {
+              contactId: contact.id,
+              data,
+            });
+          }
+          return contact.id;
+        } else {
+          const _mutation = gql`
+            mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
+              createContact(data: $data) {
+                id
+              }
+            }
+          `;
+          const result = await client.request(CreatePetitionRecipients_createContactDocument, {
+            data: item,
+          });
+          return result.createContact.id;
+        }
+      }
+    },
+    { concurrency: 3 },
+  );
+
+  return uniq(contactIds);
 }

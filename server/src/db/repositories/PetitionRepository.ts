@@ -1042,7 +1042,7 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("id"),
   );
 
-  private async createAccesses(
+  async createAccesses(
     petitionId: number,
     data: Pick<
       CreatePetitionAccess,
@@ -1158,7 +1158,7 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("created_at", "asc"),
   );
 
-  private async createMessages(
+  async createMessages(
     petitionId: number,
     scheduledAt: Date | null,
     data: Pick<
@@ -1380,6 +1380,91 @@ export class PetitionRepository extends BaseRepository {
       "*",
     );
     return row;
+  }
+
+  async createPetitionFromId(
+    petitionId: number,
+    {
+      name,
+      isTemplate,
+      creditsUsed,
+    }: { name?: Maybe<string>; isTemplate: boolean; creditsUsed?: number },
+    user: User,
+  ) {
+    const original = (await this.loadPetition(petitionId))!;
+
+    const isCreatingFromSameOrgTemplate = original.is_template && original.org_id === user.org_id;
+
+    const defaultPermissions = await this.loadTemplateDefaultPermissions(original.id);
+
+    const hasCustomOwner =
+      isCreatingFromSameOrgTemplate &&
+      (defaultPermissions.find((p) => p.type === "OWNER")?.user_id ?? user.id) !== user.id;
+
+    const petition = await this.clonePetition(
+      petitionId,
+      user,
+      {
+        is_template: isTemplate,
+        status: isTemplate ? null : "DRAFT",
+        name: original.is_template && !isTemplate ? name : original.name,
+        credits_used: creditsUsed ?? 0,
+      },
+      { insertPermissions: !hasCustomOwner },
+    );
+
+    if (hasCustomOwner && !defaultPermissions.find((p) => p.user_id === user.id)) {
+      // if the template has a custom template_default_permission OWNER and no permissions set for session user,
+      // we have to give them WRITE permissions
+      // OWNER will be set inside createPermissionsFromTemplateDefaultPermissions
+      await this.addPetitionPermissions(
+        [petition.id],
+        [
+          {
+            id: user.id,
+            type: "User",
+            isSubscribed: true,
+            permissionType: "WRITE",
+          },
+        ],
+        "User",
+        user.id,
+      );
+    }
+
+    if (isCreatingFromSameOrgTemplate) {
+      await this.createPermissionsFromTemplateDefaultPermissions(
+        petition.id,
+        original.id,
+        "User",
+        user.id,
+      );
+    }
+
+    if (original.is_template && !isTemplate) {
+      await this.createEvent({
+        type: "TEMPLATE_USED",
+        petition_id: original.id,
+        data: {
+          new_petition_id: petition.id,
+          org_id: user.org_id,
+          user_id: user.id,
+        },
+      });
+    } else if (!original.is_template) {
+      await this.createEvent({
+        type: "PETITION_CLONED",
+        petition_id: original.id,
+        data: {
+          new_petition_id: petition.id,
+          org_id: petition.org_id,
+          user_id: user.id,
+          type: petition.is_template ? "TEMPLATE" : "PETITION",
+        },
+      });
+    }
+
+    return petition;
   }
 
   async createPetition(
@@ -2400,6 +2485,7 @@ export class PetitionRepository extends BaseRepository {
           | "visibility"
           | "optional"
           | "parent_petition_field_id"
+          | "alias"
         > & {
           replies: Pick<
             PetitionFieldReply,
@@ -2426,6 +2512,7 @@ export class PetitionRepository extends BaseRepository {
           pf.visibility,
           pf.optional,
           pf.parent_petition_field_id,
+          pf.alias,
           coalesce( -- jsonb_agg filter (where ...) will return null if no rows match
             case when count(*) filter (where pfr.id is not null) > 0 then
               jsonb_agg(
@@ -6540,8 +6627,10 @@ export class PetitionRepository extends BaseRepository {
         messages,
         result: RESULT.SUCCESS,
       };
-    } catch (error: any) {
-      this.logger.error(error.message, { stack: error.stack });
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(error.message, { stack: error.stack });
+      }
       return { result: RESULT.FAILURE, error };
     }
   }
@@ -6556,10 +6645,16 @@ export class PetitionRepository extends BaseRepository {
     const fields = await this.loadAllFieldsByPetitionId(petitionId);
     const parsedReplies = await this.parsePrefillReplies(prefill, fields);
 
-    if (parsedReplies.length > 0) {
-      const replies = await this.createPetitionFieldReply(
+    const [fieldGroupReplies, otherReplies] = partition(
+      parsedReplies,
+      (r) => r.fieldType === "FIELD_GROUP",
+    );
+
+    // first create every other reply that has type !== FIELD_GROUP
+    if (otherReplies.length > 0) {
+      await this.createPetitionFieldReply(
         petitionId,
-        parsedReplies.map((reply) => ({
+        otherReplies.map((reply) => ({
           user_id: owner.id,
           petition_field_id: reply.fieldId,
           content: fieldReplyContent(reply.fieldType, reply.content),
@@ -6567,8 +6662,46 @@ export class PetitionRepository extends BaseRepository {
         })),
         `User:${owner.id}`,
       );
+    }
 
-      for (const [parentReply, { childrenReplies }] of zip(replies, parsedReplies)) {
+    if (fieldGroupReplies.length > 0) {
+      // load empty FIELD_GROUP replies to be able to use those instead of creating new ones
+      const emptyFieldGroupReplies = (
+        await this.loadEmptyFieldGroupReplies(uniq(fieldGroupReplies.map((r) => r.fieldId)))
+      ).flat();
+
+      const emptyFieldGroupRepliesByFieldId = groupBy(
+        emptyFieldGroupReplies,
+        (r) => r.petition_field_id,
+      );
+
+      // prioritize using empty replies over creating new ones
+      const replies = await pMap(
+        fieldGroupReplies,
+        async (reply) => {
+          const emptyReply = emptyFieldGroupRepliesByFieldId[reply.fieldId]?.pop();
+
+          if (isDefined(emptyReply)) {
+            return emptyReply;
+          }
+
+          const [newReply] = await this.createPetitionFieldReply(
+            petitionId,
+            {
+              user_id: owner.id,
+              petition_field_id: reply.fieldId,
+              content: {},
+              type: "FIELD_GROUP",
+            },
+            `User:${owner.id}`,
+          );
+          return newReply;
+        },
+        { concurrency: 1 },
+      );
+
+      // create "children" replies for each FIELD_GROUP reply
+      for (const [parentReply, { childrenReplies }] of zip(replies, fieldGroupReplies)) {
         if (isDefined(childrenReplies) && childrenReplies.length > 0) {
           await this.createPetitionFieldReply(
             petitionId,
@@ -6587,6 +6720,19 @@ export class PetitionRepository extends BaseRepository {
 
     return (await this.loadPetition(petitionId))!;
   }
+
+  readonly loadEmptyFieldGroupReplies = this.buildLoadMultipleBy(
+    "petition_field_reply",
+    "petition_field_id",
+    (q) =>
+      q.whereNull("parent_petition_field_reply_id").whereNull("deleted_at").whereRaw(/* sql */ `
+      not exists (
+        select pfr.id from petition_field_reply pfr
+          where pfr.parent_petition_field_reply_id = petition_field_reply.id
+          and pfr.deleted_at is null
+      )
+    `),
+  );
 
   private async parsePrefillReplies(
     prefill: Record<string, any>,

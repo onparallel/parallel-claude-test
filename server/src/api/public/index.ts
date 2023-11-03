@@ -2,7 +2,6 @@ import stringify from "fast-safe-stringify";
 import { unlink } from "fs/promises";
 import { gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
-import pMap from "p-map";
 import { isDefined, omit, pick, uniq, zip } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
@@ -29,15 +28,13 @@ import {
 import {
   ActivatePetitionRecipient_reactivateAccessesDocument,
   AssociatePetitionToProfile_associateProfileToPetitionDocument,
+  BulkSendTemplate_createBulkPetitionSendTaskDocument,
   ClosePetition_closePetitionDocument,
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetition_petitionDocument,
-  CreatePetitionRecipients_contactDocument,
-  CreatePetitionRecipients_createContactDocument,
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_sendPetitionDocument,
-  CreatePetitionRecipients_updateContactDocument,
   CreatePetitionRecipients_userByEmailDocument,
   CreateProfile_createProfileDocument,
   CreateProfile_updateProfileFieldValueDocument,
@@ -62,6 +59,7 @@ import {
   EventSubscriptions_getSubscriptionsDocument,
   ExportPetitionReplies_createExportRepliesTaskDocument,
   ExportPetitionReplies_createPrintPdfTaskDocument,
+  ExportTemplate_createTemplateRepliesCsvExportTaskDocument,
   GetContact_contactDocument,
   GetContacts_contactsDocument,
   GetMe_userDocument,
@@ -104,6 +102,8 @@ import {
   TagPetition_createTagDocument,
   TagPetition_tagPetitionDocument,
   TagPetition_tagsDocument,
+  Task_getTaskResultFileDocument,
+  Task_TaskStatusDocument,
   TemplateFragment as TemplateFragmentType,
   TransferPetition_searchUserByEmailDocument,
   TransferPetition_transferPetitionOwnershipDocument,
@@ -158,6 +158,7 @@ import {
   mapSubscription,
   mapTemplate,
   paginationParams,
+  resolveContacts,
   sortByParam,
   uploadFile,
   waitForTask,
@@ -165,6 +166,7 @@ import {
 import { anyFileUploadMiddleware, singleFileUploadMiddleware } from "./middleware";
 import {
   AssociatePetitionToProfileInput,
+  BulkSendTemplateInput,
   Contact,
   CreateContact,
   CreateOrUpdatePetitionCustomProperty,
@@ -1259,64 +1261,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
   },
   async ({ client, params, body, query }) => {
     try {
-      const contactIds = await pMap(
-        body.contacts,
-        async (item) => {
-          if (typeof item === "string") {
-            return item;
-          } else {
-            const { email, ...data } = item;
-            const _query = gql`
-              query CreatePetitionRecipients_contact($email: String!) {
-                contacts: contactsByEmail(emails: [$email]) {
-                  id
-                  firstName
-                  lastName
-                }
-              }
-            `;
-            const result = await client.request(CreatePetitionRecipients_contactDocument, {
-              email,
-            });
-            const contact = result.contacts[0];
-            if (contact) {
-              if (
-                (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
-                (contact.lastName !== data.lastName && isDefined(data.lastName))
-              ) {
-                const _mutation = gql`
-                  mutation CreatePetitionRecipients_updateContact(
-                    $contactId: GID!
-                    $data: UpdateContactInput!
-                  ) {
-                    updateContact(id: $contactId, data: $data) {
-                      id
-                    }
-                  }
-                `;
-                await client.request(CreatePetitionRecipients_updateContactDocument, {
-                  contactId: contact.id,
-                  data,
-                });
-              }
-              return contact.id;
-            } else {
-              const _mutation = gql`
-                mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
-                  createContact(data: $data) {
-                    id
-                  }
-                }
-              `;
-              const result = await client.request(CreatePetitionRecipients_createContactDocument, {
-                data: item,
-              });
-              return result.createContact.id;
-            }
-          }
-        },
-        { concurrency: 3 },
-      );
+      const contactIds = await resolveContacts(client, body.contacts);
       let message = bodyMessageToRTE(body.message);
 
       let subject = body.subject;
@@ -4067,3 +4012,138 @@ api
       return Ok(mapProfile(response.unsubscribeFromProfile[0]));
     },
   );
+
+api.path("/templates/:templateId/send", { params: { templateId } }).post(
+  {
+    // this endpoint is for Parc Taulí use case, don't expose it in the API docs
+    excludeFromSpec: true,
+    body: JsonBody(BulkSendTemplateInput),
+  },
+  async ({ client, params, body }) => {
+    const _mutation = gql`
+      mutation BulkSendTemplate_createBulkPetitionSendTask(
+        $templateId: GID!
+        $data: [BulkPetitionSendTaskDataInput!]!
+      ) {
+        createBulkPetitionSendTask(templateId: $templateId, data: $data) {
+          ...Task
+        }
+      }
+      ${TaskFragment}
+    `;
+
+    if (!Array.isArray(body) || body.length === 0) {
+      throw new BadRequestError("Request body must be an array with at least one send data.");
+    }
+
+    if (body.some((data) => data.contacts.length === 0)) {
+      throw new BadRequestError("Request body must be an array with at least one contact.");
+    }
+
+    try {
+      const result = await client.request(BulkSendTemplate_createBulkPetitionSendTaskDocument, {
+        templateId: params.templateId,
+        data: body.map((b) => ({
+          contacts: b.contacts.map((c) => {
+            if (typeof c === "string") {
+              return {
+                id: c,
+              };
+            } else {
+              return {
+                email: c.email,
+                firstName: c.firstName,
+                lastName: c.lastName,
+              };
+            }
+          }),
+          prefill: b.prefill,
+        })),
+      });
+
+      return Ok({ taskId: result.createBulkPetitionSendTask.id });
+    } catch (error) {
+      if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+        throw new ForbiddenError("You don't have enough credits to send all the petitions");
+      }
+      if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+        const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
+          email: string;
+          error_code: string;
+        };
+        if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
+          throw new BadRequestError(`${email} is not a valid email`);
+        }
+      }
+      throw error;
+    }
+  },
+);
+
+api
+  .path("/templates/:templateId/export", { params: { templateId } })
+  .get({ excludeFromSpec: true }, async ({ client, params }) => {
+    const _mutation = gql`
+      mutation ExportTemplate_createTemplateRepliesCsvExportTask($templateId: GID!) {
+        createTemplateRepliesCsvExportTask(templateId: $templateId) {
+          ...Task
+        }
+      }
+      ${TaskFragment}
+    `;
+
+    const result = await client.request(ExportTemplate_createTemplateRepliesCsvExportTaskDocument, {
+      templateId: params.templateId,
+    });
+
+    return Ok({ taskId: result.createTemplateRepliesCsvExportTask.id });
+  });
+
+api
+  .path("/tasks/:taskId/status", { params: { taskId: idParam({ type: "Task" }) } })
+  .get({ excludeFromSpec: true }, async ({ client, params }) => {
+    const _query = gql`
+      query Task_TaskStatus($taskId: GID!) {
+        task(id: $taskId) {
+          id
+          name
+          progress
+          status
+          output
+        }
+      }
+    `;
+
+    const _mutation = gql`
+      mutation Task_getTaskResultFile($taskId: GID!, $preview: Boolean) {
+        getTaskResultFile(taskId: $taskId, preview: $preview) {
+          url
+        }
+      }
+    `;
+    const result = await client.request(Task_TaskStatusDocument, {
+      taskId: params.taskId,
+      preview: true,
+    });
+
+    // for file exports, we return the file URL instead of task output
+    if (result.task.status === "COMPLETED" && result.task.name === "TEMPLATE_REPLIES_CSV_EXPORT") {
+      const fileResult = await client.request(Task_getTaskResultFileDocument, {
+        taskId: params.taskId,
+      });
+
+      return Ok({
+        id: result.task.id,
+        status: result.task.status,
+        progress: (result.task.progress ?? 0) / 100,
+        output: pick(fileResult.getTaskResultFile, ["url"]),
+      });
+    }
+
+    return Ok({
+      id: result.task.id,
+      status: result.task.status,
+      progress: (result.task.progress ?? 0) / 100,
+      output: result.task.output,
+    });
+  });

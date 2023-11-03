@@ -2910,3 +2910,44 @@ export const AssociatePetitionToProfileInput = schema({
     },
   },
 } as const);
+
+export const BulkSendTemplateInput = schema({
+  type: "array",
+  items: {
+    type: "object",
+    additionalProperties: false,
+    required: ["contacts"],
+    properties: {
+      contacts: {
+        type: "array",
+        items: {
+          oneOf: [
+            { type: "string" },
+            {
+              type: "object",
+              additionalProperties: false,
+              required: ["email", "firstName"],
+              properties: {
+                email: {
+                  type: "string",
+                  format: "email",
+                },
+                firstName: {
+                  type: "string",
+                  maxLength: 255,
+                },
+                lastName: {
+                  type: ["string", "null"],
+                  maxLength: 255,
+                },
+              },
+            },
+          ],
+        },
+      },
+      prefill: {
+        type: "object",
+      },
+    },
+  },
+} as const);
