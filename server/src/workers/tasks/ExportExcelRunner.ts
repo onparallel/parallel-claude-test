@@ -3,7 +3,6 @@ import { getPetitionFiles } from "../helpers/getPetitionFiles";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
-  private previousProgress = 0;
   async run() {
     const { petition_id: petitionId } = this.task.input;
 
@@ -25,12 +24,7 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
         locale: userData!.preferred_locale,
         xlsxOnly: true,
         onProgress: async (progress) => {
-          const currentProgress = progress * 100;
-          // Avoid updating progress too many times.
-          if (currentProgress > this.previousProgress + 10) {
-            await this.onProgress(currentProgress);
-            this.previousProgress = currentProgress;
-          }
+          await this.onProgress(progress * 100 * 0.95);
         },
       },
       this.ctx,

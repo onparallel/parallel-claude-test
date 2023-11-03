@@ -50,7 +50,8 @@ export abstract class TaskRunner<T extends TaskName> {
       throw new Error("value must be between 0 and 100");
     }
     const progress = Math.round(value);
-    if (progress !== this.previousProgress) {
+    if (progress >= this.previousProgress + 5) {
+      // Avoid updating progress too much
       this.previousProgress = progress;
       await this.ctx.tasks.updateTask(
         this.task.id,
