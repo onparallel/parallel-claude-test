@@ -338,7 +338,7 @@ export function useFeatureFlags() {
             name: "FIELD_GROUP",
             title: intl.formatMessage({
               id: "generic.petition-field-type-field-group",
-              defaultMessage: "Questions group",
+              defaultMessage: "Group of fields",
             }),
             description: intl.formatMessage(
               {
@@ -348,7 +348,7 @@ export function useFeatureFlags() {
               {
                 fieldName: intl.formatMessage({
                   id: "generic.petition-field-type-field-group",
-                  defaultMessage: "Questions group",
+                  defaultMessage: "Group of fields",
                 }),
               },
             ),

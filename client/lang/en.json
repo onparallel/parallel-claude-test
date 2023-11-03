@@ -9366,8 +9366,8 @@
   },
   {
     "term": "generic.petition-field-type-field-group",
-    "definition": "Questions group",
-    "context": "Questions group"
+    "definition": "Group of fields",
+    "context": "Group of fields"
   },
   {
     "term": "generic.petition-field-type-file-upload",

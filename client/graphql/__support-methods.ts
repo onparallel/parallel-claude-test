@@ -752,6 +752,12 @@ export const schemaTypes: IntrospectionType[] = [
     interfaces: null,
     enumValues: [
       { name: "AUTO_ANONYMIZE", description: null, isDeprecated: false, deprecationReason: null },
+      {
+        name: "BULK_PETITION_SEND_TASK",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
       { name: "CLIENT_PORTAL", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "COPY_PETITION_REPLIES",
@@ -840,6 +846,12 @@ export const schemaTypes: IntrospectionType[] = [
       },
       {
         name: "SKIP_FORWARD_SECURITY",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "TEMPLATE_REPLIES_CSV_EXPORT_TASK",
         description: null,
         isDeprecated: false,
         deprecationReason: null,

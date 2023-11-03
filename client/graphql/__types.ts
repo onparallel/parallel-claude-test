@@ -120,6 +120,18 @@ export interface BulkCreateContactsReturnType {
   errors?: Maybe<Array<Scalars["JSON"]["output"]>>;
 }
 
+export interface BulkPetitionSendTaskDataInput {
+  contacts: Array<BulkPetitionSendTaskDataInputContact>;
+  prefill?: InputMaybe<Scalars["JSONObject"]["input"]>;
+}
+
+export interface BulkPetitionSendTaskDataInputContact {
+  email?: InputMaybe<Scalars["String"]["input"]>;
+  firstName?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<Scalars["GID"]["input"]>;
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
+}
+
 export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
@@ -377,6 +389,7 @@ export interface EventSubscriptionSignatureKey {
 
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
+  | "BULK_PETITION_SEND_TASK"
   | "CLIENT_PORTAL"
   | "COPY_PETITION_REPLIES"
   | "CUSTOM_HOST_UI"
@@ -399,6 +412,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY"
+  | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
 
 /** A feature flag name with his value */
@@ -669,6 +683,8 @@ export interface Mutation {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /** Creates a Task for creating, prefilling and sending petitions from a templateId */
+  createBulkPetitionSendTask: Task;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a new Dow Jones KYC integration on the user's organization */
@@ -723,6 +739,8 @@ export interface Mutation {
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
   createTag: Tag;
+  /** Creates a Task for generating a CSV file with the replies of a template */
+  createTemplateRepliesCsvExportTask: Task;
   /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
@@ -1133,6 +1151,11 @@ export interface MutationcopyFileReplyToProfileFieldFileArgs {
   profileTypeFieldId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreateBulkPetitionSendTaskArgs {
+  data: Array<BulkPetitionSendTaskDataInput>;
+  templateId: Scalars["GID"]["input"];
+}
+
 export interface MutationcreateContactArgs {
   data: CreateContactInput;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1307,6 +1330,10 @@ export interface MutationcreateSignaturitIntegrationArgs {
 export interface MutationcreateTagArgs {
   color: Scalars["String"]["input"];
   name: Scalars["String"]["input"];
+}
+
+export interface MutationcreateTemplateRepliesCsvExportTaskArgs {
+  templateId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateTemplateRepliesReportTaskArgs {
@@ -4970,11 +4997,13 @@ export interface Task {
 
 export type TaskName =
   | "BANKFLIP_SESSION_COMPLETED"
+  | "BULK_PETITION_SEND"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"
+  | "TEMPLATE_REPLIES_CSV_EXPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
 

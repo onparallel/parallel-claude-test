@@ -145,7 +145,7 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
       case "FIELD_GROUP":
         return intl.formatMessage({
           id: "generic.petition-field-type-field-group",
-          defaultMessage: "Questions group",
+          defaultMessage: "Group of fields",
         });
       default:
         throw new Error(`Missing PetitionFieldType "${type}"`);

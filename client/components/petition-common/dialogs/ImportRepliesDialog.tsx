@@ -378,7 +378,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                     <Text as="span" textTransform="lowercase">
                       <FormattedMessage
                         id="generic.petition-field-type-field-group"
-                        defaultMessage="Questions group"
+                        defaultMessage="Group of fields"
                       />
                     </Text>
                   ),
