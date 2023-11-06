@@ -6759,7 +6759,12 @@ export class PetitionRepository extends BaseRepository {
         continue;
       }
 
-      const fieldReplies = unMaybeArray(value);
+      const fieldReplies = unMaybeArray(
+        typeof value === "string" && field.type === "CHECKBOX"
+          ? // allow multiple replies on a single string, like "Option1,Option2,Option4"
+            value.split(/(?<!\\),/).map((part) => part.replace(/\\,/g, ","))
+          : value,
+      );
       const singleReplies: {
         content: any;
         childrenReplies?: { fieldId: number; fieldType: PetitionFieldType; content: any }[];
