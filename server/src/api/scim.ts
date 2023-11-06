@@ -90,13 +90,28 @@ scim
       let userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
       if (user && userData) {
         if ((user.status === "ACTIVE") !== active) {
-          const status = await getUserNewStatus(user.id, active, req.context);
+          const newUserStatus = await getUserNewStatus(user.id, active, req.context);
+          if (newUserStatus === "ACTIVE") {
+            const allUsersGroups = await req.context.userGroups.loadAllUsersGroupsByOrgId(
+              user.org_id,
+            );
+            await req.context.userGroups.addUsersToGroups(
+              allUsersGroups.map((ug) => ug.id),
+              user.id,
+              `Provisioning:${req.context.organization!.id}`,
+            );
+          } else if (newUserStatus === "INACTIVE") {
+            await req.context.userGroups.removeUsersFromAllGroups(
+              user.id,
+              `Provisioning:${req.context.organization!.id}`,
+            );
+          }
           [user] = await req.context.users.updateUserById(
             user.id,
-            { status },
+            { status: newUserStatus },
             `Provisioning:${req.context.organization!.id}`,
           );
-          if (status === "ON_HOLD") {
+          if (newUserStatus === "ON_HOLD") {
             await req.context.emails.sendTransferParallelsEmail(
               externalId,
               req.context.organization!.id,
@@ -232,6 +247,28 @@ scim
         }
       }
       if (isDefined(userUpdate.status)) {
+        const user = await req.context.users.loadUserByExternalId.raw({
+          orgId: req.context.organization!.id,
+          externalId: req.params.externalId,
+        });
+
+        if (user && user.status !== userUpdate.status) {
+          if (userUpdate.status === "ACTIVE") {
+            const allUsersGroups = await req.context.userGroups.loadAllUsersGroupsByOrgId(
+              user.org_id,
+            );
+            await req.context.userGroups.addUsersToGroups(
+              allUsersGroups.map((ug) => ug.id),
+              user.id,
+              `Provisioning:${req.context.organization!.id}`,
+            );
+          } else if (userUpdate.status === "INACTIVE") {
+            await req.context.userGroups.removeUsersFromAllGroups(
+              user.id,
+              `Provisioning:${req.context.organization!.id}`,
+            );
+          }
+        }
         await req.context.users.updateUserByExternalId(
           req.params.externalId,
           req.context.organization!.id,
@@ -296,6 +333,27 @@ scim
       }
 
       if (isDefined(userUpdate.status)) {
+        const user = await req.context.users.loadUserByExternalId({
+          externalId: req.params.externalId,
+          orgId: req.context.organization!.id,
+        });
+        if (user && user.status !== userUpdate.status) {
+          if (userUpdate.status === "ACTIVE") {
+            const allUsersGroups = await req.context.userGroups.loadAllUsersGroupsByOrgId(
+              user.org_id,
+            );
+            await req.context.userGroups.addUsersToGroups(
+              allUsersGroups.map((ug) => ug.id),
+              user.id,
+              `Provisioning:${req.context.organization!.id}`,
+            );
+          } else if (userUpdate.status === "INACTIVE") {
+            await req.context.userGroups.removeUsersFromAllGroups(
+              user.id,
+              `Provisioning:${req.context.organization!.id}`,
+            );
+          }
+        }
         await req.context.users.updateUserByExternalId(
           req.params.externalId,
           req.context.organization!.id,
@@ -342,14 +400,20 @@ scim
         externalId: req.params.externalId,
         orgId: req.context.organization!.id,
       });
-      const status = await getUserNewStatus(user!.id, false, req.context);
+      const newStatus = await getUserNewStatus(user!.id, false, req.context);
+      if (user && user.status !== "INACTIVE" && newStatus === "INACTIVE") {
+        await req.context.userGroups.removeUsersFromAllGroups(
+          user.id,
+          `Provisioning:${req.context.organization!.id}`,
+        );
+      }
       await req.context.users.updateUserByExternalId(
         req.params.externalId,
         req.context.organization!.id,
-        { status },
+        { status: newStatus },
         `Provisioning:${req.context.organization!.id}`,
       );
-      if (status === "ON_HOLD") {
+      if (newStatus === "ON_HOLD") {
         await req.context.emails.sendTransferParallelsEmail(
           req.params.externalId,
           req.context.organization!.id,
