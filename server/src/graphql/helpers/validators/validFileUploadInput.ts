@@ -21,6 +21,7 @@ export function validFileUploadInput<TypeName extends string, FieldName extends 
           info,
           argName,
           `File size exceeds the max file size allowed of ${opts.maxSizeBytes} bytes`,
+          { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
         );
       }
       if (opts.contentType && file.contentType !== opts.contentType) {
@@ -28,6 +29,7 @@ export function validFileUploadInput<TypeName extends string, FieldName extends 
           info,
           "contentType",
           `Expected ${opts.contentType}, got ${file.contentType}`,
+          { error_code: "INVALID_CONTENT_TYPE_ERROR" },
         );
       }
     }

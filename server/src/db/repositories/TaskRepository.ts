@@ -62,10 +62,7 @@ export type TaskInput<TName extends TaskName> = {
    */
   BULK_PETITION_SEND: {
     template_id: number;
-    data: {
-      contacts: (number | { email: string; first_name: string; last_name?: string | null })[];
-      prefill?: Maybe<Record<string, any>>;
-    }[];
+    temporary_file_id: number;
   };
   TEMPLATE_REPLIES_CSV_EXPORT: {
     template_id: number;
@@ -148,11 +145,15 @@ export type TaskOutput<TName extends TaskName> = {
     error?: any;
   };
   BULK_PETITION_SEND: {
-    results: {
-      success: boolean;
-      petition_id: Maybe<string>;
-      error?: string;
-    }[];
+    status: "COMPLETED" | "FAILED";
+    results:
+      | {
+          success: boolean;
+          petition_id: Maybe<string>;
+          error?: any;
+        }[]
+      | null;
+    error?: string;
   };
   TEMPLATE_REPLIES_CSV_EXPORT: {
     temporary_file_id: number;

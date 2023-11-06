@@ -1,7 +1,8 @@
 import { addMinutes } from "date-fns";
+import Excel from "exceljs";
 import safeStringify from "fast-safe-stringify";
 import pMap from "p-map";
-import { isDefined, isNumber, partition, sumBy, uniq } from "remeda";
+import { isDefined, sumBy, uniq } from "remeda";
 import { chunkWhile } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { pFlatMap } from "../../util/promises/pFlatMap";
@@ -12,28 +13,41 @@ import {
 } from "../../util/slate/placeholders";
 import { RateLimitGuard } from "../helpers/RateLimitGuard";
 import { TaskRunner } from "../helpers/TaskRunner";
-
 export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
   async run() {
     const rateLimit = new RateLimitGuard(100); // 100 petitions per second
 
-    const { template_id: templateId, data } = this.task.input;
+    const { template_id: templateId, temporary_file_id: temporaryFileId } = this.task.input;
 
     const skipEmailSend = process.env.ENV === "staging";
 
-    if (data.length === 0) {
-      return { results: [] };
+    const template = await this.ctx.petitions.loadPetition(templateId);
+    const user = isDefined(this.task.user_id)
+      ? await this.ctx.users.loadUser(this.task.user_id)
+      : null;
+
+    if (!template || !isDefined(user)) {
+      // should not happen, just in case
+      return {
+        status: "FAILED" as const,
+        results: null,
+      };
     }
 
-    if (!isDefined(this.task.user_id)) {
-      throw new Error(`Expected user_id to be defined for Task:${this.task.id}`);
-    }
-    const user = await this.ctx.users.loadUser(this.task.user_id);
-    if (!isDefined(user)) {
-      throw new Error(`User:${this.task.user_id} not found on Task:${this.task.id}`);
-    }
+    const data = await this.parseCsvFile(temporaryFileId);
 
-    const template = (await this.ctx.petitions.loadPetition(templateId))!;
+    const usageLimit = await this.ctx.organizations.loadCurrentOrganizationUsageLimit(
+      user.org_id,
+      "PETITION_SEND",
+    );
+
+    if (!usageLimit || usageLimit.used + data.length > usageLimit.limit) {
+      return {
+        status: "FAILED" as const,
+        error: "You don't have enough credits to send all the petitions",
+        results: null,
+      };
+    }
 
     // chunk petitions into groups of 100 contacts
     const petitionChunks = chunkWhile(
@@ -50,23 +64,23 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
       async (chunk, chunkIndex) =>
         await pMap(
           chunk,
-          async ({ contacts, prefill }) => {
+          async ({ contacts, prefill, rowNumber }) => {
             try {
               await rateLimit.waitUntilAllowed();
 
+              await this.validateContacts(contacts);
               await this.ctx.orgCredits.consumePetitionSendCredits(template.org_id, 1);
 
-              const [_contactIds, contactsData] = partition(contacts, isNumber);
-              const _contacts = await this.ctx.contacts.createOrUpdate(
-                contactsData.map((contact) => ({
+              const dbContacts = await this.ctx.contacts.createOrUpdate(
+                contacts.map((contact) => ({
                   org_id: template.org_id,
-                  email: contact.email,
-                  first_name: contact.first_name,
-                  last_name: contact.last_name,
+                  email: contact.email!,
+                  first_name: contact.firstName!,
+                  last_name: contact.lastName ?? null,
                 })),
                 `User:${user.id}`,
               );
-              const contactIds = uniq([..._contactIds, ..._contacts.map((c) => c.id)]);
+              const contactIds = uniq(dbContacts.map((c) => c.id));
 
               const getValues = await this.ctx.petitionMessageContext.fetchPlaceholderValues({
                 petitionId: templateId,
@@ -147,7 +161,9 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
               return {
                 success: false,
                 petition_id: null,
-                error: error instanceof Error ? error.message : safeStringify(error),
+                error:
+                  `[row ${rowNumber}]: ` +
+                  (error instanceof Error ? error.message : safeStringify(error)),
               };
             } finally {
               await this.onProgress(100 * (++processed / data.length));
@@ -158,6 +174,71 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
       { concurrency: 1 },
     );
 
-    return { results };
+    return { status: "COMPLETED" as const, results };
+  }
+
+  private async validateContacts(
+    contacts: { email: string | null; firstName: string | null; lastName: string | null }[],
+  ) {
+    if (contacts.length === 0) {
+      throw new Error("Missing recipient information");
+    }
+    if (contacts.some((c) => !isDefined(c.email) || !isDefined(c.firstName))) {
+      throw new Error("Missing recipient email or first name");
+    }
+    const invalidEmails: string[] = [];
+    for (const { email } of contacts) {
+      if (!(await this.ctx.emails.validateEmail(email!))) {
+        invalidEmails.push(email!);
+      }
+    }
+
+    if (invalidEmails.length > 0) {
+      throw new Error(`Invalid email(s): ${invalidEmails.join(", ")}`);
+    }
+  }
+
+  private async parseCsvFile(temporaryFileId: number) {
+    const sendData: {
+      contacts: { email: string | null; firstName: string | null; lastName: string | null }[];
+      prefill: any;
+      rowNumber: number;
+    }[] = [];
+
+    const temporaryFile = (await this.ctx.files.loadTemporaryFile(temporaryFileId))!;
+    const buffer = await this.ctx.storage.temporaryFiles.downloadFile(temporaryFile.path);
+
+    const workBook = new Excel.Workbook();
+    const csvFile = await workBook.csv.read(buffer, {
+      // exceljs by default tries to convert values to numbers, dates, etc.
+      // we don't want that, so we just return the raw value
+      // e.g. phone prefill values like "+34xxxxxxxxx" would be converted to the number 34xxxxxxxxx, which is an invalid reply for PHONE type fields
+      map: (value) => value,
+    });
+
+    const headings: string[] = [];
+
+    csvFile.workbook.worksheets[0].eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.eachCell((cell) => {
+          headings.push(cell.value?.toString() ?? "");
+        });
+      } else {
+        const email = row.getCell(1).value?.toString() ?? null;
+        const firstName = row.getCell(2).value?.toString() ?? null;
+        const lastName = row.getCell(3).value?.toString() ?? null;
+        const prefill: Record<string, any> = {};
+        row.eachCell((cell, colNumber) => {
+          // starting from 4th column, every cell is a prefill data where the column header is the alias of the field
+          if (colNumber >= 4) {
+            const alias = headings[colNumber - 1];
+            prefill[alias] = cell.value?.toString() ?? null;
+          }
+        });
+        sendData.push({ contacts: [{ email, firstName, lastName }], prefill, rowNumber });
+      }
+    });
+
+    return sendData;
   }
 }

@@ -116,18 +116,6 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  BulkPetitionSendTaskDataInput: {
-    // input type
-    contacts: NexusGenInputs["BulkPetitionSendTaskDataInputContact"][]; // [BulkPetitionSendTaskDataInputContact!]!
-    prefill?: NexusGenScalars["JSONObject"] | null; // JSONObject
-  };
-  BulkPetitionSendTaskDataInputContact: {
-    // input type
-    email?: string | null; // String
-    firstName?: string | null; // String
-    id?: NexusGenScalars["GID"] | null; // GID
-    lastName?: string | null; // String
-  };
   CreateContactInput: {
     // input type
     email: string; // String!
@@ -1726,6 +1714,7 @@ export interface NexusGenFieldTypes {
     updateUserGroupMembership: NexusGenRootTypes["User"]; // User!
     updateUserGroupPermissions: NexusGenRootTypes["UserGroup"]; // UserGroup!
     updateUserPreferredLocale: NexusGenRootTypes["User"]; // User!
+    uploadBulkPetitionSendTaskInputFile: NexusGenScalars["JSONObject"]; // JSONObject!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
@@ -3922,6 +3911,7 @@ export interface NexusGenFieldTypeNames {
     updateUserGroupMembership: "User";
     updateUserGroupPermissions: "UserGroup";
     updateUserPreferredLocale: "User";
+    uploadBulkPetitionSendTaskInputFile: "JSONObject";
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     verifyPublicAccess: "PublicAccessVerification";
@@ -5691,8 +5681,8 @@ export interface NexusGenArgTypes {
     };
     createBulkPetitionSendTask: {
       // args
-      data: NexusGenInputs["BulkPetitionSendTaskDataInput"][]; // [BulkPetitionSendTaskDataInput!]!
       templateId: NexusGenScalars["GID"]; // GID!
+      temporaryFileId: NexusGenScalars["GID"]; // GID!
     };
     createContact: {
       // args
@@ -6722,6 +6712,10 @@ export interface NexusGenArgTypes {
     updateUserPreferredLocale: {
       // args
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
+    };
+    uploadBulkPetitionSendTaskInputFile: {
+      // args
+      file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
     };
     uploadDynamicSelectFieldFile: {
       // args

@@ -76,18 +76,6 @@ type BulkCreateContactsReturnType {
   errors: [JSON!]
 }
 
-input BulkPetitionSendTaskDataInput {
-  contacts: [BulkPetitionSendTaskDataInputContact!]!
-  prefill: JSONObject
-}
-
-input BulkPetitionSendTaskDataInputContact {
-  email: String
-  firstName: String
-  id: GID
-  lastName: String
-}
-
 enum BulkSendSigningMode {
   """
   Allow configured signer(s) to sign every petition on the batch
@@ -833,7 +821,7 @@ type Mutation {
   """
   Creates a Task for creating, prefilling and sending petitions from a templateId
   """
-  createBulkPetitionSendTask(data: [BulkPetitionSendTaskDataInput!]!, templateId: GID!): Task!
+  createBulkPetitionSendTask(templateId: GID!, temporaryFileId: GID!): Task!
 
   """
   Create a contact.
@@ -2312,6 +2300,7 @@ type Mutation {
   Sets the locale passed as arg as the preferred language of the user to see the page
   """
   updateUserPreferredLocale(locale: UserLocale!): User!
+  uploadBulkPetitionSendTaskInputFile(file: FileUploadInput!): JSONObject!
 
   """
   Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options

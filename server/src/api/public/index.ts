@@ -1,6 +1,6 @@
 import stringify from "fast-safe-stringify";
 import { unlink } from "fs/promises";
-import { gql, GraphQLClient } from "graphql-request";
+import { GraphQLClient, gql } from "graphql-request";
 import { outdent } from "outdent";
 import { isDefined, omit, pick, uniq, zip } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
@@ -29,22 +29,23 @@ import {
   ActivatePetitionRecipient_reactivateAccessesDocument,
   AssociatePetitionToProfile_associateProfileToPetitionDocument,
   BulkSendTemplate_createBulkPetitionSendTaskDocument,
+  BulkSendTemplate_uploadBulkPetitionSendTaskInputFileDocument,
   ClosePetition_closePetitionDocument,
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-  CreatePetition_petitionDocument,
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_userByEmailDocument,
-  CreateProfile_createProfileDocument,
-  CreateProfile_updateProfileFieldValueDocument,
+  CreatePetition_petitionDocument,
   CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
   CreateProfileFieldValue_profileDocument,
   CreateProfileFieldValue_profileFieldFileUploadCompleteDocument,
   CreateProfileFieldValue_updateProfileFieldValueDocument,
+  CreateProfile_createProfileDocument,
+  CreateProfile_updateProfileFieldValueDocument,
   DeactivatePetitionRecipient_deactivateAccessesDocument,
-  DeletePetition_deletePetitionsDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+  DeletePetition_deletePetitionsDocument,
   DeleteProfileFieldValue_deleteProfileFieldFileDocument,
   DeleteProfileFieldValue_profileDocument,
   DeleteProfileFieldValue_updateProfileFieldValueDocument,
@@ -65,15 +66,15 @@ import {
   GetMe_userDocument,
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
-  GetPetition_petitionDocument,
   GetPetitionEvents_PetitionEventsDocument,
   GetPetitionProfiles_petitionDocument,
   GetPetitionRecipients_petitionAccessesDocument,
+  GetPetition_petitionDocument,
   GetPetitions_petitionsDocument,
-  GetProfile_profileDocument,
   GetProfileFields_profileDocument,
-  GetProfiles_profilesDocument,
   GetProfileSubscribers_profileDocument,
+  GetProfile_profileDocument,
+  GetProfiles_profilesDocument,
   GetSignatures_petitionSignaturesDocument,
   GetTags_tagsDocument,
   GetTemplate_templateDocument,
@@ -102,27 +103,27 @@ import {
   TagPetition_createTagDocument,
   TagPetition_tagPetitionDocument,
   TagPetition_tagsDocument,
-  Task_getTaskResultFileDocument,
   Task_TaskStatusDocument,
+  Task_getTaskResultFileDocument,
   TemplateFragment as TemplateFragmentType,
   TransferPetition_searchUserByEmailDocument,
   TransferPetition_transferPetitionOwnershipDocument,
   UnsubscribeFromProfile_unsubscribeFromProfileDocument,
   UntagPetition_untagPetitionDocument,
-  UpdatePetition_petitionDocument,
-  UpdatePetition_updatePetitionDocument,
   UpdatePetitionField_updatePetitionFieldDocument,
   UpdatePetitionInput,
+  UpdatePetition_petitionDocument,
+  UpdatePetition_updatePetitionDocument,
+  UpdateProfileFieldValueInput,
   UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
   UpdateProfileFieldValue_profileDocument,
   UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument,
   UpdateProfileFieldValue_updateProfileFieldValueDocument,
-  UpdateProfileFieldValueInput,
+  UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
   UpdateReply_petitionDocument,
   UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
   UpdateReply_updatePetitionFieldRepliesDocument,
-  UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
   UserFragmentDoc,
 } from "./__types";
 import { description } from "./description";
@@ -166,7 +167,6 @@ import {
 import { anyFileUploadMiddleware, singleFileUploadMiddleware } from "./middleware";
 import {
   AssociatePetitionToProfileInput,
-  BulkSendTemplateInput,
   Contact,
   CreateContact,
   CreateOrUpdatePetitionCustomProperty,
@@ -179,8 +179,8 @@ import {
   ListOfPetitionEvents,
   ListOfPetitionFieldsWithReplies,
   ListOfProfileProperties,
-  ListOfProfiles,
   ListOfProfileSubscriptions,
+  ListOfProfiles,
   ListOfSignatureRequests,
   ListOfSubscriptions,
   PaginatedContacts,
@@ -193,7 +193,6 @@ import {
   PetitionAccess,
   PetitionCustomProperties,
   PetitionEvent,
-  petitionEventTypes,
   PetitionField,
   PetitionFieldReply,
   Profile,
@@ -216,6 +215,7 @@ import {
   UpdateProfileFieldValueFormDataBody,
   UpdateReply,
   UserWithOrg,
+  petitionEventTypes,
 } from "./schemas";
 
 function assert(condition: any): asserts condition {}
@@ -4017,62 +4017,56 @@ api.path("/templates/:templateId/send", { params: { templateId } }).post(
   {
     // this endpoint is for Parc Taulí use case, don't expose it in the API docs
     excludeFromSpec: true,
-    body: JsonBody(BulkSendTemplateInput),
+    middleware: singleFileUploadMiddleware("file"),
+    body: FormDataBody({ type: "object", format: "binary" }),
   },
-  async ({ client, params, body }) => {
-    const _mutation = gql`
+  async ({ client, params, files }) => {
+    const _mutations = gql`
       mutation BulkSendTemplate_createBulkPetitionSendTask(
         $templateId: GID!
-        $data: [BulkPetitionSendTaskDataInput!]!
+        $temporaryFileId: GID!
       ) {
-        createBulkPetitionSendTask(templateId: $templateId, data: $data) {
+        createBulkPetitionSendTask(templateId: $templateId, temporaryFileId: $temporaryFileId) {
           ...Task
         }
       }
       ${TaskFragment}
+
+      mutation BulkSendTemplate_uploadBulkPetitionSendTaskInputFile($file: FileUploadInput!) {
+        uploadBulkPetitionSendTaskInputFile(file: $file)
+      }
     `;
-
-    if (!Array.isArray(body) || body.length === 0) {
-      throw new BadRequestError("Request body must be an array with at least one send data.");
-    }
-
-    if (body.some((data) => data.contacts.length === 0)) {
-      throw new BadRequestError("Request body must be an array with at least one contact.");
+    const file = files?.["file"]?.[0];
+    if (!file) {
+      throw new BadRequestError("Input file is missing");
     }
 
     try {
+      const fileUpload = await client.request(
+        BulkSendTemplate_uploadBulkPetitionSendTaskInputFileDocument,
+        { file: { contentType: file.mimetype, filename: file.originalname, size: file.size } },
+      );
+
+      const { temporaryFileId, presignedPostData } = fileUpload.uploadBulkPetitionSendTaskInputFile;
+
+      await uploadFile(file, presignedPostData);
+
       const result = await client.request(BulkSendTemplate_createBulkPetitionSendTaskDocument, {
         templateId: params.templateId,
-        data: body.map((b) => ({
-          contacts: b.contacts.map((c) => {
-            if (typeof c === "string") {
-              return {
-                id: c,
-              };
-            } else {
-              return {
-                email: c.email,
-                firstName: c.firstName,
-                lastName: c.lastName,
-              };
-            }
-          }),
-          prefill: b.prefill,
-        })),
+        temporaryFileId: temporaryFileId,
       });
 
       return Ok({ taskId: result.createBulkPetitionSendTask.id });
     } catch (error) {
-      if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
-        throw new ForbiddenError("You don't have enough credits to send all the petitions");
-      }
       if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-        const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
-          email: string;
+        const { error_code: errorCode } = error.response.errors![0].extensions.extra as {
           error_code: string;
         };
-        if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
-          throw new BadRequestError(`${email} is not a valid email`);
+        if (errorCode === "INVALID_CONTENT_TYPE_ERROR") {
+          throw new BadRequestError(`File must be a CSV file`);
+        }
+        if (errorCode === "FILE_SIZE_EXCEEDED_ERROR") {
+          throw new BadRequestError(`File size exceeded`);
         }
       }
       throw error;

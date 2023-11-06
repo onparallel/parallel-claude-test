@@ -110,18 +110,6 @@ export type BulkCreateContactsReturnType = {
   errors: Maybe<Array<Scalars["JSON"]["output"]>>;
 };
 
-export type BulkPetitionSendTaskDataInput = {
-  contacts: Array<BulkPetitionSendTaskDataInputContact>;
-  prefill?: InputMaybe<Scalars["JSONObject"]["input"]>;
-};
-
-export type BulkPetitionSendTaskDataInputContact = {
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName?: InputMaybe<Scalars["String"]["input"]>;
-  id?: InputMaybe<Scalars["GID"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-};
-
 export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
@@ -984,6 +972,7 @@ export type Mutation = {
   updateUserGroupPermissions: UserGroup;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   updateUserPreferredLocale: User;
+  uploadBulkPetitionSendTaskInputFile: Scalars["JSONObject"]["output"];
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
   uploadDynamicSelectFieldFile: PetitionField;
   /** Uploads a user avatar image */
@@ -1107,8 +1096,8 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
 };
 
 export type MutationcreateBulkPetitionSendTaskArgs = {
-  data: Array<BulkPetitionSendTaskDataInput>;
   templateId: Scalars["GID"]["input"];
+  temporaryFileId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateContactArgs = {
@@ -2138,6 +2127,10 @@ export type MutationupdateUserGroupPermissionsArgs = {
 
 export type MutationupdateUserPreferredLocaleArgs = {
   locale: UserLocale;
+};
+
+export type MutationuploadBulkPetitionSendTaskInputFileArgs = {
+  file: FileUploadInput;
 };
 
 export type MutationuploadDynamicSelectFieldFileArgs = {

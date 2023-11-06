@@ -1,25 +1,15 @@
 import { differenceInDays } from "date-fns";
-import {
-  booleanArg,
-  idArg,
-  inputObjectType,
-  list,
-  mutationField,
-  nonNull,
-  nullable,
-  objectType,
-  stringArg,
-} from "nexus";
+import { booleanArg, idArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
+import { toGlobalId } from "../../util/globalId";
 import { isValidTimezone } from "../../util/time";
-import { userHasAccessToContacts } from "../contact/authorizers";
+import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
-import { validateAnd, validateIf } from "../helpers/validateArgs";
-import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
 import {
   petitionHasRepliableFields,
@@ -294,6 +284,43 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
   },
 });
 
+export const uploadBulkPetitionSendTaskInputFile = mutationField(
+  "uploadBulkPetitionSendTaskInputFile",
+  {
+    type: "JSONObject",
+    authorize: authenticateAnd(userHasFeatureFlag("BULK_PETITION_SEND_TASK")),
+    args: {
+      file: nonNull("FileUploadInput"),
+    },
+    validateArgs: validFileUploadInput(
+      (args) => args.file,
+      { contentType: "text/csv", maxSizeBytes: 1024 * 1024 * 10 },
+      "file",
+    ),
+    resolve: async (_, args, ctx) => {
+      const { filename, size, contentType } = args.file;
+      const key = random(16);
+      const temporaryFile = await ctx.files.createTemporaryFile(
+        {
+          path: key,
+          filename,
+          size: size.toString(),
+          content_type: contentType,
+        },
+        `User:${ctx.user!.id}`,
+      );
+
+      const presignedPostData = await ctx.storage.temporaryFiles.getSignedUploadEndpoint(
+        key,
+        contentType,
+        size,
+      );
+
+      return { temporaryFileId: toGlobalId("FileUpload", temporaryFile.id), presignedPostData };
+    },
+  },
+);
+
 export const createBulkPetitionSendTask = mutationField("createBulkPetitionSendTask", {
   description: "Creates a Task for creating, prefilling and sending petitions from a templateId",
   type: "Task",
@@ -304,85 +331,19 @@ export const createBulkPetitionSendTask = mutationField("createBulkPetitionSendT
     petitionIsNotAnonymized("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
     petitionHasRepliableFields("templateId"),
-    userHasAccessToContacts((args) =>
-      args.data.flatMap((d) => d.contacts.filter((c) => isDefined(c.id)).map((c) => c.id!)),
-    ),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
-    data: nonNull(
-      list(
-        nonNull(
-          inputObjectType({
-            name: "BulkPetitionSendTaskDataInput",
-            definition(t) {
-              t.nonNull.list.nonNull.field("contacts", {
-                type: inputObjectType({
-                  name: "BulkPetitionSendTaskDataInputContact",
-                  definition(t) {
-                    t.globalId("id", { prefixName: "Contact" });
-                    t.string("email");
-                    t.string("firstName");
-                    t.string("lastName");
-                  },
-                }),
-              });
-              t.nullable.jsonObject("prefill");
-            },
-          }).asArg(),
-        ),
-      ),
-    ),
+    temporaryFileId: nonNull(globalIdArg("FileUpload")),
   },
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.data, "data"),
-    validateIf(
-      (args) =>
-        args.data.some(
-          (d) =>
-            d.contacts.length === 0 ||
-            !d.contacts.every(
-              (c) => isDefined(c.id) || (isDefined(c.email) && isDefined(c.firstName)),
-            ),
-        ),
-      (_, args, ctx, info) => {
-        throw new ArgValidationError(
-          info,
-          "data.contacts",
-          `Every element in array must contain at least 1 id or a combination of email, firstName and lastName.`,
-        );
-      },
-    ),
-  ),
-  resolve: async (_, { templateId, data }, ctx) => {
-    const usageLimit = await ctx.organizations.loadCurrentOrganizationUsageLimit(
-      ctx.user!.org_id,
-      "PETITION_SEND",
-    );
-
-    if (!usageLimit || usageLimit.used + data.length > usageLimit.limit) {
-      throw new ApolloError(
-        "You don't have enough credits to send all the petitions",
-        "PETITION_SEND_LIMIT_REACHED",
-      );
-    }
-
+  resolve: async (_, { templateId, temporaryFileId }, ctx) => {
     return await ctx.tasks.createTask(
       {
         name: "BULK_PETITION_SEND",
         user_id: ctx.user!.id,
         input: {
           template_id: templateId,
-          data: data.map((d) => ({
-            contacts: d.contacts.map((c) => {
-              if (isDefined(c.id)) {
-                return c.id;
-              } else {
-                return { email: c.email!, first_name: c.firstName!, last_name: c.lastName };
-              }
-            }),
-            prefill: d.prefill,
-          })),
+          temporary_file_id: temporaryFileId,
         },
       },
       `User:${ctx.user!.id}`,
