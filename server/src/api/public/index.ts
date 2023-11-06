@@ -3006,6 +3006,16 @@ api
         const result = await client.request(CreateContact_contactDocument, { data: body });
         return Created(result.createContact!);
       } catch (error) {
+        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
+            email: string;
+            error_code: string;
+          };
+          if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
+            throw new BadRequestError(`${email} is not a valid email`);
+          }
+        }
+
         throw error;
       }
     },
