@@ -30,7 +30,7 @@ import { isReplyContentCompatible, mapReplyContents } from "@parallel/utils/peti
 import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { groupBy, isDefined } from "remeda";
+import { groupBy, isDefined, pick } from "remeda";
 
 export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ petitionId: string }>) {
   const {
@@ -212,7 +212,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                 res = await createPetitionFieldReplies({
                   variables: {
                     petitionId,
-                    fields: mappedFields.fields,
+                    fields: mappedFields.fields.map((data) => pick(data, ["id", "content"])),
                     overwriteExisting: data.overwriteExisting,
                   },
                 });
