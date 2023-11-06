@@ -141,13 +141,18 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         const matchingField =
           (isDefined(field.alias) &&
             filteredSourceFields.find((f) => {
-              return field.alias === f.alias && isReplyContentCompatible(field, f);
+              return (
+                field.alias === f.alias &&
+                isReplyContentCompatible(field, f) &&
+                isDefined(field.parent) === isDefined(f.parent)
+              );
             })) ||
           (isDefined(field.fromPetitionFieldId) &&
             filteredSourceFields.find((f) => {
               return (
                 field.fromPetitionFieldId === f.fromPetitionFieldId &&
-                isReplyContentCompatible(field, f)
+                isReplyContentCompatible(field, f) &&
+                isDefined(field.parent) === isDefined(f.parent)
               );
             })) ||
           null;
