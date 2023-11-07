@@ -20,9 +20,9 @@ import {
 import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
-import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
+import { PetitionComposeContents } from "@parallel/components/petition-compose/PetitionComposeContents";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
@@ -865,10 +865,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     </TabList>
                     <TabPanels {...extendFlexColumn}>
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                        <PetitionContents
+                        <PetitionComposeContents
                           fieldsWithIndices={allFieldsWithIndices as any}
                           onFieldClick={handleIndexFieldClick}
-                          showAliasButtons={true}
                           onFieldEdit={handleFieldEdit}
                           isReadOnly={isReadOnly}
                         />
@@ -1003,7 +1002,7 @@ const _fragments = {
     return gql`
       fragment PetitionCompose_PetitionField on PetitionField {
         ...PetitionComposeFieldList_PetitionField
-        ...PetitionContents_PetitionField
+        ...PetitionComposeContents_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
@@ -1014,7 +1013,7 @@ const _fragments = {
         }
         children {
           id
-          ...PetitionContents_PetitionField
+          ...PetitionComposeContents_PetitionField
           ...PetitionComposeFieldSettings_PetitionField
           ...validatePetitionFields_PetitionField
           ...FieldErrorDialog_PetitionField
@@ -1030,7 +1029,7 @@ const _fragments = {
       }
       ${PetitionComposeFieldList.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
-      ${PetitionContents.fragments.PetitionField}
+      ${PetitionComposeContents.fragments.PetitionField}
       ${validatePetitionFields.fragments.PetitionField}
       ${FieldErrorDialog.fragments.PetitionField}
       ${ReferencedFieldDialog.fragments.PetitionField}
@@ -1117,6 +1116,7 @@ const _mutations = [
       ) {
         id
         ...PetitionCompose_PetitionField
+        ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
         petition {
           ...PetitionLayout_PetitionBase
           fields {
@@ -1131,6 +1131,7 @@ const _mutations = [
         }
       }
     }
+    ${updatePreviewFieldReplies.fragments.PetitionField}
     ${PetitionLayout.fragments.PetitionBase}
     ${_fragments.PetitionField}
   `,

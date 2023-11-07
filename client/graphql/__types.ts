@@ -11094,34 +11094,6 @@ export type MoreLiquidReferencesButton_PetitionFieldFragment = {
   }> | null;
 };
 
-export type PetitionContents_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  title?: string | null;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  isInternal: boolean;
-  alias?: string | null;
-  isReadOnly: boolean;
-  multiple: boolean;
-  parent?: { __typename?: "PetitionField"; id: string } | null;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-  }>;
-  children?: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-    multiple: boolean;
-    alias?: string | null;
-    options: { [key: string]: any };
-  }> | null;
-};
-
 export type SelectedSignerRow_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
   firstName: string;
@@ -13647,6 +13619,27 @@ export type PetitionComposeAttachments_petitionAttachmentDownloadLinkMutation = 
     __typename?: "FileUploadDownloadLinkResult";
     url?: string | null;
   };
+};
+
+export type PetitionComposeContents_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  isInternal: boolean;
+  alias?: string | null;
+  multiple: boolean;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+  children?: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    multiple: boolean;
+    alias?: string | null;
+    options: { [key: string]: any };
+  }> | null;
 };
 
 export type PetitionComposeField_UserFragment = {
@@ -17804,6 +17797,24 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   }>;
   petition: { __typename?: "Petition"; id: string };
   signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+};
+
+export type PetitionRepliesContents_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  isInternal: boolean;
+  alias?: string | null;
+  isReadOnly: boolean;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+  }>;
 };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
@@ -28892,18 +28903,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
-    }>;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -28916,7 +28917,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
         isComplete: boolean;
       };
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
   }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -29100,12 +29100,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -29118,12 +29112,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         size: number;
         isComplete: boolean;
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
     }>;
   }>;
   myEffectivePermission?: {
@@ -29292,12 +29280,6 @@ export type PetitionCompose_PetitionFieldFragment = {
         isComplete: boolean;
       };
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
-    }>;
   }> | null;
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
@@ -29310,12 +29292,6 @@ export type PetitionCompose_PetitionFieldFragment = {
       size: number;
       isComplete: boolean;
     };
-  }>;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
   }>;
 };
 
@@ -29801,13 +29777,45 @@ export type PetitionCompose_createPetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      isAnonymized: boolean;
+      createdAt: string;
+      updatedAt: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        };
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
+    }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      isAnonymized: boolean;
+      createdAt: string;
+      updatedAt: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        };
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
+    }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -29819,12 +29827,6 @@ export type PetitionCompose_createPetitionFieldMutation = {
         size: number;
         isComplete: boolean;
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
     }>;
   };
 };
@@ -29968,12 +29970,6 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -29986,12 +29982,6 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         size: number;
         isComplete: boolean;
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
     }>;
   };
 };
@@ -30147,12 +30137,6 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30165,12 +30149,6 @@ export type PetitionCompose_updatePetitionFieldMutation = {
         size: number;
         isComplete: boolean;
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
     }>;
   };
 };
@@ -30272,12 +30250,6 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30290,12 +30262,6 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
         size: number;
         isComplete: boolean;
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
     }>;
   };
 };
@@ -30405,12 +30371,6 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30423,12 +30383,6 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
         size: number;
         isComplete: boolean;
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
     }>;
   };
 };
@@ -30546,12 +30500,6 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
           isComplete: boolean;
         };
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30564,12 +30512,6 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
         size: number;
         isComplete: boolean;
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
     }>;
   };
 };
@@ -30805,18 +30747,8 @@ export type PetitionCompose_petitionQuery = {
                 isComplete: boolean;
               };
             }>;
-            comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              status: PetitionFieldReplyStatus;
-            }>;
           }> | null;
-          replies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            status: PetitionFieldReplyStatus;
-          }>;
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -30829,7 +30761,6 @@ export type PetitionCompose_petitionQuery = {
               isComplete: boolean;
             };
           }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
         }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -31027,12 +30958,6 @@ export type PetitionCompose_petitionQuery = {
                 isComplete: boolean;
               };
             }>;
-            comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              status: PetitionFieldReplyStatus;
-            }>;
           }> | null;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -31045,12 +30970,6 @@ export type PetitionCompose_petitionQuery = {
               size: number;
               isComplete: boolean;
             };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            status: PetitionFieldReplyStatus;
           }>;
         }>;
         myEffectivePermission?: {
@@ -35224,10 +35143,9 @@ export type PetitionReplies_PetitionFragment = {
       id: string;
       type: PetitionFieldType;
       alias?: string | null;
-      title?: string | null;
-      multiple: boolean;
       options: { [key: string]: any };
       visibility?: { [key: string]: any } | null;
+      title?: string | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
@@ -35433,7 +35351,6 @@ export type PetitionReplies_PetitionFieldFragment = {
   isInternal: boolean;
   alias?: string | null;
   hasCommentsEnabled: boolean;
-  multiple: boolean;
   visibility?: { [key: string]: any } | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
@@ -35619,8 +35536,6 @@ export type PetitionReplies_PetitionFieldFragment = {
     id: string;
     type: PetitionFieldType;
     title?: string | null;
-    multiple: boolean;
-    alias?: string | null;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     replies: Array<{
@@ -35995,10 +35910,9 @@ export type PetitionReplies_closePetitionMutation = {
         id: string;
         type: PetitionFieldType;
         alias?: string | null;
-        title?: string | null;
-        multiple: boolean;
         options: { [key: string]: any };
         visibility?: { [key: string]: any } | null;
+        title?: string | null;
         parent?: { __typename?: "PetitionField"; id: string } | null;
         replies: Array<{
           __typename?: "PetitionFieldReply";
@@ -36426,10 +36340,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         id: string;
         type: PetitionFieldType;
         alias?: string | null;
-        title?: string | null;
-        multiple: boolean;
         options: { [key: string]: any };
         visibility?: { [key: string]: any } | null;
+        title?: string | null;
         parent?: { __typename?: "PetitionField"; id: string } | null;
         replies: Array<{
           __typename?: "PetitionFieldReply";
@@ -37024,10 +36937,9 @@ export type PetitionReplies_petitionQuery = {
             id: string;
             type: PetitionFieldType;
             alias?: string | null;
-            title?: string | null;
-            multiple: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
+            title?: string | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
             replies: Array<{
               __typename?: "PetitionFieldReply";
@@ -47274,20 +47186,6 @@ export const PetitionComposeAttachments_PetitionBaseFragmentDoc = gql`
   }
   ${PetitionComposeAttachments_PetitionAttachmentsListFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeAttachments_PetitionBaseFragment, unknown>;
-export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
-  fragment filterPetitionFields_PetitionField on PetitionField {
-    id
-    type
-    isReadOnly
-    comments {
-      id
-    }
-    replies {
-      id
-      status
-    }
-  }
-` as unknown as DocumentNode<filterPetitionFields_PetitionFieldFragment, unknown>;
 export const MoreLiquidReferencesButton_PetitionFieldFragmentDoc = gql`
   fragment MoreLiquidReferencesButton_PetitionField on PetitionField {
     id
@@ -47329,8 +47227,8 @@ export const AddAliasToFieldDialog_PetitionFieldFragmentDoc = gql`
     options
   }
 ` as unknown as DocumentNode<AddAliasToFieldDialog_PetitionFieldFragment, unknown>;
-export const PetitionContents_PetitionFieldFragmentDoc = gql`
-  fragment PetitionContents_PetitionField on PetitionField {
+export const PetitionComposeContents_PetitionFieldFragmentDoc = gql`
+  fragment PetitionComposeContents_PetitionField on PetitionField {
     id
     title
     type
@@ -47340,16 +47238,14 @@ export const PetitionContents_PetitionFieldFragmentDoc = gql`
     parent {
       id
     }
-    ...filterPetitionFields_PetitionField
     ...MoreLiquidReferencesButton_PetitionField
     ...CopyLiquidReferenceButton_PetitionField
     ...AddAliasToFieldDialog_PetitionField
   }
-  ${filterPetitionFields_PetitionFieldFragmentDoc}
   ${MoreLiquidReferencesButton_PetitionFieldFragmentDoc}
   ${CopyLiquidReferenceButton_PetitionFieldFragmentDoc}
   ${AddAliasToFieldDialog_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionContents_PetitionFieldFragment, unknown>;
+` as unknown as DocumentNode<PetitionComposeContents_PetitionFieldFragment, unknown>;
 export const SettingsRowAlias_PetitionFieldFragmentDoc = gql`
   fragment SettingsRowAlias_PetitionField on PetitionField {
     id
@@ -47395,7 +47291,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   fragment PetitionCompose_PetitionField on PetitionField {
     ...PetitionComposeFieldList_PetitionField
-    ...PetitionContents_PetitionField
+    ...PetitionComposeContents_PetitionField
     ...PetitionComposeFieldSettings_PetitionField
     ...validatePetitionFields_PetitionField
     ...FieldErrorDialog_PetitionField
@@ -47406,7 +47302,7 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
     }
     children {
       id
-      ...PetitionContents_PetitionField
+      ...PetitionComposeContents_PetitionField
       ...PetitionComposeFieldSettings_PetitionField
       ...validatePetitionFields_PetitionField
       ...FieldErrorDialog_PetitionField
@@ -47421,7 +47317,7 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
     }
   }
   ${PetitionComposeFieldList_PetitionFieldFragmentDoc}
-  ${PetitionContents_PetitionFieldFragmentDoc}
+  ${PetitionComposeContents_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
   ${validatePetitionFields_PetitionFieldFragmentDoc}
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
@@ -48428,6 +48324,20 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   ${CopyOrDownloadReplyButton_PetitionFieldReplyFragmentDoc}
   ${getReplyContents_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesFieldReply_PetitionFieldReplyFragment, unknown>;
+export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
+  fragment filterPetitionFields_PetitionField on PetitionField {
+    id
+    type
+    isReadOnly
+    comments {
+      id
+    }
+    replies {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<filterPetitionFields_PetitionFieldFragment, unknown>;
 export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
     id
@@ -48490,6 +48400,25 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
   ${FileAttachmentButton_FileUploadFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldFragment, unknown>;
+export const PetitionRepliesContents_PetitionFieldFragmentDoc = gql`
+  fragment PetitionRepliesContents_PetitionField on PetitionField {
+    id
+    title
+    type
+    options
+    isInternal
+    alias
+    parent {
+      id
+    }
+    comments {
+      id
+      isUnread
+    }
+    ...filterPetitionFields_PetitionField
+  }
+  ${filterPetitionFields_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<PetitionRepliesContents_PetitionFieldFragment, unknown>;
 export const PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
     id
@@ -48540,13 +48469,13 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
     isReadOnly
     requireApproval
     ...PetitionRepliesField_PetitionField
-    ...PetitionContents_PetitionField
+    ...PetitionRepliesContents_PetitionField
     ...PetitionRepliesFieldComments_PetitionField
     ...ExportRepliesDialog_PetitionField
     ...useFieldLogic_PetitionField
   }
   ${PetitionRepliesField_PetitionFieldFragmentDoc}
-  ${PetitionContents_PetitionFieldFragmentDoc}
+  ${PetitionRepliesContents_PetitionFieldFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldLogic_PetitionFieldFragmentDoc}
@@ -54088,6 +54017,7 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
     ) {
       id
       ...PetitionCompose_PetitionField
+      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
       petition {
         ...PetitionLayout_PetitionBase
         fields {
@@ -54103,6 +54033,7 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
     }
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
+  ${PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionCompose_createPetitionFieldMutation,

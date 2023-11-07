@@ -10,60 +10,45 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { EyeOffIcon } from "@parallel/chakra/icons";
+import { CommentIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import {
-  PetitionContents_PetitionFieldFragment,
+  PetitionRepliesContents_PetitionFieldFragment,
   PetitionSignatureStatusFilter,
   SignatureOrgIntegrationEnvironment,
-  UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { PetitionFieldFilter, filterPetitionFields } from "@parallel/utils/filterPetitionFields";
-import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { ComponentType, ReactNode, createElement } from "react";
-import { FormattedMessage } from "react-intl";
+import { ReactNode } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
-import { CopyLiquidReferenceButton } from "./CopyLiquidReferenceButton";
-import { MoreLiquidReferencesButton } from "./MoreLiquidReferencesButton";
-import { AddAliasToFieldDialog, useAddAliasToFieldDialog } from "./dialogs/AddAliasToFieldDialog";
-import { isDefined } from "remeda";
+import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 
-interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
-  field: T;
-}
-
-export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldFragment> {
+export interface PetitionRepliesContentsProps<
+  T extends PetitionRepliesContents_PetitionFieldFragment,
+> {
   fieldsWithIndices: [field: T, fieldIndex: PetitionFieldIndex, childrenFieldIndices?: string[]][];
-  showAliasButtons: boolean;
   fieldLogic?: FieldLogicResult[];
   onFieldClick: (fieldId: string) => void;
-  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   filter?: PetitionFieldFilter;
-  fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
   signatureStatus?: PetitionSignatureStatusFilter;
   signatureEnvironment?: SignatureOrgIntegrationEnvironment | null;
   onSignatureStatusClick?: () => void;
-  isReadOnly?: boolean;
 }
 
-export function PetitionContents<T extends PetitionContents_PetitionFieldFragment>({
+export function PetitionRepliesContents<T extends PetitionRepliesContents_PetitionFieldFragment>({
   fieldsWithIndices,
   filter,
-  showAliasButtons,
   fieldLogic,
   onFieldClick,
-  onFieldEdit,
-  fieldIndicators,
   signatureStatus,
   signatureEnvironment,
   onSignatureStatusClick,
-  isReadOnly,
-}: PetitionContentsProps<T>) {
+}: PetitionRepliesContentsProps<T>) {
   const handleFieldClick = useMemoFactory(
     (fieldId: string) => () => onFieldClick(fieldId),
     [onFieldClick],
@@ -80,29 +65,17 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
       {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) => {
         if (x.type === "FIELD") {
           return (
-            <PetitionContentsItem
-              isChildField={isDefined(x.field.parent)}
+            <PetitionRepliesContentsItem
               key={x.field.id}
               field={x.field}
-              isVisible={true}
               fieldIndex={x.fieldIndex}
               onFieldClick={handleFieldClick(x.field.id)}
-              onFieldEdit={onFieldEdit}
-              fieldIndicators={fieldIndicators}
-              showAliasButtons={
-                x.field.type === "HEADING" ||
-                x.field.type === "DYNAMIC_SELECT" ||
-                isFileTypeField(x.field.type)
-                  ? false
-                  : showAliasButtons
-              }
-              isReadOnly={isReadOnly}
             />
           );
         }
 
         return (
-          <PetitionContentsDivider key={index} isDashed>
+          <PetitionRepliesContentsDivider key={index} isDashed>
             <Flex alignItems="center">
               <EyeOffIcon marginRight={1} />
               <FormattedMessage
@@ -111,7 +84,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
                 values={{ count: x.count }}
               />
             </Flex>
-          </PetitionContentsDivider>
+          </PetitionRepliesContentsDivider>
         );
       })}
     </Stack>
@@ -150,9 +123,9 @@ function SignatureStatusInfo({
   );
 }
 
-PetitionContents.fragments = {
+PetitionRepliesContents.fragments = {
   PetitionField: gql`
-    fragment PetitionContents_PetitionField on PetitionField {
+    fragment PetitionRepliesContents_PetitionField on PetitionField {
       id
       title
       type
@@ -162,51 +135,36 @@ PetitionContents.fragments = {
       parent {
         id
       }
+      comments {
+        id
+        isUnread
+      }
       ...filterPetitionFields_PetitionField
-      ...MoreLiquidReferencesButton_PetitionField
-      ...CopyLiquidReferenceButton_PetitionField
-      ...AddAliasToFieldDialog_PetitionField
     }
     ${filterPetitionFields.fragments.PetitionField}
-    ${MoreLiquidReferencesButton.fragments.PetitionField}
-    ${CopyLiquidReferenceButton.fragments.PetitionField}
-    ${AddAliasToFieldDialog.fragments.PetitionField}
   `,
 };
 
-interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFragment> {
+interface PetitionRepliesContentsItemProps<
+  T extends PetitionRepliesContents_PetitionFieldFragment,
+> {
   field: T;
   fieldIndex: PetitionFieldIndex;
-  isVisible: boolean;
   onFieldClick: () => void;
-  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
-  showAliasButtons: boolean;
-  fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
-  isReadOnly?: boolean;
-  isChildField?: boolean;
 }
 
-function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>({
+function _PetitionRepliesContentsItem<T extends PetitionRepliesContents_PetitionFieldFragment>({
   field,
-  isVisible,
   fieldIndex,
   onFieldClick,
-  onFieldEdit,
-  showAliasButtons,
-  fieldIndicators,
-  isReadOnly,
-  isChildField,
-}: PetitionContentsItemProps<T>) {
-  const showAddAliasToFieldDialog = useAddAliasToFieldDialog();
-  const handleAddAliasToField = async () => {
-    return await showAddAliasToFieldDialog({ field, fieldIndex, onFieldEdit });
-  };
+}: PetitionRepliesContentsItemProps<T>) {
+  const intl = useIntl();
   return (
     <>
       {field.type === "HEADING" && field.options.hasPageBreak ? (
-        <PetitionContentsDivider>
+        <PetitionRepliesContentsDivider>
           <FormattedMessage id="generic.page-break" defaultMessage="Page break" />
-        </PetitionContentsDivider>
+        </PetitionRepliesContentsDivider>
       ) : null}
       <Box as="li" listStyleType="none" display="flex" position="relative" flex="none">
         <LinkBox
@@ -218,7 +176,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           height="auto"
           paddingX={2}
           paddingY={1}
-          paddingLeft={field.type === "HEADING" ? 2 : isChildField ? 8 : 4}
+          paddingLeft={field.type === "HEADING" ? 2 : 4}
           fontWeight={field.type === "HEADING" ? "medium" : "normal"}
           textAlign="left"
           onClick={onFieldClick}
@@ -246,7 +204,6 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
             minWidth={0}
             noOfLines={1}
             wordBreak="break-all"
-            opacity={isVisible ? 1 : 0.6}
             paddingY={1}
           >
             <Text as="span">{fieldIndex}. </Text>
@@ -262,45 +219,50 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
               </Text>
             )}
           </LinkOverlay>
-          {fieldIndicators ? createElement(fieldIndicators, { field }) : null}
-          {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}
-          {showAliasButtons ? (
-            <>
-              <CopyLiquidReferenceButton
-                className="alias-button"
-                field={field}
-                background="white"
-                boxShadow="md"
-                _hover={{
-                  boxShadow: "lg",
-                }}
-                isDisabled={!field.alias && isReadOnly}
-                onAddAliasToField={handleAddAliasToField}
+          {field.comments.length ? (
+            <Stack as="span" direction="row-reverse" display="inline-flex" alignItems="center">
+              <Stack
+                as="span"
+                direction="row-reverse"
+                spacing={1}
+                display="inline-flex"
+                alignItems="flex-end"
+                color="gray.600"
+              >
+                <CommentIcon fontSize="sm" opacity="0.8" />
+                <Text
+                  as="span"
+                  fontSize="xs"
+                  role="img"
+                  aria-label={intl.formatMessage(
+                    {
+                      id: "generic.comments-button-label",
+                      defaultMessage:
+                        "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+                    },
+                    { commentCount: field.comments.length },
+                  )}
+                >
+                  {intl.formatNumber(field.comments.length)}
+                </Text>
+              </Stack>
+              <RecipientViewCommentsBadge
+                hasUnreadComments={field.comments.some((c) => c.isUnread)}
               />
-              <MoreLiquidReferencesButton
-                className="alias-button"
-                field={field}
-                background="white"
-                boxShadow="md"
-                _hover={{
-                  boxShadow: "lg",
-                }}
-                isDisabled={!field.alias && isReadOnly}
-                onAddAliasToField={handleAddAliasToField}
-              />
-            </>
+            </Stack>
           ) : null}
+          {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}
         </LinkBox>
       </Box>
     </>
   );
 }
 
-const PetitionContentsItem = memoWithFragments(_PetitionContentsItem, {
-  field: PetitionContents.fragments.PetitionField,
+const PetitionRepliesContentsItem = memoWithFragments(_PetitionRepliesContentsItem, {
+  field: PetitionRepliesContents.fragments.PetitionField,
 });
 
-function PetitionContentsDivider({
+function PetitionRepliesContentsDivider({
   children,
   isDashed,
 }: {

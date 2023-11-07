@@ -3,7 +3,6 @@ import { Box, Button, Flex, MenuItem, MenuList, Stack, Text, useToast } from "@c
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
-  CommentIcon,
   DownloadIcon,
   FilePdfIcon,
   ListIcon,
@@ -33,7 +32,6 @@ import {
 import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
-import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
@@ -44,6 +42,7 @@ import {
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
+import { PetitionRepliesContents } from "@parallel/components/petition-replies/PetitionRepliesContents";
 import {
   PetitionRepliesField,
   PetitionRepliesFieldProps,
@@ -54,7 +53,6 @@ import { PetitionRepliesFilterButton } from "@parallel/components/petition-repli
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
-import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/RecipientViewCommentsBadge";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
@@ -63,7 +61,6 @@ import {
   PetitionReplies_closePetitionDocument,
   PetitionReplies_fileUploadReplyDownloadLinkDocument,
   PetitionReplies_petitionDocument,
-  PetitionReplies_PetitionFieldFragment,
   PetitionReplies_PetitionFragment,
   PetitionReplies_sendPetitionClosedNotificationDocument,
   PetitionReplies_updatePetitionDocument,
@@ -688,16 +685,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       <FormattedMessage id="generic.contents" defaultMessage="Contents" />
                     </CardHeader>
                     <Box overflow="auto">
-                      <PetitionContents
+                      <PetitionRepliesContents
                         fieldsWithIndices={fieldsWithIndices}
                         filter={filter}
                         fieldLogic={fieldLogic}
                         onFieldClick={handlePetitionContentsFieldClick}
-                        fieldIndicators={PetitionContentsIndicators}
                         signatureStatus={petitionSignatureStatus}
                         signatureEnvironment={petitionSignatureEnvironment}
                         onSignatureStatusClick={handlePetitionContentsSignatureClick}
-                        showAliasButtons={false}
                       />
                     </Box>
                   </Card>
@@ -810,7 +805,7 @@ PetitionReplies.fragments = {
         isReadOnly
         requireApproval
         ...PetitionRepliesField_PetitionField
-        ...PetitionContents_PetitionField
+        ...PetitionRepliesContents_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
         ...ExportRepliesDialog_PetitionField
         ...useFieldLogic_PetitionField
@@ -818,7 +813,7 @@ PetitionReplies.fragments = {
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
-      ${PetitionContents.fragments.PetitionField}
+      ${PetitionRepliesContents.fragments.PetitionField}
       ${useFieldLogic.fragments.PetitionField}
     `;
   },
@@ -1016,44 +1011,6 @@ function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
       }
       {...props}
     />
-  );
-}
-
-function PetitionContentsIndicators({ field }: { field: PetitionReplies_PetitionFieldFragment }) {
-  const intl = useIntl();
-  return (
-    <>
-      {field.comments.length ? (
-        <Stack as="span" direction="row-reverse" display="inline-flex" alignItems="center">
-          <Stack
-            as="span"
-            direction="row-reverse"
-            spacing={1}
-            display="inline-flex"
-            alignItems="flex-end"
-            color="gray.600"
-          >
-            <CommentIcon fontSize="sm" opacity="0.8" />
-            <Text
-              as="span"
-              fontSize="xs"
-              role="img"
-              aria-label={intl.formatMessage(
-                {
-                  id: "generic.comments-button-label",
-                  defaultMessage:
-                    "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-                },
-                { commentCount: field.comments.length },
-              )}
-            >
-              {intl.formatNumber(field.comments.length)}
-            </Text>
-          </Stack>
-          <RecipientViewCommentsBadge hasUnreadComments={field.comments.some((c) => c.isUnread)} />
-        </Stack>
-      ) : null}
-    </>
   );
 }
 
