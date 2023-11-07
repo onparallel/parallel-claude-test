@@ -286,7 +286,7 @@ export function PetitionSharingDialog({
   const getSuccessTitle = () => {
     const template = intl.formatMessage(
       {
-        id: "template-sharing.success-title",
+        id: "component.petition-sharing-dialog.template-sharing-success-title",
         defaultMessage: "{count, plural, =1 {Template} other {Templates}} shared",
       },
       { count: petitionsOwnedWrite.length },
@@ -294,7 +294,7 @@ export function PetitionSharingDialog({
 
     const petition = intl.formatMessage(
       {
-        id: "petition-sharing.success-title",
+        id: "component.petition-sharing-dialog.petition-sharing-success-title",
         defaultMessage: "{count, plural, =1 {Parallel} other {Parallels}} shared",
       },
       { count: petitionsOwnedWrite.length },
@@ -323,7 +323,7 @@ export function PetitionSharingDialog({
           </Circle>
           <Text as="div" flex="1">
             <FormattedMessage
-              id="petition-sharing.header"
+              id="component.petition-sharing-dialog.header"
               defaultMessage="Share with people and teams"
             />
           </Text>
@@ -358,7 +358,7 @@ export function PetitionSharingDialog({
                         petitionsOwnedWrite.length
                           ? undefined
                           : intl.formatMessage({
-                              id: "petition-sharing.input-placeholder-not-owner",
+                              id: "component.petition-sharing-dialog.input-placeholder-not-owner",
                               defaultMessage: "Only the parallel owner can share it",
                             })
                       }
@@ -389,7 +389,7 @@ export function PetitionSharingDialog({
                 data-testid="notify-users-checkbox"
               >
                 <FormattedMessage
-                  id="petition-sharing.notify-checkbox"
+                  id="component.petition-sharing-dialog.notify-checkbox"
                   defaultMessage="Notify users"
                 />
               </Checkbox>
@@ -399,11 +399,11 @@ export function PetitionSharingDialog({
                   {...messageRegisterProps}
                   maxHeight="30vh"
                   aria-label={intl.formatMessage({
-                    id: "petition-sharing.message-placeholder",
+                    id: "component.petition-sharing-dialog.message-placeholder",
                     defaultMessage: "Message",
                   })}
                   placeholder={intl.formatMessage({
-                    id: "petition-sharing.message-placeholder",
+                    id: "component.petition-sharing-dialog.message-placeholder",
                     defaultMessage: "Message",
                   })}
                 />
@@ -440,7 +440,8 @@ export function PetitionSharingDialog({
                             {")"}
                           </Text>
                         ) : null}
-                        {petitions[0].effectivePermissions.some(
+                        {!isTemplate &&
+                        petitions[0].effectivePermissions.some(
                           (ep) => ep.user.id === user.id && ep.isSubscribed,
                         ) ? (
                           <SubscribedNotificationsIcon />
@@ -547,6 +548,7 @@ export function PetitionSharingDialog({
                             userGroupId={group.id}
                             userDetails={(userId: string) => {
                               if (
+                                !isTemplate &&
                                 petitions[0].effectivePermissions.some(
                                   (ep) => ep.user.id === userId && ep.isSubscribed,
                                 )
@@ -641,13 +643,13 @@ export function PetitionSharingDialog({
                         <Text>
                           {isTemplate ? (
                             <FormattedMessage
-                              id="template-sharing.insufficient-permissions-list"
+                              id="component.petition-sharing-dialog.template-insufficient-permissions-list"
                               defaultMessage="The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:"
                               values={{ count: petitionsRead.length }}
                             />
                           ) : (
                             <FormattedMessage
-                              id="petition-sharing.insufficient-permissions-list"
+                              id="component.petition-sharing-dialog.petition-insufficient-permissions-list"
                               defaultMessage="The following {count, plural, =1 {parallel has} other {parallels have}} been ignored and cannot be shared due to lack of permissions:"
                               values={{ count: petitionsRead.length }}
                             />
@@ -668,12 +670,12 @@ export function PetitionSharingDialog({
                       <Text>
                         {isTemplate ? (
                           <FormattedMessage
-                            id="template-sharing.insufficient-permissions"
+                            id="component.petition-sharing-dialog.template-insufficient-permissions"
                             defaultMessage="You do not have permission to share the selected templates."
                           />
                         ) : (
                           <FormattedMessage
-                            id="petition-sharing.insufficient-permissions"
+                            id="component.petition-sharing-dialog.petition-insufficient-permissions"
                             defaultMessage="You do not have permission to share the selected parallels."
                           />
                         )}
@@ -891,14 +893,14 @@ function ConfirmRemovePetitionPermissionDialog({
       closeOnOverlayClick={true}
       header={
         <FormattedMessage
-          id="petition-sharing.confirm-remove.header"
+          id="component.confirm-remove-petition-permission-dialog.header"
           defaultMessage="Stop sharing"
         />
       }
       body={
         name ? (
           <FormattedMessage
-            id="petition-sharing.confirm-remove.message"
+            id="component.confirm-remove-petition-permission-dialog.message"
             defaultMessage="Are you sure you want to stop sharing this parallel with {name}?"
             values={{
               name: <Text as="strong">{name}</Text>,
@@ -906,7 +908,7 @@ function ConfirmRemovePetitionPermissionDialog({
           />
         ) : (
           <FormattedMessage
-            id="petition-sharing.confirm-remove.message-2"
+            id="component.confirm-remove-petition-permission-dialog.message-2"
             defaultMessage="Are you sure you want to remove your permissions? Doing so will cause you to lose access."
           />
         )
@@ -914,7 +916,7 @@ function ConfirmRemovePetitionPermissionDialog({
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="petition-sharing.confirm-remove.confirm-button"
+            id="component.confirm-remove-petition-permission-dialog.confirm-button"
             defaultMessage="Yes, remove"
           />
         </Button>
@@ -931,13 +933,13 @@ function ConfirmEditPetitionPermissionDialog({ ...props }: DialogProps) {
       closeOnOverlayClick={true}
       header={
         <FormattedMessage
-          id="petition-sharing.confirm-edit.header"
+          id="component.confirm-edit-petition-permission-dialog.header"
           defaultMessage="Edit permissions"
         />
       }
       body={
         <FormattedMessage
-          id="petition-sharing.confirm-edit.message-2"
+          id="component.confirm-edit-petition-permission-dialog.message"
           defaultMessage="Are you sure you want to modify your permissions? If you do you will lose the ability to edit."
         />
       }
@@ -980,13 +982,13 @@ function ConfirmTransferPetitionOwnershipDialog({
       closeOnOverlayClick={true}
       header={
         <FormattedMessage
-          id="petition-sharing.confirm-transfer-ownership.header"
+          id="component.confirm-transfer-petition-ownership-dialog.header"
           defaultMessage="Transfer ownership"
         />
       }
       body={
         <FormattedMessage
-          id="petition-sharing.confirm-transfer-ownership.message"
+          id="component.confirm-transfer-petition-ownership-dialog.message"
           defaultMessage="Are you sure you want to transfer the ownership of this parallel to {name}?"
           values={{
             name: <Text as="strong">{user.fullName}</Text>,
@@ -996,7 +998,7 @@ function ConfirmTransferPetitionOwnershipDialog({
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="petition-sharing.confirm-transfer-ownership.confirm-button"
+            id="component.confirm-transfer-petition-ownership-dialog.confirm-button"
             defaultMessage="Yes, transfer"
           />
         </Button>

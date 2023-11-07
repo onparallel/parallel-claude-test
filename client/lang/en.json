@@ -925,6 +925,16 @@
     "context": "Keep draft"
   },
   {
+    "term": "component.confirm-edit-petition-permission-dialog.header",
+    "definition": "Edit permissions",
+    "context": "Edit permissions"
+  },
+  {
+    "term": "component.confirm-edit-petition-permission-dialog.message",
+    "definition": "Are you sure you want to modify your permissions? If you do you will lose the ability to edit.",
+    "context": "Are you sure you want to modify your permissions? If you do you will lose the ability to edit."
+  },
+  {
     "term": "component.confirm-link-field-dialog.body",
     "definition": "This field contains collected replies. If you add this field you will lose those replies including uploaded files <b>forever</b>.",
     "context": "This field contains collected replies. If you add this field you will lose those replies including uploaded files <b>forever</b>."
@@ -1050,6 +1060,26 @@
     "context": "Remove from team"
   },
   {
+    "term": "component.confirm-remove-petition-permission-dialog.confirm-button",
+    "definition": "Yes, remove",
+    "context": "Yes, remove"
+  },
+  {
+    "term": "component.confirm-remove-petition-permission-dialog.header",
+    "definition": "Stop sharing",
+    "context": "Stop sharing"
+  },
+  {
+    "term": "component.confirm-remove-petition-permission-dialog.message",
+    "definition": "Are you sure you want to stop sharing this parallel with {name}?",
+    "context": "Are you sure you want to stop sharing this parallel with {name}?"
+  },
+  {
+    "term": "component.confirm-remove-petition-permission-dialog.message-2",
+    "definition": "Are you sure you want to remove your permissions? Doing so will cause you to lose access.",
+    "context": "Are you sure you want to remove your permissions? Doing so will cause you to lose access."
+  },
+  {
     "term": "component.confirm-resend-completed-notification.confirm-button",
     "definition": "Yes, resend the notification",
     "context": "Yes, resend the notification"
@@ -1163,6 +1193,21 @@
     "term": "component.confirm-skip-forward-security.header",
     "definition": "Disable Forward Security",
     "context": "Disable Forward Security"
+  },
+  {
+    "term": "component.confirm-transfer-petition-ownership-dialog.confirm-button",
+    "definition": "Yes, transfer",
+    "context": "Yes, transfer"
+  },
+  {
+    "term": "component.confirm-transfer-petition-ownership-dialog.header",
+    "definition": "Transfer ownership",
+    "context": "Transfer ownership"
+  },
+  {
+    "term": "component.confirm-transfer-petition-ownership-dialog.message",
+    "definition": "Are you sure you want to transfer the ownership of this parallel to {name}?",
+    "context": "Are you sure you want to transfer the ownership of this parallel to {name}?"
   },
   {
     "term": "component.confirm-unlink-field-dialog.body",
@@ -4895,6 +4940,41 @@
     "context": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far."
   },
   {
+    "term": "component.petition-sharing-dialog.header",
+    "definition": "Share with people and teams",
+    "context": "Share with people and teams"
+  },
+  {
+    "term": "component.petition-sharing-dialog.input-placeholder-not-owner",
+    "definition": "Only the parallel owner can share it",
+    "context": "Only the parallel owner can share it"
+  },
+  {
+    "term": "component.petition-sharing-dialog.message-placeholder",
+    "definition": "Message",
+    "context": "Message"
+  },
+  {
+    "term": "component.petition-sharing-dialog.notify-checkbox",
+    "definition": "Notify users",
+    "context": "Notify users"
+  },
+  {
+    "term": "component.petition-sharing-dialog.petition-insufficient-permissions",
+    "definition": "You do not have permission to share the selected parallels.",
+    "context": "You do not have permission to share the selected parallels."
+  },
+  {
+    "term": "component.petition-sharing-dialog.petition-insufficient-permissions-list",
+    "definition": "The following {count, plural, =1 {parallel has} other {parallels have}} been ignored and cannot be shared due to lack of permissions:",
+    "context": "The following {count, plural, =1 {parallel has} other {parallels have}} been ignored and cannot be shared due to lack of permissions:"
+  },
+  {
+    "term": "component.petition-sharing-dialog.petition-sharing-success-title",
+    "definition": "{count, plural, =1 {Parallel} other {Parallels}} shared",
+    "context": "{count, plural, =1 {Parallel} other {Parallels}} shared"
+  },
+  {
     "term": "component.petition-sharing-dialog.subscribe",
     "definition": "Subscribe to notifications",
     "context": "Subscribe to notifications"
@@ -4903,6 +4983,21 @@
     "term": "component.petition-sharing-dialog.subscribe-help",
     "definition": "Users will receive notifications about the activity of this parallel.",
     "context": "Users will receive notifications about the activity of this parallel."
+  },
+  {
+    "term": "component.petition-sharing-dialog.template-insufficient-permissions",
+    "definition": "You do not have permission to share the selected templates.",
+    "context": "You do not have permission to share the selected templates."
+  },
+  {
+    "term": "component.petition-sharing-dialog.template-insufficient-permissions-list",
+    "definition": "The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:",
+    "context": "The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:"
+  },
+  {
+    "term": "component.petition-sharing-dialog.template-sharing-success-title",
+    "definition": "{count, plural, =1 {Template} other {Templates}} shared",
+    "context": "{count, plural, =1 {Template} other {Templates}} shared"
   },
   {
     "term": "component.petition-sigatures-card.awaiting",
@@ -12070,86 +12165,6 @@
     "context": "Preview file. ⇧ + click to download"
   },
   {
-    "term": "petition-sharing.confirm-edit.header",
-    "definition": "Edit permissions",
-    "context": "Edit permissions"
-  },
-  {
-    "term": "petition-sharing.confirm-edit.message-2",
-    "definition": "Are you sure you want to modify your permissions? If you do you will lose the ability to edit.",
-    "context": "Are you sure you want to modify your permissions? If you do you will lose the ability to edit."
-  },
-  {
-    "term": "petition-sharing.confirm-remove.confirm-button",
-    "definition": "Yes, remove",
-    "context": "Yes, remove"
-  },
-  {
-    "term": "petition-sharing.confirm-remove.header",
-    "definition": "Stop sharing",
-    "context": "Stop sharing"
-  },
-  {
-    "term": "petition-sharing.confirm-remove.message",
-    "definition": "Are you sure you want to stop sharing this parallel with {name}?",
-    "context": "Are you sure you want to stop sharing this parallel with {name}?"
-  },
-  {
-    "term": "petition-sharing.confirm-remove.message-2",
-    "definition": "Are you sure you want to remove your permissions? Doing so will cause you to lose access.",
-    "context": "Are you sure you want to remove your permissions? Doing so will cause you to lose access."
-  },
-  {
-    "term": "petition-sharing.confirm-transfer-ownership.confirm-button",
-    "definition": "Yes, transfer",
-    "context": "Yes, transfer"
-  },
-  {
-    "term": "petition-sharing.confirm-transfer-ownership.header",
-    "definition": "Transfer ownership",
-    "context": "Transfer ownership"
-  },
-  {
-    "term": "petition-sharing.confirm-transfer-ownership.message",
-    "definition": "Are you sure you want to transfer the ownership of this parallel to {name}?",
-    "context": "Are you sure you want to transfer the ownership of this parallel to {name}?"
-  },
-  {
-    "term": "petition-sharing.header",
-    "definition": "Share with people and teams",
-    "context": "Share with people and teams"
-  },
-  {
-    "term": "petition-sharing.input-placeholder-not-owner",
-    "definition": "Only the parallel owner can share it",
-    "context": "Only the parallel owner can share it"
-  },
-  {
-    "term": "petition-sharing.insufficient-permissions",
-    "definition": "You do not have permission to share the selected parallels.",
-    "context": "You do not have permission to share the selected parallels."
-  },
-  {
-    "term": "petition-sharing.insufficient-permissions-list",
-    "definition": "The following {count, plural, =1 {parallel has} other {parallels have}} been ignored and cannot be shared due to lack of permissions:",
-    "context": "The following {count, plural, =1 {parallel has} other {parallels have}} been ignored and cannot be shared due to lack of permissions:"
-  },
-  {
-    "term": "petition-sharing.message-placeholder",
-    "definition": "Message",
-    "context": "Message"
-  },
-  {
-    "term": "petition-sharing.notify-checkbox",
-    "definition": "Notify users",
-    "context": "Notify users"
-  },
-  {
-    "term": "petition-sharing.success-title",
-    "definition": "{count, plural, =1 {Parallel} other {Parallels}} shared",
-    "context": "{count, plural, =1 {Parallel} other {Parallels}} shared"
-  },
-  {
     "term": "petition-signature-status-label.cancelled",
     "definition": "eSignature cancelled",
     "context": "eSignature cancelled"
@@ -13283,21 +13298,6 @@
     "term": "supported-locales.spanish",
     "definition": "Spanish",
     "context": "Spanish"
-  },
-  {
-    "term": "template-sharing.insufficient-permissions",
-    "definition": "You do not have permission to share the selected templates.",
-    "context": "You do not have permission to share the selected templates."
-  },
-  {
-    "term": "template-sharing.insufficient-permissions-list",
-    "definition": "The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:",
-    "context": "The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:"
-  },
-  {
-    "term": "template-sharing.success-title",
-    "definition": "{count, plural, =1 {Template} other {Templates}} shared",
-    "context": "{count, plural, =1 {Template} other {Templates}} shared"
   },
   {
     "term": "template.description-edit.header",
