@@ -31,7 +31,7 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,

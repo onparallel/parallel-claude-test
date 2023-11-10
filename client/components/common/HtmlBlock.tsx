@@ -13,7 +13,7 @@ export const HtmlBlock = chakraForwardRef<"div", { dangerousInnerHtml: string }>
       if (domNode instanceof Element && domNode.name === "a") {
         return (
           <Link href={domNode.attribs.href} isExternal>
-            {domToReact(domNode.children, options)}
+            {domToReact(domNode.children as any, options)}
           </Link>
         );
       }

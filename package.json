@@ -17,12 +17,12 @@
     "postpull": "yarn && cd server && yarn migrate"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
     "@typescript/analyze-trace": "^0.10.1",
-    "eslint": "^8.51.0",
+    "eslint": "^8.53.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-formatjs": "^4.11.0",
+    "eslint-plugin-formatjs": "^4.11.1",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "7.33.2",
     "npm-check-updates": "^16.14.6",
