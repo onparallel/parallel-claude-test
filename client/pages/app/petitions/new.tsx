@@ -349,8 +349,8 @@ function NewPetition() {
                       state.owner === true
                         ? "IS_OWNER"
                         : state.owner === false
-                        ? "NOT_IS_OWNER"
-                        : null
+                          ? "NOT_IS_OWNER"
+                          : null
                     }
                     onChange={handleSharedFilterChange}
                     backgroundColor="white"

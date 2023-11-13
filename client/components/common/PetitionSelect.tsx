@@ -165,12 +165,12 @@ export const PetitionSelect = Object.assign(
       value === null
         ? null
         : needsLoading
-        ? // value is string | string[]
-          unMaybeArray(value as any).join(",")
-        : // value is PetitionSelection[]
-          unMaybeArray(value as any)
-            .map((x) => x.id)
-            .join(","),
+          ? // value is string | string[]
+            unMaybeArray(value as any).join(",")
+          : // value is PetitionSelection[]
+            unMaybeArray(value as any)
+              .map((x) => x.id)
+              .join(","),
     ]);
     const intl = useIntl();
     const placeholder = useMemo(() => {

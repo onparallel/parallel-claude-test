@@ -199,29 +199,29 @@ export function ProfileField(props: ProfileFieldProps) {
                         ),
                 }
               : petitionField.type === "DATE"
-              ? {
-                  text: intl.formatDate(reply.content.value as string, {
-                    ...FORMATS.L,
-                    timeZone: "UTC",
-                  }),
-                  value:
-                    field.type === "DATE"
-                      ? reply.content.value
-                      : intl.formatDate(reply.content.value as string, {
-                          ...FORMATS.L,
-                          timeZone: "UTC",
-                        }),
-                }
-              : unMaybeArray(
-                  petitionField.type === "DATE_TIME"
-                    ? `${intl.formatDate(reply.content.value as string, {
-                        timeZone: reply.content.timezone,
-                        ...FORMATS["L+LT"],
-                      })} (${prettifyTimezone(reply.content.timezone)})`
-                    : petitionField.type === "CHECKBOX"
-                    ? (reply.content.value as string[])
-                    : (reply.content.value as string),
-                ).map((text) => ({ text, value: text })),
+                ? {
+                    text: intl.formatDate(reply.content.value as string, {
+                      ...FORMATS.L,
+                      timeZone: "UTC",
+                    }),
+                    value:
+                      field.type === "DATE"
+                        ? reply.content.value
+                        : intl.formatDate(reply.content.value as string, {
+                            ...FORMATS.L,
+                            timeZone: "UTC",
+                          }),
+                  }
+                : unMaybeArray(
+                    petitionField.type === "DATE_TIME"
+                      ? `${intl.formatDate(reply.content.value as string, {
+                          timeZone: reply.content.timezone,
+                          ...FORMATS["L+LT"],
+                        })} (${prettifyTimezone(reply.content.timezone)})`
+                      : petitionField.type === "CHECKBOX"
+                        ? (reply.content.value as string[])
+                        : (reply.content.value as string),
+                  ).map((text) => ({ text, value: text })),
           )
             .filter(({ value }) => content?.value !== value)
             .map(({ value, text }, i) => (

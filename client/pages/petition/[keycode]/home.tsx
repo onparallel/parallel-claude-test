@@ -108,8 +108,8 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
         state.status === "ALL"
           ? null
           : status === "PENDING"
-          ? ["PENDING"]
-          : ["COMPLETED", "CLOSED"],
+            ? ["PENDING"]
+            : ["COMPLETED", "CLOSED"],
     },
   });
   const {
@@ -671,8 +671,8 @@ RecipientPortal.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
             state.status === "ALL"
               ? null
               : state.status === "PENDING"
-              ? ["PENDING"]
-              : ["COMPLETED", "CLOSED"],
+                ? ["PENDING"]
+                : ["COMPLETED", "CLOSED"],
         },
       }),
     ]);

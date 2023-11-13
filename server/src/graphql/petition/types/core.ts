@@ -1008,13 +1008,13 @@ export const PetitionFieldReply = objectType({
                 ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
               }
             : root.anonymized_at
-            ? {}
-            : {
-                ...(root.type === "ES_TAX_DOCUMENTS"
-                  ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
-                    { request: root.content.request, error: root.content.error }
-                  : {}),
-              };
+              ? {}
+              : {
+                  ...(root.type === "ES_TAX_DOCUMENTS"
+                    ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
+                      { request: root.content.request, error: root.content.error }
+                    : {}),
+                };
         } else {
           return root.content ?? {};
         }

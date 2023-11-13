@@ -17,8 +17,11 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       const hasAccess = isDefined(this.task.user_id)
         ? await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [petitionId])
         : isDefined(this.task.petition_access_id)
-        ? this.ctx.petitions.recipientHasAccessToPetition(this.task.petition_access_id, petitionId)
-        : false;
+          ? this.ctx.petitions.recipientHasAccessToPetition(
+              this.task.petition_access_id,
+              petitionId,
+            )
+          : false;
       if (!hasAccess) {
         throw new Error(
           `${

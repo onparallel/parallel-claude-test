@@ -167,11 +167,11 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
             request.model.type === "CARP_CIUD_CERT_CATASTRO"
               ? null
               : documents.json.length === 1
-              ? await this.ctx.bankflip.fetchJsonDocumentContents(
-                  metadata.orgId,
-                  documents.json[0].id,
-                )
-              : null,
+                ? await this.ctx.bankflip.fetchJsonDocumentContents(
+                    metadata.orgId,
+                    documents.json[0].id,
+                  )
+                : null,
         });
       }
       return results;

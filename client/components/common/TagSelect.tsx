@@ -478,12 +478,12 @@ function useGetTagValues<IsMulti extends boolean = false>(
       value === null
         ? null
         : needsLoading
-        ? // value is string | string[]
-          unMaybeArray(value as any).join(",")
-        : // value is TagSelection[]
-          unMaybeArray(value as any)
-            .map((x) => x.id)
-            .join(","),
+          ? // value is string | string[]
+            unMaybeArray(value as any).join(",")
+          : // value is TagSelection[]
+            unMaybeArray(value as any)
+              .map((x) => x.id)
+              .join(","),
       ...deps,
     ],
     isMulti ? [] : null,

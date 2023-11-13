@@ -94,11 +94,11 @@ export function DateRangePickerButton({
       {isDefined(currentActiveRange)
         ? currentActiveRange.text
         : isDefined(_value)
-        ? _value.map((date) => intl.formatDate(date, FORMATS.ll)).join(" - ")
-        : intl.formatMessage({
-            id: "component.date-range-picker-button.default-text",
-            defaultMessage: "All time",
-          })}
+          ? _value.map((date) => intl.formatDate(date, FORMATS.ll)).join(" - ")
+          : intl.formatMessage({
+              id: "component.date-range-picker-button.default-text",
+              defaultMessage: "All time",
+            })}
     </Button>
   );
 

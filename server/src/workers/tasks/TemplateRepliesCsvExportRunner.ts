@@ -127,10 +127,10 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           row[columnId] = !isFileTypeField(field.type)
             ? replies.map((r) => replyContent({ ...r, type: field.type })).join("; ")
             : replies.length > 0
-            ? replies.length === 1
-              ? "1 file"
-              : replies.length + " files"
-            : "";
+              ? replies.length === 1
+                ? "1 file"
+                : replies.length + " files"
+              : "";
         }
 
         for (const field of aliasedPetitionFields) {

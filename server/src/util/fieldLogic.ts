@@ -249,8 +249,8 @@ function evaluatePredicate(
       typeof value === "string"
         ? value.toLowerCase()
         : Array.isArray(value)
-        ? value.map((v) => v.toLowerCase())
-        : value;
+          ? value.map((v) => v.toLowerCase())
+          : value;
 
     if (_reply === null || _value === null) return false;
     switch (operator) {

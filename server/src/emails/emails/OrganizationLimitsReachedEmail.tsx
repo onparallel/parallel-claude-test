@@ -37,27 +37,28 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
           defaultMessage: "You have reached your plan's parallels limit",
         })
       : signatureTotalCreditsUsed
-      ? intl.formatMessage({
-          id: "organization-limits-reached.signaturit-shared-apikey.last-credit-used.subject",
-          defaultMessage: "You have reached your plan's signatures limit",
-        })
-      : petitionSendFewCreditsRemaining
-      ? intl.formatMessage(
-          {
-            id: "organization-limits-reached.parallel-send.few-credits-remaining.subject",
-            defaultMessage: "Alert: You have used {value, number, percent} of your parallels",
-          },
-          { value },
-        )
-      : signatureFewCreditsRemaining
-      ? intl.formatMessage(
-          {
-            id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.subject",
-            defaultMessage: "Alert: You have used {value, number, percent} of your signatures",
-          },
-          { value },
-        )
-      : (null as never);
+        ? intl.formatMessage({
+            id: "organization-limits-reached.signaturit-shared-apikey.last-credit-used.subject",
+            defaultMessage: "You have reached your plan's signatures limit",
+          })
+        : petitionSendFewCreditsRemaining
+          ? intl.formatMessage(
+              {
+                id: "organization-limits-reached.parallel-send.few-credits-remaining.subject",
+                defaultMessage: "Alert: You have used {value, number, percent} of your parallels",
+              },
+              { value },
+            )
+          : signatureFewCreditsRemaining
+            ? intl.formatMessage(
+                {
+                  id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.subject",
+                  defaultMessage:
+                    "Alert: You have used {value, number, percent} of your signatures",
+                },
+                { value },
+              )
+            : (null as never);
   },
   text(
     { senderName, used, total, limitName, orgName }: OrganizationLimitsReachedEmailProps,
@@ -93,7 +94,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
         ${closing({}, intl)}
       `
       : signatureTotalCreditsUsed
-      ? outdent`
+        ? outdent`
         ${greetingUser({ name: senderName }, intl)}
 
         ${intl.formatMessage(
@@ -116,8 +117,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
       
         ${closing({}, intl)}
       `
-      : petitionSendFewCreditsRemaining
-      ? outdent`
+        : petitionSendFewCreditsRemaining
+          ? outdent`
         ${greetingUser({ name: senderName }, intl)}
 
         ${intl.formatMessage(
@@ -153,8 +154,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
         
         ${closing({}, intl)}
       `
-      : signatureFewCreditsRemaining
-      ? outdent`
+          : signatureFewCreditsRemaining
+            ? outdent`
         ${greetingUser({ name: senderName }, intl)}
 
         ${intl.formatMessage(
@@ -189,7 +190,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
         )}
 
       `
-      : (null as never);
+            : (null as never);
   },
   html({
     limitName,

@@ -38,8 +38,8 @@ function UpdateProfileTypeFieldDialog({
       f.isExpirable && f.expiryAlertAheadTime === null
         ? "DO_NOT_REMEMBER"
         : f.expiryAlertAheadTime
-        ? durationToExpiration(f.expiryAlertAheadTime)
-        : null,
+          ? durationToExpiration(f.expiryAlertAheadTime)
+          : null,
     ),
   );
 
@@ -57,8 +57,8 @@ function UpdateProfileTypeFieldDialog({
       isExpirable: fields.every((f) => f.isExpirable)
         ? true
         : fields.some((f) => f.isExpirable)
-        ? null
-        : false,
+          ? null
+          : false,
       expiryAlertAheadTime:
         uniqueExpiryAlertAheadTimes.length === 1 ? uniqueExpiryAlertAheadTimes[0] : undefined,
     },

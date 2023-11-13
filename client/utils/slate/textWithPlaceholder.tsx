@@ -75,8 +75,8 @@ export function slateNodesToTextWithPlaceholders(
           e.type === ELEMENT_PLACEHOLDER && placeholders.some((p) => p.key === e.placeholder)
             ? `{{ ${e.placeholder} }}`
             : "text" in e
-            ? (e.text as string).replaceAll("{", "\\{")
-            : "",
+              ? (e.text as string).replaceAll("{", "\\{")
+              : "",
         )
         .join(""),
     )

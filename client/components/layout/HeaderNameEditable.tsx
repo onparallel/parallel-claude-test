@@ -133,10 +133,10 @@ export const HeaderNameEditable = Object.assign(
                             state === "SAVING"
                               ? "gray.500"
                               : state === "SAVED"
-                              ? "green.500"
-                              : state === "ERROR"
-                              ? "red.500"
-                              : undefined
+                                ? "green.500"
+                                : state === "ERROR"
+                                  ? "red.500"
+                                  : undefined
                           }
                           fontSize="xs"
                           cursor="default"

@@ -150,12 +150,12 @@ export const UserSelect = Object.assign(
       value === null
         ? null
         : needsLoading
-        ? // value is string | string[]
-          unMaybeArray(value as any).join(",")
-        : // value is UserSelection | UserSelection[]
-          unMaybeArray(value as any)
-            .map((x) => x.id)
-            .join(","),
+          ? // value is string | string[]
+            unMaybeArray(value as any).join(",")
+          : // value is UserSelection | UserSelection[]
+            unMaybeArray(value as any)
+              .map((x) => x.id)
+              .join(","),
     ]);
     const intl = useIntl();
     const placeholder = useMemo(() => {
@@ -167,21 +167,21 @@ export const UserSelect = Object.assign(
               defaultMessage: "Select users or teams from your organization",
             })
           : isMulti && !includeGroups
-          ? intl.formatMessage({
-              id: "component.user-select.placeholder-multi-without-groups",
-              defaultMessage: "Select users from your organization",
-            })
-          : !isMulti && includeGroups
-          ? intl.formatMessage({
-              id: "component.user-select.placeholder-single-with-groups",
-              defaultMessage: "Select a user or team from your organization",
-            })
-          : !isMulti && !includeGroups
-          ? intl.formatMessage({
-              id: "component.user-select.placeholder-single-without-groups",
-              defaultMessage: "Select a user from your organization",
-            })
-          : (null as never))
+            ? intl.formatMessage({
+                id: "component.user-select.placeholder-multi-without-groups",
+                defaultMessage: "Select users from your organization",
+              })
+            : !isMulti && includeGroups
+              ? intl.formatMessage({
+                  id: "component.user-select.placeholder-single-with-groups",
+                  defaultMessage: "Select a user or team from your organization",
+                })
+              : !isMulti && !includeGroups
+                ? intl.formatMessage({
+                    id: "component.user-select.placeholder-single-without-groups",
+                    defaultMessage: "Select a user from your organization",
+                  })
+                : (null as never))
       );
     }, [_placeholder, isMulti, includeGroups]);
 
@@ -393,13 +393,13 @@ function Option({ children, ...props }: OptionProps<UserSelectSelection<boolean>
               "data-email": props.data.email,
             }
           : props.data.__typename === "UserGroup"
-          ? {
-              "data-option-type": "UserGroup",
-              "data-user-group-id": props.data.id,
-              "data-all-users-group": props.data.type === "ALL_USERS",
-              "data-name": userGroupReferenceText(props.data, intl.locale as UserLocale),
-            }
-          : {}),
+            ? {
+                "data-option-type": "UserGroup",
+                "data-user-group-id": props.data.id,
+                "data-all-users-group": props.data.type === "ALL_USERS",
+                "data-name": userGroupReferenceText(props.data, intl.locale as UserLocale),
+              }
+            : {}),
       }}
     >
       <UserSelectOption

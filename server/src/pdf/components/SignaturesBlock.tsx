@@ -56,95 +56,95 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
             },
           ]
         : templateId === "EAwW2jXkP4C9LbfNRp"
-        ? [
-            {
-              fullName: "TIKO",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/sello-tiko.png",
-              date,
-            },
-          ]
-        : ["zas25KHxAByKWUgG8U2", "zas25KHxAByKWUhxeC6"].includes(templateId)
-        ? [
-            {
-              fullName: "Marta Blanco Maseda",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/marta-blanco-maseda-imasd.png",
-              date,
-            },
-          ]
-        : [
-            "zas25KHxAByKWmEFbpV",
-            "zas25KHxAByKWmEFbpU",
-            "zas25KHxAByKWmEFbpT",
-            "zas25KHxAByKWmM6rrm",
-          ].includes(templateId)
-        ? [
-            {
-              fullName: "Carlos Guerrero Martín",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/carlos-guerrero-martin-debify.png",
-              date,
-            },
-          ]
-        : [
-            "zas25KHxAByKWmFx9gf",
-            "zas25KHxAByKWmHefVF",
-            "zas25KHxAByKWmHefVH",
-            "zas25KHxAByKWmHefVK",
-            "zas25KHxAByKWmHefZj",
-            "zas25KHxAByKWmHefZm",
-            "zas25KHxAByKWmHguoJ",
-            "zas25KHxAByKWmHgusw",
-            "zas25KHxAByKWmHguxV",
-            "zas25KHxAByKX3mJq5E",
-            "zas25KHxAByKX3usjzq",
-            "zas25KHxAByKXKL5aMA",
-            "zas25KHxAByKXKJPAzn",
-            "zas25KHxAByKXBVeaGh",
-          ].includes(templateId)
-        ? [
-            {
-              fullName: "Jorge Arturo Cáceres Quezada",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/jorge-arturo-caceres-rive.png",
-              date,
-            },
-          ]
-        : ["zas25KHxAByKWmKNDXb", "zas25KHxAByKWmKRZgb"].includes(templateId)
-        ? [
-            {
-              fullName: "Dña Ana Ortiz Canela",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/ana-ortiz-canela-gesdocument.png",
-              date,
-            },
-          ]
-        : ["zas25KHxAByKWu4g76M"].includes(templateId)
-        ? [
-            {
-              fullName: "Fernando López Clemente",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/fernando-lopez-clemente-anticipa.png",
-              date,
-            },
-          ]
-        : ["zas25KHxAByKXKJNo2z"].includes(templateId)
-        ? [
-            {
-              fullName: "D. Álvaro Gámez Serracarbassa",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/alvaro-gamez-serracarbassa-broseta.png",
-              date,
-            },
-            {
-              fullName: "D. Claudio Aguiló Casanova",
-              signatureImageUrl:
-                "https://static.onparallel.com/static/images/signatures/claudio-aguilo-casanova-broseta.png",
-              date,
-            },
-          ]
-        : []
+          ? [
+              {
+                fullName: "TIKO",
+                signatureImageUrl:
+                  "https://static.onparallel.com/static/images/signatures/sello-tiko.png",
+                date,
+              },
+            ]
+          : ["zas25KHxAByKWUgG8U2", "zas25KHxAByKWUhxeC6"].includes(templateId)
+            ? [
+                {
+                  fullName: "Marta Blanco Maseda",
+                  signatureImageUrl:
+                    "https://static.onparallel.com/static/images/signatures/marta-blanco-maseda-imasd.png",
+                  date,
+                },
+              ]
+            : [
+                  "zas25KHxAByKWmEFbpV",
+                  "zas25KHxAByKWmEFbpU",
+                  "zas25KHxAByKWmEFbpT",
+                  "zas25KHxAByKWmM6rrm",
+                ].includes(templateId)
+              ? [
+                  {
+                    fullName: "Carlos Guerrero Martín",
+                    signatureImageUrl:
+                      "https://static.onparallel.com/static/images/signatures/carlos-guerrero-martin-debify.png",
+                    date,
+                  },
+                ]
+              : [
+                    "zas25KHxAByKWmFx9gf",
+                    "zas25KHxAByKWmHefVF",
+                    "zas25KHxAByKWmHefVH",
+                    "zas25KHxAByKWmHefVK",
+                    "zas25KHxAByKWmHefZj",
+                    "zas25KHxAByKWmHefZm",
+                    "zas25KHxAByKWmHguoJ",
+                    "zas25KHxAByKWmHgusw",
+                    "zas25KHxAByKWmHguxV",
+                    "zas25KHxAByKX3mJq5E",
+                    "zas25KHxAByKX3usjzq",
+                    "zas25KHxAByKXKL5aMA",
+                    "zas25KHxAByKXKJPAzn",
+                    "zas25KHxAByKXBVeaGh",
+                  ].includes(templateId)
+                ? [
+                    {
+                      fullName: "Jorge Arturo Cáceres Quezada",
+                      signatureImageUrl:
+                        "https://static.onparallel.com/static/images/signatures/jorge-arturo-caceres-rive.png",
+                      date,
+                    },
+                  ]
+                : ["zas25KHxAByKWmKNDXb", "zas25KHxAByKWmKRZgb"].includes(templateId)
+                  ? [
+                      {
+                        fullName: "Dña Ana Ortiz Canela",
+                        signatureImageUrl:
+                          "https://static.onparallel.com/static/images/signatures/ana-ortiz-canela-gesdocument.png",
+                        date,
+                      },
+                    ]
+                  : ["zas25KHxAByKWu4g76M"].includes(templateId)
+                    ? [
+                        {
+                          fullName: "Fernando López Clemente",
+                          signatureImageUrl:
+                            "https://static.onparallel.com/static/images/signatures/fernando-lopez-clemente-anticipa.png",
+                          date,
+                        },
+                      ]
+                    : ["zas25KHxAByKXKJNo2z"].includes(templateId)
+                      ? [
+                          {
+                            fullName: "D. Álvaro Gámez Serracarbassa",
+                            signatureImageUrl:
+                              "https://static.onparallel.com/static/images/signatures/alvaro-gamez-serracarbassa-broseta.png",
+                            date,
+                          },
+                          {
+                            fullName: "D. Claudio Aguiló Casanova",
+                            signatureImageUrl:
+                              "https://static.onparallel.com/static/images/signatures/claudio-aguilo-casanova-broseta.png",
+                            date,
+                          },
+                        ]
+                      : []
       : []),
     ...signatureConfig.signers!.map((signer, i) => ({
       wordAnchor: `3cb39pzCQA9wJ${i}`,

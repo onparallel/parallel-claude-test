@@ -183,8 +183,8 @@ export function TemplateDetailsModal({
                       p.__typename === "PetitionUserPermission"
                         ? p.user
                         : p.__typename === "PetitionUserGroupPermission"
-                        ? p.group
-                        : (null as never),
+                          ? p.group
+                          : (null as never),
                     )}
                   />
                 </HStack>

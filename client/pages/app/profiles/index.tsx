@@ -224,8 +224,8 @@ function Profiles() {
     )
       ? true
       : selectedRows.every((row) => row.subscribers.every((s) => s.user.id !== me!.id))
-      ? false
-      : undefined;
+        ? false
+        : undefined;
     try {
       await showSubscribersDialog({
         me,
@@ -234,8 +234,8 @@ function Profiles() {
           selectedRows.length === 1
             ? selectedRows[0].subscribers.map((s) => s.user)
             : isSubscribed
-            ? [me]
-            : ([] as any),
+              ? [me]
+              : ([] as any),
         isSubscribed,
       });
     } catch {}
@@ -316,11 +316,11 @@ function Profiles() {
                       defaultMessage: "Multiple types",
                     })
                   : isDefined(profileType)
-                  ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
-                  : intl.formatMessage({
-                      id: "page.profiles.all-profiles",
-                      defaultMessage: "All profiles",
-                    })}
+                    ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
+                    : intl.formatMessage({
+                        id: "page.profiles.all-profiles",
+                        defaultMessage: "All profiles",
+                      })}
               </MenuButton>
               <Portal>
                 <MenuList minWidth="180px" maxWidth="320px">

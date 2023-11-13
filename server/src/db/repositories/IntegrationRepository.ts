@@ -30,31 +30,31 @@ export type IntegrationSettings<
         SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
       } & { [key in SignaturitBrandingIdKey]?: string }
     : TProvider extends "DOCUSIGN"
-    ? {
-        CREDENTIALS: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };
-        ENVIRONMENT: "production" | "sandbox";
-      }
-    : never
+      ? {
+          CREDENTIALS: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };
+          ENVIRONMENT: "production" | "sandbox";
+        }
+      : never
   : TType extends "SSO"
-  ? {
-      EMAIL_DOMAINS: string[];
-      COGNITO_PROVIDER: string;
-    }
-  : TType extends "USER_PROVISIONING"
-  ? {
-      AUTH_KEY: string;
-    }
-  : TType extends "DOW_JONES_KYC"
-  ? {
-      CREDENTIALS: {
-        ACCESS_TOKEN: string;
-        REFRESH_TOKEN: string;
-        CLIENT_ID: string;
-        USERNAME: string;
-        PASSWORD: string;
-      };
-    }
-  : never;
+    ? {
+        EMAIL_DOMAINS: string[];
+        COGNITO_PROVIDER: string;
+      }
+    : TType extends "USER_PROVISIONING"
+      ? {
+          AUTH_KEY: string;
+        }
+      : TType extends "DOW_JONES_KYC"
+        ? {
+            CREDENTIALS: {
+              ACCESS_TOKEN: string;
+              REFRESH_TOKEN: string;
+              CLIENT_ID: string;
+              USERNAME: string;
+              PASSWORD: string;
+            };
+          }
+        : never;
 
 export type IntegrationCredentials<
   TType extends IntegrationType,

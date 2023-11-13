@@ -428,8 +428,8 @@ function Petitions() {
         r.__typename === "PetitionFolder"
           ? r.minimumPermissionType
           : r.__typename === "Petition" || r.__typename === "PetitionTemplate"
-          ? r.myEffectivePermission!.permissionType
-          : (null as never),
+            ? r.myEffectivePermission!.permissionType
+            : (null as never),
       ),
       maxBy((p) => ["OWNER", "WRITE", "READ"].indexOf(p)),
     )!;

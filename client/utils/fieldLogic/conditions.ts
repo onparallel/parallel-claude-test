@@ -21,12 +21,12 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
     operator: isOnlyHasReplies
       ? "GREATER_THAN"
       : field.type === "CHECKBOX"
-      ? "CONTAIN"
-      : field.type === "NUMBER"
-      ? "GREATER_THAN"
-      : field.type === "DATE" || field.type === "DATE_TIME"
-      ? "LESS_THAN"
-      : "EQUAL",
+        ? "CONTAIN"
+        : field.type === "NUMBER"
+          ? "GREATER_THAN"
+          : field.type === "DATE" || field.type === "DATE_TIME"
+            ? "LESS_THAN"
+            : "EQUAL",
     value: defaultFieldConditionValue(field, column),
     column,
   };

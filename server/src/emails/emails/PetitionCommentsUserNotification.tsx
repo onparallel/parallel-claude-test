@@ -87,22 +87,22 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
              { count: commentCount, petitionName },
            )
          : onlyMentions
-         ? intl.formatMessage(
-             {
-               id: "petition-comments-user-notification.intro-text.mentions",
-               defaultMessage:
-                 "You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
-             },
-             { count: mentionCount, petitionName },
-           )
-         : intl.formatMessage(
-             {
-               id: "petition-comments-user-notification.intro-text",
-               defaultMessage:
-                 "You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
-             },
-             { commentCount, mentionCount, petitionName },
-           )
+           ? intl.formatMessage(
+               {
+                 id: "petition-comments-user-notification.intro-text.mentions",
+                 defaultMessage:
+                   "You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
+               },
+               { count: mentionCount, petitionName },
+             )
+           : intl.formatMessage(
+               {
+                 id: "petition-comments-user-notification.intro-text",
+                 defaultMessage:
+                   "You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
+               },
+               { commentCount, mentionCount, petitionName },
+             )
      }
 
       ${intl.formatMessage({

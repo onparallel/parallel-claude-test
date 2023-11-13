@@ -61,8 +61,8 @@ export type PaginationFieldConfig<
   sortableBy?: ItemType extends ObjectOrInterfaceNames
     ? KeysOfType<core.GetGen2<"fieldTypes", ItemType>, SortableFieldTypes>[]
     : ItemType extends ObjectOrInterfaceTypeDef<infer TypeName>
-    ? KeysOfType<core.GetGen2<"fieldTypes", TypeName>, SortableFieldTypes>[]
-    : never;
+      ? KeysOfType<core.GetGen2<"fieldTypes", TypeName>, SortableFieldTypes>[]
+      : never;
   /**
    * Additional args to use for just this field
    */
@@ -221,8 +221,8 @@ export function paginationPlugin() {
                 typeof fieldConfig.extendArgs === "function"
                   ? fieldConfig.extendArgs(args)
                   : typeof fieldConfig.extendArgs === "object"
-                  ? { ...args, ...(fieldConfig.extendArgs ?? {}) }
-                  : args,
+                    ? { ...args, ...(fieldConfig.extendArgs ?? {}) }
+                    : args,
               type: paginationName as any,
               resolve(root, args, ctx, info) {
                 return fieldConfig.resolve(root, args, ctx, info);

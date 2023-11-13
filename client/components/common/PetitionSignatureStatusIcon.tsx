@@ -47,8 +47,8 @@ export function PetitionSignatureStatusIcon({
             ? "gray.800"
             : "yellow.600"
           : environment === "PRODUCTION"
-          ? "gray.300"
-          : "#DBBC8E",
+            ? "gray.300"
+            : "#DBBC8E",
     }),
     [environment, status],
   );

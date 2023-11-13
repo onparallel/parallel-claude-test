@@ -61,14 +61,14 @@ export const DowJonesRiskLabel = chakraForwardRef<"span", { risk: string }>(
             risk === "PEP"
               ? "green"
               : risk === "RCA"
-              ? "blue"
-              : /^SAN(-?|$)/.test(risk)
-              ? "red"
-              : /^OOL(-?|$)/.test(risk)
-              ? "orange"
-              : /^SI(-?|$)/.test(risk)
-              ? "yellow"
-              : undefined
+                ? "blue"
+                : /^SAN(-?|$)/.test(risk)
+                  ? "red"
+                  : /^OOL(-?|$)/.test(risk)
+                    ? "orange"
+                    : /^SI(-?|$)/.test(risk)
+                      ? "yellow"
+                      : undefined
           }
           {...props}
         >

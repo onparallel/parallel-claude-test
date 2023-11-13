@@ -132,8 +132,8 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                   status: skipEmailSend
                     ? "PROCESSED"
                     : isDefined(scheduledAt)
-                    ? "SCHEDULED"
-                    : "PROCESSING",
+                      ? "SCHEDULED"
+                      : "PROCESSING",
                   email_subject: emailSubject,
                   email_body: emailBody,
                 })),

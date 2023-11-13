@@ -142,15 +142,15 @@ async function startSignatureProcess(
       ].includes(error.message)
         ? error.message
         : error instanceof InvalidCredentialsError &&
-          [
-            "CONSENT_REQUIRED", // docusign app needs user consent
-            "ACCOUNT_SUSPENDED", // docusign user account has been suspended and can't be used on a production environment
-            "INVALID_CREDENTIALS", // signaturit apikey is invalid
-          ].includes(error.code)
-        ? error.code
-        : error instanceof SignaturitRequestError
-        ? error.code
-        : "UNKNOWN_ERROR";
+            [
+              "CONSENT_REQUIRED", // docusign app needs user consent
+              "ACCOUNT_SUSPENDED", // docusign user account has been suspended and can't be used on a production environment
+              "INVALID_CREDENTIALS", // signaturit apikey is invalid
+            ].includes(error.code)
+          ? error.code
+          : error instanceof SignaturitRequestError
+            ? error.code
+            : "UNKNOWN_ERROR";
 
     await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
       cancel_reason: "REQUEST_ERROR",

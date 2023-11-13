@@ -336,8 +336,8 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
               p.__typename === "PetitionUserPermission"
                 ? p.user
                 : p.__typename === "PetitionUserGroupPermission"
-                ? p.group
-                : (null as never),
+                  ? p.group
+                  : (null as never),
             )}
           />
         </Flex>
@@ -608,8 +608,8 @@ export const TEMPLATES_COLUMNS = (
               p.__typename === "PetitionUserPermission"
                 ? p.user
                 : p.__typename === "PetitionUserGroupPermission"
-                ? p.group
-                : (null as never),
+                  ? p.group
+                  : (null as never),
             )}
           />
         </Flex>

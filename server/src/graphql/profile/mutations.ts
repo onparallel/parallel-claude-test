@@ -677,11 +677,11 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
           ? // priorize expiryDate argument if set
             field.expiryDate
           : // else, check option useReplyAsExpiryDate for DATE replies
-          profileTypeField.type === "DATE" &&
-            profileTypeField.options.useReplyAsExpiryDate &&
-            isDefined(field.content?.value)
-          ? (field.content!.value as string)
-          : null,
+            profileTypeField.type === "DATE" &&
+              profileTypeField.options.useReplyAsExpiryDate &&
+              isDefined(field.content?.value)
+            ? (field.content!.value as string)
+            : null,
       };
     });
 

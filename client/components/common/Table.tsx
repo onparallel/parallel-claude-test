@@ -493,8 +493,8 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           backgroundColor: isSelected
             ? colors.rowSelected
             : isHighlightable
-            ? colors.rowHover
-            : colors.row,
+              ? colors.rowHover
+              : colors.row,
         }}
         cursor={onRowClick ? "pointer" : "default"}
         borderTop="1px solid"

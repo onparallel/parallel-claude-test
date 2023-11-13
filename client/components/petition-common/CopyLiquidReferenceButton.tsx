@@ -47,17 +47,17 @@ export const CopyLiquidReferenceButton = Object.assign(
               field.type === "FIELD_GROUP"
                 ? `{{ ${alias}.size }}`
                 : (field.type === "CHECKBOX" &&
-                    (field.options.limit.type === "UNLIMITED" || field.options.limit.max > 1)) ||
-                  field.multiple ||
-                  isDefined(field.parent)
-                ? [
-                    `{% for ${loopVariable} in ${alias} -%}`,
-                    `- {{ ${loopVariable}${defaultFilter} }}`,
-                    `{% endfor %}`,
-                  ].join("\n")
-                : field.type === "CHECKBOX"
-                ? `{{ ${alias}[0] }}`
-                : `{{ ${alias}${defaultFilter} }}`;
+                      (field.options.limit.type === "UNLIMITED" || field.options.limit.max > 1)) ||
+                    field.multiple ||
+                    isDefined(field.parent)
+                  ? [
+                      `{% for ${loopVariable} in ${alias} -%}`,
+                      `- {{ ${loopVariable}${defaultFilter} }}`,
+                      `{% endfor %}`,
+                    ].join("\n")
+                  : field.type === "CHECKBOX"
+                    ? `{{ ${alias}[0] }}`
+                    : `{{ ${alias}${defaultFilter} }}`;
             copyFormula({ value });
           } catch {}
         }}

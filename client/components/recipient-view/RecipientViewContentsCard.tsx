@@ -260,12 +260,12 @@ export const RecipientViewContentsCard = Object.assign(
                                         color: replies.some((r) => r.status === "REJECTED")
                                           ? "red.600"
                                           : completedFieldReplies(
-                                              field,
-                                              usePreviewReplies,
-                                              fieldLogic,
-                                            ).length !== 0
-                                          ? "gray.400"
-                                          : "inherit",
+                                                field,
+                                                usePreviewReplies,
+                                                fieldLogic,
+                                              ).length !== 0
+                                            ? "gray.400"
+                                            : "inherit",
                                       }
                                     : {
                                         color: replies.some((r) => r.status === "REJECTED")

@@ -166,8 +166,8 @@ export function createPlaceholderPlugin<
         return Array.isArray(node)
           ? filterNodes(node).map((n) => visitNodes(n) as Node)
           : "children" in node
-          ? { ...node, children: filterNodes(node.children).map((n) => visitNodes(n) as Node) }
-          : node;
+            ? { ...node, children: filterNodes(node.children).map((n) => visitNodes(n) as Node) }
+            : node;
       }
       return editor;
     },
@@ -335,14 +335,14 @@ function PlaceholderElement({
               color: "gray.800",
             }
           : hasNoReplies
-          ? {
-              backgroundColor: "yellow.200",
-              color: "yellow.800",
-            }
-          : {
-              backgroundColor: "blue.100",
-              color: "blue.800",
-            })}
+            ? {
+                backgroundColor: "yellow.200",
+                color: "yellow.800",
+              }
+            : {
+                backgroundColor: "blue.100",
+                color: "blue.800",
+              })}
         whiteSpace="nowrap"
         fontWeight="semibold"
         borderRadius="sm"

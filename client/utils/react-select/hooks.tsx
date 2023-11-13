@@ -157,8 +157,8 @@ export function useReactSelectProps<
           boxShadow: isInvalid
             ? `0 0 0 1px ${error}`
             : isFocused
-            ? `0 0 0 1px ${borderColor}`
-            : undefined,
+              ? `0 0 0 1px ${borderColor}`
+              : undefined,
           pointerEvents: isDisabled || isReadOnly ? "none" : undefined,
           fontSize: fontSize,
           "&:hover": {

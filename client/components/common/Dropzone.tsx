@@ -74,8 +74,8 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(func
             ? "red.500"
             : "gray.600"
           : isInvalid
-          ? "red.500"
-          : "gray.500"
+            ? "red.500"
+            : "gray.500"
       }
       border="2px dashed"
       borderRadius="md"
@@ -85,8 +85,8 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(func
             ? "red.500"
             : "gray.400"
           : isInvalid
-          ? "red.500"
-          : "gray.200"
+            ? "red.500"
+            : "gray.200"
       }
       padding={4}
       {...(inputProps.disabled

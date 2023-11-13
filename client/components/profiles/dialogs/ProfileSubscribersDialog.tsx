@@ -66,8 +66,8 @@ function ProfileSubscribersDialog({
     profileIds.length > 1
       ? [me]
       : isSubscribed
-      ? users.sort((u) => (u.id === me.id ? -1 : 1))
-      : [me, ...users];
+        ? users.sort((u) => (u.id === me.id ? -1 : 1))
+        : [me, ...users];
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(

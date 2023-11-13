@@ -197,8 +197,8 @@ export async function seed(knex: Knex): Promise<any> {
     ].includes(usersData.find((ud) => ud.id === u.user_data_id)!.email)
       ? "ADMIN"
       : u.is_org_owner
-      ? "OWNER"
-      : "NORMAL",
+        ? "OWNER"
+        : "NORMAL",
   }));
 
   const orgUsers = orgIds.map((id) => [id, users.filter((u) => u.org_id === id)] as const);

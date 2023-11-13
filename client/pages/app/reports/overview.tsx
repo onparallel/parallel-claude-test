@@ -919,15 +919,15 @@ function useDownloadOverviewExcel() {
                     { count: row.template_count ?? 0 },
                   )
                 : row.aggregation_type === "NO_TEMPLATE"
-                ? intl.formatMessage({
-                    id: "page.reports-overview.parallels-no-template",
-                    defaultMessage: "Parallels without a template",
-                  })
-                : row.template_name ||
-                  intl.formatMessage({
-                    id: "generic.unnamed-template",
-                    defaultMessage: "Unnamed template",
-                  }),
+                  ? intl.formatMessage({
+                      id: "page.reports-overview.parallels-no-template",
+                      defaultMessage: "Parallels without a template",
+                    })
+                  : row.template_name ||
+                    intl.formatMessage({
+                      id: "generic.unnamed-template",
+                      defaultMessage: "Unnamed template",
+                    }),
             total: row.status.all,
             completed: row.status.completed,
             signed: row.status.signed,

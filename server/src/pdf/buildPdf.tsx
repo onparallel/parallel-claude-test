@@ -50,8 +50,8 @@ async function createHyphenationCallback(locale: ContactLocale) {
     locale === "en"
       ? await import("hyphen/patterns/en-us")
       : locale === "es"
-      ? await import("hyphen/patterns/es")
-      : (null as never);
+        ? await import("hyphen/patterns/es")
+        : (null as never);
   const SOFT_HYPHEN = "\u00ad";
   const hyphenator = hyphen(pattern);
   const splitHyphen = (word: string) => word.split(SOFT_HYPHEN);

@@ -76,8 +76,8 @@ export function PetitionFieldLogicConditionSubjectSelect({
         o.type === "FIELD"
           ? o.field.id === condition.fieldId && condition.column === undefined
           : o.type === "DYNAMIC_SELECT_OPTION"
-          ? o.field.id === condition.fieldId && o.columnIndex === condition.column
-          : never(),
+            ? o.field.id === condition.fieldId && o.columnIndex === condition.column
+            : never(),
       ) ?? null;
 
     return {
@@ -208,8 +208,8 @@ const getOptionValue = (option: ConditionSubjectSelectOption) => {
   return option.type === "FIELD"
     ? `${option.type}:${option.field.id}`
     : option.type === "DYNAMIC_SELECT_OPTION"
-    ? `${option.type}:${option.field.id}-${option.column}`
-    : never();
+      ? `${option.type}:${option.field.id}-${option.column}`
+      : never();
 };
 
 const getOptionLabel = (option: ConditionSubjectSelectOption) => {

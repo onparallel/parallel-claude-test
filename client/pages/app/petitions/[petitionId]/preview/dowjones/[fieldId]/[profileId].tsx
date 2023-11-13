@@ -509,8 +509,8 @@ function ProfileResultPerson({
             {year && month && day
               ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
               : year
-              ? year
-              : "-"}
+                ? year
+                : "-"}
           </Text>
         </HStack>
       </Stack>
@@ -579,8 +579,8 @@ function ProfileResultEntity({
             {year && month && day
               ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
               : year
-              ? year
-              : "-"}
+                ? year
+                : "-"}
           </Text>
         </HStack>
       </Stack>
@@ -617,8 +617,8 @@ function useDowJonesKycSanctionsColumns() {
               {year && month && day
                 ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
                 : year
-                ? year
-                : "-"}
+                  ? year
+                  : "-"}
             </>
           );
         },

@@ -571,13 +571,13 @@ export const PublicPetitionFieldReply = objectType({
                 uploadComplete: file.upload_complete,
               }
             : root.anonymized_at
-            ? {}
-            : {
-                ...(root.type === "ES_TAX_DOCUMENTS"
-                  ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
-                    { request: root.content.request, error: root.content.error }
-                  : {}),
-              };
+              ? {}
+              : {
+                  ...(root.type === "ES_TAX_DOCUMENTS"
+                    ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
+                      { request: root.content.request, error: root.content.error }
+                    : {}),
+                };
         } else {
           return root.content ?? {};
         }

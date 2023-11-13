@@ -31,8 +31,8 @@ export function ScheduleMessageDialog({ ...props }: DialogProps<{}, Date>) {
         return isWeekend(today)
           ? parse(hours, "HH:mm", nextMonday)
           : isFuture(parse(hours, "HH:mm", today))
-          ? parse(hours, "HH:mm", today)
-          : parse(hours, "HH:mm", tomorrowOrNextMonday);
+            ? parse(hours, "HH:mm", today)
+            : parse(hours, "HH:mm", tomorrowOrNextMonday);
       }),
     [date],
   );

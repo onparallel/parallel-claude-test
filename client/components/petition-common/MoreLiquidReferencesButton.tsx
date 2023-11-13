@@ -206,13 +206,13 @@ function useLiquidReferences({
             field.type === "NUMBER"
               ? 123
               : field.type === "PHONE"
-              ? "+34612312312"
-              : field.type === "DATE"
-              ? "2022-05-29"
-              : intl.formatMessage({
-                  id: "component.more-liquid-references-button.example-reply",
-                  defaultMessage: "Example reply",
-                });
+                ? "+34612312312"
+                : field.type === "DATE"
+                  ? "2022-05-29"
+                  : intl.formatMessage({
+                      id: "component.more-liquid-references-button.example-reply",
+                      defaultMessage: "Example reply",
+                    });
           return (alias: string) =>
             [
               `{% if ${buildAlias(alias)} == ${JSON.stringify(value)} %}`,
@@ -494,9 +494,9 @@ function defaultFielGroupChildReference(
           `{% endfor %}`,
         ].join("")
       : field.type === "CHECKBOX"
-      ? `{{ ${alias}[0] }}`
-      : field.type === "FIELD_GROUP"
-      ? `{{ ${alias}.size }}`
-      : `{{ ${alias}${defaultFilter} }}`;
+        ? `{{ ${alias}[0] }}`
+        : field.type === "FIELD_GROUP"
+          ? `{{ ${alias}.size }}`
+          : `{{ ${alias}${defaultFilter} }}`;
   return value;
 }

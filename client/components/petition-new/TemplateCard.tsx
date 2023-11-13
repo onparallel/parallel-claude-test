@@ -51,8 +51,8 @@ export const TemplateCard = Object.assign(
               p.__typename === "PetitionUserPermission"
                 ? p.user
                 : p.__typename === "PetitionUserGroupPermission"
-                ? p.group
-                : (null as never),
+                  ? p.group
+                  : (null as never),
             )}
           />
         </Flex>

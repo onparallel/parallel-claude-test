@@ -105,8 +105,8 @@ export function UpdateOrganizationUsageDetailsDialog({
   let nextPeriod: Maybe<Date> = startNewPeriod
     ? now
     : currentUsageLimit
-    ? add(new Date(currentUsageLimit.periodStartDate), currentUsageLimit.period)
-    : now;
+      ? add(new Date(currentUsageLimit.periodStartDate), currentUsageLimit.period)
+      : now;
 
   function addDuration(d1: Duration, d2: Duration) {
     const newDuration: Duration = {};
@@ -129,23 +129,23 @@ export function UpdateOrganizationUsageDetailsDialog({
     renewalCycles === 0
       ? null
       : startNewPeriod || !currentUsageLimit
-      ? add(
-          now,
-          multiplyDuration(
-            { [periodUnits as keyof Duration]: periodValue },
-            renewalCycles - (startNewPeriod ? 0 : currentUsageLimit?.cycleNumber ?? 0),
-          ),
-        )
-      : add(
-          new Date(currentUsageLimit.periodStartDate),
-          addDuration(
-            currentUsageLimit.period,
+        ? add(
+            now,
             multiplyDuration(
               { [periodUnits as keyof Duration]: periodValue },
-              renewalCycles - currentUsageLimit.cycleNumber,
+              renewalCycles - (startNewPeriod ? 0 : currentUsageLimit?.cycleNumber ?? 0),
             ),
-          ),
-        );
+          )
+        : add(
+            new Date(currentUsageLimit.periodStartDate),
+            addDuration(
+              currentUsageLimit.period,
+              multiplyDuration(
+                { [periodUnits as keyof Duration]: periodValue },
+                renewalCycles - currentUsageLimit.cycleNumber,
+              ),
+            ),
+          );
 
   if (nextPeriod.getTime() - (subscriptionEndDate?.getTime() ?? 0) === 0) {
     nextPeriod = null;

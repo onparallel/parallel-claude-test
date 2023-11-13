@@ -2613,8 +2613,8 @@ describe("GraphQL/Profiles", () => {
             f.id === profileType0Fields[0].id
               ? { content: { value: "John" }, expiryDate: null }
               : f.id === profileType0Fields[1].id
-              ? { content: { value: "Wick" }, expiryDate: null }
-              : null,
+                ? { content: { value: "Wick" }, expiryDate: null }
+                : null,
         })),
       });
 
@@ -2740,10 +2740,10 @@ describe("GraphQL/Profiles", () => {
             f.id === profileType0Fields[0].id
               ? { content: { value: "Harry" }, expiryDate: null }
               : f.id === profileType0Fields[1].id
-              ? { content: { value: "Potter" }, expiryDate: null }
-              : f.id === profileType0Fields[5].id
-              ? { content: { value: "123456" }, expiryDate: "2030-01-01" }
-              : null,
+                ? { content: { value: "Potter" }, expiryDate: null }
+                : f.id === profileType0Fields[5].id
+                  ? { content: { value: "123456" }, expiryDate: "2030-01-01" }
+                  : null,
         })),
       });
     });

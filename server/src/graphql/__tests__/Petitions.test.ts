@@ -4417,15 +4417,15 @@ describe("GraphQL/Petitions", () => {
                 allowAdditionalSigners: false,
               }
             : i === 2
-            ? {
-                orgIntegrationId: sharedSignaturitIntegration.id,
-                signersInfo: [],
-                timezone: "Europe/Madrid",
-                title: "Signature!",
-                review: false,
-                allowAdditionalSigners: false,
-              }
-            : null,
+              ? {
+                  orgIntegrationId: sharedSignaturitIntegration.id,
+                  signersInfo: [],
+                  timezone: "Europe/Madrid",
+                  title: "Signature!",
+                  review: false,
+                  allowAdditionalSigners: false,
+                }
+              : null,
       }));
     });
 

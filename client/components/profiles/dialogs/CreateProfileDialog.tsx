@@ -61,8 +61,8 @@ function CreateProfileDialog({
             field.myPermission !== "WRITE"
               ? ""
               : i < fields.length - 1
-              ? suggestions[i] ?? ""
-              : suggestions.slice(i).join(" ");
+                ? suggestions[i] ?? ""
+                : suggestions.slice(i).join(" ");
 
           return {
             profileTypeFieldId: field.id,

@@ -204,11 +204,11 @@ export const templatesQuery = queryField((t) => {
                     filters: [{ operator: "IS_OWNER", value: toGlobalId("User", userId) }],
                   }
                 : isOwner === false
-                ? {
-                    operator: "AND",
-                    filters: [{ operator: "NOT_IS_OWNER", value: toGlobalId("User", userId) }],
-                  }
-                : null,
+                  ? {
+                      operator: "AND",
+                      filters: [{ operator: "NOT_IS_OWNER", value: toGlobalId("User", userId) }],
+                    }
+                  : null,
           },
         });
       }

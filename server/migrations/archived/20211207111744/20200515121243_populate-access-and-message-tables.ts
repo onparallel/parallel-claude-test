@@ -108,8 +108,8 @@ export async function up(knex: Knex): Promise<any> {
           s.status === "SCHEDULED"
             ? "SCHEDULED"
             : s.status === "CANCELLED"
-            ? "CANCELLED"
-            : "PROCESSED",
+              ? "CANCELLED"
+              : "PROCESSED",
         ...pick(s, [
           "petition_id",
           "sender_id",

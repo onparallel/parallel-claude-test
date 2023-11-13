@@ -119,8 +119,8 @@ export function TemplateDefaultPermissionsDialog({
       ...(p.__typename === "TemplateDefaultUserPermission"
         ? { userId: p.user.id }
         : p.__typename === "TemplateDefaultUserGroupPermission"
-        ? { userGroupId: p.group.id }
-        : (null as never)),
+          ? { userGroupId: p.group.id }
+          : (null as never)),
     };
   }
 
@@ -186,8 +186,8 @@ export function TemplateDefaultPermissionsDialog({
                     ...(x.__typename === "User"
                       ? { userId: x.id }
                       : x.__typename === "UserGroup"
-                      ? { userGroupId: x.id }
-                      : (null as never)),
+                        ? { userGroupId: x.id }
+                        : (null as never)),
                   }))
                   .concat(defaultPermissions.map(mapPermission)),
               );

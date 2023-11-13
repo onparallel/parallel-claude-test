@@ -352,8 +352,8 @@ export function ReportsStatisticsConversion({
             return index === 0
               ? data.percentage
               : data.id === "closed" && conversionFunnel.signed > 0 && !hasSignature
-              ? arr[index - 2].percentage
-              : arr[index - 1].percentage;
+                ? arr[index - 2].percentage
+                : arr[index - 1].percentage;
           }),
           barPercentage: 0.95,
           categoryPercentage: 0.95,

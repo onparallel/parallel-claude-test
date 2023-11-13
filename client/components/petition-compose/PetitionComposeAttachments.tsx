@@ -687,14 +687,14 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
           defaultMessage: "Cover",
         })
       : type === "ANNEX"
-      ? intl.formatMessage({
-          id: "component.petition-compose-attachments.annex",
-          defaultMessage: "Annex",
-        })
-      : intl.formatMessage({
-          id: "component.petition-compose-attachments.back-cover",
-          defaultMessage: "Back cover",
-        });
+        ? intl.formatMessage({
+            id: "component.petition-compose-attachments.annex",
+            defaultMessage: "Annex",
+          })
+        : intl.formatMessage({
+            id: "component.petition-compose-attachments.back-cover",
+            defaultMessage: "Back cover",
+          });
 
   return (
     <Reorder.Item

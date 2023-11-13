@@ -683,8 +683,8 @@ export class Auth implements IAuth {
           value === undefined
             ? []
             : Array.isArray(value)
-            ? value.map((v) => [name, v] as const)
-            : [[name, value] as const],
+              ? value.map((v) => [name, v] as const)
+              : [[name, value] as const],
         )
         .map(([name, value]) => ({ headerName: name, headerValue: value })),
       ServerName: this.config.misc.parallelUrl,

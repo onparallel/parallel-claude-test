@@ -285,16 +285,16 @@ export function defaultFieldProperties(
     type === "FILE_UPLOAD" // FILE_UPLOAD always true
       ? true
       : type === "CHECKBOX" // CHECKBOX always false
-      ? false
-      : type === "HEADING" // HEADING always false
-      ? false
-      : type === "DOW_JONES_KYC" // DOW_JONES_KYC always true
-      ? true
-      : type === "FIELD_GROUP" // FIELD_GROUP always true
-      ? true
-      : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
-      ? false
-      : field?.multiple ?? false;
+        ? false
+        : type === "HEADING" // HEADING always false
+          ? false
+          : type === "DOW_JONES_KYC" // DOW_JONES_KYC always true
+            ? true
+            : type === "FIELD_GROUP" // FIELD_GROUP always true
+              ? true
+              : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
+                ? false
+                : field?.multiple ?? false;
 
   const alias = type === "HEADING" ? null : field?.alias ?? null;
 

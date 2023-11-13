@@ -484,9 +484,9 @@ function ConditionPredicate({
           ["EQUAL", "NOT_EQUAL"].includes(operator) && Array.isArray(condition.value)
             ? condition.value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column)
             : ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) &&
-              typeof condition.value === "string"
-            ? [condition.value]
-            : condition.value,
+                typeof condition.value === "string"
+              ? [condition.value]
+              : condition.value,
       });
     } else {
       if (
@@ -760,11 +760,11 @@ function ConditionPredicateValueSelect({
       referencedField.type === "SELECT"
         ? (referencedField.options as FieldOptions["SELECT"]).values
         : referencedField.type === "CHECKBOX"
-        ? (referencedField.options as FieldOptions["CHECKBOX"]).values
-        : getDynamicSelectValues(
-            (referencedField.options as FieldOptions["DYNAMIC_SELECT"]).values,
-            condition.column!,
-          );
+          ? (referencedField.options as FieldOptions["CHECKBOX"]).values
+          : getDynamicSelectValues(
+              (referencedField.options as FieldOptions["DYNAMIC_SELECT"]).values,
+              condition.column!,
+            );
     return uniq(values)
       .sort((a, b) => a.localeCompare(b))
       .map((value) => toSimpleSelectOption(value)!);

@@ -784,14 +784,14 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                     defaultMessage: "Add a title for this text block...",
                   })
                 : field.type === "FILE_UPLOAD"
-                ? intl.formatMessage({
-                    id: "component.petition-compose-field.file-upload-title-placeholder",
-                    defaultMessage: "Describe the file(s) that you need...",
-                  })
-                : intl.formatMessage({
-                    id: "component.petition-compose-field.generic-title-placeholder",
-                    defaultMessage: "Ask for the information that you need...",
-                  })
+                  ? intl.formatMessage({
+                      id: "component.petition-compose-field.file-upload-title-placeholder",
+                      defaultMessage: "Describe the file(s) that you need...",
+                    })
+                  : intl.formatMessage({
+                      id: "component.petition-compose-field.generic-title-placeholder",
+                      defaultMessage: "Ask for the information that you need...",
+                    })
             }
             value={title ?? ""}
             width="100%"

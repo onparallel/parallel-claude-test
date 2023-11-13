@@ -101,15 +101,15 @@ export function DateRangePicker({
         (isDefined(endDate) && isEqual(endOfDay(date), endDate))
           ? { variant: "solid", colorScheme: "primary" }
           : isDefined(startDate) &&
-            isDefined(endDate) &&
-            isAfter(date, startDate) &&
-            isBefore(endOfDay(date), endDate)
-          ? {
-              variant: "ghost",
-              backgroundColor: "primary.100",
-              _hover: { backgroundColor: "primary.300" },
-            }
-          : { variant: "ghost" }),
+              isDefined(endDate) &&
+              isAfter(date, startDate) &&
+              isBefore(endOfDay(date), endDate)
+            ? {
+                variant: "ghost",
+                backgroundColor: "primary.100",
+                _hover: { backgroundColor: "primary.300" },
+              }
+            : { variant: "ghost" }),
         // Make button fill entire cell so it's easier to select
         _after: {
           content: "''",
@@ -141,12 +141,12 @@ export function DateRangePicker({
                   ...(isEqual(date, startDate) && isEqual(endOfDay(date), endDate)
                     ? {}
                     : isEqual(date, startDate)
-                    ? { right: 0, width: "calc(50% + 16px)", borderLeftRadius: "full" }
-                    : isEqual(endOfDay(date), endDate)
-                    ? { left: 0, width: "calc(50% + 16px)", borderRightRadius: "full" }
-                    : isAfter(date, startDate) && isBefore(date, endDate)
-                    ? { width: "100%" }
-                    : {}),
+                      ? { right: 0, width: "calc(50% + 16px)", borderLeftRadius: "full" }
+                      : isEqual(endOfDay(date), endDate)
+                        ? { left: 0, width: "calc(50% + 16px)", borderRightRadius: "full" }
+                        : isAfter(date, startDate) && isBefore(date, endDate)
+                          ? { width: "100%" }
+                          : {}),
                 },
               }
             : {}),
@@ -185,21 +185,21 @@ export function DateRangePicker({
                         : isEqual(date, startDate!))))
                     ? {}
                     : isEqual(date, hoveredDate)
-                    ? // date is the hoveredDate
-                      {
-                        width: "calc(50% + 16px)",
-                        borderBlockWidth: "2px",
-                        ...(edgeSelection === "START"
-                          ? { right: 0, borderLeftRadius: "full", borderLeftWidth: "2px" }
-                          : { left: 0, borderRightRadius: "full", borderRightWidth: "2px" }),
-                      }
-                    : edgeSelection === "START" && isEqual(endOfDay(date), endDate!)
-                    ? // date is endDate and hovering after it
-                      { width: "50%", left: 0, borderBlockWidth: "2px" }
-                    : edgeSelection === "END" && isEqual(date, startDate!)
-                    ? // date is startDate and hovering before it it
-                      { width: "50%", right: 0, borderBlockWidth: "2px" }
-                    : { width: "100%", borderBlockWidth: "2px" }),
+                      ? // date is the hoveredDate
+                        {
+                          width: "calc(50% + 16px)",
+                          borderBlockWidth: "2px",
+                          ...(edgeSelection === "START"
+                            ? { right: 0, borderLeftRadius: "full", borderLeftWidth: "2px" }
+                            : { left: 0, borderRightRadius: "full", borderRightWidth: "2px" }),
+                        }
+                      : edgeSelection === "START" && isEqual(endOfDay(date), endDate!)
+                        ? // date is endDate and hovering after it
+                          { width: "50%", left: 0, borderBlockWidth: "2px" }
+                        : edgeSelection === "END" && isEqual(date, startDate!)
+                          ? // date is startDate and hovering before it it
+                            { width: "50%", right: 0, borderBlockWidth: "2px" }
+                          : { width: "100%", borderBlockWidth: "2px" }),
                 },
               }
             : {}),

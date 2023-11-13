@@ -59,8 +59,8 @@ export function createMentionPlugin<
                 mentionable.__typename === "User"
                   ? mentionable.fullName
                   : mentionable.__typename === "UserGroup"
-                  ? userGroupReferenceText(mentionable, locale ?? "en")
-                  : "",
+                    ? userGroupReferenceText(mentionable, locale ?? "en")
+                    : "",
             },
           ],
         };
@@ -86,8 +86,8 @@ function mapMentionable(mentionable: Mentionable) {
     mentionable.__typename === "User"
       ? mentionable.fullName!
       : mentionable.__typename === "UserGroup"
-      ? mentionable.name
-      : "";
+        ? mentionable.name
+        : "";
   return {
     key: mentionable.id,
     text,

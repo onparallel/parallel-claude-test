@@ -296,14 +296,14 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           row[columnId] = !isFileTypeField(field.type)
             ? replies.map((r) => replyContent({ ...r, type: field.type })).join("; ")
             : replies.length > 0
-            ? intl.formatMessage(
-                {
-                  id: "export-template-report.file-cell-content",
-                  defaultMessage: "{count, plural, =1{1 file} other {# files}}",
-                },
-                { count: replies.length },
-              )
-            : "";
+              ? intl.formatMessage(
+                  {
+                    id: "export-template-report.file-cell-content",
+                    defaultMessage: "{count, plural, =1{1 file} other {# files}}",
+                  },
+                  { count: replies.length },
+                )
+              : "";
         }
 
         for (const field of petitionFields) {
