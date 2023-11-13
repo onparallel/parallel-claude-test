@@ -1,3 +1,7 @@
+# [chore] lint fix after prettier update to 3.1.0
+
+7035b2aac39359726dde3ef637bcb72eb2d461d1
+
 # [chore] run prettier with interface over type rule
 
 93485d4a0ccebc2c693005766d6df8c06c2caa0d
