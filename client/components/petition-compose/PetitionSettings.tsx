@@ -359,7 +359,8 @@ function _PetitionSettings({
       description={
         <FormattedMessage
           id="component.petition-settings.restrict-editing-description"
-          defaultMessage="Enable this option to prevent users from accidentally making changes to this parallel."
+          defaultMessage="Enable this option to prevent users from accidentally making changes to this {isTemplate, select, true{template} other{parallel}}."
+          values={{ isTemplate: petition.__typename === "PetitionTemplate" }}
         />
       }
       isChecked={petition.isRestricted}

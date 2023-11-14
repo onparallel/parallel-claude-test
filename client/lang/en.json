@@ -4906,8 +4906,8 @@
   },
   {
     "term": "component.petition-settings.restrict-editing-description",
-    "definition": "Enable this option to prevent users from accidentally making changes to this parallel.",
-    "context": "Enable this option to prevent users from accidentally making changes to this parallel."
+    "definition": "Enable this option to prevent users from accidentally making changes to this {isTemplate, select, true{template} other{parallel}}.",
+    "context": "Enable this option to prevent users from accidentally making changes to this {isTemplate, select, true{template} other{parallel}}."
   },
   {
     "term": "component.petition-settings.share-automatically",
