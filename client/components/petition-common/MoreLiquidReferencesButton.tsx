@@ -98,7 +98,7 @@ export const MoreLiquidReferencesButton = Object.assign(
             <MenuItem
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
               as={NakedHelpCenterLink}
-              articleId={5998723}
+              articleId={6323096}
             >
               <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
             </MenuItem>
