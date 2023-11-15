@@ -49,9 +49,10 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
 
     const baseDate = new Date();
     let processed = 0;
+    const CHUNK_SIZE = 100;
     const results = await pFlatMap(
       // chunk into groups of 100 petitions to avoid sending every email at once
-      chunk(data, 100),
+      chunk(data, CHUNK_SIZE),
       async (chunk, chunkIndex) =>
         await pMap(
           chunk,
@@ -151,7 +152,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                 success: false,
                 petition_id: null,
                 error:
-                  `[row ${rowNumber + 1}]: ` +
+                  `[row ${CHUNK_SIZE * chunkIndex + rowNumber + 1}]: ` +
                   (error instanceof Error ? error.message : safeStringify(error)),
               };
             } finally {
