@@ -1,6 +1,8 @@
 import { enumType, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isDefined, omit } from "remeda";
 import { TaskNameValues, TaskStatusValues } from "../../db/__types";
+import { TaskOutput } from "../../db/repositories/TaskRepository";
+import { toGlobalId } from "../../util/globalId";
 
 export const Task = objectType({
   name: "Task",
@@ -21,7 +23,26 @@ export const Task = objectType({
     t.nullable.int("progress");
     t.nullable.json("output", {
       resolve: (t) => {
-        return isDefined(t.output?.temporary_file_id) ? {} : t.output;
+        if (t.output === null) {
+          return null;
+        }
+
+        if (isDefined(t.output?.temporary_file_id)) {
+          return {};
+        }
+
+        if (t.name === "BULK_PETITION_SEND") {
+          const output = t.output as TaskOutput<"BULK_PETITION_SEND">;
+          return {
+            ...output,
+            results:
+              output.results?.map((r) => ({
+                ...omit(r, ["petition_id"]),
+                petitionId: r.petition_id ? toGlobalId("Petition", r.petition_id) : null,
+              })) ?? null,
+          };
+        }
+        return t.output;
       },
     });
   },

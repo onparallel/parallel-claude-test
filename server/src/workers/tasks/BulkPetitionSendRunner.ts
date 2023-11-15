@@ -2,9 +2,7 @@ import { addMinutes } from "date-fns";
 import Excel from "exceljs";
 import safeStringify from "fast-safe-stringify";
 import pMap from "p-map";
-import { isDefined, sumBy, uniq } from "remeda";
-import { chunkWhile } from "../../util/arrays";
-import { toGlobalId } from "../../util/globalId";
+import { chunk, isDefined } from "remeda";
 import { pFlatMap } from "../../util/promises/pFlatMap";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import {
@@ -49,43 +47,35 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
       };
     }
 
-    // chunk petitions into groups of 100 contacts
-    const petitionChunks = chunkWhile(
-      data,
-      (currentChunk, item) =>
-        currentChunk.length === 0 ||
-        sumBy(currentChunk, (x) => x.contacts.length) + item.contacts.length <= 100,
-    );
-
     const baseDate = new Date();
     let processed = 0;
     const results = await pFlatMap(
-      petitionChunks,
+      // chunk into groups of 100 petitions to avoid sending every email at once
+      chunk(data, 100),
       async (chunk, chunkIndex) =>
         await pMap(
           chunk,
-          async ({ contacts, prefill, rowNumber }) => {
+          async (row, rowNumber) => {
             try {
               await rateLimit.waitUntilAllowed();
 
-              await this.validateContacts(contacts);
+              await this.validateContactData(row);
               await this.ctx.orgCredits.consumePetitionSendCredits(template.org_id, 1);
 
-              const dbContacts = await this.ctx.contacts.createOrUpdate(
-                contacts.map((contact) => ({
+              const [contact] = await this.ctx.contacts.createOrUpdate(
+                {
                   org_id: template.org_id,
-                  email: contact.email!,
-                  first_name: contact.firstName!,
-                  last_name: contact.lastName ?? null,
-                })),
+                  email: row.email,
+                  first_name: row.firstName,
+                  last_name: row.lastName ?? null,
+                },
                 `User:${user.id}`,
               );
-              const contactIds = uniq(dbContacts.map((c) => c.id));
 
               const getValues = await this.ctx.petitionMessageContext.fetchPlaceholderValues({
                 petitionId: templateId,
                 userId: user.id,
-                contactId: contactIds[0],
+                contactId: contact.id,
               });
 
               const emailSubject = template.email_subject
@@ -98,18 +88,17 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                 user,
               );
 
-              if (prefill) {
-                await this.ctx.petitions.prefillPetition(petition.id, prefill, user);
-              }
+              await this.ctx.petitions.prefillPetition(petition.id, row, user);
 
               const accesses = await this.ctx.petitions.createAccesses(
                 petition.id,
-                contactIds.map((contactId) => ({
-                  petition_id: petition.id,
-                  contact_id: contactId,
-                  reminders_left: 10,
-                  reminders_active: false,
-                })),
+                [
+                  {
+                    contact_id: contact.id,
+                    reminders_left: 10,
+                    reminders_active: false,
+                  },
+                ],
                 user,
                 false,
               );
@@ -155,14 +144,14 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
 
               return {
                 success: true,
-                petition_id: toGlobalId("Petition", petition.id),
+                petition_id: petition.id,
               };
             } catch (error) {
               return {
                 success: false,
                 petition_id: null,
                 error:
-                  `[row ${rowNumber}]: ` +
+                  `[row ${rowNumber + 1}]: ` +
                   (error instanceof Error ? error.message : safeStringify(error)),
               };
             } finally {
@@ -177,33 +166,18 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
     return { status: "COMPLETED" as const, results };
   }
 
-  private async validateContacts(
-    contacts: { email: string | null; firstName: string | null; lastName: string | null }[],
-  ) {
-    if (contacts.length === 0) {
-      throw new Error("Missing recipient information");
-    }
-    if (contacts.some((c) => !isDefined(c.email) || !isDefined(c.firstName))) {
-      throw new Error("Missing recipient email or first name");
-    }
-    const invalidEmails: string[] = [];
-    for (const { email } of contacts) {
-      if (!(await this.ctx.emails.validateEmail(email!))) {
-        invalidEmails.push(email!);
-      }
+  private async validateContactData(row: Record<string, any>) {
+    if (!isDefined(row.email) || !isDefined(row.firstName)) {
+      throw new Error(`Missing 'email' or 'firstName' columns`);
     }
 
-    if (invalidEmails.length > 0) {
-      throw new Error(`Invalid email(s): ${invalidEmails.join(", ")}`);
+    if (!(await this.ctx.emails.validateEmail(row.email))) {
+      throw new Error(`Invalid email: ${row.email}`);
     }
   }
 
   private async parseCsvFile(temporaryFileId: number) {
-    const sendData: {
-      contacts: { email: string | null; firstName: string | null; lastName: string | null }[];
-      prefill: any;
-      rowNumber: number;
-    }[] = [];
+    const sendData: Record<string, any>[] = [];
 
     const temporaryFile = (await this.ctx.files.loadTemporaryFile(temporaryFileId))!;
     const buffer = await this.ctx.storage.temporaryFiles.downloadFile(temporaryFile.path);
@@ -224,18 +198,11 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
           headings.push(cell.value?.toString() ?? "");
         });
       } else {
-        const email = row.getCell(1).value?.toString() ?? null;
-        const firstName = row.getCell(2).value?.toString() ?? null;
-        const lastName = row.getCell(3).value?.toString() ?? null;
-        const prefill: Record<string, any> = {};
+        const rowData: Record<string, any> = {};
         row.eachCell((cell, colNumber) => {
-          // starting from 4th column, every cell is a prefill data where the column header is the alias of the field
-          if (colNumber >= 4) {
-            const alias = headings[colNumber - 1];
-            prefill[alias] = cell.value?.toString() ?? null;
-          }
+          rowData[headings[colNumber - 1]] = cell.value;
         });
-        sendData.push({ contacts: [{ email, firstName, lastName }], prefill, rowNumber });
+        sendData.push(rowData);
       }
     });
 

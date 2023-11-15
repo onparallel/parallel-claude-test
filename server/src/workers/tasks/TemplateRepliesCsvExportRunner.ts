@@ -61,11 +61,14 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           (f) => f.type !== "HEADING" && isDefined(f.alias),
         );
 
-        const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
+        const [contact] = petitionsAccessesContacts[petitionIndex].filter(isDefined);
 
         const row: Record<string, Maybe<string | Date>> = {
           "parallel-id": toGlobalId("Petition", petition.id),
-          "recipient-email": contacts.map((c) => c.email).join(", ") || "",
+          "recipient-email": contact?.email ?? "",
+          "recipient-first-name": contact?.first_name ?? "",
+          "recipient-last-name": contact?.last_name ?? "",
+          "created-at": petition.created_at,
         };
 
         function replyContent(r: Pick<PetitionFieldReply, "content" | "type">) {
@@ -198,7 +201,19 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
       },
       {
         id: "recipient-email",
-        title: "Recipient Email",
+        title: "email",
+      },
+      {
+        id: "recipient-first-name",
+        title: "firstName",
+      },
+      {
+        id: "recipient-last-name",
+        title: "lastName",
+      },
+      {
+        id: "created-at",
+        title: "Created at",
       },
     ];
 

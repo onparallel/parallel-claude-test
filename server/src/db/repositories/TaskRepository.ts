@@ -149,7 +149,7 @@ export type TaskOutput<TName extends TaskName> = {
     results:
       | {
           success: boolean;
-          petition_id: Maybe<string>;
+          petition_id: Maybe<number>;
           error?: any;
         }[]
       | null;
