@@ -144,7 +144,15 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
                             date,
                           },
                         ]
-                      : []
+                      : ["zas25KHxAByKXKRCYU4"].includes(templateId)
+                        ? [
+                            {
+                              fullName: "Juan Francisco Sahuquillo Cebrián",
+                              signatureImageUrl:
+                                "https://static.onparallel.com/static/images/signatures/juan-francisco-sahuquillo-cebrian-tiko.png",
+                            },
+                          ]
+                        : []
       : []),
     ...signatureConfig.signers!.map((signer, i) => ({
       wordAnchor: `3cb39pzCQA9wJ${i}`,
