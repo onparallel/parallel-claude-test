@@ -182,7 +182,7 @@ function CreateOrUpdateUserDialog({
                     switch (actionMeta.action) {
                       case "remove-value":
                       case "pop-value":
-                        if (actionMeta.removedValue.isDisabled) {
+                        if (actionMeta.removedValue?.isDisabled) {
                           return;
                         }
                     }
