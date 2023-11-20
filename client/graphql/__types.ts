@@ -13941,6 +13941,7 @@ export type PetitionComposeFieldGroupChildren_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   visibility?: { [key: string]: any } | null;
+  isInternal: boolean;
   title?: string | null;
   type: PetitionFieldType;
   children?: Array<{
@@ -47663,6 +47664,7 @@ export const PetitionComposeFieldGroupChildren_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldGroupChildren_PetitionField on PetitionField {
     id
     visibility
+    isInternal
     children {
       id
       type

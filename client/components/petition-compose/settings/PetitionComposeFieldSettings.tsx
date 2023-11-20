@@ -27,6 +27,7 @@ import { SpanishTaxDocumentsSettings } from "./PetitionComposeTaxDocumentsSettin
 import { TextSettings } from "./PetitionComposeTextSettings";
 import { SettingsRow } from "./SettingsRow";
 import { SettingsRowAlias } from "./SettingsRowAlias";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 
 export interface PetitionComposeFieldSettingsProps {
   petitionId: string;
@@ -57,7 +58,7 @@ export const PetitionComposeFieldSettings = Object.assign(
       ref,
     ) {
       const intl = useIntl();
-
+      const showErrorDialog = useErrorDialog();
       const isOnlyInternal = field.type === "DOW_JONES_KYC";
       const isFieldGroupChild = isDefined(field.parent?.id) ? true : false;
 
@@ -320,9 +321,28 @@ export const PetitionComposeFieldSettings = Object.assign(
                 <Box>
                   <PetitionFieldTypeSelect
                     type={field.type}
-                    onChange={(type) => {
+                    onChange={async (type) => {
                       if (type !== field.type) {
-                        onFieldTypeChange(field.id, type);
+                        const isTypeChangeNotAllowed =
+                          isFieldGroupChild &&
+                          type === "DOW_JONES_KYC" &&
+                          field.position === 0 &&
+                          !field.parent!.isInternal;
+
+                        if (isTypeChangeNotAllowed) {
+                          try {
+                            await showErrorDialog({
+                              message: (
+                                <FormattedMessage
+                                  id="component.petition-compose-field-settings.first-child-is-internal-error"
+                                  defaultMessage="The first field of a group cannot be internal if the group is not."
+                                />
+                              ),
+                            });
+                          } catch {}
+                        } else {
+                          onFieldTypeChange(field.id, type);
+                        }
                       }
                     }}
                     isDisabled={isReadOnly || field.isFixed}

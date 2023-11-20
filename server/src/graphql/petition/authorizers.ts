@@ -894,6 +894,20 @@ export function fieldHasParent<
   };
 }
 
+export function parentFieldIsInternal<
+  TypeName extends string,
+  FieldName extends string,
+  TArgChildFieldId extends Arg<TypeName, FieldName, number>,
+>(childFieldIdArg: TArgChildFieldId): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const childId = args[childFieldIdArg] as unknown as number;
+    const field = await ctx.petitions.loadField(childId);
+    const parent = await ctx.petitions.loadField(field!.parent_petition_field_id!);
+
+    return parent?.is_internal ?? false;
+  };
+}
+
 export function fieldIsNotFirstChild<
   TypeName extends string,
   FieldName extends string,

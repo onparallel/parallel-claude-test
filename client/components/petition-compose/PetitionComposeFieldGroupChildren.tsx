@@ -26,6 +26,7 @@ import { PetitionFieldOptionsListEditor } from "./PetitionFieldOptionsListEditor
 import { ReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 
 interface PetitionComposeFieldGroupChildrenProps
   extends Pick<
@@ -94,9 +95,23 @@ export function PetitionComposeFieldGroupChildren({
     }),
     [],
   );
-
-  const handleAddNewField = (type: PetitionFieldType) => {
-    onAddField(type, (field.children?.length ?? 0) + 1, field.id);
+  const showErrorDialog = useErrorDialog();
+  const handleAddNewField = async (type: PetitionFieldType) => {
+    const childrenLength = field.children?.length ?? 0;
+    if (type === "DOW_JONES_KYC" && childrenLength === 0 && !field.isInternal) {
+      try {
+        await showErrorDialog({
+          message: (
+            <FormattedMessage
+              id="component.petition-compose-field-group-children.first-child-is-internal-error"
+              defaultMessage="The first field of a group cannot be internal if the group is not."
+            />
+          ),
+        });
+      } catch {}
+    } else {
+      onAddField(type, childrenLength + 1, field.id);
+    }
   };
 
   const [hoveredFieldId, _setHoveredFieldId] = useState<string | null>(null);
@@ -185,11 +200,16 @@ export function PetitionComposeFieldGroupChildren({
       },
       onSelectFieldType(type: PetitionFieldType) {
         if (isDefined(field.children)) {
-          onAddField(
-            type,
-            field.children.findIndex((f) => f.id === fieldId),
-            field.id,
-          );
+          let position = field.children.findIndex((f) => f.id === fieldId);
+          if (
+            type === "DOW_JONES_KYC" &&
+            field.children.length > 0 &&
+            position === 0 &&
+            !field.isInternal
+          ) {
+            position = 1;
+          }
+          onAddField(type, position, field.id);
         }
       },
       onOpen() {
@@ -405,6 +425,7 @@ PetitionComposeFieldGroupChildren.fragments = {
     fragment PetitionComposeFieldGroupChildren_PetitionField on PetitionField {
       id
       visibility
+      isInternal
       children {
         id
         type

@@ -105,6 +105,7 @@ import {
   firstChildHasType,
   foldersAreInPath,
   messageBelongToPetition,
+  parentFieldIsInternal,
   petitionHasRepliableFields,
   petitionHasStatus,
   petitionIsNotAnonymized,
@@ -2023,7 +2024,17 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     petitionsAreNotPublicTemplates("petitionId"),
     not(fieldHasType("fieldId", "FIELD_GROUP")),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
-    ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
+    ifArgEquals(
+      "type",
+      "DOW_JONES_KYC",
+      and(
+        userHasFeatureFlag("DOW_JONES_KYC"),
+        or(
+          fieldIsNotFirstChild("fieldId"),
+          chain(fieldHasParent("fieldId"), parentFieldIsInternal("fieldId")),
+        ),
+      ),
+    ),
     ifArgEquals(
       "type",
       "FIELD_GROUP",

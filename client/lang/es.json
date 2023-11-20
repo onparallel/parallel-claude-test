@@ -3920,6 +3920,11 @@
     "context": "Drag fields here to add them to the group"
   },
   {
+    "term": "component.petition-compose-field-group-children.first-child-is-internal-error",
+    "definition": "El primer campo de un grupo no puede ser interno si el grupo no lo es.",
+    "context": "The first field of a group cannot be internal if the group is not."
+  },
+  {
     "term": "component.petition-compose-field-group-settings.group-name",
     "definition": "Nombre del grupo",
     "context": "Group name"
@@ -3958,6 +3963,11 @@
     "term": "component.petition-compose-field-settings.file-multiple-label",
     "definition": "Permitir subir más de un archivo",
     "context": "Allow uploading more than one file"
+  },
+  {
+    "term": "component.petition-compose-field-settings.first-child-is-internal-error",
+    "definition": "El primer campo de un grupo no puede ser interno si el grupo no lo es.",
+    "context": "The first field of a group cannot be internal if the group is not."
   },
   {
     "term": "component.petition-compose-field-settings.include-approval-description",

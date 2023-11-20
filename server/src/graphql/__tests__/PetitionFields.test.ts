@@ -54,7 +54,10 @@ describe("GraphQL/Petition Fields", () => {
       type: "TEXT",
     }));
 
-    await mocks.createFeatureFlags([{ name: "FIELD_GROUP", default_value: true }]);
+    await mocks.createFeatureFlags([
+      { name: "FIELD_GROUP", default_value: true },
+      { name: "DOW_JONES_KYC", default_value: true },
+    ]);
   });
 
   afterAll(async () => {
@@ -4325,6 +4328,67 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("sends error when changing type of first child of external field group to DOW_JONES_KYC", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(petitionId: $petitionId, fieldId: $fieldId, type: $type) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", childrenFields[0].id),
+          type: "DOW_JONES_KYC",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("allows to change type of first child to DOW_JONES_KYC if field group is internal", async () => {
+      await mocks.knex
+        .from("petition_field")
+        .where("id", fieldGroupField.id)
+        .update({ is_internal: true });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(petitionId: $petitionId, fieldId: $fieldId, type: $type) {
+              id
+              type
+              isInternal
+              position
+              parent {
+                id
+                isInternal
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", childrenFields[0].id),
+          type: "DOW_JONES_KYC",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.changePetitionFieldType).toEqual({
+        id: toGlobalId("PetitionField", childrenFields[0].id),
+        type: "DOW_JONES_KYC",
+        isInternal: true,
+        position: 0,
+        parent: {
+          id: toGlobalId("PetitionField", fieldGroupField.id),
+          isInternal: true,
+        },
+      });
     });
   });
 
