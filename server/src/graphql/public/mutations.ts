@@ -87,7 +87,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
   },
   resolve: async (_, args, ctx) => {
     const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
-    if (petition.skip_forward_security) {
+    if (petition.skip_forward_security && isDefined(ctx.access!.contact_id)) {
       await ctx.petitions.createEvent({
         type: "ACCESS_OPENED",
         petition_id: ctx.access!.petition_id,
