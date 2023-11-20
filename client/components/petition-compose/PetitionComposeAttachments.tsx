@@ -193,7 +193,7 @@ export const PetitionComposeAttachments = Object.assign(
 
     const showErrorDialog = useErrorDialog();
     const [draggedFiles, setDraggedFiles] = useState<(File | DataTransferItem)[]>([]);
-    const { getRootProps, isDragActive, open } = useDropzone({
+    const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
       accept: {
         "application/pdf": [],
       },
@@ -390,6 +390,7 @@ export const PetitionComposeAttachments = Object.assign(
           />
         </CardHeader>
         <Stack paddingY={4} paddingX={2}>
+          <input type="file" {...getInputProps()} />
           {allAttachments.length > 0 ? (
             <Stack spacing={2} divider={<Divider />}>
               {[
