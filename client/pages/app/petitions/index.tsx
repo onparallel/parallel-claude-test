@@ -868,15 +868,18 @@ function usePetitionListActions({
       leftIcon: <UserArrowIcon />,
       children: <FormattedMessage id="page.petitions-list.actions-share" defaultMessage="Share" />,
     },
-
-    {
-      key: "clone",
-      isDisabled: hasSelectedFolders || !userCanCreateTemplate,
-      onClick: onCloneClick,
-      leftIcon: <CopyIcon />,
-      children: <FormattedMessage id="generic.duplicate" defaultMessage="Duplicate" />,
-      wrap: restrictWhenCantCreateTemplate,
-    },
+    ...(type === "TEMPLATE"
+      ? [
+          {
+            key: "clone",
+            isDisabled: hasSelectedFolders || !userCanCreateTemplate,
+            onClick: onCloneClick,
+            leftIcon: <CopyIcon />,
+            children: <FormattedMessage id="generic.duplicate" defaultMessage="Duplicate" />,
+            wrap: restrictWhenCantCreateTemplate,
+          },
+        ]
+      : []),
     {
       key: "move-to",
       onClick: onMoveToClick,

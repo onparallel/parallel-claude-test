@@ -4595,11 +4595,6 @@
     "context": "Download results"
   },
   {
-    "term": "component.petition-header.duplicate-label-petition",
-    "definition": "Duplicar parallel",
-    "context": "Duplicate parallel"
-  },
-  {
     "term": "component.petition-header.duplicate-label-template",
     "definition": "Duplicar plantilla",
     "context": "Duplicate template"

@@ -678,25 +678,18 @@ export const PetitionHeader = Object.assign(
                       />
                     </MenuItem>
                   ) : null}
-
-                  <MenuItem
-                    onClick={handleCloneClick}
-                    icon={<CopyIcon display="block" boxSize={4} />}
-                    isDisabled={isPetition ? !userCanCreatePetition : !userCanCreateTemplate}
-                  >
-                    {isPetition ? (
-                      <FormattedMessage
-                        id="component.petition-header.duplicate-label-petition"
-                        defaultMessage="Duplicate parallel"
-                      />
-                    ) : (
+                  {isPetition ? null : (
+                    <MenuItem
+                      onClick={handleCloneClick}
+                      icon={<CopyIcon display="block" boxSize={4} />}
+                      isDisabled={!userCanCreateTemplate}
+                    >
                       <FormattedMessage
                         id="component.petition-header.duplicate-label-template"
                         defaultMessage="Duplicate template"
                       />
-                    )}
-                  </MenuItem>
-
+                    </MenuItem>
+                  )}
                   {isPetition ? (
                     <MenuItem
                       onClick={handleSaveAsTemplate}

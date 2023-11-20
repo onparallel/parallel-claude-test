@@ -14224,33 +14224,6 @@ export type PetitionComposeVariables_PetitionBaseFragment =
   | PetitionComposeVariables_PetitionBase_Petition_Fragment
   | PetitionComposeVariables_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionComposeVariables_createPetitionVariableMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  data: CreatePetitionVariableInput;
-}>;
-
-export type PetitionComposeVariables_createPetitionVariableMutation = {
-  createPetitionVariable: {
-    __typename?: "Petition";
-    id: string;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
-  };
-};
-
-export type PetitionComposeVariables_updatePetitionVariableMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  name: Scalars["String"]["input"];
-  data: UpdatePetitionVariableInput;
-}>;
-
-export type PetitionComposeVariables_updatePetitionVariableMutation = {
-  updatePetitionVariable: {
-    __typename?: "Petition";
-    id: string;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
-  };
-};
-
 export type PetitionComposeVariables_deletePetitionVariableMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   name: Scalars["String"]["input"];
@@ -52122,35 +52095,6 @@ export const PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument = 
 ` as unknown as DocumentNode<
   PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables
->;
-export const PetitionComposeVariables_createPetitionVariableDocument = gql`
-  mutation PetitionComposeVariables_createPetitionVariable(
-    $petitionId: GID!
-    $data: CreatePetitionVariableInput!
-  ) {
-    createPetitionVariable(petitionId: $petitionId, data: $data) {
-      ...PetitionComposeVariables_PetitionBase
-    }
-  }
-  ${PetitionComposeVariables_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionComposeVariables_createPetitionVariableMutation,
-  PetitionComposeVariables_createPetitionVariableMutationVariables
->;
-export const PetitionComposeVariables_updatePetitionVariableDocument = gql`
-  mutation PetitionComposeVariables_updatePetitionVariable(
-    $petitionId: GID!
-    $name: String!
-    $data: UpdatePetitionVariableInput!
-  ) {
-    updatePetitionVariable(petitionId: $petitionId, name: $name, data: $data) {
-      ...PetitionComposeVariables_PetitionBase
-    }
-  }
-  ${PetitionComposeVariables_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionComposeVariables_updatePetitionVariableMutation,
-  PetitionComposeVariables_updatePetitionVariableMutationVariables
 >;
 export const PetitionComposeVariables_deletePetitionVariableDocument = gql`
   mutation PetitionComposeVariables_deletePetitionVariable($petitionId: GID!, $name: String!) {
