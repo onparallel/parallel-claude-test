@@ -66,10 +66,14 @@ export function PetitionFieldVisibilityEditor({
     <PetitionFieldLogicContext petition={petition} field={field}>
       <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="gray.100">
         <Grid
-          templateColumns={{
-            base: "auto minmax(160px, 1fr)",
-            xl: "auto minmax(160px, 2fr) 3fr",
-          }}
+          templateColumns={
+            isReadOnly
+              ? "auto 1fr"
+              : {
+                  base: "auto minmax(160px, 1fr)",
+                  xl: "auto minmax(160px, 2fr) 3fr",
+                }
+          }
           alignItems="start"
           columnGap={2}
           rowGap={2}
@@ -77,58 +81,87 @@ export function PetitionFieldVisibilityEditor({
           {visibility.conditions.map((condition, index) => {
             return (
               <Fragment key={index}>
-                <Box fontSize="sm">
-                  {index === 0 ? (
-                    <PetitionFieldVisibilityTypeSelect
-                      value={visibility.type}
-                      onChange={(type) => setVisibilityType(type!)}
-                      isReadOnly={isReadOnly}
-                    />
-                  ) : (
-                    <Stack direction="row">
-                      <IconButton
-                        size="sm"
-                        icon={<DeleteIcon />}
-                        aria-label={intl.formatMessage({
-                          id: "generic.remove",
-                          defaultMessage: "Remove",
-                        })}
-                        onClick={() =>
-                          setConditions((conditions) => conditions.filter((c, i) => i !== index))
-                        }
-                        isDisabled={isReadOnly}
+                {isReadOnly ? (
+                  <Box justifySelf="flex-end" fontSize="sm" height="24px" lineHeight="24px">
+                    {index === 0 ? (
+                      <PetitionFieldVisibilityTypeSelect
+                        value={visibility.type}
+                        onChange={(type) => setVisibilityType(type!)}
+                        isReadOnly
                       />
-                      {index === 1 ? (
-                        <Box flex="1" minWidth="0">
-                          <PetitionFieldLogicConditionLogicalJoinSelect
-                            value={visibility.operator}
-                            onChange={(operator) => setVisibilityOperator(operator!)}
-                            isReadOnly={isReadOnly}
-                          />
-                        </Box>
-                      ) : (
-                        <Flex
-                          flex="1"
-                          alignItems="start"
-                          paddingLeft="11px"
-                          textStyle={isReadOnly ? "muted" : undefined}
-                        >
+                    ) : (
+                      <Box justifySelf="flex-end" fontSize="sm">
+                        <Box as="span">
                           {visibility.operator === "AND" ? (
                             <FormattedMessage
-                              id="component.petition-field-visibility-editor.and"
+                              id="generic.condition-logical-join-and"
                               defaultMessage="and"
                             />
                           ) : (
                             <FormattedMessage
-                              id="component.petition-field-visibility-editor.or"
+                              id="generic.condition-logical-join-or"
                               defaultMessage="or"
                             />
                           )}
-                        </Flex>
-                      )}
-                    </Stack>
-                  )}
-                </Box>
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                ) : (
+                  <>
+                    {index === 0 ? (
+                      <Box justifySelf="flex-end" fontSize="sm">
+                        <PetitionFieldVisibilityTypeSelect
+                          value={visibility.type}
+                          onChange={(type) => setVisibilityType(type!)}
+                          isReadOnly={isReadOnly}
+                        />
+                      </Box>
+                    ) : (
+                      <Stack direction="row">
+                        <IconButton
+                          size="sm"
+                          icon={<DeleteIcon />}
+                          aria-label={intl.formatMessage({
+                            id: "generic.remove",
+                            defaultMessage: "Remove",
+                          })}
+                          onClick={() =>
+                            setConditions((conditions) => conditions.filter((c, i) => i !== index))
+                          }
+                          isDisabled={isReadOnly}
+                        />
+                        {index === 1 ? (
+                          <Box flex="1" minWidth="0">
+                            <PetitionFieldLogicConditionLogicalJoinSelect
+                              value={visibility.operator}
+                              onChange={(operator) => setVisibilityOperator(operator!)}
+                            />
+                          </Box>
+                        ) : (
+                          <Flex
+                            flex="1"
+                            alignItems="start"
+                            paddingLeft="11px"
+                            textStyle={isReadOnly ? "muted" : undefined}
+                          >
+                            {visibility.operator === "AND" ? (
+                              <FormattedMessage
+                                id="generic.condition-logical-join-and"
+                                defaultMessage="and"
+                              />
+                            ) : (
+                              <FormattedMessage
+                                id="generic.condition-logical-join-or"
+                                defaultMessage="or"
+                              />
+                            )}
+                          </Flex>
+                        )}
+                      </Stack>
+                    )}
+                  </>
+                )}
                 <PetitionFieldLogicConditionEditor
                   condition={condition}
                   onConditionChange={(value) => updateCondition(index, value)}

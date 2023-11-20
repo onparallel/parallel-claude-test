@@ -4,3 +4,4 @@ export * from "./permissions";
 export * from "./signature";
 export * from "./user-replies";
 export * from "./attachments";
+export * from "./variables";

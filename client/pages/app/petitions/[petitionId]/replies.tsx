@@ -12,6 +12,10 @@ import {
 } from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
 import { Card, CardHeader } from "@parallel/components/common/Card";
+import { Divider } from "@parallel/components/common/Divider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
+import { ShareButton } from "@parallel/components/common/ShareButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
@@ -19,11 +23,7 @@ import {
   useDialog,
   withDialogs,
 } from "@parallel/components/common/dialogs/DialogProvider";
-import { Divider } from "@parallel/components/common/Divider";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
-import { ShareButton } from "@parallel/components/common/ShareButton";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
   usePetitionStateWrapper,
@@ -33,15 +33,6 @@ import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
-import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
-import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
-import {
-  ExportRepliesDialog,
-  useExportRepliesDialog,
-} from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
-import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
-import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
-import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
 import { PetitionRepliesContents } from "@parallel/components/petition-replies/PetitionRepliesContents";
 import {
   PetitionRepliesField,
@@ -52,16 +43,26 @@ import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies
 import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
+import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
 import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
+import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
+import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
+import {
+  ExportRepliesDialog,
+  useExportRepliesDialog,
+} from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
+import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
+import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
+import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
+  PetitionReplies_PetitionFragment,
   PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   PetitionReplies_associateProfileToPetitionDocument,
   PetitionReplies_closePetitionDocument,
   PetitionReplies_fileUploadReplyDownloadLinkDocument,
   PetitionReplies_petitionDocument,
-  PetitionReplies_PetitionFragment,
   PetitionReplies_sendPetitionClosedNotificationDocument,
   PetitionReplies_updatePetitionDocument,
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
@@ -75,12 +76,14 @@ import { compose } from "@parallel/utils/compose";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import {
+  PetitionFieldFilter,
   defaultFieldsFilter,
   filterPetitionFields,
-  PetitionFieldFilter,
 } from "@parallel/utils/filterPetitionFields";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import {
   useCreatePetitionFieldComment,
   useDeletePetitionFieldComment,
@@ -95,8 +98,6 @@ import { useExportRepliesTask } from "@parallel/utils/tasks/useExportRepliesTask
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
-import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
-import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { withMetadata } from "@parallel/utils/withMetadata";
@@ -133,7 +134,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
-  const fieldLogic = useFieldLogic(petition.fields);
+  const fieldLogic = useFieldLogic(petition);
   const toast = useToast();
 
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
@@ -147,6 +148,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
   const fieldRefs = useMultipleRefs<HTMLElement>();
   const signaturesRef = useRef<HTMLElement>(null);
+  const variablesRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     // force a rerender when active field is coming from url so the flyout repositions
     if (activeFieldId) {
@@ -296,6 +299,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, []);
   const handlePetitionContentsSignatureClick = useCallback(() => {
     highlight(signaturesRef.current);
+  }, []);
+  const handlePetitionContentsVariablesClick = useCallback(() => {
+    highlight(variablesRef.current);
   }, []);
 
   const fieldsWithIndices = useFieldsWithIndices(petition.fields);
@@ -458,8 +464,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     me.organization.isPetitionUsageLimitReached &&
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
-
-  const scope = useLiquidScope(petition);
 
   const extendFlexColumn = {
     display: "flex",
@@ -693,6 +697,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                         signatureStatus={petitionSignatureStatus}
                         signatureEnvironment={petitionSignatureEnvironment}
                         onSignatureStatusClick={handlePetitionContentsSignatureClick}
+                        onVariablesClick={
+                          petition.variables.length
+                            ? handlePetitionContentsVariablesClick
+                            : undefined
+                        }
                       />
                     </Box>
                   </Card>
@@ -709,39 +718,49 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             petition={petition}
             user={me}
             layerStyle="highlightable"
-            marginBottom={8}
+            marginBottom={4}
             onRefetchPetition={refetch}
             isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
           />
+          {petition.variables.length ? (
+            <PetitionVariablesCard
+              ref={variablesRef as any}
+              layerStyle="highlightable"
+              marginBottom={8}
+              petition={petition}
+              finalVariables={fieldLogic[0].finalVariables}
+            />
+          ) : null}
           <Stack flex="2" spacing={4} data-section="replies-fields">
-            <LiquidScopeProvider scope={scope}>
+            <LiquidScopeProvider petition={petition}>
               {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) =>
                 x.type === "FIELD" ? (
-                  <PetitionRepliesField
-                    ref={fieldRefs[x.field.id]}
-                    id={`field-${x.field.id}`}
-                    data-section="replies-field"
-                    data-field-type={x.field.type}
-                    key={x.field.id}
-                    petitionId={petition.id}
-                    field={x.field}
-                    childrenFieldIndices={x.childrenFieldIndices}
-                    fieldIndex={x.fieldIndex}
-                    onAction={handleAction}
-                    isActive={activeFieldId === x.field.id}
-                    onToggleComments={() => {
-                      setQueryState({
-                        comments: activeFieldId === x.field.id ? null : x.field.id,
-                        profile: null,
-                      });
-                    }}
-                    onUpdateReplyStatus={(fieldId, replyId, status) =>
-                      handleUpdateRepliesStatus(fieldId, [replyId], status, x.field.id)
-                    }
-                    isDisabled={myEffectivePermission === "READ"}
-                    filter={filter}
-                    fieldLogic={x.fieldLogic!}
-                  />
+                  <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
+                    <PetitionRepliesField
+                      ref={fieldRefs[x.field.id]}
+                      id={`field-${x.field.id}`}
+                      data-section="replies-field"
+                      data-field-type={x.field.type}
+                      petitionId={petition.id}
+                      field={x.field}
+                      childrenFieldIndices={x.childrenFieldIndices}
+                      fieldIndex={x.fieldIndex}
+                      onAction={handleAction}
+                      isActive={activeFieldId === x.field.id}
+                      onToggleComments={() => {
+                        setQueryState({
+                          comments: activeFieldId === x.field.id ? null : x.field.id,
+                          profile: null,
+                        });
+                      }}
+                      onUpdateReplyStatus={(fieldId, replyId, status) =>
+                        handleUpdateRepliesStatus(fieldId, [replyId], status, x.field.id)
+                      }
+                      isDisabled={myEffectivePermission === "READ"}
+                      filter={filter}
+                      fieldLogic={x.fieldLogic!}
+                    />
+                  </LiquidPetitionVariableProvider>
                 ) : (
                   <PetitionRepliesFilteredFields key={index} count={x.count} />
                 ),
@@ -766,7 +785,12 @@ PetitionReplies.fragments = {
         ...PetitionLayout_PetitionBase
         fields {
           id
-          ...PetitionReplies_PetitionField
+          isReadOnly
+          requireApproval
+          ...PetitionRepliesField_PetitionField
+          ...PetitionRepliesContents_PetitionField
+          ...PetitionRepliesFieldComments_PetitionField
+          ...ExportRepliesDialog_PetitionField
           ...ProfileDrawer_PetitionField
         }
         ...ShareButton_PetitionBase
@@ -781,22 +805,28 @@ PetitionReplies.fragments = {
         profiles {
           ...ProfileDrawer_Profile
         }
+        variables {
+          name
+        }
+        ...PetitionVariablesCard_PetitionBase
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
         ...useClosePetitionDialog_Petition
-        ...useLiquidScope_PetitionBase
+        ...useFieldLogic_PetitionBase
+        ...LiquidScopeProvider_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
-      ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
       ${getPetitionSignatureStatus.fragments.Petition}
       ${getPetitionSignatureEnvironment.fragments.Petition}
       ${useClosePetitionDialog.fragments.Petition}
-      ${useLiquidScope.fragments.PetitionBase}
+      ${useFieldLogic.fragments.PetitionBase}
+      ${LiquidScopeProvider.fragments.PetitionBase}
       ${ProfileDrawer.fragments.Profile}
       ${ProfileDrawer.fragments.PetitionField}
+      ${PetitionVariablesCard.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -814,7 +844,6 @@ PetitionReplies.fragments = {
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionRepliesContents.fragments.PetitionField}
-      ${useFieldLogic.fragments.PetitionField}
     `;
   },
   get Query() {

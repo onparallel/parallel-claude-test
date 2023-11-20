@@ -17,7 +17,7 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { titleize } from "../../util/strings";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
-import { applyFieldLogic } from "../../util/fieldLogic";
+import { applyFieldVisibility } from "../../util/fieldLogic";
 
 function getPetitionSignatureStatus({
   status,
@@ -100,7 +100,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       const [
         petitionsAccesses,
         petitionsMessages,
-        petitionsComposedFields,
+        composedPetitions,
         petitionsOwner,
         petitionsTags,
         petitionsEvents,
@@ -108,7 +108,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       ] = await Promise.all([
         this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.getComposedPetitionFields(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(
+          petitions.map((p) => p.id),
+        ),
         this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
         this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
@@ -143,7 +145,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       );
 
       rows = petitions.map((petition, petitionIndex) => {
-        const petitionFields = applyFieldLogic(petitionsComposedFields[petitionIndex]).filter(
+        const petitionFields = applyFieldVisibility(composedPetitions[petitionIndex]).filter(
           (f) => f.type !== "HEADING",
         );
 

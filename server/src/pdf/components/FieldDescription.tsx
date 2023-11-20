@@ -4,7 +4,7 @@ import { Fragment, useMemo } from "react";
 import { range, zip } from "remeda";
 import { cleanupText } from "../utils/cleanupText";
 import { useTheme } from "../utils/ThemeProvider";
-import { useLiquid } from "../utils/useLiquid";
+import { useLiquid } from "../utils/liquid/useLiquid";
 
 interface FieldDescriptionProps {
   description: string;

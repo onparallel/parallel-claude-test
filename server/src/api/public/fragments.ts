@@ -191,6 +191,10 @@ export const PetitionFragment = gql`
         total
       }
     }
+    variablesResult @include(if: $includeVariablesResult) {
+      name
+      value
+    }
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}

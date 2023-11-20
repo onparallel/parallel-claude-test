@@ -210,6 +210,11 @@ export type CreatePetitionFieldReplyInput = {
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
+export type CreatePetitionVariableInput = {
+  defaultValue: Scalars["Int"]["input"];
+  name: Scalars["String"]["input"];
+};
+
 export type CreateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
@@ -668,6 +673,8 @@ export type Mutation = {
   createPetitionFieldReplies: Array<PetitionFieldReply>;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
+  /** Creates a new variable on the petition. */
+  createPetitionVariable: Petition;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   createProfile: Profile;
@@ -717,6 +724,8 @@ export type Mutation = {
   deletePetitionListView: User;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
+  /** Deletes a variable from the petition. */
+  deletePetitionVariable: Petition;
   /** Delete petitions and folders. */
   deletePetitions: Success;
   /** Permanently deletes the profile */
@@ -946,6 +955,8 @@ export type Mutation = {
    *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
+  /** Updates a variable on the petition. */
+  updatePetitionVariable: Petition;
   updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
@@ -1222,6 +1233,11 @@ export type MutationcreatePetitionListViewArgs = {
   name: Scalars["String"]["input"];
 };
 
+export type MutationcreatePetitionVariableArgs = {
+  data: CreatePetitionVariableInput;
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationcreatePrintPdfTaskArgs = {
   includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1362,6 +1378,11 @@ export type MutationdeletePetitionListViewArgs = {
 export type MutationdeletePetitionReplyArgs = {
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
+};
+
+export type MutationdeletePetitionVariableArgs = {
+  name: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionsArgs = {
@@ -2039,6 +2060,12 @@ export type MutationupdatePetitionUserNotificationReadStatusArgs = {
   petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
+export type MutationupdatePetitionVariableArgs = {
+  data: UpdatePetitionVariableInput;
+  name: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationupdateProfileFieldValueArgs = {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
@@ -2470,6 +2497,8 @@ export type Petition = PetitionBase & {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
+  variablesResult: Array<PetitionVariableResult>;
 };
 
 /** A petition */
@@ -2634,6 +2663,8 @@ export type PetitionBase = {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
+  variablesResult: Array<PetitionVariableResult>;
 };
 
 export type PetitionBaseMini = {
@@ -2826,6 +2857,8 @@ export type PetitionField = {
   isInternal: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"]["output"];
+  /** A JSON object representing the math to be performed on the field */
+  math: Maybe<Array<Scalars["JSONObject"]["output"]>>;
   /** Determines if this field allows multiple replies. */
   multiple: Scalars["Boolean"]["output"];
   /** Determines if this field is optional. */
@@ -3466,6 +3499,8 @@ export type PetitionTemplate = PetitionBase & {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
+  variablesResult: Array<PetitionVariableResult>;
 };
 
 /** A petition template */
@@ -3532,6 +3567,16 @@ export type PetitionUserPermission = PetitionPermission &
     /** The user linked to the permission */
     user: User;
   };
+
+export type PetitionVariable = {
+  defaultValue: Scalars["Int"]["output"];
+  name: Scalars["String"]["output"];
+};
+
+export type PetitionVariableResult = {
+  name: Scalars["String"]["output"];
+  value: Maybe<Scalars["Int"]["output"]>;
+};
 
 export type Profile = Timestamps & {
   /** Time when the resource was created. */
@@ -3928,6 +3973,7 @@ export type PublicPetition = Timestamps & {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
 };
 
 /** A public view of a petition access */
@@ -3968,6 +4014,8 @@ export type PublicPetitionField = {
   isInternal: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"]["output"];
+  /** A JSON object representing the math to be performed on the field */
+  math: Maybe<Array<Scalars["JSONObject"]["output"]>>;
   /** Determines if this field allows multiple replies. */
   multiple: Scalars["Boolean"]["output"];
   /** Determines if this field is optional. */
@@ -4898,6 +4946,7 @@ export type UpdatePetitionFieldInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   hasCommentsEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   isInternal?: InputMaybe<Scalars["Boolean"]["input"]>;
+  math?: InputMaybe<Array<Scalars["JSONObject"]["input"]>>;
   multiple?: InputMaybe<Scalars["Boolean"]["input"]>;
   optional?: InputMaybe<Scalars["Boolean"]["input"]>;
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
@@ -4932,6 +4981,10 @@ export type UpdatePetitionInput = {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   signatureConfig?: InputMaybe<SignatureConfigInput>;
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type UpdatePetitionVariableInput = {
+  defaultValue: Scalars["Int"]["input"];
 };
 
 export type UpdateProfileFieldValueInput = {
@@ -5220,6 +5273,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
     showInPdf: boolean;
     showActivityInPdf: boolean;
     visibility: { [key: string]: any } | null;
+    math: Array<{ [key: string]: any }> | null;
     replies: Array<{
       content: { [key: string]: any };
       id: string;
@@ -5240,6 +5294,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
           showInPdf: boolean;
           showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
+          math: Array<{ [key: string]: any }> | null;
           children: Array<{
             id: string;
             type: PetitionFieldType;
@@ -5249,6 +5304,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
             showInPdf: boolean;
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
+            math: Array<{ [key: string]: any }> | null;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -5299,6 +5355,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       showInPdf: boolean;
       showActivityInPdf: boolean;
       visibility: { [key: string]: any } | null;
+      math: Array<{ [key: string]: any }> | null;
       parent: { id: string } | null;
       replies: Array<{
         id: string;
@@ -5319,6 +5376,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
   }>;
   organization: { name: string; logoUrl: string | null };
   selectedDocumentTheme: { data: { [key: string]: any } };
+  variables: Array<{ name: string; defaultValue: number }>;
 };
 
 export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
@@ -5336,6 +5394,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
     showInPdf: boolean;
     showActivityInPdf: boolean;
     visibility: { [key: string]: any } | null;
+    math: Array<{ [key: string]: any }> | null;
     replies: Array<{
       content: { [key: string]: any };
       id: string;
@@ -5356,6 +5415,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
           showInPdf: boolean;
           showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
+          math: Array<{ [key: string]: any }> | null;
           children: Array<{
             id: string;
             type: PetitionFieldType;
@@ -5365,6 +5425,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
             showInPdf: boolean;
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
+            math: Array<{ [key: string]: any }> | null;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -5415,6 +5476,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
       showInPdf: boolean;
       showActivityInPdf: boolean;
       visibility: { [key: string]: any } | null;
+      math: Array<{ [key: string]: any }> | null;
       parent: { id: string } | null;
       replies: Array<{
         id: string;
@@ -5435,6 +5497,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
   }>;
   organization: { name: string; logoUrl: string | null };
   selectedDocumentTheme: { data: { [key: string]: any } };
+  variables: Array<{ name: string; defaultValue: number }>;
 };
 
 export type PetitionExport_PetitionBaseFragment =
@@ -5450,6 +5513,7 @@ export type PetitionExport_PetitionFieldInnerFragment = {
   showInPdf: boolean;
   showActivityInPdf: boolean;
   visibility: { [key: string]: any } | null;
+  math: Array<{ [key: string]: any }> | null;
 };
 
 export type PetitionExport_PetitionFieldReplyInnerFragment = {
@@ -5477,6 +5541,7 @@ export type PetitionExport_PetitionFieldFragment = {
   showInPdf: boolean;
   showActivityInPdf: boolean;
   visibility: { [key: string]: any } | null;
+  math: Array<{ [key: string]: any }> | null;
   children: Array<{
     id: string;
     type: PetitionFieldType;
@@ -5486,6 +5551,7 @@ export type PetitionExport_PetitionFieldFragment = {
     showInPdf: boolean;
     showActivityInPdf: boolean;
     visibility: { [key: string]: any } | null;
+    math: Array<{ [key: string]: any }> | null;
     parent: { id: string } | null;
     replies: Array<{
       id: string;
@@ -5523,6 +5589,7 @@ export type PetitionExport_PetitionFieldReplyFragment = {
       showInPdf: boolean;
       showActivityInPdf: boolean;
       visibility: { [key: string]: any } | null;
+      math: Array<{ [key: string]: any }> | null;
       children: Array<{
         id: string;
         type: PetitionFieldType;
@@ -5532,6 +5599,7 @@ export type PetitionExport_PetitionFieldReplyFragment = {
         showInPdf: boolean;
         showActivityInPdf: boolean;
         visibility: { [key: string]: any } | null;
+        math: Array<{ [key: string]: any }> | null;
         parent: { id: string } | null;
         replies: Array<{
           id: string;
@@ -5602,6 +5670,7 @@ export type PetitionExport_petitionQuery = {
           showInPdf: boolean;
           showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
+          math: Array<{ [key: string]: any }> | null;
           replies: Array<{
             content: { [key: string]: any };
             id: string;
@@ -5622,6 +5691,7 @@ export type PetitionExport_petitionQuery = {
                 showInPdf: boolean;
                 showActivityInPdf: boolean;
                 visibility: { [key: string]: any } | null;
+                math: Array<{ [key: string]: any }> | null;
                 children: Array<{
                   id: string;
                   type: PetitionFieldType;
@@ -5631,6 +5701,7 @@ export type PetitionExport_petitionQuery = {
                   showInPdf: boolean;
                   showActivityInPdf: boolean;
                   visibility: { [key: string]: any } | null;
+                  math: Array<{ [key: string]: any }> | null;
                   parent: { id: string } | null;
                   replies: Array<{
                     id: string;
@@ -5687,6 +5758,7 @@ export type PetitionExport_petitionQuery = {
             showInPdf: boolean;
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
+            math: Array<{ [key: string]: any }> | null;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -5707,6 +5779,7 @@ export type PetitionExport_petitionQuery = {
         }>;
         organization: { name: string; logoUrl: string | null };
         selectedDocumentTheme: { data: { [key: string]: any } };
+        variables: Array<{ name: string; defaultValue: number }>;
       }
     | {
         __typename: "PetitionTemplate";
@@ -5723,6 +5796,7 @@ export type PetitionExport_petitionQuery = {
           showInPdf: boolean;
           showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
+          math: Array<{ [key: string]: any }> | null;
           replies: Array<{
             content: { [key: string]: any };
             id: string;
@@ -5743,6 +5817,7 @@ export type PetitionExport_petitionQuery = {
                 showInPdf: boolean;
                 showActivityInPdf: boolean;
                 visibility: { [key: string]: any } | null;
+                math: Array<{ [key: string]: any }> | null;
                 children: Array<{
                   id: string;
                   type: PetitionFieldType;
@@ -5752,6 +5827,7 @@ export type PetitionExport_petitionQuery = {
                   showInPdf: boolean;
                   showActivityInPdf: boolean;
                   visibility: { [key: string]: any } | null;
+                  math: Array<{ [key: string]: any }> | null;
                   parent: { id: string } | null;
                   replies: Array<{
                     id: string;
@@ -5808,6 +5884,7 @@ export type PetitionExport_petitionQuery = {
             showInPdf: boolean;
             showActivityInPdf: boolean;
             visibility: { [key: string]: any } | null;
+            math: Array<{ [key: string]: any }> | null;
             parent: { id: string } | null;
             replies: Array<{
               id: string;
@@ -5828,11 +5905,12 @@ export type PetitionExport_petitionQuery = {
         }>;
         organization: { name: string; logoUrl: string | null };
         selectedDocumentTheme: { data: { [key: string]: any } };
+        variables: Array<{ name: string; defaultValue: number }>;
       }
     | null;
 };
 
-export type useLiquidScope_PetitionBase_Petition_Fragment = {
+export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
   id: string;
   fields: Array<{
     id: string;
@@ -5849,7 +5927,7 @@ export type useLiquidScope_PetitionBase_Petition_Fragment = {
   }>;
 };
 
-export type useLiquidScope_PetitionBase_PetitionTemplate_Fragment = {
+export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   fields: Array<{
     id: string;
@@ -5866,11 +5944,11 @@ export type useLiquidScope_PetitionBase_PetitionTemplate_Fragment = {
   }>;
 };
 
-export type useLiquidScope_PetitionBaseFragment =
-  | useLiquidScope_PetitionBase_Petition_Fragment
-  | useLiquidScope_PetitionBase_PetitionTemplate_Fragment;
+export type LiquidScopeProvider_PetitionBaseFragment =
+  | LiquidScopeProvider_PetitionBase_Petition_Fragment
+  | LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment;
 
-export type useLiquidScope_PetitionFieldFragment = {
+export type LiquidScopeProvider_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   multiple: boolean;
@@ -5887,6 +5965,7 @@ export const PetitionExport_PetitionFieldInnerFragmentDoc = gql`
     showInPdf
     showActivityInPdf
     visibility
+    math
     options
   }
 ` as unknown as DocumentNode<PetitionExport_PetitionFieldInnerFragment, unknown>;
@@ -5987,24 +6066,24 @@ export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
     timezone
   }
 ` as unknown as DocumentNode<SignaturesBlock_SignatureConfigFragment, unknown>;
-export const useLiquidScope_PetitionFieldFragmentDoc = gql`
-  fragment useLiquidScope_PetitionField on PetitionField {
+export const LiquidScopeProvider_PetitionFieldFragmentDoc = gql`
+  fragment LiquidScopeProvider_PetitionField on PetitionField {
     id
     type
     multiple
     alias
   }
-` as unknown as DocumentNode<useLiquidScope_PetitionFieldFragment, unknown>;
-export const useLiquidScope_PetitionBaseFragmentDoc = gql`
-  fragment useLiquidScope_PetitionBase on PetitionBase {
+` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldFragment, unknown>;
+export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
+  fragment LiquidScopeProvider_PetitionBase on PetitionBase {
     id
     fields {
-      ...useLiquidScope_PetitionField
+      ...LiquidScopeProvider_PetitionField
       replies {
         content
         children {
           field {
-            ...useLiquidScope_PetitionField
+            ...LiquidScopeProvider_PetitionField
           }
           replies {
             content
@@ -6013,8 +6092,8 @@ export const useLiquidScope_PetitionBaseFragmentDoc = gql`
       }
     }
   }
-  ${useLiquidScope_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<useLiquidScope_PetitionBaseFragment, unknown>;
+  ${LiquidScopeProvider_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<LiquidScopeProvider_PetitionBaseFragment, unknown>;
 export const PetitionExport_PetitionBaseFragmentDoc = gql`
   fragment PetitionExport_PetitionBase on PetitionBase {
     id
@@ -6042,13 +6121,17 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
         }
       }
     }
-    ...useLiquidScope_PetitionBase
+    ...LiquidScopeProvider_PetitionBase
+    variables {
+      name
+      defaultValue
+    }
     __typename
   }
   ${PetitionExport_PetitionFieldFragmentDoc}
   ${PetitionExport_PetitionFieldReplyFragmentDoc}
   ${SignaturesBlock_SignatureConfigFragmentDoc}
-  ${useLiquidScope_PetitionBaseFragmentDoc}
+  ${LiquidScopeProvider_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionBaseFragment, unknown>;
 export const PetitionExport_petitionDocument = gql`
   query PetitionExport_petition($petitionId: GID!) {

@@ -12,14 +12,16 @@ export function useReferencedFieldDialog() {
 }
 
 export function ReferencedFieldDialog({
-  type,
+  referencedInMath,
+  referencesInVisibility,
   ...props
 }: DialogProps<{
-  type: "DELETING_FIELD" | "INVALID_CONDITION";
   fieldsWithIndices: [
     field: ReferencedFieldDialog_PetitionFieldFragment,
     fieldIndex: PetitionFieldIndex,
   ][];
+  referencedInMath: boolean;
+  referencesInVisibility: boolean;
 }>) {
   const focusRef = useRef<HTMLButtonElement>(null);
   return (
@@ -35,26 +37,44 @@ export function ReferencedFieldDialog({
         />
       }
       message={
-        type === "DELETING_FIELD" ? (
+        referencedInMath && !referencesInVisibility ? (
           <FormattedMessage
-            id="component.referenced-field-dialog.referenced-error"
-            defaultMessage="The {count, plural, =1 {field below is} other {fields below are}} referencing this field. To proceed you need to remove the referencing conditions."
+            id="component.referenced-field-dialog.referenced-calculations"
+            defaultMessage="The {count, plural, =1 {field below is} other {fields below are}} making calculations with this field. To proceed you need to remove the referencing calculations."
             values={{ count: props.fieldsWithIndices.length }}
           />
-        ) : type === "INVALID_CONDITION" ? (
+        ) : !referencedInMath && referencesInVisibility ? (
           <FormattedMessage
-            id="component.referenced-field-dialog.referenced-invalid-conditions"
-            defaultMessage="The {count, plural, =1 {field below is} other {fields below are}} referencing this field with invalid conditions. To proceed you need to remove the referencing invalid conditions."
+            id="component.referenced-field-dialog.referenced-conditions"
+            defaultMessage="The {count, plural, =1 {field below has} other {fields below have}} conditions with this field. To proceed you need to remove the referencing conditions."
             values={{ count: props.fieldsWithIndices.length }}
           />
-        ) : null
+        ) : (
+          <FormattedMessage
+            id="component.referenced-field-dialog.referenced-logic"
+            defaultMessage="The {count, plural, =1 {field below has} other {fields below have}} conditions and calculations with this field. To proceed you need to remove the referencing conditions and calculations."
+            values={{ count: props.fieldsWithIndices.length }}
+          />
+        )
       }
       confirm={
         <Button colorScheme="primary" ref={focusRef} onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="component.referenced-field-dialog.confirm"
-            defaultMessage="Remove conditions"
-          />
+          {!referencedInMath && referencesInVisibility ? (
+            <FormattedMessage
+              id="component.referenced-field-dialog.confirm-conditions"
+              defaultMessage="Remove conditions"
+            />
+          ) : referencedInMath && !referencesInVisibility ? (
+            <FormattedMessage
+              id="component.referenced-field-dialog.confirm-calculations"
+              defaultMessage="Remove calculations"
+            />
+          ) : (
+            <FormattedMessage
+              id="component.referenced-calculations-dialog.confirm-logic"
+              defaultMessage="Remove logic"
+            />
+          )}
         </Button>
       }
     />

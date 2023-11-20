@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
-import { isDefined, omit } from "remeda";
+import { difference, isDefined, omit, uniq } from "remeda";
 import {
   ContactLocale,
   ContactLocaleValues,
@@ -11,11 +11,13 @@ import {
   User,
 } from "../db/__types";
 import { validateFieldOptions } from "../db/helpers/fieldOptions";
-import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { validateFieldVisibility } from "../graphql/helpers/validators/validFieldVisibility";
+import { PetitionRepository, PetitionVariable } from "../db/repositories/PetitionRepository";
+import { validateFieldLogic } from "../graphql/helpers/validators/validFieldLogic";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
 import { safeJsonParse } from "../util/safeJsonParse";
 import { Maybe } from "../util/types";
+import { FIELD_REFERENCE_REGEX } from "../graphql";
+import { PetitionFieldMath, PetitionFieldVisibility } from "../util/fieldLogic";
 
 export const PETITION_IMPORT_EXPORT_SERVICE = Symbol.for("PETITION_IMPORT_EXPORT_SERVICE");
 
@@ -32,6 +34,7 @@ const PETITION_JSON_SCHEMA = {
         "multiple",
         "options",
         "visibility",
+        "math",
         "alias",
         "isInternal",
         "showInPdf",
@@ -48,6 +51,7 @@ const PETITION_JSON_SCHEMA = {
         multiple: { type: "boolean" },
         options: { type: "object" },
         visibility: { type: ["object", "null"] },
+        math: { type: ["array", "null"], items: { type: "object" } },
         alias: { type: ["string", "null"] },
         isInternal: { type: "boolean" },
         showInPdf: { type: "boolean" },
@@ -63,7 +67,7 @@ const PETITION_JSON_SCHEMA = {
     },
     petition: {
       type: "object",
-      required: ["name", "locale", "isTemplate", "fields"],
+      required: ["name", "locale", "isTemplate", "fields", "variables"],
       additionalProperties: false,
       properties: {
         name: { type: ["string", "null"] },
@@ -80,6 +84,17 @@ const PETITION_JSON_SCHEMA = {
             $ref: "#/definitions/petition-field",
           },
         },
+        variables: {
+          type: "array",
+          items: {
+            type: "object",
+            required: ["name", "defaultValue"],
+            properties: {
+              name: { type: "string" },
+              defaultValue: { type: "number" },
+            },
+          },
+        },
       },
     },
   },
@@ -94,7 +109,8 @@ interface PetitionFieldJson {
   optional: boolean;
   multiple: boolean;
   options: any;
-  visibility: any;
+  visibility: PetitionFieldVisibility | null;
+  math: PetitionFieldMath[] | null;
   alias: Maybe<string>;
   isInternal: boolean;
   showInPdf: boolean;
@@ -109,6 +125,7 @@ interface PetitionJson {
   isTemplate: boolean;
   templateDescription: Maybe<string>;
   fields: PetitionFieldJson[];
+  variables: { name: string; defaultValue: number }[];
 }
 
 export interface IPetitionImportExportService {
@@ -160,13 +177,41 @@ export class PetitionImportExportService implements IPetitionImportExportService
         visibility: isDefined(field.visibility)
           ? {
               ...field.visibility,
-              conditions: field.visibility.conditions.map((c: any) => ({
-                ...c,
-                fieldId: customFieldIds[c.fieldId],
-              })),
+              conditions: (field.visibility as PetitionFieldVisibility).conditions.map((c) => {
+                if ("fieldId" in c) {
+                  return {
+                    ...c,
+                    fieldId: customFieldIds[c.fieldId],
+                  };
+                } else {
+                  return c;
+                }
+              }),
             }
           : null,
         alias: field.alias,
+        math: isDefined(field.math)
+          ? (field.math as PetitionFieldMath[]).map((math) => ({
+              ...math,
+              conditions: math.conditions.map((c) => {
+                if ("fieldId" in c) {
+                  return {
+                    ...c,
+                    fieldId: customFieldIds[c.fieldId],
+                  };
+                } else {
+                  return c;
+                }
+              }),
+              operations: math.operations.map((op) => ({
+                ...op,
+                operand:
+                  op.operand.type === "FIELD"
+                    ? { ...op.operand, fieldId: customFieldIds[op.operand.fieldId] }
+                    : op.operand,
+              })),
+            }))
+          : null,
         isInternal: field.is_internal,
         showInPdf: field.show_in_pdf,
         showActivityInPdf: field.show_activity_in_pdf,
@@ -192,6 +237,10 @@ export class PetitionImportExportService implements IPetitionImportExportService
               : undefined,
         };
       }),
+      variables: (petition.variables ?? []).map((v) => ({
+        name: v.name,
+        defaultValue: v.default_value,
+      })),
     };
   }
 
@@ -211,7 +260,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
     }
 
     // restore "position" property on fields based on array index
-    const allFields = json.fields.flatMap((f, position) => [
+    const allJsonFields = json.fields.flatMap((f, position) => [
       {
         ...omit(f, ["children"]),
         position,
@@ -228,9 +277,17 @@ export class PetitionImportExportService implements IPetitionImportExportService
       })) ?? []),
     ]);
 
-    allFields.forEach((field) => {
+    const fieldAliases = allJsonFields.map((f) => f.alias).filter(isDefined);
+    const variables = json.variables.map((v) => ({
+      name: v.name,
+      default_value: v.defaultValue,
+    }));
+
+    this.validateJsonVariablesAndAliases(variables, fieldAliases);
+
+    allJsonFields.forEach((field) => {
       validateFieldOptions(field.type, field.options);
-      validateFieldVisibility(field, allFields);
+      validateFieldLogic(field, allJsonFields, variables);
     });
 
     return await this.petitions.withTransaction(async (t) => {
@@ -242,6 +299,10 @@ export class PetitionImportExportService implements IPetitionImportExportService
           template_description: isDefined(json.templateDescription)
             ? JSON.stringify(json.templateDescription)
             : null,
+          variables: json.variables.map((v) => ({
+            name: v.name,
+            default_value: v.defaultValue,
+          })),
         },
         user,
         true,
@@ -254,7 +315,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
        */
       const newFieldIds: Record<number, number> = {};
       await pMap(
-        allFields,
+        allJsonFields,
         async (jsonField) => {
           const [field] = await this.petitions.createPetitionFieldsAtPosition(
             petition.id,
@@ -269,16 +330,24 @@ export class PetitionImportExportService implements IPetitionImportExportService
               visibility: isDefined(jsonField.visibility)
                 ? {
                     ...jsonField.visibility,
-                    conditions: jsonField.visibility.conditions.map((c: any) => {
-                      // the field.id should always be set on the map, as visibility conditions can only be applied on previous fields
-                      const fieldId = newFieldIds[c.fieldId];
-                      if (!fieldId) {
-                        throw new Error(`Expected PetitionField ${c.fieldId} to be present on map`);
+                    conditions: jsonField.visibility.conditions.map((c) => {
+                      if ("fieldId" in c) {
+                        // the field.id should always be set on the map, as visibility conditions can only be applied on previous fields
+                        const fieldId = newFieldIds[c.fieldId];
+                        if (!fieldId) {
+                          throw new Error(
+                            `Expected PetitionField ${c.fieldId} to be present on map`,
+                          );
+                        }
+                        return { ...c, fieldId };
+                      } else {
+                        return c;
                       }
-                      return { ...c, fieldId };
                     }),
                   }
                 : null,
+              // math conditions may reference fields that are not yet created, so the ids mapping will be done later
+              math: jsonField.math,
               alias: jsonField.alias,
               is_internal: jsonField.isInternal,
               show_in_pdf: jsonField.showInPdf,
@@ -294,11 +363,59 @@ export class PetitionImportExportService implements IPetitionImportExportService
           );
 
           newFieldIds[jsonField.id] = field.id;
-          return field;
+
+          // update math conditions after creating the field in DB, as they may reference themselves
+          if (isDefined(field.math)) {
+            const updatedMath = (field.math as PetitionFieldMath[]).map((math) => ({
+              ...math,
+              conditions: math.conditions.map((c) => {
+                if ("fieldId" in c) {
+                  const fieldId = newFieldIds[c.fieldId];
+                  if (!fieldId) {
+                    throw new Error(`Expected PetitionField ${c.fieldId} to be present on map`);
+                  }
+                  return { ...c, fieldId };
+                } else {
+                  return c;
+                }
+              }),
+              operations: math.operations.map((op) => ({
+                ...op,
+                operand:
+                  op.operand.type === "FIELD"
+                    ? { ...op.operand, fieldId: newFieldIds[op.operand.fieldId] }
+                    : op.operand,
+              })),
+            }));
+
+            await this.petitions.updatePetitionField(
+              petition.id,
+              field.id,
+              { math: updatedMath },
+              `User:${user.id}`,
+              t,
+            );
+          }
         },
         { concurrency: 1 },
       );
       return petition.id;
     });
+  }
+
+  private validateJsonVariablesAndAliases(variables: PetitionVariable[], aliases: string[]) {
+    const values = [...variables.map((v) => v.name), ...aliases];
+    const diff = difference(values, uniq(values));
+    if (diff.length > 0) {
+      throw new Error(`Found duplicate petition variables or field aliases: ${diff.join(", ")}`);
+    }
+
+    // every value must match regexp
+    const invalidValues = values.filter((v) => !FIELD_REFERENCE_REGEX.test(v));
+    if (invalidValues.length > 0) {
+      throw new Error(
+        `Found invalid petition variables or field aliases: ${invalidValues.join(", ")}`,
+      );
+    }
   }
 }

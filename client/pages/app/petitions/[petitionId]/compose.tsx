@@ -1,6 +1,6 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Box, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
-import { ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
+import { CalculatorIcon, ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -24,6 +24,7 @@ import { useSendPetitionHandler } from "@parallel/components/petition-common/use
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
 import { PetitionComposeContents } from "@parallel/components/petition-compose/PetitionComposeContents";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
+import { PetitionComposeVariables } from "@parallel/components/petition-compose/PetitionComposeVariables";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
@@ -66,6 +67,7 @@ import { compose } from "@parallel/utils/compose";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import {
   PetitionFieldLogicCondition,
+  PetitionFieldMath,
   PetitionFieldVisibility,
 } from "@parallel/utils/fieldLogic/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -77,7 +79,7 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { isDefined, uniqBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
@@ -226,34 +228,92 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     // if they want to remove the conflicting conditions
 
     const fieldToCheck = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
-    const referencing = allFieldsWithIndices.filter(
+    const referencingVisibility = allFieldsWithIndices.filter(
       ([f]) =>
-        (f.visibility as PetitionFieldVisibility)?.conditions.some((c) =>
-          fieldToCheck.type === "FIELD_GROUP"
-            ? c.fieldId === fieldId || fieldToCheck.children?.some((f) => c.fieldId === f.id)
-            : c.fieldId === fieldId,
+        (f.visibility as PetitionFieldVisibility)?.conditions.some(
+          (c) =>
+            "fieldId" in c &&
+            (fieldToCheck.type === "FIELD_GROUP"
+              ? c.fieldId === fieldId || fieldToCheck.children?.some((f) => c.fieldId === f.id)
+              : c.fieldId === fieldId),
         ),
     );
 
-    if (referencing.length > 0) {
+    const referencingMath = allFieldsWithIndices.filter(
+      ([f]) =>
+        (f.math as PetitionFieldMath[])?.some(
+          (calc) =>
+            calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
+            calc.operations.some(
+              (o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId,
+            ),
+        ),
+    );
+
+    if (referencingVisibility.length > 0 || referencingMath.length > 0) {
       try {
         await showReferencedFieldDialog({
-          type: "DELETING_FIELD",
-          fieldsWithIndices: referencing,
+          fieldsWithIndices: uniqBy(
+            [...referencingMath, ...referencingVisibility],
+            ([_, fieldIndex]) => fieldIndex,
+          ),
+          referencedInMath: referencingMath.length > 0,
+          referencesInVisibility: referencingVisibility.length > 0,
         });
       } catch {
         return false;
       }
-      for (const [field] of referencing) {
+      for (const [field] of referencingVisibility) {
         const visibility = field.visibility! as PetitionFieldVisibility;
-        const conditions = visibility.conditions.filter((c) =>
-          fieldToCheck.type === "FIELD_GROUP" && fieldToCheck.children?.length
-            ? c.fieldId !== fieldId && !fieldToCheck.children?.some((ch) => c.fieldId === ch.id)
-            : c.fieldId !== fieldId,
+        const conditions = visibility.conditions.filter(
+          (c) =>
+            !(
+              "fieldId" in c &&
+              (fieldToCheck.type === "FIELD_GROUP"
+                ? c.fieldId === fieldId || fieldToCheck.children?.some((f) => c.fieldId === f.id)
+                : c.fieldId === fieldId)
+            ),
         );
 
         await _handleFieldEdit(field.id, {
           visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
+        });
+      }
+
+      for (const [field] of referencingMath) {
+        const newMath = (field.math! as PetitionFieldMath[])
+          .map((calc) => {
+            const conditions = calc.conditions.filter(
+              (c) => !("fieldId" in c && c.fieldId === fieldId),
+            );
+
+            const operations = calc.operations.filter(
+              (o) =>
+                !(
+                  o.operand.type === "FIELD" &&
+                  (fieldToCheck.type === "FIELD_GROUP"
+                    ? o.operand.fieldId === fieldId ||
+                      fieldToCheck.children?.some(
+                        (f) => "fieldId" in o.operand && o.operand.fieldId === f.id,
+                      )
+                    : o.operand.fieldId === fieldId)
+                ),
+            );
+
+            if (!conditions.length || !operations.length) {
+              return null;
+            }
+
+            return {
+              ...calc,
+              conditions,
+              operations,
+            };
+          })
+          .filter(isDefined);
+
+        await _handleFieldEdit(field.id, {
+          math: newMath.length > 0 ? newMath : null,
         });
       }
       return true;
@@ -381,7 +441,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       if (data.multiple === false) {
         // check no field is referencing with invalid NUMBER_OF_REPLIES condition
         const validCondition = (c: PetitionFieldLogicCondition) => {
-          if (c.fieldId === fieldId) {
+          if ("fieldId" in c && c.fieldId === fieldId) {
             if (c.modifier === "NUMBER_OF_REPLIES") {
               return c.value === 0 && (c.operator === "EQUAL" || c.operator === "GREATER_THAN");
             } else if (c.modifier === "ALL" || c.modifier === "NONE") {
@@ -390,18 +450,30 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           }
           return true;
         };
-        const referencing = allFieldsWithIndices.filter(
+        const referencingVisibility = allFieldsWithIndices.filter(
           ([f]) =>
             (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => !validCondition(c)),
         );
-        if (referencing.length) {
+
+        const referencingMath = allFieldsWithIndices.filter(
+          ([f]) =>
+            (f.math as PetitionFieldMath[])?.some((calc) =>
+              calc.conditions.some((c) => !validCondition(c)),
+            ),
+        );
+
+        if (referencingVisibility.length || referencingMath.length) {
           try {
             await showReferencedFieldDialog({
-              type: "INVALID_CONDITION",
-              fieldsWithIndices: referencing,
+              fieldsWithIndices: uniqBy(
+                [...referencingMath, ...referencingVisibility],
+                ([_, fieldIndex]) => fieldIndex,
+              ),
+              referencedInMath: referencingMath.length > 0,
+              referencesInVisibility: referencingVisibility.length > 0,
             });
             await Promise.all(
-              referencing.map(async ([field]) => {
+              referencingVisibility.map(async ([field]) => {
                 const visibility = field.visibility! as PetitionFieldVisibility;
                 const conditions = visibility.conditions.filter(validCondition);
                 await handleFieldEdit(field.id, {
@@ -409,6 +481,27 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 });
               }),
             );
+
+            for (const [field] of referencingMath) {
+              const newMath = (field.math! as PetitionFieldMath[])
+                .map((calc) => {
+                  const conditions = calc.conditions.filter(validCondition);
+
+                  if (!conditions.length) {
+                    return null;
+                  }
+
+                  return {
+                    ...calc,
+                    conditions,
+                  };
+                })
+                .filter(isDefined);
+
+              await _handleFieldEdit(field.id, {
+                math: newMath.length > 0 ? newMath : null,
+              });
+            }
           } catch {
             return;
           }
@@ -444,25 +537,78 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
       const { allFieldsWithIndices } = fieldsRef.current!;
       const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
-      const referencing = allFieldsWithIndices.filter(
+      const referencingVisibility = allFieldsWithIndices.filter(
         ([f]) =>
-          (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId),
+          (f.visibility as PetitionFieldVisibility)?.conditions.some(
+            (c) => "fieldId" in c && c.fieldId === fieldId,
+          ),
       );
-      if (referencing.length) {
+
+      const referencingMath = allFieldsWithIndices.filter(
+        ([f]) =>
+          (f.math as PetitionFieldMath[])?.some(
+            (calc) =>
+              calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
+              calc.operations.some(
+                (o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId,
+              ),
+          ),
+      );
+
+      if (referencingVisibility.length || referencingMath.length) {
         // valid field types changes
         if (type === "TEXT" && field.type === "SELECT") {
           // pass
         } else {
           try {
             await showReferencedFieldDialog({
-              type: "INVALID_CONDITION",
-              fieldsWithIndices: referencing,
+              fieldsWithIndices: uniqBy(
+                [...referencingMath, ...referencingVisibility],
+                ([_, fieldIndex]) => fieldIndex,
+              ),
+              referencedInMath: referencingMath.length > 0,
+              referencesInVisibility: referencingVisibility.length > 0,
             });
-            for (const [field] of referencing) {
+            for (const [field] of referencingVisibility) {
               const visibility = field.visibility! as PetitionFieldVisibility;
-              const conditions = visibility.conditions.filter((c) => c.fieldId !== fieldId);
+              const conditions = visibility.conditions.filter(
+                (c) => !("fieldId" in c && c.fieldId === fieldId),
+              );
               await _handleFieldEdit(field.id, {
                 visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
+              });
+            }
+
+            for (const [field] of referencingMath) {
+              const newMath = (field.math! as PetitionFieldMath[])
+                .map((calc) => {
+                  const conditions = calc.conditions.filter(
+                    (c) => !("fieldId" in c && c.fieldId === fieldId),
+                  );
+
+                  const operations = calc.operations.filter(
+                    (o) =>
+                      !(
+                        o.operand.type === "FIELD" &&
+                        "fieldId" in o.operand &&
+                        o.operand.fieldId === fieldId
+                      ),
+                  );
+
+                  if (!conditions.length || !operations.length) {
+                    return null;
+                  }
+
+                  return {
+                    ...calc,
+                    conditions,
+                    operations,
+                  };
+                })
+                .filter(isDefined);
+
+              await _handleFieldEdit(field.id, {
+                math: newMath.length > 0 ? newMath : null,
               });
             }
           } catch {
@@ -634,6 +780,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 <FormattedMessage
                   id="generic.first-child-is-internal-error"
                   defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+                />
+              ),
+            }),
+          );
+        } else if (isApolloError(error, "INVALID_FIELD_CONDITIONS_ORDER")) {
+          await withError(
+            showErrorDialog({
+              message: (
+                <FormattedMessage
+                  id="generic.invalid-field-conditions-error"
+                  defaultMessage="You can only move fields so that visibility and calculations conditions refer only to previous fields."
                 />
               ),
             }),
@@ -862,6 +1019,19 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                           defaultMessage="Settings"
                         />
                       </Tab>
+                      <Tab
+                        data-action="petition-settings"
+                        className="petition-settings"
+                        padding={4}
+                        lineHeight={5}
+                        fontWeight="bold"
+                      >
+                        <CalculatorIcon fontSize="16px" marginRight={2} aria-hidden="true" />
+                        <FormattedMessage
+                          id="page.compose.petition-variables-header"
+                          defaultMessage="Variables"
+                        />
+                      </Tab>
                     </TabList>
                     <TabPanels {...extendFlexColumn}>
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
@@ -879,6 +1049,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                           onUpdatePetition={handleUpdatePetition}
                           validPetitionFields={validPetitionFields}
                           onRefetch={() => refetch({ id: petitionId })}
+                        />
+                      </TabPanel>
+                      <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
+                        <PetitionComposeVariables
+                          petition={petition}
+                          allFieldsWithIndices={allFieldsWithIndices as any}
+                          isReadOnly={isReadOnly}
                         />
                       </TabPanel>
                     </TabPanels>
@@ -989,12 +1166,14 @@ const _fragments = {
           permissionType
         }
         isAnonymized
+        ...PetitionComposeVariables_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionComposeFieldList.fragments.PetitionBase}
       ${PetitionSettings.fragments.PetitionBase}
       ${PetitionComposeAttachments.fragments.PetitionBase}
       ${useSendPetitionHandler.fragments.Petition}
+      ${PetitionComposeVariables.fragments.PetitionBase}
       ${this.PetitionField}
     `;
   },

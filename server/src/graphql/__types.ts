@@ -128,6 +128,11 @@ export interface NexusGenInputs {
     id: NexusGenScalars["GID"]; // GID!
     parentReplyId?: NexusGenScalars["GID"] | null; // GID
   };
+  CreatePetitionVariableInput: {
+    // input type
+    defaultValue: number; // Int!
+    name: string; // String!
+  };
   CreateProfileTypeFieldInput: {
     // input type
     alias?: string | null; // String
@@ -307,6 +312,7 @@ export interface NexusGenInputs {
     description?: string | null; // String
     hasCommentsEnabled?: boolean | null; // Boolean
     isInternal?: boolean | null; // Boolean
+    math?: NexusGenScalars["JSONObject"][] | null; // [JSONObject!]
     multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
@@ -341,6 +347,10 @@ export interface NexusGenInputs {
     remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
     signatureConfig?: NexusGenInputs["SignatureConfigInput"] | null; // SignatureConfigInput
     skipForwardSecurity?: boolean | null; // Boolean
+  };
+  UpdatePetitionVariableInput: {
+    // input type
+    defaultValue: number; // Int!
   };
   UpdateProfileFieldValueInput: {
     // input type
@@ -884,6 +894,14 @@ export interface NexusGenObjects {
   PetitionUntaggedEvent: petitionEvents.PetitionUntaggedEvent;
   PetitionUserGroupPermission: db.PetitionPermission;
   PetitionUserPermission: db.PetitionPermission;
+  PetitionVariable: {
+    name: string;
+    default_value: number;
+  };
+  PetitionVariableResult: {
+    name: string;
+    value: number | null;
+  };
   Profile: db.Profile;
   ProfileAnonymizedEvent: profileEvents.ProfileAnonymizedEvent;
   ProfileAssociatedEvent: petitionEvents.ProfileAssociatedEvent;
@@ -1554,6 +1572,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createPetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     createPetitionListView: NexusGenRootTypes["PetitionListView"]; // PetitionListView!
+    createPetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createProfile: NexusGenRootTypes["Profile"]; // Profile!
     createProfileFieldFileUploadLink: NexusGenRootTypes["ProfileFieldPropertyAndFileWithUploadData"]; // ProfileFieldPropertyAndFileWithUploadData!
@@ -1581,6 +1600,7 @@ export interface NexusGenFieldTypes {
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionListView: NexusGenRootTypes["User"]; // User!
     deletePetitionReply: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    deletePetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
     deletePetitions: NexusGenEnums["Success"]; // Success!
     deleteProfile: NexusGenEnums["Success"]; // Success!
     deleteProfileFieldFile: NexusGenEnums["Result"]; // Result!
@@ -1698,6 +1718,7 @@ export interface NexusGenFieldTypes {
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
+    updatePetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
     updateProfileFieldValue: NexusGenRootTypes["Profile"]; // Profile!
     updateProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -1853,6 +1874,8 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    variables: NexusGenRootTypes["PetitionVariable"][]; // [PetitionVariable!]!
+    variablesResult: NexusGenRootTypes["PetitionVariableResult"][]; // [PetitionVariableResult!]!
   };
   PetitionAccess: {
     // field return type
@@ -2026,6 +2049,7 @@ export interface NexusGenFieldTypes {
     isFixed: boolean; // Boolean!
     isInternal: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
+    math: NexusGenScalars["JSONObject"][] | null; // [JSONObject!]
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
     options: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -2342,6 +2366,8 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    variables: NexusGenRootTypes["PetitionVariable"][]; // [PetitionVariable!]!
+    variablesResult: NexusGenRootTypes["PetitionVariableResult"][]; // [PetitionVariableResult!]!
   };
   PetitionUntaggedEvent: {
     // field return type
@@ -2370,6 +2396,16 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     user: NexusGenRootTypes["User"]; // User!
+  };
+  PetitionVariable: {
+    // field return type
+    defaultValue: number; // Int!
+    name: string; // String!
+  };
+  PetitionVariableResult: {
+    // field return type
+    name: string; // String!
+    value: number | null; // Int
   };
   Profile: {
     // field return type
@@ -2639,6 +2675,7 @@ export interface NexusGenFieldTypes {
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    variables: NexusGenRootTypes["PetitionVariable"][]; // [PetitionVariable!]!
   };
   PublicPetitionAccess: {
     // field return type
@@ -2667,6 +2704,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isInternal: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
+    math: NexusGenScalars["JSONObject"][] | null; // [JSONObject!]
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
     options: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -3286,6 +3324,8 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    variables: NexusGenRootTypes["PetitionVariable"][]; // [PetitionVariable!]!
+    variablesResult: NexusGenRootTypes["PetitionVariableResult"][]; // [PetitionVariableResult!]!
   };
   PetitionEvent: {
     // field return type
@@ -3751,6 +3791,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldComment: "PetitionFieldComment";
     createPetitionFieldReplies: "PetitionFieldReply";
     createPetitionListView: "PetitionListView";
+    createPetitionVariable: "Petition";
     createPrintPdfTask: "Task";
     createProfile: "Profile";
     createProfileFieldFileUploadLink: "ProfileFieldPropertyAndFileWithUploadData";
@@ -3778,6 +3819,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionFieldComment: "PetitionField";
     deletePetitionListView: "User";
     deletePetitionReply: "PetitionField";
+    deletePetitionVariable: "Petition";
     deletePetitions: "Success";
     deleteProfile: "Success";
     deleteProfileFieldFile: "Result";
@@ -3895,6 +3937,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionPermissionSubscription: "Petition";
     updatePetitionRestriction: "PetitionBase";
     updatePetitionUserNotificationReadStatus: "PetitionUserNotification";
+    updatePetitionVariable: "Petition";
     updateProfileFieldValue: "Profile";
     updateProfileType: "ProfileType";
     updateProfileTypeField: "ProfileTypeField";
@@ -4050,6 +4093,8 @@ export interface NexusGenFieldTypeNames {
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
+    variables: "PetitionVariable";
+    variablesResult: "PetitionVariableResult";
   };
   PetitionAccess: {
     // field return type name
@@ -4223,6 +4268,7 @@ export interface NexusGenFieldTypeNames {
     isFixed: "Boolean";
     isInternal: "Boolean";
     isReadOnly: "Boolean";
+    math: "JSONObject";
     multiple: "Boolean";
     optional: "Boolean";
     options: "JSONObject";
@@ -4539,6 +4585,8 @@ export interface NexusGenFieldTypeNames {
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
+    variables: "PetitionVariable";
+    variablesResult: "PetitionVariableResult";
   };
   PetitionUntaggedEvent: {
     // field return type name
@@ -4567,6 +4615,16 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     updatedAt: "DateTime";
     user: "User";
+  };
+  PetitionVariable: {
+    // field return type name
+    defaultValue: "Int";
+    name: "String";
+  };
+  PetitionVariableResult: {
+    // field return type name
+    name: "String";
+    value: "Int";
   };
   Profile: {
     // field return type name
@@ -4836,6 +4894,7 @@ export interface NexusGenFieldTypeNames {
     status: "PetitionStatus";
     tone: "Tone";
     updatedAt: "DateTime";
+    variables: "PetitionVariable";
   };
   PublicPetitionAccess: {
     // field return type name
@@ -4864,6 +4923,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isInternal: "Boolean";
     isReadOnly: "Boolean";
+    math: "JSONObject";
     multiple: "Boolean";
     optional: "Boolean";
     options: "JSONObject";
@@ -5483,6 +5543,8 @@ export interface NexusGenFieldTypeNames {
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
+    variables: "PetitionVariable";
+    variablesResult: "PetitionVariableResult";
   };
   PetitionEvent: {
     // field return type name
@@ -5806,6 +5868,11 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["PetitionListViewDataInput"]; // PetitionListViewDataInput!
       name: string; // String!
     };
+    createPetitionVariable: {
+      // args
+      data: NexusGenInputs["CreatePetitionVariableInput"]; // CreatePetitionVariableInput!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     createPrintPdfTask: {
       // args
       includeNdLinks?: boolean | null; // Boolean
@@ -5947,6 +6014,11 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
+    };
+    deletePetitionVariable: {
+      // args
+      name: string; // String!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     deletePetitions: {
       // args
@@ -6622,6 +6694,12 @@ export interface NexusGenArgTypes {
       petitionFieldCommentIds?: NexusGenScalars["GID"][] | null; // [GID!]
       petitionIds?: NexusGenScalars["GID"][] | null; // [GID!]
       petitionUserNotificationIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
+    updatePetitionVariable: {
+      // args
+      data: NexusGenInputs["UpdatePetitionVariableInput"]; // UpdatePetitionVariableInput!
+      name: string; // String!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     updateProfileFieldValue: {
       // args

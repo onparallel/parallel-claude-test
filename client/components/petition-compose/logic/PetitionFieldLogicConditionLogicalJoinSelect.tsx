@@ -10,14 +10,14 @@ export function PetitionFieldLogicConditionLogicalJoinSelect(
       {
         value: "AND",
         label: intl.formatMessage({
-          id: "component.petition-field-visibility-editor.and",
+          id: "generic.condition-logical-join-and",
           defaultMessage: "and",
         }),
       },
       {
         value: "OR",
         label: intl.formatMessage({
-          id: "component.petition-field-visibility-editor.or",
+          id: "generic.condition-logical-join-or",
           defaultMessage: "or",
         }),
       },

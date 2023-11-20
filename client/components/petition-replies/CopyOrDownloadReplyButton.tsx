@@ -31,6 +31,7 @@ export function CopyOrDownloadReplyButton({
       {reply.field!.type === "NUMBER" ? (
         <CopyToClipboardButton
           size="xs"
+          fontSize="md"
           isDisabled={reply.isAnonymized}
           text={intl.formatNumber(content, {
             minimumFractionDigits: 0,
@@ -44,7 +45,12 @@ export function CopyOrDownloadReplyButton({
           onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
         />
       ) : (
-        <CopyToClipboardButton size="xs" text={content} isDisabled={reply.isAnonymized} />
+        <CopyToClipboardButton
+          size="xs"
+          fontSize="md"
+          text={content}
+          isDisabled={reply.isAnonymized}
+        />
       )}
       {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
         <NetDocumentsIconButton

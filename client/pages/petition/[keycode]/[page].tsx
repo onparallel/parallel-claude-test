@@ -1,5 +1,8 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Box, Button, Flex, Stack } from "@chakra-ui/react";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
+import { Spacer } from "@parallel/components/common/Spacer";
+import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
@@ -7,20 +10,11 @@ import {
   withDialogs,
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
-import { Spacer } from "@parallel/components/common/Spacer";
-import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import {
   RedirectError,
-  withApolloData,
   WithApolloDataContext,
+  withApolloData,
 } from "@parallel/components/common/withApolloData";
-import { useCompletingMessageDialog } from "@parallel/components/recipient-view/dialogs/CompletingMessageDialog";
-import {
-  RecipientViewConfirmPetitionSignersDialogResult,
-  useRecipientViewConfirmPetitionSignersDialog,
-} from "@parallel/components/recipient-view/dialogs/RecipientViewConfirmPetitionSignersDialog";
-import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import { LastSavedProvider } from "@parallel/components/recipient-view/LastSavedProvider";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
@@ -29,22 +23,28 @@ import { RecipientViewPagination } from "@parallel/components/recipient-view/Rec
 import { RecipientViewPetitionStatusAlert } from "@parallel/components/recipient-view/RecipientViewPetitionStatusAlert";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import { RecipientViewSignatureSentAlert } from "@parallel/components/recipient-view/RecipientViewSignatureSentAlert";
+import { useCompletingMessageDialog } from "@parallel/components/recipient-view/dialogs/CompletingMessageDialog";
 import {
+  RecipientViewConfirmPetitionSignersDialogResult,
+  useRecipientViewConfirmPetitionSignersDialog,
+} from "@parallel/components/recipient-view/dialogs/RecipientViewConfirmPetitionSignersDialog";
+import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
+import {
+  RecipientView_PublicUserFragment,
   RecipientView_accessDocument,
   RecipientView_accessesDocument,
   RecipientView_publicCompletePetitionDocument,
-  RecipientView_PublicUserFragment,
   Tone,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
-import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
-import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import useResizeObserver from "@react-hook/resize-observer";
@@ -88,8 +88,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const pages = useGetPetitionPages(petition.fields, { hideInternalFields: true });
-  const fields = pages[currentPage - 1];
+  const pages = useGetPetitionPages(petition, { hideInternalFields: true });
+  const fieldsWithLogic = pages[currentPage - 1];
   const tone = petition.tone;
 
   const showFullScreenDialog =
@@ -186,7 +186,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   });
 
   const breakpoint = "md";
-  const scope = useLiquidScope(petition);
 
   const titleOrgName = granter.organization.hasRemoveParallelBranding
     ? granter.organization.name
@@ -285,18 +284,20 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               </Box>
               <Flex flexDirection="column" flex="2" minWidth={0}>
                 <Stack spacing={4} key={currentPage}>
-                  <LiquidScopeProvider scope={scope}>
+                  <LiquidScopeProvider petition={petition}>
                     <AnimatePresence initial={false}>
-                      {fields.map((field) => {
+                      {fieldsWithLogic.map(({ field, logic }) => {
                         return (
-                          <RecipientViewPetitionField
-                            key={field.id}
-                            keycode={keycode}
-                            access={access!}
-                            field={field}
-                            isDisabled={petition.status === "CLOSED"}
-                            showErrors={showErrors && !canFinalize}
-                          />
+                          <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                            <RecipientViewPetitionField
+                              keycode={keycode}
+                              access={access!}
+                              field={field}
+                              isDisabled={petition.status === "CLOSED"}
+                              showErrors={showErrors && !canFinalize}
+                              fieldLogic={logic}
+                            />
+                          </LiquidPetitionVariableProvider>
                         );
                       })}
                     </AnimatePresence>
@@ -430,8 +431,8 @@ const _fragments = {
         tone
         fields {
           id
-          ...RecipientView_PublicPetitionField
-          ...useGetPetitionPages_PublicPetitionField
+          ...RecipientViewPetitionField_PublicPetitionField
+          ...completedFieldReplies_PublicPetitionField
         }
         signatureConfig {
           review
@@ -449,10 +450,11 @@ const _fragments = {
           ...RecipientViewHeader_PublicContact
         }
         signatureStatus
+        isCompletingMessageEnabled
         ...RecipientViewContentsCard_PublicPetition
         ...RecipientViewProgressFooter_PublicPetition
-        ...useLiquidScope_PublicPetition
-        isCompletingMessageEnabled
+        ...useGetPetitionPages_PublicPetition
+        ...LiquidScopeProvider_PublicPetition
         ...useCompletingMessageDialog_PublicPetition
         ...RecipientViewFooter_PublicPetition
         ...RecipientViewPetitionStatusAlert_PublicPetition
@@ -460,33 +462,20 @@ const _fragments = {
         ...usePetitionCanFinalize_PublicPetition
       }
 
-      ${this.PublicPetitionField}
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PetitionSigner}
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicSignatureConfig}
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
       ${RecipientViewFooter.fragments.PublicPetition}
-      ${useGetPetitionPages.fragments.PublicPetitionField}
-      ${useLiquidScope.fragments.PublicPetition}
+      ${useGetPetitionPages.fragments.PublicPetition}
+      ${LiquidScopeProvider.fragments.PublicPetition}
       ${useCompletingMessageDialog.fragments.PublicPetition}
       ${RecipientViewPetitionStatusAlert.fragments.PublicPetition}
       ${RecipientViewSignatureSentAlert.fragments.PublicPetition}
       ${usePetitionCanFinalize.fragments.PublicPetition}
-    `;
-  },
-  get PublicPetitionField() {
-    return gql`
-      fragment RecipientView_PublicPetitionField on PublicPetitionField {
-        id
-        ...RecipientViewPetitionField_PublicPetitionField
-        ...RecipientViewContentsCard_PublicPetitionField
-        ...RecipientViewProgressFooter_PublicPetitionField
-        ...completedFieldReplies_PublicPetitionField
-      }
+
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
-      ${RecipientViewContentsCard.fragments.PublicPetitionField}
-      ${RecipientViewProgressFooter.fragments.PublicPetitionField}
       ${completedFieldReplies.fragments.PublicPetitionField}
     `;
   },

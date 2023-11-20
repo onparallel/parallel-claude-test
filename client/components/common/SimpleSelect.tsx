@@ -3,6 +3,7 @@ import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-
 import { OptionBase } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import {
+  Component,
   DependencyList,
   ForwardedRef,
   forwardRef,
@@ -14,8 +15,8 @@ import { IntlShape, useIntl } from "react-intl";
 import Select, {
   components,
   OptionProps,
-  Props as SelectProps,
   SelectInstance,
+  Props as SelectProps,
 } from "react-select";
 import { indexBy } from "remeda";
 
@@ -30,6 +31,7 @@ export interface SimpleSelectProps<
   OptionType extends SimpleOption<T> = SimpleOption<T>,
 > extends UseReactSelectProps<OptionType, IsMulti>,
     Omit<SelectProps<OptionType, IsMulti>, "value" | "onChange"> {
+  as?: Component;
   value: If<IsMulti, T[], T | null>;
   onChange: (value: If<IsMulti, T[], T | null>) => void;
 }
@@ -44,7 +46,13 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
   IsMulti extends boolean = false,
   OptionType extends SimpleOption<T> = SimpleOption<T>,
 >(
-  { value, onChange, ...props }: SimpleSelectProps<T, IsMulti, OptionType>,
+  {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    as,
+    value,
+    onChange,
+    ...props
+  }: SimpleSelectProps<T, IsMulti, OptionType>,
   ref: ForwardedRef<SelectInstance<OptionType, IsMulti>>,
 ) {
   const rsProps = useReactSelectProps({
@@ -65,8 +73,10 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
       return isDefined(value) ? _options[value as string] ?? null : null;
     }
   }, [props.options, props.isMulti, value]);
+
+  const Component: typeof Select = (as as any) ?? Select;
   return (
-    <Select
+    <Component
       ref={ref}
       getOptionValue={(o) => o.value}
       getOptionLabel={(o) => o.label}

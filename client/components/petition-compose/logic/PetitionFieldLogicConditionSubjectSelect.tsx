@@ -1,4 +1,5 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, HStack, StackProps, Text } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionFieldLogicContext_PetitionFieldFragment } from "@parallel/graphql/__types";
@@ -9,7 +10,7 @@ import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { never } from "@parallel/utils/never";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { memo, useMemo } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   CSSObjectWithLabel,
@@ -26,27 +27,14 @@ export function PetitionFieldLogicConditionSubjectSelect({
   value: condition,
   onChange,
   isReadOnly,
+  showErrors,
 }: ValueProps<PetitionFieldLogicCondition, false> & {
   isReadOnly?: boolean;
+  showErrors?: boolean;
 }) {
   const intl = useIntl();
-  const rsProps = useReactSelectProps<ConditionSubjectSelectOption, false, never>({
-    isReadOnly,
-    size: "sm",
-    components: {
-      SingleValue,
-      MultiValueLabel,
-      Option,
-    },
-    styles: {
-      option: (styles: CSSObjectWithLabel) => ({
-        ...styles,
-        display: "flex",
-        padding: "6px 8px",
-      }),
-    },
-  });
-  const { fieldsWithIndices } = usePetitionFieldLogicContext();
+
+  const { fieldsWithIndices, variables } = usePetitionFieldLogicContext();
 
   const { options, value } = useMemo(() => {
     const fieldOptions = fieldsWithIndices.flatMap(([field, fieldIndex]) => {
@@ -71,22 +59,74 @@ export function PetitionFieldLogicConditionSubjectSelect({
       return options;
     });
 
+    const variableOptions = variables.map((v) => ({
+      type: "VARIABLE" as const,
+      variableName: v.name,
+    }));
+
     const value: ConditionSubjectSelectOption | null =
-      fieldOptions.find((o) =>
-        o.type === "FIELD"
-          ? o.field.id === condition.fieldId && condition.column === undefined
-          : o.type === "DYNAMIC_SELECT_OPTION"
-            ? o.field.id === condition.fieldId && o.columnIndex === condition.column
-            : never(),
-      ) ?? null;
+      "fieldId" in condition
+        ? fieldOptions.find((o) =>
+            o.type === "FIELD"
+              ? o.field.id === condition.fieldId && condition.column === undefined
+              : o.type === "DYNAMIC_SELECT_OPTION"
+                ? o.field.id === condition.fieldId && o.columnIndex === condition.column
+                : never(),
+          ) ?? null
+        : variableOptions.find((o) => o.variableName === condition.variableName) ?? null;
 
     return {
-      options: fieldOptions,
+      options: [
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-logic-condition-subject-select.group-variables",
+            defaultMessage: "Variables",
+          }),
+          options: variableOptions,
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-logic-condition-subject-select.group-fields",
+            defaultMessage: "Fields",
+          }),
+          options: fieldOptions,
+        },
+      ],
       value,
     };
   }, [fieldsWithIndices, condition]);
 
-  return (
+  const rsProps = useReactSelectProps<ConditionSubjectSelectOption, false, never>({
+    isReadOnly,
+    isInvalid: showErrors && !value,
+    size: "sm",
+    components: {
+      SingleValue,
+      MultiValueLabel,
+      Option,
+    },
+    styles: {
+      option: (styles: CSSObjectWithLabel) => ({
+        ...styles,
+        display: "flex",
+        padding: "6px 8px",
+      }),
+    },
+  });
+
+  return isReadOnly ? (
+    <ConditionSubjectItem
+      option={value!}
+      display="inline-flex"
+      maxWidth="400px"
+      height="18px"
+      position="relative"
+      fontWeight="semibold"
+      top="2.5px"
+      spacing={1}
+      marginRight={2}
+    />
+  ) : (
     <Select
       placeholder={intl.formatMessage({
         id: "component.petition-field-select.placeholder",
@@ -101,7 +141,11 @@ export function PetitionFieldLogicConditionSubjectSelect({
         } else if (value.type === "DYNAMIC_SELECT_OPTION") {
           onChange(defaultFieldCondition([value.field, value.columnIndex]));
         } else {
-          never();
+          onChange({
+            variableName: value.variableName,
+            operator: "GREATER_THAN",
+            value: 0,
+          });
         }
       }}
       getOptionValue={getOptionValue}
@@ -126,21 +170,24 @@ type ConditionSubjectSelectOption =
       column: string;
       columnIndex: number;
       label: string;
+    }
+  | {
+      type: "VARIABLE";
+      variableName: string;
     };
 
-const ConditionSubjectItem = memo(function ConditionSubjectItem({
-  option,
-  highlight,
-  indent,
-}: {
-  option: ConditionSubjectSelectOption;
-  highlight?: string;
-  indent?: boolean;
-}) {
+const ConditionSubjectItem = chakraForwardRef<
+  "div",
+  {
+    option: ConditionSubjectSelectOption;
+    highlight?: string;
+    indent?: boolean;
+  } & StackProps
+>(function ConditionSubjectItem({ option, highlight, indent, ...props }, ref) {
   if (option.type === "FIELD") {
     const { field, fieldIndex } = option;
     return (
-      <>
+      <HStack ref={ref} {...props}>
         <PetitionFieldTypeIndicator
           as="div"
           type={field.type}
@@ -151,8 +198,6 @@ const ConditionSubjectItem = memo(function ConditionSubjectItem({
         />
         <Box
           fontSize="sm"
-          marginLeft={2}
-          paddingRight={1}
           flex="1"
           minWidth="0"
           whiteSpace="nowrap"
@@ -169,12 +214,12 @@ const ConditionSubjectItem = memo(function ConditionSubjectItem({
             </Text>
           )}
         </Box>
-      </>
+      </HStack>
     );
   } else if (option.type === "DYNAMIC_SELECT_OPTION") {
     const { fieldIndex, column, label, isChild } = option;
     return (
-      <>
+      <HStack ref={ref} {...props}>
         <PetitionFieldTypeIndicator
           as="div"
           type="DYNAMIC_SELECT"
@@ -187,8 +232,6 @@ const ConditionSubjectItem = memo(function ConditionSubjectItem({
           as="div"
           search={highlight}
           fontSize="sm"
-          marginLeft={2}
-          paddingRight={1}
           flex="1"
           minWidth="0"
           whiteSpace="nowrap"
@@ -197,7 +240,26 @@ const ConditionSubjectItem = memo(function ConditionSubjectItem({
         >
           {label}
         </HighlightText>
-      </>
+      </HStack>
+    );
+  } else if (option.type === "VARIABLE") {
+    return (
+      <Badge
+        ref={ref}
+        {...props}
+        colorScheme="blue"
+        fontSize="sm"
+        textTransform="none"
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        top={0}
+        height="auto"
+      >
+        <HighlightText as="span" alignSelf="center" search={highlight}>
+          {option.variableName}
+        </HighlightText>
+      </Badge>
     );
   } else {
     never();
@@ -209,7 +271,7 @@ const getOptionValue = (option: ConditionSubjectSelectOption) => {
     ? `${option.type}:${option.field.id}`
     : option.type === "DYNAMIC_SELECT_OPTION"
       ? `${option.type}:${option.field.id}-${option.column}`
-      : never();
+      : `${option.type}:${option.variableName}`;
 };
 
 const getOptionLabel = (option: ConditionSubjectSelectOption) => {
@@ -218,7 +280,7 @@ const getOptionLabel = (option: ConditionSubjectSelectOption) => {
   } else if (option.type === "DYNAMIC_SELECT_OPTION") {
     return `${option.field.title ?? ""} ${option.label}`;
   } else {
-    never();
+    return option.variableName;
   }
 };
 

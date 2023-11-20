@@ -14,6 +14,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import {
+  CalculatorIcon,
   ChevronRightIcon,
   ConditionIcon,
   CopyIcon,
@@ -89,6 +90,7 @@ import { NativeTypes } from "react-dnd-html5-backend";
 import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
+import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
 export interface PetitionComposeFieldProps {
   user: PetitionComposeField_UserFragment;
@@ -107,6 +109,7 @@ export interface PetitionComposeFieldProps {
   onSettingsClick: () => void;
   onTypeIndicatorClick: () => void;
   onFieldVisibilityClick: () => void;
+  onFieldCalculationsClick: (removeMath?: boolean) => void;
   onDeleteClick: () => void;
   onFocusNextField: () => void;
   onFocusPrevField: () => void;
@@ -121,6 +124,7 @@ export interface PetitionComposeFieldProps {
     | "onDeleteClick"
     | "onFieldEdit"
     | "onFieldVisibilityClick"
+    | "onFieldCalculationsClick"
     | "onFocusPrevField"
     | "onFocusNextField"
     | "onAddField"
@@ -161,6 +165,7 @@ const _PetitionComposeField = chakraForwardRef<
     onDeleteClick,
     onFieldEdit,
     onFieldVisibilityClick,
+    onFieldCalculationsClick,
     onFocusNextField,
     onFocusPrevField,
     onAddField,
@@ -546,6 +551,7 @@ const _PetitionComposeField = chakraForwardRef<
                   onCloneField={onCloneField}
                   onDeleteClick={onDeleteClick}
                   onFieldVisibilityClick={onFieldVisibilityClick}
+                  onFieldCalculationsClick={onFieldCalculationsClick}
                   onSettingsClick={onSettingsClick}
                   isReadOnly={isReadOnly}
                   fieldProps={fieldProps}
@@ -561,6 +567,7 @@ const _PetitionComposeField = chakraForwardRef<
                   onSettingsClick={onSettingsClick}
                   onDeleteClick={onDeleteClick}
                   onVisibilityClick={onFieldVisibilityClick}
+                  onFieldCalculationsClick={onFieldCalculationsClick}
                   onAttachmentClick={open}
                   className={isChildren ? "field-actions-children" : "field-actions"}
                   position="absolute"
@@ -665,6 +672,7 @@ interface PetitionComposeFieldInnerProps
     | "onSettingsClick"
     | "onDeleteClick"
     | "onFieldVisibilityClick"
+    | "onFieldCalculationsClick"
     | "fieldProps"
     | "onUpdateFieldPositions"
   > {
@@ -702,6 +710,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     onFieldVisibilityClick,
     fieldProps,
     onUpdateFieldPositions,
+    onFieldCalculationsClick,
     index,
     isReadOnly,
     ...props
@@ -1040,6 +1049,23 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           </PetitionComposeFieldVisibilityAccordion>
         </Box>
       ) : null}
+      {field.math ? (
+        <Box paddingTop={1}>
+          <PetitionComposeFieldVariablesAccordion
+            isOpen={false}
+            onEditClick={onFieldCalculationsClick}
+            isReadOnly={isReadOnly}
+          >
+            <PetitionFieldMathEditor
+              field={field}
+              petition={petition}
+              showErrors={showError}
+              onMathChange={(visibility) => {}}
+              isReadOnly={true}
+            />
+          </PetitionComposeFieldVariablesAccordion>
+        </Box>
+      ) : null}
     </Stack>
   );
 });
@@ -1047,7 +1073,12 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 interface PetitionComposeFieldActionsProps
   extends Pick<
     PetitionComposeFieldProps,
-    "field" | "onCloneField" | "onSettingsClick" | "onDeleteClick" | "onUnlinkField"
+    | "field"
+    | "onCloneField"
+    | "onSettingsClick"
+    | "onDeleteClick"
+    | "onUnlinkField"
+    | "onFieldCalculationsClick"
   > {
   isActive: boolean;
   canChangeVisibility: boolean;
@@ -1062,6 +1093,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       field,
       canChangeVisibility,
       onVisibilityClick,
+      onFieldCalculationsClick,
       onAttachmentClick,
       onCloneField,
       onSettingsClick,
@@ -1076,6 +1108,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
     const intl = useIntl();
     const isChildren = field.parent?.id !== undefined;
     const hasCondition = field.visibility;
+    const hasMath = field.math;
     const buildUrlToSection = useBuildUrlToPetitionSection();
     return (
       <Stack ref={ref} direction="row" padding={1} {...props}>
@@ -1141,6 +1174,50 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             />
           </SmallPopover>
         )}
+        {hasMath ? (
+          <ConfimationPopover
+            description={
+              <FormattedMessage
+                id="component.petition-compose-field.confirm-remove-math"
+                defaultMessage="Do you want to remove all the calculations?"
+              />
+            }
+            confirm={
+              <Button onClick={() => onFieldCalculationsClick(true)} size="sm" colorScheme="red">
+                <FormattedMessage id="generic.remove" defaultMessage="Remove" />
+              </Button>
+            }
+          >
+            <IconButtonWithTooltip
+              isDisabled={isReadOnly}
+              icon={<CalculatorIcon />}
+              size="sm"
+              variant="ghost"
+              placement="bottom"
+              color="primary.500"
+              label={intl.formatMessage({
+                id: "component.petition-compose-field.remove-calculations",
+                defaultMessage: "Remove calculations",
+              })}
+              onClick={onSettingsClick}
+            />
+          </ConfimationPopover>
+        ) : (
+          <IconButtonWithTooltip
+            isDisabled={isReadOnly}
+            icon={<CalculatorIcon />}
+            size="sm"
+            variant="ghost"
+            placement="bottom"
+            color="gray.600"
+            label={intl.formatMessage({
+              id: "component.petition-compose-field.add-calculation",
+              defaultMessage: "Add calculation",
+            })}
+            onClick={() => onFieldCalculationsClick()}
+          />
+        )}
+
         <IconButtonWithTooltip
           isDisabled={isReadOnly}
           icon={<PaperclipIcon />}
@@ -1302,6 +1379,7 @@ const fragments = {
         isInternal
         isReadOnly
         visibility
+        math
         children {
           type
           description
@@ -1560,7 +1638,7 @@ const PetitionComposeFieldVisibilityAccordion = chakraForwardRef<
           return (
             <>
               <Heading>
-                <AccordionButton borderRadius="md">
+                <AccordionButton borderRadius="md" paddingY={3}>
                   <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
                     <ChevronFilledIcon
                       color="gray.500"
@@ -1590,6 +1668,87 @@ const PetitionComposeFieldVisibilityAccordion = chakraForwardRef<
                 </AccordionButton>
               </Heading>
               <AccordionPanel padding={0}>{isExpanded ? children : null}</AccordionPanel>
+            </>
+          );
+        }}
+      </AccordionItem>
+    </Accordion>
+  );
+});
+
+interface PetitionComposeFieldVariablesAccordionProps {
+  isOpen: boolean;
+  isReadOnly?: boolean;
+  onEditClick: () => void;
+}
+
+const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
+  "div",
+  PetitionComposeFieldVariablesAccordionProps
+>(function PetitionComposeFieldVariablesAccordion(
+  { isOpen, onEditClick, isReadOnly, children },
+  ref,
+) {
+  return (
+    <Accordion
+      defaultIndex={isOpen ? [0] : undefined}
+      allowToggle
+      reduceMotion
+      borderRadius="md"
+      backgroundColor="purple.75"
+      border="none"
+      ref={ref}
+    >
+      <AccordionItem border="none">
+        {({ isExpanded }) => {
+          return (
+            <>
+              <Heading position="relative">
+                <AccordionButton borderRadius="md" backgroundColor="purple.75" paddingY={3}>
+                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
+                    <ChevronFilledIcon
+                      color="gray.500"
+                      fontSize="xs"
+                      transform={isExpanded ? "rotate(90deg)" : undefined}
+                      marginRight={2}
+                    />
+                    <CalculatorIcon />
+                    <FormattedMessage
+                      id="component.petition-compose-field.calculations-title"
+                      defaultMessage="Calculations"
+                    />
+                    <HelpPopover marginLeft={1}>
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="component.petition-compose-field.calculations-help"
+                          defaultMessage="This field will perform calculations when the conditions are met."
+                        />
+                      </Text>
+                      <Text fontSize="sm">
+                        <HelpCenterLink articleId={8574972}>
+                          <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+                        </HelpCenterLink>
+                      </Text>
+                    </HelpPopover>
+                  </HStack>
+                </AccordionButton>
+                {!isReadOnly ? (
+                  <Flex position="absolute" right={3} top={1}>
+                    <Button
+                      background="white"
+                      size="sm"
+                      fontSize="md"
+                      fontWeight={400}
+                      onClick={() => onEditClick()}
+                    >
+                      <FormattedMessage id="generic.edit" defaultMessage="Edit" />
+                    </Button>
+                  </Flex>
+                ) : null}
+              </Heading>
+              <AccordionPanel paddingY={0} paddingX={3} paddingBottom={2}>
+                {isExpanded ? children : null}
+              </AccordionPanel>
             </>
           );
         }}

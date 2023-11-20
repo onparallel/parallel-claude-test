@@ -2,7 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
-import { LiquidProvider } from "@parallel/utils/useLiquid";
+import { LiquidProvider } from "@parallel/utils/liquid/LiquidContext";
 import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect, useRef } from "react";

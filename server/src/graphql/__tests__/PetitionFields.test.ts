@@ -896,6 +896,168 @@ describe("GraphQL/Petition Fields", () => {
         replies: [],
       });
     });
+
+    it("updates self-references on math conditions when cloning the field", async () => {
+      const [field] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "TEXT",
+      }));
+      await mocks.knex.raw(
+        /* sql */ `
+        update petition_field set math = ? where id = ?
+      `,
+        [
+          JSON.stringify([
+            {
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: field.id,
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: 1,
+                },
+              ],
+              operations: [
+                {
+                  operator: "ASSIGNATION",
+                  operand: { type: "NUMBER", value: 10 },
+                  variable: "score",
+                },
+              ],
+            },
+          ]),
+          field.id,
+        ],
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              id
+              math
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitionField).toEqual({
+        id: expect.any(String),
+        math: [
+          {
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: data.clonePetitionField.id,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 1,
+              },
+            ],
+            operations: [
+              {
+                operator: "ASSIGNATION",
+                operand: { type: "NUMBER", value: 10 },
+                variable: "score",
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("updates self-references on math conditions inside children when cloning a FIELD_GROUP field", async () => {
+      const [fieldGroup] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "FIELD_GROUP",
+      }));
+      const [child] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "TEXT",
+        position: 0,
+        parent_petition_field_id: fieldGroup.id,
+      }));
+
+      await mocks.knex.raw(
+        /* sql */ `
+        update petition_field set math = ? where id = ?
+      `,
+        [
+          JSON.stringify([
+            {
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: child.id,
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: 1,
+                },
+              ],
+              operations: [
+                {
+                  operator: "ASSIGNATION",
+                  operand: { type: "NUMBER", value: 10 },
+                  variable: "score",
+                },
+              ],
+            },
+          ]),
+          child.id,
+        ],
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              id
+              children {
+                id
+                math
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fieldGroup.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitionField).toEqual({
+        id: expect.any(String),
+        children: [
+          {
+            id: expect.any(String),
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: data.clonePetitionField.children[0].id,
+                    modifier: "NUMBER_OF_REPLIES",
+                    operator: "EQUAL",
+                    value: 1,
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ASSIGNATION",
+                    operand: { type: "NUMBER", value: 10 },
+                    variable: "score",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
   });
 
   describe("deletePetitionField", () => {
@@ -1178,6 +1340,222 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("sends error when trying to delete a field that is being referenced in the math conditions of another field", async () => {
+      await mocks.knex.raw(
+        /* sql */ `
+          update petition_field set math = ? where id = ?
+        `,
+        [
+          JSON.stringify([
+            {
+              operator: "AND",
+              conditions: [
+                {
+                  operator: "EQUAL",
+                  value: 10,
+                  fieldId: fields[2].id,
+                  modifier: "NUMBER_OF_REPLIES",
+                },
+              ],
+              operations: [
+                {
+                  variable: "var",
+                  operand: { type: "NUMBER", value: 0 },
+                  operator: "ASSIGNATION",
+                },
+              ],
+            },
+          ]),
+          fields[4].id,
+        ],
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to delete a field that is being referenced in the math operations of another field", async () => {
+      await mocks.knex.raw(
+        /* sql */ `
+            update petition_field set math = ? where id = ?
+          `,
+        [
+          JSON.stringify([
+            {
+              operator: "AND",
+              conditions: [
+                {
+                  operator: "EQUAL",
+                  value: 10,
+                  variableName: "variable",
+                },
+              ],
+              operations: [
+                {
+                  variable: "var",
+                  operand: { type: "FIELD", fieldId: fields[2].id },
+                  operator: "ASSIGNATION",
+                },
+              ],
+            },
+          ]),
+          fields[4].id,
+        ],
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("allows to delete field if its referencing itself in its math conditions", async () => {
+      await mocks.knex.raw(
+        /* sql */ `
+          update petition_field set math = ? where id = ?
+        `,
+        [
+          JSON.stringify([
+            {
+              operator: "AND",
+              conditions: [
+                {
+                  operator: "EQUAL",
+                  value: 10,
+                  fieldId: fields[2].id,
+                  modifier: "NUMBER_OF_REPLIES",
+                },
+              ],
+              operations: [
+                {
+                  variable: "var",
+                  operand: { type: "NUMBER", value: 0 },
+                  operator: "ASSIGNATION",
+                },
+              ],
+            },
+          ]),
+          fields[2].id,
+        ],
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deletePetitionField).toEqual({
+        fields: [
+          { id: toGlobalId("PetitionField", fields[0].id) },
+          { id: toGlobalId("PetitionField", fields[1].id) },
+          { id: toGlobalId("PetitionField", fields[3].id) },
+          { id: toGlobalId("PetitionField", fields[4].id) },
+          { id: toGlobalId("PetitionField", fields[5].id) },
+          { id: toGlobalId("PetitionField", fields[6].id) },
+        ],
+      });
+    });
+
+    it("allows to delete field if its referencing itself in its math operations", async () => {
+      await mocks.knex.raw(
+        /* sql */ `
+            update petition_field set math = ? where id = ?
+          `,
+        [
+          JSON.stringify([
+            {
+              operator: "AND",
+              conditions: [
+                {
+                  operator: "EQUAL",
+                  value: 10,
+                  variableName: "variable",
+                },
+              ],
+              operations: [
+                {
+                  variable: "var",
+                  operand: { type: "FIELD", fieldId: fields[2].id },
+                  operator: "ASSIGNATION",
+                },
+              ],
+            },
+          ]),
+          fields[2].id,
+        ],
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deletePetitionField).toEqual({
+        fields: [
+          { id: toGlobalId("PetitionField", fields[0].id) },
+          { id: toGlobalId("PetitionField", fields[1].id) },
+          { id: toGlobalId("PetitionField", fields[3].id) },
+          { id: toGlobalId("PetitionField", fields[4].id) },
+          { id: toGlobalId("PetitionField", fields[5].id) },
+          { id: toGlobalId("PetitionField", fields[6].id) },
+        ],
+      });
     });
 
     it("deletes the linked attachments and uploaded files when deleting a field", async () => {
@@ -2278,6 +2656,58 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("INVALID_FIELD_CONDITIONS_ORDER");
       expect(data).toBeNull();
     });
+
+    it("sends error when moving a field that is being referenced by a field group child after its parent", async () => {
+      const [textField, fieldGroupField] = await mocks.createRandomPetitionFields(
+        petition.id,
+        2,
+        (i) => ({
+          type: ["TEXT", "FIELD_GROUP"][i] as PetitionFieldType,
+        }),
+      );
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        position: 0,
+        parent_petition_field_id: fieldGroupField.id,
+        type: "SHORT_TEXT",
+        visibility: JSON.stringify({
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: textField.id,
+              modifier: "NONE",
+              operator: "CONTAIN",
+              value: "$",
+            },
+          ],
+        }),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $parentFieldId: GID, $fieldIds: [GID!]!) {
+            updateFieldPositions(
+              petitionId: $petitionId
+              parentFieldId: $parentFieldId
+              fieldIds: $fieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: [
+            ...fieldGIDs,
+            toGlobalId("PetitionField", fieldGroupField.id),
+            toGlobalId("PetitionField", textField.id),
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_FIELD_CONDITIONS_ORDER");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updatePetitionField", () => {
@@ -2292,10 +2722,12 @@ describe("GraphQL/Petition Fields", () => {
 
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
-      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        variables: [{ name: "score", default_value: 0 }],
+      }));
 
-      fields = await mocks.createRandomPetitionFields(userPetition.id, 6, (index) => {
-        const type = ["HEADING", "TEXT", "FILE_UPLOAD", "HEADING", "TEXT", "FIELD_GROUP"][
+      fields = await mocks.createRandomPetitionFields(userPetition.id, 7, (index) => {
+        const type = ["HEADING", "TEXT", "FILE_UPLOAD", "HEADING", "TEXT", "FIELD_GROUP", "NUMBER"][
           index
         ] as PetitionFieldType;
         return {
@@ -2560,6 +2992,185 @@ describe("GraphQL/Petition Fields", () => {
               modifier: "NUMBER_OF_REPLIES",
               operator: "EQUAL",
               value: 1,
+            },
+          ],
+        },
+      });
+    });
+
+    it("updates field with visibility and math logic", async () => {
+      await mocks.knex
+        .from("petition")
+        .where("id", userPetition.id)
+        .update({
+          variables: JSON.stringify([
+            { name: "var_1", default_value: 0 },
+            { name: "var_2", default_value: 0 },
+            { name: "var_3", default_value: 0 },
+          ]),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              visibility
+              math
+              petition {
+                variables {
+                  name
+                  defaultValue
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[4],
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: fieldGIDs[2],
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: 1,
+                },
+                {
+                  operator: "LESS_THAN",
+                  value: 100,
+                  variableName: "var_1",
+                },
+              ],
+            },
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: fieldGIDs[2],
+                    modifier: "NUMBER_OF_REPLIES",
+                    operator: "GREATER_THAN",
+                    value: 1,
+                  },
+                  {
+                    operator: "EQUAL",
+                    value: 100,
+                    variableName: "var_3",
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ADDITION",
+                    operand: {
+                      type: "NUMBER",
+                      value: 100,
+                    },
+                    variable: "var_2",
+                  },
+                  {
+                    operator: "MULTIPLICATION",
+                    operand: {
+                      type: "FIELD",
+                      fieldId: fieldGIDs[6],
+                    },
+                    variable: "var_3",
+                  },
+                  {
+                    operator: "DIVISION",
+                    operand: {
+                      type: "VARIABLE",
+                      name: "var_1",
+                    },
+                    variable: "var_3",
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      );
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetitionField).toEqual({
+        id: fieldGIDs[4],
+        visibility: {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: fieldGIDs[2],
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "EQUAL",
+              value: 1,
+            },
+            {
+              operator: "LESS_THAN",
+              value: 100,
+              variableName: "var_1",
+            },
+          ],
+        },
+        math: [
+          {
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: fieldGIDs[2],
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "GREATER_THAN",
+                value: 1,
+              },
+              {
+                operator: "EQUAL",
+                value: 100,
+                variableName: "var_3",
+              },
+            ],
+            operations: [
+              {
+                operator: "ADDITION",
+                operand: {
+                  type: "NUMBER",
+                  value: 100,
+                },
+                variable: "var_2",
+              },
+              {
+                operator: "MULTIPLICATION",
+                operand: {
+                  type: "FIELD",
+                  fieldId: fieldGIDs[6],
+                },
+                variable: "var_3",
+              },
+              {
+                operator: "DIVISION",
+                operand: {
+                  type: "VARIABLE",
+                  name: "var_1",
+                },
+                variable: "var_3",
+              },
+            ],
+          },
+        ],
+        petition: {
+          variables: [
+            {
+              name: "var_1",
+              defaultValue: 0,
+            },
+            {
+              name: "var_2",
+              defaultValue: 0,
+            },
+            {
+              name: "var_3",
+              defaultValue: 0,
             },
           ],
         },
@@ -3332,6 +3943,26 @@ describe("GraphQL/Petition Fields", () => {
           },
         ],
       });
+    });
+
+    it("sends error when setting a field alias same as a petition variable", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          data: { alias: "score" },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ALIAS_ALREADY_EXISTS");
+      expect(data).toBeNull();
     });
   });
 

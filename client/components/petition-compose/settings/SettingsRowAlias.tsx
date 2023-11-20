@@ -20,7 +20,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { REFERENCE_REGEX } from "@parallel/utils/validation";
+import { REFERENCE_REGEX, isFirstCharacterNumber } from "@parallel/utils/validation";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
@@ -43,7 +43,6 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
     async (fieldId, data) => {
       try {
         await onFieldEdit(fieldId, data);
-        if (isDefined(aliasError)) setAliasError(null);
       } catch (error) {
         if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
           setAliasError("UNIQUE");
@@ -62,6 +61,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
     setAlias(value);
 
     if (!value || REFERENCE_REGEX.test(value)) {
+      setAliasError(null);
       debouncedOnUpdate(field.id, {
         options: {
           ...field.options,
@@ -83,11 +83,16 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
       <SettingsRow
         data-section="field-reference"
         isDisabled={isReadOnly}
-        label={<FormattedMessage id="field-settings.alias-label" defaultMessage="References" />}
+        label={
+          <FormattedMessage
+            id="component.settings-row-alias.alias-label"
+            defaultMessage="References"
+          />
+        }
         description={
           <Text fontSize="sm">
             <FormattedMessage
-              id="field-settings.alias-description"
+              id="component.settings-row-alias.alias-description"
               defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
             />
             <HelpCenterLink marginLeft={1} articleId={6323096}>
@@ -121,13 +126,20 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
           </HStack>
           <FormErrorMessage>
             {aliasError === "INVALID" ? (
-              <FormattedMessage
-                id="field-settings.reference-invalid-error"
-                defaultMessage="Use only letters, numbers or _"
-              />
+              isFirstCharacterNumber(alias) ? (
+                <FormattedMessage
+                  id="component.settings-row-alias.reference-invalid-error-begin-letter"
+                  defaultMessage="References must begin with a letter"
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.settings-row-alias.reference-invalid-error"
+                  defaultMessage="Use only letters, numbers or _"
+                />
+              )
             ) : (
               <FormattedMessage
-                id="field-settings.reference-exists-error"
+                id="component.settings-row-alias.reference-exists-error"
                 defaultMessage="This reference is already in use."
               />
             )}

@@ -18,7 +18,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { REFERENCE_REGEX } from "@parallel/utils/validation";
+import { REFERENCE_REGEX, isFirstCharacterNumber } from "@parallel/utils/validation";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -45,12 +45,15 @@ export function AddAliasToFieldDialog({
     register,
     formState: { errors },
     setError,
+    watch,
   } = useForm<{ alias: string }>({
     mode: "onChange",
     defaultValues: {
       alias: "",
     },
   });
+
+  const alias = watch("alias");
 
   const updateField = useCallback(
     async (fieldId: string, data: UpdatePetitionFieldInput) => {
@@ -132,6 +135,11 @@ export function AddAliasToFieldDialog({
                 <FormattedMessage
                   id="component.add-alias-to-field-dialog.reference-exists-error"
                   defaultMessage="This reference is already in use."
+                />
+              ) : isFirstCharacterNumber(alias) ? (
+                <FormattedMessage
+                  id="component.add-alias-to-field-dialog.reference-exists-error-begin-letter"
+                  defaultMessage="References must begin with a letter"
                 />
               ) : (
                 <FormattedMessage

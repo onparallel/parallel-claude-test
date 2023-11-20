@@ -4,6 +4,7 @@ import {
   ConfirmDialogProps,
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { ReactNode, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -38,7 +39,12 @@ function ConfirmDeleteDialog({
     defaultValues: { confirmation: "" },
     mode: "onSubmit",
   });
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const confirmationRegisterProps = useRegisterWithRef(inputRef, register, "confirmation", {
+    validate: (value) => value === confirmation,
+  });
+
   return (
     <ConfirmDialog
       initialFocusRef={inputRef}
@@ -56,10 +62,7 @@ function ConfirmDeleteDialog({
                 }}
               />
             </FormLabel>
-            <Input
-              {...register("confirmation", { validate: (value) => value === confirmation })}
-              placeholder={confirmation}
-            />
+            <Input {...confirmationRegisterProps} placeholder={confirmation} />
           </FormControl>
         </Stack>
       }

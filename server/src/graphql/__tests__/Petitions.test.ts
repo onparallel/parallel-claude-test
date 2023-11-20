@@ -163,11 +163,11 @@ describe("GraphQL/Petitions", () => {
 
     [privateTag] = await mocks.createRandomTags(otherOrg.id, 1);
 
-    fields = await mocks.createRandomPetitionFields(petitions[0].id, 2, () => ({
-      type: "TEXT",
+    fields = await mocks.createRandomPetitionFields(petitions[0].id, 2, (i) => ({
+      type: ["TEXT", "NUMBER"][i] as PetitionFieldType,
     }));
 
-    await mocks.knex.raw("UPDATE petition_field set visibility = ? where id = ?", [
+    await mocks.knex.raw("UPDATE petition_field set visibility = ?, math = ? where id = ?", [
       JSON.stringify({
         type: "SHOW",
         operator: "AND",
@@ -180,6 +180,37 @@ describe("GraphQL/Petitions", () => {
           },
         ],
       }),
+      JSON.stringify([
+        {
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: fields[0].id,
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+          ],
+          operations: [
+            {
+              operator: "ADDITION",
+              operand: {
+                type: "NUMBER",
+                value: 100,
+              },
+              variable: "score",
+            },
+            {
+              operator: "MULTIPLICATION",
+              operand: {
+                type: "FIELD",
+                fieldId: fields[1].id,
+              },
+              variable: "price",
+            },
+          ],
+        },
+      ]),
       fields[1].id,
     ]);
 
@@ -2004,7 +2035,7 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("updates referenced fieldIds on visibility conditions when cloning a petition", async () => {
+    it("updates referenced fieldIds on visibility conditions and math when cloning a petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!) {
@@ -2012,6 +2043,7 @@ describe("GraphQL/Petitions", () => {
               fields {
                 id
                 visibility
+                math
               }
             }
           }
@@ -2024,7 +2056,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data!.clonePetitions[0]).toEqual({
         fields: [
-          { id: clonedFieldIds[0], visibility: null },
+          { id: clonedFieldIds[0], visibility: null, math: null },
           {
             id: clonedFieldIds[1],
             visibility: {
@@ -2039,6 +2071,37 @@ describe("GraphQL/Petitions", () => {
               operator: "AND",
               type: "SHOW",
             },
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: clonedFieldIds[0],
+                    modifier: "NUMBER_OF_REPLIES",
+                    operator: "GREATER_THAN",
+                    value: 1,
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ADDITION",
+                    operand: {
+                      type: "NUMBER",
+                      value: 100,
+                    },
+                    variable: "score",
+                  },
+                  {
+                    operator: "MULTIPLICATION",
+                    operand: {
+                      type: "FIELD",
+                      fieldId: clonedFieldIds[1],
+                    },
+                    variable: "price",
+                  },
+                ],
+              },
+            ],
           },
         ],
       });

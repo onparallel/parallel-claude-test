@@ -3,20 +3,17 @@ import {
   usePetitionCanFinalize_PetitionBaseFragment,
   usePetitionCanFinalize_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
+import { useMemo } from "react";
+import { omit, pick, zip } from "remeda";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { useFieldLogic } from "./fieldLogic/useFieldLogic";
-import { omit, pick, zip } from "remeda";
-import { useMemo } from "react";
 
-type usePetitionCanFinalize_Petition =
+type PetitionSelection =
   | usePetitionCanFinalize_PetitionBaseFragment
   | usePetitionCanFinalize_PublicPetitionFragment;
 
-export function usePetitionCanFinalize(
-  petition: usePetitionCanFinalize_Petition,
-  publicContext?: boolean,
-) {
-  const logic = useFieldLogic(petition.fields);
+export function usePetitionCanFinalize(petition: PetitionSelection, publicContext?: boolean) {
+  const logic = useFieldLogic(petition);
   return useMemo(() => {
     let page = 1;
 
@@ -143,11 +140,11 @@ usePetitionCanFinalize.fragments = {
             }
           }
         }
-        ...useFieldLogic_PetitionField
         ...completedFieldReplies_PetitionField
       }
+      ...useFieldLogic_PetitionBase
     }
-    ${useFieldLogic.fragments.PetitionField}
+    ${useFieldLogic.fragments.PetitionBase}
     ${completedFieldReplies.fragments.PetitionField}
   `,
   PublicPetition: gql`
@@ -174,11 +171,11 @@ usePetitionCanFinalize.fragments = {
             }
           }
         }
-        ...useFieldLogic_PublicPetitionField
         ...completedFieldReplies_PublicPetitionField
       }
+      ...useFieldLogic_PublicPetition
     }
-    ${useFieldLogic.fragments.PublicPetitionField}
+    ${useFieldLogic.fragments.PublicPetition}
     ${completedFieldReplies.fragments.PublicPetitionField}
   `,
 };

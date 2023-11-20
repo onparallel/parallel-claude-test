@@ -14,7 +14,7 @@ import {
 import type { marked } from "@onparallel/marked-do-not-use";
 import { Lexer } from "@onparallel/marked-do-not-use";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { useLiquid } from "@parallel/utils/useLiquid";
+import { useLiquid } from "@parallel/utils/liquid/useLiquid";
 import { Fragment, useMemo } from "react";
 import { times, zip } from "remeda";
 import { BreakLines } from "./BreakLines";

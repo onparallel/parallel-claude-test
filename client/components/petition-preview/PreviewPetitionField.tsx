@@ -44,6 +44,7 @@ import {
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -56,6 +57,7 @@ export interface PreviewPetitionFieldProps
   isCacheOnly: boolean;
   myEffectivePermission: PetitionPermissionType;
   showErrors: boolean;
+  fieldLogic: FieldLogicResult;
 }
 
 export function PreviewPetitionField({
@@ -65,6 +67,7 @@ export function PreviewPetitionField({
   isDisabled,
   myEffectivePermission,
   showErrors,
+  fieldLogic,
   ...props
 }: PreviewPetitionFieldProps) {
   const petitionId = petition.id;
@@ -266,6 +269,7 @@ export function PreviewPetitionField({
         isCacheOnly={isCacheOnly}
         petition={petition}
         showErrors={showErrors}
+        fieldLogic={fieldLogic}
       />
     );
   }

@@ -8,10 +8,21 @@ export type PetitionFieldVisibilityType = "SHOW" | "HIDE";
 
 export type PetitionFieldLogicConditionLogicalJoin = "AND" | "OR";
 
-export interface PetitionFieldLogicCondition {
+export type PetitionFieldLogicCondition =
+  | PetitionFieldLogicFieldCondition
+  | PetitionFieldLogicVariableCondition;
+
+export interface PetitionFieldLogicFieldCondition extends PetitionFieldLogicConditionBase {
+  modifier: PetitionFieldLogicConditionMultipleValueModifier;
   fieldId: string;
   column?: number;
-  modifier: PetitionFieldLogicConditionMultipleValueModifier;
+}
+
+export interface PetitionFieldLogicVariableCondition extends PetitionFieldLogicConditionBase {
+  variableName: string;
+}
+
+interface PetitionFieldLogicConditionBase {
   operator: PetitionFieldLogicConditionOperator;
   value: string | string[] | number | null;
 }
@@ -48,17 +59,17 @@ export interface PetitionFieldMath {
   operations: PetitionFieldMathOperation[];
 }
 
-type PetitionFieldMathOperand =
+export type PetitionFieldMathOperand =
   | { type: "NUMBER"; value: number }
   | { type: "FIELD"; fieldId: string }
   | { type: "VARIABLE"; name: string };
 
-type PetitionFieldMathOperator =
+export type PetitionFieldMathOperator =
   | "ASSIGNATION"
   | "ADDITION"
   | "SUBSTRACTION"
-  | "DIVISION"
-  | "MULTIPLICATION";
+  | "MULTIPLICATION"
+  | "DIVISION";
 
 export interface PetitionFieldMathOperation {
   variable: string;

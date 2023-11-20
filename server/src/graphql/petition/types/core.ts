@@ -14,6 +14,12 @@ import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { renderSlateToHtml } from "../../../util/slate/render";
+import {
+  PetitionFieldMath,
+  PetitionFieldVisibility,
+  mapFieldLogicCondition,
+  mapFieldMathOperation,
+} from "../../../util/fieldLogic";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -333,6 +339,14 @@ export const PetitionBase = interfaceType({
     t.nullable.datetime("lastRecipientActivityAt", {
       deprecation: "",
       resolve: (o) => o.last_recipient_activity_at,
+    });
+    t.nonNull.list.nonNull.field("variables", {
+      type: "PetitionVariable",
+      resolve: (o) => o.variables ?? [],
+    });
+    t.nonNull.list.nonNull.field("variablesResult", {
+      type: "PetitionVariableResult",
+      resolve: async (o, _, ctx) => await ctx.petitions.loadResolvedPetitionVariables(o.id),
     });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
@@ -670,14 +684,32 @@ export const PetitionField = objectType({
     t.int("position");
     t.nullable.jsonObject("visibility", {
       description: "A JSON object representing the conditions for the field to be visible",
-      resolve: (o) =>
-        o.visibility && {
-          ...o.visibility,
-          conditions: o.visibility.conditions.map((c: any) => ({
-            ...c,
-            fieldId: toGlobalId("PetitionField", c.fieldId),
-          })),
-        },
+      resolve: (o) => {
+        if (isDefined(o.visibility)) {
+          const visibility = o.visibility as PetitionFieldVisibility;
+          return {
+            ...visibility,
+            conditions: visibility.conditions.map((c) => mapFieldLogicCondition(c)),
+          };
+        }
+
+        return null;
+      },
+    });
+    t.nullable.list.nonNull.jsonObject("math", {
+      description: "A JSON object representing the math to be performed on the field",
+      resolve: (o) => {
+        if (isDefined(o.math)) {
+          const math = o.math as PetitionFieldMath[];
+          return math.map((m) => ({
+            ...m,
+            conditions: m.conditions.map((c) => mapFieldLogicCondition(c)),
+            operations: m.operations.map((op) => mapFieldMathOperation(op)),
+          }));
+        }
+
+        return null;
+      },
     });
     t.nonNull.list.nonNull.field("attachments", {
       type: "PetitionFieldAttachment",

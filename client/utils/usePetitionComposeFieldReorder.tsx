@@ -4,7 +4,7 @@ import { usePetitionComposeFieldReorder_PetitionFieldFragment } from "@parallel/
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { indexBy, isDefined } from "remeda";
-import { PetitionFieldVisibility } from "./fieldLogic/types";
+import { PetitionFieldMath, PetitionFieldVisibility } from "./fieldLogic/types";
 import { Maybe } from "./types";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
 import { useUpdatingRef } from "./useUpdatingRef";
@@ -28,6 +28,52 @@ export function usePetitionComposeFieldReorder<
   const depsRef = useUpdatingRef({ fieldIds, fields, onUpdateFieldPositions });
   const showError = useErrorDialog();
   const startDragIndex = useRef<number | null>();
+
+  async function verifyFieldPositions(field: T, position: number, newFieldOrder: string[]) {
+    const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
+    const math = field.math as Maybe<PetitionFieldMath[]>;
+
+    if (
+      visibility?.conditions.some(
+        (c) => "fieldId" in c && newFieldOrder.indexOf(c.fieldId) > position,
+      )
+    ) {
+      try {
+        await showError({
+          message: (
+            <FormattedMessage
+              id="util.use-petition-compose-field-reorder.move-referenced-field-error-visibility"
+              defaultMessage="You can only move fields so that visibility conditions refer only to previous fields."
+            />
+          ),
+        });
+      } catch {}
+      throw new Error("CANCELLED");
+    }
+
+    if (
+      math?.some(
+        (m) =>
+          m.conditions.some((c) => "fieldId" in c && newFieldOrder.indexOf(c.fieldId) > position) ||
+          m.operations.some(
+            (o) =>
+              o.operand.type === "FIELD" && newFieldOrder.indexOf(o.operand.fieldId) > position,
+          ),
+      )
+    ) {
+      try {
+        await showError({
+          message: (
+            <FormattedMessage
+              id="util.use-petition-compose-field-reorder.move-referenced-field-error-math"
+              defaultMessage="You can only move fields so that calculations refer only to previous fields."
+            />
+          ),
+        });
+      } catch {}
+      throw new Error("CANCELLED");
+    }
+  }
 
   return {
     fields: useMemo(() => {
@@ -74,11 +120,13 @@ export function usePetitionComposeFieldReorder<
         for (const fieldId of fieldsToCheck) {
           const position = allFieldIds.indexOf(fieldId);
           const field = byId[fieldId];
-          const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
 
           const hasFirstChildInternalError =
             isDefined(field.parent) && !field.parent.isInternal && field.isInternal;
-          if ((isFieldGroup && position === 0 && visibility) || hasFirstChildInternalError) {
+          if (
+            (isFieldGroup && position === 0 && isDefined(field.visibility)) ||
+            hasFirstChildInternalError
+          ) {
             // The first field in a group cannot have visibility conditions
             try {
               setFieldIds(fields.map((f) => f.id));
@@ -99,22 +147,17 @@ export function usePetitionComposeFieldReorder<
             return;
           }
 
-          if (
-            visibility &&
-            visibility.conditions.some((c) => allNewFieldIds.indexOf(c.fieldId) > position)
-          ) {
-            try {
+          try {
+            await verifyFieldPositions(field, position, allNewFieldIds);
+            // do the same checks as before for every child of the moved field
+            for (const child of field.children ?? []) {
+              await verifyFieldPositions(child as T, position, allNewFieldIds);
+            }
+          } catch (error) {
+            if (error instanceof Error && error.message === "CANCELLED") {
               setFieldIds(fields.map((f) => f.id));
-              await showError({
-                message: (
-                  <FormattedMessage
-                    id="util.use-petition-compose-field-reorder.move-referenced-field-error"
-                    defaultMessage="You can only move fields so that visibility conditions refer only to previous fields."
-                  />
-                ),
-              });
-            } catch {}
-            return;
+              return;
+            }
           }
         }
         setFieldIds(newFieldIds);
@@ -143,6 +186,7 @@ usePetitionComposeFieldReorder.fragments = {
     fragment usePetitionComposeFieldReorder_PetitionFieldData on PetitionField {
       id
       visibility
+      math
       isInternal
     }
   `,

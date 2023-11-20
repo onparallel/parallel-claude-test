@@ -222,6 +222,11 @@ input CreatePetitionFieldReplyInput {
   parentReplyId: GID
 }
 
+input CreatePetitionVariableInput {
+  defaultValue: Int!
+  name: String!
+}
+
 input CreateProfileTypeFieldInput {
   alias: String
   expiryAlertAheadTime: Duration
@@ -1033,6 +1038,11 @@ type Mutation {
   createPetitionListView(data: PetitionListViewDataInput!, name: String!): PetitionListView!
 
   """
+  Creates a new variable on the petition.
+  """
+  createPetitionVariable(data: CreatePetitionVariableInput!, petitionId: GID!): Petition!
+
+  """
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
   createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
@@ -1194,6 +1204,11 @@ type Mutation {
   Deletes a reply to a petition field.
   """
   deletePetitionReply(petitionId: GID!, replyId: GID!): PetitionField!
+
+  """
+  Deletes a variable from the petition.
+  """
+  deletePetitionVariable(name: String!, petitionId: GID!): Petition!
 
   """
   Delete petitions and folders.
@@ -2198,6 +2213,15 @@ type Mutation {
     petitionIds: [GID!]
     petitionUserNotificationIds: [GID!]
   ): [PetitionUserNotification!]!
+
+  """
+  Updates a variable on the petition.
+  """
+  updatePetitionVariable(
+    data: UpdatePetitionVariableInput!
+    name: String!
+    petitionId: GID!
+  ): Petition!
   updateProfileFieldValue(fields: [UpdateProfileFieldValueInput!]!, profileId: GID!): Profile!
   updateProfileType(
     name: LocalizableUserText
@@ -2847,6 +2871,8 @@ type Petition implements PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+  variables: [PetitionVariable!]!
+  variablesResult: [PetitionVariableResult!]!
 }
 
 """
@@ -3143,6 +3169,8 @@ interface PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+  variables: [PetitionVariable!]!
+  variablesResult: [PetitionVariableResult!]!
 }
 
 type PetitionBaseMini {
@@ -3391,6 +3419,11 @@ type PetitionField {
   Determines if the field accepts replies
   """
   isReadOnly: Boolean!
+
+  """
+  A JSON object representing the math to be performed on the field
+  """
+  math: [JSONObject!]
 
   """
   Determines if this field allows multiple replies.
@@ -4511,6 +4544,8 @@ type PetitionTemplate implements PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+  variables: [PetitionVariable!]!
+  variablesResult: [PetitionVariableResult!]!
 }
 
 type PetitionUntaggedEvent implements PetitionEvent {
@@ -4610,6 +4645,16 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
   The user linked to the permission
   """
   user: User!
+}
+
+type PetitionVariable {
+  defaultValue: Int!
+  name: String!
+}
+
+type PetitionVariableResult {
+  name: String!
+  value: Int
 }
 
 type Profile implements Timestamps {
@@ -5182,6 +5227,7 @@ type PublicPetition implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+  variables: [PetitionVariable!]!
 }
 
 """
@@ -5254,6 +5300,11 @@ type PublicPetitionField {
   Determines if the field accepts replies
   """
   isReadOnly: Boolean!
+
+  """
+  A JSON object representing the math to be performed on the field
+  """
+  math: [JSONObject!]
 
   """
   Determines if this field allows multiple replies.
@@ -6605,6 +6656,7 @@ input UpdatePetitionFieldInput {
   description: String
   hasCommentsEnabled: Boolean
   isInternal: Boolean
+  math: [JSONObject!]
   multiple: Boolean
   optional: Boolean
   options: JSONObject
@@ -6639,6 +6691,10 @@ input UpdatePetitionInput {
   remindersConfig: RemindersConfigInput
   signatureConfig: SignatureConfigInput
   skipForwardSecurity: Boolean
+}
+
+input UpdatePetitionVariableInput {
+  defaultValue: Int!
 }
 
 input UpdateProfileFieldValueInput {

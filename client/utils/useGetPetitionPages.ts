@@ -1,31 +1,34 @@
 import { gql } from "@apollo/client";
 import {
-  useGetPetitionPages_PetitionFieldFragment,
-  useGetPetitionPages_PublicPetitionFieldFragment,
+  useGetPetitionPages_PetitionBaseFragment,
+  useGetPetitionPages_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { zip } from "remeda";
-import { useFieldLogic } from "./fieldLogic/useFieldLogic";
-import { ArrayUnionToUnion } from "./types";
+import { FieldLogic, useFieldLogic } from "./fieldLogic/useFieldLogic";
+import { ArrayUnionToUnion, UnwrapArray } from "./types";
 
-type PetitionFieldSelection =
-  | useGetPetitionPages_PublicPetitionFieldFragment
-  | useGetPetitionPages_PetitionFieldFragment;
+type PetitionSelection =
+  | useGetPetitionPages_PublicPetitionFragment
+  | useGetPetitionPages_PetitionBaseFragment;
+
+type PetitionFieldSelection = ArrayUnionToUnion<PetitionSelection["fields"]>;
 
 interface useGetPetitionPagesOptions {
   usePreviewReplies?: boolean;
   hideInternalFields?: boolean;
 }
 
-export function useGetPetitionPages<T extends PetitionFieldSelection>(
-  fields: T[],
+export function useGetPetitionPages<T extends PetitionSelection>(
+  petition: T,
   { usePreviewReplies, hideInternalFields }: useGetPetitionPagesOptions,
-) {
-  const logic = useFieldLogic(fields as any, usePreviewReplies);
+): { field: UnwrapArray<T["fields"]>; logic: FieldLogic }[][] {
+  const fieldLogic = useFieldLogic(petition, usePreviewReplies);
   return useMemo(() => {
-    const pages: T[][] = [];
-    let page: T[] = [];
-    for (const [field, { isVisible, groupChildrenLogic }] of zip(fields, logic)) {
+    const pages: { field: UnwrapArray<T["fields"]>; logic: FieldLogic }[][] = [];
+    let page: { field: UnwrapArray<T["fields"]>; logic: FieldLogic }[] = [];
+    const fields = petition.fields as PetitionFieldSelection[];
+    for (const [field, logic] of zip(fields, fieldLogic)) {
       const isHidden = hideInternalFields && field.isInternal;
       if (!isHidden) {
         if (field.type === "HEADING" && field.options!.hasPageBreak) {
@@ -34,84 +37,94 @@ export function useGetPetitionPages<T extends PetitionFieldSelection>(
             page = [];
           }
         }
-        if (isVisible) {
+        if (logic.isVisible) {
           if (field.type === "FIELD_GROUP") {
             const repliesKey =
               usePreviewReplies && field.__typename === "PetitionField"
                 ? "previewReplies"
                 : "replies";
             page.push({
-              ...field,
-              [repliesKey]: zip(
-                field[repliesKey as keyof typeof field] as ArrayUnionToUnion<
-                  PetitionFieldSelection["replies"]
-                >[],
-                groupChildrenLogic!,
-              ).map(([reply, childrenLogic]) => {
-                return {
-                  ...reply,
-                  children: zip(
-                    reply.children! as ArrayUnionToUnion<
-                      ArrayUnionToUnion<PetitionFieldSelection["replies"]>["children"]
-                    >[],
-                    childrenLogic,
-                  )
-                    .filter(
-                      ([child, { isVisible }]) =>
-                        isVisible && !(hideInternalFields && child.field.isInternal),
+              field: {
+                ...field,
+                [repliesKey]: zip(
+                  field[repliesKey as keyof typeof field] as ArrayUnionToUnion<
+                    PetitionFieldSelection["replies"]
+                  >[],
+                  logic.groupChildrenLogic!,
+                ).map(([reply, childrenLogic]) => {
+                  return {
+                    ...reply,
+                    children: zip(
+                      reply.children! as ArrayUnionToUnion<
+                        ArrayUnionToUnion<PetitionFieldSelection["replies"]>["children"]
+                      >[],
+                      childrenLogic,
                     )
-                    .map(([r]) => r),
-                };
-              }),
+                      .filter(
+                        ([child, { isVisible }]) =>
+                          isVisible && !(hideInternalFields && child.field.isInternal),
+                      )
+                      .map(([child]) => child),
+                  };
+                }),
+              } as any,
+              logic: {
+                ...logic,
+                groupChildrenLogic: logic.groupChildrenLogic!.map((g) =>
+                  g.filter(({ isVisible }) => isVisible),
+                ),
+              } as any,
             });
           } else {
-            page.push(field);
+            page.push({ field: field as any, logic });
           }
         }
       }
     }
     pages.push(page);
     return pages;
-  }, [fields, logic, usePreviewReplies, hideInternalFields]);
+  }, [petition.fields, fieldLogic, usePreviewReplies, hideInternalFields]);
 }
 
 useGetPetitionPages.fragments = {
-  PublicPetitionField: gql`
-    fragment useGetPetitionPages_PublicPetitionField on PublicPetitionField {
-      id
-      id
-      type
-      visibility
-      options
-      isInternal
-      replies {
-        children {
-          field {
-            isInternal
+  PublicPetition: gql`
+    fragment useGetPetitionPages_PublicPetition on PublicPetition {
+      ...useFieldLogic_PublicPetition
+      fields {
+        id
+        type
+        visibility
+        options
+        isInternal
+        replies {
+          children {
+            field {
+              isInternal
+            }
           }
         }
       }
-      ...useFieldLogic_PublicPetitionField
     }
-    ${useFieldLogic.fragments.PublicPetitionField}
+    ${useFieldLogic.fragments.PublicPetition}
   `,
-  PetitionField: gql`
-    fragment useGetPetitionPages_PetitionField on PetitionField {
-      id
-      id
-      type
-      visibility
-      options
-      isInternal
-      replies {
-        children {
-          field {
-            isInternal
+  PetitionBase: gql`
+    fragment useGetPetitionPages_PetitionBase on PetitionBase {
+      ...useFieldLogic_PetitionBase
+      fields {
+        id
+        type
+        visibility
+        options
+        isInternal
+        replies {
+          children {
+            field {
+              isInternal
+            }
           }
         }
       }
-      ...useFieldLogic_PetitionField
     }
-    ${useFieldLogic.fragments.PetitionField}
+    ${useFieldLogic.fragments.PetitionBase}
   `,
 };

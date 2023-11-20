@@ -1,7 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
-import { LiquidProvider } from "@parallel/utils/useLiquid";
+import { LiquidProvider } from "@parallel/utils/liquid/LiquidContext";
 import { DecoratorFunction } from "@storybook/csf";
 import { useMemo } from "react";
 import { IntlProvider } from "react-intl";

@@ -3,7 +3,7 @@ export const EMAIL_REGEX =
 
 export const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/; // lowercase, uppercase, numbers and 8 chars
 
-export const REFERENCE_REGEX = /^[A-Za-z0-9_]+$/;
+export const REFERENCE_REGEX = /^[a-z_][a-z0-9_]*$/i;
 
 export const isValidDateString = (value: string | string[] | undefined) => {
   return (
@@ -12,3 +12,7 @@ export const isValidDateString = (value: string | string[] | undefined) => {
     !isNaN(new Date(value).valueOf())
   );
 };
+
+export function isFirstCharacterNumber(str: string) {
+  return /^\d/.test(str);
+}

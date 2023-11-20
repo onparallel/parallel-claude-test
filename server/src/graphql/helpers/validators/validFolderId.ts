@@ -4,8 +4,7 @@ import { fromGlobalIds } from "../../../util/globalId";
 import { MaybeArray } from "../../../util/types";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
-
-export const PETITION_FOLDER_REGEX = /^\/([^/]+\/)*$/;
+import { PETITION_FOLDER_REGEX } from "./validPath";
 
 export function validFolderId<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<string> | null | undefined,

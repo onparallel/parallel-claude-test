@@ -14,14 +14,12 @@ import { ChevronFilledIcon, CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   RecipientViewContentsCard_PetitionBaseFragment,
-  RecipientViewContentsCard_PetitionFieldFragment,
-  RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult, useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
+import { ArrayUnionToUnion, Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -36,9 +34,7 @@ type PetitionSelection =
   | RecipientViewContentsCard_PublicPetitionFragment
   | RecipientViewContentsCard_PetitionBaseFragment;
 
-type PetitionFieldSelection =
-  | RecipientViewContentsCard_PublicPetitionFieldFragment
-  | RecipientViewContentsCard_PetitionFieldFragment;
+type PetitionFieldSelection = ArrayUnionToUnion<PetitionSelection["fields"]>;
 
 interface RecipientViewContentsCardProps {
   currentPage: number;
@@ -54,7 +50,7 @@ export const RecipientViewContentsCard = Object.assign(
     const router = useRouter();
     const { query } = router;
     const { pages, fields, fieldLogic } = useGetPagesAndFields(
-      petition.fields,
+      petition,
       currentPage,
       usePreviewReplies,
     );
@@ -318,36 +314,28 @@ export const RecipientViewContentsCard = Object.assign(
           fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
             fields {
               id
-              ...RecipientViewContentsCard_PublicPetitionField
-            }
-          }
-          ${this.PublicPetitionField}
-        `;
-      },
-      get PublicPetitionField() {
-        return gql`
-          fragment RecipientViewContentsCard_PublicPetitionField on PublicPetitionField {
-            id
-            type
-            title
-            options
-            optional
-            isInternal
-            isReadOnly
-            replies {
-              id
-              status
-              parent {
+              type
+              title
+              options
+              optional
+              isInternal
+              isReadOnly
+              replies {
                 id
+                status
+                parent {
+                  id
+                }
               }
+              commentCount
+              unreadCommentCount
+              hasCommentsEnabled
+              ...completedFieldReplies_PublicPetitionField
             }
-            commentCount
-            unreadCommentCount
-            hasCommentsEnabled
-            ...useFieldLogic_PublicPetitionField
-            ...completedFieldReplies_PublicPetitionField
+            ...useFieldLogic_PublicPetition
           }
-          ${useFieldLogic.fragments.PublicPetitionField}
+
+          ${useFieldLogic.fragments.PublicPetition}
           ${completedFieldReplies.fragments.PublicPetitionField}
         `;
       },
@@ -356,43 +344,35 @@ export const RecipientViewContentsCard = Object.assign(
           fragment RecipientViewContentsCard_PetitionBase on PetitionBase {
             fields {
               id
-              ...RecipientViewContentsCard_PetitionField
-            }
-          }
-          ${this.PetitionField}
-        `;
-      },
-      get PetitionField() {
-        return gql`
-          fragment RecipientViewContentsCard_PetitionField on PetitionField {
-            id
-            type
-            title
-            options
-            optional
-            isInternal
-            isReadOnly
-            previewReplies @client {
-              id
-              status
-              parent {
+              type
+              title
+              options
+              optional
+              isInternal
+              isReadOnly
+              previewReplies @client {
                 id
+                status
+                parent {
+                  id
+                }
               }
-            }
-            replies {
-              id
-              status
-              parent {
+              replies {
                 id
+                status
+                parent {
+                  id
+                }
               }
+              commentCount
+              unreadCommentCount
+              hasCommentsEnabled
+              ...completedFieldReplies_PetitionField
             }
-            commentCount
-            unreadCommentCount
-            hasCommentsEnabled
-            ...useFieldLogic_PetitionField
-            ...completedFieldReplies_PetitionField
+            ...useFieldLogic_PetitionBase
           }
-          ${useFieldLogic.fragments.PetitionField}
+
+          ${useFieldLogic.fragments.PetitionBase}
           ${completedFieldReplies.fragments.PetitionField}
         `;
       },
@@ -434,8 +414,8 @@ function RecipientViewContentsIndicators({
   );
 }
 
-function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
-  fields: T,
+function useGetPagesAndFields<T extends PetitionSelection>(
+  petition: T,
   page: number,
   usePreviewReplies?: boolean,
 ) {
@@ -447,10 +427,10 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
     currentFieldCommentCount: number;
     currentFieldHasUnreadComments: boolean;
   }[] = [];
-  const logic = useFieldLogic(fields, usePreviewReplies);
-  const _fields: T = [] as any;
+  const logic = useFieldLogic(petition, usePreviewReplies);
+  const _fields: T["fields"] = [] as any;
   const _fieldLogic: FieldLogicResult[] = [];
-  for (const [field, fieldLogic] of zip(fields as PetitionFieldSelection[], logic)) {
+  for (const [field, fieldLogic] of zip(petition.fields as PetitionFieldSelection[], logic)) {
     const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
 
     if (

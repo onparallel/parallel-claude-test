@@ -1,18 +1,20 @@
-import { Liquid, LiquidError } from "liquidjs";
-import { createContext, PropsWithChildren, useContext } from "react";
-import { IntlShape, useIntl } from "react-intl";
+import { Liquid } from "liquidjs";
+import { createContext, PropsWithChildren } from "react";
+import { IntlShape } from "react-intl";
 import { isDefined } from "remeda";
-import { FORMATS, prettifyTimezone } from "./dates";
-import { useConstant } from "./useConstant";
-import { DateLiquidValue, DateTimeLiquidValue } from "./useLiquidScope";
+import { FORMATS, prettifyTimezone } from "../dates";
+import { useConstant } from "../useConstant";
+import { DateLiquidValue, DateTimeLiquidValue } from "./LiquidValue";
 
 function useCreateLiquid() {
   return useConstant(() => {
     const engine = new Liquid({ cache: true });
 
-    engine.registerFilter("number", function (value: number | string, digits?: number) {
+    engine.registerFilter("number", function (value: any, digits?: number) {
       if (typeof value === "string") {
         value = parseFloat(value);
+      } else if (typeof value === "object" && "toString" in value) {
+        value = parseFloat(value.toString());
       }
       if (typeof value !== "number") {
         return undefined;
@@ -24,9 +26,11 @@ function useCreateLiquid() {
       });
     });
 
-    engine.registerFilter("currency", function (value: number | string, currency: string) {
+    engine.registerFilter("currency", function (value: any, currency: string) {
       if (typeof value === "string") {
         value = parseFloat(value);
+      } else if (typeof value === "object" && "toString" in value) {
+        value = parseFloat(value.toString());
       }
       if (typeof value !== "number") {
         return undefined;
@@ -35,9 +39,11 @@ function useCreateLiquid() {
       return intl.formatNumber(value, { style: "currency", currency });
     });
 
-    engine.registerFilter("percent", function (value: number | string, digits?: number) {
+    engine.registerFilter("percent", function (value: any, digits?: number) {
       if (typeof value === "string") {
         value = parseFloat(value);
+      } else if (typeof value === "object" && "toString" in value) {
+        value = parseFloat(value.toString());
       }
       if (typeof value !== "number") {
         return undefined;
@@ -116,35 +122,9 @@ function useCreateLiquid() {
     return engine;
   });
 }
-
-const LiquidContext = createContext<Liquid | null>(null);
+export const LiquidContext = createContext<Liquid | null>(null);
 
 export function LiquidProvider({ children }: PropsWithChildren<{}>) {
   const liquid = useCreateLiquid();
   return <LiquidContext.Provider value={liquid}>{children}</LiquidContext.Provider>;
-}
-
-const LiquidScopeContext = createContext<any>({});
-
-export function LiquidScopeProvider({ scope, children }: PropsWithChildren<{ scope: any }>) {
-  return <LiquidScopeContext.Provider value={scope}>{children}</LiquidScopeContext.Provider>;
-}
-
-export function useLiquid(text: string) {
-  const intl = useIntl();
-  const scope = useContext(LiquidScopeContext);
-  const liquid = useContext(LiquidContext)!;
-  if (text.includes("{{") || text.includes("{%")) {
-    try {
-      return liquid.parseAndRenderSync(text, scope, { globals: { intl } });
-    } catch (e) {
-      if (e instanceof LiquidError) {
-        // eslint-disable-next-line no-console
-        console.log(`Liquid error: ${e.message}`);
-      }
-      return "";
-    }
-  } else {
-    return text;
-  }
 }

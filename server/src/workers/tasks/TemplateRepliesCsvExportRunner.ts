@@ -52,12 +52,13 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
     let rows: Record<string, Maybe<string | Date>>[] = [];
 
     if (petitions.length > 0) {
-      const petitionsComposedFields = await this.ctx.readonlyPetitions.getComposedPetitionFields(
-        petitions.map((p) => p.id),
-      );
+      const petitionsComposedFields =
+        await this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(
+          petitions.map((p) => p.id),
+        );
 
       rows = petitions.map((petition, petitionIndex) => {
-        const aliasedPetitionFields = petitionsComposedFields[petitionIndex].filter(
+        const aliasedPetitionFields = petitionsComposedFields[petitionIndex].fields.filter(
           (f) => f.type !== "HEADING" && isDefined(f.alias),
         );
 

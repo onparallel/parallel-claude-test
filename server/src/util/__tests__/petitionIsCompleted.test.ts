@@ -3,253 +3,624 @@ import { petitionIsCompleted } from "../petitionIsCompleted";
 describe("petitionIsCompleted", () => {
   it("field group with optional incomplete fields", () => {
     expect(
-      petitionIsCompleted([
-        {
-          id: 3280,
-          is_internal: false,
-          type: "HEADING",
-          options: {},
-          visibility: null,
-          optional: false,
-          replies: [],
-          children: null,
-        },
-        {
-          id: 3425,
-          is_internal: false,
-          type: "FIELD_GROUP",
-          options: {},
-          visibility: null,
-          optional: true,
-          children: [
-            {
-              id: 3438,
-              is_internal: false,
-              type: "SHORT_TEXT",
-              options: {},
-              optional: false,
-              parent: { id: 3425 },
-              replies: [
-                {
-                  content: { value: "AA" },
-                  anonymized_at: null,
-                },
-              ],
-              visibility: null,
-            },
-            {
-              id: 3440,
-              is_internal: false,
-              type: "SHORT_TEXT",
-              optional: true,
-              options: {},
-              replies: [],
-              visibility: null,
-              parent: { id: 3425 },
-            },
-          ],
-          replies: [
-            {
-              content: {},
-              anonymized_at: null,
-              children: [
-                {
-                  field: {
-                    id: 3438,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {},
-                    optional: false,
+      petitionIsCompleted({
+        fields: [
+          {
+            id: 3280,
+            is_internal: false,
+            type: "HEADING",
+            options: {},
+            visibility: null,
+            math: null,
+            optional: false,
+            replies: [],
+            children: null,
+          },
+          {
+            id: 3425,
+            is_internal: false,
+            type: "FIELD_GROUP",
+            options: {},
+            visibility: null,
+            math: null,
+            optional: true,
+            children: [
+              {
+                id: 3438,
+                is_internal: false,
+                type: "SHORT_TEXT",
+                options: {},
+                optional: false,
+                parent: { id: 3425 },
+                replies: [
+                  {
+                    content: { value: "AA" },
+                    anonymized_at: null,
                   },
-                  replies: [
-                    {
-                      content: { value: "AA" },
-                      anonymized_at: null,
+                ],
+                visibility: null,
+                math: null,
+              },
+              {
+                id: 3440,
+                is_internal: false,
+                type: "SHORT_TEXT",
+                optional: true,
+                options: {},
+                replies: [],
+                visibility: null,
+                math: null,
+                parent: { id: 3425 },
+              },
+            ],
+            replies: [
+              {
+                content: {},
+                anonymized_at: null,
+                children: [
+                  {
+                    field: {
+                      id: 3438,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {},
+                      optional: false,
                     },
-                  ],
-                },
-                {
-                  field: {
-                    id: 3440,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {},
-                    optional: true,
+                    replies: [
+                      {
+                        content: { value: "AA" },
+                        anonymized_at: null,
+                      },
+                    ],
                   },
-                  replies: [],
-                },
-              ],
-            },
-          ],
-        },
-      ]),
+                  {
+                    field: {
+                      id: 3440,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {},
+                      optional: true,
+                    },
+                    replies: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        variables: [],
+      }),
     ).toBeTrue();
   });
 
   it("field group with not visible required fields", () => {
     expect(
-      petitionIsCompleted([
-        {
-          id: 3280,
-          is_internal: false,
-          type: "HEADING",
-          options: {
-            hasPageBreak: false,
-          },
-          visibility: null,
-          optional: false,
-          replies: [],
-          children: null,
-        },
-        {
-          id: 3425,
-          is_internal: false,
-          type: "FIELD_GROUP",
-          options: {
-            groupName: null,
-          },
-          visibility: null,
-          optional: true,
-          replies: [
-            {
-              content: {},
-              anonymized_at: null,
-              children: [
-                {
-                  field: {
-                    id: 3438,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {
-                      format: null,
-                      maxLength: null,
-                      placeholder: null,
-                    },
-                    optional: false,
-                  },
-                  replies: [
-                    {
-                      content: {
-                        value: "A",
-                      },
-                      anonymized_at: null,
-                    },
-                  ],
-                },
-                {
-                  field: {
-                    id: 3440,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {
-                      format: null,
-                      maxLength: null,
-                      placeholder: null,
-                    },
-                    optional: false,
-                  },
-                  replies: [],
-                },
-              ],
+      petitionIsCompleted({
+        fields: [
+          {
+            id: 3280,
+            is_internal: false,
+            type: "HEADING",
+            options: {
+              hasPageBreak: false,
             },
-          ],
-          children: [
-            {
-              id: 3438,
-              is_internal: false,
-              type: "SHORT_TEXT",
-              options: {
-                format: null,
-                maxLength: null,
-                placeholder: null,
-              },
-              visibility: null,
-              optional: false,
-              parent: {
-                id: 3425,
-              },
-              replies: [
-                {
-                  content: {
-                    value: "A",
-                  },
-                  anonymized_at: null,
-                },
-              ],
+            visibility: null,
+            math: null,
+            optional: false,
+            replies: [],
+            children: null,
+          },
+          {
+            id: 3425,
+            is_internal: false,
+            type: "FIELD_GROUP",
+            options: {
+              groupName: null,
             },
-            {
-              id: 3440,
-              is_internal: false,
-              type: "SHORT_TEXT",
-              options: {
-                format: null,
-                maxLength: null,
-                placeholder: null,
-              },
-              visibility: {
-                type: "SHOW",
-                operator: "AND",
-                conditions: [
+            visibility: null,
+            math: null,
+            optional: true,
+            replies: [
+              {
+                content: {},
+                anonymized_at: null,
+                children: [
                   {
-                    value: "$$$",
-                    fieldId: 3438,
-                    modifier: "ANY",
-                    operator: "EQUAL",
+                    field: {
+                      id: 3438,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {
+                        format: null,
+                        maxLength: null,
+                        placeholder: null,
+                      },
+                      optional: false,
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "A",
+                        },
+                        anonymized_at: null,
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      id: 3440,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {
+                        format: null,
+                        maxLength: null,
+                        placeholder: null,
+                      },
+                      optional: false,
+                    },
+                    replies: [],
                   },
                 ],
               },
-              optional: false,
-              parent: {
-                id: 3425,
+            ],
+            children: [
+              {
+                id: 3438,
+                is_internal: false,
+                type: "SHORT_TEXT",
+                options: {
+                  format: null,
+                  maxLength: null,
+                  placeholder: null,
+                },
+                visibility: null,
+                math: null,
+                optional: false,
+                parent: {
+                  id: 3425,
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "A",
+                    },
+                    anonymized_at: null,
+                  },
+                ],
               },
-              replies: [],
-            },
-          ],
-        },
-      ]),
+              {
+                id: 3440,
+                is_internal: false,
+                type: "SHORT_TEXT",
+                options: {
+                  format: null,
+                  maxLength: null,
+                  placeholder: null,
+                },
+                visibility: {
+                  type: "SHOW",
+                  operator: "AND",
+                  conditions: [
+                    {
+                      value: "$$$",
+                      fieldId: 3438,
+                      modifier: "ANY",
+                      operator: "EQUAL",
+                    },
+                  ],
+                },
+                math: null,
+                optional: false,
+                parent: {
+                  id: 3425,
+                },
+                replies: [],
+              },
+            ],
+          },
+        ],
+        variables: [],
+      }),
     ).toBeTrue();
   });
 
   it("visibility conditions referencing a field group child", () => {
     expect(
-      petitionIsCompleted([
-        {
-          id: 3280,
-          is_internal: false,
-          type: "HEADING",
-          options: {
-            hasPageBreak: false,
+      petitionIsCompleted({
+        fields: [
+          {
+            id: 3280,
+            is_internal: false,
+            type: "HEADING",
+            options: {
+              hasPageBreak: false,
+            },
+            visibility: null,
+            math: null,
+            optional: false,
+            replies: [],
+            children: null,
           },
-          visibility: null,
-          optional: false,
-          replies: [],
-          children: null,
-        },
-        {
-          id: 3425,
-          is_internal: false,
-          type: "FIELD_GROUP",
-          options: {
-            groupName: null,
+          {
+            id: 3425,
+            is_internal: false,
+            type: "FIELD_GROUP",
+            options: {
+              groupName: null,
+            },
+            visibility: null,
+            math: null,
+            optional: true,
+            replies: [
+              {
+                content: {},
+                anonymized_at: null,
+                children: [
+                  {
+                    field: {
+                      id: 3438,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {
+                        format: null,
+                        maxLength: null,
+                        placeholder: null,
+                      },
+                      optional: false,
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "A",
+                        },
+                        anonymized_at: null,
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      id: 3440,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {
+                        format: null,
+                        maxLength: null,
+                        placeholder: null,
+                      },
+                      optional: false,
+                    },
+                    replies: [],
+                  },
+                ],
+              },
+              {
+                content: {},
+                anonymized_at: null,
+                children: [
+                  {
+                    field: {
+                      id: 3438,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {
+                        format: null,
+                        maxLength: null,
+                        placeholder: null,
+                      },
+                      optional: false,
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "$$$",
+                        },
+                        anonymized_at: null,
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      id: 3440,
+                      is_internal: false,
+                      type: "SHORT_TEXT",
+                      options: {
+                        format: null,
+                        maxLength: null,
+                        placeholder: null,
+                      },
+                      optional: false,
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: "B!",
+                        },
+                        anonymized_at: null,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+            children: [
+              {
+                id: 3438,
+                is_internal: false,
+                type: "SHORT_TEXT",
+                options: {
+                  format: null,
+                  maxLength: null,
+                  placeholder: null,
+                },
+                visibility: null,
+                math: null,
+                optional: false,
+                parent: {
+                  id: 3425,
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "A",
+                    },
+                    anonymized_at: null,
+                  },
+                  {
+                    content: {
+                      value: "$$$",
+                    },
+                    anonymized_at: null,
+                  },
+                ],
+              },
+              {
+                id: 3440,
+                is_internal: false,
+                type: "SHORT_TEXT",
+                options: {
+                  format: null,
+                  maxLength: null,
+                  placeholder: null,
+                },
+                visibility: {
+                  type: "SHOW",
+                  operator: "AND",
+                  conditions: [
+                    {
+                      value: "$$$",
+                      fieldId: 3438,
+                      modifier: "ANY",
+                      operator: "EQUAL",
+                    },
+                  ],
+                },
+                math: null,
+                optional: false,
+                parent: {
+                  id: 3425,
+                },
+                replies: [
+                  {
+                    content: {
+                      value: "B!",
+                    },
+                    anonymized_at: null,
+                  },
+                ],
+              },
+            ],
           },
-          visibility: null,
-          optional: true,
-          replies: [
+          {
+            id: 3445,
+            is_internal: false,
+            type: "NUMBER",
+            options: {
+              range: {
+                min: 0,
+              },
+              prefix: null,
+              suffix: null,
+              decimals: 2,
+              placeholder: null,
+            },
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  value: 2,
+                  fieldId: 3425,
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "GREATER_THAN",
+                },
+              ],
+            },
+            math: null,
+            optional: false,
+            replies: [],
+            children: null,
+          },
+        ],
+        variables: [],
+      }),
+    ).toBeTrue();
+  });
+
+  it("incomplete required internal field on public context", () => {
+    expect(
+      petitionIsCompleted(
+        {
+          fields: [
             {
-              content: {},
-              anonymized_at: null,
+              id: 3280,
+              is_internal: false,
+              type: "HEADING",
+              options: {
+                hasPageBreak: false,
+              },
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [],
+              children: null,
+            },
+            {
+              id: 3425,
+              is_internal: false,
+              type: "FIELD_GROUP",
+              options: {
+                groupName: null,
+              },
+              visibility: null,
+              math: null,
+              optional: true,
+              replies: [
+                {
+                  content: {},
+                  anonymized_at: null,
+                  children: [
+                    {
+                      field: {
+                        id: 3438,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "A",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                    {
+                      field: {
+                        id: 3440,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [],
+                    },
+                  ],
+                },
+                {
+                  content: {},
+                  anonymized_at: null,
+                  children: [
+                    {
+                      field: {
+                        id: 3438,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "$$$",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                    {
+                      field: {
+                        id: 3440,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "B!",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  content: {},
+                  anonymized_at: null,
+                  children: [
+                    {
+                      field: {
+                        id: 3438,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "A",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                    {
+                      field: {
+                        id: 3440,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [],
+                    },
+                  ],
+                },
+              ],
               children: [
                 {
-                  field: {
-                    id: 3438,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {
-                      format: null,
-                      maxLength: null,
-                      placeholder: null,
-                    },
-                    optional: false,
+                  id: 3438,
+                  is_internal: false,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
+                  },
+                  visibility: null,
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
                   },
                   replies: [
                     {
@@ -258,60 +629,45 @@ describe("petitionIsCompleted", () => {
                       },
                       anonymized_at: null,
                     },
-                  ],
-                },
-                {
-                  field: {
-                    id: 3440,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {
-                      format: null,
-                      maxLength: null,
-                      placeholder: null,
-                    },
-                    optional: false,
-                  },
-                  replies: [],
-                },
-              ],
-            },
-            {
-              content: {},
-              anonymized_at: null,
-              children: [
-                {
-                  field: {
-                    id: 3438,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {
-                      format: null,
-                      maxLength: null,
-                      placeholder: null,
-                    },
-                    optional: false,
-                  },
-                  replies: [
                     {
                       content: {
                         value: "$$$",
                       },
                       anonymized_at: null,
                     },
+                    {
+                      content: {
+                        value: "A",
+                      },
+                      anonymized_at: null,
+                    },
                   ],
                 },
                 {
-                  field: {
-                    id: 3440,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {
-                      format: null,
-                      maxLength: null,
-                      placeholder: null,
-                    },
-                    optional: false,
+                  id: 3440,
+                  is_internal: false,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
+                  },
+                  visibility: {
+                    type: "SHOW",
+                    operator: "AND",
+                    conditions: [
+                      {
+                        value: "$$$",
+                        fieldId: 3438,
+                        modifier: "ANY",
+                        operator: "EQUAL",
+                      },
+                    ],
+                  },
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
                   },
                   replies: [
                     {
@@ -324,354 +680,28 @@ describe("petitionIsCompleted", () => {
                 },
               ],
             },
-          ],
-          children: [
             {
-              id: 3438,
-              is_internal: false,
-              type: "SHORT_TEXT",
+              id: 3445,
+              is_internal: true,
+              type: "NUMBER",
               options: {
-                format: null,
-                maxLength: null,
+                range: {
+                  min: 0,
+                },
+                prefix: null,
+                suffix: null,
+                decimals: 2,
                 placeholder: null,
               },
               visibility: null,
+              math: null,
               optional: false,
-              parent: {
-                id: 3425,
-              },
-              replies: [
-                {
-                  content: {
-                    value: "A",
-                  },
-                  anonymized_at: null,
-                },
-                {
-                  content: {
-                    value: "$$$",
-                  },
-                  anonymized_at: null,
-                },
-              ],
-            },
-            {
-              id: 3440,
-              is_internal: false,
-              type: "SHORT_TEXT",
-              options: {
-                format: null,
-                maxLength: null,
-                placeholder: null,
-              },
-              visibility: {
-                type: "SHOW",
-                operator: "AND",
-                conditions: [
-                  {
-                    value: "$$$",
-                    fieldId: 3438,
-                    modifier: "ANY",
-                    operator: "EQUAL",
-                  },
-                ],
-              },
-              optional: false,
-              parent: {
-                id: 3425,
-              },
-              replies: [
-                {
-                  content: {
-                    value: "B!",
-                  },
-                  anonymized_at: null,
-                },
-              ],
+              replies: [],
+              children: null,
             },
           ],
+          variables: [],
         },
-        {
-          id: 3445,
-          is_internal: false,
-          type: "NUMBER",
-          options: {
-            range: {
-              min: 0,
-            },
-            prefix: null,
-            suffix: null,
-            decimals: 2,
-            placeholder: null,
-          },
-          visibility: {
-            type: "SHOW",
-            operator: "AND",
-            conditions: [
-              {
-                value: 2,
-                fieldId: 3425,
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "GREATER_THAN",
-              },
-            ],
-          },
-          optional: false,
-          replies: [],
-          children: null,
-        },
-      ]),
-    ).toBeTrue();
-  });
-
-  it("incomplete required internal field on public context", () => {
-    expect(
-      petitionIsCompleted(
-        [
-          {
-            id: 3280,
-            is_internal: false,
-            type: "HEADING",
-            options: {
-              hasPageBreak: false,
-            },
-            visibility: null,
-            optional: false,
-            replies: [],
-            children: null,
-          },
-          {
-            id: 3425,
-            is_internal: false,
-            type: "FIELD_GROUP",
-            options: {
-              groupName: null,
-            },
-            visibility: null,
-            optional: true,
-            replies: [
-              {
-                content: {},
-                anonymized_at: null,
-                children: [
-                  {
-                    field: {
-                      id: 3438,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "A",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                  {
-                    field: {
-                      id: 3440,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [],
-                  },
-                ],
-              },
-              {
-                content: {},
-                anonymized_at: null,
-                children: [
-                  {
-                    field: {
-                      id: 3438,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "$$$",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                  {
-                    field: {
-                      id: 3440,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "B!",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                content: {},
-                anonymized_at: null,
-                children: [
-                  {
-                    field: {
-                      id: 3438,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "A",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                  {
-                    field: {
-                      id: 3440,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [],
-                  },
-                ],
-              },
-            ],
-            children: [
-              {
-                id: 3438,
-                is_internal: false,
-                type: "SHORT_TEXT",
-                options: {
-                  format: null,
-                  maxLength: null,
-                  placeholder: null,
-                },
-                visibility: null,
-                optional: false,
-                parent: {
-                  id: 3425,
-                },
-                replies: [
-                  {
-                    content: {
-                      value: "A",
-                    },
-                    anonymized_at: null,
-                  },
-                  {
-                    content: {
-                      value: "$$$",
-                    },
-                    anonymized_at: null,
-                  },
-                  {
-                    content: {
-                      value: "A",
-                    },
-                    anonymized_at: null,
-                  },
-                ],
-              },
-              {
-                id: 3440,
-                is_internal: false,
-                type: "SHORT_TEXT",
-                options: {
-                  format: null,
-                  maxLength: null,
-                  placeholder: null,
-                },
-                visibility: {
-                  type: "SHOW",
-                  operator: "AND",
-                  conditions: [
-                    {
-                      value: "$$$",
-                      fieldId: 3438,
-                      modifier: "ANY",
-                      operator: "EQUAL",
-                    },
-                  ],
-                },
-                optional: false,
-                parent: {
-                  id: 3425,
-                },
-                replies: [
-                  {
-                    content: {
-                      value: "B!",
-                    },
-                    anonymized_at: null,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 3445,
-            is_internal: true,
-            type: "NUMBER",
-            options: {
-              range: {
-                min: 0,
-              },
-              prefix: null,
-              suffix: null,
-              decimals: 2,
-              placeholder: null,
-            },
-            visibility: null,
-            optional: false,
-            replies: [],
-            children: null,
-          },
-        ],
         true,
       ),
     ).toBeTrue();
@@ -680,251 +710,259 @@ describe("petitionIsCompleted", () => {
   it("incomplete required internal field on not public context", () => {
     expect(
       petitionIsCompleted(
-        [
-          {
-            id: 3280,
-            is_internal: false,
-            type: "HEADING",
-            options: {
-              hasPageBreak: false,
+        {
+          fields: [
+            {
+              id: 3280,
+              is_internal: false,
+              type: "HEADING",
+              options: {
+                hasPageBreak: false,
+              },
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [],
+              children: null,
             },
-            visibility: null,
-            optional: false,
-            replies: [],
-            children: null,
-          },
-          {
-            id: 3425,
-            is_internal: false,
-            type: "FIELD_GROUP",
-            options: {
-              groupName: null,
-            },
-            visibility: null,
-            optional: true,
-            replies: [
-              {
-                content: {},
-                anonymized_at: null,
-                children: [
-                  {
-                    field: {
-                      id: 3438,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "A",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                  {
-                    field: {
-                      id: 3440,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [],
-                  },
-                ],
+            {
+              id: 3425,
+              is_internal: false,
+              type: "FIELD_GROUP",
+              options: {
+                groupName: null,
               },
-              {
-                content: {},
-                anonymized_at: null,
-                children: [
-                  {
-                    field: {
-                      id: 3438,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "$$$",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                  {
-                    field: {
-                      id: 3440,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "B!",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                content: {},
-                anonymized_at: null,
-                children: [
-                  {
-                    field: {
-                      id: 3438,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [
-                      {
-                        content: {
-                          value: "A",
-                        },
-                        anonymized_at: null,
-                      },
-                    ],
-                  },
-                  {
-                    field: {
-                      id: 3440,
-                      is_internal: false,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [],
-                  },
-                ],
-              },
-            ],
-            children: [
-              {
-                id: 3438,
-                is_internal: false,
-                type: "SHORT_TEXT",
-                options: {
-                  format: null,
-                  maxLength: null,
-                  placeholder: null,
-                },
-                visibility: null,
-                optional: false,
-                parent: {
-                  id: 3425,
-                },
-                replies: [
-                  {
-                    content: {
-                      value: "A",
-                    },
-                    anonymized_at: null,
-                  },
-                  {
-                    content: {
-                      value: "$$$",
-                    },
-                    anonymized_at: null,
-                  },
-                  {
-                    content: {
-                      value: "A",
-                    },
-                    anonymized_at: null,
-                  },
-                ],
-              },
-              {
-                id: 3440,
-                is_internal: false,
-                type: "SHORT_TEXT",
-                options: {
-                  format: null,
-                  maxLength: null,
-                  placeholder: null,
-                },
-                visibility: {
-                  type: "SHOW",
-                  operator: "AND",
-                  conditions: [
+              visibility: null,
+              math: null,
+              optional: true,
+              replies: [
+                {
+                  content: {},
+                  anonymized_at: null,
+                  children: [
                     {
-                      value: "$$$",
-                      fieldId: 3438,
-                      modifier: "ANY",
-                      operator: "EQUAL",
+                      field: {
+                        id: 3438,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "A",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                    {
+                      field: {
+                        id: 3440,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [],
                     },
                   ],
                 },
-                optional: false,
-                parent: {
-                  id: 3425,
-                },
-                replies: [
-                  {
-                    content: {
-                      value: "B!",
+                {
+                  content: {},
+                  anonymized_at: null,
+                  children: [
+                    {
+                      field: {
+                        id: 3438,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "$$$",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
                     },
-                    anonymized_at: null,
+                    {
+                      field: {
+                        id: 3440,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "B!",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  content: {},
+                  anonymized_at: null,
+                  children: [
+                    {
+                      field: {
+                        id: 3438,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "A",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                    {
+                      field: {
+                        id: 3440,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [],
+                    },
+                  ],
+                },
+              ],
+              children: [
+                {
+                  id: 3438,
+                  is_internal: false,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
                   },
-                ],
-              },
-            ],
-          },
-          {
-            id: 3445,
-            is_internal: true,
-            type: "NUMBER",
-            options: {
-              range: {
-                min: 0,
-              },
-              prefix: null,
-              suffix: null,
-              decimals: 2,
-              placeholder: null,
+                  visibility: null,
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
+                  },
+                  replies: [
+                    {
+                      content: {
+                        value: "A",
+                      },
+                      anonymized_at: null,
+                    },
+                    {
+                      content: {
+                        value: "$$$",
+                      },
+                      anonymized_at: null,
+                    },
+                    {
+                      content: {
+                        value: "A",
+                      },
+                      anonymized_at: null,
+                    },
+                  ],
+                },
+                {
+                  id: 3440,
+                  is_internal: false,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
+                  },
+                  visibility: {
+                    type: "SHOW",
+                    operator: "AND",
+                    conditions: [
+                      {
+                        value: "$$$",
+                        fieldId: 3438,
+                        modifier: "ANY",
+                        operator: "EQUAL",
+                      },
+                    ],
+                  },
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
+                  },
+                  replies: [
+                    {
+                      content: {
+                        value: "B!",
+                      },
+                      anonymized_at: null,
+                    },
+                  ],
+                },
+              ],
             },
-            visibility: null,
-            optional: false,
-            replies: [],
-            children: null,
-          },
-        ],
+            {
+              id: 3445,
+              is_internal: true,
+              type: "NUMBER",
+              options: {
+                range: {
+                  min: 0,
+                },
+                prefix: null,
+                suffix: null,
+                decimals: 2,
+                placeholder: null,
+              },
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [],
+              children: null,
+            },
+          ],
+          variables: [],
+        },
         false,
       ),
     ).toBeFalse();
@@ -933,91 +971,99 @@ describe("petitionIsCompleted", () => {
   it("incomplete internal field group on public context", () => {
     expect(
       petitionIsCompleted(
-        [
-          {
-            id: 3280,
-            is_internal: false,
-            type: "HEADING",
-            options: {
-              hasPageBreak: false,
+        {
+          fields: [
+            {
+              id: 3280,
+              is_internal: false,
+              type: "HEADING",
+              options: {
+                hasPageBreak: false,
+              },
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [],
+              children: null,
             },
-            visibility: null,
-            optional: false,
-            replies: [],
-            children: null,
-          },
-          {
-            id: 3425,
-            is_internal: true,
-            type: "FIELD_GROUP",
-            options: {
-              groupName: null,
+            {
+              id: 3425,
+              is_internal: true,
+              type: "FIELD_GROUP",
+              options: {
+                groupName: null,
+              },
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [],
+              children: [
+                {
+                  id: 3438,
+                  is_internal: true,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
+                  },
+                  visibility: null,
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
+                  },
+                  replies: [],
+                },
+                {
+                  id: 3440,
+                  is_internal: true,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
+                  },
+                  visibility: null,
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
+                  },
+                  replies: [],
+                },
+              ],
             },
-            visibility: null,
-            optional: false,
-            replies: [],
-            children: [
-              {
-                id: 3438,
-                is_internal: true,
-                type: "SHORT_TEXT",
-                options: {
-                  format: null,
-                  maxLength: null,
-                  placeholder: null,
+            {
+              id: 3446,
+              is_internal: false,
+              type: "NUMBER",
+              options: {
+                range: {
+                  min: 0,
                 },
-                visibility: null,
-                optional: false,
-                parent: {
-                  id: 3425,
-                },
-                replies: [],
+                prefix: null,
+                suffix: null,
+                decimals: 2,
+                placeholder: null,
               },
-              {
-                id: 3440,
-                is_internal: true,
-                type: "SHORT_TEXT",
-                options: {
-                  format: null,
-                  maxLength: null,
-                  placeholder: null,
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [
+                {
+                  content: {
+                    value: 123,
+                  },
+                  anonymized_at: null,
+                  children: null,
                 },
-                visibility: null,
-                optional: false,
-                parent: {
-                  id: 3425,
-                },
-                replies: [],
-              },
-            ],
-          },
-          {
-            id: 3446,
-            is_internal: false,
-            type: "NUMBER",
-            options: {
-              range: {
-                min: 0,
-              },
-              prefix: null,
-              suffix: null,
-              decimals: 2,
-              placeholder: null,
+              ],
+              children: null,
             },
-            visibility: null,
-            optional: false,
-            replies: [
-              {
-                content: {
-                  value: 123,
-                },
-                anonymized_at: null,
-                children: null,
-              },
-            ],
-            children: null,
-          },
-        ],
+          ],
+          variables: [],
+        },
         true,
       ),
     ).toBeTrue();
@@ -1026,7 +1072,130 @@ describe("petitionIsCompleted", () => {
   it("field group with incomplete internal child on public context", () => {
     expect(
       petitionIsCompleted(
-        [
+        {
+          fields: [
+            {
+              id: 3280,
+              is_internal: false,
+              type: "HEADING",
+              options: {
+                hasPageBreak: false,
+              },
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [],
+              children: null,
+            },
+            {
+              id: 3425,
+              is_internal: false,
+              type: "FIELD_GROUP",
+              options: {
+                groupName: null,
+              },
+              visibility: null,
+              math: null,
+              optional: false,
+              replies: [
+                {
+                  content: {},
+                  anonymized_at: null,
+                  children: [
+                    {
+                      field: {
+                        id: 3438,
+                        is_internal: false,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [
+                        {
+                          content: {
+                            value: "A",
+                          },
+                          anonymized_at: null,
+                        },
+                      ],
+                    },
+                    {
+                      field: {
+                        id: 3440,
+                        is_internal: true,
+                        type: "SHORT_TEXT",
+                        options: {
+                          format: null,
+                          maxLength: null,
+                          placeholder: null,
+                        },
+                        optional: false,
+                      },
+                      replies: [],
+                    },
+                  ],
+                },
+              ],
+              children: [
+                {
+                  id: 3438,
+                  is_internal: false,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
+                  },
+                  visibility: null,
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
+                  },
+                  replies: [
+                    {
+                      content: {
+                        value: "A",
+                      },
+                      anonymized_at: null,
+                    },
+                  ],
+                },
+                {
+                  id: 3440,
+                  is_internal: true,
+                  type: "SHORT_TEXT",
+                  options: {
+                    format: null,
+                    maxLength: null,
+                    placeholder: null,
+                  },
+                  visibility: null,
+                  math: null,
+                  optional: false,
+                  parent: {
+                    id: 3425,
+                  },
+                  replies: [],
+                },
+              ],
+            },
+          ],
+          variables: [],
+        },
+        true,
+      ),
+    ).toBeTrue();
+  });
+
+  it('checkbox with "exact" option', () => {
+    expect(
+      petitionIsCompleted({
+        fields: [
           {
             id: 3280,
             is_internal: false,
@@ -1035,18 +1204,69 @@ describe("petitionIsCompleted", () => {
               hasPageBreak: false,
             },
             visibility: null,
+            math: null,
             optional: false,
             replies: [],
             children: null,
           },
           {
-            id: 3425,
+            id: 3447,
+            is_internal: false,
+            type: "CHECKBOX",
+            options: {
+              limit: {
+                max: 2,
+                min: 1,
+                type: "EXACT",
+              },
+              values: ["A", "B", "C"],
+            },
+            visibility: null,
+            math: null,
+            optional: false,
+            replies: [
+              {
+                content: {
+                  value: ["A"],
+                },
+                anonymized_at: null,
+                children: null,
+              },
+            ],
+            children: null,
+          },
+        ],
+        variables: [],
+      }),
+    ).toBeFalse();
+  });
+
+  it("field group with incomplete 'exact' checkbox field", () => {
+    expect(
+      petitionIsCompleted({
+        fields: [
+          {
+            id: 3280,
+            is_internal: false,
+            type: "HEADING",
+            options: {
+              hasPageBreak: false,
+            },
+            visibility: null,
+            math: null,
+            optional: false,
+            replies: [],
+            children: null,
+          },
+          {
+            id: 3448,
             is_internal: false,
             type: "FIELD_GROUP",
             options: {
               groupName: null,
             },
             visibility: null,
+            math: null,
             optional: false,
             replies: [
               {
@@ -1055,7 +1275,31 @@ describe("petitionIsCompleted", () => {
                 children: [
                   {
                     field: {
-                      id: 3438,
+                      id: 3447,
+                      is_internal: false,
+                      type: "CHECKBOX",
+                      options: {
+                        limit: {
+                          max: 2,
+                          min: 1,
+                          type: "EXACT",
+                        },
+                        values: ["A", "B", "C"],
+                      },
+                      optional: false,
+                    },
+                    replies: [
+                      {
+                        content: {
+                          value: ["A"],
+                        },
+                        anonymized_at: null,
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      id: 3449,
                       is_internal: false,
                       type: "SHORT_TEXT",
                       options: {
@@ -1068,32 +1312,45 @@ describe("petitionIsCompleted", () => {
                     replies: [
                       {
                         content: {
-                          value: "A",
+                          value: "AAA",
                         },
                         anonymized_at: null,
                       },
                     ],
-                  },
-                  {
-                    field: {
-                      id: 3440,
-                      is_internal: true,
-                      type: "SHORT_TEXT",
-                      options: {
-                        format: null,
-                        maxLength: null,
-                        placeholder: null,
-                      },
-                      optional: false,
-                    },
-                    replies: [],
                   },
                 ],
               },
             ],
             children: [
               {
-                id: 3438,
+                id: 3447,
+                is_internal: false,
+                type: "CHECKBOX",
+                options: {
+                  limit: {
+                    max: 2,
+                    min: 1,
+                    type: "EXACT",
+                  },
+                  values: ["A", "B", "C"],
+                },
+                visibility: null,
+                math: null,
+                optional: false,
+                parent: {
+                  id: 3448,
+                },
+                replies: [
+                  {
+                    content: {
+                      value: ["A"],
+                    },
+                    anonymized_at: null,
+                  },
+                ],
+              },
+              {
+                id: 3449,
                 is_internal: false,
                 type: "SHORT_TEXT",
                 options: {
@@ -1102,217 +1359,25 @@ describe("petitionIsCompleted", () => {
                   placeholder: null,
                 },
                 visibility: null,
+                math: null,
                 optional: false,
                 parent: {
-                  id: 3425,
+                  id: 3448,
                 },
                 replies: [
                   {
                     content: {
-                      value: "A",
+                      value: "AAA",
                     },
                     anonymized_at: null,
                   },
                 ],
               },
-              {
-                id: 3440,
-                is_internal: true,
-                type: "SHORT_TEXT",
-                options: {
-                  format: null,
-                  maxLength: null,
-                  placeholder: null,
-                },
-                visibility: null,
-                optional: false,
-                parent: {
-                  id: 3425,
-                },
-                replies: [],
-              },
             ],
           },
         ],
-        true,
-      ),
-    ).toBeTrue();
-  });
-
-  it('checkbox with "exact" option', () => {
-    expect(
-      petitionIsCompleted([
-        {
-          id: 3280,
-          is_internal: false,
-          type: "HEADING",
-          options: {
-            hasPageBreak: false,
-          },
-          visibility: null,
-          optional: false,
-          replies: [],
-          children: null,
-        },
-        {
-          id: 3447,
-          is_internal: false,
-          type: "CHECKBOX",
-          options: {
-            limit: {
-              max: 2,
-              min: 1,
-              type: "EXACT",
-            },
-            values: ["A", "B", "C"],
-          },
-          visibility: null,
-          optional: false,
-          replies: [
-            {
-              content: {
-                value: ["A"],
-              },
-              anonymized_at: null,
-              children: null,
-            },
-          ],
-          children: null,
-        },
-      ]),
-    ).toBeFalse();
-  });
-
-  it("field group with incomplete 'exact' checkbox field", () => {
-    expect(
-      petitionIsCompleted([
-        {
-          id: 3280,
-          is_internal: false,
-          type: "HEADING",
-          options: {
-            hasPageBreak: false,
-          },
-          visibility: null,
-          optional: false,
-          replies: [],
-          children: null,
-        },
-        {
-          id: 3448,
-          is_internal: false,
-          type: "FIELD_GROUP",
-          options: {
-            groupName: null,
-          },
-          visibility: null,
-          optional: false,
-          replies: [
-            {
-              content: {},
-              anonymized_at: null,
-              children: [
-                {
-                  field: {
-                    id: 3447,
-                    is_internal: false,
-                    type: "CHECKBOX",
-                    options: {
-                      limit: {
-                        max: 2,
-                        min: 1,
-                        type: "EXACT",
-                      },
-                      values: ["A", "B", "C"],
-                    },
-                    optional: false,
-                  },
-                  replies: [
-                    {
-                      content: {
-                        value: ["A"],
-                      },
-                      anonymized_at: null,
-                    },
-                  ],
-                },
-                {
-                  field: {
-                    id: 3449,
-                    is_internal: false,
-                    type: "SHORT_TEXT",
-                    options: {
-                      format: null,
-                      maxLength: null,
-                      placeholder: null,
-                    },
-                    optional: false,
-                  },
-                  replies: [
-                    {
-                      content: {
-                        value: "AAA",
-                      },
-                      anonymized_at: null,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-          children: [
-            {
-              id: 3447,
-              is_internal: false,
-              type: "CHECKBOX",
-              options: {
-                limit: {
-                  max: 2,
-                  min: 1,
-                  type: "EXACT",
-                },
-                values: ["A", "B", "C"],
-              },
-              visibility: null,
-              optional: false,
-              parent: {
-                id: 3448,
-              },
-              replies: [
-                {
-                  content: {
-                    value: ["A"],
-                  },
-                  anonymized_at: null,
-                },
-              ],
-            },
-            {
-              id: 3449,
-              is_internal: false,
-              type: "SHORT_TEXT",
-              options: {
-                format: null,
-                maxLength: null,
-                placeholder: null,
-              },
-              visibility: null,
-              optional: false,
-              parent: {
-                id: 3448,
-              },
-              replies: [
-                {
-                  content: {
-                    value: "AAA",
-                  },
-                  anonymized_at: null,
-                },
-              ],
-            },
-          ],
-        },
-      ]),
+        variables: [],
+      }),
     ).toBeFalse();
   });
 });

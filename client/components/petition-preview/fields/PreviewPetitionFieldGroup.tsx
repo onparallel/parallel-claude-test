@@ -31,7 +31,10 @@ import {
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
+import { zip } from "remeda";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 
 export interface PreviewPetitionFieldGroupProps
   extends Omit<
@@ -60,6 +63,7 @@ export interface PreviewPetitionFieldGroupProps
   }>;
   petition: PreviewPetitionFieldGroup_PetitionBaseFragment;
   showErrors: boolean;
+  fieldLogic: FieldLogicResult;
 }
 
 export function PreviewPetitionFieldGroup({
@@ -77,6 +81,7 @@ export function PreviewPetitionFieldGroup({
   onStartAsyncFieldCompletion,
   onRefreshField,
   showErrors,
+  fieldLogic,
 }: PreviewPetitionFieldGroupProps) {
   const intl = useIntl();
   const handleAddReply = async () => {
@@ -97,7 +102,7 @@ export function PreviewPetitionFieldGroup({
         onAddNewGroup={handleAddReply}
         composeUrl={buildUrlToSection("compose", { field: field.id })}
       >
-        {replies.map((group, index) => {
+        {zip(replies, fieldLogic.groupChildrenLogic!).map(([group, groupLogic], index) => {
           const groupHasSomeReply = group.children!.some((c) => c.replies.length > 0);
           const groupHasSomeApprovedReply = group.children!.some((c) =>
             c.replies.some((r) => r.status === "APPROVED"),
@@ -114,31 +119,32 @@ export function PreviewPetitionFieldGroup({
               }}
               id={`reply-${group.id}`}
             >
-              {group.children!.map(({ field, replies }) => {
+              {zip(group.children!, groupLogic).map(([{ field, replies }, logic]) => {
                 return (
-                  <PreviewPetitionFieldGroupField
-                    key={field.id}
-                    parentReplyId={group.id}
-                    field={{ ...field, replies }}
-                    petition={petition}
-                    isInvalid={
-                      showErrors &&
-                      !canFinalize &&
-                      incompleteFields.some(
-                        ({ id, parentReplyId }) => id === field.id && parentReplyId === group.id,
-                      )
-                    }
-                    isDisabled={isDisabled}
-                    isCacheOnly={isCacheOnly}
-                    onDownloadAttachment={onDownloadAttachment}
-                    onDeleteReply={onDeleteReply}
-                    onUpdateReply={onUpdateReply}
-                    onCreateReply={onCreateReply}
-                    onDownloadFileUploadReply={onDownloadFileUploadReply}
-                    onCreateFileReply={onCreateFileReply}
-                    onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
-                    onRefreshField={onRefreshField}
-                  />
+                  <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                    <PreviewPetitionFieldGroupField
+                      parentReplyId={group.id}
+                      field={{ ...field, replies }}
+                      petition={petition}
+                      isInvalid={
+                        showErrors &&
+                        !canFinalize &&
+                        incompleteFields.some(
+                          ({ id, parentReplyId }) => id === field.id && parentReplyId === group.id,
+                        )
+                      }
+                      isDisabled={isDisabled}
+                      isCacheOnly={isCacheOnly}
+                      onDownloadAttachment={onDownloadAttachment}
+                      onDeleteReply={onDeleteReply}
+                      onUpdateReply={onUpdateReply}
+                      onCreateReply={onCreateReply}
+                      onDownloadFileUploadReply={onDownloadFileUploadReply}
+                      onCreateFileReply={onCreateFileReply}
+                      onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
+                      onRefreshField={onRefreshField}
+                    />
+                  </LiquidPetitionVariableProvider>
                 );
               })}
               {petition.__typename === "PetitionTemplate" ? null : (

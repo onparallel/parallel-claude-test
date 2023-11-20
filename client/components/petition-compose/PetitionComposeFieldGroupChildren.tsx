@@ -416,6 +416,7 @@ PetitionComposeFieldGroupChildren.fragments = {
         isInternal
         isReadOnly
         visibility
+        math
         attachments {
           ...PetitionComposeFieldAttachment_PetitionFieldAttachment
         }

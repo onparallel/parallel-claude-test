@@ -75,6 +75,11 @@
     "context": "This reference is already in use."
   },
   {
+    "term": "component.add-alias-to-field-dialog.reference-exists-error-begin-letter",
+    "definition": "Las referencias deben empezar por una letra",
+    "context": "References must begin with a letter"
+  },
+  {
     "term": "component.add-alias-to-field-dialog.reference-invalid-error",
     "definition": "Utiliza solo letras, números o _",
     "context": "Use only letters, numbers or _"
@@ -830,6 +835,16 @@
     "context": "To be able to delete {count, plural, =1 {this profile type} other {these profile types}}, first delete all profiles using {count, plural, =1 {this type} other {these types}}."
   },
   {
+    "term": "component.confirm-delete-variable-dialog.body",
+    "definition": "Si continúas, se perderá la variable y no podrá utilizarse en ningún cálculo. ¿Estás seguro de querer eliminar?",
+    "context": "If you continue, the variable will be lost and cannot be used in any calculations. Are you sure you want to delete it?"
+  },
+  {
+    "term": "component.confirm-delete-variable-dialog.header",
+    "definition": "Eliminar variable",
+    "context": "Delete variable"
+  },
+  {
     "term": "component.confirm-disable-ongoing-signature-petition-close.body",
     "definition": "Hay un proceso de firma digital pendiente. Si cierras este parallel, el proceso será cancelado.",
     "context": "There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled."
@@ -1440,6 +1455,46 @@
     "context": "New team"
   },
   {
+    "term": "component.create-or-edit-petition-variable-dialog.create-title",
+    "definition": "Nueva variable",
+    "context": "New variable"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.edit-title",
+    "definition": "Editar variable",
+    "context": "Edit variable"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.info-name-variable",
+    "definition": "Una vez añadida la variable el nombre no se podrá editar.",
+    "context": "Once the variable is added, its name cannot be edited."
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.unique-identifier-alredy-exists",
+    "definition": "Este identificador ya está siendo utilizado",
+    "context": "This identifier is already in use"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.variable-initial-value",
+    "definition": "Valor inicial",
+    "context": "Initial value"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.variable-invalid-error",
+    "definition": "El nombre debe empezar con letras y solo pueden contener letras, números y _",
+    "context": "The name must begin with letters and can only contain letters, numbers and _"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.variable-name",
+    "definition": "Nombre de la variable",
+    "context": "Variable name"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.variable-name-placeholder",
+    "definition": "Ej: precio, score",
+    "context": "e.g: price, score"
+  },
+  {
     "term": "component.create-or-update-document-theme-dialog.create-theme-button",
     "definition": "Crear tema",
     "context": "Create theme"
@@ -2023,6 +2078,31 @@
     "term": "component.draggable-list.visiblity",
     "definition": "Visibilidad",
     "context": "Visibility"
+  },
+  {
+    "term": "component.edit-petition-field-calculations-dialog.body-description",
+    "definition": "Realiza cálculos basados en respuestas.",
+    "context": "Make calculations based on the replies."
+  },
+  {
+    "term": "component.edit-petition-field-calculations-dialog.create-variable-button",
+    "definition": "Crear variable",
+    "context": "Create variable"
+  },
+  {
+    "term": "component.edit-petition-field-calculations-dialog.help-center-link",
+    "definition": "Más sobre los cálculos",
+    "context": "More about calculations"
+  },
+  {
+    "term": "component.edit-petition-field-calculations-dialog.title",
+    "definition": "Cálculos",
+    "context": "Calculations"
+  },
+  {
+    "term": "component.edit-petition-field-calculations-dialog.variables-warning",
+    "definition": "Necesitas añadir al menos una variable para poder realizar cálculos.",
+    "context": "You need to add at least one variable to be able to perform calculations."
   },
   {
     "term": "component.edit-tags-dialog.header",
@@ -3145,6 +3225,36 @@
     "context": "Displays the reply in capital letters."
   },
   {
+    "term": "component.more-liquid-variables-button.current-value",
+    "definition": "Valor actual",
+    "context": "Current value"
+  },
+  {
+    "term": "component.more-liquid-variables-button.current-value-description",
+    "definition": "Muestra el cálculo hasta este campo.",
+    "context": "Shows the result up to this field."
+  },
+  {
+    "term": "component.more-liquid-variables-button.final-value",
+    "definition": "Valor final",
+    "context": "Final value"
+  },
+  {
+    "term": "component.more-liquid-variables-button.final-value-description",
+    "definition": "Muestra el resultado final.",
+    "context": "Shows the final result."
+  },
+  {
+    "term": "component.more-liquid-variables-button.formula-copied-alert",
+    "definition": "Fórmula copiada al portapapeles",
+    "context": "Formula copied to clipboard"
+  },
+  {
+    "term": "component.more-liquid-variables-button.formulas",
+    "definition": "Fórmulas",
+    "context": "Formulas"
+  },
+  {
     "term": "component.more-options-menu-profile.close-profile",
     "definition": "Cerrar perfil",
     "context": "Close profile"
@@ -3885,9 +3995,24 @@
     "context": "Add attachment"
   },
   {
+    "term": "component.petition-compose-field.add-calculation",
+    "definition": "Añadir cálculo",
+    "context": "Add calculation"
+  },
+  {
     "term": "component.petition-compose-field.add-condition",
     "definition": "Añadir condición",
     "context": "Add condition"
+  },
+  {
+    "term": "component.petition-compose-field.calculations-help",
+    "definition": "Este campo realizará los siguientes cálculos cuando se cumplan las condiciones.",
+    "context": "This field will perform calculations when the conditions are met."
+  },
+  {
+    "term": "component.petition-compose-field.calculations-title",
+    "definition": "Cálculos",
+    "context": "Calculations"
   },
   {
     "term": "component.petition-compose-field.conditions-not-available-first-field-group",
@@ -3903,6 +4028,11 @@
     "term": "component.petition-compose-field.confirm-delete",
     "definition": "¿Quieres eliminar este campo?",
     "context": "Do you want to delete this field?"
+  },
+  {
+    "term": "component.petition-compose-field.confirm-remove-math",
+    "definition": "¿Quieres quitar los cálculos añadidos?",
+    "context": "Do you want to remove all the calculations?"
   },
   {
     "term": "component.petition-compose-field.drag-to-sort-label",
@@ -3990,6 +4120,11 @@
     "context": "Only attachments of up to {size} are allowed."
   },
   {
+    "term": "component.petition-compose-field.remove-calculations",
+    "definition": "Quitar cálculos",
+    "context": "Remove calculations"
+  },
+  {
     "term": "component.petition-compose-field.remove-condition",
     "definition": "Borrar condición",
     "context": "Remove condition"
@@ -4040,6 +4175,31 @@
     "context": "No format"
   },
   {
+    "term": "component.petition-compose-variables.add-variable",
+    "definition": "Añadir variable",
+    "context": "Add variable"
+  },
+  {
+    "term": "component.petition-compose-variables.description",
+    "definition": "Define variables para realizar cálculos basados en respuestas.",
+    "context": "Define variables to perform calculations based on answers."
+  },
+  {
+    "term": "component.petition-compose-variables.edit-variable",
+    "definition": "Editar variable",
+    "context": "Edit variable"
+  },
+  {
+    "term": "component.petition-compose-variables.more-about-variables-link",
+    "definition": "Más sobre variables",
+    "context": "More about variables"
+  },
+  {
+    "term": "component.petition-compose-variables.no-variables-available",
+    "definition": "No hay variables disponibles",
+    "context": "No variables available"
+  },
+  {
     "term": "component.petition-contents.hidden-fields-divider",
     "definition": "{count, plural, =1 {1 campo no aplica} other {# campos no aplican}}",
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
@@ -4063,6 +4223,91 @@
     "term": "component.petition-field-logic-add-condition-button.add-condition",
     "definition": "Añadir condición",
     "context": "Add condition"
+  },
+  {
+    "term": "component.petition-field-logic-condition-subject-select.group-fields",
+    "definition": "Campos",
+    "context": "Fields"
+  },
+  {
+    "term": "component.petition-field-logic-condition-subject-select.group-variables",
+    "definition": "Variables",
+    "context": "Variables"
+  },
+  {
+    "term": "component.petition-field-math-editor.add-calculation",
+    "definition": "Añadir cálculo",
+    "context": "Add calculation"
+  },
+  {
+    "term": "component.petition-field-math-editor.add-operation",
+    "definition": "Añadir acción",
+    "context": "Add action"
+  },
+  {
+    "term": "component.petition-field-math-editor.remove-calculation",
+    "definition": "Quitar cálculo",
+    "context": "Remove calculation"
+  },
+  {
+    "term": "component.petition-field-math-editor.then",
+    "definition": "Entonces",
+    "context": "Then"
+  },
+  {
+    "term": "component.petition-field-math-editor.to",
+    "definition": "a",
+    "context": "to"
+  },
+  {
+    "term": "component.petition-field-math-editor.when",
+    "definition": "Cuando",
+    "context": "When"
+  },
+  {
+    "term": "component.petition-field-math-operand-select.group-fields",
+    "definition": "Campos",
+    "context": "Fields"
+  },
+  {
+    "term": "component.petition-field-math-operand-select.group-variables",
+    "definition": "Variables",
+    "context": "Variables"
+  },
+  {
+    "term": "component.petition-field-math-operand-select.number",
+    "definition": "Número",
+    "context": "Number"
+  },
+  {
+    "term": "component.petition-field-math-operand-select.placeholder",
+    "definition": "Selecciona un operando",
+    "context": "Select an operand"
+  },
+  {
+    "term": "component.petition-field-math-operator-select.addition",
+    "definition": "Suma",
+    "context": "Add"
+  },
+  {
+    "term": "component.petition-field-math-operator-select.assignation",
+    "definition": "Asigna",
+    "context": "Assign"
+  },
+  {
+    "term": "component.petition-field-math-operator-select.division",
+    "definition": "Divide",
+    "context": "Divide"
+  },
+  {
+    "term": "component.petition-field-math-operator-select.multiplication",
+    "definition": "Multiplica",
+    "context": "Multiply"
+  },
+  {
+    "term": "component.petition-field-math-operator-select.substraction",
+    "definition": "Resta",
+    "context": "Substract"
   },
   {
     "term": "component.petition-field-select.placeholder",
@@ -4168,11 +4413,6 @@
     "term": "component.petition-field-visibility-editor.all",
     "definition": "todas",
     "context": "all"
-  },
-  {
-    "term": "component.petition-field-visibility-editor.and",
-    "definition": "y",
-    "context": "and"
   },
   {
     "term": "component.petition-field-visibility-editor.any",
@@ -4298,11 +4538,6 @@
     "term": "component.petition-field-visibility-editor.number-of-replies",
     "definition": "nº de respuestas",
     "context": "no. of replies"
-  },
-  {
-    "term": "component.petition-field-visibility-editor.or",
-    "definition": "o",
-    "context": "or"
   },
   {
     "term": "component.petition-field-visibility-editor.start-with-default",
@@ -4678,6 +4913,11 @@
     "term": "component.petition-reminder-settings.text",
     "definition": "Enviar cada <days-input></days-input> días a las <time-input></time-input> hasta <limit-input></limit-input> recordatorios.",
     "context": "Send every <days-input></days-input> days at <time-input></time-input> up to <limit-input></limit-input> reminders."
+  },
+  {
+    "term": "component.petition-replies-contents.calculation-results-button",
+    "definition": "Resultados cálculos",
+    "context": "Calculation results"
   },
   {
     "term": "component.petition-replies-field-reply.approve",
@@ -5243,6 +5483,21 @@
     "term": "component.petition-user-notification.mark-as-unread",
     "definition": "Marcar como no leído",
     "context": "Mark as unread"
+  },
+  {
+    "term": "component.petition-variable-select.create-new-variable",
+    "definition": "Crear variable: <b>{name}</b>",
+    "context": "Create variable: <b>{name}</b>"
+  },
+  {
+    "term": "component.petition-variable-select.placeholder",
+    "definition": "Selecciona una variable",
+    "context": "Select a variable"
+  },
+  {
+    "term": "component.petition-variables-card.header",
+    "definition": "Resultados cálculos",
+    "context": "Calculation results"
   },
   {
     "term": "component.petitions-table-columns.header-last-activity-at",
@@ -6495,8 +6750,48 @@
     "context": "Recover"
   },
   {
-    "term": "component.referenced-field-dialog.confirm",
-    "definition": "Borrar condiciones",
+    "term": "component.referenced-calculations-dialog.confirm",
+    "definition": "Quitar cálculos",
+    "context": "Remove calculations"
+  },
+  {
+    "term": "component.referenced-calculations-dialog.confirm-conditions",
+    "definition": "Quitar condiciones",
+    "context": "Remove conditions"
+  },
+  {
+    "term": "component.referenced-calculations-dialog.confirm-logic",
+    "definition": "Quitar lógica",
+    "context": "Remove logic"
+  },
+  {
+    "term": "component.referenced-calculations-dialog.header",
+    "definition": "Variable referenciada",
+    "context": "Referenced variable"
+  },
+  {
+    "term": "component.referenced-calculations-dialog.referenced-error",
+    "definition": "{count, plural, =1 {El campo siguiente tiene} other {Los campos siguiente tienen}} cálculos y condiciones que utilizan esta variable. Para continuar necesitas borrar las condiciones y cálculos que hacen referencia.",
+    "context": "The {count, plural, =1 {field below have} other {fields below has}} calculations and conditions that use this variable. To proceed you need to remove the referencing conditions and calculations."
+  },
+  {
+    "term": "component.referenced-calculations-dialog.referenced-math-error",
+    "definition": "{count, plural, =1 {El campo siguiente tiene} other {Los campos siguiente tienen}} cálculos que afectan a esta variable. Para continuar necesitas borrar estos cálculos.",
+    "context": "The {count, plural, =1 {field below have} other {fields below has}} calculations that affect this variable. To proceed you need to remove this calculations."
+  },
+  {
+    "term": "component.referenced-calculations-dialog.referenced-visibility-error",
+    "definition": "{count, plural, =1 {El campo siguiente tiene} other {Los campos siguiente tienen}} condiciones que referencian a esta variable. Para continuar necesitas borrar las condiciones que hacen referencia.",
+    "context": "The {count, plural, =1 {field below have} other {fields below has}} conditions that use this variable. To proceed you need to remove the referencing conditions."
+  },
+  {
+    "term": "component.referenced-field-dialog.confirm-calculations",
+    "definition": "Quitar cálculos",
+    "context": "Remove calculations"
+  },
+  {
+    "term": "component.referenced-field-dialog.confirm-conditions",
+    "definition": "Quitar condiciones",
     "context": "Remove conditions"
   },
   {
@@ -6505,14 +6800,19 @@
     "context": "This field is being referenced"
   },
   {
-    "term": "component.referenced-field-dialog.referenced-error",
-    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguiente hacen}} referencia a este campo. Para continuar necesitas borrar las condiciones que hacen referencia.",
-    "context": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field. To proceed you need to remove the referencing conditions."
+    "term": "component.referenced-field-dialog.referenced-calculations",
+    "definition": "{count, plural, =1 {El campo siguiente utiliza} other {Los campos siguiente utilizan}} este campo para hacer cálculos. Para continuar necesitas quitar los cálculos que hacen referencia.",
+    "context": "The {count, plural, =1 {field below is} other {fields below are}} making calculations with this field. To proceed you need to remove the referencing calculations."
   },
   {
-    "term": "component.referenced-field-dialog.referenced-invalid-conditions",
-    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguiente hacen}} referencia a este campo con condiciones inválidas. Para continuar necesitas borrar las condiciones inválidas que hacen referencia.",
-    "context": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field with invalid conditions. To proceed you need to remove the referencing invalid conditions."
+    "term": "component.referenced-field-dialog.referenced-conditions",
+    "definition": "{count, plural, =1 {El campo siguiente tiene} other {Los campos siguiente tienen}} condiciones con este campo. Para continuar necesitas quitar las condiciones que hacen referencia.",
+    "context": "The {count, plural, =1 {field below has} other {fields below have}} conditions with this field. To proceed you need to remove the referencing conditions."
+  },
+  {
+    "term": "component.referenced-field-dialog.referenced-logic",
+    "definition": "{count, plural, =1 {El campo siguiente tiene} other {Los campos siguiente tienen}} condiciones y cálculos con este campo. Para continuar necesitas quitar las condiciones y cálculos que hacen referencia.",
+    "context": "The {count, plural, =1 {field below has} other {fields below have}} conditions and calculations with this field. To proceed you need to remove the referencing conditions and calculations."
   },
   {
     "term": "component.remove-signature-token-dialog.body",
@@ -7143,6 +7443,31 @@
     "term": "component.settings-public-link-dialog.title",
     "definition": "Ajustes del enlace público",
     "context": "Public link configuration"
+  },
+  {
+    "term": "component.settings-row-alias.alias-description",
+    "definition": "Permite identificar fácilmente el campo en las respuestas de la API. Además, puede insertarse en la descripción del campo para reemplazar automáticamente el contenido.",
+    "context": "Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
+  },
+  {
+    "term": "component.settings-row-alias.alias-label",
+    "definition": "Referencias",
+    "context": "References"
+  },
+  {
+    "term": "component.settings-row-alias.reference-exists-error",
+    "definition": "Esta referencia ya está siendo utilizada.",
+    "context": "This reference is already in use."
+  },
+  {
+    "term": "component.settings-row-alias.reference-invalid-error",
+    "definition": "Utiliza solo letras, números o _",
+    "context": "Use only letters, numbers or _"
+  },
+  {
+    "term": "component.settings-row-alias.reference-invalid-error-begin-letter",
+    "definition": "Las referencias deben empezar por una letra",
+    "context": "References must begin with a letter"
   },
   {
     "term": "component.settings-row-button.edit-settings",
@@ -8440,16 +8765,6 @@
     "context": "Please try again later and if the error persists <a>reach out to support</a> for help."
   },
   {
-    "term": "field-settings.alias-description",
-    "definition": "Permite identificar fácilmente el campo en las respuestas de la API. Además, puede insertarse en la descripción del campo para reemplazar automáticamente el contenido.",
-    "context": "Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
-  },
-  {
-    "term": "field-settings.alias-label",
-    "definition": "Referencias",
-    "context": "References"
-  },
-  {
     "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",
     "definition": "Adjunte un archivo .xlsx como el del modelo.",
     "context": "Attach an .xlsx file like the one in the model."
@@ -8503,16 +8818,6 @@
     "term": "field-settings.heading-page-break-visibility",
     "definition": "No se puede añadir saltos de página en secciones con condiciones de visibilidad",
     "context": "Can't add page breaks on headings with visibility conditions"
-  },
-  {
-    "term": "field-settings.reference-exists-error",
-    "definition": "Esta referencia ya está siendo utilizada.",
-    "context": "This reference is already in use."
-  },
-  {
-    "term": "field-settings.reference-invalid-error",
-    "definition": "Utiliza solo letras, números o _",
-    "context": "Use only letters, numbers or _"
   },
   {
     "term": "footer.slogan",
@@ -8678,6 +8983,16 @@
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {Sin comentarios} =1 {# comentario} other {# comentarios}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "generic.condition-logical-join-and",
+    "definition": "y",
+    "context": "and"
+  },
+  {
+    "term": "generic.condition-logical-join-or",
+    "definition": "o",
+    "context": "or"
   },
   {
     "term": "generic.confirm",
@@ -9178,6 +9493,11 @@
     "term": "generic.integration-provider",
     "definition": "Proveedor",
     "context": "Provider"
+  },
+  {
+    "term": "generic.invalid-field-conditions-error",
+    "definition": "Sólo se pueden mover campos de manera que las condiciones de visibilidad y los cálculos hagan referencia únicamente a campos anteriores.",
+    "context": "You can only move fields so that visibility and calculations conditions refer only to previous fields."
   },
   {
     "term": "generic.invalid-password-policy-error",
@@ -9908,6 +10228,11 @@
     "term": "generic.unnamed-template",
     "definition": "Plantilla sin nombre",
     "context": "Unnamed template"
+  },
+  {
+    "term": "generic.unset-value",
+    "definition": "Valor no establecido",
+    "context": "Unset value"
   },
   {
     "term": "generic.unsubscribed",
@@ -10693,6 +11018,11 @@
     "term": "page.compose.petition-settings-header",
     "definition": "Ajustes",
     "context": "Settings"
+  },
+  {
+    "term": "page.compose.petition-variables-header",
+    "definition": "Variables",
+    "context": "Variables"
   },
   {
     "term": "page.compose.send-from-activity",
@@ -13665,8 +13995,13 @@
     "context": "This team contains all users from the organization."
   },
   {
-    "term": "util.use-petition-compose-field-reorder.move-referenced-field-error",
-    "definition": "Solo se pueden mover campos de manera que las condiciones de visibilidad hagan referencia únicamente a campos anteriores.",
+    "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",
+    "definition": "Sólo se pueden mover campos de manera que los cálculos hagan referencia únicamente a campos anteriores.",
+    "context": "You can only move fields so that calculations refer only to previous fields."
+  },
+  {
+    "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-visibility",
+    "definition": "Sólo se pueden mover campos de manera que las condiciones de visibilidad hagan referencia únicamente a campos anteriores.",
     "context": "You can only move fields so that visibility conditions refer only to previous fields."
   },
   {

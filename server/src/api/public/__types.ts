@@ -210,6 +210,11 @@ export type CreatePetitionFieldReplyInput = {
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
+export type CreatePetitionVariableInput = {
+  defaultValue: Scalars["Int"]["input"];
+  name: Scalars["String"]["input"];
+};
+
 export type CreateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
@@ -668,6 +673,8 @@ export type Mutation = {
   createPetitionFieldReplies: Array<PetitionFieldReply>;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
+  /** Creates a new variable on the petition. */
+  createPetitionVariable: Petition;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   createProfile: Profile;
@@ -717,6 +724,8 @@ export type Mutation = {
   deletePetitionListView: User;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
+  /** Deletes a variable from the petition. */
+  deletePetitionVariable: Petition;
   /** Delete petitions and folders. */
   deletePetitions: Success;
   /** Permanently deletes the profile */
@@ -946,6 +955,8 @@ export type Mutation = {
    *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
+  /** Updates a variable on the petition. */
+  updatePetitionVariable: Petition;
   updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
@@ -1222,6 +1233,11 @@ export type MutationcreatePetitionListViewArgs = {
   name: Scalars["String"]["input"];
 };
 
+export type MutationcreatePetitionVariableArgs = {
+  data: CreatePetitionVariableInput;
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationcreatePrintPdfTaskArgs = {
   includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1362,6 +1378,11 @@ export type MutationdeletePetitionListViewArgs = {
 export type MutationdeletePetitionReplyArgs = {
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
+};
+
+export type MutationdeletePetitionVariableArgs = {
+  name: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionsArgs = {
@@ -2039,6 +2060,12 @@ export type MutationupdatePetitionUserNotificationReadStatusArgs = {
   petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
+export type MutationupdatePetitionVariableArgs = {
+  data: UpdatePetitionVariableInput;
+  name: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationupdateProfileFieldValueArgs = {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
@@ -2470,6 +2497,8 @@ export type Petition = PetitionBase & {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
+  variablesResult: Array<PetitionVariableResult>;
 };
 
 /** A petition */
@@ -2634,6 +2663,8 @@ export type PetitionBase = {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
+  variablesResult: Array<PetitionVariableResult>;
 };
 
 export type PetitionBaseMini = {
@@ -2826,6 +2857,8 @@ export type PetitionField = {
   isInternal: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"]["output"];
+  /** A JSON object representing the math to be performed on the field */
+  math: Maybe<Array<Scalars["JSONObject"]["output"]>>;
   /** Determines if this field allows multiple replies. */
   multiple: Scalars["Boolean"]["output"];
   /** Determines if this field is optional. */
@@ -3466,6 +3499,8 @@ export type PetitionTemplate = PetitionBase & {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
+  variablesResult: Array<PetitionVariableResult>;
 };
 
 /** A petition template */
@@ -3532,6 +3567,16 @@ export type PetitionUserPermission = PetitionPermission &
     /** The user linked to the permission */
     user: User;
   };
+
+export type PetitionVariable = {
+  defaultValue: Scalars["Int"]["output"];
+  name: Scalars["String"]["output"];
+};
+
+export type PetitionVariableResult = {
+  name: Scalars["String"]["output"];
+  value: Maybe<Scalars["Int"]["output"]>;
+};
 
 export type Profile = Timestamps & {
   /** Time when the resource was created. */
@@ -3928,6 +3973,7 @@ export type PublicPetition = Timestamps & {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
+  variables: Array<PetitionVariable>;
 };
 
 /** A public view of a petition access */
@@ -3968,6 +4014,8 @@ export type PublicPetitionField = {
   isInternal: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"]["output"];
+  /** A JSON object representing the math to be performed on the field */
+  math: Maybe<Array<Scalars["JSONObject"]["output"]>>;
   /** Determines if this field allows multiple replies. */
   multiple: Scalars["Boolean"]["output"];
   /** Determines if this field is optional. */
@@ -4898,6 +4946,7 @@ export type UpdatePetitionFieldInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   hasCommentsEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   isInternal?: InputMaybe<Scalars["Boolean"]["input"]>;
+  math?: InputMaybe<Array<Scalars["JSONObject"]["input"]>>;
   multiple?: InputMaybe<Scalars["Boolean"]["input"]>;
   optional?: InputMaybe<Scalars["Boolean"]["input"]>;
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
@@ -4932,6 +4981,10 @@ export type UpdatePetitionInput = {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   signatureConfig?: InputMaybe<SignatureConfigInput>;
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type UpdatePetitionVariableInput = {
+  defaultValue: Scalars["Int"]["input"];
 };
 
 export type UpdateProfileFieldValueInput = {
@@ -5421,6 +5474,7 @@ export type PetitionFragment = {
     external: { approved: number; replied: number; optional: number; total: number };
     internal: { approved: number; replied: number; optional: number; total: number };
   };
+  variablesResult?: Array<{ name: string; value: number | null }>;
 };
 
 export type TemplateFragment = {
@@ -5686,6 +5740,7 @@ export type GetPetitions_petitionsQueryVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
@@ -5795,6 +5850,7 @@ export type GetPetitions_petitionsQuery = {
             external: { approved: number; replied: number; optional: number; total: number };
             internal: { approved: number; replied: number; optional: number; total: number };
           };
+          variablesResult?: Array<{ name: string; value: number | null }>;
         }
       | {}
     >;
@@ -5811,6 +5867,7 @@ export type CreatePetition_petitionMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
 }>;
 
 export type CreatePetition_petitionMutation = {
@@ -5917,6 +5974,7 @@ export type CreatePetition_petitionMutation = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
+        variablesResult?: Array<{ name: string; value: number | null }>;
       }
     | {};
 };
@@ -5930,6 +5988,7 @@ export type GetPetition_petitionQueryVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
 }>;
 
 export type GetPetition_petitionQuery = {
@@ -6036,6 +6095,7 @@ export type GetPetition_petitionQuery = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
+        variablesResult?: Array<{ name: string; value: number | null }>;
       }
     | {}
     | null;
@@ -6084,6 +6144,7 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
 }>;
 
 export type UpdatePetition_updatePetitionMutation = {
@@ -6190,6 +6251,7 @@ export type UpdatePetition_updatePetitionMutation = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
+        variablesResult?: Array<{ name: string; value: number | null }>;
       }
     | {};
 };
@@ -6210,6 +6272,7 @@ export type ClosePetition_closePetitionMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
 }>;
 
 export type ClosePetition_closePetitionMutation = {
@@ -6315,6 +6378,7 @@ export type ClosePetition_closePetitionMutation = {
       external: { approved: number; replied: number; optional: number; total: number };
       internal: { approved: number; replied: number; optional: number; total: number };
     };
+    variablesResult?: Array<{ name: string; value: number | null }>;
   };
 };
 
@@ -6327,6 +6391,7 @@ export type ReopenPetition_reopenPetitionMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
 }>;
 
 export type ReopenPetition_reopenPetitionMutation = {
@@ -6432,6 +6497,7 @@ export type ReopenPetition_reopenPetitionMutation = {
       external: { approved: number; replied: number; optional: number; total: number };
       internal: { approved: number; replied: number; optional: number; total: number };
     };
+    variablesResult?: Array<{ name: string; value: number | null }>;
   };
 };
 
@@ -6458,6 +6524,7 @@ export type TagPetition_tagPetitionMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
 }>;
 
 export type TagPetition_tagPetitionMutation = {
@@ -6564,6 +6631,7 @@ export type TagPetition_tagPetitionMutation = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
+        variablesResult?: Array<{ name: string; value: number | null }>;
       }
     | {};
 };
@@ -6641,6 +6709,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
   senderId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
@@ -6749,6 +6818,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
         external: { approved: number; replied: number; optional: number; total: number };
         internal: { approved: number; replied: number; optional: number; total: number };
       };
+      variablesResult?: Array<{ name: string; value: number | null }>;
     } | null;
   }>;
 };
@@ -9012,6 +9082,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
   includeReplies: Scalars["Boolean"]["input"];
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
 }>;
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
@@ -9117,6 +9188,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
       external: { approved: number; replied: number; optional: number; total: number };
       internal: { approved: number; replied: number; optional: number; total: number };
     };
+    variablesResult?: Array<{ name: string; value: number | null }>;
   };
 };
 
@@ -9371,6 +9443,10 @@ export const PetitionFragmentDoc = gql`
         total
       }
     }
+    variablesResult @include(if: $includeVariablesResult) {
+      name
+      value
+    }
   }
   ${PetitionAccessFragmentDoc}
   ${PetitionFieldWithRepliesFragmentDoc}
@@ -9621,6 +9697,7 @@ export const GetPetitions_petitionsDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
     $fromTemplateId: [GID!]
   ) {
     petitions(
@@ -9648,6 +9725,7 @@ export const CreatePetition_petitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
   ) {
     createPetition(name: $name, petitionId: $templateId) {
       ...Petition
@@ -9668,6 +9746,7 @@ export const GetPetition_petitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
   ) {
     petition(id: $petitionId) {
       ...Petition
@@ -9704,6 +9783,7 @@ export const UpdatePetition_updatePetitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...Petition
@@ -9732,6 +9812,7 @@ export const ClosePetition_closePetitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
   ) {
     closePetition(petitionId: $petitionId) {
       ...Petition
@@ -9752,6 +9833,7 @@ export const ReopenPetition_reopenPetitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
   ) {
     reopenPetition(petitionId: $petitionId) {
       ...Petition
@@ -9791,6 +9873,7 @@ export const TagPetition_tagPetitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
   ) {
     tagPetition(petitionId: $petitionId, tagId: $tagId) {
       ...Petition
@@ -9885,6 +9968,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
     $senderId: GID
   ) {
     sendPetition(
@@ -10918,6 +11002,7 @@ export const SubmitReplies_bulkCreatePetitionRepliesDocument = gql`
     $includeReplies: Boolean!
     $includeProgress: Boolean!
     $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
   ) {
     bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
       ...Petition

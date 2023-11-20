@@ -32,12 +32,13 @@ export interface PetitionRepliesContentsProps<
   T extends PetitionRepliesContents_PetitionFieldFragment,
 > {
   fieldsWithIndices: [field: T, fieldIndex: PetitionFieldIndex, childrenFieldIndices?: string[]][];
-  fieldLogic?: FieldLogicResult[];
+  fieldLogic: FieldLogicResult[];
   onFieldClick: (fieldId: string) => void;
   filter?: PetitionFieldFilter;
   signatureStatus?: PetitionSignatureStatusFilter;
   signatureEnvironment?: SignatureOrgIntegrationEnvironment | null;
   onSignatureStatusClick?: () => void;
+  onVariablesClick?: () => void;
 }
 
 export function PetitionRepliesContents<T extends PetitionRepliesContents_PetitionFieldFragment>({
@@ -48,11 +49,13 @@ export function PetitionRepliesContents<T extends PetitionRepliesContents_Petiti
   signatureStatus,
   signatureEnvironment,
   onSignatureStatusClick,
+  onVariablesClick,
 }: PetitionRepliesContentsProps<T>) {
   const handleFieldClick = useMemoFactory(
     (fieldId: string) => () => onFieldClick(fieldId),
     [onFieldClick],
   );
+
   return (
     <Stack as="ol" spacing={1} padding={4}>
       {signatureStatus ? (
@@ -61,6 +64,24 @@ export function PetitionRepliesContents<T extends PetitionRepliesContents_Petiti
           environment={signatureEnvironment}
           onClick={onSignatureStatusClick}
         />
+      ) : null}
+      {onVariablesClick !== undefined ? (
+        <Box as="li" listStyleType="none" display="flex">
+          <Button
+            variant="ghost"
+            height="auto"
+            padding={2}
+            fontWeight="bold"
+            onClick={onVariablesClick}
+            width="100%"
+            justifyContent="flex-start"
+          >
+            <FormattedMessage
+              id="component.petition-replies-contents.calculation-results-button"
+              defaultMessage="Calculation results"
+            />
+          </Button>
+        </Box>
       ) : null}
       {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) => {
         if (x.type === "FIELD") {

@@ -291,14 +291,14 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
             defaultMessage="Sign a PDF document with all the replies using one of our integrated eSignature providers."
           />
         </Text>
-        <Text>
-          <HelpCenterLink articleId={6022979} display="flex" alignItems="center" fontSize="sm">
+        <Flex>
+          <HelpCenterLink articleId={6022979} display="flex" alignItems="center">
             <FormattedMessage
               id="component.signature-config-dialog.header-help-link"
               defaultMessage="More about eSignature"
             />
           </HelpCenterLink>
-        </Text>
+        </Flex>
       </Stack>
       <FormControl hidden={integrations.length < 2}>
         <FormLabel>

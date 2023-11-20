@@ -15,7 +15,7 @@ import {
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";
+import { FORMATS, dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";
 import { defaultFieldConditionValue } from "@parallel/utils/fieldLogic/conditions";
 import {
   PetitionFieldLogicCondition,
@@ -26,10 +26,18 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { never } from "@parallel/utils/never";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { useEffect, useMemo, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { unMaybeArray } from "@parallel/utils/types";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import {
+  FormattedDate,
+  FormattedList,
+  FormattedMessage,
+  FormattedNumber,
+  useIntl,
+} from "react-intl";
 import { createFilter } from "react-select";
 import { isDefined, uniq } from "remeda";
+import { assert } from "ts-essentials";
 import { HelpPopover } from "../../common/HelpPopover";
 import { NumeralInput } from "../../common/NumeralInput";
 import { SimpleOption, SimpleSelect } from "../../common/SimpleSelect";
@@ -47,45 +55,67 @@ export function PetitionFieldLogicConditionEditor({
   isReadOnly?: boolean;
   showErrors?: boolean;
 }) {
-  const { fieldsWithIndices, field } = usePetitionFieldLogicContext();
-  const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0];
+  const {
+    fieldsWithIndices,
+    fieldWithIndex: [field],
+  } = usePetitionFieldLogicContext();
+  const referencedField =
+    "fieldId" in condition
+      ? fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0]
+      : undefined;
   const isMultipleValue = isDefined(referencedField)
     ? referencedField.multiple ||
       (isDefined(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
     : false;
+  const Wrapper = isReadOnly ? Box : Fragment;
   return (
-    <>
+    <Wrapper {...(isReadOnly ? { fontSize: "sm" } : {})}>
       <PetitionFieldLogicConditionSubjectSelect
         value={condition}
         onChange={onConditionChange}
         isReadOnly={isReadOnly}
+        showErrors={showErrors}
       />
-      <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
-        {isMultipleValue ? (
-          <ConditionMultipleValuedModifier
+      {isReadOnly ? (
+        <>
+          {isMultipleValue ? (
+            <ConditionMultipleValueModifier
+              value={condition}
+              onChange={onConditionChange}
+              isReadOnly
+            />
+          ) : null}
+          <ConditionPredicate
             value={condition}
             onChange={onConditionChange}
-            isReadOnly={isReadOnly}
+            showErrors={showErrors}
+            isReadOnly
           />
-        ) : null}
-        <ConditionPredicate
-          value={condition}
-          onChange={onConditionChange}
-          isReadOnly={isReadOnly}
-          showErrors={showErrors}
-        />
-      </Stack>
-    </>
+        </>
+      ) : (
+        <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
+          {isMultipleValue ? (
+            <ConditionMultipleValueModifier value={condition} onChange={onConditionChange} />
+          ) : null}
+          <ConditionPredicate
+            value={condition}
+            onChange={onConditionChange}
+            showErrors={showErrors}
+          />
+        </Stack>
+      )}
+    </Wrapper>
   );
 }
 
-function ConditionMultipleValuedModifier({
+function ConditionMultipleValueModifier({
   value: condition,
   onChange,
   isReadOnly,
 }: ValueProps<PetitionFieldLogicCondition, false> & {
   isReadOnly?: boolean;
 }) {
+  assert("fieldId" in condition);
   const { fieldsWithIndices } = usePetitionFieldLogicContext();
   const conditionField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)![0];
   const options = useSimpleSelectOptions<PetitionFieldLogicConditionMultipleValueModifier>(
@@ -149,10 +179,11 @@ function ConditionMultipleValuedModifier({
     [conditionField.type, condition.column],
   );
 
-  return (
+  return isReadOnly ? (
+    <>{options.find((o) => o.value === condition.modifier)!.label} </>
+  ) : (
     <SimpleSelect
       size="sm"
-      isReadOnly={isReadOnly}
       options={options}
       value={condition.modifier}
       onChange={(modifier) => {
@@ -188,6 +219,10 @@ function ConditionMultipleValuedModifier({
           left: "50%",
           transform: "translateX(-50%)",
         }),
+        option: (styles) => ({
+          ...styles,
+          whiteSpace: "nowrap",
+        }),
       }}
     />
   );
@@ -204,8 +239,16 @@ function ConditionPredicate({
   showErrors,
   isReadOnly,
 }: ConditionPredicateProps) {
-  const { fieldsWithIndices, field } = usePetitionFieldLogicContext();
-  const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0];
+  const {
+    fieldsWithIndices,
+    fieldWithIndex: [field],
+  } = usePetitionFieldLogicContext();
+  const isFieldCondition = "fieldId" in condition;
+  const isVariableCondition = "variableName" in condition;
+  const referencedField = isFieldCondition
+    ? fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0]
+    : undefined;
+  const referencedVariable = isVariableCondition ? condition.variableName : undefined;
   const isMultipleValue = isDefined(referencedField)
     ? referencedField.multiple ||
       (isDefined(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
@@ -213,10 +256,7 @@ function ConditionPredicate({
   const options = useSimpleSelectOptions(
     (intl) => {
       const options: SimpleOption<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
-      if (
-        (isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") ||
-        referencedField?.type === "NUMBER"
-      ) {
+      if (isVariableCondition && isDefined(referencedVariable)) {
         options.push(
           { label: "=", value: "EQUAL" },
           { label: "≠", value: "NOT_EQUAL" },
@@ -225,219 +265,229 @@ function ConditionPredicate({
           { label: "≤", value: "LESS_THAN_OR_EQUAL" },
           { label: "≥", value: "GREATER_THAN_OR_EQUAL" },
         );
-      } else if (referencedField?.type === "DATE" || referencedField?.type === "DATE_TIME") {
-        options.push(
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.equal-date",
-              defaultMessage: "is the",
-            }),
-            value: "EQUAL",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.not-equal-date",
-              defaultMessage: "is not the",
-            }),
-            value: "NOT_EQUAL",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.less-than-date",
-              defaultMessage: "is before the",
-            }),
-            value: "LESS_THAN",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.greater-than-date",
-              defaultMessage: "is after the",
-            }),
-            value: "GREATER_THAN",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.less-or-equal-than-date",
-              defaultMessage: "is before the (incl.)",
-            }),
-            value: "LESS_THAN_OR_EQUAL",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.greater-or-equal-than-date",
-              defaultMessage: "is after the (incl.)",
-            }),
-            value: "GREATER_THAN_OR_EQUAL",
-          },
-        );
-      } else if (referencedField?.type === "CHECKBOX") {
-        options.push(
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.contain-choice",
-              defaultMessage: "is selected",
-            }),
-            value: "CONTAIN",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.not-contain-choice",
-              defaultMessage: "is not selected",
-            }),
-            value: "NOT_CONTAIN",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.number-of-choices",
-              defaultMessage: "no. of selected",
-            }),
-            value: "NUMBER_OF_SUBREPLIES",
-          },
-        );
-      } else if (
-        referencedField?.type === "SELECT" ||
-        (referencedField?.type === "DYNAMIC_SELECT" && "column" in condition)
-      ) {
-        options.push(
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.equal-select",
-                defaultMessage: "{modifier, select, ALL {are} other {is}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "EQUAL",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.not-equal-select",
-                defaultMessage: "{modifier, select, ALL {are not} other {is not}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "NOT_EQUAL",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.is-one-of-select",
-                defaultMessage: "{modifier, select, ALL {are one of} other {is one of}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "IS_ONE_OF",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.not-is-one-of-select",
-                defaultMessage: "{modifier, select, ALL {are not one of} other {is not one of}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "NOT_IS_ONE_OF",
-          },
-        );
-      } else if (
-        isDefined(referencedField) &&
-        !isFileTypeField(referencedField.type) &&
-        referencedField.type !== "DYNAMIC_SELECT"
-      ) {
-        options.push(
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.equal-default",
-                defaultMessage: "{modifier, select, ALL {are equal to} other {is equal to}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "EQUAL",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.not-equal-default",
-                defaultMessage:
-                  "{modifier, select, ALL {are not equal to} other {is not equal to}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "NOT_EQUAL",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.start-with-default",
-                defaultMessage: "{modifier, select, ALL {start with} other {starts with}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "START_WITH",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.end-with-default",
-                defaultMessage: "{modifier, select, ALL {end with} other {ends with}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "END_WITH",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.contain-default",
-                defaultMessage: "{modifier, select, ALL {contain} other {contains}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "CONTAIN",
-          },
-          {
-            label: intl.formatMessage(
-              {
-                id: "component.petition-field-visibility-editor.not-contain-default",
-                defaultMessage: "{modifier, select, ALL {do not contain} other {does not contain}}",
-              },
-              { modifier: condition.modifier },
-            ),
-            value: "NOT_CONTAIN",
-          },
-        );
-      }
-      if (!isMultipleValue) {
-        options.push(
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.have-reply",
-              defaultMessage: "has replies",
-            }),
-            value: "HAVE_REPLY",
-          },
-          {
-            label: intl.formatMessage({
-              id: "component.petition-field-visibility-editor.not-have-reply",
-              defaultMessage: "does not have replies",
-            }),
-            value: "NOT_HAVE_REPLY",
-          },
-        );
+      } else if (isFieldCondition && isDefined(referencedField)) {
+        if (
+          (isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") ||
+          referencedField.type === "NUMBER"
+        ) {
+          options.push(
+            { label: "=", value: "EQUAL" },
+            { label: "≠", value: "NOT_EQUAL" },
+            { label: "<", value: "LESS_THAN" },
+            { label: ">", value: "GREATER_THAN" },
+            { label: "≤", value: "LESS_THAN_OR_EQUAL" },
+            { label: "≥", value: "GREATER_THAN_OR_EQUAL" },
+          );
+        } else if (referencedField.type === "DATE" || referencedField.type === "DATE_TIME") {
+          options.push(
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.equal-date",
+                defaultMessage: "is the",
+              }),
+              value: "EQUAL",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-equal-date",
+                defaultMessage: "is not the",
+              }),
+              value: "NOT_EQUAL",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.less-than-date",
+                defaultMessage: "is before the",
+              }),
+              value: "LESS_THAN",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.greater-than-date",
+                defaultMessage: "is after the",
+              }),
+              value: "GREATER_THAN",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.less-or-equal-than-date",
+                defaultMessage: "is before the (incl.)",
+              }),
+              value: "LESS_THAN_OR_EQUAL",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.greater-or-equal-than-date",
+                defaultMessage: "is after the (incl.)",
+              }),
+              value: "GREATER_THAN_OR_EQUAL",
+            },
+          );
+        } else if (referencedField.type === "CHECKBOX") {
+          options.push(
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.contain-choice",
+                defaultMessage: "is selected",
+              }),
+              value: "CONTAIN",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-contain-choice",
+                defaultMessage: "is not selected",
+              }),
+              value: "NOT_CONTAIN",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.number-of-choices",
+                defaultMessage: "no. of selected",
+              }),
+              value: "NUMBER_OF_SUBREPLIES",
+            },
+          );
+        } else if (
+          referencedField.type === "SELECT" ||
+          (referencedField.type === "DYNAMIC_SELECT" && "column" in condition)
+        ) {
+          options.push(
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.equal-select",
+                  defaultMessage: "{modifier, select, ALL {are} other {is}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "EQUAL",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.not-equal-select",
+                  defaultMessage: "{modifier, select, ALL {are not} other {is not}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "NOT_EQUAL",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.is-one-of-select",
+                  defaultMessage: "{modifier, select, ALL {are one of} other {is one of}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "IS_ONE_OF",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.not-is-one-of-select",
+                  defaultMessage: "{modifier, select, ALL {are not one of} other {is not one of}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "NOT_IS_ONE_OF",
+            },
+          );
+        } else if (
+          isDefined(referencedField) &&
+          !isFileTypeField(referencedField.type) &&
+          referencedField.type !== "DYNAMIC_SELECT"
+        ) {
+          options.push(
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.equal-default",
+                  defaultMessage: "{modifier, select, ALL {are equal to} other {is equal to}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "EQUAL",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.not-equal-default",
+                  defaultMessage:
+                    "{modifier, select, ALL {are not equal to} other {is not equal to}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "NOT_EQUAL",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.start-with-default",
+                  defaultMessage: "{modifier, select, ALL {start with} other {starts with}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "START_WITH",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.end-with-default",
+                  defaultMessage: "{modifier, select, ALL {end with} other {ends with}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "END_WITH",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.contain-default",
+                  defaultMessage: "{modifier, select, ALL {contain} other {contains}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "CONTAIN",
+            },
+            {
+              label: intl.formatMessage(
+                {
+                  id: "component.petition-field-visibility-editor.not-contain-default",
+                  defaultMessage:
+                    "{modifier, select, ALL {do not contain} other {does not contain}}",
+                },
+                { modifier: condition.modifier },
+              ),
+              value: "NOT_CONTAIN",
+            },
+          );
+        }
+        if (!isMultipleValue) {
+          options.push(
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.have-reply",
+                defaultMessage: "has replies",
+              }),
+              value: "HAVE_REPLY",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-have-reply",
+                defaultMessage: "does not have replies",
+              }),
+              value: "NOT_HAVE_REPLY",
+            },
+          );
+        }
       }
       return options;
     },
-    [
-      referencedField?.type,
-      isMultipleValue,
-      condition.modifier,
-      "column" in condition && condition.column,
-    ],
+    [referencedField, isMultipleValue, condition, referencedVariable],
   );
   const operator =
-    !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES"
+    isFieldCondition && !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES"
       ? condition.operator === "GREATER_THAN"
         ? "HAVE_REPLY"
         : "NOT_HAVE_REPLY"
@@ -470,13 +520,15 @@ function ConditionPredicate({
         operator: "NUMBER_OF_SUBREPLIES",
         value: 0,
       });
-    } else if (isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") {
+    } else if (isFieldCondition && isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") {
       onChange({ ...condition, operator });
     } else if (
+      isFieldCondition &&
       isDefined(referencedField) &&
       ["SELECT", "DYNAMIC_SELECT"].includes(referencedField.type) &&
       condition.modifier !== "NUMBER_OF_REPLIES"
     ) {
+      assert("fieldId" in condition);
       onChange({
         ...condition,
         operator,
@@ -490,6 +542,7 @@ function ConditionPredicate({
       });
     } else {
       if (
+        isFieldCondition &&
         isDefined(referencedField) &&
         (condition.modifier === "NUMBER_OF_REPLIES" ||
           condition.operator === "NUMBER_OF_SUBREPLIES")
@@ -507,49 +560,80 @@ function ConditionPredicate({
             : defaultValue,
         });
       } else {
-        const { value, modifier } = condition;
         onChange({
           ...condition,
           operator,
-          modifier,
-          value,
         });
       }
     }
   };
 
-  return !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES" ? (
-    <Box flex="1" minWidth="0">
-      <SimpleSelect
-        size="sm"
-        isReadOnly={isReadOnly}
-        options={options}
-        value={operator}
-        onChange={handleOperatorChange}
-      />
-    </Box>
+  return isFieldCondition && !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES" ? (
+    isReadOnly ? (
+      <Box as="span">{options.find((o) => o.value === operator)!.label}</Box>
+    ) : (
+      <Box flex="1" minWidth="0">
+        <SimpleSelect
+          size="sm"
+          isReadOnly={isReadOnly}
+          options={options}
+          value={operator}
+          onChange={handleOperatorChange}
+          styles={{
+            menu: (styles) => ({
+              ...styles,
+              minWidth: "100%",
+              width: "unset",
+              left: "50%",
+              transform: "translateX(-50%)",
+            }),
+            option: (styles) => ({
+              ...styles,
+              whiteSpace: "nowrap",
+            }),
+          }}
+        />
+      </Box>
+    )
   ) : (
     <>
-      <SimpleSelect
-        size="sm"
-        isReadOnly={isReadOnly}
-        options={options}
-        value={operator}
-        onChange={handleOperatorChange}
-        styles={{
-          menu: (styles) => ({
-            ...styles,
-            minWidth: "100%",
-            width: "unset",
-            left: "50%",
-            transform: "translateX(-50%)",
-          }),
-        }}
-      />
-      <Box flex="1" minWidth={20}>
-        {condition.modifier === "NUMBER_OF_REPLIES" ||
-        condition.operator === "NUMBER_OF_SUBREPLIES" ||
-        !isDefined(referencedField) ? (
+      {isReadOnly ? (
+        <>
+          <Box as="span">{options.find((o) => o.value === operator)!.label}</Box>{" "}
+        </>
+      ) : (
+        <SimpleSelect
+          size="sm"
+          isReadOnly={isReadOnly}
+          options={options}
+          value={operator}
+          onChange={handleOperatorChange}
+          styles={{
+            menu: (styles) => ({
+              ...styles,
+              minWidth: "100%",
+              width: "unset",
+              left: "50%",
+              transform: "translateX(-50%)",
+            }),
+            option: (styles) => ({
+              ...styles,
+              whiteSpace: "nowrap",
+            }),
+          }}
+        />
+      )}
+      <Box {...(isReadOnly ? { as: "span" } : { flex: "1", minWidth: 20 })}>
+        {isVariableCondition ? (
+          <ConditionPredicateValueFloat
+            value={condition}
+            onChange={onChange}
+            isReadOnly={isReadOnly}
+            showErrors={showErrors}
+          />
+        ) : condition.modifier === "NUMBER_OF_REPLIES" ||
+          condition.operator === "NUMBER_OF_SUBREPLIES" ||
+          !isDefined(referencedField) ? (
           <ConditionPredicateValueNumber
             value={condition}
             onChange={onChange}
@@ -580,25 +664,12 @@ function ConditionPredicate({
             showErrors={showErrors}
           />
         ) : referencedField.type === "DATE_TIME" ? (
-          <HStack>
-            <ConditionPredicateValueDatetime
-              value={condition}
-              onChange={onChange}
-              isReadOnly={isReadOnly}
-              showErrors={showErrors}
-            />
-            <HelpPopover>
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="component.petition-field-visibility-editor.date-time-help"
-                  defaultMessage="This date and time use your current timezone {timezone}."
-                  values={{
-                    timezone: prettifyTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone),
-                  }}
-                />
-              </Text>
-            </HelpPopover>
-          </HStack>
+          <ConditionPredicateValueDatetime
+            value={condition}
+            onChange={onChange}
+            isReadOnly={isReadOnly}
+            showErrors={showErrors}
+          />
         ) : (
           <ConditionPredicateValueString
             value={condition}
@@ -620,7 +691,15 @@ function ConditionPredicateValueDate({
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState(condition.value as string | null);
-  return (
+  return isReadOnly ? (
+    isDefined(condition.value) ? (
+      <FormattedDate value={condition.value as string} {...FORMATS.L} />
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    )
+  ) : (
     <Input
       size="sm"
       type="date"
@@ -651,22 +730,51 @@ function ConditionPredicateValueDatetime({
       ? dateToDatetimeLocal(condition.value)
       : null,
   );
-  return (
-    <Input
-      size="sm"
-      type="datetime-local"
-      onChange={(e) => setValue(e.target.value || null)}
-      onBlur={() => onChange({ ...condition!, value: value && new Date(value).toISOString() })}
-      value={value ?? ""}
-      backgroundColor="white"
-      isInvalid={showError && value === null}
-      placeholder={intl.formatMessage({
-        id: "generic.enter-a-value",
-        defaultMessage: "Enter a value",
-      })}
-      isDisabled={isReadOnly}
-      opacity={isReadOnly ? "1 !important" : undefined}
-    />
+  const icon = (
+    <HelpPopover marginLeft={0}>
+      <Text fontSize="sm">
+        <FormattedMessage
+          id="component.petition-field-visibility-editor.date-time-help"
+          defaultMessage="This date and time use your current timezone {timezone}."
+          values={{
+            timezone: prettifyTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone),
+          }}
+        />
+      </Text>
+    </HelpPopover>
+  );
+  return isReadOnly ? (
+    isDefined(condition.value) ? (
+      <>
+        <FormattedDate value={condition.value as string} {...FORMATS["L+LT"]} />{" "}
+        <Box as="span" position="relative" top="-1.5px">
+          {icon}
+        </Box>
+      </>
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    )
+  ) : (
+    <HStack>
+      <Input
+        size="sm"
+        type="datetime-local"
+        onChange={(e) => setValue(e.target.value || null)}
+        onBlur={() => onChange({ ...condition!, value: value && new Date(value).toISOString() })}
+        value={value ?? ""}
+        backgroundColor="white"
+        isInvalid={showError && value === null}
+        placeholder={intl.formatMessage({
+          id: "generic.enter-a-value",
+          defaultMessage: "Enter a value",
+        })}
+        isDisabled={isReadOnly}
+        opacity={isReadOnly ? "1 !important" : undefined}
+      />
+      {icon}
+    </HStack>
   );
 }
 
@@ -678,7 +786,15 @@ function ConditionPredicateValueFloat({
   const intl = useIntl();
   const [value, setValue] = useState((condition.value as number) ?? 0);
 
-  return (
+  return isReadOnly ? (
+    isDefined(condition.value) ? (
+      <FormattedNumber value={condition.value as number} />
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    )
+  ) : (
     <NumeralInput
       size="sm"
       backgroundColor="white"
@@ -702,10 +818,15 @@ function ConditionPredicateValueNumber({
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const { fieldsWithIndices } = usePetitionFieldLogicContext();
-  const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0];
+  const isFieldCondition = "fieldId" in condition;
+  const referencedField = isFieldCondition
+    ? fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0]
+    : undefined;
   const [value, setValue] = useState((condition.value as number) ?? 0);
   const maxValue =
-    referencedField?.type === "CHECKBOX" ? referencedField.options.values.length : Infinity;
+    isDefined(referencedField) && referencedField.type === "CHECKBOX"
+      ? referencedField.options.values.length
+      : Infinity;
   useEffect(() => {
     if (maxValue < value) {
       setValue(maxValue);
@@ -715,7 +836,15 @@ function ConditionPredicateValueNumber({
       onChange({ ...condition, value: 0 });
     }
   }, [maxValue]);
-  return (
+  return isReadOnly ? (
+    isDefined(condition.value) ? (
+      <FormattedNumber value={condition.value as number} maximumFractionDigits={0} />
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    )
+  ) : (
     <NumberInput
       size="sm"
       min={0}
@@ -753,6 +882,7 @@ function ConditionPredicateValueSelect({
   isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
+  assert("fieldId" in condition);
   const { fieldsWithIndices } = usePetitionFieldLogicContext();
   const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)![0];
   const options = useMemo(() => {
@@ -771,7 +901,25 @@ function ConditionPredicateValueSelect({
   }, [referencedField.type, referencedField.options.values, condition.column]);
   const isMultiCondition =
     condition.operator === "IS_ONE_OF" || condition.operator === "NOT_IS_ONE_OF";
-  return (
+  return isReadOnly ? (
+    isDefined(condition.value) &&
+    (Array.isArray(condition.value) ? condition.value.length > 0 : true) ? (
+      <FormattedList
+        value={unMaybeArray(condition.value as string | string[]).map((value, index) => (
+          <Box as="span" key={index} fontStyle="italic">
+            {'"'}
+            {value}
+            {'"'}
+          </Box>
+        ))}
+        type="disjunction"
+      />
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    )
+  ) : (
     <SimpleSelect
       size="sm"
       options={options}
@@ -803,7 +951,23 @@ function ConditionPredicateValueString({
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState(condition.value as string | null);
-  return (
+  return isReadOnly ? (
+    isDefined(condition.value) ? (
+      <Box as="span" fontStyle="italic">
+        {'"'}
+        {Number.isNaN(Number(condition.value)) ? (
+          condition.value
+        ) : (
+          <FormattedNumber value={condition.value as number} maximumFractionDigits={0} />
+        )}
+        {'"'}
+      </Box>
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    )
+  ) : (
     <Input
       size="sm"
       onChange={(e) => setValue(e.target.value || null)}

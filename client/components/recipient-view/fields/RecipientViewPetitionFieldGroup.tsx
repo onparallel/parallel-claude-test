@@ -33,11 +33,13 @@ import {
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, zip } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -62,6 +64,7 @@ export interface RecipientViewPetitionFieldGroupProps
   }>;
   showErrors: boolean;
   petition: RecipientViewPetitionFieldGroup_PublicPetitionFragment;
+  fieldLogic: FieldLogicResult;
 }
 
 export function RecipientViewPetitionFieldGroup({
@@ -78,6 +81,7 @@ export function RecipientViewPetitionFieldGroup({
   onStartAsyncFieldCompletion,
   showErrors,
   petition,
+  fieldLogic,
 }: RecipientViewPetitionFieldGroupProps) {
   const handleAddReply = async () => {
     await onCreateReply({});
@@ -92,7 +96,7 @@ export function RecipientViewPetitionFieldGroup({
       onDownloadAttachment={onDownloadAttachment}
       onAddNewGroup={handleAddReply}
     >
-      {field.replies.map((group, index) => {
+      {zip(field.replies, fieldLogic.groupChildrenLogic!).map(([group, groupLogic], index) => {
         return (
           <RecipientViewPetitionFieldGroupCard
             key={index}
@@ -103,29 +107,30 @@ export function RecipientViewPetitionFieldGroup({
             }}
             id={`reply-${group.id}`}
           >
-            {group.children!.map(({ field, replies }) => {
+            {zip(group.children!, groupLogic).map(([{ field, replies }, logic]) => {
               return (
-                <RecipientViewPetitionFieldGroupField
-                  key={field.id}
-                  parentReplyId={group.id}
-                  field={{ ...field, replies }}
-                  isInvalid={
-                    showErrors &&
-                    !canFinalize &&
-                    incompleteFields.some(
-                      ({ id, parentReplyId }) => id === field.id && parentReplyId === group.id,
-                    )
-                  }
-                  isDisabled={isDisabled}
-                  onDownloadAttachment={onDownloadAttachment}
-                  onDeleteReply={onDeleteReply}
-                  onUpdateReply={onUpdateReply}
-                  onCreateReply={onCreateReply}
-                  onDownloadFileUploadReply={onDownloadFileUploadReply}
-                  onCreateFileReply={onCreateFileReply}
-                  onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
-                  onRefreshField={onRefreshField}
-                />
+                <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                  <RecipientViewPetitionFieldGroupField
+                    parentReplyId={group.id}
+                    field={{ ...field, replies }}
+                    isInvalid={
+                      showErrors &&
+                      !canFinalize &&
+                      incompleteFields.some(
+                        ({ id, parentReplyId }) => id === field.id && parentReplyId === group.id,
+                      )
+                    }
+                    isDisabled={isDisabled}
+                    onDownloadAttachment={onDownloadAttachment}
+                    onDeleteReply={onDeleteReply}
+                    onUpdateReply={onUpdateReply}
+                    onCreateReply={onCreateReply}
+                    onDownloadFileUploadReply={onDownloadFileUploadReply}
+                    onCreateFileReply={onCreateFileReply}
+                    onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
+                    onRefreshField={onRefreshField}
+                  />
+                </LiquidPetitionVariableProvider>
               );
             })}
           </RecipientViewPetitionFieldGroupCard>

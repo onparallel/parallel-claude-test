@@ -4,7 +4,7 @@ import { WorkerContext } from "../../context";
 import { UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
 import { getAllFieldsWithIndices } from "../../util/fieldIndices";
-import { applyFieldLogic } from "../../util/fieldLogic";
+import { applyFieldVisibility } from "../../util/fieldLogic";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
@@ -22,12 +22,17 @@ export async function* getPetitionFiles(
   options: GetPetitionFilesOptions,
   ctx: WorkerContext,
 ) {
-  const [composedFields] = await ctx.petitions.getComposedPetitionFields([petitionId]);
+  const [composedPetition] = await ctx.petitions.getComposedPetitionFieldsAndVariables([
+    petitionId,
+  ]);
 
   const indices = Object.fromEntries(
-    getAllFieldsWithIndices(composedFields).map(([field, fieldIndex]) => [field.id, fieldIndex]),
+    getAllFieldsWithIndices(composedPetition.fields).map(([field, fieldIndex]) => [
+      field.id,
+      fieldIndex,
+    ]),
   );
-  const visibleFields = applyFieldLogic(composedFields);
+  const visibleFields = applyFieldVisibility(composedPetition);
   const allReplies = visibleFields
     .flatMap((f) => [
       ...f.replies,

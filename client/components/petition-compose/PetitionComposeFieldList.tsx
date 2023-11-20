@@ -29,7 +29,11 @@ import {
 import { assignRef } from "@parallel/utils/assignRef";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { defaultFieldCondition } from "@parallel/utils/fieldLogic/conditions";
-import { PetitionFieldVisibility } from "@parallel/utils/fieldLogic/types";
+import {
+  PetitionFieldLogicCondition,
+  PetitionFieldMath,
+  PetitionFieldVisibility,
+} from "@parallel/utils/fieldLogic/types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -40,6 +44,7 @@ import { Fragment, memo, useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { intersection, isDefined } from "remeda";
 import { AddFieldButton } from "../petition-common/AddFieldButton";
+import { useEditPetitionFieldCalculationsDialog } from "./dialogs/EditPetitionFieldCalculationsDialog";
 
 export interface PetitionComposeFieldListProps extends BoxProps {
   user: PetitionComposeFieldList_UserFragment;
@@ -90,7 +95,10 @@ export const PetitionComposeFieldList = Object.assign(
       [petition.fields],
     );
 
+    const showEditPetitionFieldCalculationsDialog = useEditPetitionFieldCalculationsDialog();
+
     // Memoize field callbacks
+    const petitionDataRef = useUpdatingRef({ petition });
     const allFieldsDataRef = useUpdatingRef({ fields: allFields, active: activeFieldId });
     const fieldsDataRef = useUpdatingRef({ fields: petition.fields, active: activeFieldId });
     const fieldProps = useMemoFactory(
@@ -104,6 +112,7 @@ export const PetitionComposeFieldList = Object.assign(
         | "onDeleteClick"
         | "onFieldEdit"
         | "onFieldVisibilityClick"
+        | "onFieldCalculationsClick"
         | "onFocusPrevField"
         | "onFocusNextField"
         | "onAddField"
@@ -121,46 +130,79 @@ export const PetitionComposeFieldList = Object.assign(
             // ensure no field has a condition on a missing value
             const values = field.options.values as any[];
             const newValues = data.options.values as any[];
-            const referencing = fields.filter(
+            const referencingVisibility = fields.filter(
               (f) =>
                 (f.visibility as PetitionFieldVisibility)?.conditions.some(
                   (c) =>
+                    "fieldId" in c &&
                     c.fieldId === fieldId &&
                     c.modifier !== "NUMBER_OF_REPLIES" &&
                     c.value !== null &&
                     !newValues.includes(c.value),
                 ),
             );
+
+            const referencingMath = fields.filter(
+              (f) =>
+                (f.math as PetitionFieldMath[])?.some((calc) =>
+                  calc.conditions.some(
+                    (c) =>
+                      "fieldId" in c &&
+                      c.fieldId === fieldId &&
+                      c.modifier !== "NUMBER_OF_REPLIES" &&
+                      c.value !== null &&
+                      !newValues.includes(c.value),
+                  ),
+                ),
+            );
+
+            const updatePetitionFieldLogicCondition = (c: PetitionFieldLogicCondition) => {
+              if ("fieldId" in c && c.fieldId !== fieldId) return c;
+
+              if (c.operator === "NOT_IS_ONE_OF" || c.operator === "IS_ONE_OF") {
+                if (Array.isArray(c.value)) {
+                  return {
+                    ...c,
+                    value: intersection(c.value, newValues),
+                  };
+                } else {
+                  return c;
+                }
+              } else if (c.value !== null && !newValues.includes(c.value)) {
+                const index = values.indexOf(c.value);
+                return {
+                  ...c,
+                  value: index > newValues.length - 1 ? null : newValues[index] ?? null,
+                };
+              } else {
+                return c;
+              }
+            };
+
             // update visibility for fields referencing old options
             await Promise.all(
-              referencing.map(async (field) => {
+              referencingVisibility.map(async (field) => {
                 const visibility = field.visibility as PetitionFieldVisibility;
                 await onFieldEdit(field.id, {
                   visibility: {
                     ...visibility,
-                    conditions: visibility.conditions.map((c) => {
-                      if (c.fieldId !== fieldId) return c;
-
-                      if (c.operator === "NOT_IS_ONE_OF" || c.operator === "IS_ONE_OF") {
-                        if (Array.isArray(c.value)) {
-                          return {
-                            ...c,
-                            value: intersection(c.value, newValues),
-                          };
-                        } else {
-                          return c;
-                        }
-                      } else if (c.value !== null && !newValues.includes(c.value)) {
-                        const index = values.indexOf(c.value);
-                        return {
-                          ...c,
-                          value: index > newValues.length - 1 ? null : newValues[index] ?? null,
-                        };
-                      } else {
-                        return c;
-                      }
-                    }),
+                    conditions: visibility.conditions.map(updatePetitionFieldLogicCondition),
                   },
+                });
+              }),
+            );
+
+            // update math for fields referencing old options
+            await Promise.all(
+              referencingMath.map(async (field) => {
+                const math = field.math as PetitionFieldMath[];
+                await onFieldEdit(field.id, {
+                  math: math.map((calc) => {
+                    return {
+                      ...calc,
+                      conditions: calc.conditions.map(updatePetitionFieldLogicCondition),
+                    };
+                  }),
                 });
               }),
             );
@@ -204,6 +246,24 @@ export const PetitionComposeFieldList = Object.assign(
             }
           }
         },
+        onFieldCalculationsClick: async (removeMath?: boolean) => {
+          const { fields } = allFieldsDataRef.current!;
+          const { petition } = petitionDataRef.current!;
+          const field = fields.find((f) => f.id === fieldId)!;
+          try {
+            if (field.math && removeMath === true) {
+              onFieldEdit(fieldId, { math: null });
+            } else {
+              const { math } = await showEditPetitionFieldCalculationsDialog({
+                field,
+                petition,
+                isReadOnly,
+              });
+
+              onFieldEdit(fieldId, { math });
+            }
+          } catch {}
+        },
         onFocusPrevField: () => {
           const { fields } = allFieldsDataRef.current!;
           const index = fields.findIndex((f) => f.id === fieldId);
@@ -243,7 +303,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
       }),
-      [onCloneField, onFieldSettingsClick, onDeleteField, onFieldEdit],
+      [onCloneField, onFieldSettingsClick, onDeleteField, onFieldEdit, isReadOnly],
     );
 
     const [hoveredFieldId, _setHoveredFieldId] = useState<string | null>(null);
@@ -464,6 +524,7 @@ export const PetitionComposeFieldList = Object.assign(
           type
           options
           visibility
+          math
           isReadOnly
           isFixed
           ...PetitionComposeField_PetitionField
@@ -478,7 +539,10 @@ export const PetitionComposeFieldList = Object.assign(
           fields {
             ...PetitionComposeFieldList_PetitionField
           }
+          ...PetitionComposeField_PetitionBase
         }
+        ${PetitionComposeField.fragments.PetitionBase}
+        ${useEditPetitionFieldCalculationsDialog.fragments.PetitionBase}
       `,
     },
   },

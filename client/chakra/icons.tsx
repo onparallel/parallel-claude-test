@@ -1281,6 +1281,51 @@ export const AddIcon = createIcon({
   ),
 });
 
+export const SubstractIcon = createIcon({
+  displayName: "SubstractIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <path
+      fill="currentColor"
+      d="M1 12C1 12.3978 1.14487 12.7794 1.40273 13.0607C1.66059 13.342 2.01033 13.5 2.375 13.5H10.3958H13.6042H21.625C21.9897 13.5 22.3394 13.342 22.5973 13.0607C22.8551 12.7794 23 12.3978 23 12C23 11.6022 22.8551 11.2206 22.5973 10.9393C22.3394 10.658 21.9897 10.5 21.625 10.5H13.6042H10.3958H2.375C2.01033 10.5 1.66059 10.658 1.40273 10.9393C1.14487 11.2206 1 11.6022 1 12Z"
+    ></path>
+  ),
+});
+
+export const MultiplyIcon = createIcon({
+  displayName: "MultiplyIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g stroke="currentColor" strokeLinecap="round" strokeWidth="3">
+      <path d="M3 21L20.6777 3.32233"></path>
+      <path d="M3 3L20.6777 20.6777"></path>
+    </g>
+  ),
+});
+
+export const DivideIcon = createIcon({
+  displayName: "DvidieIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g fill="currentColor">
+      <path d="M1 11.875C1 12.2397 1.14487 12.5894 1.40273 12.8473C1.66059 13.1051 2.01033 13.25 2.375 13.25H10.3958H13.6042H21.625C21.9897 13.25 22.3394 13.1051 22.5973 12.8473C22.8551 12.5894 23 12.2397 23 11.875C23 11.5103 22.8551 11.1606 22.5973 10.9027C22.3394 10.6449 21.9897 10.5 21.625 10.5H13.6042H10.3958H2.375C2.01033 10.5 1.66059 10.6449 1.40273 10.9027C1.14487 11.1606 1 11.5103 1 11.875Z"></path>
+      <circle cx="12" cy="4" r="3" />
+      <circle cx="12" cy="20" r="3" />
+    </g>
+  ),
+});
+
+export const AssignIcon = createIcon({
+  displayName: "AssignIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g stroke="currentColor" strokeLinecap="round" strokeWidth="3" fill="none">
+      <path d="M2 12L22 12" />
+      <path d="M15 5L22 12L15 19" />
+    </g>
+  ),
+});
+
 export const HelpOutlineIcon = createIcon({
   displayName: "HelpOutlineIcon",
   viewBox: "0 0 24 24",
@@ -2634,6 +2679,47 @@ export const TagIcon = createIcon({
     >
       <path d="M21.4236 14.3079L14.3178 21.4137C14.1337 21.598 13.9151 21.7442 13.6745 21.8439C13.4339 21.9437 13.1759 21.995 12.9155 21.995C12.655 21.995 12.3971 21.9437 12.1564 21.8439C11.9158 21.7442 11.6972 21.598 11.5131 21.4137L3 12.9105V3H12.9105L21.4236 11.5131C21.7928 11.8845 22 12.3869 22 12.9105C22 13.4341 21.7928 13.9365 21.4236 14.3079Z" />
       <path d="M7.95526 7.95508H7.96526" />
+    </g>
+  ),
+});
+
+export const CalculatorIcon = createIcon({
+  displayName: "CalculatorIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <g clipPath="url(#clip0_263_7005)">
+        <path d="M14 15.75H21M14 20.25H21" />
+      </g>
+      <g clipPath="url(#clip1_263_7005)">
+        <path d="M3.44995 21L6.44889 18M6.44889 18L9.44995 15M6.44889 18L3.44995 15M6.44889 18L9.44995 21" />
+      </g>
+      <g clipPath="url(#clip2_263_7005)">
+        <path d="M14 6.3999H21" />
+      </g>
+      <g clipPath="url(#clip3_263_7005)">
+        <path d="M3 6.5H6.375M6.375 6.5H9.75M6.375 6.5V3M6.375 6.5V10" />
+      </g>
+      <defs>
+        <clipPath id="clip0_263_7005">
+          <rect width="9" height="8" fill="white" transform="translate(13 14)" />
+        </clipPath>
+        <clipPath id="clip1_263_7005">
+          <rect width="9" height="8" fill="white" transform="translate(2 14)" />
+        </clipPath>
+        <clipPath id="clip2_263_7005">
+          <rect width="9" height="2" fill="white" transform="translate(13 5.3999)" />
+        </clipPath>
+        <clipPath id="clip3_263_7005">
+          <rect width="9" height="9" fill="white" transform="translate(2 2)" />
+        </clipPath>
+      </defs>
     </g>
   ),
 });

@@ -1,29 +1,35 @@
 import { gql } from "@apollo/client";
 import {
+  LiquidScopeProvider_PetitionBaseFragment,
+  LiquidScopeProvider_PublicPetitionFragment,
   PetitionFieldType,
-  useLiquidScope_PetitionBaseFragment,
-  useLiquidScope_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
-import { useMemo } from "react";
-import { IntlShape, useIntl } from "react-intl";
+import { createContext, PropsWithChildren, useMemo } from "react";
+import { useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
-import { FORMATS, prettifyTimezone } from "./dates";
-import { PetitionFieldIndex, useFieldsWithIndices } from "./fieldIndices";
-import { isFileTypeField } from "./isFileTypeField";
-import { ArrayUnionToUnion, UnwrapArray } from "./types";
+import { PetitionFieldIndex, useFieldsWithIndices } from "../fieldIndices";
+import { isFileTypeField } from "../isFileTypeField";
+import { ArrayUnionToUnion, UnwrapArray } from "../types";
+import { DateLiquidValue, DateTimeLiquidValue } from "./LiquidValue";
 
-export function useLiquidScope(
-  petition: useLiquidScope_PetitionBaseFragment | useLiquidScope_PublicPetitionFragment,
-  usePreviewReplies?: boolean,
-) {
+export const LiquidScopeContext = createContext<Record<string, any> | null>(null);
+
+export function LiquidScopeProvider({
+  petition,
+  usePreviewReplies,
+  children,
+}: PropsWithChildren<{
+  petition: LiquidScopeProvider_PetitionBaseFragment | LiquidScopeProvider_PublicPetitionFragment;
+  usePreviewReplies?: boolean;
+}>) {
   const intl = useIntl();
   const fieldsWithIndices = useFieldsWithIndices(
     petition.fields as (
-      | UnwrapArray<useLiquidScope_PetitionBaseFragment["fields"]>
-      | UnwrapArray<useLiquidScope_PublicPetitionFragment["fields"]>
+      | UnwrapArray<LiquidScopeProvider_PetitionBaseFragment["fields"]>
+      | UnwrapArray<LiquidScopeProvider_PublicPetitionFragment["fields"]>
     )[],
   );
-  return useMemo(() => {
+  const scope = useMemo(() => {
     const scope: Record<string, any> = { petitionId: petition.id, _: {} };
     for (const [field, fieldIndex, childrenFieldIndices] of fieldsWithIndices) {
       const replies =
@@ -77,50 +83,20 @@ export function useLiquidScope(
       }
     }
   }, [petition.fields]);
+  return <LiquidScopeContext.Provider value={scope}>{children}</LiquidScopeContext.Provider>;
 }
 
-abstract class LiquidValue<T> {
-  constructor(
-    protected intl: IntlShape,
-    public readonly content: T,
-  ) {}
-
-  abstract toString(): string;
-}
-
-export class DateTimeLiquidValue extends LiquidValue<{
-  datetime: string;
-  timezone: string;
-  value: string;
-}> {
-  toString() {
-    return `${this.intl.formatDate(new Date(this.content.value), {
-      timeZone: this.content.timezone,
-      ...FORMATS["LLL"],
-    })} (${prettifyTimezone(this.content.timezone)})`;
-  }
-}
-
-export class DateLiquidValue extends LiquidValue<{ value: string }> {
-  toString() {
-    return this.intl.formatDate(new Date(this.content.value), {
-      timeZone: "UTC",
-      ...FORMATS["LL"],
-    });
-  }
-}
-
-useLiquidScope.fragments = {
+LiquidScopeProvider.fragments = {
   PetitionBase: gql`
-    fragment useLiquidScope_PetitionBase on PetitionBase {
+    fragment LiquidScopeProvider_PetitionBase on PetitionBase {
       id
       fields {
-        ...useLiquidScope_PetitionField
+        ...LiquidScopeProvider_PetitionField
         previewReplies @client {
           content
           children {
             field {
-              ...useLiquidScope_PetitionField
+              ...LiquidScopeProvider_PetitionField
             }
             replies {
               content
@@ -131,7 +107,7 @@ useLiquidScope.fragments = {
           content
           children {
             field {
-              ...useLiquidScope_PetitionField
+              ...LiquidScopeProvider_PetitionField
             }
             replies {
               content
@@ -140,7 +116,7 @@ useLiquidScope.fragments = {
         }
       }
     }
-    fragment useLiquidScope_PetitionField on PetitionField {
+    fragment LiquidScopeProvider_PetitionField on PetitionField {
       id
       type
       multiple
@@ -148,15 +124,15 @@ useLiquidScope.fragments = {
     }
   `,
   PublicPetition: gql`
-    fragment useLiquidScope_PublicPetition on PublicPetition {
+    fragment LiquidScopeProvider_PublicPetition on PublicPetition {
       id
       fields {
-        ...useLiquidScope_PublicPetitionField
+        ...LiquidScopeProvider_PublicPetitionField
         replies {
           content
           children {
             field {
-              ...useLiquidScope_PublicPetitionField
+              ...LiquidScopeProvider_PublicPetitionField
             }
             replies {
               content
@@ -165,7 +141,7 @@ useLiquidScope.fragments = {
         }
       }
     }
-    fragment useLiquidScope_PublicPetitionField on PublicPetitionField {
+    fragment LiquidScopeProvider_PublicPetitionField on PublicPetitionField {
       id
       type
       multiple

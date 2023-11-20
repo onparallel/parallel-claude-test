@@ -5,19 +5,26 @@
 
 import { gql } from "@apollo/client";
 import {
+  useFieldLogic_PetitionBaseFragment,
   useFieldLogic_PetitionFieldFragment,
   useFieldLogic_PublicPetitionFieldFragment,
+  useFieldLogic_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { filter, flatMap, flatMapToObj, indexBy, isDefined, pipe } from "remeda";
 import { assert } from "ts-essentials";
 import { completedFieldReplies } from "../completedFieldReplies";
-import { UnionToArrayUnion } from "../types";
 import {
-  PetitionFieldVisibility,
   PetitionFieldLogicCondition,
   PetitionFieldLogicConditionOperator,
+  PetitionFieldLogicFieldCondition,
+  PetitionFieldLogicVariableCondition,
+  PetitionFieldMath,
+  PetitionFieldMathOperand,
+  PetitionFieldMathOperation,
+  PetitionFieldVisibility,
 } from "./types";
+import { UnwrapArray } from "../types";
 
 type PetitionFieldSelection =
   | useFieldLogic_PublicPetitionFieldFragment
@@ -25,6 +32,9 @@ type PetitionFieldSelection =
 
 export interface FieldLogic {
   isVisible: boolean;
+  previousVariables: Record<string, number>;
+  currentVariables: Record<string, number>;
+  finalVariables: Record<string, number>;
 }
 
 export interface FieldLogicResult extends FieldLogic {
@@ -40,20 +50,21 @@ export interface FieldLogicChildLogicResult extends FieldLogic {}
  * passed array of fields.
  */
 export function useFieldLogic(
-  fields: UnionToArrayUnion<PetitionFieldSelection>,
+  petition: useFieldLogic_PetitionBaseFragment | useFieldLogic_PublicPetitionFragment,
   usePreviewReplies = false,
 ): FieldLogicResult[] {
   return useMemo(
     () =>
       Array.from(
         (function* () {
+          const fields = petition.fields as PetitionFieldSelection[];
           const fieldsById = pipe(
-            fields as PetitionFieldSelection[],
+            fields,
             flatMap((f) => [f, ...(f.children ?? [])]),
             indexBy((f) => f.id),
           );
           const parentById = pipe(
-            fields as PetitionFieldSelection[],
+            fields,
             filter((f) => isDefined(f.children)),
             flatMapToObj((f) => f.children!.map((c) => [c.id, f])),
           );
@@ -61,28 +72,81 @@ export function useFieldLogic(
           // we need to collect visible replies for child fields so that these fields can be referenced
           // later in fields outside the field group and only visible replies are taken into account
           const childFieldReplies: { [fieldId: string]: any[] } = {};
+          const currentVariables = Object.fromEntries(
+            petition.variables.map((v) => [v.name, v.defaultValue]),
+          );
+
+          function getReplies(
+            referencedField:
+              | PetitionFieldSelection
+              | UnwrapArray<PetitionFieldSelection["children"]>,
+          ) {
+            const parent = parentById[referencedField.id];
+            return isDefined(parent)
+              ? // if field has parent use collected replies
+                childFieldReplies[referencedField.id]
+              : visibilitiesById[referencedField.id]
+                ? usePreviewReplies && referencedField.__typename === "PetitionField"
+                  ? (referencedField.previewReplies as any[])
+                  : (referencedField.replies as any[])
+                : // if field is not visible then count as if no replies
+                  [];
+          }
+
+          function evaluateCondition(condition: PetitionFieldLogicCondition) {
+            if ("fieldId" in condition) {
+              const referencedField = fieldsById[condition.fieldId];
+              return fieldConditionIsMet(condition, referencedField, getReplies(referencedField));
+            } else {
+              return variableConditionIsMet(condition, currentVariables);
+            }
+          }
+
+          function getOperandValue(
+            operand: PetitionFieldMathOperand,
+            currentVariables: Record<string, number>,
+          ): number | null {
+            if (operand.type === "NUMBER") {
+              return operand.value;
+            } else if (operand.type === "FIELD") {
+              const referencedField = fieldsById[operand.fieldId];
+              const replies = getReplies(referencedField);
+              return replies.length > 0 ? (replies[0].content.value as number) : null;
+            } else {
+              return currentVariables[operand.name];
+            }
+          }
+
           for (const field of fields) {
+            const previousVariables = { ...currentVariables };
             if (field.visibility) {
               const { conditions, operator, type } = field.visibility as PetitionFieldVisibility;
-              const result = conditions[operator === "OR" ? "some" : "every"]((c) => {
-                const referencedField = fieldsById[c.fieldId];
-                const parent = parentById[referencedField.id];
-                let replies: any;
-                if (isDefined(parent)) {
-                  replies = childFieldReplies[referencedField.id];
-                } else {
-                  // if field is not visible then count as if no replies
-                  replies = visibilitiesById[c.fieldId]
-                    ? usePreviewReplies && referencedField.__typename === "PetitionField"
-                      ? (referencedField.previewReplies as any[])
-                      : (referencedField.replies as any[])
-                    : [];
-                }
-                return fieldConditionIsMet(c, referencedField, replies);
-              });
+              const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
+                evaluateCondition(c),
+              );
               visibilitiesById[field.id] = type === "SHOW" ? result : !result;
             } else {
               visibilitiesById[field.id] = true;
+            }
+            if (visibilitiesById[field.id] && isDefined(field.math)) {
+              for (const {
+                conditions,
+                operator,
+                operations,
+              } of field.math as PetitionFieldMath[]) {
+                const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
+                  evaluateCondition(c),
+                );
+                if (conditionsApply) {
+                  for (const operation of operations) {
+                    applyMathOperation(
+                      operation,
+                      currentVariables,
+                      getOperandValue(operation.operand, currentVariables),
+                    );
+                  }
+                }
+              }
             }
             if (isDefined(field.children)) {
               for (const child of field.children) {
@@ -94,35 +158,68 @@ export function useFieldLogic(
                   : field.replies;
               const groupChildrenLogic = childReplies.map((reply) => {
                 const groupVisibilityById: { [fieldId: string]: boolean } = {};
+
+                function getReplies(
+                  referencedField: UnwrapArray<PetitionFieldSelection["children"]>,
+                ) {
+                  const parent = parentById[referencedField.id];
+                  // if it belongs to the same FIELD_GROUP then only use replies in the same child reply
+                  if (isDefined(parent) && parent.id === field.id) {
+                    return groupVisibilityById[referencedField.id]
+                      ? reply.children!.find((c) => c.field.id === referencedField.id)?.replies ??
+                          []
+                      : [];
+                  } else if (isDefined(parent) && parent.id !== field.id) {
+                    // if none of the child replies on that field were visible childFieldReplies[referencedField.id] === undefined
+                    return childFieldReplies[referencedField.id] ?? [];
+                  } else {
+                    return visibilitiesById[referencedField.id]
+                      ? usePreviewReplies && referencedField.__typename === "PetitionField"
+                        ? (referencedField.previewReplies as any[])
+                        : (referencedField.replies as any[])
+                      : [];
+                  }
+                }
+
+                function evaluateCondition(condition: PetitionFieldLogicCondition) {
+                  if ("fieldId" in condition) {
+                    const referencedField = fieldsById[condition.fieldId];
+                    return fieldConditionIsMet(
+                      condition,
+                      referencedField,
+                      getReplies(referencedField),
+                    );
+                  } else {
+                    return variableConditionIsMet(condition, currentVariables);
+                  }
+                }
+
+                function getOperandValue(
+                  operand: PetitionFieldMathOperand,
+                  currentVariables: Record<string, number>,
+                ): number | null {
+                  if (operand.type === "NUMBER") {
+                    return operand.value;
+                  } else if (operand.type === "FIELD") {
+                    const referencedField = fieldsById[operand.fieldId];
+                    const replies = getReplies(referencedField);
+                    return replies.length > 0 ? (replies[0].content.value as number) : null;
+                  } else {
+                    return currentVariables[operand.name];
+                  }
+                }
+
                 return field.children!.map((child) => {
+                  const previousVariables = { ...currentVariables };
                   if (!visibilitiesById[field.id]) {
                     groupVisibilityById[child.id] = false;
                   } else if (child.visibility) {
                     const { conditions, operator, type } =
                       child.visibility as PetitionFieldVisibility;
-                    const result = conditions[operator === "OR" ? "some" : "every"]((c) => {
-                      // if field is not visible then count as if no replies
-                      const referencedField = fieldsById[c.fieldId];
-                      const parent = parentById[referencedField.id];
-                      let replies: any[];
-                      // if it belongs to the same FIELD_GROUP then only use replies in the same child reply
-                      if (isDefined(parent) && parent.id === field.id) {
-                        replies = groupVisibilityById[referencedField.id]
-                          ? reply.children!.find((c) => c.field.id === referencedField.id)
-                              ?.replies ?? []
-                          : [];
-                      } else if (isDefined(parent) && parent.id !== field.id) {
-                        // if none of the child replies on that field were visible childFieldReplies[referencedField.id] === undefined
-                        replies = childFieldReplies[referencedField.id] ?? [];
-                      } else {
-                        replies = visibilitiesById[referencedField.id]
-                          ? usePreviewReplies && referencedField.__typename === "PetitionField"
-                            ? (referencedField.previewReplies as any[])
-                            : (referencedField.replies as any[])
-                          : [];
-                      }
-                      return fieldConditionIsMet(c, referencedField, replies);
-                    });
+
+                    const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
+                      evaluateCondition(c),
+                    );
                     groupVisibilityById[child.id] = type === "SHOW" ? result : !result;
                   } else {
                     groupVisibilityById[child.id] = true;
@@ -132,26 +229,59 @@ export function useFieldLogic(
                     childFieldReplies[child.id].push(
                       ...(reply.children!.find((c) => c.field.id === child.id)?.replies ?? []),
                     );
+                    if (isDefined(child.math)) {
+                      for (const {
+                        conditions,
+                        operator,
+                        operations,
+                      } of child.math as PetitionFieldMath[]) {
+                        const conditionsApply = conditions[operator === "OR" ? "some" : "every"](
+                          (c) => evaluateCondition(c),
+                        );
+                        if (conditionsApply) {
+                          for (const operation of operations) {
+                            applyMathOperation(
+                              operation,
+                              currentVariables,
+                              getOperandValue(operation.operand, currentVariables),
+                            );
+                          }
+                        }
+                      }
+                    }
                   }
-                  return { isVisible: groupVisibilityById[child.id] };
+                  return {
+                    isVisible: groupVisibilityById[child.id],
+                    currentVariables: { ...currentVariables },
+                    previousVariables,
+                    finalVariables: currentVariables,
+                  };
                 });
               });
               yield {
                 isVisible: visibilitiesById[field.id],
+                currentVariables: { ...currentVariables },
+                previousVariables,
+                finalVariables: currentVariables,
                 groupChildrenLogic,
               };
             } else {
-              yield { isVisible: visibilitiesById[field.id] };
+              yield {
+                isVisible: visibilitiesById[field.id],
+                currentVariables: { ...currentVariables },
+                previousVariables,
+                finalVariables: currentVariables,
+              };
             }
           }
         })(),
       ),
-    [fields],
+    [petition.fields, petition.variables],
   );
 }
 
 function fieldConditionIsMet(
-  condition: PetitionFieldLogicCondition,
+  condition: PetitionFieldLogicFieldCondition,
   field: Pick<PetitionFieldSelection, "type" | "options">,
   replies: any[],
 ) {
@@ -183,6 +313,14 @@ function fieldConditionIsMet(
     default:
       return false;
   }
+}
+
+function variableConditionIsMet(
+  condition: PetitionFieldLogicVariableCondition,
+  currentVariables: Record<string, number>,
+) {
+  const { operator, value, variableName } = condition;
+  return evaluatePredicate(currentVariables[variableName], operator, value);
 }
 
 function evaluatePredicate(
@@ -267,8 +405,51 @@ function evaluatePredicate(
   }
 }
 
+function applyMathOperation(
+  operation: PetitionFieldMathOperation,
+  currentVariables: Record<string, number>,
+  value: number | null,
+) {
+  const currentValue = currentVariables[operation.variable];
+  let result: number;
+  if (Number.isNaN(currentValue) || value === null) {
+    result = NaN;
+  } else {
+    switch (operation.operator) {
+      case "ASSIGNATION":
+        result = value;
+        break;
+      case "ADDITION":
+        result = currentValue + value;
+        break;
+      case "SUBSTRACTION":
+        result = currentValue - value;
+        break;
+      case "MULTIPLICATION":
+        result = currentValue * value;
+        break;
+      case "DIVISION":
+        result = currentValue / value;
+        break;
+    }
+  }
+  if (!isFinite(result)) {
+    result = NaN;
+  }
+  currentVariables[operation.variable] = result;
+}
+
 useFieldLogic.fragments = {
-  PublicPetitionField: gql`
+  PublicPetition: gql`
+    fragment useFieldLogic_PublicPetition on PublicPetition {
+      variables {
+        name
+        defaultValue
+      }
+      fields {
+        ...useFieldLogic_PublicPetitionField
+      }
+    }
     fragment useFieldLogic_PublicPetitionField on PublicPetitionField {
       ...useFieldLogic_PublicPetitionFieldInner
       children {
@@ -301,10 +482,20 @@ useFieldLogic.fragments = {
       type
       options
       visibility
+      math
     }
     ${completedFieldReplies.fragments.PublicPetitionField}
   `,
-  PetitionField: gql`
+  PetitionBase: gql`
+    fragment useFieldLogic_PetitionBase on PetitionBase {
+      variables {
+        name
+        defaultValue
+      }
+      fields {
+        ...useFieldLogic_PetitionField
+      }
+    }
     fragment useFieldLogic_PetitionField on PetitionField {
       ...useFieldLogic_PetitionFieldInner
       children {
@@ -357,6 +548,7 @@ useFieldLogic.fragments = {
       type
       options
       visibility
+      math
     }
     ${completedFieldReplies.fragments.PetitionField}
   `,

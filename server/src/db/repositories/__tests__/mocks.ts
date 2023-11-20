@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
-import { range } from "remeda";
+import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
@@ -322,6 +322,7 @@ export class Mocks {
       .insert(
         range(0, amount || 1).map<CreatePetition>((index) => {
           const locale = randomContactLocale();
+          const rest = builder?.(index) ?? {};
           return {
             org_id: orgId,
             is_template: false,
@@ -329,7 +330,9 @@ export class Mocks {
             name: faker.word.words(),
             recipient_locale: locale,
             document_organization_theme_id: theme.id,
-            ...builder?.(index),
+            ...(isDefined(rest.variables)
+              ? { ...rest, variables: this.knex.raw(`?::jsonb`, JSON.stringify(rest.variables)) }
+              : rest),
           };
         }),
       )

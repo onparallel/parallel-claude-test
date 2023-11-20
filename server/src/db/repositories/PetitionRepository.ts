@@ -20,12 +20,17 @@ import {
   zip,
 } from "remeda";
 import { RESULT } from "../../graphql";
-import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldVisibility";
+import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
-import { PetitionFieldVisibility, applyFieldLogic } from "../../util/fieldLogic";
+import {
+  PetitionFieldMath,
+  PetitionFieldVisibility,
+  applyFieldVisibility,
+  evaluateFieldLogic,
+} from "../../util/fieldLogic";
 import { fieldReplyContent } from "../../util/fieldReplyContent";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -110,6 +115,11 @@ import {
   PetitionUserNotification,
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
+
+export interface PetitionVariable {
+  name: string;
+  default_value: number;
+}
 
 type PetitionType = "PETITION" | "TEMPLATE";
 
@@ -897,91 +907,91 @@ export class PetitionRepository extends BaseRepository {
       };
     }
   >(async (petitionIds) => {
-    const composedFields = await this.getComposedPetitionFields(petitionIds as number[]);
+    const composedPetitions = await this.getComposedPetitionFieldsAndVariables(
+      petitionIds as number[],
+    );
 
-    return composedFields
-      .map((fields) => fields.filter((f) => f.type !== "HEADING"))
-      .map((fields) => {
-        const visibleFields = applyFieldLogic(fields);
+    return composedPetitions.map((petition) => {
+      const visibleFields = applyFieldVisibility(petition).filter((f) => f.type !== "HEADING");
 
-        const visibleExternalFields = visibleFields
-          .filter((f) => !f.is_internal)
-          .flatMap((f) => {
-            if (f.type === "FIELD_GROUP") {
-              return f.replies.flatMap((reply) =>
-                reply
-                  .children!.filter((childReply) => !childReply.field.is_internal)
-                  .map((childReply) => ({
-                    ...childReply.field,
-                    children: [],
-                    replies: childReply.replies.map((r) => ({ ...r, children: [] })),
-                  })),
-              );
-            } else {
-              return [f];
-            }
-          });
+      const visibleExternalFields = visibleFields
+        .filter((f) => !f.is_internal)
+        .flatMap((f) => {
+          if (f.type === "FIELD_GROUP") {
+            return f.replies.flatMap((reply) =>
+              reply
+                .children!.filter((childReply) => !childReply.field.is_internal)
+                .map((childReply) => ({
+                  ...childReply.field,
+                  children: [],
+                  replies: childReply.replies.map((r) => ({ ...r, children: [] })),
+                })),
+            );
+          } else {
+            return [f];
+          }
+        });
 
-        const visibleInternalFields = visibleFields
-          .filter((f) => f.is_internal)
-          .flatMap((f) => {
-            if (f.type === "FIELD_GROUP") {
-              return f.replies.flatMap((reply) =>
-                reply
-                  .children!.filter((childReply) => childReply.field.is_internal)
-                  .map((childReply) => ({
-                    ...childReply.field,
-                    children: [],
-                    replies: childReply.replies.map((r) => ({ ...r, children: [] })),
-                  })),
-              );
-            } else {
-              return [f];
-            }
-          });
+      const visibleInternalFields = visibleFields
+        .filter((f) => f.is_internal)
+        .flatMap((f) => {
+          if (f.type === "FIELD_GROUP") {
+            return f.replies.flatMap((reply) =>
+              reply
+                .children!.filter((childReply) => childReply.field.is_internal)
+                .map((childReply) => ({
+                  ...childReply.field,
+                  children: [],
+                  replies: childReply.replies.map((r) => ({ ...r, children: [] })),
+                })),
+            );
+          } else {
+            return [f];
+          }
+        });
 
-        const validatedExternal = countBy(
-          visibleExternalFields,
-          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
-        );
+      const validatedExternal = countBy(
+        visibleExternalFields,
+        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
+      );
 
-        const validatedInternal = countBy(
-          visibleInternalFields,
-          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
-        );
+      const validatedInternal = countBy(
+        visibleInternalFields,
+        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
+      );
 
-        return {
-          external: {
-            approved: validatedExternal,
-            replied: countBy(
-              visibleExternalFields,
-              (f) =>
-                completedFieldReplies(f).length > 0 &&
-                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
-            ),
-            optional: countBy(
-              visibleExternalFields,
-              (f) => f.optional && completedFieldReplies(f).length === 0,
-            ),
-            total: visibleExternalFields.length,
-          },
-          internal: {
-            validated: validatedInternal,
-            approved: validatedInternal,
-            replied: countBy(
-              visibleInternalFields,
-              (f) =>
-                completedFieldReplies(f).length > 0 &&
-                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
-            ),
-            optional: countBy(
-              visibleInternalFields,
-              (f) => f.optional && completedFieldReplies(f).length === 0,
-            ),
-            total: visibleInternalFields.length,
-          },
-        };
-      });
+      return {
+        external: {
+          approved: validatedExternal,
+          replied: countBy(
+            visibleExternalFields,
+            (f) =>
+              completedFieldReplies(f).length > 0 &&
+              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
+          ),
+          optional: countBy(
+            visibleExternalFields,
+            (f) => f.optional && completedFieldReplies(f).length === 0,
+          ),
+          total: visibleExternalFields.length,
+        },
+        internal: {
+          validated: validatedInternal,
+          approved: validatedInternal,
+          replied: countBy(
+            visibleInternalFields,
+            (f) =>
+              completedFieldReplies(f).length > 0 &&
+              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
+          ),
+          optional: countBy(
+            visibleInternalFields,
+            (f) => f.optional && completedFieldReplies(f).length === 0,
+          ),
+          total: visibleInternalFields.length,
+        },
+      };
+    });
   });
 
   readonly loadPublicPetitionProgress = this.buildLoader<
@@ -992,38 +1002,39 @@ export class PetitionRepository extends BaseRepository {
       total: number;
     }
   >(async (petitionIds) => {
-    const composedFields = await this.getComposedPetitionFields(petitionIds as number[]);
+    const composedPetitions = await this.getComposedPetitionFieldsAndVariables(
+      petitionIds as number[],
+    );
 
-    return composedFields
-      .map((fields) => fields.filter((f) => f.type !== "HEADING"))
-      .map((fields) => {
-        const visibleFields = applyFieldLogic(fields)
-          .filter((f) => !f.is_internal)
-          .flatMap((f) => {
-            if (f.type === "FIELD_GROUP") {
-              return f.replies.flatMap((reply) =>
-                reply
-                  .children!.filter((childReply) => !childReply.field.is_internal)
-                  .map((childReply) => ({
-                    ...childReply.field,
-                    children: [],
-                    replies: childReply.replies.map((r) => ({ ...r, children: [] })),
-                  })),
-              );
-            } else {
-              return [f];
-            }
-          });
+    return composedPetitions.map((petition) => {
+      const visibleFields = applyFieldVisibility(petition)
+        .filter((f) => f.type !== "HEADING")
+        .filter((f) => !f.is_internal)
+        .flatMap((f) => {
+          if (f.type === "FIELD_GROUP") {
+            return f.replies.flatMap((reply) =>
+              reply
+                .children!.filter((childReply) => !childReply.field.is_internal)
+                .map((childReply) => ({
+                  ...childReply.field,
+                  children: [],
+                  replies: childReply.replies.map((r) => ({ ...r, children: [] })),
+                })),
+            );
+          } else {
+            return [f];
+          }
+        });
 
-        return {
-          replied: countBy(visibleFields, (f) => completedFieldReplies(f).length > 0),
-          optional: countBy(
-            visibleFields,
-            (f) => f.optional && completedFieldReplies(f).length === 0,
-          ),
-          total: visibleFields.length,
-        };
-      });
+      return {
+        replied: countBy(visibleFields, (f) => completedFieldReplies(f).length > 0),
+        optional: countBy(
+          visibleFields,
+          (f) => f.optional && completedFieldReplies(f).length === 0,
+        ),
+        total: visibleFields.length,
+      };
+    });
   });
 
   readonly loadAccess = this.buildLoadBy("petition_access", "id");
@@ -1489,7 +1500,8 @@ export class PetitionRepository extends BaseRepository {
           org_id: user.org_id,
           document_organization_theme_id: defaultDocumentTheme.id,
           status: data.is_template ? null : data.status ?? "DRAFT",
-          ...omit(data, ["status"]),
+          variables: this.json(data.variables ?? []),
+          ...omit(data, ["status", "variables"]),
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
         },
@@ -1738,11 +1750,32 @@ export class PetitionRepository extends BaseRepository {
       });
 
       for (const field of reorderedFields.filter(
-        (f) => f.parent_petition_field_id === parentFieldId && isDefined(f.visibility),
+        (f) => isDefined(f.visibility) || isDefined(f.math),
       )) {
-        for (const condition of (field.visibility as PetitionFieldVisibility).conditions) {
-          const referencedField = reorderedFields.find((f) => f.id === condition.fieldId)!;
-          validateReferencingFieldsPositions(field, referencedField, reorderedFields);
+        if (isDefined(field.visibility)) {
+          for (const condition of (field.visibility as PetitionFieldVisibility).conditions) {
+            if ("fieldId" in condition) {
+              const referencedField = reorderedFields.find((f) => f.id === condition.fieldId)!;
+              validateReferencingFieldsPositions(field, referencedField, reorderedFields);
+            }
+          }
+        }
+
+        if (isDefined(field.math)) {
+          for (const math of field.math as PetitionFieldMath[]) {
+            for (const condition of math.conditions) {
+              if ("fieldId" in condition) {
+                const referencedField = reorderedFields.find((f) => f.id === condition.fieldId)!;
+                validateReferencingFieldsPositions(field, referencedField, reorderedFields);
+              }
+            }
+            for (const { operand } of math.operations) {
+              if (operand.type === "FIELD") {
+                const referencedField = reorderedFields.find((f) => f.id === operand.fieldId)!;
+                validateReferencingFieldsPositions(field, referencedField, reorderedFields);
+              }
+            }
+          }
         }
       }
     } catch {
@@ -1844,10 +1877,11 @@ export class PetitionRepository extends BaseRepository {
       user,
     );
 
+    const clonedFields = [{ originalFieldId: fieldId, cloned }];
     if (field.type === "FIELD_GROUP") {
       const children = await this.loadPetitionFieldChildren(field.id);
       if (children.length) {
-        await this.createPetitionFieldsAtPosition(
+        const clonedChildren = await this.createPetitionFieldsAtPosition(
           petitionId,
           children.map((child) =>
             omit(child, [
@@ -1865,6 +1899,80 @@ export class PetitionRepository extends BaseRepository {
           0,
           user,
         );
+
+        clonedFields.push(
+          ...zip(children, clonedChildren).map(([original, cloned]) => ({
+            originalFieldId: original.id,
+            cloned,
+          })),
+        );
+      }
+    }
+
+    // when cloning, we need to check if the fields have math conditions or operations that references to themselves.
+    // if so, we need to update the cloned field math to reference to the cloned field id instead of the original field id
+    const clonedFieldsForMathUpdate = clonedFields
+      .filter(
+        ({ originalFieldId, cloned }) =>
+          (cloned.math as PetitionFieldMath[] | null)?.some(
+            (m) =>
+              m.conditions.some((c) => "fieldId" in c && c.fieldId === originalFieldId) ||
+              m.operations.some(
+                (op) => op.operand.type === "FIELD" && op.operand.fieldId === originalFieldId,
+              ),
+          ),
+      )
+      .map(({ originalFieldId, cloned }) => ({
+        id: cloned.id,
+        math: (cloned.math as PetitionFieldMath[]).map((m) => ({
+          ...m,
+          conditions: m.conditions.map((c) => {
+            if ("fieldId" in c && c.fieldId === originalFieldId) {
+              return {
+                ...c,
+                fieldId: cloned.id,
+              };
+            } else {
+              return c;
+            }
+          }),
+          operations: m.operations.map((op) => {
+            if (op.operand.type === "FIELD" && op.operand.fieldId === originalFieldId) {
+              return {
+                ...op,
+                operand: {
+                  ...op.operand,
+                  fieldId: cloned.id,
+                },
+              };
+            } else {
+              return op;
+            }
+          }),
+        })),
+      }));
+
+    if (clonedFieldsForMathUpdate.length > 0) {
+      const updatedFields = await this.raw<PetitionField>(
+        /* sql */ `
+        update petition_field as pf set
+          math = t.math
+        from (?) as t (id, math)
+        where t.id = pf.id
+        returning *;
+      `,
+        [
+          this.sqlValues(
+            clonedFieldsForMathUpdate.map((child) => [child.id, this.json(child.math)]),
+            ["int", "jsonb"],
+          ),
+        ],
+      );
+
+      const updatedCloned = updatedFields.find((f) => f.id === cloned.id);
+      // if the cloned field was updated, we need to return the updated version
+      if (isDefined(updatedCloned)) {
+        return updatedCloned;
       }
     }
 
@@ -1938,7 +2046,8 @@ export class PetitionRepository extends BaseRepository {
         this.insert(
           "petition_field",
           dataArr.map((field) => ({
-            ...field,
+            ...omit(field, ["math"]),
+            math: field.math ? this.json(field.math) : null,
             parent_petition_field_id: parentFieldId,
             petition_id: petitionId,
             position: position++,
@@ -2088,6 +2197,7 @@ export class PetitionRepository extends BaseRepository {
         .update(
           {
             ...data,
+            ...("math" in data ? { math: this.json(data.math) } : {}),
             updated_at: this.now(),
             updated_by: updatedBy,
           },
@@ -2483,6 +2593,7 @@ export class PetitionRepository extends BaseRepository {
           | "type"
           | "options"
           | "visibility"
+          | "math"
           | "optional"
           | "parent_petition_field_id"
           | "alias"
@@ -2510,6 +2621,7 @@ export class PetitionRepository extends BaseRepository {
           pf.type,
           pf.options,
           pf.visibility,
+          pf.math,
           pf.optional,
           pf.parent_petition_field_id,
           pf.alias,
@@ -2558,49 +2670,68 @@ export class PetitionRepository extends BaseRepository {
     return petitionIds.map((id) => fieldsByPetition[id] ?? []);
   }
 
-  async getComposedPetitionFields(petitionIds: number[]) {
-    const fieldsWithRepliesByPetition = await this.getPetitionFieldsWithReplies(petitionIds);
+  async getPetitionVariables(petitionIds: number[]) {
+    const petitionVariables = await this.from("petition")
+      .whereIn("id", petitionIds)
+      .whereNull("deleted_at")
+      .select(["id", "variables"]);
 
-    return fieldsWithRepliesByPetition.map((fieldsWithReplies) => {
-      const [fields, children] = partition(
-        fieldsWithReplies,
-        (f) => f.parent_petition_field_id === null,
-      );
+    const variablesByPetitionId = indexBy(petitionVariables, (v) => v.id);
 
-      return sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
-        const fieldChildren =
-          field.type === "FIELD_GROUP"
-            ? pipe(
-                children,
-                filter((c) => c.parent_petition_field_id! === field.id),
-                sortBy([(f) => f.position, "asc"]),
-                map((child) => ({
-                  ...child,
-                  parent: field,
-                })),
-              )
-            : [];
+    return petitionIds.map((id) => variablesByPetitionId[id]?.variables ?? []);
+  }
 
-        const fieldReplies = field.replies.map((reply) => ({
-          ...reply,
-          children:
-            field.type === "FIELD_GROUP"
-              ? fieldChildren.map((child) => ({
-                  field: child,
-                  replies: child.replies.filter(
-                    (cr) => cr.parent_petition_field_reply_id === reply.id,
-                  ),
-                }))
-              : null,
-        }));
+  async getComposedPetitionFieldsAndVariables(petitionIds: number[]) {
+    const [fieldsWithRepliesByPetition, variablesByPetition] = await Promise.all([
+      this.getPetitionFieldsWithReplies(petitionIds),
+      this.getPetitionVariables(petitionIds),
+    ]);
+
+    return zip(fieldsWithRepliesByPetition, variablesByPetition).map(
+      ([fieldsWithReplies, variables]) => {
+        const [fields, children] = partition(
+          fieldsWithReplies,
+          (f) => f.parent_petition_field_id === null,
+        );
 
         return {
-          ...field,
-          children: field.type === "FIELD_GROUP" ? fieldChildren : null,
-          replies: fieldReplies,
+          fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
+            const fieldChildren =
+              field.type === "FIELD_GROUP"
+                ? pipe(
+                    children,
+                    filter((c) => c.parent_petition_field_id! === field.id),
+                    sortBy([(f) => f.position, "asc"]),
+                    map((child) => ({
+                      ...child,
+                      parent: field,
+                    })),
+                  )
+                : [];
+
+            const fieldReplies = field.replies.map((reply) => ({
+              ...reply,
+              children:
+                field.type === "FIELD_GROUP"
+                  ? fieldChildren.map((child) => ({
+                      field: child,
+                      replies: child.replies.filter(
+                        (cr) => cr.parent_petition_field_reply_id === reply.id,
+                      ),
+                    }))
+                  : null,
+            }));
+
+            return {
+              ...field,
+              children: field.type === "FIELD_GROUP" ? fieldChildren : null,
+              replies: fieldReplies,
+            };
+          }),
+          variables,
         };
-      });
-    });
+      },
+    );
   }
 
   async completePetition(
@@ -2612,8 +2743,8 @@ export class PetitionRepository extends BaseRepository {
     const isAccess = "keycode" in userOrAccess;
     const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
 
-    const [composedFields] = await this.getComposedPetitionFields([petitionId]);
-    const canComplete = petitionIsCompleted(composedFields, isAccess);
+    const [composedPetition] = await this.getComposedPetitionFieldsAndVariables([petitionId]);
+    const canComplete = petitionIsCompleted(composedPetition, isAccess);
 
     if (canComplete) {
       const petition = await this.withTransaction(async (t) => {
@@ -2751,6 +2882,7 @@ export class PetitionRepository extends BaseRepository {
             sourcePetition.is_template && data?.is_template === false
               ? sourcePetition.default_path // if creating a petition from a template, use default_path
               : sourcePetition.path, // else, use path
+          variables: this.json(sourcePetition.variables ?? []),
           ...data,
         },
         t,
@@ -2783,7 +2915,8 @@ export class PetitionRepository extends BaseRepository {
                     : field.from_petition_field_id;
                 }
                 return {
-                  ...omit(field, ["id", "petition_id", "created_at", "updated_at"]),
+                  ...omit(field, ["id", "petition_id", "created_at", "updated_at", "math"]),
+                  math: field.math ? this.json(field.math) : null,
                   petition_id: cloned.id,
                   from_petition_field_id: fromPetitionFieldId,
                   created_by: createdBy,
@@ -2924,33 +3057,71 @@ export class PetitionRepository extends BaseRepository {
         await this.clonePetitionReplyEvents(petitionId, cloned.id, newFieldIds, newReplyIds, t);
       }
 
-      const toUpdate = clonedFields.filter((f) => f.visibility);
+      const toUpdate = clonedFields.filter((f) => isDefined(f.visibility) || isDefined(f.math));
       if (toUpdate.length > 0) {
-        // update visibility conditions on cloned fields
+        // update visibility conditions and math on cloned fields
         await this.raw<PetitionField>(
           /* sql */ `
           update petition_field as pf set
-            visibility = t.visibility
-          from (?) as t (id, visibility)
+            visibility = t.visibility,
+            math = t.math
+          from (?) as t (id, visibility, math)
           where t.id = pf.id
           returning *;
         `,
           [
             this.sqlValues(
               toUpdate.map((field) => {
-                const visibility = field.visibility as PetitionFieldVisibility;
+                const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
+                const math = field.math as Maybe<PetitionFieldMath[]>;
+
                 return [
                   field.id,
-                  JSON.stringify({
-                    ...visibility,
-                    conditions: visibility.conditions.map((condition) => ({
-                      ...condition,
-                      fieldId: newFieldIds[condition.fieldId],
-                    })),
-                  }),
+                  visibility
+                    ? JSON.stringify({
+                        ...visibility,
+                        conditions: visibility.conditions.map((condition) => {
+                          if ("fieldId" in condition) {
+                            return {
+                              ...condition,
+                              fieldId: newFieldIds[condition.fieldId],
+                            };
+                          } else {
+                            return condition;
+                          }
+                        }),
+                      })
+                    : null,
+                  math
+                    ? JSON.stringify(
+                        math.map((m) => ({
+                          ...m,
+                          operations: m.operations.map((op) => ({
+                            ...op,
+                            operand:
+                              op.operand.type === "FIELD"
+                                ? {
+                                    ...op.operand,
+                                    fieldId: newFieldIds[op.operand.fieldId],
+                                  }
+                                : op.operand,
+                          })),
+                          conditions: m.conditions.map((condition) => {
+                            if ("fieldId" in condition) {
+                              return {
+                                ...condition,
+                                fieldId: newFieldIds[condition.fieldId],
+                              };
+                            } else {
+                              return condition;
+                            }
+                          }),
+                        })),
+                      )
+                    : null,
                 ];
               }),
-              ["int", "jsonb"],
+              ["int", "jsonb", "jsonb"],
             ),
           ],
           t,
@@ -6725,13 +6896,19 @@ export class PetitionRepository extends BaseRepository {
     "petition_field_reply",
     "petition_field_id",
     (q) =>
-      q.whereNull("parent_petition_field_reply_id").whereNull("deleted_at").whereRaw(/* sql */ `
+      q
+        .whereNull("parent_petition_field_reply_id")
+        .whereNull("deleted_at")
+        .whereRaw(
+          /* sql */ `
       not exists (
         select pfr.id from petition_field_reply pfr
           where pfr.parent_petition_field_reply_id = petition_field_reply.id
           and pfr.deleted_at is null
       )
-    `),
+    `,
+        )
+        .orderBy("id", "desc"),
   );
 
   private async parsePrefillReplies(
@@ -7192,4 +7369,85 @@ export class PetitionRepository extends BaseRepository {
       t,
     );
   }
+
+  async createVariable(petitionId: number, data: PetitionVariable) {
+    const [petition] = await this.raw<Petition>(
+      /* sql */ `
+        update petition
+        set 
+          variables = coalesce(variables, '[]') || jsonb_build_object('name', ?::text, 'default_value', ?::int)
+        where id = ?
+        returning *;
+      `,
+      [data.name, data.default_value, petitionId],
+    );
+
+    return petition;
+  }
+
+  async updateVariable(petitionId: number, key: string, data: Omit<PetitionVariable, "name">) {
+    const [petition] = await this.raw<Petition>(
+      /* sql */ `
+      update petition
+      set 
+        variables = (
+        select jsonb_agg(
+          case
+            when element->>'name' = ? then jsonb_build_object('name', ?::text, 'default_value', ?::int)
+            else element
+          end
+        )
+        from jsonb_array_elements(variables) as element
+        )
+      where id = ?
+      returning *;
+      `,
+      [key, key, data.default_value, petitionId],
+    );
+
+    return petition;
+  }
+
+  async deleteVariable(petitionId: number, key: string) {
+    const [petition] = await this.raw<Petition>(
+      /* sql */ `
+      update petition
+      set variables = coalesce(
+        (
+          select jsonb_agg(element)
+          from jsonb_array_elements(variables) as element
+          where element->>'name' != ?
+        ), 
+        '[]'::jsonb -- if there's no variables left, set it to empty array
+      )
+      where id = ?
+      returning *;
+    `,
+      [key, petitionId],
+    );
+
+    return petition;
+  }
+
+  readonly loadResolvedPetitionVariables = this.buildLoader<
+    number,
+    { name: string; value: number | null }[]
+  >(async (petitionIds) => {
+    const composedPetitions = await this.getComposedPetitionFieldsAndVariables(
+      petitionIds as number[],
+    );
+
+    return composedPetitions.map((petition) => {
+      const evaluatedFields = evaluateFieldLogic(petition);
+
+      const finalVariables = evaluatedFields[0].finalVariables;
+      return petition.variables.map((variable) => {
+        const total = finalVariables[variable.name];
+        return {
+          name: variable.name,
+          value: isFinite(total) ? total : null,
+        };
+      });
+    });
+  });
 }

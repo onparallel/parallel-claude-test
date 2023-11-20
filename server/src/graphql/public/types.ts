@@ -2,8 +2,13 @@ import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { isDefined, minBy } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
+import {
+  PetitionFieldMath,
+  PetitionFieldVisibility,
+  mapFieldLogicCondition,
+  mapFieldMathOperation,
+} from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -281,6 +286,10 @@ export const PublicPetition = objectType({
         return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(o.id);
       },
     });
+    t.nonNull.list.nonNull.field("variables", {
+      type: "PetitionVariable",
+      resolve: (o) => o.variables ?? [],
+    });
   },
 });
 
@@ -401,15 +410,30 @@ export const PublicPetitionField = objectType({
     t.nullable.jsonObject("visibility", {
       description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) => {
-        return (
-          o.visibility && {
-            ...o.visibility,
-            conditions: o.visibility.conditions.map((c: any) => ({
-              ...c,
-              fieldId: toGlobalId("PetitionField", c.fieldId),
-            })),
-          }
-        );
+        if (isDefined(o.visibility)) {
+          const visibility = o.visibility as PetitionFieldVisibility;
+          return {
+            ...visibility,
+            conditions: visibility.conditions.map((c) => mapFieldLogicCondition(c)),
+          };
+        }
+
+        return null;
+      },
+    });
+    t.nullable.list.nonNull.jsonObject("math", {
+      description: "A JSON object representing the math to be performed on the field",
+      resolve: (o) => {
+        if (isDefined(o.math)) {
+          const math = o.math as PetitionFieldMath[];
+          return math.map((m) => ({
+            ...m,
+            conditions: m.conditions.map((c) => mapFieldLogicCondition(c)),
+            operations: m.operations.map((op) => mapFieldMathOperation(op)),
+          }));
+        }
+
+        return null;
       },
     });
     t.nonNull.list.nonNull.field("attachments", {

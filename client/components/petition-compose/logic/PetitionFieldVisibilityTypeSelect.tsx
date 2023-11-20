@@ -2,10 +2,13 @@ import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect
 import { PetitionFieldVisibilityType } from "@parallel/utils/fieldLogic/types";
 import { useIntl } from "react-intl";
 import { SimpleSelect, SimpleSelectProps } from "../../common/SimpleSelect";
+import { Text } from "@chakra-ui/react";
 
-export function PetitionFieldVisibilityTypeSelect(
-  props: Omit<SimpleSelectProps<PetitionFieldVisibilityType>, "options">,
-) {
+export function PetitionFieldVisibilityTypeSelect({
+  value,
+  isReadOnly,
+  ...props
+}: Omit<SimpleSelectProps<PetitionFieldVisibilityType>, "options">) {
   const intl = useIntl();
   const options = useSimpleSelectOptions(
     () => [
@@ -27,9 +30,12 @@ export function PetitionFieldVisibilityTypeSelect(
     [],
   );
 
-  return (
+  return isReadOnly ? (
+    <Text as="span">{options.find((o) => o.value === value)!.label}</Text>
+  ) : (
     <SimpleSelect
       size="sm"
+      value={value}
       options={options}
       styles={{ control: (styles) => ({ ...styles, flexWrap: "nowrap" }) }}
       {...props}

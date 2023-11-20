@@ -13,6 +13,7 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
+import { PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
@@ -924,7 +925,7 @@ export function firstChildHasType<
   };
 }
 
-export function fieldIsNotBeingReferencedByVisibilityCondition<
+export function fieldIsNotBeingReferencedByAnotherFieldLogic<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
@@ -953,8 +954,23 @@ export function fieldIsNotBeingReferencedByVisibilityCondition<
       (f) =>
         (!isDefined(f.parent_petition_field_id) ||
           !targetFields.map((f) => f.id).includes(f.parent_petition_field_id)) && // filter children of target fields
-        isDefined(f.visibility) &&
-        f.visibility.conditions.some((c: any) => fieldIds.includes(c.fieldId)),
+        ((isDefined(f.visibility) &&
+          (f.visibility as PetitionFieldVisibility).conditions.some(
+            (c) => "fieldId" in c && fieldIds.includes(c.fieldId),
+          )) ||
+          (isDefined(f.math) &&
+            (f.math as PetitionFieldMath[]).some(
+              (math) =>
+                math.conditions.some(
+                  (c) => "fieldId" in c && fieldIds.includes(c.fieldId) && c.fieldId !== f.id,
+                ) ||
+                math.operations.some(
+                  (op) =>
+                    op.operand.type === "FIELD" &&
+                    fieldIds.includes(op.operand.fieldId) &&
+                    op.operand.fieldId !== f.id,
+                ),
+            ))),
     );
 
     if (referencingFields.length > 0) {
@@ -965,6 +981,27 @@ export function fieldIsNotBeingReferencedByVisibilityCondition<
           referencingFieldIds: referencingFields.map((f) => toGlobalId("PetitionField", f.id)),
         },
       );
+    }
+
+    return true;
+  };
+}
+
+export function fieldAliasIsAvailable<
+  TypeName extends string,
+  FieldName extends string,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  petitionIdArg: TPetitionIdArg,
+  aliasProp: (args: core.ArgsValue<TypeName, FieldName>) => string,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const alias = aliasProp(args);
+    const [petitionVariables] = await ctx.petitions.getPetitionVariables([petitionId]);
+
+    if (petitionVariables.some((v) => v.name === alias)) {
+      throw new ApolloError(`Alias is being used as petition variable`, "ALIAS_ALREADY_EXISTS");
     }
 
     return true;

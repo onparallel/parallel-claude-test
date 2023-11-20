@@ -20,7 +20,7 @@ type FilterPetitionFieldResult<T extends filterPetitionFields_PetitionFieldFragm
       type: "FIELD";
       field: T;
       fieldIndex: PetitionFieldIndex;
-      fieldLogic: FieldLogic | undefined;
+      fieldLogic: FieldLogic;
       childrenFieldIndices?: string[];
     }
   | { type: "HIDDEN"; count: number };
@@ -36,7 +36,7 @@ export const defaultFieldsFilter = {
 
 export function filterPetitionFields<T extends filterPetitionFields_PetitionFieldFragment>(
   fieldsWithIndices: [field: T, fieldIndex: PetitionFieldIndex, childrenFieldIndices?: string[]][],
-  fieldLogic: FieldLogic[] | undefined,
+  fieldLogic: FieldLogic[],
   filter: PetitionFieldFilter = defaultFieldsFilter,
 ): FilterPetitionFieldResult<T>[] {
   const filtered = [] as FilterPetitionFieldResult<T>[];

@@ -572,6 +572,22 @@ const _PetitionSigner = {
   },
 } as const;
 
+const _VariablesResult = {
+  type: "object",
+  title: "VariablesResult",
+  description: "Information about the variables",
+  required: ["name", "value"],
+  additionalProperties: false,
+  properties: {
+    name: { type: "string", description: "The name of the variable" },
+    value: {
+      type: ["number", "null"],
+      description:
+        "The final value of the variable based on the calculations applied on each field. This can be null if some calculation results in a non-numeric value, like division by zero.",
+    },
+  },
+} as const;
+
 const _Petition = {
   title: "Petition",
   type: "object",
@@ -692,6 +708,11 @@ const _Petition = {
       description:
         "If parameter `include` contains `signers`, this will be the list of signers of the parallel.",
       ...ListOf(_PetitionSigner),
+    },
+    variablesResult: {
+      description:
+        "If parameter `include` contains `variablesResult`, this will be the list of defined variables of the parallel.",
+      ...ListOf(_VariablesResult),
     },
   },
 } as const;

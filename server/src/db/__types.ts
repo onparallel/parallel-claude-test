@@ -1054,6 +1054,7 @@ export interface Petition {
   recipient_locale: ContactLocale; // contact_locale
   last_activity_at: Maybe<Date>; // timestamptz
   last_recipient_activity_at: Maybe<Date>; // timestamptz
+  variables: Maybe<any>; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -1101,6 +1102,7 @@ export type CreatePetition = PartialProps<
   | "send_on_behalf_user_id"
   | "last_activity_at"
   | "last_recipient_activity_at"
+  | "variables"
 >;
 
 export interface PetitionAccess {
@@ -1251,6 +1253,7 @@ export interface PetitionField {
   show_activity_in_pdf: boolean; // bool
   require_approval: boolean; // bool
   parent_petition_field_id: Maybe<number>; // int4
+  math: Maybe<any>; // jsonb
 }
 
 export type CreatePetitionField = PartialProps<
@@ -1276,6 +1279,7 @@ export type CreatePetitionField = PartialProps<
   | "show_activity_in_pdf"
   | "require_approval"
   | "parent_petition_field_id"
+  | "math"
 >;
 
 export interface PetitionFieldAttachment {

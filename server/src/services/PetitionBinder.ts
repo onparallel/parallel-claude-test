@@ -23,7 +23,7 @@ import { MaybePromise } from "../util/types";
 import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
 import { IStorageService, STORAGE_SERVICE } from "./StorageService";
-import { applyFieldLogic } from "../util/fieldLogic";
+import { applyFieldVisibility } from "../util/fieldLogic";
 
 function isPrintableContentType(contentType: string) {
   return ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType);
@@ -277,9 +277,10 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async getPrintableFiles(petitionId: number) {
-    const [composedFields] = await this.petitions.getComposedPetitionFields([petitionId]);
-    const visibleFields = applyFieldLogic(composedFields);
-    const fileTypeFields = visibleFields
+    const [composedPetition] = await this.petitions.getComposedPetitionFieldsAndVariables([
+      petitionId,
+    ]);
+    const fileTypeFields = applyFieldVisibility(composedPetition)
       .flatMap((f) => [f, ...(f.children ?? [])])
       .filter((f) => isFileTypeField(f.type) && !!f.options.attachToPdf);
 

@@ -22,12 +22,12 @@ import {
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { generateCssStripe } from "@parallel/utils/css";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { ArrayUnionToUnion, UnwrapArray } from "@parallel/utils/types";
 import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { zip } from "remeda";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { useTone } from "../common/ToneProvider";
-import { ArrayUnionToUnion, UnwrapArray } from "@parallel/utils/types";
 
 type PetitionSelection =
   | RecipientViewProgressFooter_PublicPetitionFragment
@@ -51,16 +51,16 @@ export interface RecipientViewProgressFooterProps {
 
 export const RecipientViewProgressFooter = Object.assign(
   chakraForwardRef<"div", RecipientViewProgressFooterProps>(function RecipientViewProgressFooter(
-    { petition: { status, fields, signatureConfig }, onFinalize, isDisabled, ...props },
+    { petition, onFinalize, isDisabled, ...props },
     ref,
   ) {
-    const fieldLogic = useFieldLogic(fields);
+    const fieldLogic = useFieldLogic(petition);
     const [poppoverClosed, setPoppoverClosed] = useState(false);
     const { replied, optional, total } = useMemo(() => {
       let replied = 0;
       let optional = 0;
       let total = 0;
-      for (const [field, logic] of zip(fields as PetitionFieldSelection[], fieldLogic)) {
+      for (const [field, logic] of zip(petition.fields as PetitionFieldSelection[], fieldLogic)) {
         const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
         if (logic.isVisible && !field.isReadOnly && !isHiddenToPublic) {
           if (field.type === "FIELD_GROUP") {
@@ -96,13 +96,14 @@ export const RecipientViewProgressFooter = Object.assign(
         }
       }
       return { replied, optional, total };
-    }, [fields, fieldLogic]);
+    }, [petition.fields, fieldLogic]);
 
     const tone = useTone();
 
-    const isCompleted = status === "COMPLETED";
+    const isCompleted = petition.status === "COMPLETED";
     return (
       <Box
+        ref={ref}
         as="section"
         backgroundColor="white"
         boxShadow="short"
@@ -169,7 +170,7 @@ export const RecipientViewProgressFooter = Object.assign(
               isDisabled={isCompleted || isDisabled}
               onClick={onFinalize}
             >
-              {signatureConfig?.review === false ? (
+              {petition.signatureConfig?.review === false ? (
                 <FormattedMessage
                   id="recipient-view.submit-and-sign-button-short"
                   defaultMessage="Finalize and sign"
@@ -211,12 +212,9 @@ export const RecipientViewProgressFooter = Object.assign(
             signatureConfig {
               review
             }
+            ...useFieldLogic_PetitionBase
           }
-          ${this.PetitionField}
-        `;
-      },
-      get PetitionField() {
-        return gql`
+
           fragment RecipientViewProgressFooter_PetitionField on PetitionField {
             id
             type
@@ -239,10 +237,9 @@ export const RecipientViewProgressFooter = Object.assign(
                 }
               }
             }
-            ...useFieldLogic_PetitionField
             ...completedFieldReplies_PetitionField
           }
-          ${useFieldLogic.fragments.PetitionField}
+          ${useFieldLogic.fragments.PetitionBase}
           ${completedFieldReplies.fragments.PetitionField}
           ${completedFieldReplies.fragments.PetitionFieldReply}
         `;
@@ -258,12 +255,9 @@ export const RecipientViewProgressFooter = Object.assign(
             signatureConfig {
               review
             }
+            ...useFieldLogic_PublicPetition
           }
-          ${this.PublicPetitionField}
-        `;
-      },
-      get PublicPetitionField() {
-        return gql`
+
           fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
             id
             type
@@ -286,10 +280,9 @@ export const RecipientViewProgressFooter = Object.assign(
                 }
               }
             }
-            ...useFieldLogic_PublicPetitionField
             ...completedFieldReplies_PublicPetitionField
           }
-          ${useFieldLogic.fragments.PublicPetitionField}
+          ${useFieldLogic.fragments.PublicPetition}
           ${completedFieldReplies.fragments.PublicPetitionField}
           ${completedFieldReplies.fragments.PublicPetitionFieldReply}
         `;

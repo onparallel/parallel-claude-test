@@ -3,7 +3,7 @@ import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionReminder from "../../emails/emails/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
-import { applyFieldLogic } from "../../util/fieldLogic";
+import { applyFieldVisibility } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
 import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
@@ -27,14 +27,16 @@ export async function petitionReminder(
         `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`,
       );
     }
-    const [petition, granterData, contact, [composedFields], originalMessage] = await Promise.all([
-      context.petitions.loadPetition(access.petition_id),
-      context.users.loadUserDataByUserId(access.granter_id),
-      access.contact_id ? context.contacts.loadContact(access.contact_id) : null,
+    const [petition, granterData, contact, [composedPetition], originalMessage] = await Promise.all(
+      [
+        context.petitions.loadPetition(access.petition_id),
+        context.users.loadUserDataByUserId(access.granter_id),
+        access.contact_id ? context.contacts.loadContact(access.contact_id) : null,
 
-      context.petitions.getComposedPetitionFields([access.petition_id]),
-      context.petitions.loadOriginalMessageByPetitionAccess(access.id, access.petition_id),
-    ]);
+        context.petitions.getComposedPetitionFieldsAndVariables([access.petition_id]),
+        context.petitions.loadOriginalMessageByPetitionAccess(access.id, access.petition_id),
+      ],
+    );
     if (!petition) {
       return; // if the petition was deleted, return without throwing error
     }
@@ -51,7 +53,7 @@ export async function petitionReminder(
     }
     const remindersSent = await context.petitions.loadReminderCountForAccess(access.id);
 
-    const repliableFields = applyFieldLogic(composedFields)
+    const repliableFields = applyFieldVisibility(composedPetition)
       .filter((f) => f.type !== "HEADING" && !f.is_internal)
       .flatMap((f) => {
         if (f.type === "FIELD_GROUP") {

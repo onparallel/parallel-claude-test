@@ -41,6 +41,7 @@ import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFiel
 import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 import { useCreateFileUploadReply } from "./clientMutations";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
@@ -52,9 +53,13 @@ export interface RecipientViewPetitionFieldProps
   access: RecipientViewPetitionField_PublicPetitionAccessFragment;
   isDisabled: boolean;
   showErrors: boolean;
+  fieldLogic?: FieldLogicResult;
 }
 
-export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
+export function RecipientViewPetitionField({
+  fieldLogic,
+  ...props
+}: RecipientViewPetitionFieldProps) {
   const uploads = useRef<Record<string, AbortController>>({});
   const { updateLastSaved } = useLastSaved();
   const tone = useTone();
@@ -257,6 +262,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         onDownloadFileUploadReply={handleDownloadFileUploadReply}
         onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
         petition={props.access.petition}
+        fieldLogic={fieldLogic!}
       />
     );
   }

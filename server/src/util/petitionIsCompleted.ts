@@ -1,15 +1,17 @@
 import { PetitionField, PetitionFieldReply } from "../db/__types";
+import { PetitionVariable } from "../db/repositories/PetitionRepository";
 import { completedFieldReplies } from "./completedFieldReplies";
-import { applyFieldLogic } from "./fieldLogic";
+import { applyFieldVisibility } from "./fieldLogic";
 import { Maybe } from "./types";
 
-interface PartialField
+interface InnerPartialField
   extends Pick<
     PetitionField,
-    "id" | "type" | "options" | "optional" | "is_internal" | "visibility"
-  > {
+    "id" | "type" | "options" | "optional" | "is_internal" | "visibility" | "math"
+  > {}
+interface PartialField extends InnerPartialField {
   children: Maybe<
-    (Pick<PetitionField, "id" | "type" | "options" | "optional" | "is_internal" | "visibility"> & {
+    (InnerPartialField & {
       parent: Maybe<Pick<PetitionField, "id">>;
       replies: Pick<PetitionFieldReply, "content" | "anonymized_at">[];
     })[]
@@ -17,15 +19,20 @@ interface PartialField
   replies: (Pick<PetitionFieldReply, "content" | "anonymized_at"> & {
     children: Maybe<
       {
-        field: Pick<PetitionField, "id" | "type" | "options" | "optional" | "is_internal">;
+        field: Omit<InnerPartialField, "visibility" | "math">;
         replies: Pick<PetitionFieldReply, "content" | "anonymized_at">[];
       }[]
     >;
   })[];
 }
 
-export function petitionIsCompleted(fields: PartialField[], publicContext?: boolean) {
-  return applyFieldLogic(fields).every(
+interface PartialPetition {
+  fields: PartialField[];
+  variables: PetitionVariable[];
+}
+
+export function petitionIsCompleted(petition: PartialPetition, publicContext?: boolean) {
+  return applyFieldVisibility(petition).every(
     (field) =>
       (publicContext ? field.is_internal : false) ||
       field.type === "HEADING" ||

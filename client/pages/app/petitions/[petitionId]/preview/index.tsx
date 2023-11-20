@@ -11,49 +11,49 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
-import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  FieldErrorDialog,
-  useFieldErrorDialog,
-} from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import {
+  FieldErrorDialog,
+  useFieldErrorDialog,
+} from "@parallel/components/common/dialogs/FieldErrorDialog";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
+import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
+import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import {
   ConfirmPetitionSignersDialog,
   ConfirmPetitionSignersDialogResult,
   useConfirmPetitionSignersDialog,
 } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
-import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
-import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
+import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import {
   HiddenFieldDialog,
   useHiddenFieldDialog,
 } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
-import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import {
   GeneratePrefilledPublicLinkDialog,
   useGeneratePrefilledPublicLinkDialog,
 } from "@parallel/components/petition-preview/dialogs/GeneratePrefilledPublicLinkDialog";
-import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
-  PetitionPreview_completePetitionDocument,
   PetitionPreview_PetitionBaseFragment,
+  PetitionPreview_completePetitionDocument,
   PetitionPreview_petitionDocument,
   PetitionPreview_updatePetitionDocument,
   PetitionPreview_userDocument,
@@ -69,11 +69,11 @@ import {
   useGoToPetitionSection,
 } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
-import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
-import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
@@ -131,7 +131,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
 
-  const pages = useGetPetitionPages(petition.fields, { usePreviewReplies: !isPetition });
+  const pages = useGetPetitionPages(petition, { usePreviewReplies: !isPetition });
   const currentPage = useMemo(() => {
     const { field: fieldId, reply: replyId } = query;
     let page = 0;
@@ -139,22 +139,24 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       return Number(query.page);
     }
     if (fieldId) {
-      page = pages.findIndex((fields) =>
-        fields.some((f) => f.id === fieldId || f.children?.some((c) => c.id === fieldId)),
+      page = pages.findIndex((fieldsWithLogic) =>
+        fieldsWithLogic.some(
+          ({ field: f }) => f.id === fieldId || f.children?.some((c) => c.id === fieldId),
+        ),
       );
     }
 
     if (replyId && typeof replyId === "string") {
       const id = replyId.split("-")[0];
-      page = pages.findIndex((fields) =>
-        fields.some((f) => f.id === id || f.children?.some((c) => c.id === id)),
+      page = pages.findIndex((fieldsWithLogic) =>
+        fieldsWithLogic.some(({ field: f }) => f.id === id || f.children?.some((c) => c.id === id)),
       );
     }
 
     return Math.max(page + 1, 1);
   }, [query.page]);
 
-  const fields = pages[currentPage - 1];
+  const fieldsWithLogic = pages[currentPage - 1];
 
   useEffect(() => {
     const layoutBody = document.getElementById("petition-layout-body");
@@ -167,7 +169,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const showHiddenFieldDialog = useHiddenFieldDialog();
   useTempQueryParam("field", async (fieldId) => {
     try {
-      if (!fields.some((f) => f.id === fieldId || f.children?.some((cf) => cf.id === fieldId))) {
+      if (
+        !fieldsWithLogic.some(
+          ({ field: f }) => f.id === fieldId || f.children?.some((cf) => cf.id === fieldId),
+        )
+      ) {
         await showHiddenFieldDialog({
           field: petition.fields.find((f) => f.id === fieldId)!,
           petition,
@@ -341,8 +347,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const displayPetitionLimitReachedAlert =
     me.organization.isPetitionUsageLimitReached && isPetition && petition.status === "DRAFT";
 
-  const scope = useLiquidScope(petition, petition.__typename === "PetitionTemplate");
-
   const showGeneratePrefilledPublicLinkButton =
     me.hasPublicLinkPrefill &&
     petition.__typename === "PetitionTemplate" &&
@@ -476,89 +480,96 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               </Box>
               <Flex data-section="preview-fields" flexDirection="column" flex="2" minWidth={0}>
                 <Stack spacing={4} key={0}>
-                  <LiquidScopeProvider scope={scope}>
-                    {fields.map((field) => {
+                  <LiquidScopeProvider
+                    petition={petition}
+                    usePreviewReplies={petition.__typename === "PetitionTemplate"}
+                  >
+                    {fieldsWithLogic.map(({ field, logic }) => {
                       const fieldHasReplies = field.replies.length !== 0;
 
                       return (
-                        <Box
-                          key={field.id}
-                          position="relative"
-                          _focusWithin={{
-                            ".edit-preview-field-buttons": {
-                              display: "flex",
-                            },
-                          }}
-                          _hover={{
-                            ".edit-preview-field-buttons": {
-                              display: "inline-flex",
-                            },
-                          }}
-                        >
-                          <PreviewPetitionField
-                            key={field.id}
-                            petition={petition}
-                            field={field}
-                            isDisabled={
-                              (isPetition && petition.status === "CLOSED") ||
-                              petition.isAnonymized ||
-                              displayPetitionLimitReachedAlert
-                            }
-                            isCacheOnly={!isPetition}
-                            myEffectivePermission={myEffectivePermission}
-                            showErrors={showErrors && !canFinalize}
-                          />
-                          {field.type !== "FIELD_GROUP" ? (
-                            <Center
-                              display={{ base: "none", xl: "flex" }}
-                              position="absolute"
-                              top="0px"
-                              right="-48px"
-                              height="100%"
-                              width="auto"
-                              minWidth="48px"
-                              padding={2}
-                            >
-                              <Stack className={"edit-preview-field-buttons"} display="none">
-                                <NakedLink href={buildUrlToSection("compose", { field: field.id })}>
-                                  <IconButtonWithTooltip
-                                    as="a"
-                                    size="sm"
-                                    variant="outline"
-                                    backgroundColor="white"
-                                    placement="bottom"
-                                    color="gray.600"
-                                    icon={<EditSimpleIcon boxSize={4} />}
-                                    label={intl.formatMessage({
-                                      id: "page.preview.edit-field",
-                                      defaultMessage: "Edit field",
-                                    })}
-                                  />
-                                </NakedLink>
-                                {field.type === "HEADING" || !isPetition ? null : (
+                        <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                          <Box
+                            position="relative"
+                            _focusWithin={{
+                              ".edit-preview-field-buttons": {
+                                display: "flex",
+                              },
+                            }}
+                            _hover={{
+                              ".edit-preview-field-buttons": {
+                                display: "inline-flex",
+                              },
+                            }}
+                          >
+                            <PreviewPetitionField
+                              key={field.id}
+                              petition={petition}
+                              field={field}
+                              isDisabled={
+                                (isPetition && petition.status === "CLOSED") ||
+                                petition.isAnonymized ||
+                                displayPetitionLimitReachedAlert
+                              }
+                              isCacheOnly={!isPetition}
+                              myEffectivePermission={myEffectivePermission}
+                              showErrors={showErrors && !canFinalize}
+                              fieldLogic={logic}
+                            />
+                            {field.type !== "FIELD_GROUP" ? (
+                              <Center
+                                display={{ base: "none", xl: "flex" }}
+                                position="absolute"
+                                top="0px"
+                                right="-48px"
+                                height="100%"
+                                width="auto"
+                                minWidth="48px"
+                                padding={2}
+                              >
+                                <Stack className={"edit-preview-field-buttons"} display="none">
                                   <NakedLink
-                                    href={buildUrlToSection("replies", { field: field.id })}
+                                    href={buildUrlToSection("compose", { field: field.id })}
                                   >
                                     <IconButtonWithTooltip
                                       as="a"
-                                      icon={<ChevronRightIcon boxSize={5} />}
                                       size="sm"
                                       variant="outline"
                                       backgroundColor="white"
                                       placement="bottom"
                                       color="gray.600"
-                                      isDisabled={!fieldHasReplies}
+                                      icon={<EditSimpleIcon boxSize={4} />}
                                       label={intl.formatMessage({
-                                        id: "page.preview.review-reply",
-                                        defaultMessage: "Review reply",
+                                        id: "page.preview.edit-field",
+                                        defaultMessage: "Edit field",
                                       })}
                                     />
                                   </NakedLink>
-                                )}
-                              </Stack>
-                            </Center>
-                          ) : null}
-                        </Box>
+                                  {field.type === "HEADING" || !isPetition ? null : (
+                                    <NakedLink
+                                      href={buildUrlToSection("replies", { field: field.id })}
+                                    >
+                                      <IconButtonWithTooltip
+                                        as="a"
+                                        icon={<ChevronRightIcon boxSize={5} />}
+                                        size="sm"
+                                        variant="outline"
+                                        backgroundColor="white"
+                                        placement="bottom"
+                                        color="gray.600"
+                                        isDisabled={!fieldHasReplies}
+                                        label={intl.formatMessage({
+                                          id: "page.preview.review-reply",
+                                          defaultMessage: "Review reply",
+                                        })}
+                                      />
+                                    </NakedLink>
+                                  )}
+                                </Stack>
+                              </Center>
+                            ) : null}
+                          </Box>
+                        </LiquidPetitionVariableProvider>
                       );
                     })}
                   </LiquidScopeProvider>
@@ -633,7 +644,6 @@ const _fragments = {
         position
         ...useAllFieldsWithIndices_PetitionField
         ...PreviewPetitionField_PetitionField
-        ...useGetPetitionPages_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         ...completedFieldReplies_PetitionField
@@ -665,9 +675,10 @@ const _fragments = {
         }
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
+      ...useGetPetitionPages_PetitionBase
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
-      ...useLiquidScope_PetitionBase
+      ...LiquidScopeProvider_PetitionBase
       ...PreviewPetitionField_PetitionBase
       ...usePetitionCanFinalize_PetitionBase
       ...HiddenFieldDialog_PetitionBase
@@ -678,15 +689,15 @@ const _fragments = {
     ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
     ${RecipientViewProgressFooter.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
+    ${useGetPetitionPages.fragments.PetitionBase}
     ${RecipientViewContentsCard.fragments.PetitionBase}
     ${PetitionLayout.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
-    ${useGetPetitionPages.fragments.PetitionField}
     ${useAllFieldsWithIndices.fragments.PetitionField}
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
-    ${useLiquidScope.fragments.PetitionBase}
+    ${LiquidScopeProvider.fragments.PetitionBase}
     ${completedFieldReplies.fragments.PetitionField}
     ${HiddenFieldDialog.fragments.PetitionBase}
     ${HiddenFieldDialog.fragments.PetitionField}

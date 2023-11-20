@@ -7,6 +7,9 @@ import { Maybe, MaybeArray } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
+import { NexusGenInputs } from "../../__types";
+import { PetitionFieldMath, PetitionFieldVisibility } from "../../../util/fieldLogic";
+import { toGlobalId } from "../../../util/globalId";
 
 async function contextUserHasAccessToUsers(userIds: number[], ctx: ApiContext) {
   try {
@@ -163,5 +166,128 @@ export function petitionCanUploadAttachments<
     const newUploadsCount = (args[dataArrArg] as unknown as any[]).length;
     const allAttachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(petitionId);
     return allAttachments.length + newUploadsCount <= maxAllowed;
+  };
+}
+
+export function petitionVariableCanBeCreated<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgData extends Arg<TypeName, FieldName, NexusGenInputs["CreatePetitionVariableInput"]>,
+>(petitionIdArg: TArgPetitionId, dataArg: TArgData): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const data = args[dataArg] as unknown as NexusGenInputs["CreatePetitionVariableInput"];
+    const [petition, fields] = await Promise.all([
+      ctx.petitions.loadPetition.raw(petitionId),
+      ctx.petitions.loadAllFieldsByPetitionId(petitionId),
+    ]);
+
+    if (petition?.variables?.some((v) => v.name === data.name)) {
+      throw new ApolloError(
+        "Variable with this name already exists",
+        "PETITION_VARIABLE_ALREADY_EXISTS_ERROR",
+      );
+    }
+
+    if (fields.some((f) => f.alias === data.name)) {
+      throw new ApolloError("Field with this alias already exists", "ALIAS_ALREADY_EXISTS");
+    }
+
+    return true;
+  };
+}
+
+export function variableIsNotBeingReferencedByFieldLogic<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgVariableName extends Arg<TypeName, FieldName, string>,
+>(
+  petitionIdArg: TArgPetitionId,
+  variableNameArg: TArgVariableName,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const variableName = args[variableNameArg] as unknown as string;
+
+    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
+
+    const referencingFields = petitionFields.filter((f) => {
+      if (
+        (f.visibility as PetitionFieldVisibility | null)?.conditions.some(
+          (c) => "variableName" in c && c.variableName === variableName,
+        )
+      ) {
+        return true;
+      }
+
+      if (
+        (f.math as PetitionFieldMath[] | null)?.some(
+          (m) =>
+            m.conditions.some((c) => "variableName" in c && c.variableName === variableName) ||
+            m.operations.some(
+              (op) =>
+                op.variable === variableName ||
+                (op.operand.type === "VARIABLE" && op.operand.name === variableName),
+            ),
+        )
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (referencingFields.length > 0) {
+      throw new ApolloError(
+        "The variable is being referenced in another field.",
+        "VARIABLE_IS_REFERENCED_ERROR",
+      );
+    }
+
+    return true;
+  };
+}
+
+export function fieldIsNotBeingUsedInMathOperation<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgFieldId extends Arg<TypeName, FieldName, number>,
+>(
+  petitionIdArg: TArgPetitionId,
+  fieldIdArg: TArgFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const fieldId = args[fieldIdArg] as unknown as number;
+
+    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
+
+    const field = petitionFields.find((f) => f.id === fieldId);
+    if (!field || field.type !== "NUMBER") {
+      return true;
+    }
+
+    const referencingFields = petitionFields.filter(
+      (f) =>
+        isDefined(f.math) &&
+        (f.math as PetitionFieldMath[]).some((m) =>
+          m.operations.some((op) => op.operand.type === "FIELD" && op.operand.fieldId === fieldId),
+        ),
+    );
+
+    if (referencingFields.length > 0) {
+      throw new ApolloError(
+        "The petition field is being referenced on math operations of another field.",
+        "FIELD_IS_REFERENCED_ERROR",
+        {
+          referencingFieldIds: referencingFields.map((f) => toGlobalId("PetitionField", f.id)),
+        },
+      );
+    }
+
+    return true;
   };
 }

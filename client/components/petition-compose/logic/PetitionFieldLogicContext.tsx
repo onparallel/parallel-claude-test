@@ -9,14 +9,19 @@ import { PropsWithChildren, createContext, useContext, useMemo } from "react";
 interface PetitionFieldLogicContextProps {
   field: PetitionFieldLogicContext_PetitionFieldFragment;
   petition: PetitionFieldLogicContext_PetitionBaseFragment;
+  includeSelf?: boolean;
 }
 
 interface UsePetitionFieldLogicContext {
-  field: PetitionFieldLogicContext_PetitionFieldFragment;
+  fieldWithIndex: [
+    field: PetitionFieldLogicContext_PetitionFieldFragment,
+    fieldIndex: PetitionFieldIndex,
+  ];
   fieldsWithIndices: [
     field: PetitionFieldLogicContext_PetitionFieldFragment,
     fieldIndex: PetitionFieldIndex,
   ][];
+  variables: PetitionFieldLogicContext_PetitionBaseFragment["variables"];
 }
 
 const _PetitionFieldLogicContext = createContext<UsePetitionFieldLogicContext | undefined>(
@@ -27,19 +32,19 @@ export function PetitionFieldLogicContext({
   field,
   petition,
   children,
+  includeSelf,
 }: PropsWithChildren<PetitionFieldLogicContextProps>) {
   const fieldsWithIndices = useAllFieldsWithIndices(petition.fields);
+  const fieldIndex = fieldsWithIndices.findIndex(([f]) => f.id === field.id);
   const value = useMemo<UsePetitionFieldLogicContext>(() => {
     return {
-      field,
+      fieldWithIndex: fieldsWithIndices.find(([f]) => f.id === field.id)!,
       fieldsWithIndices: fieldsWithIndices
-        .slice(
-          0,
-          fieldsWithIndices.findIndex(([f]) => f.id === field.id),
-        )
+        .slice(0, includeSelf ? fieldIndex + 1 : fieldIndex)
         .filter(([f]) => !f.isReadOnly),
+      variables: petition.variables,
     };
-  }, [fieldsWithIndices]);
+  }, [fieldsWithIndices, petition.variables]);
 
   return (
     <_PetitionFieldLogicContext.Provider value={value}>
@@ -57,6 +62,10 @@ PetitionFieldLogicContext.fragments = {
           children {
             ...PetitionFieldLogicContext_PetitionField
           }
+        }
+        variables {
+          name
+          defaultValue
         }
       }
       ${this.PetitionField}

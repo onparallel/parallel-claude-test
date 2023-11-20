@@ -369,6 +369,7 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
             ? `- \`recipients.recipientUrl\`: Include the recipient URL in when using \`recipients\`. **A special permission is required as there are security implications**.`
             : ``
         }
+        - \`variablesResult\`: An array with the result of the defined variables of the parallel.
       `,
       array: true,
       required: false,
@@ -380,6 +381,7 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
         "progress",
         "signers",
         ...(includeRecipientUrl ? ["recipients.recipientUrl" as const] : []),
+        "variablesResult",
       ],
     }),
   };
@@ -400,6 +402,7 @@ function getPetitionIncludesFromQuery<
     includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
     includeProgress: query.include?.includes("progress") ?? false,
     includeSigners: query.include?.includes("signers") ?? false,
+    includeVariablesResult: query.include?.includes("variablesResult") ?? false,
   };
 }
 
@@ -609,6 +612,7 @@ api
           $includeReplies: Boolean!
           $includeProgress: Boolean!
           $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
           $fromTemplateId: [GID!]
         ) {
           petitions(
@@ -664,6 +668,7 @@ api
           $includeReplies: Boolean!
           $includeProgress: Boolean!
           $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
         ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
@@ -706,6 +711,7 @@ api
           $includeReplies: Boolean!
           $includeProgress: Boolean!
           $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
         ) {
           petition(id: $petitionId) {
             ...Petition
@@ -772,6 +778,7 @@ api
           $includeReplies: Boolean!
           $includeProgress: Boolean!
           $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
         ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
@@ -893,6 +900,7 @@ api.path("/petitions/:petitionId/close", { params: { petitionId } }).post(
         $includeReplies: Boolean!
         $includeProgress: Boolean!
         $includeSigners: Boolean!
+        $includeVariablesResult: Boolean!
       ) {
         closePetition(petitionId: $petitionId) {
           ...Petition
@@ -937,6 +945,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
         $includeReplies: Boolean!
         $includeProgress: Boolean!
         $includeSigners: Boolean!
+        $includeVariablesResult: Boolean!
       ) {
         reopenPetition(petitionId: $petitionId) {
           ...Petition
@@ -1019,6 +1028,7 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
         $includeReplies: Boolean!
         $includeProgress: Boolean!
         $includeSigners: Boolean!
+        $includeVariablesResult: Boolean!
       ) {
         tagPetition(petitionId: $petitionId, tagId: $tagId) {
           ...Petition
@@ -1288,6 +1298,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeReplies: Boolean!
           $includeProgress: Boolean!
           $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
           $senderId: GID
         ) {
           sendPetition(

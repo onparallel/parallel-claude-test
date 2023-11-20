@@ -26,6 +26,12 @@ import {
 } from "../../../db/__types";
 import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
+import {
+  PetitionFieldMath,
+  PetitionFieldVisibility,
+  mapFieldLogicCondition,
+  mapFieldMathOperation,
+} from "../../../util/fieldLogic";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { isValueCompatible } from "../../../util/isValueCompatible";
@@ -58,7 +64,7 @@ import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues
 import { datetimeArg } from "../../helpers/scalars/DateTime";
 import { jsonArg, jsonObjectArg } from "../../helpers/scalars/JSON";
 import { uploadArg } from "../../helpers/scalars/Upload";
-import { validateAnd, validateIf, validateIfDefined, validateOr } from "../../helpers/validateArgs";
+import { validateAnd, validateIfDefined, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
 import { maxLength } from "../../helpers/validators/maxLength";
@@ -66,7 +72,7 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
-import { validFieldVisibility } from "../../helpers/validators/validFieldVisibility";
+import { validFieldMath, validFieldVisibility } from "../../helpers/validators/validFieldLogic";
 import { validFolderId } from "../../helpers/validators/validFolderId";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validPath } from "../../helpers/validators/validPath";
@@ -89,9 +95,10 @@ import {
   accessesIsNotOptedOut,
   contextUserCanClonePetitions,
   defaultOnBehalfUserBelongsToContextOrganization,
+  fieldAliasIsAvailable,
   fieldHasParent,
   fieldHasType,
-  fieldIsNotBeingReferencedByVisibilityCondition,
+  fieldIsNotBeingReferencedByAnotherFieldLogic,
   fieldIsNotFirstChild,
   fieldIsNotFixed,
   fieldsBelongsToPetition,
@@ -118,10 +125,12 @@ import {
 import { validatePublicPetitionLinkSlug } from "../validations";
 import { ApolloError, ArgValidationError } from "./../../helpers/errors";
 import {
+  fieldIsNotBeingUsedInMathOperation,
   userCanSendAs,
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserAndUserGroups,
 } from "./authorizers";
+import { FIELD_REFERENCE_REGEX } from "./variables";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create parallel.",
@@ -988,7 +997,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    fieldIsNotBeingReferencedByVisibilityCondition("petitionId", "fieldId"),
+    fieldIsNotBeingReferencedByAnotherFieldLogic("petitionId", "fieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1073,6 +1082,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgDefined((args) => args.data.hasCommentsEnabled, not(fieldHasType("fieldId", ["HEADING"]))),
     ifArgDefined((args) => args.data.multiple, not(fieldHasType("fieldId", ["FIELD_GROUP"]))),
+    ifArgDefined(
+      (args) => args.data.alias,
+      fieldAliasIsAvailable("petitionId", (args) => args.data.alias!),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1090,6 +1103,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.boolean("showInPdf");
           t.nullable.boolean("showActivityInPdf");
           t.nullable.field("visibility", { type: "JSONObject" });
+          t.nullable.list.nonNull.field("math", { type: "JSONObject" });
           t.nullable.string("alias");
           t.nullable.boolean("hasCommentsEnabled");
           t.nullable.boolean("requireApproval");
@@ -1102,18 +1116,18 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     notEmptyObject((args) => args.data, "data"),
     maxLength((args) => args.data.title, "data.title", 500),
     maxLength((args) => args.data.alias, "data.alias", 100),
-    validateIf(
-      (args) => isDefined(args.data.alias),
-      validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/),
+    validateRegex((args) => args.data.alias, "data.alias", FIELD_REFERENCE_REGEX),
+    validFieldVisibility(
+      (args) => args.petitionId,
+      (args) => args.fieldId,
+      (args) => args.data.visibility as any,
+      "data.visibility",
     ),
-    validateIf(
-      (args) => isDefined(args.data.visibility),
-      validFieldVisibility(
-        (args) => args.petitionId,
-        (args) => args.fieldId,
-        (args) => args.data.visibility,
-        "data.visibility",
-      ),
+    validFieldMath(
+      (args) => args.petitionId,
+      (args) => args.fieldId,
+      (args) => args.data.math as any,
+      "data.math",
     ),
   ),
   resolve: async (_, args, ctx, info) => {
@@ -1124,6 +1138,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       multiple,
       options,
       visibility,
+      math,
       alias,
       isInternal,
       showInPdf,
@@ -1203,11 +1218,19 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           ? null
           : {
               ...visibility,
-              conditions: visibility.conditions.map((c: any) => ({
-                ...c,
-                fieldId: fromGlobalId(c.fieldId, "PetitionField").id,
-              })),
+              conditions: (visibility as PetitionFieldVisibility<string>).conditions.map((c) =>
+                mapFieldLogicCondition(c),
+              ),
             };
+    }
+
+    if (math !== undefined) {
+      data.math =
+        (math as PetitionFieldMath<string>[] | null)?.map((m) => ({
+          ...m,
+          conditions: m.conditions.map((c) => mapFieldLogicCondition(c)),
+          operations: m.operations.map((op) => mapFieldMathOperation(op)),
+        })) ?? null;
     }
 
     if (isDefined(hasCommentsEnabled)) {
@@ -2007,6 +2030,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
       and(userHasFeatureFlag("FIELD_GROUP"), not(fieldHasParent("fieldId"))),
     ),
     petitionIsNotAnonymized("petitionId"),
+    fieldIsNotBeingUsedInMathOperation("petitionId", "fieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2034,8 +2058,8 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
       await ctx.petitions.updatePetitionToPendingStatus(args.petitionId, `User:${ctx.user!.id}`);
 
       return field;
-    } catch (e: any) {
-      if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
+    } catch (e) {
+      if (e instanceof Error && e.message === "UPDATE_FIXED_FIELD_ERROR") {
         throw new ApolloError("Can't change type of a fixed field", "UPDATE_FIXED_FIELD_ERROR");
       } else {
         throw e;
@@ -2612,6 +2636,8 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
             "First child of an external field cannot be internal",
             "FIRST_CHILD_IS_INTERNAL_ERROR",
           );
+        } else if (error.message === "INVALID_FIELD_CONDITIONS_ORDER") {
+          throw new ApolloError("Invalid field conditions order", "INVALID_FIELD_CONDITIONS_ORDER");
         }
       }
       throw error;
@@ -2636,7 +2662,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
     fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
     fieldHasType("parentFieldId", "FIELD_GROUP"),
     fieldHasParent("childrenFieldIds", "parentFieldId"),
-    fieldIsNotBeingReferencedByVisibilityCondition("petitionId", "childrenFieldIds"),
+    fieldIsNotBeingReferencedByAnotherFieldLogic("petitionId", "childrenFieldIds"),
   ),
   validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
   resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {

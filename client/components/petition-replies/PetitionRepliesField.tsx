@@ -51,6 +51,7 @@ import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
+import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 
 export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   petitionId: string;
@@ -338,101 +339,103 @@ export const PetitionRepliesField = Object.assign(
                       fieldLogic.groupChildrenLogic![index],
                     ).map((x) => {
                       return x.type === "FIELD" ? (
-                        <Stack key={x.field.id}>
-                          <Box>
-                            <Box position="relative">
-                              {x.field.optional ? null : (
-                                <Tooltip
-                                  placement="bottom"
-                                  label={intl.formatMessage({
-                                    id: "generic.required-field",
-                                    defaultMessage: "Required field",
-                                  })}
-                                >
-                                  <Box
-                                    paddingLeft={{ base: 2.5, md: 0 }}
-                                    width={4}
-                                    height={4}
-                                    textAlign="center"
-                                    fontSize="xl"
-                                    color="red.600"
-                                    userSelect="none"
-                                    position="absolute"
-                                    left={0}
-                                    top={0}
-                                    transform={{
-                                      base: "translate(-1.25rem, 25%)",
-                                      md: "translate(-1rem, 25%)",
-                                    }}
-                                  >
-                                    <Box position="relative" bottom={2} pointerEvents="none">
-                                      *
-                                    </Box>
-                                  </Box>
-                                </Tooltip>
-                              )}
-                              <Heading
-                                fontSize="md"
-                                as="h4"
-                                {...(x.field.title
-                                  ? { overflowWrap: "anywhere", fontWeight: 500 }
-                                  : { textStyle: "hint", whiteSpace: "nowrap" })}
-                              >
-                                {x.field.title || (
-                                  <FormattedMessage
-                                    id="generic.untitled-field"
-                                    defaultMessage="Untitled field"
-                                  />
-                                )}
-                              </Heading>
-                            </Box>
+                        <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
+                          <Stack key={x.field.id}>
                             <Box>
-                              {x.field.description ? (
-                                <FieldDescription
-                                  description={x.field.description}
-                                  marginTop={1}
-                                  color="gray.600"
-                                  fontSize="sm"
-                                  overflowWrap="anywhere"
-                                />
-                              ) : null}
-                              {x.field.attachments.length ? (
-                                <Box marginTop={2} paddingY={1}>
-                                  <PetitionRepliesFieldAttachments
-                                    attachments={x.field.attachments}
-                                    onAttachmentClick={handleAttachmentClick}
-                                  />
-                                </Box>
-                              ) : null}
-                            </Box>
-                          </Box>
-                          {x.field.type === "HEADING" ? null : (
-                            <Stack spacing={4}>
-                              {x.field.childReplies.length ? (
-                                x.field.childReplies.map((reply) => (
-                                  <PetitionRepliesFieldReply
-                                    key={reply.id}
-                                    reply={reply}
-                                    onAction={(action) => onAction(action, reply)}
-                                    onUpdateStatus={(status) =>
-                                      onUpdateReplyStatus(x.field.id, reply.id, status)
-                                    }
-                                    isDisabled={isDisabled}
-                                  />
-                                ))
-                              ) : (
-                                <Box paddingTop={3} paddingBottom={3}>
-                                  <Text textStyle="hint" textAlign="center">
+                              <Box position="relative">
+                                {x.field.optional ? null : (
+                                  <Tooltip
+                                    placement="bottom"
+                                    label={intl.formatMessage({
+                                      id: "generic.required-field",
+                                      defaultMessage: "Required field",
+                                    })}
+                                  >
+                                    <Box
+                                      paddingLeft={{ base: 2.5, md: 0 }}
+                                      width={4}
+                                      height={4}
+                                      textAlign="center"
+                                      fontSize="xl"
+                                      color="red.600"
+                                      userSelect="none"
+                                      position="absolute"
+                                      left={0}
+                                      top={0}
+                                      transform={{
+                                        base: "translate(-1.25rem, 25%)",
+                                        md: "translate(-1rem, 25%)",
+                                      }}
+                                    >
+                                      <Box position="relative" bottom={2} pointerEvents="none">
+                                        *
+                                      </Box>
+                                    </Box>
+                                  </Tooltip>
+                                )}
+                                <Heading
+                                  fontSize="md"
+                                  as="h4"
+                                  {...(x.field.title
+                                    ? { overflowWrap: "anywhere", fontWeight: 500 }
+                                    : { textStyle: "hint", whiteSpace: "nowrap" })}
+                                >
+                                  {x.field.title || (
                                     <FormattedMessage
-                                      id="component.petition-replies-field.no-replies"
-                                      defaultMessage="There are no replies to this field yet"
+                                      id="generic.untitled-field"
+                                      defaultMessage="Untitled field"
                                     />
-                                  </Text>
-                                </Box>
-                              )}
-                            </Stack>
-                          )}
-                        </Stack>
+                                  )}
+                                </Heading>
+                              </Box>
+                              <Box>
+                                {x.field.description ? (
+                                  <FieldDescription
+                                    description={x.field.description}
+                                    marginTop={1}
+                                    color="gray.600"
+                                    fontSize="sm"
+                                    overflowWrap="anywhere"
+                                  />
+                                ) : null}
+                                {x.field.attachments.length ? (
+                                  <Box marginTop={2} paddingY={1}>
+                                    <PetitionRepliesFieldAttachments
+                                      attachments={x.field.attachments}
+                                      onAttachmentClick={handleAttachmentClick}
+                                    />
+                                  </Box>
+                                ) : null}
+                              </Box>
+                            </Box>
+                            {x.field.type === "HEADING" ? null : (
+                              <Stack spacing={4}>
+                                {x.field.childReplies.length ? (
+                                  x.field.childReplies.map((reply) => (
+                                    <PetitionRepliesFieldReply
+                                      key={reply.id}
+                                      reply={reply}
+                                      onAction={(action) => onAction(action, reply)}
+                                      onUpdateStatus={(status) =>
+                                        onUpdateReplyStatus(x.field.id, reply.id, status)
+                                      }
+                                      isDisabled={isDisabled}
+                                    />
+                                  ))
+                                ) : (
+                                  <Box paddingTop={3} paddingBottom={3}>
+                                    <Text textStyle="hint" textAlign="center">
+                                      <FormattedMessage
+                                        id="component.petition-replies-field.no-replies"
+                                        defaultMessage="There are no replies to this field yet"
+                                      />
+                                    </Text>
+                                  </Box>
+                                )}
+                              </Stack>
+                            )}
+                          </Stack>
+                        </LiquidPetitionVariableProvider>
                       ) : (
                         <PetitionRepliesFilteredFields key={index} count={x.count} />
                       );

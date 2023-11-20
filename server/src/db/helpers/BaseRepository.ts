@@ -16,6 +16,7 @@ import { OrganizationUsageDetails } from "../repositories/OrganizationRepository
 import {
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
+  PetitionVariable,
 } from "../repositories/PetitionRepository";
 import type * as db from "../__types";
 import { hashString } from "../../util/token";
@@ -28,7 +29,13 @@ export interface TableTypes
       petition_user_notification: PetitionUserNotification;
       system_event: SystemEvent;
       organization: Replace<db.Organization, { usage_details: OrganizationUsageDetails }>;
-      petition: Replace<db.Petition, { signature_config: PetitionSignatureConfig | null }>;
+      petition: Replace<
+        db.Petition,
+        {
+          signature_config: PetitionSignatureConfig | null;
+          variables: PetitionVariable[] | null;
+        }
+      >;
       petition_signature_request: Replace<
         db.PetitionSignatureRequest,
         {
@@ -50,7 +57,13 @@ export interface TableCreateTypes
       petition_event: CreatePetitionEvent;
       system_event: CreateSystemEvent;
       petition_user_notification: CreatePetitionUserNotification;
-      petition: Replace<db.CreatePetition, { signature_config?: PetitionSignatureConfig | null }>;
+      petition: Replace<
+        db.CreatePetition,
+        {
+          signature_config?: PetitionSignatureConfig | null;
+          variables?: PetitionVariable[] | null;
+        }
+      >;
       petition_signature_request: Replace<
         db.CreatePetitionSignatureRequest,
         { signature_config: PetitionSignatureConfig }
