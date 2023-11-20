@@ -1,9 +1,11 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { NormalLink } from "@parallel/components/common/Link";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SearchInput } from "@parallel/components/common/SearchInput";
@@ -128,14 +130,36 @@ function Alerts() {
                     </Text>
                   </Flex>
                 ) : (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text fontSize="lg">
+                  <Stack
+                    flex="1"
+                    alignItems="center"
+                    justifyContent="center"
+                    textAlign="center"
+                    padding={4}
+                  >
+                    <Image
+                      paddingBottom={2}
+                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/alerts/empty-alerts.svg`}
+                    />
+                    <Text fontWeight="bold">
                       <FormattedMessage
                         id="page.alerts.no-alerts"
-                        defaultMessage="You have no alerts yet."
+                        defaultMessage="You have no alerts set up"
                       />
                     </Text>
-                  </Flex>
+                    <Text>
+                      <FormattedMessage
+                        id="page.alerts.no-alerts-body"
+                        defaultMessage="Alerts are automatically created when an expiration date is added to a profile"
+                      />
+                    </Text>
+                    <NormalLink as={NakedHelpCenterLink} articleId={8174034} fontWeight="bold">
+                      <FormattedMessage
+                        id="page.alerts.no-alerts-help-center-link"
+                        defaultMessage="How to add alerts"
+                      />
+                    </NormalLink>
+                  </Stack>
                 )
               ) : null
             }

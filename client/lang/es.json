@@ -10911,8 +10911,18 @@
   },
   {
     "term": "page.alerts.no-alerts",
-    "definition": "Aún no tienes alertas.",
-    "context": "You have no alerts yet."
+    "definition": "No tienes alertas configuradas",
+    "context": "You have no alerts set up"
+  },
+  {
+    "term": "page.alerts.no-alerts-body",
+    "definition": "Las alertas se crean automáticamente al añadir una fecha de vencimiento en un perfil",
+    "context": "Alerts are automatically created when an expiration date is added to a profile"
+  },
+  {
+    "term": "page.alerts.no-alerts-help-center-link",
+    "definition": "Cómo añadir alertas",
+    "context": "How to add alerts"
   },
   {
     "term": "page.alerts.no-results",
