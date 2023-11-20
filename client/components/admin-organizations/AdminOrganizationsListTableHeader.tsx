@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { useEffect, useRef } from "react";
 
 export interface AdminOrganizationsListTableHeaderProps {
   search: string | null;
@@ -19,6 +20,11 @@ export function AdminOrganizationsListTableHeader({
   onCreateClick,
 }: AdminOrganizationsListTableHeaderProps) {
   const intl = useIntl();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <Stack direction="row" alignItems="center" padding={2}>
@@ -33,7 +39,11 @@ export function AdminOrganizationsListTableHeader({
         })}
       />
       <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
+        <SearchInput
+          ref={inputRef}
+          value={search ?? ""}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
       </Box>
       <Spacer />
       <Box>

@@ -138,14 +138,14 @@ function AdminOrganizations() {
   return (
     <AdminSettingsLayout
       title={intl.formatMessage({
-        id: "admin.organizations",
+        id: "page.admin-organizations.title",
         defaultMessage: "Organizations",
       })}
       me={me}
       realMe={realMe}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="admin.organizations" defaultMessage="Organizations" />
+          <FormattedMessage id="page.admin-organizations.title" defaultMessage="Organizations" />
         </Heading>
       }
     >

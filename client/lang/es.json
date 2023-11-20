@@ -1,15 +1,5 @@
 [
   {
-    "term": "admin.organizations",
-    "definition": "Organizaciones",
-    "context": "Organizations"
-  },
-  {
-    "term": "admin.support-methods",
-    "definition": "Métodos de soporte",
-    "context": "Support methods"
-  },
-  {
     "term": "admin.title",
     "definition": "Panel de administrador",
     "context": "Admin panel"
@@ -10908,6 +10898,16 @@
     "term": "page.admin-organizations-subscriptions.users-header",
     "definition": "Usuarios",
     "context": "Users"
+  },
+  {
+    "term": "page.admin-organizations.title",
+    "definition": "Organizaciones",
+    "context": "Organizations"
+  },
+  {
+    "term": "page.admin-support-methods.title",
+    "definition": "Métodos de soporte",
+    "context": "Support methods"
   },
   {
     "term": "page.alerts.no-alerts",

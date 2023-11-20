@@ -49,14 +49,17 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
   return (
     <AdminSettingsLayout
       title={intl.formatMessage({
-        id: "admin.support-methods",
+        id: "page.admin-support-methods.title",
         defaultMessage: "Support methods",
       })}
       me={me}
       realMe={realMe}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="admin.support-methods" defaultMessage="Support methods" />
+          <FormattedMessage
+            id="page.admin-support-methods.title"
+            defaultMessage="Support methods"
+          />
         </Heading>
       }
     >
