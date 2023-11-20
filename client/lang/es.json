@@ -10505,6 +10505,16 @@
     "context": "Changes saved correctly"
   },
   {
+    "term": "page.admin-organization-users.invalid-email-toast-description",
+    "definition": "El email proporcionado no es válido.",
+    "context": "The provided email is invalid."
+  },
+  {
+    "term": "page.admin-organization-users.invalid-email-toast-title",
+    "definition": "Email inválido",
+    "context": "Invalid email"
+  },
+  {
     "term": "page.admin-organizations-subscriptions.activate-signature-button",
     "definition": "Activar firma",
     "context": "Activate signature"
@@ -10858,6 +10868,16 @@
     "term": "page.organization-profile-type.changes-saved-body",
     "definition": "Los cambios de \"Nombre de cada perfil\" han sido guardados.",
     "context": "The \"Name of each profile\" changes have been saved."
+  },
+  {
+    "term": "page.organization-users.invalid-email-toast-description",
+    "definition": "El email proporcionado no es válido.",
+    "context": "The provided email is invalid."
+  },
+  {
+    "term": "page.organization-users.invalid-email-toast-title",
+    "definition": "Email inválido",
+    "context": "Invalid email"
   },
   {
     "term": "page.organization-users.no-search-results",

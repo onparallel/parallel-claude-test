@@ -131,6 +131,23 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           }),
           isClosable: true,
         });
+      } else if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
+        const code = (error as any).graphQLErrors[0]?.extensions?.extra?.error_code;
+        if (code === "INVALID_MX_EMAIL_ERROR" || code === "INVALID_EMAIL_ERROR") {
+          toast({
+            status: "error",
+            title: intl.formatMessage({
+              id: "page.admin-organization-users.invalid-email-toast-title",
+              defaultMessage: "Invalid email",
+            }),
+            description: intl.formatMessage({
+              id: "page.admin-organization-users.invalid-email-toast-description",
+              defaultMessage: "The provided email is invalid.",
+            }),
+          });
+        } else {
+          showGenericErrorToast(error);
+        }
       } else {
         showGenericErrorToast(error);
       }
