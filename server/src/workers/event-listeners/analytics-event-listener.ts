@@ -245,12 +245,13 @@ async function trackPetitionDeletedEvent(event: PetitionDeletedEvent, ctx: Worke
 }
 
 async function trackUserLoggedInEvent(event: UserLoggedInEvent, ctx: WorkerContext) {
-  const [user, userData, stats] = await Promise.all([
+  const [user, userData, stats, permissions] = await Promise.all([
     loadUser(event.data.user_id, ctx),
     loadUserDataByUserId(event.data.user_id, ctx),
     loadUserStats(event.data.user_id, ctx),
+    ctx.users.loadUserPermissions(event.data.user_id),
   ]);
-  await ctx.analytics.identifyUser(user, userData, stats);
+  await ctx.analytics.identifyUser(user, userData, { ...stats, permissions });
   await ctx.analytics.trackEvent({
     type: "USER_LOGGED_IN",
     user_id: event.data.user_id,
