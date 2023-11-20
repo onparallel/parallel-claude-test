@@ -1389,14 +1389,6 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
     } catch (error) {
       if (containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")) {
         throw new ConflictError("The parallel was already sent to some of the provided contacts");
-      } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-        const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
-          email: string;
-          error_code: string;
-        };
-        if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
-          throw new BadRequestError(`${email} is not a valid email`);
-        }
       } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
         throw new ForbiddenError("You don't have enough credits to send this parallel");
       } else if (containsGraphQLError(error, "SEND_AS_ERROR")) {

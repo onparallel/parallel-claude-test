@@ -11,7 +11,7 @@ import { waitFor } from "../../util/promises/waitFor";
 import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
 import { Maybe, UnwrapArray } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
-import { InternalError } from "../rest/errors";
+import { BadRequestError, InternalError } from "../rest/errors";
 import {
   buildDefinition,
   buildParse,
@@ -573,64 +573,84 @@ export async function resolveContacts(
       }
   )[],
 ) {
-  const contactIds = await pMap(
-    contacts,
-    async (item) => {
-      if (typeof item === "string") {
-        return item;
-      } else {
-        const { email, ...data } = item;
-        const _query = gql`
-          query CreatePetitionRecipients_contact($email: String!) {
-            contacts: contactsByEmail(emails: [$email]) {
-              id
-              firstName
-              lastName
+  try {
+    const contactIds = await pMap(
+      contacts,
+      async (item) => {
+        if (typeof item === "string") {
+          return item;
+        } else {
+          const { email, ...data } = item;
+          const _query = gql`
+            query CreatePetitionRecipients_contact($email: String!) {
+              contacts: contactsByEmail(emails: [$email]) {
+                id
+                firstName
+                lastName
+              }
             }
-          }
-        `;
-        const result = await client.request(CreatePetitionRecipients_contactDocument, {
-          email,
-        });
-        const contact = result.contacts[0];
-        if (contact) {
-          if (
-            (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
-            (contact.lastName !== data.lastName && isDefined(data.lastName))
-          ) {
+          `;
+          const result = await client.request(CreatePetitionRecipients_contactDocument, {
+            email,
+          });
+          const contact = result.contacts[0];
+          if (contact) {
+            if (
+              (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
+              (contact.lastName !== data.lastName && isDefined(data.lastName))
+            ) {
+              const _mutation = gql`
+                mutation CreatePetitionRecipients_updateContact(
+                  $contactId: GID!
+                  $data: UpdateContactInput!
+                ) {
+                  updateContact(id: $contactId, data: $data) {
+                    id
+                  }
+                }
+              `;
+              await client.request(CreatePetitionRecipients_updateContactDocument, {
+                contactId: contact.id,
+                data,
+              });
+            }
+            return contact.id;
+          } else {
             const _mutation = gql`
-              mutation CreatePetitionRecipients_updateContact(
-                $contactId: GID!
-                $data: UpdateContactInput!
-              ) {
-                updateContact(id: $contactId, data: $data) {
+              mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
+                createContact(data: $data) {
                   id
                 }
               }
             `;
-            await client.request(CreatePetitionRecipients_updateContactDocument, {
-              contactId: contact.id,
-              data,
+            const result = await client.request(CreatePetitionRecipients_createContactDocument, {
+              data: item,
             });
+            return result.createContact.id;
           }
-          return contact.id;
-        } else {
-          const _mutation = gql`
-            mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
-              createContact(data: $data) {
-                id
-              }
-            }
-          `;
-          const result = await client.request(CreatePetitionRecipients_createContactDocument, {
-            data: item,
-          });
-          return result.createContact.id;
         }
-      }
-    },
-    { concurrency: 3 },
-  );
+      },
+      { concurrency: 3 },
+    );
 
-  return uniq(contactIds);
+    return uniq(contactIds);
+  } catch (error) {
+    if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+      const {
+        email,
+        error_code: errorCode,
+        error_message: errorMessage,
+      } = error.response.errors![0].extensions.extra as {
+        email: string;
+        error_code: string;
+        error_message: string;
+      };
+      if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
+        throw new BadRequestError(`${email} is not a valid email`);
+      } else if (errorCode === "VALUE_IS_EMPTY_ERROR") {
+        throw new BadRequestError(`Error updating contacts: ${errorMessage}`);
+      }
+      throw new BadRequestError("Error updating contacts");
+    }
+  }
 }
