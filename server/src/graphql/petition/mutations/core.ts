@@ -2399,20 +2399,26 @@ export const completePetition = mutationField("completePetition", {
         }
       }
       return petition;
-    } catch (error: any) {
-      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
-        throw new ApolloError(
-          "Can't complete the parallel due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED",
-        );
-      } else if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
-        throw new ApolloError(
-          "Can't complete the petition without signers information",
-          "REQUIRED_SIGNER_INFO_ERROR",
-        );
-      } else {
-        throw error;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+          throw new ApolloError(
+            "Can't complete the parallel due to lack of credits",
+            "PETITION_SEND_LIMIT_REACHED",
+          );
+        } else if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
+          throw new ApolloError(
+            "Can't complete the petition without signers information",
+            "REQUIRED_SIGNER_INFO_ERROR",
+          );
+        } else if (error.message === "CANT_COMPLETE_PETITION_ERROR") {
+          throw new ApolloError(
+            "Can't transition status to COMPLETED",
+            "CANT_COMPLETE_PETITION_ERROR",
+          );
+        }
       }
+      throw error;
     }
   },
 });

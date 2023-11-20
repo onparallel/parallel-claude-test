@@ -407,17 +407,19 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       }
 
       return petition;
-    } catch (error: any) {
-      if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
-        throw new ApolloError(
-          "Can't complete the petition without signers information",
-          "REQUIRED_SIGNER_INFO_ERROR",
-        );
-      } else if (error.message === "CANT_COMPLETE_PETITION_ERROR") {
-        throw new ApolloError(
-          "Can't transition status to COMPLETED",
-          "CANT_COMPLETE_PETITION_ERROR",
-        );
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
+          throw new ApolloError(
+            "Can't complete the petition without signers information",
+            "REQUIRED_SIGNER_INFO_ERROR",
+          );
+        } else if (error.message === "CANT_COMPLETE_PETITION_ERROR") {
+          throw new ApolloError(
+            "Can't transition status to COMPLETED",
+            "CANT_COMPLETE_PETITION_ERROR",
+          );
+        }
       }
       throw error;
     }
