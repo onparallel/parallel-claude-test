@@ -650,7 +650,7 @@ export async function resolveContacts(
       } else if (errorCode === "VALUE_IS_EMPTY_ERROR") {
         throw new BadRequestError(`Error updating contacts: ${errorMessage}`);
       }
-      throw new BadRequestError("Error updating contacts");
     }
+    throw new BadRequestError("Error updating contacts");
   }
 }
