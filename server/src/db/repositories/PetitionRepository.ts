@@ -6937,8 +6937,10 @@ export class PetitionRepository extends BaseRepository {
       }
 
       const fieldReplies = unMaybeArray(
-        typeof value === "string" && field.type === "CHECKBOX"
+        typeof value === "string"
           ? // allow multiple replies on a single string, like "Option1,Option2,Option4"
+            // If reply contains a comma, it must be escaped.
+            // e.g.: "Yes\,i want to...,No\, i don't want to..." will be split as: ["Yes, i want to...", "No, i don't want to..."]
             value.split(/(?<!\\),/).map((part) => part.replace(/\\,/g, ","))
           : value,
       );
@@ -6980,6 +6982,11 @@ export class PetitionRepository extends BaseRepository {
             }))),
           );
         }
+      } else if (field.type === "NUMBER") {
+        singleReplies.push(
+          // try to parse reply as a number with decimals. If NaN, validateReplyContent will ignore it
+          ...fieldReplies.map((value) => ({ content: { value: parseFloat(value) } })),
+        );
       } else {
         singleReplies.push(...fieldReplies.map((value) => ({ content: { value } })));
       }
