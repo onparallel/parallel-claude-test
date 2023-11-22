@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { BellIcon, DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
-import { withError } from "@parallel/utils/promises/withError";
+import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -11,11 +11,10 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
+import { useSignatureCancelledRequestErrorDialog } from "../petition-activity/dialogs/SignatureCancelledRequestErrorDialog";
 import { useConfirmSendSignatureReminderDialog } from "./dialogs/ConfirmSendSignatureReminderDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
-import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
-import { useSignatureCancelledRequestErrorDialog } from "../petition-activity/dialogs/SignatureCancelledRequestErrorDialog";
 
 interface CurrentSignatureRequestRowProps {
   signatureRequest: CurrentSignatureRequestRow_PetitionSignatureRequestFragment;
@@ -46,17 +45,10 @@ export function CurrentSignatureRequestRow({
 
   const showConfirmSendSignatureReminderDialog = useConfirmSendSignatureReminderDialog();
   async function handleConfirmSendSignatureReminders() {
-    const [, sendReminder] = await withError(
-      showConfirmSendSignatureReminderDialog({
-        pendingSigners: signerStatus
-          .filter(({ status }) => status === "PENDING")
-          .map(({ signer }) => signer),
-      }),
-    );
-
-    if (sendReminder) {
+    try {
+      await showConfirmSendSignatureReminderDialog();
       onSendReminder(signatureRequest.id);
-    }
+    } catch {}
   }
 
   const requestErrorMessage = useSignatureCancelledRequestErrorMessage();

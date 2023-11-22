@@ -1166,8 +1166,8 @@
   },
   {
     "term": "component.confirm-send-signature-reminder.body",
-    "definition": "{contactsList} {count, plural, =1{has} other{have}} not yet signed the document. Do you want to send a reminder to sign it?",
-    "context": "{contactsList} {count, plural, =1{has} other{have}} not yet signed the document. Do you want to send a reminder to sign it?"
+    "definition": "We will send a reminder to all contacts who still need to sign. Do you want to continue?",
+    "context": "We will send a reminder to all contacts who still need to sign. Do you want to continue?"
   },
   {
     "term": "component.confirm-send-signature-reminder.confirm",
@@ -1176,8 +1176,8 @@
   },
   {
     "term": "component.confirm-send-signature-reminder.header",
-    "definition": "Send signature reminder",
-    "context": "Send signature reminder"
+    "definition": "Send reminder",
+    "context": "Send reminder"
   },
   {
     "term": "component.confirm-signer-info-dialog.header",
