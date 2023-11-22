@@ -46,6 +46,7 @@ export interface FieldOptions {
   };
   SELECT: {
     values: string[];
+    labels?: string[];
     placeholder?: Maybe<string>;
   };
   DYNAMIC_SELECT: {
@@ -60,6 +61,7 @@ export interface FieldOptions {
   };
   CHECKBOX: {
     values: string[];
+    labels?: string[];
     limit: {
       type: string;
       min: number;

@@ -122,6 +122,12 @@ const SCHEMAS = {
     required: ["values"],
     additionalProperties: false,
     properties: {
+      labels: {
+        type: ["array", "null"],
+        items: {
+          type: "string",
+        },
+      },
       values: {
         type: ["array", "null"],
         items: {
@@ -184,6 +190,12 @@ const SCHEMAS = {
     required: ["values", "limit"],
     additionalProperties: false,
     properties: {
+      labels: {
+        type: ["array", "null"],
+        items: {
+          type: "string",
+        },
+      },
       values: {
         type: ["array", "null"],
         items: {

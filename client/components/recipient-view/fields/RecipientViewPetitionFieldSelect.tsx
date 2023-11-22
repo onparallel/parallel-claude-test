@@ -1,11 +1,8 @@
 import { Box, Center, FormControl, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import {
-  SimpleOption,
-  SimpleSelect,
-  toSimpleSelectOption,
-} from "@parallel/components/common/SimpleSelect";
+import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -14,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
+import { zip } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -21,7 +19,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
@@ -61,7 +58,11 @@ export function RecipientViewPetitionFieldSelect({
 
   const options = field.options as FieldOptions["SELECT"];
   const values = useMemo(
-    () => options.values.map((option) => toSimpleSelectOption(option)!),
+    () =>
+      zip(options.values, options.labels ?? options.values).map(([value, label]) => ({
+        value,
+        label,
+      })),
     [field.options],
   );
 
@@ -205,10 +206,13 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
   const [isSaving, setIsSaving] = useState(false);
 
   const options = field.options as FieldOptions["SELECT"];
-
   const values = useMemo(
-    () => options.values.map((option) => toSimpleSelectOption(option)!),
-    [options.values],
+    () =>
+      zip(options.values, options.labels ?? options.values).map(([value, label]) => ({
+        value,
+        label,
+      })),
+    [field.options],
   );
 
   const id = `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`;

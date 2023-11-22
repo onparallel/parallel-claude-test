@@ -1,13 +1,15 @@
 import { Box, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { zip } from "remeda";
 
 export interface RecipientViewPetitionFieldCheckboxProps
   extends Omit<
@@ -47,9 +49,9 @@ export function RecipientViewPetitionFieldCheckbox({
   onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldCheckboxProps) {
-  const { values, limit } = field.options;
+  const options = field.options as FieldOptions["CHECKBOX"];
 
-  const { type = "UNLIMITED", max = 1 } = limit ?? {};
+  const { type = "UNLIMITED", max = 1 } = options.limit ?? {};
 
   const reply = field.replies.length > 0 ? field.replies[0] : undefined;
   const isRejected = reply?.status === "REJECTED" ?? false;
@@ -82,23 +84,25 @@ export function RecipientViewPetitionFieldCheckbox({
     setIsSaving(false);
   };
 
-  const handleChange = (option: string) => {
-    const isSelected = checkedItems.includes(option);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const value = e.target.value;
+    const isSelected = checkedItems.includes(value);
     let newCheckedItems: string[];
     if (showRadio) {
-      newCheckedItems = isSelected ? [] : [option];
+      newCheckedItems = isSelected ? [] : [value];
     } else {
       // skip if maximum allowed options are selected
       if (type !== "UNLIMITED" && !isSelected && checkedItems.length >= max) {
         return;
       }
       newCheckedItems = isSelected
-        ? checkedItems.filter((o) => o !== option)
-        : [...checkedItems, option];
+        ? checkedItems.filter((o) => o !== value)
+        : [...checkedItems, value];
     }
     setCheckedItems(newCheckedItems);
     // make sure we only submit existing options
-    const filteredChecked = newCheckedItems.filter((c) => values.includes(c));
+    const filteredChecked = newCheckedItems.filter((c) => options.values.includes(c));
 
     if (!filteredChecked.length && reply) {
       handleDelete();
@@ -107,7 +111,7 @@ export function RecipientViewPetitionFieldCheckbox({
         haveChanges({
           checked: filteredChecked,
           value: reply.content.value,
-          max: type === "UNLIMITED" ? values.length : max,
+          max: type === "UNLIMITED" ? options.values.length : max,
         })
       ) {
         handleUpdate(filteredChecked);
@@ -172,20 +176,18 @@ export function RecipientViewPetitionFieldCheckbox({
           />
         </HStack>
 
-        {values.map((option: string, index: number) => (
+        {zip(options.values, options.labels ?? options.values).map(([value, label], index) => (
           <Checkbox
             key={index}
-            data-value={option}
+            data-value={value}
             isInvalid={isRejected || isInvalid}
             isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
-            isChecked={checkedItems.includes(option)}
-            onChange={(e) => {
-              e.preventDefault();
-              handleChange(option);
-            }}
+            isChecked={checkedItems.includes(value)}
+            value={value}
+            onChange={handleChange}
             {...(showRadio ? { icon: <CustomIcon />, variant: "radio" } : {})}
           >
-            {option}
+            {label}
           </Checkbox>
         ))}
       </Stack>
