@@ -436,6 +436,7 @@ export interface NexusGenEnums {
   PetitionFieldType: db.PetitionFieldType;
   PetitionListViewColumn:
     | "createdAt"
+    | "fromTemplateId"
     | "lastActivityAt"
     | "lastRecipientActivityAt"
     | "name"
@@ -445,8 +446,7 @@ export interface NexusGenEnums {
     | "sharedWith"
     | "signature"
     | "status"
-    | "tagsFilters"
-    | "template";
+    | "tagsFilters";
   PetitionListViewSearchIn: "CURRENT_FOLDER" | "EVERYWHERE";
   PetitionListViewSortDirection: "ASC" | "DESC";
   PetitionListViewSortField:

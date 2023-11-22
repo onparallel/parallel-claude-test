@@ -586,7 +586,7 @@ function useDownloadConversionReportExcel() {
           {
             key: "total",
             header: intl.formatMessage({
-              id: "petitions.title",
+              id: "generic.root-petitions",
               defaultMessage: "Parallels",
             }),
             width: 12,

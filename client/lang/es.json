@@ -11660,6 +11660,21 @@
     "context": "New template"
   },
   {
+    "term": "page.petitions.no-parallels",
+    "definition": "No tienes ningún parallel todavía. ¡Empieza creando uno nuevo!",
+    "context": "You have no parallels yet. Start by creating one now!"
+  },
+  {
+    "term": "page.petitions.no-results",
+    "definition": "No encontramos parallels con este criterio",
+    "context": "There's no parallels matching your criteria"
+  },
+  {
+    "term": "page.petitions.no-templates",
+    "definition": "No tienes ninguna plantilla todavía. ¡Empieza creando una nueva!",
+    "context": "You have no templates yet. Start by creating one now!"
+  },
+  {
     "term": "page.preview.edit-field",
     "definition": "Editar campo",
     "context": "Edit field"
@@ -12860,39 +12875,14 @@
     "context": "Status"
   },
   {
-    "term": "petitions.no-parallels",
-    "definition": "No tienes ningún parallel todavía. ¡Empieza creando uno nuevo!",
-    "context": "You have no parallels yet. Start by creating one now!"
-  },
-  {
     "term": "petitions.no-reminders-left",
     "definition": "No quedan recodatorios",
     "context": "No reminders left"
   },
   {
-    "term": "petitions.no-results",
-    "definition": "No encontramos parallels con este criterio",
-    "context": "There's no parallels matching your criteria"
-  },
-  {
-    "term": "petitions.no-templates",
-    "definition": "No tienes ninguna plantilla todavía. ¡Empieza creando una nueva!",
-    "context": "You have no templates yet. Start by creating one now!"
-  },
-  {
     "term": "petitions.reminders-not-set",
     "definition": "Sin recordatorios",
     "context": "Not set"
-  },
-  {
-    "term": "petitions.title",
-    "definition": "Parallels",
-    "context": "Parallels"
-  },
-  {
-    "term": "petitions.title-templates",
-    "definition": "Plantillas",
-    "context": "Templates"
   },
   {
     "term": "placeholder-plugin.deleted-field",

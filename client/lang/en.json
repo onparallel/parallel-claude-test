@@ -11660,6 +11660,21 @@
     "context": "New template"
   },
   {
+    "term": "page.petitions.no-parallels",
+    "definition": "You have no parallels yet. Start by creating one now!",
+    "context": "You have no parallels yet. Start by creating one now!"
+  },
+  {
+    "term": "page.petitions.no-results",
+    "definition": "There's no parallels matching your criteria",
+    "context": "There's no parallels matching your criteria"
+  },
+  {
+    "term": "page.petitions.no-templates",
+    "definition": "You have no templates yet. Start by creating one now!",
+    "context": "You have no templates yet. Start by creating one now!"
+  },
+  {
     "term": "page.preview.edit-field",
     "definition": "Edit field",
     "context": "Edit field"
@@ -12860,39 +12875,14 @@
     "context": "Status"
   },
   {
-    "term": "petitions.no-parallels",
-    "definition": "You have no parallels yet. Start by creating one now!",
-    "context": "You have no parallels yet. Start by creating one now!"
-  },
-  {
     "term": "petitions.no-reminders-left",
     "definition": "No reminders left",
     "context": "No reminders left"
   },
   {
-    "term": "petitions.no-results",
-    "definition": "There's no parallels matching your criteria",
-    "context": "There's no parallels matching your criteria"
-  },
-  {
-    "term": "petitions.no-templates",
-    "definition": "You have no templates yet. Start by creating one now!",
-    "context": "You have no templates yet. Start by creating one now!"
-  },
-  {
     "term": "petitions.reminders-not-set",
     "definition": "Not set",
     "context": "Not set"
-  },
-  {
-    "term": "petitions.title",
-    "definition": "Parallels",
-    "context": "Parallels"
-  },
-  {
-    "term": "petitions.title-templates",
-    "definition": "Templates",
-    "context": "Templates"
   },
   {
     "term": "placeholder-plugin.deleted-field",

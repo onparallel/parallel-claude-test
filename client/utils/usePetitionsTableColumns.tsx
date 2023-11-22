@@ -37,6 +37,7 @@ import { useGoToContact } from "./goToContact";
 import { useGoToPetition } from "./goToPetition";
 import { usePetitionSignatureStatusLabels } from "./usePetitionSignatureStatusLabels";
 import { usePetitionStatusLabels } from "./usePetitionStatusLabels";
+import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/template/PetitionTemplateFilter";
 
 type PetitionBase = usePetitionsTableColumns_PetitionBaseFragment;
 type Petition = usePetitionsTableColumns_PetitionBase_Petition_Fragment;
@@ -70,7 +71,7 @@ type PetitionsTableColumns_PetitionTemplateOrFolder = TableColumn<
 export function getPetitionsTableIncludes(columns?: PetitionsTableColumn[]) {
   return {
     includeRecipients: columns ? columns.includes("recipients") : true,
-    includeTemplate: columns ? columns.includes("template") : true,
+    includeTemplate: columns ? columns.includes("fromTemplateId") : true,
     includeStatus: columns ? columns.includes("status") : true,
     includeSignature: columns ? columns.includes("signature") : true,
     includeSharedWith: columns ? columns.includes("sharedWith") : true,
@@ -210,7 +211,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     },
   },
   {
-    key: "template",
+    key: "fromTemplateId",
     label: (intl) =>
       intl.formatMessage({
         id: "component.petitions-table-columns.header-template",
@@ -221,6 +222,8 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       minWidth: "200px",
       whiteSpace: "nowrap",
     },
+    isFilterable: true,
+    Filter: PetitionTemplateFilter,
     CellContent: ({ row }) => {
       if (row.__typename === "Petition") {
         return isDefined(row.fromTemplate) ? (

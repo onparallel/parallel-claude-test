@@ -95,7 +95,7 @@ export const PetitionListViewData = objectType({
         members: [
           "name",
           "recipients",
-          "template",
+          "fromTemplateId",
           "status",
           "signature",
           "sharedWith",

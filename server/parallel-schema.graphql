@@ -3838,6 +3838,7 @@ type PetitionListView {
 
 enum PetitionListViewColumn {
   createdAt
+  fromTemplateId
   lastActivityAt
   lastRecipientActivityAt
   name
@@ -3848,7 +3849,6 @@ enum PetitionListViewColumn {
   signature
   status
   tagsFilters
-  template
 }
 
 type PetitionListViewData {

@@ -457,11 +457,11 @@ function Petitions() {
       title={
         state.type === "PETITION"
           ? intl.formatMessage({
-              id: "petitions.title",
+              id: "generic.root-petitions",
               defaultMessage: "Parallels",
             })
           : intl.formatMessage({
-              id: "petitions.title-templates",
+              id: "generic.root-templates",
               defaultMessage: "Templates",
             })
       }
@@ -612,7 +612,13 @@ function Petitions() {
             pageSize={state.items}
             totalCount={petitions?.totalCount}
             sort={sort}
-            filter={pick(state, ["sharedWith", "status", "tagsFilters", "signature"])}
+            filter={pick(state, [
+              "sharedWith",
+              "status",
+              "tagsFilters",
+              "signature",
+              "fromTemplateId",
+            ])}
             onFilterChange={(key, value) => {
               setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
             }}
@@ -651,7 +657,7 @@ function Petitions() {
                   <Flex flex="1" alignItems="center" justifyContent="center">
                     <Text color="gray.300" fontSize="lg">
                       <FormattedMessage
-                        id="petitions.no-results"
+                        id="page.petitions.no-results"
                         defaultMessage="There's no parallels matching your criteria"
                       />
                     </Text>
@@ -663,12 +669,12 @@ function Petitions() {
                     <Text fontSize="lg">
                       {state.type === "TEMPLATE" ? (
                         <FormattedMessage
-                          id="petitions.no-templates"
+                          id="page.petitions.no-templates"
                           defaultMessage="You have no templates yet. Start by creating one now!"
                         />
                       ) : (
                         <FormattedMessage
-                          id="petitions.no-parallels"
+                          id="page.petitions.no-parallels"
                           defaultMessage="You have no parallels yet. Start by creating one now!"
                         />
                       )}
