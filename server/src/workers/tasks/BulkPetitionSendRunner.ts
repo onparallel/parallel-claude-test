@@ -201,11 +201,37 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
       } else {
         const rowData: Record<string, any> = {};
         row.eachCell((cell, colNumber) => {
-          rowData[headings[colNumber - 1]] = cell.value;
+          const heading = headings[colNumber - 1];
+          const COMPOSED_ALIAS_REGEX = /^(.+)\[([0-9]+)\]\.(.+)$/; // e.g. "family_members[0].first_name"
+          if (cell && cell.value !== "") {
+            const match = heading.match(COMPOSED_ALIAS_REGEX);
+            if (match) {
+              const [, parentAlias, groupIndex, childAlias] = match;
+
+              rowData[parentAlias] ??= [];
+              rowData[parentAlias][parseInt(groupIndex)] = {
+                ...rowData[parentAlias][parseInt(groupIndex)],
+                [childAlias]: cell.value,
+              };
+            } else {
+              rowData[heading] = cell.value;
+            }
+          }
         });
         sendData.push(rowData);
       }
     });
+
+    // if any value in entry is an array, filter it to remove empty values
+    // this way we will not create "empty" FIELD_GROUP replies.
+    // (At least 1 child reply is required for for the parent reply to be created)
+    for (const entry of sendData) {
+      for (const [key, value] of Object.entries(entry)) {
+        if (Array.isArray(value)) {
+          entry[key] = value.filter(isDefined);
+        }
+      }
+    }
 
     return sendData;
   }

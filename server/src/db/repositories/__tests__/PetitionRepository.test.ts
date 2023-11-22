@@ -2113,6 +2113,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [],
         },
         {
@@ -2129,6 +2130,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2164,6 +2166,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2190,6 +2193,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2216,6 +2220,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2242,6 +2247,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2281,6 +2287,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2312,6 +2319,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2343,6 +2351,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2378,6 +2387,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: fieldGroup.id,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2404,6 +2414,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: fieldGroup.id,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2439,6 +2450,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [],
         },
         {
@@ -2455,6 +2467,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2490,6 +2503,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2516,6 +2530,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2542,6 +2557,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2568,6 +2584,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [],
         },
         {
@@ -2584,6 +2601,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [],
         },
         {
@@ -2600,6 +2618,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [],
         },
         {
@@ -2616,6 +2635,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: null,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2651,6 +2671,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: fieldGroup.id,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),
@@ -2677,6 +2698,7 @@ describe("repositories/PetitionRepository", () => {
           optional: false,
           parent_petition_field_id: fieldGroup.id,
           alias: null,
+          multiple: true,
           replies: [
             {
               id: expect.any(Number),

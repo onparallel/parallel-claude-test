@@ -1,7 +1,7 @@
 import Excel from "exceljs";
 import { isDefined, partition, sortBy } from "remeda";
 import { Readable } from "stream";
-import { PetitionField, PetitionFieldReply } from "../../db/__types";
+import { PetitionField, PetitionFieldReply, PetitionFieldType } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { Maybe } from "../../util/types";
@@ -72,17 +72,26 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           "created-at": petition.created_at,
         };
 
-        function replyContent(r: Pick<PetitionFieldReply, "content" | "type">) {
+        function replyContent(r: { content: any; type: PetitionFieldType; escapeCommas: boolean }) {
+          function valueMap(value: any) {
+            // escape commas on every reply to distinguish between multiple replies
+            if (r.escapeCommas && typeof value === "string") {
+              return value.replaceAll(",", "\\,");
+            }
+            return value;
+          }
+
           switch (r.type) {
             case "CHECKBOX":
-              return (r.content.value as string[]).join(" ");
+              return (r.content.value as string[]).map(valueMap).join(",");
             case "DYNAMIC_SELECT":
               return (r.content.value as string[][])
                 .map((value) => value[1])
                 .filter(isDefined)
-                .join(" ");
+                .map(valueMap)
+                .join(",");
             default:
-              return r.content.value as string;
+              return valueMap(r.content.value);
           }
         }
 
@@ -95,6 +104,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
             | "title"
             | "parent_petition_field_id"
             | "alias"
+            | "multiple"
           > & {
             reply_group_index?: number;
           },
@@ -129,7 +139,18 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           }
 
           row[columnId] = !isFileTypeField(field.type)
-            ? replies.map((r) => replyContent({ ...r, type: field.type })).join("; ")
+            ? replies
+                .map((r) =>
+                  replyContent({
+                    content: r.content,
+                    type: field.type,
+                    escapeCommas:
+                      field.multiple ||
+                      field.type === "CHECKBOX" ||
+                      field.type === "DYNAMIC_SELECT",
+                  }),
+                )
+                .join(",")
             : replies.length > 0
               ? replies.length === 1
                 ? "1 file"

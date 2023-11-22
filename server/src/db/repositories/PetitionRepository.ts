@@ -2597,6 +2597,7 @@ export class PetitionRepository extends BaseRepository {
           | "optional"
           | "parent_petition_field_id"
           | "alias"
+          | "multiple"
         > & {
           replies: Pick<
             PetitionFieldReply,
@@ -2625,6 +2626,7 @@ export class PetitionRepository extends BaseRepository {
           pf.optional,
           pf.parent_petition_field_id,
           pf.alias,
+          pf.multiple,
           coalesce( -- jsonb_agg filter (where ...) will return null if no rows match
             case when count(*) filter (where pfr.id is not null) > 0 then
               jsonb_agg(
@@ -6913,7 +6915,10 @@ export class PetitionRepository extends BaseRepository {
 
   private async parsePrefillReplies(
     prefill: Record<string, any>,
-    fields: Pick<PetitionField, "id" | "type" | "alias" | "options" | "parent_petition_field_id">[],
+    fields: Pick<
+      PetitionField,
+      "id" | "type" | "alias" | "options" | "parent_petition_field_id" | "multiple"
+    >[],
     parentFieldId: number | null = null,
   ) {
     const entries = Object.entries(prefill);
@@ -6937,7 +6942,8 @@ export class PetitionRepository extends BaseRepository {
       }
 
       const fieldReplies = unMaybeArray(
-        typeof value === "string"
+        (field.multiple || field.type === "CHECKBOX" || field.type === "DYNAMIC_SELECT") &&
+          typeof value === "string"
           ? // allow multiple replies on a single string, like "Option1,Option2,Option4"
             // If reply contains a comma, it must be escaped.
             // e.g.: "Yes\,i want to...,No\, i don't want to..." will be split as: ["Yes, i want to...", "No, i don't want to..."]
