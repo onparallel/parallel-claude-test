@@ -10,6 +10,7 @@ import {
   ResourceType,
   RunInstancesCommand,
   Tenancy,
+  _InstanceType,
 } from "@aws-sdk/client-ec2";
 import chalk from "chalk";
 import pMap from "p-map";
@@ -19,17 +20,19 @@ import { run } from "./utils/run";
 import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
 import { wait, waitFor } from "./utils/wait";
 
+type Environment = "staging" | "production";
+
 const INSTANCE_TYPES = {
   production: "t2.large",
   staging: "t2.medium",
-};
+} satisfies Record<Environment, _InstanceType>;
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-0efd07b5b1e1d0a24";
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
 const SECURITY_GROUP_IDS = {
   production: ["sg-078abc8a772035e7a"],
   staging: ["sg-083d7b4facd31a090"],
-};
+} satisfies Record<Environment, string[]>;
 const REGION = "eu-central-1";
 const ENHANCED_MONITORING = true;
 const HOME_DIR = "/home/ec2-user";
@@ -51,7 +54,7 @@ const NUM_INSTANCES = {
 const ec2 = new EC2Client({});
 
 async function main() {
-  const { commit: _commit, env: _env } = await yargs
+  const { commit: _commit, env } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
     .option("commit", {
       required: true,
@@ -60,12 +63,11 @@ async function main() {
     })
     .option("env", {
       required: true,
-      choices: ["staging", "production"],
+      choices: ["staging", "production"] satisfies Environment[],
       description: "The environment for the build",
     }).argv;
 
   const commit = _commit.slice(0, 7);
-  const env = _env as "production" | "staging";
   const image = await ec2
     .send(
       new DescribeImagesCommand({

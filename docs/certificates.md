@@ -1,6 +1,6 @@
 Certificates are managed with Letsencrypt certbot.
 
-The certificates for \*.onparallel.com are use the dns challenge instead of the http challenge. This challenge requires the following script `bin/src/manual-renewal-hook.ts` which handles the creation and cleanup of the necessary dns records.
+The certificates for \*.onparallel.com are use the dns challenge instead of the http challenge. This challenge requires the following script `bin/src/manual-renewal-hook.ts` which handles the creation and cleanup of the necessary dns records. A specific hosted zone was created on `_acme-challenge.onparallel.com` to limit the permission of dns record changes to that specific zone.
 
 Certbot logs are stored in `/var/log/letsencrypt/letsencrypt.log`. Check with the command
 

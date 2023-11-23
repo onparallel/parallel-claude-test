@@ -7,7 +7,7 @@ import { run } from "../utils/run";
 
 const API_KEY = process.env.API_KEY;
 
-const TEMPLATE_IDS = ["zas25KHxAByKXBamSGb"];
+const TEMPLATE_IDS = ["zas25KHxAByKXKSsb6Q"];
 
 async function request(
   path: string,

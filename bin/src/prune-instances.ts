@@ -12,6 +12,8 @@ import chalk from "chalk";
 import yargs from "yargs";
 import { run } from "./utils/run";
 
+type Environment = "staging" | "production";
+
 const ec2 = new EC2Client({});
 const elb = new ElasticLoadBalancingClient({});
 
@@ -24,7 +26,7 @@ async function main() {
     })
     .option("env", {
       required: true,
-      choices: ["staging", "production"],
+      choices: ["staging", "production"] satisfies Environment[],
       description: "The environment for the build",
     }).argv;
 

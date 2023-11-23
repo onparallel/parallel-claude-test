@@ -7,6 +7,8 @@ import { token } from "./utils/token";
 
 const WORK_DIR = "/home/ec2-user";
 
+type Environment = "staging" | "production";
+
 async function main() {
   const { commit: _commit, env } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
@@ -17,7 +19,7 @@ async function main() {
     })
     .option("env", {
       required: true,
-      choices: ["staging", "production"],
+      choices: ["staging", "production"] satisfies Environment[],
       description: "The environment for the build",
     }).argv;
 

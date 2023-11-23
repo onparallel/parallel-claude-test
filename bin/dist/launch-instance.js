@@ -40,7 +40,7 @@ const NUM_INSTANCES = {
 };
 const ec2 = new client_ec2_1.EC2Client({});
 async function main() {
-    const { commit: _commit, env: _env } = await yargs_1.default
+    const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
         required: true,
@@ -53,7 +53,6 @@ async function main() {
         description: "The environment for the build",
     }).argv;
     const commit = _commit.slice(0, 7);
-    const env = _env;
     const image = await ec2
         .send(new client_ec2_1.DescribeImagesCommand({
         ImageIds: [IMAGE_ID],

@@ -11,8 +11,8 @@ const run_1 = require("../utils/run");
  * of the replies to the petition
  */
 const API_KEY = process.env.API_KEY;
-const TEMPLATE_ID = "zas25KHxAByKWu6SFLA";
-const TEMPLATE_FIELD_ID = "FDXxUofV6Q2DPnQMZxXw7FYfeJy5F";
+const TEMPLATE_ID = "zas25KHxAByKXBfqRXS";
+const TEMPLATE_FIELD_ID = "FDXxUofV6Q2DPnQMZxXwAFcfqTgoK";
 async function request(path, { query, method = "GET", body, }) {
     const res = await (0, node_fetch_1.default)(`https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${query && query.size > 0 ? `?${query}` : ""}`, {
         method,
@@ -36,7 +36,7 @@ async function main() {
     });
     for (const petition of petitions.items) {
         const field = petition.fields.find((f) => f.fromPetitionFieldId === TEMPLATE_FIELD_ID);
-        const replies = (_c = (_b = (_a = field.replies) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.content) === null || _c === void 0 ? void 0 : _c.map((r) => r.replace(/ - .*/, ""));
+        const replies = (_c = (_b = (_a = field.replies) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.content) === null || _c === void 0 ? void 0 : _c.map((r) => r.replace(/^[\d_]+/, "").replace(/: .*$/, ""));
         if (replies && replies.length > 0) {
             const tags = (0, remeda_1.difference)(replies, petition.tags);
             if (tags.length > 0) {

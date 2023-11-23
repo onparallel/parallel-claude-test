@@ -9,7 +9,7 @@ const run_1 = require("../utils/run");
  * This script closes all petitions coming from the same template
  */
 const API_KEY = process.env.API_KEY;
-const TEMPLATE_IDS = ["zas25KHxAByKWu6SFLA"];
+const TEMPLATE_IDS = ["zas25KHxAByKXKSsb6Q"];
 async function request(path, { query, method = "GET", body, }) {
     const res = await (0, node_fetch_1.default)(`https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${query && query.size > 0 ? `?${query}` : ""}`, {
         method,
@@ -25,13 +25,14 @@ async function main() {
     const petitions = await request("/petitions", {
         query: new URLSearchParams({
             fromTemplateId: TEMPLATE_IDS.join(","),
+            status: "COMPLETED",
             limit: "1000",
         }),
     });
     let i = 0;
     for (const petition of petitions.items) {
         if (petition.status !== "CLOSED") {
-            console.log(`Closing petition ${petition.id} (${++i}/${petitions.totalCount}))`);
+            console.log(`Closing petition ${petition.id} (${++i}/${petitions.totalCount})`);
             await request(`/petitions/${petition.id}/close`, { method: "POST" });
         }
     }
