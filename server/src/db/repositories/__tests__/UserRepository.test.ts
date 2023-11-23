@@ -66,12 +66,14 @@ describe("UserRepository", () => {
       await mocks.insertUserGroupMembers(denyAllGroup.id, [owner.id]);
 
       const permissions = await usersRepo.loadUserPermissions(owner.id);
-      expect(permissions).toEqual(difference(UserGroupPermissionNameValues, ["SUPERADMIN"]));
+      expect(permissions).toIncludeSameMembers(
+        difference(UserGroupPermissionNameValues, ["SUPERADMIN"]),
+      );
     });
 
     it("any user in the org should have these permissions", async () => {
       const permissions = await usersRepo.loadUserPermissions(user.id);
-      expect(permissions).toEqual([
+      expect(permissions).toIncludeSameMembers([
         "PETITIONS:CHANGE_PATH",
         "PETITIONS:CREATE_TEMPLATES",
         "INTEGRATIONS:CRUD_API",
@@ -108,7 +110,7 @@ describe("UserRepository", () => {
       await mocks.insertUserGroupMembers(denyProfilesGroup.id, [user.id]);
 
       const permissions = await usersRepo.loadUserPermissions(user.id);
-      expect(permissions).toEqual([
+      expect(permissions).toIncludeSameMembers([
         "PETITIONS:CHANGE_PATH",
         "PETITIONS:CREATE_TEMPLATES",
         "INTEGRATIONS:CRUD_API",
