@@ -8,13 +8,15 @@ The client uses the following libraries:
 - [Chakra UI](https://chakra-ui.com/) as the main UI library
 - [Apollo Client](https://www.apollographql.com/docs/react/) for fetching data from the GraphQl API
 - [react-intl](https://github.com/formatjs/react-intl) for translating the app.
+- [react-select](https://react-select.com/)
+- [react-hook-form](https://react-hook-form.com/)
 
 ### Commands
 
 - `yarn dev`: Runs the client locally with live-reload.
 - `yarn build`: Creates a production build of the next app.
 - `yarn start`: Serves the production build locally.
-- `yarn generate-graphql-types`: Generates the interfaces for all the queries, mutations and fragments used in the client (`graphql/__types.ts`).
+- `yarn generate-graphql-types`: Generates the interfaces for all the queries, mutations and fragments used in the client (`graphql/__types.ts`). It uses [GraphQL Code Generator](https://the-guild.dev/graphql/codegen)
 - `yarn extract-i18n-terms`: Extracts the translation terms into `lang/[locale].json`.
 
 ## Server
@@ -27,6 +29,7 @@ The backend uses the following libraries:
 - [Dataloader](https://github.com/graphql/dataloader) for avoiding the N + 1 query problem with GraphQL.
 
 As external dependencies, the backend uses:
+
 - [Ghostscript](https://ghostscript.com/)
 - [ImageMagick](https://imagemagick.org/)
 - [Exiftool](https://exiftool.org/)
@@ -38,6 +41,7 @@ You can install this dependencies via brew:
 `brew install ghostscript imagemagick exiftool qpdf`
 
 On dev environment, we use [Ngrok](https://ngrok.com/) to launch a local tunnel in order to:
+
 - Receive webhook events from different integrations (Signaturit, Docusign, Bankflip, ...)
 - Receive custom emails from AWS Cognito (SignUp, ResendCode, AdminCreateUser, ForgotPassword). After launching ngrok, you will need to configure the https localtunnel url on AWS Lambda function "cognito-custom-messages-development" as an environment variable.
 
