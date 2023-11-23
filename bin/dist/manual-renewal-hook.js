@@ -19,7 +19,7 @@ const remeda_1 = require("remeda");
 const run_1 = require("./utils/run");
 const wait_1 = require("./utils/wait");
 const ZONE_MAP = {
-    "onparallel.com": "Z0656942RU9E747YU795",
+    "onparallel.com": "Z02973211MQQN7F0EL8OY",
 };
 const route53 = new client_route_53_1.Route53Client({});
 async function main() {

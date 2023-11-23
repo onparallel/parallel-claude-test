@@ -24,7 +24,7 @@ import { run } from "./utils/run";
 import { waitFor } from "./utils/wait";
 
 const ZONE_MAP: Record<string, string> = {
-  "onparallel.com": "Z0656942RU9E747YU795",
+  "onparallel.com": "Z02973211MQQN7F0EL8OY",
 };
 
 const route53 = new Route53Client({});
