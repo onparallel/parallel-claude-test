@@ -88,7 +88,7 @@ function ConfirmDeactivateUserDialog({
           />
         ) : (
           <FormattedMessage
-            id="organization-users.deactivate"
+            id="component.confirm-deactivate-user-dialog.deactivate-users"
             defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
             values={{ count: users!.length }}
           />

@@ -3163,6 +3163,7 @@ export interface PetitionListView {
 
 export type PetitionListViewColumn =
   | "createdAt"
+  | "fromTemplateId"
   | "lastActivityAt"
   | "lastRecipientActivityAt"
   | "name"
@@ -3172,8 +3173,7 @@ export type PetitionListViewColumn =
   | "sharedWith"
   | "signature"
   | "status"
-  | "tagsFilters"
-  | "template";
+  | "tagsFilters";
 
 export interface PetitionListViewData {
   __typename?: "PetitionListViewData";
@@ -25425,9 +25425,11 @@ export type OrganizationUsers_UserFragment = {
   userGroups: Array<{
     __typename?: "UserGroup";
     id: string;
+    imMember: boolean;
+    hasPermissions: boolean;
     name: string;
-    memberCount: number;
     localizableName: { [locale in UserLocale]?: string };
+    memberCount: number;
     type: UserGroupType;
   }>;
 };
@@ -25457,9 +25459,11 @@ export type OrganizationUsers_inviteUserToOrganizationMutation = {
     userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
+      imMember: boolean;
+      hasPermissions: boolean;
       name: string;
-      memberCount: number;
       localizableName: { [locale in UserLocale]?: string };
+      memberCount: number;
       type: UserGroupType;
     }>;
   };
@@ -25487,9 +25491,11 @@ export type OrganizationUsers_updateUserGroupMembershipMutation = {
     userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
+      imMember: boolean;
+      hasPermissions: boolean;
       name: string;
-      memberCount: number;
       localizableName: { [locale in UserLocale]?: string };
+      memberCount: number;
       type: UserGroupType;
     }>;
   };
@@ -25602,9 +25608,11 @@ export type OrganizationUsers_orgUsersQuery = {
           userGroups: Array<{
             __typename?: "UserGroup";
             id: string;
+            imMember: boolean;
+            hasPermissions: boolean;
             name: string;
-            memberCount: number;
             localizableName: { [locale in UserLocale]?: string };
+            memberCount: number;
             type: UserGroupType;
           }>;
         }>;
@@ -45865,6 +45873,13 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     lastActiveAt
     status
     isSsoUser
+    userGroups {
+      id
+      imMember
+      hasPermissions
+      name
+      localizableName
+    }
     ...useCreateOrUpdateUserDialog_User
     ...useConfirmDeactivateUserDialog_User
   }

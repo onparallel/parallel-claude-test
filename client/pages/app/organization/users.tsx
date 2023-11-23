@@ -1,16 +1,20 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Heading, Text, Tooltip, useToast } from "@chakra-ui/react";
+import { Badge, Flex, Heading, Stack, Text, Tooltip, useToast } from "@chakra-ui/react";
 import {
   AlertCircleFilledIcon,
   ArrowUpRightIcon,
   ForbiddenIcon,
+  KeyIcon,
   LogInIcon,
   UserCheckIcon,
   UserXIcon,
+  UsersIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -36,6 +40,7 @@ import {
   OrganizationUsers_userDocument,
   UserStatus,
 } from "@parallel/graphql/__types";
+import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
@@ -183,12 +188,12 @@ function OrganizationUsers() {
       });
       toast({
         title: intl.formatMessage({
-          id: "organization.user-created-success.toast-title",
+          id: "page.users.user-created-success-toast-title",
           defaultMessage: "User created successfully.",
         }),
         description: intl.formatMessage(
           {
-            id: "organization.user-created-success.toast-description",
+            id: "page.users.user-created-success-toast-description",
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
@@ -205,11 +210,11 @@ function OrganizationUsers() {
         toast({
           status: "info",
           title: intl.formatMessage({
-            id: "organization.user-already-registered.toast-title",
+            id: "page.users.user-already-registered-toast-title",
             defaultMessage: "User already registered",
           }),
           description: intl.formatMessage({
-            id: "organization.user-already-registered.toast-description",
+            id: "page.users.user-already-registered-toast-description",
             defaultMessage: "The provided email is already registered on the organization.",
           }),
           isClosable: true,
@@ -218,11 +223,11 @@ function OrganizationUsers() {
         toast({
           status: "error",
           title: intl.formatMessage({
-            id: "organization.user-limit-reached.toast-title",
+            id: "page.users.user-limit-reached-toast-title",
             defaultMessage: "User limit reached",
           }),
           description: intl.formatMessage({
-            id: "organization.user-limit-reached.toast-description",
+            id: "page.users.user-limit-reached-toast-description",
             defaultMessage: "You reached the maximum amount of users you can create.",
           }),
           isClosable: true,
@@ -275,7 +280,7 @@ function OrganizationUsers() {
         });
         toast({
           title: intl.formatMessage({
-            id: "organization.parallels-transfer-success.toast-title",
+            id: "page.users.parallels-transfer-success-toast-title",
             defaultMessage: "Parallels transferred successfully.",
           }),
           status: "success",
@@ -295,7 +300,7 @@ function OrganizationUsers() {
         });
         toast({
           title: intl.formatMessage({
-            id: "organization.user-updated-success.toast-title",
+            id: "page.users.user-updated-success-toast-title",
             defaultMessage: "User updated successfully.",
           }),
           status: "success",
@@ -346,7 +351,7 @@ function OrganizationUsers() {
           defaultMessage: "Success",
         }),
         description: intl.formatMessage({
-          id: "organization.user-updated-success.toast-title",
+          id: "page.users.user-updated-success-toast-title",
           defaultMessage: "User updated successfully.",
         }),
         status: "success",
@@ -367,12 +372,12 @@ function OrganizationUsers() {
 
       toast({
         title: intl.formatMessage({
-          id: "organization.user-invitation-sent.toast-title",
+          id: "page.users.user-invitation-sent-toast-title",
           defaultMessage: "Invitation sent",
         }),
         description: intl.formatMessage(
           {
-            id: "organization.user-created-success.toast-description",
+            id: "page.users.user-created-success-toast-description",
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
@@ -388,12 +393,12 @@ function OrganizationUsers() {
       } else if (isApolloError(error, "RESET_USER_PASSWORD_TIME_RESTRICTION")) {
         toast({
           title: intl.formatMessage({
-            id: "organization.user-invitation-sent-error.toast-title",
+            id: "page.users.user-invitation-sent-error-toast-title",
             defaultMessage: "Invitation already sent",
           }),
           description: intl.formatMessage(
             {
-              id: "organization.user-invitation-sent-error.toast-description",
+              id: "page.users.user-invitation-sent-error-toast-description",
               defaultMessage: "An invitation has been sent to {email} recently, try again later.",
             },
             { email: selectedRows[0].email },
@@ -405,11 +410,11 @@ function OrganizationUsers() {
       } else if (isApolloError(error, "RESET_USER_PASSWORD_STATUS_ERROR")) {
         toast({
           title: intl.formatMessage({
-            id: "organization.user-invitation-not-sent-error.toast-title",
+            id: "page.users.user-invitation-not-sent-error-toast-title",
             defaultMessage: "Invitation not sent",
           }),
           description: intl.formatMessage({
-            id: "organization.user-invitation-status-error.toast-description",
+            id: "page.users.user-invitation-status-error-toast-description",
             defaultMessage:
               "It seems the user has already logged in. There is no need to resend the invitation.",
           }),
@@ -420,11 +425,11 @@ function OrganizationUsers() {
       } else if (isApolloError(error, "RESET_USER_PASSWORD_INACTIVE_ERROR")) {
         toast({
           title: intl.formatMessage({
-            id: "organization.user-invitation-not-sent-error.toast-title",
+            id: "page.users.user-invitation-not-sent-error-toast-title",
             defaultMessage: "Invitation not sent",
           }),
           description: intl.formatMessage({
-            id: "organization.user-invitation-inactive-error.toast-description",
+            id: "page.users.user-invitation-inactive-error-toast-description",
             defaultMessage: "The selected user is inactive. Refresh your browser and try again.",
           }),
           status: "error",
@@ -434,11 +439,11 @@ function OrganizationUsers() {
       } else if (isApolloError(error, "RESET_USER_PASSWORD_SSO_ERROR")) {
         toast({
           title: intl.formatMessage({
-            id: "organization.user-invitation-not-sent-error.toast-title",
+            id: "page.users.user-invitation-not-sent-error-toast-title",
             defaultMessage: "Invitation not sent",
           }),
           description: intl.formatMessage({
-            id: "organization.user-invitation-sso-error.toast-description",
+            id: "page.users.user-invitation-sso-error-toast-description",
             defaultMessage: "We can't resend the invitation to SSO users.",
           }),
           status: "error",
@@ -462,7 +467,7 @@ function OrganizationUsers() {
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
-            id: "organization-users.update-user-status.error.deactivate-owner-user",
+            id: "page.users.error-deactivate-owner-user",
             defaultMessage:
               "You can't deactivate the owner. Please, remove it from the selection and try again.",
           }),
@@ -472,7 +477,7 @@ function OrganizationUsers() {
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
-            id: "organization-users.update-user-status.error.deactivate-own-user",
+            id: "page.users.error-deactivate-own-user",
             defaultMessage:
               "You can't deactivate your own user. Please, remove it from the selection and try again.",
           }),
@@ -483,7 +488,7 @@ function OrganizationUsers() {
         showErrorDialog({
           message: intl.formatMessage(
             {
-              id: "organization-users.update-user-status.error.update-sso-user",
+              id: "page.users.error-update-sso-user",
               defaultMessage:
                 "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider.",
             },
@@ -504,14 +509,14 @@ function OrganizationUsers() {
   return (
     <OrganizationSettingsLayout
       title={intl.formatMessage({
-        id: "organization.users.title",
+        id: "page.users.title",
         defaultMessage: "Users",
       })}
       me={me}
       realMe={realMe}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="organization.users.title" defaultMessage="Users" />
+          <FormattedMessage id="page.users.title" defaultMessage="Users" />
         </Heading>
       }
     >
@@ -547,7 +552,7 @@ function OrganizationUsers() {
                     leftIcon: <UserCheckIcon />,
                     children: (
                       <FormattedMessage
-                        id="organization-users.activate"
+                        id="page.users.activate-users"
                         defaultMessage="Activate {count, plural, =1{user} other {users}}"
                         values={{ count: selectedRows.length }}
                       />
@@ -562,7 +567,7 @@ function OrganizationUsers() {
                     leftIcon: <UserXIcon />,
                     children: (
                       <FormattedMessage
-                        id="organization-users.deactivate"
+                        id="page.users.deactivate-users"
                         defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
                         values={{ count: selectedRows.length }}
                       />
@@ -580,7 +585,7 @@ function OrganizationUsers() {
                           leftIcon: <LogInIcon />,
                           children: (
                             <FormattedMessage
-                              id="organization-users.login-as"
+                              id="page.users.login-as"
                               defaultMessage="Login as..."
                             />
                           ),
@@ -599,7 +604,7 @@ function OrganizationUsers() {
                           leftIcon: <ArrowUpRightIcon />,
                           children: (
                             <FormattedMessage
-                              id="organization-users.resend-invitation"
+                              id="page.users.resend-invitation"
                               defaultMessage="Resend invitation"
                             />
                           ),
@@ -696,7 +701,7 @@ function useOrganizationUsersTableColumns() {
         key: "fullName",
         isSortable: true,
         label: intl.formatMessage({
-          id: "organization-users.header.name",
+          id: "page.users.table-name-label",
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
@@ -714,14 +719,14 @@ function useOrganizationUsersTableColumns() {
               {row.status === "INACTIVE" ? (
                 <Tooltip
                   label={intl.formatMessage({
-                    id: "organization-users.header.inactive-user",
+                    id: "page.users.inactive-user",
                     defaultMessage: "Inactive user",
                   })}
                 >
                   <ForbiddenIcon
                     marginLeft={2}
                     aria-label={intl.formatMessage({
-                      id: "organization-users.header.inactive-user",
+                      id: "page.users.inactive-user",
                       defaultMessage: "Inactive user",
                     })}
                   />
@@ -729,7 +734,7 @@ function useOrganizationUsersTableColumns() {
               ) : row.status === "ON_HOLD" ? (
                 <Tooltip
                   label={intl.formatMessage({
-                    id: "organization-users.header.untransferred-parallels",
+                    id: "page.users.untransferred-parallels",
                     defaultMessage: "Untransferred parallels",
                   })}
                 >
@@ -737,7 +742,7 @@ function useOrganizationUsersTableColumns() {
                     color="yellow.500"
                     marginLeft={2}
                     aria-label={intl.formatMessage({
-                      id: "organization-users.header.untransferred-parallels",
+                      id: "page.users.untransferred-parallels",
                       defaultMessage: "Untransferred parallels",
                     })}
                   />
@@ -753,10 +758,91 @@ function useOrganizationUsersTableColumns() {
         },
       },
       {
+        key: "teams",
+        label: intl.formatMessage({
+          id: "page.users.table-teams-label",
+          defaultMessage: "Teams",
+        }),
+        CellContent: ({ row }) => {
+          return (
+            <EnumerateList
+              values={row.userGroups
+                .filter((userGroup) => userGroup.imMember)
+                .sort((a, b) => {
+                  // type === ALL_USER always goes last
+                  if (a.type === "ALL_USERS" && b.type !== "ALL_USERS") {
+                    return 1;
+                  }
+                  if (a.type !== "ALL_USERS" && b.type === "ALL_USERS") {
+                    return -1;
+                  }
+
+                  // groups with permissions show first
+                  if (a.hasPermissions && !b.hasPermissions) {
+                    return -1;
+                  }
+                  if (!a.hasPermissions && b.hasPermissions) {
+                    return 1;
+                  }
+
+                  // then sort by name
+                  if (a.name && b.name) {
+                    return a.name.localeCompare(b.name);
+                  }
+
+                  // if all is the same it doesn't matter the order
+                  return 0;
+                })}
+              maxItems={2}
+              renderItem={({ value }, index) => {
+                return (
+                  <Text key={index} as="span" whiteSpace="nowrap">
+                    {value.hasPermissions ? <KeyIcon marginRight={1} marginBottom={0.5} /> : null}
+                    <LocalizableUserTextRender value={value.localizableName} default={value.name} />
+                  </Text>
+                );
+              }}
+              renderOther={({ children, remaining }) => {
+                return (
+                  <SmallPopover
+                    id="other-groups"
+                    width="auto"
+                    content={
+                      <Stack width="auto" spacing={1}>
+                        {remaining
+                          .sort((a, b) => (a.name && b.name ? a.name.localeCompare(b.name) : 1))
+                          .map((userGroup, index) => {
+                            return (
+                              <Text key={index} as="span" whiteSpace="nowrap">
+                                {userGroup.hasPermissions ? (
+                                  <KeyIcon marginRight={1} marginBottom={0.5} />
+                                ) : (
+                                  <UsersIcon marginRight={1} marginBottom={0.5} />
+                                )}
+                                <LocalizableUserTextRender
+                                  value={userGroup.localizableName}
+                                  default={userGroup.name}
+                                />
+                              </Text>
+                            );
+                          })}
+                      </Stack>
+                    }
+                    placement="bottom"
+                  >
+                    <Text as="span">{children}</Text>
+                  </SmallPopover>
+                );
+              }}
+            />
+          );
+        },
+      },
+      {
         key: "email",
         isSortable: true,
         label: intl.formatMessage({
-          id: "organization-users.header.user-email",
+          id: "page.users.table-user-email-label",
           defaultMessage: "Email",
         }),
         CellContent: ({ row }) => (
@@ -827,6 +913,13 @@ OrganizationUsers.fragments = {
         lastActiveAt
         status
         isSsoUser
+        userGroups {
+          id
+          imMember
+          hasPermissions
+          name
+          localizableName
+        }
         ...useCreateOrUpdateUserDialog_User
         ...useConfirmDeactivateUserDialog_User
       }

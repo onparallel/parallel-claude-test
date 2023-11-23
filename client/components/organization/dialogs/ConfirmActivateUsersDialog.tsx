@@ -8,14 +8,14 @@ function ConfirmActivateUsersDialog({ count, ...props }: DialogProps<{ count: nu
     <ConfirmDialog
       header={
         <FormattedMessage
-          id="organization-users.activate"
+          id="component.confirm-activate-user-dialog.activate-users"
           defaultMessage="Activate {count, plural, =1{user} other {users}}"
           values={{ count }}
         />
       }
       body={
         <FormattedMessage
-          id="organization.confirm-activate-user-dialog.body"
+          id="component.confirm-activate-user-dialog.body"
           defaultMessage="Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
           values={{ count }}
         />
@@ -23,7 +23,7 @@ function ConfirmActivateUsersDialog({ count, ...props }: DialogProps<{ count: nu
       confirm={
         <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="organization-users.activate"
+            id="component.confirm-activate-user-dialog.activate-users"
             defaultMessage="Activate {count, plural, =1{user} other {users}}"
             values={{ count }}
           />

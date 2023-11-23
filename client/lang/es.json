@@ -660,6 +660,16 @@
     "context": "The following contacts opted out from receiving reminders and any changes will not apply to them:"
   },
   {
+    "term": "component.confirm-activate-user-dialog.activate-users",
+    "definition": "Activar {count, plural, =1{usuario} other {usuarios}}",
+    "context": "Activate {count, plural, =1{user} other {users}}"
+  },
+  {
+    "term": "component.confirm-activate-user-dialog.body",
+    "definition": "Estás seguro que quieres <b>activar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
+    "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
+  },
+  {
     "term": "component.confirm-comment-mention-and-share-dialog.body",
     "definition": "Los siguientes {entries} no podrán ver tu {isNote, select, true{nota} other{comentario}} porque no tienen acceso al parallel:",
     "context": "The following {entries} won't be able to see your {isNote, select, true{note} other{comment}} because the parallel is not shared with them:"
@@ -743,6 +753,11 @@
     "term": "component.confirm-deactivate-event-subscription-dialog.warning",
     "definition": "Cualquier aplicación o script utilizando esta suscripción dejarán de recibir notificaciones de eventos de Parallel.",
     "context": "Any applications or scripts using this event subscription will no longer receive event notifications from Parallel."
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.deactivate-users",
+    "definition": "Desactivar {count, plural, =1{usuario} other {usuarios}}",
+    "context": "Deactivate {count, plural, =1{user} other {users}}"
   },
   {
     "term": "component.confirm-deactivate-user-dialog.include-drafts",
@@ -10395,69 +10410,14 @@
     "context": "out of"
   },
   {
-    "term": "organization-users.activate",
-    "definition": "Activar {count, plural, =1{usuario} other {usuarios}}",
-    "context": "Activate {count, plural, =1{user} other {users}}"
-  },
-  {
-    "term": "organization-users.deactivate",
-    "definition": "Desactivar {count, plural, =1{usuario} other {usuarios}}",
-    "context": "Deactivate {count, plural, =1{user} other {users}}"
-  },
-  {
     "term": "organization-users.header.id",
     "definition": "ID",
     "context": "ID"
   },
   {
-    "term": "organization-users.header.inactive-user",
-    "definition": "Usuario inactivo",
-    "context": "Inactive user"
-  },
-  {
-    "term": "organization-users.header.name",
-    "definition": "Nombre",
-    "context": "Name"
-  },
-  {
-    "term": "organization-users.header.untransferred-parallels",
-    "definition": "Parallels sin transferir",
-    "context": "Untransferred parallels"
-  },
-  {
-    "term": "organization-users.header.user-email",
-    "definition": "Email",
-    "context": "Email"
-  },
-  {
     "term": "organization-users.invite-user.add-in",
     "definition": "Añadir a (opcional)",
     "context": "Add to (optional)"
-  },
-  {
-    "term": "organization-users.login-as",
-    "definition": "Acceder como...",
-    "context": "Login as..."
-  },
-  {
-    "term": "organization-users.resend-invitation",
-    "definition": "Reenviar invitación",
-    "context": "Resend invitation"
-  },
-  {
-    "term": "organization-users.update-user-status.error.deactivate-own-user",
-    "definition": "No puedes desactivar a tu propio usuario. Por favor, quítalo de la selección e inténtalo nuevamente.",
-    "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
-  },
-  {
-    "term": "organization-users.update-user-status.error.deactivate-owner-user",
-    "definition": "No puedes desactivar al propietario. Por favor, quítalo de la selección e inténtalo nuevamente.",
-    "context": "You can't deactivate the owner. Please, remove it from the selection and try again."
-  },
-  {
-    "term": "organization-users.update-user-status.error.update-sso-user",
-    "definition": "{count, plural, =1{El usuario seleccionado es administrado} other{Algunos de los usuarios seleccionados son administrados}} por un proveedor de SSO. Por favor, actualiza el estado directamente en el proveedor.",
-    "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."
   },
   {
     "term": "organization.branding.brand",
@@ -10533,11 +10493,6 @@
     "term": "organization.compliance.title",
     "definition": "Compliance",
     "context": "Compliance"
-  },
-  {
-    "term": "organization.confirm-activate-user-dialog.body",
-    "definition": "Estás seguro que quieres <b>activar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
-    "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
   },
   {
     "term": "organization.confirm-deactivate-user-dialog.body",
@@ -10680,11 +10635,6 @@
     "context": "Organization created successfully."
   },
   {
-    "term": "organization.parallels-transfer-success.toast-title",
-    "definition": "Parallels transferidos con éxito.",
-    "context": "Parallels transferred successfully."
-  },
-  {
     "term": "organization.profiles.profile-types",
     "definition": "Tipos de perfil",
     "context": "Profile types"
@@ -10713,81 +10663,6 @@
     "term": "organization.usage.title",
     "definition": "Uso",
     "context": "Usage"
-  },
-  {
-    "term": "organization.user-already-registered.toast-description",
-    "definition": "El email ya se encuentra registrado en la organización.",
-    "context": "The provided email is already registered on the organization."
-  },
-  {
-    "term": "organization.user-already-registered.toast-title",
-    "definition": "Usuario ya registrado",
-    "context": "User already registered"
-  },
-  {
-    "term": "organization.user-created-success.toast-description",
-    "definition": "Hemos enviado un email a {email} con instrucciones para registrarse en Parallel.",
-    "context": "We have sent an email to {email} with instructions to register in Parallel."
-  },
-  {
-    "term": "organization.user-created-success.toast-title",
-    "definition": "Usuario creado con éxito.",
-    "context": "User created successfully."
-  },
-  {
-    "term": "organization.user-invitation-inactive-error.toast-description",
-    "definition": "El usuario seleccionado está inactivo. Refresca tu navegador e intenta nuevamente.",
-    "context": "The selected user is inactive. Refresh your browser and try again."
-  },
-  {
-    "term": "organization.user-invitation-not-sent-error.toast-title",
-    "definition": "La invitación no fue enviada",
-    "context": "Invitation not sent"
-  },
-  {
-    "term": "organization.user-invitation-sent-error.toast-description",
-    "definition": "Se ha enviado una invitación a {email} recientemente, prueba más tarde.",
-    "context": "An invitation has been sent to {email} recently, try again later."
-  },
-  {
-    "term": "organization.user-invitation-sent-error.toast-title",
-    "definition": "Invitación ya enviada",
-    "context": "Invitation already sent"
-  },
-  {
-    "term": "organization.user-invitation-sent.toast-title",
-    "definition": "Invitación enviada",
-    "context": "Invitation sent"
-  },
-  {
-    "term": "organization.user-invitation-sso-error.toast-description",
-    "definition": "No podemos reenviar la invitación a usuarios SSO.",
-    "context": "We can't resend the invitation to SSO users."
-  },
-  {
-    "term": "organization.user-invitation-status-error.toast-description",
-    "definition": "Parece que el usuario ya ha iniciado sesión. No hay necesidad de reenviar la invitación.",
-    "context": "It seems the user has already logged in. There is no need to resend the invitation."
-  },
-  {
-    "term": "organization.user-limit-reached.toast-description",
-    "definition": "Has alcanzado la cantidad máxima de usuarios que puedes crear.",
-    "context": "You reached the maximum amount of users you can create."
-  },
-  {
-    "term": "organization.user-limit-reached.toast-title",
-    "definition": "Límite de usuarios alcanzado",
-    "context": "User limit reached"
-  },
-  {
-    "term": "organization.user-updated-success.toast-title",
-    "definition": "Usuario actualizado con éxito.",
-    "context": "User updated successfully."
-  },
-  {
-    "term": "organization.users.title",
-    "definition": "Usuarios",
-    "context": "Users"
   },
   {
     "term": "organizations.header.organization-name",
@@ -12468,6 +12343,146 @@
     "term": "page.usage.users",
     "definition": "Usuarios",
     "context": "Users"
+  },
+  {
+    "term": "page.users.activate-users",
+    "definition": "Activar {count, plural, =1{usuario} other {usuarios}}",
+    "context": "Activate {count, plural, =1{user} other {users}}"
+  },
+  {
+    "term": "page.users.deactivate-users",
+    "definition": "Desactivar {count, plural, =1{usuario} other {usuarios}}",
+    "context": "Deactivate {count, plural, =1{user} other {users}}"
+  },
+  {
+    "term": "page.users.error-deactivate-own-user",
+    "definition": "No puedes desactivar a tu propio usuario. Por favor, quítalo de la selección e inténtalo nuevamente.",
+    "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
+  },
+  {
+    "term": "page.users.error-deactivate-owner-user",
+    "definition": "No puedes desactivar al propietario. Por favor, quítalo de la selección e inténtalo nuevamente.",
+    "context": "You can't deactivate the owner. Please, remove it from the selection and try again."
+  },
+  {
+    "term": "page.users.error-update-sso-user",
+    "definition": "{count, plural, =1{El usuario seleccionado es administrado} other{Algunos de los usuarios seleccionados son administrados}} por un proveedor de SSO. Por favor, actualiza el estado directamente en el proveedor.",
+    "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."
+  },
+  {
+    "term": "page.users.inactive-user",
+    "definition": "Usuario inactivo",
+    "context": "Inactive user"
+  },
+  {
+    "term": "page.users.login-as",
+    "definition": "Acceder como...",
+    "context": "Login as..."
+  },
+  {
+    "term": "page.users.parallels-transfer-success-toast-title",
+    "definition": "Parallels transferidos con éxito.",
+    "context": "Parallels transferred successfully."
+  },
+  {
+    "term": "page.users.resend-invitation",
+    "definition": "Reenviar invitación",
+    "context": "Resend invitation"
+  },
+  {
+    "term": "page.users.table-name-label",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "page.users.table-teams-label",
+    "definition": "Equipos",
+    "context": "Teams"
+  },
+  {
+    "term": "page.users.table-user-email-label",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
+    "term": "page.users.title",
+    "definition": "Usuarios",
+    "context": "Users"
+  },
+  {
+    "term": "page.users.untransferred-parallels",
+    "definition": "Parallels sin transferir",
+    "context": "Untransferred parallels"
+  },
+  {
+    "term": "page.users.user-already-registered-toast-description",
+    "definition": "El email ya se encuentra registrado en la organización.",
+    "context": "The provided email is already registered on the organization."
+  },
+  {
+    "term": "page.users.user-already-registered-toast-title",
+    "definition": "Usuario ya registrado",
+    "context": "User already registered"
+  },
+  {
+    "term": "page.users.user-created-success-toast-description",
+    "definition": "Hemos enviado un email a {email} con instrucciones para registrarse en Parallel.",
+    "context": "We have sent an email to {email} with instructions to register in Parallel."
+  },
+  {
+    "term": "page.users.user-created-success-toast-title",
+    "definition": "Usuario creado con éxito.",
+    "context": "User created successfully."
+  },
+  {
+    "term": "page.users.user-invitation-inactive-error-toast-description",
+    "definition": "El usuario seleccionado está inactivo. Refresca tu navegador e intenta nuevamente.",
+    "context": "The selected user is inactive. Refresh your browser and try again."
+  },
+  {
+    "term": "page.users.user-invitation-not-sent-error-toast-title",
+    "definition": "La invitación no fue enviada",
+    "context": "Invitation not sent"
+  },
+  {
+    "term": "page.users.user-invitation-sent-error-toast-description",
+    "definition": "Se ha enviado una invitación a {email} recientemente, prueba más tarde.",
+    "context": "An invitation has been sent to {email} recently, try again later."
+  },
+  {
+    "term": "page.users.user-invitation-sent-error-toast-title",
+    "definition": "Invitación ya enviada",
+    "context": "Invitation already sent"
+  },
+  {
+    "term": "page.users.user-invitation-sent-toast-title",
+    "definition": "Invitación enviada",
+    "context": "Invitation sent"
+  },
+  {
+    "term": "page.users.user-invitation-sso-error-toast-description",
+    "definition": "No podemos reenviar la invitación a usuarios SSO.",
+    "context": "We can't resend the invitation to SSO users."
+  },
+  {
+    "term": "page.users.user-invitation-status-error-toast-description",
+    "definition": "Parece que el usuario ya ha iniciado sesión. No hay necesidad de reenviar la invitación.",
+    "context": "It seems the user has already logged in. There is no need to resend the invitation."
+  },
+  {
+    "term": "page.users.user-limit-reached-toast-description",
+    "definition": "Has alcanzado la cantidad máxima de usuarios que puedes crear.",
+    "context": "You reached the maximum amount of users you can create."
+  },
+  {
+    "term": "page.users.user-limit-reached-toast-title",
+    "definition": "Límite de usuarios alcanzado",
+    "context": "User limit reached"
+  },
+  {
+    "term": "page.users.user-updated-success-toast-title",
+    "definition": "Usuario actualizado con éxito.",
+    "context": "User updated successfully."
   },
   {
     "term": "petition-access.click-here-to-send",

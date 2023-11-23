@@ -101,12 +101,12 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
         duration: 5000,
         status: "success",
         title: intl.formatMessage({
-          id: "organization.user-created-success.toast-title",
+          id: "page.users.user-created-success-toast-title",
           defaultMessage: "User created successfully.",
         }),
         description: intl.formatMessage(
           {
-            id: "organization.user-created-success.toast-description",
+            id: "page.users.user-created-success-toast-description",
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
@@ -122,11 +122,11 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
         toast({
           status: "info",
           title: intl.formatMessage({
-            id: "organization.user-already-registered.toast-title",
+            id: "page.users.user-already-registered-toast-title",
             defaultMessage: "User already registered",
           }),
           description: intl.formatMessage({
-            id: "organization.user-already-registered.toast-description",
+            id: "page.users.user-already-registered-toast-description",
             defaultMessage: "The provided email is already registered on the organization.",
           }),
           isClosable: true,
@@ -216,9 +216,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
                 selectedRows[0].id === me.id ||
                 selectedRows[0].status === "INACTIVE",
               leftIcon: <LogInIcon />,
-              children: (
-                <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
-              ),
+              children: <FormattedMessage id="page.users.login-as" defaultMessage="Login as..." />,
             },
           ]}
           header={
@@ -280,7 +278,7 @@ function useOrganizationMembersTableColumns() {
         key: "fullName",
         isSortable: true,
         label: intl.formatMessage({
-          id: "organization-users.header.name",
+          id: "page.users.table-name-label",
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
@@ -292,7 +290,7 @@ function useOrganizationMembersTableColumns() {
               {row.status === "INACTIVE" ? (
                 <Tooltip
                   label={intl.formatMessage({
-                    id: "organization-users.header.inactive-user",
+                    id: "page.users.inactive-user",
                     defaultMessage: "Inactive user",
                   })}
                 >
@@ -300,7 +298,7 @@ function useOrganizationMembersTableColumns() {
                     marginLeft={2}
                     color="red.300"
                     aria-label={intl.formatMessage({
-                      id: "organization-users.header.inactive-user",
+                      id: "page.users.inactive-user",
                       defaultMessage: "Inactive user",
                     })}
                   />
@@ -319,7 +317,7 @@ function useOrganizationMembersTableColumns() {
         key: "email",
         isSortable: true,
         label: intl.formatMessage({
-          id: "organization-users.header.user-email",
+          id: "page.users.table-user-email-label",
           defaultMessage: "Email",
         }),
         CellContent: ({ row }) => <>{row.email}</>,
