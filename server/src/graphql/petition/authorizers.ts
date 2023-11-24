@@ -678,7 +678,11 @@ export function replyCanBeDeleted<
   return async (_, args, ctx) => {
     const replyId = args[argReplyId] as unknown as number;
 
-    const field = (await ctx.petitions.loadFieldForReply(replyId))!;
+    const field = await ctx.petitions.loadFieldForReply(replyId);
+    if (!isDefined(field)) {
+      return false;
+    }
+
     if (field.type === "FIELD_GROUP" && !field.optional) {
       const replies = await ctx.petitions.loadRepliesForField(field.id);
       if (replies.length === 1 && replies[0].id === replyId) {
