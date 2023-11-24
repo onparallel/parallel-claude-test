@@ -11,6 +11,7 @@ import {
   UsersIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { NormalLink } from "@parallel/components/common/Link";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
@@ -758,11 +759,25 @@ function useOrganizationUsersTableColumns() {
         },
       },
       {
+        key: "email",
+        isSortable: true,
+        label: intl.formatMessage({
+          id: "page.users.table-user-email-label",
+          defaultMessage: "Email",
+        }),
+        CellContent: ({ row }) => (
+          <Text opacity={row.status === "INACTIVE" ? 0.5 : 1}>{row.email}</Text>
+        ),
+      },
+      {
         key: "teams",
         label: intl.formatMessage({
           id: "page.users.table-teams-label",
           defaultMessage: "Teams",
         }),
+        cellProps: {
+          minWidth: "220px",
+        },
         CellContent: ({ row }) => {
           return (
             <EnumerateList
@@ -830,7 +845,7 @@ function useOrganizationUsersTableColumns() {
                     }
                     placement="bottom"
                   >
-                    <Text as="span">{children}</Text>
+                    <NormalLink as="span">{children}</NormalLink>
                   </SmallPopover>
                 );
               }}
@@ -838,17 +853,7 @@ function useOrganizationUsersTableColumns() {
           );
         },
       },
-      {
-        key: "email",
-        isSortable: true,
-        label: intl.formatMessage({
-          id: "page.users.table-user-email-label",
-          defaultMessage: "Email",
-        }),
-        CellContent: ({ row }) => (
-          <Text opacity={row.status === "INACTIVE" ? 0.5 : 1}>{row.email}</Text>
-        ),
-      },
+
       {
         key: "lastActiveAt",
         label: intl.formatMessage({
