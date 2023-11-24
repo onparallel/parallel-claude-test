@@ -475,9 +475,10 @@ function Petitions() {
               <MenuButton
                 as={Button}
                 size="lg"
-                variant="ghost"
+                variant="outline"
                 fontSize="2xl"
-                paddingX={3}
+                paddingX={4}
+                backgroundColor="white"
                 data-action="change-parallel-template"
                 data-testid="petition-type-menu-button"
                 leftIcon={

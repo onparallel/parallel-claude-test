@@ -303,9 +303,10 @@ function Profiles() {
               <MenuButton
                 as={Button}
                 size="lg"
-                variant="ghost"
+                variant="outline"
                 fontSize="2xl"
-                paddingX={3}
+                paddingX={4}
+                backgroundColor="white"
                 data-action="change-profile-type"
                 data-testid="profile-type-menu-button"
                 rightIcon={<ChevronDownIcon boxSize={5} />}
