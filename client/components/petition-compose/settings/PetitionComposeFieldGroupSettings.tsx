@@ -1,4 +1,4 @@
-import { Image, Input, Text } from "@chakra-ui/react";
+import { Input, Text } from "@chakra-ui/react";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
@@ -51,13 +51,6 @@ export function FieldGroupSettings({
               defaultMessage='If you choose "Relative", groups will be labeled “Relative 1”, “Relative 2” and so on. If left unnamed, groups default to “Reply 1”, “Reply 2”, etc.'
             />
           </Text>
-          {/* TODO: Change placeholder image for group name gif */}
-          <Image
-            height="55px"
-            marginTop={2}
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/placeholder.gif`}
-            role="presentation"
-          />
         </>
       }
       controlId="text-group-mame"
