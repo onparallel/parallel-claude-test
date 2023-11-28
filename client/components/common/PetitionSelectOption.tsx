@@ -8,11 +8,21 @@ interface PetitionSelectOptionProps {
   data: PetitionSelectOption_PetitionBaseFragment;
   highlight?: string;
   isDisabled?: boolean;
+  noOfLines?: number;
 }
 
-export function PetitionSelectOption({ data, highlight, isDisabled }: PetitionSelectOptionProps) {
+export function PetitionSelectOption({
+  data,
+  highlight,
+  noOfLines = 1,
+  isDisabled,
+}: PetitionSelectOptionProps) {
   return (
-    <Box verticalAlign="baseline" noOfLines={1} wordBreak="break-all">
+    <Box
+      verticalAlign="baseline"
+      noOfLines={noOfLines}
+      wordBreak={noOfLines > 1 ? "break-word" : "break-all"}
+    >
       {data.name ? (
         <HighlightText search={highlight} as="span">
           {data.name}

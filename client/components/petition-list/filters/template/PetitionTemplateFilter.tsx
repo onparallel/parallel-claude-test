@@ -16,6 +16,7 @@ export function PetitionTemplateFilter({ value, onChange }: TableColumnFilterPro
           const templateIds = v?.map((p) => p.id) ?? [];
           onChange(templateIds);
         }}
+        noOfLines={2}
       />
     </Box>
   );

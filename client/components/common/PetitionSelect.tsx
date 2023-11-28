@@ -92,6 +92,7 @@ export interface PetitionSelectProps<
   isSync?: IsSync;
   defaultOptions?: boolean;
   permissionTypes?: PetitionPermissionType[];
+  noOfLines?: number;
 }
 
 export const PetitionSelect = Object.assign(
@@ -319,7 +320,14 @@ function MultiValueLabel({ children, ...props }: MultiValueGenericProps<Petition
   );
 }
 
-function Option({ children, ...props }: OptionProps<PetitionSelectSelection>) {
+interface ReactSelectExtraProps {
+  noOfLines?: number;
+}
+
+function Option({
+  children,
+  ...props
+}: OptionProps<PetitionSelectSelection> & { selectProps: ReactSelectExtraProps }) {
   return (
     <components.Option
       {...props}
@@ -332,6 +340,7 @@ function Option({ children, ...props }: OptionProps<PetitionSelectSelection>) {
         data={props.data}
         highlight={props.selectProps.inputValue}
         isDisabled={props.isDisabled}
+        noOfLines={props.selectProps.noOfLines}
       />
     </components.Option>
   );
