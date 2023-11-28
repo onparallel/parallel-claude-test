@@ -150,7 +150,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             ) : (
               <Text pointerEvents="none" fontSize="sm">
                 <FormattedMessage
-                  id="generic.dropzone-single.default"
+                  id="generic.dropzone-single-default"
                   defaultMessage="Drag the file here, or click to select it"
                 />
               </Text>
@@ -160,13 +160,13 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             <Text color="red.500" fontSize="sm">
               {fileDropError === "file-too-large" ? (
                 <FormattedMessage
-                  id="dropzone.error.file-too-large"
+                  id="generic.dropzone-error-file-too-large"
                   defaultMessage="The file is too large. Maximum size allowed {size}"
                   values={{ size: <FileSize value={MAX_FILESIZE} /> }}
                 />
               ) : fileDropError === "file-invalid-type" ? (
                 <FormattedMessage
-                  id="dropzone.error.file-invalid-type"
+                  id="generic.dropzone-error-file-invalid-type"
                   defaultMessage="File type not allowed. Please, attach an {extension} file"
                   values={{ extension: ".xlsx" }}
                 />

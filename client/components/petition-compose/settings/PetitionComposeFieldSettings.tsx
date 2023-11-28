@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Image, Stack, Switch, Text } from "@chakra-ui/react";
+import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
-import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   PetitionComposeFieldSettings_UserFragment,
@@ -10,24 +10,27 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { ReactNode } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { ComponentType, PropsWithChildren, ReactNode } from "react";
+import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
-import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
-import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
-import { FieldGroupSettings } from "./PetitionComposeFieldGroupSettings";
-import { FileUploadSettings } from "./PetitionComposeFileUploadSettings";
-import { HeadingSettings } from "./PetitionComposeHeadingSettings";
-import { NumberSettings } from "./PetitionComposeNumberSettings";
-import { PhoneSettings } from "./PetitionComposePhoneSettings";
-import { SelectOptionSettings } from "./PetitionComposeSelectOptionSettings";
-import { ShortTextSettings } from "./PetitionComposeShortTextSettings";
-import { SpanishTaxDocumentsSettings } from "./PetitionComposeTaxDocumentsSettings";
-import { TextSettings } from "./PetitionComposeTextSettings";
-import { SettingsRow } from "./SettingsRow";
-import { SettingsRowAlias } from "./SettingsRowAlias";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { PetitionComposeCheckboxSettings } from "./fields/PetitionComposeCheckboxSettings";
+import { PetitionComposeDynamicSelectFieldSettings } from "./fields/PetitionComposeDynamicSelectFieldSettings";
+import { PetitionComposeFieldGroupSettings } from "./fields/PetitionComposeFieldGroupSettings";
+import { PetitionComposeHeadingSettings } from "./fields/PetitionComposeHeadingSettings";
+import { PetitionComposeNumberSettings } from "./fields/PetitionComposeNumberSettings";
+import { PetitionComposeShortTextSettings } from "./fields/PetitionComposeShortTextSettings";
+import { AllowCommentSettingsRow } from "./rows/AllowCommentSettingsRow";
+import { AllowMultipleFilesSettingsRow } from "./rows/AllowMultipleFilesSettingsRow";
+import { AllowMultipleRepliesSettingsRow } from "./rows/AllowMultipleRepliesSettingsRow";
+import { AttachFilesToPdfSettingsRow } from "./rows/AttachFilesToPdfSettingsRow";
+import { IncludeApprovalSettingsRow } from "./rows/IncludeApprovalSettingsRow";
+import { InternalFieldSettingsRow } from "./rows/InternalFieldSettingsRow";
+import { SettingsRowAlias } from "./rows/SettingsRowAlias";
+import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
+import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
+import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
 
 export interface PetitionComposeFieldSettingsProps {
   petitionId: string;
@@ -40,6 +43,20 @@ export interface PetitionComposeFieldSettingsProps {
   isReadOnly?: boolean;
   children?: ReactNode;
 }
+
+const COMPONENTS: Partial<
+  Record<
+    PetitionFieldType,
+    ComponentType<Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">>
+  >
+> = {
+  HEADING: PetitionComposeHeadingSettings,
+  CHECKBOX: PetitionComposeCheckboxSettings,
+  DYNAMIC_SELECT: PetitionComposeDynamicSelectFieldSettings,
+  FIELD_GROUP: PetitionComposeFieldGroupSettings,
+  NUMBER: PetitionComposeNumberSettings,
+  SHORT_TEXT: PetitionComposeShortTextSettings,
+};
 
 export const PetitionComposeFieldSettings = Object.assign(
   chakraForwardRef<"section", PetitionComposeFieldSettingsProps>(
@@ -57,249 +74,46 @@ export const PetitionComposeFieldSettings = Object.assign(
       },
       ref,
     ) {
-      const intl = useIntl();
       const showErrorDialog = useErrorDialog();
-      const isOnlyInternal = field.type === "DOW_JONES_KYC";
-      const isFieldGroupChild = isDefined(field.parent?.id) ? true : false;
+
+      const isFieldGroupChild = isDefined(field.parent);
 
       const showInPdf = isFieldGroupChild ? field.parent!.showInPdf : field.showInPdf;
 
       const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
 
+      const canOnlyBeInternal = ["DOW_JONES_KYC"].includes(field.type);
+
       const isInternalFieldDisabled =
         isReadOnly ||
         field.isFixed ||
-        isOnlyInternal ||
+        canOnlyBeInternal ||
         parentIsInternal ||
         (isFieldGroupChild && field.position === 0);
 
-      const commonSettings = (
-        <>
-          <SettingsRow
-            isDisabled={isInternalFieldDisabled}
-            label={
-              <FormattedMessage
-                id="component.petition-settings.petition-internal-field"
-                defaultMessage="Internal field"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="component.petition-compose-field-settings.internal-field-description"
-                defaultMessage="Enabling this will make the field invisible to the recipient."
-              />
-            }
-            controlId="internal-field"
-          >
-            <RestrictedFeaturePopover
-              isRestricted={isOnlyInternal}
-              borderRadius="xl"
-              content={
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-settings.only-internal-field"
-                    defaultMessage="This field can only be used internally."
-                  />
-                </Text>
-              }
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="internal-field"
-                color="green"
-                isChecked={field.isInternal}
-                onChange={(event) =>
-                  onFieldEdit(field.id, {
-                    isInternal: event.target.checked,
-                  })
-                }
-                isDisabled={isInternalFieldDisabled}
-              />
-            </RestrictedFeaturePopover>
-          </SettingsRow>
-          {isFieldGroupChild ? null : (
-            <>
-              {isOnlyInternal ? null : (
-                <SettingsRow
-                  isDisabled={isReadOnly || field.isInternal}
-                  label={
-                    <FormattedMessage
-                      id="component.petition-settings.petition-comments-enable"
-                      defaultMessage="Allow comments"
-                    />
-                  }
-                  controlId="enable-comments"
-                >
-                  <Switch
-                    height="20px"
-                    display="block"
-                    id="enable-comments"
-                    color="green"
-                    isChecked={field.isInternal ? false : field.hasCommentsEnabled}
-                    onChange={(event) =>
-                      onFieldEdit(field.id, {
-                        hasCommentsEnabled: event.target.checked,
-                      })
-                    }
-                    isDisabled={isReadOnly || field.isInternal}
-                  />
-                </SettingsRow>
-              )}
-            </>
-          )}
+      const canChangeFieldType = !["FIELD_GROUP"].includes(field.type);
 
-          {!["HEADING", "FIELD_GROUP"].includes(field.type) && (
-            <SettingsRow
-              isDisabled={isReadOnly}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.include-approval"
-                  defaultMessage="Include approval"
-                />
-              }
-              description={
-                <FormattedMessage
-                  id="component.petition-compose-field-settings.include-approval-description"
-                  defaultMessage="Enabling this option will include the buttons for approving and rejecting replies."
-                />
-              }
-              controlId="include-approval"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="include-approval"
-                color="green"
-                isChecked={field.requireApproval}
-                onChange={(event) =>
-                  onFieldEdit(field.id, {
-                    requireApproval: event.target.checked,
-                  })
-                }
-                isDisabled={isReadOnly}
-              />
-            </SettingsRow>
-          )}
-          {isFieldGroupChild || isOnlyInternal ? null : (
-            <SettingsRow
-              isDisabled={isReadOnly}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.petition-shown-in-pdf"
-                  defaultMessage="Show in PDF"
-                />
-              }
-              description={
-                <>
-                  <FormattedMessage
-                    id="component.petition-compose-field-settings.show-in-pdf-description"
-                    defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
-                  />
-                  <Image
-                    marginTop={2}
-                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
-                  />
-                </>
-              }
-              controlId="show-in-pdf"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="show-in-pdf"
-                color="green"
-                isChecked={showInPdf}
-                onChange={(event) =>
-                  onFieldEdit(field.id, {
-                    showInPdf: event.target.checked,
-                  })
-                }
-                isDisabled={isReadOnly}
-              />
-            </SettingsRow>
-          )}
+      const canChangeMultiple = ![
+        "HEADING",
+        "CHECKBOX",
+        "ES_TAX_DOCUMENTS",
+        "DOW_JONES_KYC",
+        "FIELD_GROUP",
+      ].includes(field.type);
 
-          {!isOnlyInternal && showInPdf && !["HEADING", "FIELD_GROUP"].includes(field.type) ? (
-            <SettingsRow
-              isDisabled={isReadOnly}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.petition-show-activity-pdf"
-                  defaultMessage="Show reply activity"
-                />
-              }
-              description={
-                <FormattedMessage
-                  id="component.petition-compose-field-settings.show-activity-pdf-description"
-                  defaultMessage="Enabling this option will include who and when a reply and its approval were submitted in the PDF."
-                />
-              }
-              controlId="show-activity-in-pdf"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="show-activity-in-pdf"
-                color="green"
-                isChecked={field.showActivityInPdf}
-                onChange={(event) =>
-                  onFieldEdit(field.id, {
-                    showActivityInPdf: event.target.checked,
-                  })
-                }
-                isDisabled={isReadOnly}
-              />
-            </SettingsRow>
-          ) : null}
+      const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);
 
-          {!field.isReadOnly &&
-            !["CHECKBOX", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC", "FIELD_GROUP"].includes(
-              field.type,
-            ) && (
-              <SettingsRow
-                isDisabled={isReadOnly}
-                label={
-                  field.type === "FILE_UPLOAD" ? (
-                    <FormattedMessage
-                      id="component.petition-compose-field-settings.file-multiple-label"
-                      defaultMessage="Allow uploading more than one file"
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="component.petition-compose-field-settings.multiple-label"
-                      defaultMessage="Allow more than one reply"
-                    />
-                  )
-                }
-                description={
-                  field.type === "FILE_UPLOAD" ? (
-                    <FormattedMessage
-                      id="component.petition-compose-field-settings.file-multiple-description"
-                      defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="component.petition-compose-field-settings.multiple-description"
-                      defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
-                    />
-                  )
-                }
-                controlId="field-multiple"
-              >
-                <Switch
-                  height="20px"
-                  display="block"
-                  id="field-multiple"
-                  color="green"
-                  isChecked={field.multiple}
-                  onChange={(event) => onFieldEdit(field.id, { multiple: event.target.checked })}
-                  isDisabled={isReadOnly}
-                />
-              </SettingsRow>
-            )}
-        </>
-      );
+      const hasPlaceholder = (
+        ["SHORT_TEXT", "TEXT", "PHONE", "NUMBER", "SELECT"] as PetitionFieldType[]
+      ).includes(field.type);
+
+      const hasAlias = !["HEADING"].includes(field.type);
+
+      const handleFieldEdit = (data: UpdatePetitionFieldInput) => {
+        onFieldEdit(field.id, data);
+      };
+
+      const SettingsComponent = COMPONENTS[field.type] ?? EmptySettings;
 
       return (
         <Card ref={ref} display="flex" flexDirection="column" {...props}>
@@ -315,9 +129,10 @@ export const PetitionComposeFieldSettings = Object.assign(
               )}
             </Text>
           </CloseableCardHeader>
-          <Stack padding={4} spacing={4} flex={1} minHeight={0} overflow="auto">
-            <Stack spacing={4} direction="column">
-              {field.type === "FIELD_GROUP" ? null : (
+
+          <Stack as="section" padding={4} spacing={5} flex={1} minHeight={0} overflow="auto">
+            <Stack>
+              {canChangeFieldType ? (
                 <Box>
                   <PetitionFieldTypeSelect
                     type={field.type}
@@ -350,72 +165,112 @@ export const PetitionComposeFieldSettings = Object.assign(
                     isFieldGroupChild={isFieldGroupChild}
                   />
                 </Box>
-              )}
-              {field.type !== "SHORT_TEXT" ? commonSettings : null}
-              {field.type === "HEADING" ? (
-                <HeadingSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-              ) : field.type === "FILE_UPLOAD" ? (
-                <FileUploadSettings
-                  field={field}
-                  onFieldEdit={onFieldEdit}
-                  isReadOnly={isReadOnly}
-                />
-              ) : field.type === "TEXT" ? (
-                <TextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-              ) : field.type === "SHORT_TEXT" ? (
-                <ShortTextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly}>
-                  {commonSettings}
-                </ShortTextSettings>
-              ) : field.type === "SELECT" ? (
-                <SelectOptionSettings
-                  field={field}
-                  onFieldEdit={onFieldEdit}
-                  isReadOnly={isReadOnly}
-                />
-              ) : field.type === "DYNAMIC_SELECT" ? (
-                <DynamicSelectSettings
-                  petitionId={petitionId}
-                  field={field}
-                  onFieldEdit={onFieldEdit}
-                  isReadOnly={isReadOnly}
-                />
-              ) : field.type === "CHECKBOX" ? (
-                <CheckboxSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-              ) : field.type === "NUMBER" ? (
-                <NumberSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-              ) : field.type === "PHONE" ? (
-                <PhoneSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-              ) : field.type === "ES_TAX_DOCUMENTS" ? (
-                <SpanishTaxDocumentsSettings
-                  field={field}
-                  onFieldEdit={onFieldEdit}
-                  isReadOnly={isReadOnly}
-                />
-              ) : field.type === "FIELD_GROUP" ? (
-                <FieldGroupSettings
+              ) : null}
+              <SettingsComponent field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+              {canChangeMultiple ? (
+                field.type === "FILE_UPLOAD" ? (
+                  <AllowMultipleFilesSettingsRow
+                    isDisabled={isReadOnly}
+                    isChecked={field.multiple}
+                    onChange={handleFieldEdit}
+                  />
+                ) : (
+                  <AllowMultipleRepliesSettingsRow
+                    isDisabled={isReadOnly}
+                    isChecked={field.multiple}
+                    onChange={handleFieldEdit}
+                  />
+                )
+              ) : null}
+
+              {hasPlaceholder ? (
+                <SettingsRowPlaceholder
                   field={field}
                   onFieldEdit={onFieldEdit}
                   isReadOnly={isReadOnly}
                 />
               ) : null}
-            </Stack>
-            {field.type !== "HEADING" ? (
-              <Stack spacing={3}>
-                <Heading
-                  flex="1"
-                  as="h4"
-                  size="sm"
-                  overflowWrap="anywhere"
-                  textStyle={isReadOnly ? "muted" : undefined}
-                >
-                  <FormattedMessage
-                    id="component.petition-compose-field-settings.advanced-options"
-                    defaultMessage="Advanced options"
-                  />
-                </Heading>
+
+              {hasAlias ? (
                 <SettingsRowAlias field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-              </Stack>
+              ) : null}
+            </Stack>
+
+            <SettingsRowGroup
+              isReadOnly={isReadOnly}
+              label={
+                <FormattedMessage
+                  id="component.petition-compose-field-settings.interaction-with-recipients"
+                  defaultMessage="Interaction with recipients"
+                />
+              }
+            >
+              <InternalFieldSettingsRow
+                isChecked={field.isInternal}
+                isDisabled={isInternalFieldDisabled}
+                isRestricted={canOnlyBeInternal}
+                onChange={handleFieldEdit}
+              />
+              {isFieldGroupChild || canOnlyBeInternal ? null : (
+                <AllowCommentSettingsRow
+                  isDisabled={isReadOnly || field.isInternal}
+                  isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+                  onChange={handleFieldEdit}
+                />
+              )}
+            </SettingsRowGroup>
+
+            {isReplyable ? (
+              <SettingsRowGroup
+                label={
+                  <FormattedMessage
+                    id="component.petition-compose-field-settings.review-flow"
+                    defaultMessage="Review flow"
+                  />
+                }
+                isReadOnly={isReadOnly}
+              >
+                <IncludeApprovalSettingsRow
+                  isDisabled={isReadOnly}
+                  isChecked={field.requireApproval}
+                  onChange={handleFieldEdit}
+                />
+              </SettingsRowGroup>
             ) : null}
+
+            {isFieldGroupChild || canOnlyBeInternal ? null : (
+              <SettingsRowGroup
+                label={
+                  <FormattedMessage
+                    id="component.petition-compose-field-settings.document-generation"
+                    defaultMessage="Document generation"
+                  />
+                }
+                isReadOnly={isReadOnly}
+              >
+                {isFieldGroupChild || canOnlyBeInternal ? null : (
+                  <ShowPdfSettingsRow
+                    isDisabled={isReadOnly}
+                    isChecked={showInPdf}
+                    onChange={handleFieldEdit}
+                  />
+                )}
+                {showInPdf && isReplyable ? (
+                  <ShowReplyActivitySettingsRow
+                    isDisabled={isReadOnly}
+                    isChecked={field.showActivityInPdf}
+                    onChange={handleFieldEdit}
+                  />
+                ) : null}
+                {isFileTypeField(field.type) ? (
+                  <AttachFilesToPdfSettingsRow
+                    isDisabled={isReadOnly}
+                    isChecked={field.showActivityInPdf}
+                    onChange={handleFieldEdit}
+                  />
+                ) : null}
+              </SettingsRowGroup>
+            )}
           </Stack>
         </Card>
       );
@@ -456,6 +311,12 @@ export const PetitionComposeFieldSettings = Object.assign(
               type
             }
           }
+          petition {
+            id
+            fields {
+              id
+            }
+          }
           ...SettingsRowAlias_PetitionField
         }
         ${SettingsRowAlias.fragments.PetitionField}
@@ -463,3 +324,29 @@ export const PetitionComposeFieldSettings = Object.assign(
     },
   },
 );
+
+function EmptySettings({
+  children,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly" | "children">) {
+  return <>{children}</>;
+}
+
+function SettingsRowGroup({
+  isReadOnly,
+  label,
+  children,
+}: PropsWithChildren<{ label: ReactNode; isReadOnly?: boolean }>) {
+  return (
+    <Stack spacing={2} as="section">
+      <Heading
+        as="h4"
+        size="sm"
+        overflowWrap="anywhere"
+        textStyle={isReadOnly ? "muted" : undefined}
+      >
+        {label}
+      </Heading>
+      {children}
+    </Stack>
+  );
+}

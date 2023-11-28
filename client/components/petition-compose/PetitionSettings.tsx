@@ -76,8 +76,8 @@ import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
 } from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
-import { SettingsRowButton } from "./settings/SettingsRowButton";
-import { SettingsRowSwitch } from "./settings/SettingsRowSwitch";
+import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
+import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
 import {
   CompliancePeriodDialog,
   useCompliancePeriodDialog,
@@ -85,7 +85,7 @@ import {
 import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
 import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
-import { SettingsRow } from "./settings/SettingsRow";
+import { SettingsRow } from "./settings/rows/SettingsRow";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;

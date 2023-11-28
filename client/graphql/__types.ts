@@ -15095,33 +15095,6 @@ export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
 };
 
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  fieldId: Scalars["GID"]["input"];
-  file: Scalars["Upload"]["input"];
-}>;
-
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
-  uploadDynamicSelectFieldFile: {
-    __typename?: "PetitionField";
-    id: string;
-    options: { [key: string]: any };
-  };
-};
-
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  fieldId: Scalars["GID"]["input"];
-}>;
-
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
-  dynamicSelectFieldFileDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
-  };
-};
-
 export type PetitionComposeFieldSettings_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
@@ -15154,6 +15127,17 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
     isInternal: boolean;
     children?: Array<{ __typename?: "PetitionField"; id: string; type: PetitionFieldType }> | null;
   } | null;
+  petition:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      };
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -15163,6 +15147,33 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
     alias?: string | null;
     options: { [key: string]: any };
   }> | null;
+};
+
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  file: Scalars["Upload"]["input"];
+}>;
+
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
+  uploadDynamicSelectFieldFile: {
+    __typename?: "PetitionField";
+    id: string;
+    options: { [key: string]: any };
+  };
+};
+
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+}>;
+
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
+  dynamicSelectFieldFileDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
 };
 
 export type SettingsRowAlias_PetitionFieldFragment = {
@@ -29132,6 +29143,17 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     parent?: {
       __typename?: "PetitionField";
@@ -29146,6 +29168,17 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       }> | null;
     } | null;
     replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        };
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -29333,6 +29366,17 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     parent?: {
       __typename?: "PetitionField";
@@ -29346,6 +29390,17 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         type: PetitionFieldType;
       }> | null;
     } | null;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        };
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -29529,7 +29584,29 @@ export type PetitionCompose_PetitionFieldFragment = {
         isComplete: boolean;
       };
     }>;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        };
   }> | null;
+  petition:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      };
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
     id: string;
@@ -30029,6 +30106,17 @@ export type PetitionCompose_createPetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
@@ -30225,6 +30313,17 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30324,8 +30423,19 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     requireApproval: boolean;
     description?: string | null;
     petition:
-      | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
-      | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
+      | {
+          __typename?: "Petition";
+          status: PetitionStatus;
+          id: string;
+          updatedAt: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          updatedAt: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        };
     parent?: {
       __typename?: "PetitionField";
       id: string;
@@ -30395,6 +30505,17 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30440,8 +30561,19 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     requireApproval: boolean;
     description?: string | null;
     petition:
-      | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
-      | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
+      | {
+          __typename?: "Petition";
+          status: PetitionStatus;
+          id: string;
+          updatedAt: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          updatedAt: string;
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        };
     parent?: {
       __typename?: "PetitionField";
       id: string;
@@ -30511,6 +30643,17 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30635,6 +30778,17 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -30767,6 +30921,17 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
           isComplete: boolean;
         };
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -31005,6 +31170,17 @@ export type PetitionCompose_petitionQuery = {
                 isComplete: boolean;
               };
             }>;
+            petition:
+              | {
+                  __typename?: "Petition";
+                  id: string;
+                  fields: Array<{ __typename?: "PetitionField"; id: string }>;
+                }
+              | {
+                  __typename?: "PetitionTemplate";
+                  id: string;
+                  fields: Array<{ __typename?: "PetitionField"; id: string }>;
+                };
           }> | null;
           parent?: {
             __typename?: "PetitionField";
@@ -31019,6 +31195,17 @@ export type PetitionCompose_petitionQuery = {
             }> | null;
           } | null;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          petition:
+            | {
+                __typename?: "Petition";
+                id: string;
+                fields: Array<{ __typename?: "PetitionField"; id: string }>;
+              }
+            | {
+                __typename?: "PetitionTemplate";
+                id: string;
+                fields: Array<{ __typename?: "PetitionField"; id: string }>;
+              };
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -31220,6 +31407,17 @@ export type PetitionCompose_petitionQuery = {
                 isComplete: boolean;
               };
             }>;
+            petition:
+              | {
+                  __typename?: "Petition";
+                  id: string;
+                  fields: Array<{ __typename?: "PetitionField"; id: string }>;
+                }
+              | {
+                  __typename?: "PetitionTemplate";
+                  id: string;
+                  fields: Array<{ __typename?: "PetitionField"; id: string }>;
+                };
           }> | null;
           parent?: {
             __typename?: "PetitionField";
@@ -31233,6 +31431,17 @@ export type PetitionCompose_petitionQuery = {
               type: PetitionFieldType;
             }> | null;
           } | null;
+          petition:
+            | {
+                __typename?: "Petition";
+                id: string;
+                fields: Array<{ __typename?: "PetitionField"; id: string }>;
+              }
+            | {
+                __typename?: "PetitionTemplate";
+                id: string;
+                fields: Array<{ __typename?: "PetitionField"; id: string }>;
+              };
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -47899,6 +48108,12 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
       children {
         id
         type
+      }
+    }
+    petition {
+      id
+      fields {
+        id
       }
     }
     ...SettingsRowAlias_PetitionField

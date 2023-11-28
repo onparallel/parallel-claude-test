@@ -2,12 +2,12 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, List, ListItem, Progress, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NormalLink } from "@parallel/components/common/Link";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument,
   DynamicSelectSettings_uploadDynamicSelectFieldFileDocument,
@@ -16,22 +16,18 @@ import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
+import { untranslated } from "@parallel/utils/untranslated";
 import { useMemo, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
-import { SettingsRow } from "./SettingsRow";
-import { untranslated } from "@parallel/utils/untranslated";
+import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
+import { SettingsRow } from "../rows/SettingsRow";
 
-export function DynamicSelectSettings({
-  petitionId,
+export function PetitionComposeDynamicSelectFieldSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: { petitionId: string } & Pick<
-  PetitionComposeFieldSettingsProps,
-  "field" | "onFieldEdit" | "isReadOnly"
->) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
@@ -47,7 +43,7 @@ export function DynamicSelectSettings({
     await withError(
       openNewWindow(async () => {
         const { data } = await downloadLink({
-          variables: { petitionId, fieldId: field.id },
+          variables: { petitionId: field.petition.id, fieldId: field.id },
         });
         const { url, result } = data!.dynamicSelectFieldFileDownloadLink;
         if (result !== "SUCCESS") {
@@ -59,7 +55,7 @@ export function DynamicSelectSettings({
   }
 
   return (
-    <Stack spacing={4}>
+    <>
       <SettingsRow
         isDisabled={isReadOnly}
         flexDirection="column"
@@ -67,7 +63,7 @@ export function DynamicSelectSettings({
         label={
           <Text as="strong">
             <FormattedMessage
-              id="field-settings.dynamic-select.import-from-excel.label"
+              id="component.petition-compose-dynamic-select-field-settings.import-from-excel-label"
               defaultMessage="Import options from Excel"
             />
           </Text>
@@ -75,7 +71,7 @@ export function DynamicSelectSettings({
         description={
           <Text fontSize="sm">
             <FormattedMessage
-              id="field-settings.dynamic-select.import-from-excel.description"
+              id="component.petition-compose-dynamic-select-field-settings.import-from-excel-description"
               defaultMessage="Import listings to create related dropdowns. You can use the importing model as a guide."
             />
           </Text>
@@ -92,7 +88,7 @@ export function DynamicSelectSettings({
             />
           ) : (
             <DynamicSelectOptionsDropzone
-              petitionId={petitionId}
+              petitionId={field.petition.id}
               fieldId={field.id}
               isReadOnly={isReadOnly}
             />
@@ -104,14 +100,14 @@ export function DynamicSelectSettings({
             }.xlsx`}
           >
             <FormattedMessage
-              id="field-settings.dynamic-select.import-from-excel.download-model"
+              id="component.petition-compose-dynamic-select-field-settings.import-from-excel-download-model"
               defaultMessage="Download option loading model"
             />
             <DownloadIcon marginLeft={2} />
           </NormalLink>
         </Stack>
       </SettingsRow>
-    </Stack>
+    </>
   );
 }
 
@@ -229,7 +225,7 @@ function DynamicSelectLoadedOptions({
 
       <Stack fontSize="sm" color="gray.600" spacing={0}>
         <FormattedMessage
-          id="field-settings.dynamic-select.loaded-options.example"
+          id="component.petition-compose-dynamic-select-field-settings.example"
           defaultMessage="For example:"
         />
         <List as="ol" listStyleType="upper-alpha" listStylePos="inside">
@@ -272,13 +268,13 @@ function DynamicSelectOptionsDropzone({
         await showErrorDialog({
           header: (
             <FormattedMessage
-              id="field-settings.dynamic-select.import-from-excel.error-dialog-header"
+              id="component.petition-compose-dynamic-select-field-settings.import-from-excel-error-dialog-header"
               defaultMessage="Import error"
             />
           ),
           message: (
             <FormattedMessage
-              id="field-settings.dynamic-select.import-from-excel.error-dialog-body"
+              id="component.petition-compose-dynamic-select-field-settings.import-from-excel-error-dialog-body"
               defaultMessage="Please, review your file and make sure there are no empty cells on the listing."
             />
           ),
@@ -293,7 +289,7 @@ function DynamicSelectOptionsDropzone({
     <>
       <Text fontSize="sm" color="gray.600" marginTop={1}>
         <FormattedMessage
-          id="field-settings.dynamic-select.import-from-excel.attach-xlsx"
+          id="component.petition-compose-dynamic-select-field-settings.import-from-excel-attach-xlsx"
           defaultMessage="Attach an .xlsx file like the one in the model."
         />
       </Text>
@@ -307,7 +303,7 @@ function DynamicSelectOptionsDropzone({
       >
         <Text pointerEvents="none" fontSize="sm">
           <FormattedMessage
-            id="generic.dropzone-single.default"
+            id="generic.dropzone-single-default"
             defaultMessage="Drag the file here, or click to select it"
           />
         </Text>
@@ -316,13 +312,13 @@ function DynamicSelectOptionsDropzone({
         <Text color="red.500" fontSize="sm">
           {fileDropError === "file-too-large" ? (
             <FormattedMessage
-              id="dropzone.error.file-too-large"
+              id="generic.dropzone-error-file-too-large"
               defaultMessage="The file is too large. Maximum size allowed {size}"
               values={{ size: <FileSize value={MAX_FILESIZE} /> }}
             />
           ) : fileDropError === "file-invalid-type" ? (
             <FormattedMessage
-              id="dropzone.error.file-invalid-type"
+              id="generic.dropzone-error-file-invalid-type"
               defaultMessage="File type not allowed. Please, attach an {extension} file"
               values={{ extension: ".xlsx" }}
             />
@@ -333,7 +329,7 @@ function DynamicSelectOptionsDropzone({
   );
 }
 
-DynamicSelectSettings.mutations = [
+PetitionComposeDynamicSelectFieldSettings.mutations = [
   gql`
     mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
       $petitionId: GID!

@@ -3900,6 +3900,46 @@
     "context": "Too many attachments"
   },
   {
+    "term": "component.petition-compose-checkbox-settings.description",
+    "definition": "Esta opción permite limitar el número de opciones que puede escoger el destinarario.",
+    "context": "This option allows you to limit the number of options that the recipient can choose."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.example",
+    "definition": "Por ejemplo:",
+    "context": "For example:"
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-attach-xlsx",
+    "definition": "Adjunte un archivo .xlsx como el del modelo.",
+    "context": "Attach an .xlsx file like the one in the model."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-description",
+    "definition": "Importa listados para crear desplegables relacionados entre sí. Puedes utilizar el modelo de carga como guía.",
+    "context": "Import listings to create related dropdowns. You can use the importing model as a guide."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-download-model",
+    "definition": "Descargar modelo de importación de opciones",
+    "context": "Download option loading model"
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-error-dialog-body",
+    "definition": "Por favor, revisa tu archivo y asegúrate de que no hay casillas vacías en el listado.",
+    "context": "Please, review your file and make sure there are no empty cells on the listing."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-error-dialog-header",
+    "definition": "Error de importación",
+    "context": "Import error"
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-label",
+    "definition": "Importar opciones desde Excel",
+    "context": "Import options from Excel"
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -3950,14 +3990,19 @@
     "context": "E.g., Family member"
   },
   {
-    "term": "component.petition-compose-field-settings.advanced-options",
-    "definition": "Opciones avanzadas",
-    "context": "Advanced options"
-  },
-  {
     "term": "component.petition-compose-field-settings.alias-warning",
     "definition": "<b>Aviso:</b> Los campos de documentos no pueden utilizarse para reemplazar contenido en las descripciones.",
     "context": "<b>Note:</b> Document fields cannot be used to replace content in descriptions."
+  },
+  {
+    "term": "component.petition-compose-field-settings.document-generation",
+    "definition": "Generación de documentos",
+    "context": "Document generation"
+  },
+  {
+    "term": "component.petition-compose-field-settings.enable-comments",
+    "definition": "Permitir comentarios",
+    "context": "Allow comments"
   },
   {
     "term": "component.petition-compose-field-settings.file-multiple-description",
@@ -3975,14 +4020,34 @@
     "context": "The first field of a group cannot be internal if the group is not."
   },
   {
+    "term": "component.petition-compose-field-settings.include-approval",
+    "definition": "Incluir aprobación",
+    "context": "Include approval"
+  },
+  {
     "term": "component.petition-compose-field-settings.include-approval-description",
     "definition": "Al activar esta opción se incluirán los botones de aprovar y rechazar respuestas.",
     "context": "Enabling this option will include the buttons for approving and rejecting replies."
   },
   {
+    "term": "component.petition-compose-field-settings.interaction-with-recipients",
+    "definition": "Interacción con destinatarios",
+    "context": "Interaction with recipients"
+  },
+  {
+    "term": "component.petition-compose-field-settings.internal-field",
+    "definition": "Campo interno",
+    "context": "Internal field"
+  },
+  {
     "term": "component.petition-compose-field-settings.internal-field-description",
     "definition": "Al activar esta opción, este campo no será visible para el destinatario.",
     "context": "Enabling this will make the field invisible to the recipient."
+  },
+  {
+    "term": "component.petition-compose-field-settings.internal-field-restricted",
+    "definition": "Este campo solo puede utilizarse de forma interna.",
+    "context": "This field can only be used internally."
   },
   {
     "term": "component.petition-compose-field-settings.multiple-description",
@@ -3995,9 +4060,24 @@
     "context": "Allow more than one reply"
   },
   {
+    "term": "component.petition-compose-field-settings.petition-show-activity-pdf",
+    "definition": "Mostrar actividad de respuesta",
+    "context": "Show reply activity"
+  },
+  {
+    "term": "component.petition-compose-field-settings.review-flow",
+    "definition": "Flujo de revisión",
+    "context": "Review flow"
+  },
+  {
     "term": "component.petition-compose-field-settings.show-activity-pdf-description",
     "definition": "Al activar esta opción se incluirá la actividad de quién y cuándo añadió cada respuesta y su aprobación en el PDF.",
     "context": "Enabling this option will include who and when a reply and its approval were submitted in the PDF."
+  },
+  {
+    "term": "component.petition-compose-field-settings.show-in-pdf",
+    "definition": "Mostrar en PDF",
+    "context": "Show in PDF"
   },
   {
     "term": "component.petition-compose-field-settings.show-in-pdf-description",
@@ -4178,6 +4258,21 @@
     "term": "component.petition-compose-field.visibility-title",
     "definition": "Condiciones de visibilidad",
     "context": "Visibility conditions"
+  },
+  {
+    "term": "component.petition-compose-heading-settings.description",
+    "definition": "Activar esta opción creará una nueva página que usará este campo como encabezado.",
+    "context": "Enabling this will create a new page and use this as the heading of the new page"
+  },
+  {
+    "term": "component.petition-compose-heading-settings.label",
+    "definition": "Comenzar página nueva",
+    "context": "Start new page"
+  },
+  {
+    "term": "component.petition-compose-heading-settings.visibility",
+    "definition": "No se puede añadir saltos de página en secciones con condiciones de visibilidad",
+    "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
     "term": "component.petition-compose-text-settings.format",
@@ -5105,11 +5200,6 @@
     "context": "By enabling this, the contents card in the recipient view will be hidden."
   },
   {
-    "term": "component.petition-settings.include-approval",
-    "definition": "Incluir aprobación",
-    "context": "Include approval"
-  },
-  {
     "term": "component.petition-settings.link-copied-toast",
     "definition": "Enlace copiado al portapapeles",
     "context": "Link copied to clipboard"
@@ -5118,31 +5208,6 @@
     "term": "component.petition-settings.locale-label",
     "definition": "Idioma comunicaciones",
     "context": "Communications language"
-  },
-  {
-    "term": "component.petition-settings.only-internal-field",
-    "definition": "Este campo solo puede utilizarse de forma interna.",
-    "context": "This field can only be used internally."
-  },
-  {
-    "term": "component.petition-settings.petition-comments-enable",
-    "definition": "Permitir comentarios",
-    "context": "Allow comments"
-  },
-  {
-    "term": "component.petition-settings.petition-internal-field",
-    "definition": "Campo interno",
-    "context": "Internal field"
-  },
-  {
-    "term": "component.petition-settings.petition-show-activity-pdf",
-    "definition": "Mostrar actividad de respuesta",
-    "context": "Show reply activity"
-  },
-  {
-    "term": "component.petition-settings.petition-shown-in-pdf",
-    "definition": "Mostrar en PDF",
-    "context": "Show in PDF"
   },
   {
     "term": "component.petition-settings.petition-signature-enable",
@@ -8715,16 +8780,6 @@
     "context": "Contacts"
   },
   {
-    "term": "dropzone.error.file-invalid-type",
-    "definition": "Tipo de archivo no permitido. Por favor, adjunta un archivo {extension}",
-    "context": "File type not allowed. Please, attach an {extension} file"
-  },
-  {
-    "term": "dropzone.error.file-too-large",
-    "definition": "El archivo es demasiado grande. Tamaño máximo permitido {size}",
-    "context": "The file is too large. Maximum size allowed {size}"
-  },
-  {
     "term": "error.404.header",
     "definition": "No hemos podido encontrar la página que buscas.",
     "context": "We can't seem to find the page you're looking for."
@@ -8773,61 +8828,6 @@
     "term": "error.unknown-error.text",
     "definition": "Por favor inténtalo más tarde y, si el error persiste, <a>contacta con soporte</a> para que podamos ayudarte.",
     "context": "Please try again later and if the error persists <a>reach out to support</a> for help."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",
-    "definition": "Adjunte un archivo .xlsx como el del modelo.",
-    "context": "Attach an .xlsx file like the one in the model."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.description",
-    "definition": "Importa listados para crear desplegables relacionados entre sí. Puedes utilizar el modelo de carga como guía.",
-    "context": "Import listings to create related dropdowns. You can use the importing model as a guide."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.download-model",
-    "definition": "Descargar modelo de importación de opciones",
-    "context": "Download option loading model"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-dialog-body",
-    "definition": "Por favor, revisa tu archivo y asegúrate de que no hay casillas vacías en el listado.",
-    "context": "Please, review your file and make sure there are no empty cells on the listing."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-dialog-header",
-    "definition": "Error de importación",
-    "context": "Import error"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.label",
-    "definition": "Importar opciones desde Excel",
-    "context": "Import options from Excel"
-  },
-  {
-    "term": "field-settings.dynamic-select.loaded-options.example",
-    "definition": "Por ejemplo:",
-    "context": "For example:"
-  },
-  {
-    "term": "field-settings.file-checkbox-description",
-    "definition": "Esta opción permite limitar el número de opciones que puede escoger el destinarario.",
-    "context": "This option allows you to limit the number of options that the recipient can choose."
-  },
-  {
-    "term": "field-settings.heading-page-break-description",
-    "definition": "Activar esta opción creará una nueva página que usará este campo como encabezado.",
-    "context": "Enabling this will create a new page and use this as the heading of the new page"
-  },
-  {
-    "term": "field-settings.heading-page-break-label",
-    "definition": "Comenzar página nueva",
-    "context": "Start new page"
-  },
-  {
-    "term": "field-settings.heading-page-break-visibility",
-    "definition": "No se puede añadir saltos de página en secciones con condiciones de visibilidad",
-    "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
     "term": "footer.slogan",
@@ -8900,7 +8900,7 @@
     "context": "Attach files to PDF"
   },
   {
-    "term": "generic.attach-files-to-pdf.description",
+    "term": "generic.attach-files-to-pdf-description",
     "definition": "Al activar esta opción, los archivos de imagen y pdf subidos a este campo se anexarán al final en la exportación de PDF y en el documento a firmar.",
     "context": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed."
   },
@@ -9180,7 +9180,17 @@
     "context": "Drag files here, or click to select them"
   },
   {
-    "term": "generic.dropzone-single.default",
+    "term": "generic.dropzone-error-file-invalid-type",
+    "definition": "Tipo de archivo no permitido. Por favor, adjunta un archivo {extension}",
+    "context": "File type not allowed. Please, attach an {extension} file"
+  },
+  {
+    "term": "generic.dropzone-error-file-too-large",
+    "definition": "El archivo es demasiado grande. Tamaño máximo permitido {size}",
+    "context": "The file is too large. Maximum size allowed {size}"
+  },
+  {
+    "term": "generic.dropzone-single-default",
     "definition": "Arrastra el archivo aquí o haz click para seleccionarlo",
     "context": "Drag the file here, or click to select it"
   },

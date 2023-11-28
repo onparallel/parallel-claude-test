@@ -3900,6 +3900,46 @@
     "context": "Too many attachments"
   },
   {
+    "term": "component.petition-compose-checkbox-settings.description",
+    "definition": "This option allows you to limit the number of options that the recipient can choose.",
+    "context": "This option allows you to limit the number of options that the recipient can choose."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.example",
+    "definition": "For example:",
+    "context": "For example:"
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-attach-xlsx",
+    "definition": "Attach an .xlsx file like the one in the model.",
+    "context": "Attach an .xlsx file like the one in the model."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-description",
+    "definition": "Import listings to create related dropdowns. You can use the importing model as a guide.",
+    "context": "Import listings to create related dropdowns. You can use the importing model as a guide."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-download-model",
+    "definition": "Download option loading model",
+    "context": "Download option loading model"
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-error-dialog-body",
+    "definition": "Please, review your file and make sure there are no empty cells on the listing.",
+    "context": "Please, review your file and make sure there are no empty cells on the listing."
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-error-dialog-header",
+    "definition": "Import error",
+    "context": "Import error"
+  },
+  {
+    "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-label",
+    "definition": "Import options from Excel",
+    "context": "Import options from Excel"
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -3950,14 +3990,19 @@
     "context": "E.g., Family member"
   },
   {
-    "term": "component.petition-compose-field-settings.advanced-options",
-    "definition": "Advanced options",
-    "context": "Advanced options"
-  },
-  {
     "term": "component.petition-compose-field-settings.alias-warning",
     "definition": "<b>Note:</b> Document fields cannot be used to replace content in descriptions.",
     "context": "<b>Note:</b> Document fields cannot be used to replace content in descriptions."
+  },
+  {
+    "term": "component.petition-compose-field-settings.document-generation",
+    "definition": "Document generation",
+    "context": "Document generation"
+  },
+  {
+    "term": "component.petition-compose-field-settings.enable-comments",
+    "definition": "Allow comments",
+    "context": "Allow comments"
   },
   {
     "term": "component.petition-compose-field-settings.file-multiple-description",
@@ -3975,14 +4020,34 @@
     "context": "The first field of a group cannot be internal if the group is not."
   },
   {
+    "term": "component.petition-compose-field-settings.include-approval",
+    "definition": "Include approval",
+    "context": "Include approval"
+  },
+  {
     "term": "component.petition-compose-field-settings.include-approval-description",
     "definition": "Enabling this option will include the buttons for approving and rejecting replies.",
     "context": "Enabling this option will include the buttons for approving and rejecting replies."
   },
   {
+    "term": "component.petition-compose-field-settings.interaction-with-recipients",
+    "definition": "Interaction with recipients",
+    "context": "Interaction with recipients"
+  },
+  {
+    "term": "component.petition-compose-field-settings.internal-field",
+    "definition": "Internal field",
+    "context": "Internal field"
+  },
+  {
     "term": "component.petition-compose-field-settings.internal-field-description",
     "definition": "Enabling this will make the field invisible to the recipient.",
     "context": "Enabling this will make the field invisible to the recipient."
+  },
+  {
+    "term": "component.petition-compose-field-settings.internal-field-restricted",
+    "definition": "This field can only be used internally.",
+    "context": "This field can only be used internally."
   },
   {
     "term": "component.petition-compose-field-settings.multiple-description",
@@ -3995,9 +4060,24 @@
     "context": "Allow more than one reply"
   },
   {
+    "term": "component.petition-compose-field-settings.petition-show-activity-pdf",
+    "definition": "Show reply activity",
+    "context": "Show reply activity"
+  },
+  {
+    "term": "component.petition-compose-field-settings.review-flow",
+    "definition": "Review flow",
+    "context": "Review flow"
+  },
+  {
     "term": "component.petition-compose-field-settings.show-activity-pdf-description",
     "definition": "Enabling this option will include who and when a reply and its approval were submitted in the PDF.",
     "context": "Enabling this option will include who and when a reply and its approval were submitted in the PDF."
+  },
+  {
+    "term": "component.petition-compose-field-settings.show-in-pdf",
+    "definition": "Show in PDF",
+    "context": "Show in PDF"
   },
   {
     "term": "component.petition-compose-field-settings.show-in-pdf-description",
@@ -4178,6 +4258,21 @@
     "term": "component.petition-compose-field.visibility-title",
     "definition": "Visibility conditions",
     "context": "Visibility conditions"
+  },
+  {
+    "term": "component.petition-compose-heading-settings.description",
+    "definition": "Enabling this will create a new page and use this as the heading of the new page",
+    "context": "Enabling this will create a new page and use this as the heading of the new page"
+  },
+  {
+    "term": "component.petition-compose-heading-settings.label",
+    "definition": "Start new page",
+    "context": "Start new page"
+  },
+  {
+    "term": "component.petition-compose-heading-settings.visibility",
+    "definition": "Can't add page breaks on headings with visibility conditions",
+    "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
     "term": "component.petition-compose-text-settings.format",
@@ -5105,11 +5200,6 @@
     "context": "By enabling this, the contents card in the recipient view will be hidden."
   },
   {
-    "term": "component.petition-settings.include-approval",
-    "definition": "Include approval",
-    "context": "Include approval"
-  },
-  {
     "term": "component.petition-settings.link-copied-toast",
     "definition": "Link copied to clipboard",
     "context": "Link copied to clipboard"
@@ -5118,31 +5208,6 @@
     "term": "component.petition-settings.locale-label",
     "definition": "Communications language",
     "context": "Communications language"
-  },
-  {
-    "term": "component.petition-settings.only-internal-field",
-    "definition": "This field can only be used internally.",
-    "context": "This field can only be used internally."
-  },
-  {
-    "term": "component.petition-settings.petition-comments-enable",
-    "definition": "Allow comments",
-    "context": "Allow comments"
-  },
-  {
-    "term": "component.petition-settings.petition-internal-field",
-    "definition": "Internal field",
-    "context": "Internal field"
-  },
-  {
-    "term": "component.petition-settings.petition-show-activity-pdf",
-    "definition": "Show reply activity",
-    "context": "Show reply activity"
-  },
-  {
-    "term": "component.petition-settings.petition-shown-in-pdf",
-    "definition": "Show in PDF",
-    "context": "Show in PDF"
   },
   {
     "term": "component.petition-settings.petition-signature-enable",
@@ -8715,16 +8780,6 @@
     "context": "Contacts"
   },
   {
-    "term": "dropzone.error.file-invalid-type",
-    "definition": "File type not allowed. Please, attach an {extension} file",
-    "context": "File type not allowed. Please, attach an {extension} file"
-  },
-  {
-    "term": "dropzone.error.file-too-large",
-    "definition": "The file is too large. Maximum size allowed {size}",
-    "context": "The file is too large. Maximum size allowed {size}"
-  },
-  {
     "term": "error.404.header",
     "definition": "We can't seem to find the page you're looking for.",
     "context": "We can't seem to find the page you're looking for."
@@ -8773,61 +8828,6 @@
     "term": "error.unknown-error.text",
     "definition": "Please try again later and if the error persists <a>reach out to support</a> for help.",
     "context": "Please try again later and if the error persists <a>reach out to support</a> for help."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",
-    "definition": "Attach an .xlsx file like the one in the model.",
-    "context": "Attach an .xlsx file like the one in the model."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.description",
-    "definition": "Import listings to create related dropdowns. You can use the importing model as a guide.",
-    "context": "Import listings to create related dropdowns. You can use the importing model as a guide."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.download-model",
-    "definition": "Download option loading model",
-    "context": "Download option loading model"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-dialog-body",
-    "definition": "Please, review your file and make sure there are no empty cells on the listing.",
-    "context": "Please, review your file and make sure there are no empty cells on the listing."
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-dialog-header",
-    "definition": "Import error",
-    "context": "Import error"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.label",
-    "definition": "Import options from Excel",
-    "context": "Import options from Excel"
-  },
-  {
-    "term": "field-settings.dynamic-select.loaded-options.example",
-    "definition": "For example:",
-    "context": "For example:"
-  },
-  {
-    "term": "field-settings.file-checkbox-description",
-    "definition": "This option allows you to limit the number of options that the recipient can choose.",
-    "context": "This option allows you to limit the number of options that the recipient can choose."
-  },
-  {
-    "term": "field-settings.heading-page-break-description",
-    "definition": "Enabling this will create a new page and use this as the heading of the new page",
-    "context": "Enabling this will create a new page and use this as the heading of the new page"
-  },
-  {
-    "term": "field-settings.heading-page-break-label",
-    "definition": "Start new page",
-    "context": "Start new page"
-  },
-  {
-    "term": "field-settings.heading-page-break-visibility",
-    "definition": "Can't add page breaks on headings with visibility conditions",
-    "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
     "term": "footer.slogan",
@@ -8900,7 +8900,7 @@
     "context": "Attach files to PDF"
   },
   {
-    "term": "generic.attach-files-to-pdf.description",
+    "term": "generic.attach-files-to-pdf-description",
     "definition": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed.",
     "context": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed."
   },
@@ -9180,7 +9180,17 @@
     "context": "Drag files here, or click to select them"
   },
   {
-    "term": "generic.dropzone-single.default",
+    "term": "generic.dropzone-error-file-invalid-type",
+    "definition": "File type not allowed. Please, attach an {extension} file",
+    "context": "File type not allowed. Please, attach an {extension} file"
+  },
+  {
+    "term": "generic.dropzone-error-file-too-large",
+    "definition": "The file is too large. Maximum size allowed {size}",
+    "context": "The file is too large. Maximum size allowed {size}"
+  },
+  {
+    "term": "generic.dropzone-single-default",
     "definition": "Drag the file here, or click to select it",
     "context": "Drag the file here, or click to select it"
   },

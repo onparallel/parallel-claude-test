@@ -1,46 +1,28 @@
 import { Box, HStack, Stack, Text } from "@chakra-ui/react";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import {
   ShortTextFormat,
   useShortTextFormatsSelectOptions,
 } from "@parallel/utils/useShortTextFormats";
-import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components } from "react-select";
-import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
-import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
+import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 
-export function ShortTextSettings({
+export function PetitionComposeShortTextSettings({
   field,
   onFieldEdit,
   isReadOnly,
-  children,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly" | "children">) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const options = field.options as FieldOptions["SHORT_TEXT"];
-  const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
 
   const { grouped, allFormats } = useShortTextFormatsSelectOptions();
 
   const selected = allFormats.find((o) => o.value === options.format);
 
-  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
-
-  const handlePlaceholderChange = function (event: ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value;
-    setPlaceholder(value);
-    debouncedOnUpdate(field.id, {
-      options: {
-        ...field.options,
-        placeholder: value || null,
-      },
-    });
-  };
-
   return (
-    <Stack spacing={4}>
+    <>
       <Stack>
         <HStack spacing={4}>
           <Text textStyle={isReadOnly ? "muted" : undefined}>
@@ -91,13 +73,7 @@ export function ShortTextSettings({
           </Text>
         ) : null}
       </Stack>
-      {children}
-      <SettingsRowPlaceholder
-        placeholder={placeholder}
-        onChange={handlePlaceholderChange}
-        isReadOnly={isReadOnly}
-      />
-    </Stack>
+    </>
   );
 }
 

@@ -1,19 +1,29 @@
 import { Image, Input, Text } from "@chakra-ui/react";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
-
-interface SettingsRowPlaceholderProps {
-  placeholder: string;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  isReadOnly?: boolean;
-}
+import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
+import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 
 export function SettingsRowPlaceholder({
-  placeholder,
-  onChange,
+  field,
+  onFieldEdit,
   isReadOnly,
-}: SettingsRowPlaceholderProps) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
+  const [placeholder, setPlaceholder] = useState(field.options?.placeholder ?? "");
+
+  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
+
+  const handlePlaceholderChange = function (event: ChangeEvent<HTMLInputElement>) {
+    const value = event.target.value;
+    setPlaceholder(value);
+    debouncedOnUpdate(field.id, {
+      options: {
+        ...field.options,
+        placeholder: value || null,
+      },
+    });
+  };
   return (
     <SettingsRow
       isDisabled={isReadOnly}
@@ -41,7 +51,7 @@ export function SettingsRowPlaceholder({
       }
       controlId="text-placeholder"
     >
-      <Input value={placeholder} size="sm" onChange={onChange} />
+      <Input value={placeholder} size="sm" onChange={handlePlaceholderChange} />
     </SettingsRow>
   );
 }

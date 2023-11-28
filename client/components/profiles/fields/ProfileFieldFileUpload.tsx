@@ -223,7 +223,7 @@ export function ProfileFieldFileUpload({
             >
               <Text pointerEvents="none" fontSize="sm">
                 <FormattedMessage
-                  id="generic.dropzone-single.default"
+                  id="generic.dropzone-single-default"
                   defaultMessage="Drag the file here, or click to select it"
                 />
               </Text>

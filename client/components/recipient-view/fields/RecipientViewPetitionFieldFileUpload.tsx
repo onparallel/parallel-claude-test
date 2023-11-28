@@ -336,7 +336,7 @@ function PetitionFieldFileUploadDropzone({
       {fileDropError === "file-too-large" ? (
         <Text color="red.600" fontSize="sm">
           <FormattedMessage
-            id="dropzone.error.file-too-large"
+            id="generic.dropzone-error-file-too-large"
             defaultMessage="The file is too large. Maximum size allowed {size}"
             values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
           />

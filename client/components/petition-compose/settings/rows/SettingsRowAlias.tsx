@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
-import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { CopyLiquidReferenceButton } from "@parallel/components/petition-common/CopyLiquidReferenceButton";
 import { MoreLiquidReferencesButton } from "@parallel/components/petition-common/MoreLiquidReferencesButton";
 import {
@@ -79,7 +78,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
       : true;
 
   return (
-    <>
+    <Stack>
       <SettingsRow
         data-section="field-reference"
         isDisabled={isReadOnly}
@@ -124,7 +123,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
               </>
             ) : null}
           </HStack>
-          <FormErrorMessage>
+          <FormErrorMessage margin={0}>
             {aliasError === "INVALID" ? (
               isFirstCharacterNumber(alias) ? (
                 <FormattedMessage
@@ -146,7 +145,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
           </FormErrorMessage>
         </Stack>
       </SettingsRow>
-      <PaddedCollapse in={isFileTypeField(field.type) && showDocumentReferenceAlert}>
+      {isFileTypeField(field.type) && showDocumentReferenceAlert ? (
         <CloseableAlert status="warning" rounded="md">
           <AlertIcon color="yellow.500" />
           <AlertDescription width="100%">
@@ -156,8 +155,8 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
             />
           </AlertDescription>
         </CloseableAlert>
-      </PaddedCollapse>
-    </>
+      ) : null}
+    </Stack>
   );
 }
 

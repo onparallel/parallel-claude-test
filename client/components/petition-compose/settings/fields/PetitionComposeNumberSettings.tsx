@@ -22,12 +22,10 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
+import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
 
-import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
-import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
-import { SettingsRowSwitch } from "./SettingsRowSwitch";
-
-export function NumberSettings({
+export function PetitionComposeNumberSettings({
   field,
   onFieldEdit,
   isReadOnly,
@@ -37,7 +35,6 @@ export function NumberSettings({
   const [range, setRange] = useState(options.range);
   const [decimals, setDecimals] = useState(options.decimals ?? 2);
 
-  const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   const [hasPrefix, setHasPrefix] = useState(
     isDefined(options.prefix) || isDefined(options.suffix) ? true : false,
   );
@@ -49,17 +46,6 @@ export function NumberSettings({
   const isRangeInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
-
-  const handlePlaceholderChange = function (event: ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value;
-    setPlaceholder(value);
-    debouncedOnUpdate(field.id, {
-      options: {
-        ...field.options,
-        placeholder: value || null,
-      },
-    });
-  };
 
   const handleMinChange = (value: number | undefined) => {
     setRange((r) => ({ ...r, min: value }));
@@ -120,7 +106,7 @@ export function NumberSettings({
   };
 
   return (
-    <Stack spacing={4}>
+    <>
       <FormControl as={HStack} flex={1} isDisabled={isReadOnly}>
         <FormLabel margin={0} fontWeight="normal">
           <FormattedMessage
@@ -312,11 +298,6 @@ export function NumberSettings({
           </Text>
         </Stack>
       </SettingsRowSwitch>
-      <SettingsRowPlaceholder
-        placeholder={placeholder}
-        onChange={handlePlaceholderChange}
-        isReadOnly={isReadOnly}
-      />
-    </Stack>
+    </>
   );
 }

@@ -6,7 +6,6 @@ import {
   NumberInputField,
   NumberInputStepper,
   Stack,
-  Switch,
   Text,
 } from "@chakra-ui/react";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
@@ -14,12 +13,12 @@ import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
-import { SettingsRow } from "./SettingsRow";
+import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
+import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
 
 type CheckboxLimitType = "UNLIMITED" | "EXACT" | "RANGE" | "RADIO";
 
-export function CheckboxSettings({
+export function PetitionComposeCheckboxSettings({
   field,
   onFieldEdit,
   isReadOnly,
@@ -125,9 +124,23 @@ export function CheckboxSettings({
   };
 
   return (
-    <Stack spacing={4}>
-      <SettingsRow
+    <>
+      <SettingsRowSwitch
         isDisabled={isReadOnly}
+        isChecked={limitType !== "RADIO"}
+        onChange={(value) => {
+          setLimitType(value ? "UNLIMITED" : "RADIO");
+          debouncedOnUpdate(field.id, {
+            options: {
+              ...field.options,
+              limit: {
+                type: value ? "UNLIMITED" : "RADIO",
+                min: field.optional ? 0 : 1,
+                max: 1,
+              },
+            },
+          });
+        }}
         label={
           <FormattedMessage
             id="component.petition-compose-field-settings.multiple-label"
@@ -137,36 +150,13 @@ export function CheckboxSettings({
         description={
           <Text fontSize="sm">
             <FormattedMessage
-              id="field-settings.file-checkbox-description"
+              id="component.petition-compose-checkbox-settings.description"
               defaultMessage="This option allows you to limit the number of options that the recipient can choose."
             />
           </Text>
         }
         controlId="field-checkbox"
       >
-        <Switch
-          height="20px"
-          display="block"
-          id="field-checkbox"
-          color="green"
-          isChecked={limitType !== "RADIO"}
-          onChange={(event) => {
-            setLimitType(event.target.checked ? "UNLIMITED" : "RADIO");
-            debouncedOnUpdate(field.id, {
-              options: {
-                ...field.options,
-                limit: {
-                  type: event.target.checked ? "UNLIMITED" : "RADIO",
-                  min: field.optional ? 0 : 1,
-                  max: 1,
-                },
-              },
-            });
-          }}
-          isDisabled={isReadOnly}
-        />
-      </SettingsRow>
-      {limitType !== "RADIO" ? (
         <Stack direction="row">
           <Box flex="1" minWidth="0">
             <SimpleSelect
@@ -226,7 +216,7 @@ export function CheckboxSettings({
             </NumberInput>
           )}
         </Stack>
-      ) : null}
-    </Stack>
+      </SettingsRowSwitch>
+    </>
   );
 }
