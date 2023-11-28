@@ -279,7 +279,13 @@ function PetitionExportField({
   const liquidRender = useLiquidRender();
   const approxNumberLines =
     (field.description ? approxTextHeight(liquidRender(field.description)) : 0) +
-    sumBy(replies, (r) => (field.type === "TEXT" ? approxTextHeight(r.content.value ?? "") : 1)) +
+    sumBy(replies, (r) =>
+      field.type === "TEXT"
+        ? approxTextHeight(r.content.value ?? "")
+        : field.type === "CHECKBOX"
+          ? sumBy(r.content.value as string[], (v) => approxTextHeight(v))
+          : 1,
+    ) +
     // more space for activity
     sumBy(replies, () => (field.showActivityInPdf ? 3 : 0)) +
     // space for separation between replies
