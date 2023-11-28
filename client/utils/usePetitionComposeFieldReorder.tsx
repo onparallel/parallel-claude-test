@@ -151,7 +151,8 @@ export function usePetitionComposeFieldReorder<
             await verifyFieldPositions(field, position, allNewFieldIds);
             // do the same checks as before for every child of the moved field
             for (const child of field.children ?? []) {
-              await verifyFieldPositions(child as T, position, allNewFieldIds);
+              const childPosition = allFieldIds.indexOf(child.id);
+              await verifyFieldPositions(child as T, childPosition, allNewFieldIds);
             }
           } catch (error) {
             if (error instanceof Error && error.message === "CANCELLED") {
