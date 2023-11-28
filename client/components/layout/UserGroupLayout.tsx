@@ -51,7 +51,7 @@ export function UserGroupLayout({
   const intl = useIntl();
   const router = useRouter();
   const canCrudTeams = useHasPermission("TEAMS:CRUD_TEAMS");
-  const canCrudPermissions = useHasPermission("TEAMS:CRUD_PERMISSIONS");
+  const canReadPermissions = useHasPermission("TEAMS:READ_PERMISSIONS");
   const tabs = useMemo<TabDefinition<UserGroupSection>[]>(
     () => [
       {
@@ -69,40 +69,39 @@ export function UserGroupLayout({
           defaultMessage: "Permissions",
         }),
         href: `/app/organization/groups/${groupId}/permissions`,
-        isDisabled: !canCrudPermissions || !me.hasPermissionManagement,
-        decorate:
-          !canCrudPermissions || !me.hasPermissionManagement
-            ? (tab) => (
-                <SmallPopover
-                  content={
-                    <Text fontSize="sm">
-                      <FormattedMessage
-                        id="component.user-group-layout.permissions-enterprise-explanation"
-                        defaultMessage="This is an enterprise feature. To know more <a>contact our support team</a>."
-                        values={{
-                          a: (chunks: any) => (
-                            <SupportLink
-                              message={intl.formatMessage({
-                                id: "component.user-group-layout.permissions-enterprise-message",
-                                defaultMessage:
-                                  "Hi, I would like to get more information about permission management.",
-                              })}
-                            >
-                              {chunks}
-                            </SupportLink>
-                          ),
-                        }}
-                      />
-                    </Text>
-                  }
-                >
-                  <Box>{tab}</Box>
-                </SmallPopover>
-              )
-            : undefined,
+        isDisabled: !canReadPermissions || !me.hasPermissionManagement,
+        decorate: !me.hasPermissionManagement
+          ? (tab) => (
+              <SmallPopover
+                content={
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.user-group-layout.permissions-enterprise-explanation"
+                      defaultMessage="This is an enterprise feature. To know more <a>contact our support team</a>."
+                      values={{
+                        a: (chunks: any) => (
+                          <SupportLink
+                            message={intl.formatMessage({
+                              id: "component.user-group-layout.permissions-enterprise-message",
+                              defaultMessage:
+                                "Hi, I would like to get more information about permission management.",
+                            })}
+                          >
+                            {chunks}
+                          </SupportLink>
+                        ),
+                      }}
+                    />
+                  </Text>
+                }
+              >
+                <Box>{tab}</Box>
+              </SmallPopover>
+            )
+          : undefined,
       },
     ],
-    [intl.locale, canCrudPermissions],
+    [intl.locale, canReadPermissions],
   );
   const currentTab = tabs.find((t) => t.key === currentTabKey)!;
 

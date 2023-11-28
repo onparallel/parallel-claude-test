@@ -466,7 +466,8 @@ export type UserGroupPermissionName =
   | "TAGS:CREATE_TAGS"
   | "TAGS:UPDATE_TAGS"
   | "TAGS:DELETE_TAGS"
-  | "TEAMS:CRUD_PERMISSIONS";
+  | "TEAMS:READ_PERMISSIONS"
+  | "TEAMS:UPDATE_PERMISSIONS";
 
 export const UserGroupPermissionNameValues = [
   "SUPERADMIN",
@@ -498,7 +499,8 @@ export const UserGroupPermissionNameValues = [
   "TAGS:CREATE_TAGS",
   "TAGS:UPDATE_TAGS",
   "TAGS:DELETE_TAGS",
-  "TEAMS:CRUD_PERMISSIONS",
+  "TEAMS:READ_PERMISSIONS",
+  "TEAMS:UPDATE_PERMISSIONS",
 ] as UserGroupPermissionName[];
 
 export type UserGroupType = "NORMAL" | "ALL_USERS" | "INITIAL";

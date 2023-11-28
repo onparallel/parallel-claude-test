@@ -183,7 +183,7 @@ export const updateUserGroupPermissions = mutationField("updateUserGroupPermissi
   type: "UserGroup",
   authorize: authenticateAnd(
     userHasFeatureFlag("PERMISSION_MANAGEMENT"),
-    contextUserHasPermission("TEAMS:CRUD_PERMISSIONS"),
+    contextUserHasPermission("TEAMS:UPDATE_PERMISSIONS"),
     userHasAccessToUserGroups("userGroupId"),
   ),
   args: {

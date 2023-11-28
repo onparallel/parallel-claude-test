@@ -11480,6 +11480,16 @@
     "context": "Grants users in this team permissions to view the list of teams on the organization."
   },
   {
+    "term": "page.permissions-group.teams-read-permissions",
+    "definition": "Ver permisos de equipo",
+    "context": "View team permissions"
+  },
+  {
+    "term": "page.permissions-group.teams-read-permissions-description",
+    "definition": "Concede a los usuarios en este equipo permisos para ver el listado de permisos de cada equipo en la organización.",
+    "context": "Grants users in this team permissions to view the permissions of each team on the organization."
+  },
+  {
     "term": "page.permissions-group.users-crud",
     "definition": "Gestionar usuarios",
     "context": "Manage users"

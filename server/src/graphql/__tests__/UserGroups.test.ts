@@ -658,7 +658,7 @@ describe("GraphQL/UserGroups", () => {
       const [org] = await mocks.createRandomOrganizations(1, () => ({ status: "DEV" }));
       const [user] = await mocks.createRandomUsers(org.id, 1, () => ({ is_org_owner: true }));
       const [userGroup] = await mocks.createUserGroups(1, org.id, [
-        { name: "TEAMS:CRUD_PERMISSIONS", effect: "GRANT" },
+        { name: "TEAMS:UPDATE_PERMISSIONS", effect: "GRANT" },
       ]);
       await mocks.insertUserGroupMembers(userGroup.id, [user.id]);
       const { apiKey } = await mocks.createUserAuthToken("token", user.id);
@@ -686,7 +686,7 @@ describe("GraphQL/UserGroups", () => {
       expect(data).toBeNull();
     });
 
-    it("fails if user does not have TEAMS:CRUD_PERMISSIONS permission", async () => {
+    it("fails if user does not have TEAMS:UPDATE_PERMISSIONS permission", async () => {
       const [user] = await mocks.createRandomUsers(organization.id);
       const { apiKey } = await mocks.createUserAuthToken("token", user.id);
 

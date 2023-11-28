@@ -36,6 +36,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -65,6 +66,8 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
       id: groupId,
     },
   });
+
+  const canEdit = useHasPermission("TEAMS:UPDATE_PERMISSIONS");
 
   const permissionsCategories = useMemo(
     () => [
@@ -440,7 +443,19 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             }),
           },
           {
-            name: "TEAMS:CRUD_PERMISSIONS",
+            name: "TEAMS:READ_PERMISSIONS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.teams-read-permissions",
+              defaultMessage: "View team permissions",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.teams-read-permissions-description",
+              defaultMessage:
+                "Grants users in this team permissions to view the permissions of each team on the organization.",
+            }),
+          },
+          {
+            name: "TEAMS:UPDATE_PERMISSIONS",
             title: intl.formatMessage({
               id: "page.permissions-group.teams-edit-permissions",
               defaultMessage: "Manage team permissions",
@@ -612,10 +627,10 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
   const navigate = useHandleNavigation();
   useEffect(() => {
     // if user removes their permission to edit permissions, redirect to the group view
-    if (!me.permissions.includes("TEAMS:CRUD_PERMISSIONS")) {
+    if (!me.permissions.includes("TEAMS:READ_PERMISSIONS")) {
       navigate(`/app/organization/groups/${groupId}`);
     }
-  }, [me.permissions.includes("TEAMS:CRUD_PERMISSIONS")]);
+  }, [me.permissions.includes("TEAMS:READ_PERMISSIONS")]);
 
   return (
     <UserGroupLayout
@@ -694,6 +709,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                                       options={permissionEffects}
                                       onChange={onChange}
                                       components={{ SingleValue, Option }}
+                                      isDisabled={!canEdit}
                                     />
                                   )}
                                 />
@@ -708,13 +724,13 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
               })}
 
             <HStack paddingTop={6} alignSelf="flex-end">
-              <Button onClick={() => reset()} isDisabled={!formState.isDirty}>
+              <Button onClick={() => reset()} isDisabled={!formState.isDirty || !canEdit}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>
               <Button
                 colorScheme="primary"
                 type="submit"
-                isDisabled={!formState.isDirty}
+                isDisabled={!formState.isDirty || !canEdit}
                 isLoading={isSubmitting}
               >
                 <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
@@ -874,6 +890,6 @@ PermissionsGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
 export default compose(
   withDialogs,
   withFeatureFlag("PERMISSION_MANAGEMENT", "/app/organization"),
-  withPermission("TEAMS:CRUD_PERMISSIONS", { orPath: "/app/organization" }),
+  withPermission("TEAMS:READ_PERMISSIONS", { orPath: "/app/organization" }),
   withApolloData,
 )(PermissionsGroup);
