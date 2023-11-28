@@ -252,7 +252,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
               )}
             </OverflownText>
           ) : row.fromTemplate.name ? (
-            row.fromTemplate.name
+            <OverflownText>{row.fromTemplate.name}</OverflownText>
           ) : (
             <Text as="span" textStyle="hint">
               <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
