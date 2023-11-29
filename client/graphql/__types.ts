@@ -25436,7 +25436,6 @@ export type OrganizationUsers_UserFragment = {
   userGroups: Array<{
     __typename?: "UserGroup";
     id: string;
-    imMember: boolean;
     hasPermissions: boolean;
     name: string;
     localizableName: { [locale in UserLocale]?: string };
@@ -25470,7 +25469,6 @@ export type OrganizationUsers_inviteUserToOrganizationMutation = {
     userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
-      imMember: boolean;
       hasPermissions: boolean;
       name: string;
       localizableName: { [locale in UserLocale]?: string };
@@ -25502,7 +25500,6 @@ export type OrganizationUsers_updateUserGroupMembershipMutation = {
     userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
-      imMember: boolean;
       hasPermissions: boolean;
       name: string;
       localizableName: { [locale in UserLocale]?: string };
@@ -25619,7 +25616,6 @@ export type OrganizationUsers_orgUsersQuery = {
           userGroups: Array<{
             __typename?: "UserGroup";
             id: string;
-            imMember: boolean;
             hasPermissions: boolean;
             name: string;
             localizableName: { [locale in UserLocale]?: string };
@@ -46084,7 +46080,6 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     isSsoUser
     userGroups {
       id
-      imMember
       hasPermissions
       name
       localizableName

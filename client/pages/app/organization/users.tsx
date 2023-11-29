@@ -781,33 +781,31 @@ function useOrganizationUsersTableColumns() {
         CellContent: ({ row }) => {
           return (
             <EnumerateList
-              values={row.userGroups
-                .filter((userGroup) => userGroup.imMember)
-                .sort((a, b) => {
-                  // type === ALL_USER always goes last
-                  if (a.type === "ALL_USERS" && b.type !== "ALL_USERS") {
-                    return 1;
-                  }
-                  if (a.type !== "ALL_USERS" && b.type === "ALL_USERS") {
-                    return -1;
-                  }
+              values={row.userGroups.sort((a, b) => {
+                // type === ALL_USER always goes last
+                if (a.type === "ALL_USERS" && b.type !== "ALL_USERS") {
+                  return 1;
+                }
+                if (a.type !== "ALL_USERS" && b.type === "ALL_USERS") {
+                  return -1;
+                }
 
-                  // groups with permissions show first
-                  if (a.hasPermissions && !b.hasPermissions) {
-                    return -1;
-                  }
-                  if (!a.hasPermissions && b.hasPermissions) {
-                    return 1;
-                  }
+                // groups with permissions show first
+                if (a.hasPermissions && !b.hasPermissions) {
+                  return -1;
+                }
+                if (!a.hasPermissions && b.hasPermissions) {
+                  return 1;
+                }
 
-                  // then sort by name
-                  if (a.name && b.name) {
-                    return a.name.localeCompare(b.name);
-                  }
+                // then sort by name
+                if (a.name && b.name) {
+                  return a.name.localeCompare(b.name);
+                }
 
-                  // if all is the same it doesn't matter the order
-                  return 0;
-                })}
+                // if all is the same it doesn't matter the order
+                return 0;
+              })}
               maxItems={2}
               renderItem={({ value }, index) => {
                 return (
@@ -920,7 +918,6 @@ OrganizationUsers.fragments = {
         isSsoUser
         userGroups {
           id
-          imMember
           hasPermissions
           name
           localizableName
