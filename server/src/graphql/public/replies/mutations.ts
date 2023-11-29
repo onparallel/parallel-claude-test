@@ -152,10 +152,10 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
   type: "PublicPetitionField",
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    replyCanBeDeleted("replyId"),
     replyBelongsToAccess("replyId"),
     replyBelongsToExternalField("replyId"),
     replyCanBeUpdated("replyId"),
-    replyCanBeDeleted("replyId"),
   ),
   args: {
     keycode: nonNull(idArg()),

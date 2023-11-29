@@ -679,10 +679,9 @@ export function replyCanBeDeleted<
     const replyId = args[argReplyId] as unknown as number;
 
     const field = await ctx.petitions.loadFieldForReply(replyId);
-    if (!isDefined(field)) {
-      return false;
+    if (!field) {
+      throw new ApolloError(`Reply is already deleted`, "REPLY_ALREADY_DELETED_ERROR");
     }
-
     if (field.type === "FIELD_GROUP" && !field.optional) {
       const replies = await ctx.petitions.loadRepliesForField(field.id);
       if (replies.length === 1 && replies[0].id === replyId) {

@@ -30,6 +30,7 @@ import {
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 interface FieldDateTimeReply {
   datetime: string;
@@ -45,6 +46,7 @@ export interface RecipientViewPetitionFieldDateTimeProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: FieldDateTimeReply) => Promise<void>;
   onCreateReply: (content: FieldDateTimeReply) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
 }
@@ -57,6 +59,7 @@ export function RecipientViewPetitionFieldDateTime({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldDateTimeProps) {
@@ -65,7 +68,7 @@ export function RecipientViewPetitionFieldDateTime({
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
-
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -75,6 +78,10 @@ export function RecipientViewPetitionFieldDateTime({
   useEffect(() => {
     if (field.multiple && field.replies.length > 0 && showNewReply) {
       setShowNewReply(false);
+    }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+      setValue("");
     }
   }, [field.replies]);
 
@@ -144,7 +151,12 @@ export function RecipientViewPetitionFieldDateTime({
             }
           }
         }
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setHasAlreadyRepliedError(true);
+        }
+        onError(e);
+      }
       setIsSaving(false);
     },
     1000,
@@ -156,7 +168,7 @@ export function RecipientViewPetitionFieldDateTime({
     ref: newReplyRef as any,
     paddingRight: 3,
     isDisabled,
-    isInvalid,
+    isInvalid: isInvalid || hasAlreadyRepliedError,
     value,
     // This removes the reset button on Firefox
     required: true,
@@ -208,6 +220,10 @@ export function RecipientViewPetitionFieldDateTime({
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
             values={{ count: fieldReplies.length }}
           />
+        </Text>
+      ) : hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
       {field.replies.length ? (

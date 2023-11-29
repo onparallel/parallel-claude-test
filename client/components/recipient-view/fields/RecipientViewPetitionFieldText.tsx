@@ -2,6 +2,8 @@ import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
@@ -11,9 +13,9 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChangeEvent,
-  forwardRef,
   KeyboardEvent,
   MouseEvent,
+  forwardRef,
   useEffect,
   useRef,
   useState,
@@ -27,7 +29,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 
 export interface RecipientViewPetitionFieldTextProps
   extends Omit<
@@ -38,6 +39,7 @@ export interface RecipientViewPetitionFieldTextProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
 }
@@ -50,6 +52,7 @@ export function RecipientViewPetitionFieldText({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldTextProps) {
@@ -58,9 +61,9 @@ export function RecipientViewPetitionFieldText({
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
-
   const newReplyRef = useRef<HTMLTextAreaElement>(null);
   const replyRefs = useMultipleRefs<HTMLTextAreaElement>();
 
@@ -69,6 +72,10 @@ export function RecipientViewPetitionFieldText({
   useEffect(() => {
     if (field.multiple && field.replies.length > 0 && showNewReply) {
       setShowNewReply(false);
+    }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+      setValue("");
     }
   }, [field.replies]);
 
@@ -146,7 +153,12 @@ export function RecipientViewPetitionFieldText({
             }
           }
         }
-      } catch {}
+      } catch (e) {
+        onError(e);
+        if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setHasAlreadyRepliedError(true);
+        }
+      }
       setIsSaving(false);
     },
     1000,
@@ -160,7 +172,7 @@ export function RecipientViewPetitionFieldText({
     isDisabled: isDisabled,
     maxLength: field.options.maxLength ?? undefined,
     value,
-    isInvalid,
+    isInvalid: isInvalid || hasAlreadyRepliedError,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediateIfPending(value, false);
@@ -216,6 +228,10 @@ export function RecipientViewPetitionFieldText({
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
             values={{ count: fieldReplies.length }}
           />
+        </Text>
+      ) : hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
       {field.replies.length ? (

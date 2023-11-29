@@ -1,6 +1,7 @@
 import { Box, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import {
@@ -21,6 +22,7 @@ export interface RecipientViewPetitionFieldCheckboxProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string[] }) => Promise<void>;
   onCreateReply: (content: { value: string[] }) => Promise<string | undefined>;
+  onError: (error: any) => void;
 }
 
 const haveChanges = ({
@@ -48,6 +50,7 @@ export function RecipientViewPetitionFieldCheckbox({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
 }: RecipientViewPetitionFieldCheckboxProps) {
   const options = field.options as FieldOptions["CHECKBOX"];
 
@@ -56,7 +59,7 @@ export function RecipientViewPetitionFieldCheckbox({
   const reply = field.replies.length > 0 ? field.replies[0] : undefined;
   const isRejected = reply?.status === "REJECTED" ?? false;
   const showRadio = max === 1 && type !== "UNLIMITED";
-
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const [checkedItems, setCheckedItems] = useState<string[]>(reply?.content?.value ?? []);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -64,23 +67,41 @@ export function RecipientViewPetitionFieldCheckbox({
     if (haveChanges({ checked: checkedItems, value: reply?.content?.value ?? [], max: max })) {
       setCheckedItems(reply?.content?.value ?? []);
     }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+    }
   }, [reply]);
 
   const handleUpdate = async (value: string[]) => {
     setIsSaving(true);
-    await onUpdateReply(reply!.id, { value });
+    try {
+      await onUpdateReply(reply!.id, { value });
+    } catch (e) {
+      onError(e);
+    }
     setIsSaving(false);
   };
 
   const handleCreate = async (value: string[]) => {
     setIsSaving(true);
-    await onCreateReply({ value });
+    try {
+      await onCreateReply({ value });
+    } catch (e) {
+      if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+        setHasAlreadyRepliedError(true);
+      }
+      onError(e);
+    }
     setIsSaving(false);
   };
 
   const handleDelete = async () => {
     setIsSaving(true);
-    await onDeleteReply(reply!.id);
+    try {
+      await onDeleteReply(reply!.id);
+    } catch (e) {
+      onError(e);
+    }
     setIsSaving(false);
   };
 
@@ -146,9 +167,14 @@ export function RecipientViewPetitionFieldCheckbox({
             </Text>
           ) : null}
           {!isSaving && checkedItems?.length ? (
-            <Box as="span" color={isInvalid ? "red.600" : "gray.600"}>
+            <Box as="span" color={isInvalid || hasAlreadyRepliedError ? "red.600" : "gray.600"}>
               {showRadio ? null : "("}
-              {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
+              {hasAlreadyRepliedError ? (
+                <FormattedMessage
+                  id="generic.reply-not-submitted"
+                  defaultMessage="Reply not sent"
+                />
+              ) : type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-card.replies-submitted-checkbox"
                   defaultMessage="Reply submitted"
@@ -180,7 +206,7 @@ export function RecipientViewPetitionFieldCheckbox({
           <Checkbox
             key={index}
             data-value={value}
-            isInvalid={isRejected || isInvalid}
+            isInvalid={isRejected || isInvalid || hasAlreadyRepliedError}
             isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
             isChecked={checkedItems.includes(value)}
             value={value}

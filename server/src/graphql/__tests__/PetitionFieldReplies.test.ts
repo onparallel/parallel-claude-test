@@ -3610,6 +3610,42 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data).toBeNull();
     });
 
+    it("sends error if trying to delete an already deleted reply", async () => {
+      const [textReply] = await mocks.createRandomTextReply(textField.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors: errors1 } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", textReply.id),
+        },
+      );
+      expect(errors1).toBeUndefined();
+
+      const { errors: errors2 } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", textReply.id),
+        },
+      );
+      expect(errors2).toContainGraphQLError("REPLY_ALREADY_DELETED_ERROR");
+    });
+
     it("should be able to delete a rejected reply", async () => {
       const { errors, data } = await testClient.execute(
         gql`

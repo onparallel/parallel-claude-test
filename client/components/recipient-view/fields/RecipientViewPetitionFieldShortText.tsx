@@ -55,8 +55,10 @@ export interface RecipientViewPetitionFieldShortTextProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
+  hasAlreadyRepliedError?: boolean;
 }
 
 export function RecipientViewPetitionFieldShortText({
@@ -67,6 +69,7 @@ export function RecipientViewPetitionFieldShortText({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldShortTextProps) {
@@ -78,7 +81,7 @@ export function RecipientViewPetitionFieldShortText({
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const [isInvalidReply, setIsInvalidReply] = useState<Record<string, boolean>>({});
-
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
 
@@ -87,6 +90,10 @@ export function RecipientViewPetitionFieldShortText({
   useEffect(() => {
     if (field.multiple && field.replies.length > 0 && showNewReply) {
       setShowNewReply(false);
+    }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+      setValue("");
     }
   }, [field.replies]);
 
@@ -173,7 +180,10 @@ export function RecipientViewPetitionFieldShortText({
       } catch (e) {
         if (isApolloError(e, "INVALID_REPLY_ERROR")) {
           handleInvalidReply(field.id, true);
+        } else if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setHasAlreadyRepliedError(true);
         }
+        onError(e);
       }
       setIsSaving(false);
     },
@@ -197,7 +207,7 @@ export function RecipientViewPetitionFieldShortText({
     ref: newReplyRef,
     paddingRight: 10,
     isDisabled: isDisabled,
-    isInvalid: isInvalidReply[field.id] || isInvalid,
+    isInvalid: isInvalidReply[field.id] || isInvalid || hasAlreadyRepliedError,
     maxLength: field.options.maxLength ?? undefined,
     value,
     onKeyDown: async (event: KeyboardEvent) => {
@@ -279,6 +289,10 @@ export function RecipientViewPetitionFieldShortText({
             values={{ count: fieldReplies.length }}
           />
         </Text>
+      ) : hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
+        </Text>
       ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
@@ -303,7 +317,7 @@ export function RecipientViewPetitionFieldShortText({
           </AnimatePresence>
         </List>
       ) : null}
-      <FormControl isInvalid={isInvalidReply[field.id]}>
+      <FormControl isInvalid={isInvalidReply[field.id] || hasAlreadyRepliedError}>
         {(field.multiple && showNewReply) || field.replies.length === 0 ? (
           <Flex flex="1" position="relative" marginTop={2}>
             <ShortTextInput

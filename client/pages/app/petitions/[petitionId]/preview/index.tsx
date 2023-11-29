@@ -51,6 +51,7 @@ import {
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
+import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/RecipientViewRefreshRepliesAlert";
 import {
   PetitionPreview_PetitionBaseFragment,
   PetitionPreview_completePetitionDocument,
@@ -59,6 +60,7 @@ import {
   PetitionPreview_userDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
@@ -99,7 +101,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   });
 
   const [showErrors, setShowErrors] = useState(false);
-
+  const [showRefreshRepliesAlert, setShowRefreshRepliesAlert] = useState(false);
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionPreview_updatePetitionDocument);
   const handleUpdatePetition = useCallback(
@@ -361,6 +363,16 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     } catch {}
   }
 
+  const handleErrorFromFields = useCallback(async (error: any) => {
+    if (isApolloError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
+      setShowRefreshRepliesAlert(true);
+    } else if (isApolloError(error, "REPLY_ALREADY_DELETED_ERROR")) {
+      await refetch();
+    } else {
+      throw error;
+    }
+  }, []);
+
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
@@ -433,6 +445,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             ["COMPLETED", "CLOSED"].includes(petition.status) &&
             !petition.isAnonymized ? (
               <PetitionCompletedAlert />
+            ) : null}
+            {showRefreshRepliesAlert ? (
+              <RecipientViewRefreshRepliesAlert
+                onRefetch={async () => {
+                  await refetch();
+                  setShowRefreshRepliesAlert(false);
+                }}
+              />
             ) : null}
           </>
         }
@@ -515,6 +535,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                               myEffectivePermission={myEffectivePermission}
                               showErrors={showErrors && !canFinalize}
                               fieldLogic={logic}
+                              onError={handleErrorFromFields}
                             />
                             {field.type !== "FIELD_GROUP" ? (
                               <Center

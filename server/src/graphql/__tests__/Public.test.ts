@@ -2731,12 +2731,13 @@ describe("GraphQL/Public", () => {
     });
 
     describe("publicDeletePetitionFieldReply", () => {
+      let simpleField: PetitionField;
       let simpleReply: PetitionFieldReply;
       let fileUploadReply: PetitionFieldReply;
       let approvedReply: PetitionFieldReply;
       let internalReply: PetitionFieldReply;
       beforeAll(async () => {
-        const [simpleField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+        [simpleField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
           type: "TEXT",
         }));
         const [fileUploadField] = await mocks.createRandomPetitionFields(
@@ -2879,6 +2880,40 @@ describe("GraphQL/Public", () => {
         );
         expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
         expect(data).toBeNull();
+      });
+
+      it("sends error if trying to delete an already deleted reply", async () => {
+        const [textReply] = await mocks.createRandomTextReply(simpleField.id, access.id, 1);
+
+        const { errors: errors1 } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", textReply.id),
+          },
+        );
+        expect(errors1).toBeUndefined();
+
+        const { errors: errors2 } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", textReply.id),
+          },
+        );
+        expect(errors2).toContainGraphQLError("REPLY_ALREADY_DELETED_ERROR");
       });
 
       it("deletes a FIELD_GROUP reply with all its subreplies", async () => {

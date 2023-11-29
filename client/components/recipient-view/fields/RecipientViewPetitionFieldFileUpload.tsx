@@ -23,7 +23,7 @@ import { PetitionFieldType } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MaybePromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -33,6 +33,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
@@ -43,6 +44,7 @@ export interface RecipientViewPetitionFieldFileUploadProps
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (content: File[]) => void;
   onDownloadReply: (replyId: string) => void;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   isCacheOnly?: boolean;
 }
@@ -55,6 +57,7 @@ export function RecipientViewPetitionFieldFileUpload({
   onCreateReply,
   onDownloadReply,
   onCommentsButtonClick,
+  onError,
   isCacheOnly,
   isInvalid,
 }: RecipientViewPetitionFieldFileUploadProps) {
@@ -68,8 +71,21 @@ export function RecipientViewPetitionFieldFileUpload({
     },
     [onDeleteReply],
   );
-
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const fieldReplies = completedFieldReplies(field);
+
+  useEffect(() => {
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+    }
+  }, [field.replies]);
+
+  const handleError = useCallback((e: any) => {
+    if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+      setHasAlreadyRepliedError(true);
+    }
+    onError(e);
+  }, []);
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -77,13 +93,20 @@ export function RecipientViewPetitionFieldFileUpload({
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
     >
-      <Text fontSize="sm" color="gray.600">
-        <FormattedMessage
-          id="component.recipient-view-petition-field-card.files-uploaded"
-          defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-          values={{ count: fieldReplies.length }}
-        />
-      </Text>
+      {hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
+        </Text>
+      ) : (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.files-uploaded"
+            defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      )}
+
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
@@ -114,7 +137,8 @@ export function RecipientViewPetitionFieldFileUpload({
           isDisabled={isDisabled}
           field={field}
           onCreateReply={onCreateReply}
-          isInvalid={isInvalid}
+          onError={handleError}
+          isInvalid={isInvalid || hasAlreadyRepliedError}
         />
       </Box>
     </RecipientViewPetitionFieldLayout>
@@ -285,6 +309,7 @@ interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   isDisabled: boolean;
   field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
   onCreateReply: (files: File[]) => MaybePromise<void>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
 }
 
@@ -292,6 +317,7 @@ function PetitionFieldFileUploadDropzone({
   field,
   isDisabled,
   onCreateReply,
+  onError,
   isInvalid,
   ...props
 }: PetitionFieldFileUploadDropzoneProps) {
@@ -307,7 +333,9 @@ function PetitionFieldFileUploadDropzone({
       try {
         setFileDropError(null);
         await onCreateReply(files);
-      } catch {}
+      } catch (e) {
+        onError(e);
+      }
     }
   }
   return (

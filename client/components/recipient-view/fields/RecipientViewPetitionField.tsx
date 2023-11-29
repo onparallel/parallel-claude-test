@@ -54,6 +54,7 @@ export interface RecipientViewPetitionFieldProps
   isDisabled: boolean;
   showErrors: boolean;
   fieldLogic?: FieldLogicResult;
+  onError: (error: any) => void;
 }
 
 export function RecipientViewPetitionField({
@@ -117,7 +118,9 @@ export function RecipientViewPetitionField({
           },
         });
         updateLastSaved();
-      } catch {}
+      } catch (e) {
+        props.onError(e);
+      }
     },
     [publicDeletePetitionFieldReply, updateLastSaved],
   );
@@ -169,16 +172,14 @@ export function RecipientViewPetitionField({
   const createFileUploadReply = useCreateFileUploadReply();
   const handleCreateFileUploadReply = useCallback(
     async (content: File[], _fieldId?: string, parentReplyId?: string) => {
-      try {
-        createFileUploadReply({
-          keycode: props.keycode,
-          fieldId: _fieldId ?? props.field.id,
-          content,
-          uploads,
-          parentReplyId,
-        });
-        updateLastSaved();
-      } catch {}
+      await createFileUploadReply({
+        keycode: props.keycode,
+        fieldId: _fieldId ?? props.field.id,
+        content,
+        uploads,
+        parentReplyId,
+      });
+      updateLastSaved();
     },
     [createFileUploadReply, uploads, updateLastSaved],
   );

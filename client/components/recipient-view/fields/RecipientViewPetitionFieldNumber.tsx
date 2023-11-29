@@ -19,6 +19,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 export interface RecipientViewPetitionFieldNumberProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
@@ -28,6 +29,7 @@ export interface RecipientViewPetitionFieldNumberProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: number }) => Promise<void>;
   onCreateReply: (content: { value: number }) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
 }
@@ -41,6 +43,7 @@ export function RecipientViewPetitionFieldNumber({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   parentReplyId,
 }: RecipientViewPetitionFieldNumberProps) {
   const intl = useIntl();
@@ -51,7 +54,7 @@ export function RecipientViewPetitionFieldNumber({
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const [isInvalidReply, setIsInvalidReply] = useState<Record<string, boolean>>({});
-
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
 
@@ -71,6 +74,10 @@ export function RecipientViewPetitionFieldNumber({
   useEffect(() => {
     if (field.multiple && field.replies.length > 0 && showNewReply) {
       setShowNewReply(false);
+    }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+      setValue(undefined);
     }
   }, [field.replies]);
 
@@ -146,7 +153,12 @@ export function RecipientViewPetitionFieldNumber({
             }
           }
         }
-      } catch {}
+      } catch (e) {
+        onError(e);
+        if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setHasAlreadyRepliedError(true);
+        }
+      }
       setIsSaving(false);
     },
     1000,
@@ -166,7 +178,7 @@ export function RecipientViewPetitionFieldNumber({
     id: `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`,
     ref: newReplyRef,
     isDisabled: isDisabled,
-    isInvalid: isInvalidReply[field.id] || isInvalid,
+    isInvalid: isInvalidReply[field.id] || isInvalid || hasAlreadyRepliedError,
     onlyPositive: isDefined(range.min) && range.min >= 0,
     decimals: decimals ?? 2,
     prefix,
@@ -284,6 +296,12 @@ export function RecipientViewPetitionFieldNumber({
               defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
               values={{ count: field.replies.length }}
             />
+            {")"}
+          </Text>
+        ) : hasAlreadyRepliedError ? (
+          <Text fontSize="sm" color="red.500">
+            {"("}
+            <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
             {")"}
           </Text>
         ) : null}

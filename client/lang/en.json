@@ -6750,6 +6750,11 @@
     "context": "Please, enter a valid {format}."
   },
   {
+    "term": "component.recipient-view-petition-field-tax-documents.error-field-already-replied",
+    "definition": "There is already a reply for this field.",
+    "context": "There is already a reply for this field."
+  },
+  {
     "term": "component.recipient-view-petition-field-tax-documents.error-uploading",
     "definition": "We have not found any files. Please try again.",
     "context": "We have not found any files. Please try again."
@@ -6788,6 +6793,16 @@
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
     "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
     "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.description",
+    "definition": "There is a more recent version of this page. Refresh to see all added replies.",
+    "context": "There is a more recent version of this page. Refresh to see all added replies."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.refetch-button",
+    "definition": "Refresh replies",
+    "context": "Refresh replies"
   },
   {
     "term": "component.recipient-view-signature-sent-alert.check-status-button",
@@ -9903,6 +9918,11 @@
     "term": "generic.reply-not-available",
     "definition": "Reply not available",
     "context": "Reply not available"
+  },
+  {
+    "term": "generic.reply-not-submitted",
+    "definition": "Reply not sent",
+    "context": "Reply not sent"
   },
   {
     "term": "generic.required-field",

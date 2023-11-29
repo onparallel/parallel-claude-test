@@ -15,7 +15,7 @@ import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
-import { authenticateAnd } from "../../helpers/authorize";
+import { authenticateAnd, chain } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
@@ -255,10 +255,12 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    repliesBelongsToPetition("petitionId", "replyId"),
-    replyCanBeUpdated("replyId"),
-    replyCanBeDeleted("replyId"),
     petitionIsNotAnonymized("petitionId"),
+    chain(
+      replyCanBeDeleted("replyId"),
+      replyCanBeUpdated("replyId"),
+      repliesBelongsToPetition("petitionId", "replyId"),
+    ),
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);

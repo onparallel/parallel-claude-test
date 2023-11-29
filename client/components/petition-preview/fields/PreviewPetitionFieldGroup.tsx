@@ -64,6 +64,7 @@ export interface PreviewPetitionFieldGroupProps
   petition: PreviewPetitionFieldGroup_PetitionBaseFragment;
   showErrors: boolean;
   fieldLogic: FieldLogicResult;
+  onError: (error: any) => void;
 }
 
 export function PreviewPetitionFieldGroup({
@@ -81,6 +82,7 @@ export function PreviewPetitionFieldGroup({
   onStartAsyncFieldCompletion,
   onRefreshField,
   showErrors,
+  onError,
   fieldLogic,
 }: PreviewPetitionFieldGroupProps) {
   const intl = useIntl();
@@ -143,6 +145,7 @@ export function PreviewPetitionFieldGroup({
                       onCreateFileReply={onCreateFileReply}
                       onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
                       onRefreshField={onRefreshField}
+                      onError={onError}
                     />
                   </LiquidPetitionVariableProvider>
                 );
@@ -211,6 +214,7 @@ function PreviewPetitionFieldGroupField(props: {
     url: string;
   }>;
   onRefreshField: () => void;
+  onError: (error: any) => void;
 }) {
   const {
     parentReplyId,

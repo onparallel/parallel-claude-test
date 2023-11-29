@@ -8,6 +8,8 @@ import {
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useCallback, useEffect, useRef } from "react";
@@ -43,8 +45,6 @@ import {
 } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -58,6 +58,7 @@ export interface PreviewPetitionFieldProps
   myEffectivePermission: PetitionPermissionType;
   showErrors: boolean;
   fieldLogic: FieldLogicResult;
+  onError: (error: any) => void;
 }
 
 export function PreviewPetitionField({
@@ -136,7 +137,9 @@ export function PreviewPetitionField({
           parentReplyId,
           isCacheOnly,
         });
-      } catch {}
+      } catch (e) {
+        props.onError(e);
+      }
     },
     [deletePetitionReply],
   );
@@ -173,16 +176,14 @@ export function PreviewPetitionField({
   const createFileUploadReply = useCreateFileUploadReply();
   const handleCreateFileUploadReply = useCallback(
     async (content: File[], _fieldId?: string, parentReplyId?: string) => {
-      try {
-        await createFileUploadReply({
-          petitionId,
-          fieldId: _fieldId ?? fieldId,
-          content,
-          uploads,
-          parentReplyId,
-          isCacheOnly,
-        });
-      } catch {}
+      await createFileUploadReply({
+        petitionId,
+        fieldId: _fieldId ?? fieldId,
+        content,
+        uploads,
+        parentReplyId,
+        isCacheOnly,
+      });
     },
     [createFileUploadReply],
   );

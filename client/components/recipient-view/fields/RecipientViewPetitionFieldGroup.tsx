@@ -65,6 +65,7 @@ export interface RecipientViewPetitionFieldGroupProps
   showErrors: boolean;
   petition: RecipientViewPetitionFieldGroup_PublicPetitionFragment;
   fieldLogic: FieldLogicResult;
+  onError: (error: any) => void;
 }
 
 export function RecipientViewPetitionFieldGroup({
@@ -81,6 +82,7 @@ export function RecipientViewPetitionFieldGroup({
   onStartAsyncFieldCompletion,
   showErrors,
   petition,
+  onError,
   fieldLogic,
 }: RecipientViewPetitionFieldGroupProps) {
   const handleAddReply = async () => {
@@ -129,6 +131,7 @@ export function RecipientViewPetitionFieldGroup({
                     onCreateFileReply={onCreateFileReply}
                     onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
                     onRefreshField={onRefreshField}
+                    onError={onError}
                   />
                 </LiquidPetitionVariableProvider>
               );
@@ -160,6 +163,7 @@ function RecipientViewPetitionFieldGroupField(props: {
     url: string;
   }>;
   onRefreshField: () => void;
+  onError: (error: any) => void;
 }) {
   const {
     parentReplyId,

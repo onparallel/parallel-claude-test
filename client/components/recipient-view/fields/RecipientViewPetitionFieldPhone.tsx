@@ -28,6 +28,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldPhoneProps
   extends Omit<
@@ -38,6 +39,7 @@ export interface RecipientViewPetitionFieldPhoneProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
 }
@@ -50,6 +52,7 @@ export function RecipientViewPetitionFieldPhone({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldPhoneProps) {
@@ -60,6 +63,7 @@ export function RecipientViewPetitionFieldPhone({
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const [isInvalidValue, setIsInvalidValue] = useState(false);
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
@@ -67,6 +71,10 @@ export function RecipientViewPetitionFieldPhone({
   useEffect(() => {
     if (field.multiple && field.replies.length > 0 && showNewReply) {
       setShowNewReply(false);
+    }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+      setValue("");
     }
   }, [field.replies]);
 
@@ -142,7 +150,12 @@ export function RecipientViewPetitionFieldPhone({
             }
           }
         }
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setHasAlreadyRepliedError(true);
+        }
+        onError(e);
+      }
       setIsSaving(false);
     },
     1000,
@@ -154,7 +167,7 @@ export function RecipientViewPetitionFieldPhone({
     inputRef: newReplyRef,
     paddingRight: 10,
     isDisabled: isDisabled,
-    isInvalid: isInvalidValue || isInvalid,
+    isInvalid: isInvalidValue || isInvalid || hasAlreadyRepliedError,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
@@ -191,6 +204,10 @@ export function RecipientViewPetitionFieldPhone({
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
             values={{ count: fieldReplies.length }}
           />
+        </Text>
+      ) : hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
       {field.replies.length ? (

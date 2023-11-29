@@ -28,6 +28,7 @@ import {
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldDateProps
   extends Omit<
@@ -38,6 +39,7 @@ export interface RecipientViewPetitionFieldDateProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
 }
@@ -50,6 +52,7 @@ export function RecipientViewPetitionFieldDate({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldDateProps) {
@@ -58,7 +61,7 @@ export function RecipientViewPetitionFieldDate({
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
-
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
 
@@ -67,6 +70,10 @@ export function RecipientViewPetitionFieldDate({
   useEffect(() => {
     if (field.multiple && field.replies.length > 0 && showNewReply) {
       setShowNewReply(false);
+    }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+      setValue("");
     }
   }, [field.replies]);
 
@@ -133,7 +140,12 @@ export function RecipientViewPetitionFieldDate({
             }
           }
         }
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setHasAlreadyRepliedError(true);
+        }
+        onError(e);
+      }
       setIsSaving(false);
     },
     1000,
@@ -145,7 +157,7 @@ export function RecipientViewPetitionFieldDate({
     ref: newReplyRef as any,
     paddingRight: 3,
     isDisabled,
-    isInvalid,
+    isInvalid: isInvalid || hasAlreadyRepliedError,
     value,
     // This removes the reset button on Firefox
     required: true,
@@ -203,6 +215,10 @@ export function RecipientViewPetitionFieldDate({
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
             values={{ count: fieldReplies.length }}
           />
+        </Text>
+      ) : hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
       {field.replies.length ? (

@@ -6750,6 +6750,11 @@
     "context": "Please, enter a valid {format}."
   },
   {
+    "term": "component.recipient-view-petition-field-tax-documents.error-field-already-replied",
+    "definition": "Ya existe una respuesta para este campo.",
+    "context": "There is already a reply for this field."
+  },
+  {
     "term": "component.recipient-view-petition-field-tax-documents.error-uploading",
     "definition": "No hemos encontrado ningún archivo. Por favor, inténtalo de nuevo.",
     "context": "We have not found any files. Please try again."
@@ -6788,6 +6793,16 @@
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
     "definition": "{tone, select, INFORMAL{Si realizas cualquier cambio} other{Si realiza cualquier cambio}}, no {tone, select, INFORMAL{olvides} other{olvide}} hacer click de nuevo en el botón de <b>Finalizar</b>.",
     "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.description",
+    "definition": "Hay una versión más reciente de esa página. {tone, select, INFORMAL{Refresca} other{Refresque}} para ver todas las respuestas añadidas.",
+    "context": "There is a more recent version of this page. Refresh to see all added replies."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.refetch-button",
+    "definition": "Refrescar respuestas",
+    "context": "Refresh replies"
   },
   {
     "term": "component.recipient-view-signature-sent-alert.check-status-button",
@@ -9903,6 +9918,11 @@
     "term": "generic.reply-not-available",
     "definition": "Respuesta no disponible",
     "context": "Reply not available"
+  },
+  {
+    "term": "generic.reply-not-submitted",
+    "definition": "Respuesta no enviada",
+    "context": "Reply not sent"
   },
   {
     "term": "generic.required-field",

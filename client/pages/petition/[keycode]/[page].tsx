@@ -22,6 +22,7 @@ import { RecipientViewHeader } from "@parallel/components/recipient-view/Recipie
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewPetitionStatusAlert } from "@parallel/components/recipient-view/RecipientViewPetitionStatusAlert";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
+import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/RecipientViewRefreshRepliesAlert";
 import { RecipientViewSignatureSentAlert } from "@parallel/components/recipient-view/RecipientViewSignatureSentAlert";
 import { useCompletingMessageDialog } from "@parallel/components/recipient-view/dialogs/CompletingMessageDialog";
 import {
@@ -98,6 +99,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
 
   const showErrorDialog = useErrorDialog();
   const [showErrors, setShowErrors] = useState(false);
+  const [showRefreshRepliesAlert, setShowRefreshRepliesAlert] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
   const showConfirmPetitionSignersDialog = useRecipientViewConfirmPetitionSignersDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
@@ -196,6 +198,16 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     return data.access.petition;
   }
 
+  const handleErrorFromFields = useCallback(async (error: any) => {
+    if (isApolloError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
+      setShowRefreshRepliesAlert(true);
+    } else if (isApolloError(error, "REPLY_ALREADY_DELETED_ERROR")) {
+      await refetchAccess();
+    } else {
+      throw error;
+    }
+  }, []);
+
   return (
     <LastSavedProvider>
       <ToneProvider value={tone}>
@@ -251,6 +263,15 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                   />
                 )
               ) : null}
+              {showRefreshRepliesAlert ? (
+                <RecipientViewRefreshRepliesAlert
+                  tone={tone}
+                  onRefetch={async () => {
+                    await refetchAccess();
+                    setShowRefreshRepliesAlert(false);
+                  }}
+                />
+              ) : null}
             </Box>
             <Flex
               flex="1"
@@ -296,6 +317,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                               isDisabled={petition.status === "CLOSED"}
                               showErrors={showErrors && !canFinalize}
                               fieldLogic={logic}
+                              onError={handleErrorFromFields}
                             />
                           </LiquidPetitionVariableProvider>
                         );

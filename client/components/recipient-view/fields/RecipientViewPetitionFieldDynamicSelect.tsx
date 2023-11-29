@@ -8,7 +8,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
 import { countBy } from "remeda";
@@ -19,6 +19,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export type DynamicSelectValue = [string, Maybe<string>][];
 
@@ -31,6 +32,7 @@ export interface RecipientViewPetitionFieldDynamicSelectProps
   onDeleteReply: (reply: string) => void;
   onUpdateReply: (replyId: string, content: { value: DynamicSelectValue }) => Promise<void>;
   onCreateReply: (content: { value: DynamicSelectValue }) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
 }
@@ -45,14 +47,22 @@ export function RecipientViewPetitionFieldDynamicSelect({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldDynamicSelectProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const replyRefs = useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
 
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
+
+  useEffect(() => {
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+    }
+  }, [field.replies]);
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: DynamicSelectValue) => {
@@ -78,12 +88,19 @@ export function RecipientViewPetitionFieldDynamicSelect({
       label,
       i === 0 ? value : null,
     ]) as DynamicSelectValue;
-    const replyId = await onCreateReply({ value: _value });
-    if (replyId) {
-      setShowNewReply(false);
-      setTimeout(() => {
-        replyRefs[replyId].current?.focus(1);
-      });
+    try {
+      const replyId = await onCreateReply({ value: _value });
+      if (replyId) {
+        setShowNewReply(false);
+        setTimeout(() => {
+          replyRefs[replyId].current?.focus(1);
+        });
+      }
+    } catch (e) {
+      if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+        setHasAlreadyRepliedError(true);
+      }
+      onError(e);
     }
   }
 
@@ -111,6 +128,10 @@ export function RecipientViewPetitionFieldDynamicSelect({
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
             values={{ count: fieldReplies.length }}
           />
+        </Text>
+      ) : hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
       {field.replies.length ? (
@@ -143,7 +164,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
             level={0}
             onChange={handleCreateReply}
             isDisabled={isDisabled}
-            isInvalid={isInvalid}
+            isInvalid={isInvalid || hasAlreadyRepliedError}
             parentReplyId={parentReplyId}
           />
         </Box>

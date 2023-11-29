@@ -19,6 +19,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
@@ -29,6 +30,7 @@ export interface RecipientViewPetitionFieldSelectProps
   onDeleteReply: (replyId: string) => void;
   onUpdateReply: (replyId: string, content: { value: string }) => Promise<void>;
   onCreateReply: (content: { value: string }) => Promise<string | undefined>;
+  onError: (error: any) => void;
   isInvalid?: boolean;
   parentReplyId?: string;
 }
@@ -43,6 +45,7 @@ export function RecipientViewPetitionFieldSelect({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
+  onError,
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldSelectProps) {
@@ -51,7 +54,7 @@ export function RecipientViewPetitionFieldSelect({
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-
+  const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const newReplyRef = useRef<SelectInstance>(null);
   const replyRefs = useMultipleRefs<SelectInstance>();
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -69,6 +72,10 @@ export function RecipientViewPetitionFieldSelect({
   useEffect(() => {
     if (field.multiple && field.replies.length > 0 && showNewReply) {
       setShowNewReply(false);
+    }
+    if (hasAlreadyRepliedError) {
+      setHasAlreadyRepliedError(false);
+      setValue(null);
     }
   }, [field.replies]);
 
@@ -117,6 +124,10 @@ export function RecipientViewPetitionFieldSelect({
             values={{ count: fieldReplies.length }}
           />
         </Text>
+      ) : hasAlreadyRepliedError ? (
+        <Text fontSize="sm" color="red.500">
+          <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
+        </Text>
       ) : null}
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
@@ -160,7 +171,12 @@ export function RecipientViewPetitionFieldSelect({
                     await waitFor(1);
                     replyRefs[replyId].current?.focus();
                   }
-                } catch {}
+                } catch (e) {
+                  if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+                    setHasAlreadyRepliedError(true);
+                  }
+                  onError(e);
+                }
                 setIsSaving(false);
               }}
               placeholder={
@@ -174,7 +190,7 @@ export function RecipientViewPetitionFieldSelect({
                 menu: (styles) => ({ ...styles, zIndex: 100 }),
                 valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
               }}
-              isInvalid={isInvalid}
+              isInvalid={isInvalid || hasAlreadyRepliedError}
             />
             <Center height="100%" position="absolute" right="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />

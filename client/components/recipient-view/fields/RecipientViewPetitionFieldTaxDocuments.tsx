@@ -1,20 +1,21 @@
 import { Box, Button, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useTone } from "@parallel/components/common/ToneProvider";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { isDefined } from "@udecode/plate-common";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useOverwriteDocumentationDialog } from "../dialogs/OverwriteDocumentationDialog";
+import { RecipientViewPetitionFieldReplyFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
-import { RecipientViewPetitionFieldReplyFileUpload } from "./RecipientViewPetitionFieldFileUpload";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldTaxDocumentsProps
   extends Omit<
@@ -27,6 +28,7 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
   isCacheOnly?: boolean;
   onStartAsyncFieldCompletion: () => Promise<{ type: string; url: string }>;
   onRefreshField: () => void;
+  onError: (error: any) => void;
   isInvalid?: boolean;
 }
 
@@ -39,6 +41,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
   onCommentsButtonClick,
   onStartAsyncFieldCompletion,
   onRefreshField,
+  onError,
   isInvalid,
   isCacheOnly,
 }: RecipientViewPetitionFieldTaxDocumentsProps) {
@@ -53,7 +56,15 @@ export function RecipientViewPetitionFieldTaxDocuments({
     [onDeleteReply],
   );
   const tone = useTone();
-  const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
+  const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING" | "FIELD_ALREADY_REPLIED_ERROR">(
+    "IDLE",
+  );
+
+  useEffect(() => {
+    if (state === "FIELD_ALREADY_REPLIED_ERROR") {
+      setState("IDLE");
+    }
+  }, [field.replies]);
 
   // ready means bankflip exported all requested docs and sent event to our webhook to start uploading replies
   const [bankflipSessionReady, setBankflipSessionReady] = useState(false);
@@ -124,8 +135,13 @@ export function RecipientViewPetitionFieldTaxDocuments({
       if (isCacheOnly) {
         setState("IDLE");
       }
-    } catch {
-      setState("ERROR");
+    } catch (e) {
+      onError(e);
+      if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+        setState("FIELD_ALREADY_REPLIED_ERROR");
+      } else {
+        setState("ERROR");
+      }
     }
   };
 
@@ -233,6 +249,16 @@ export function RecipientViewPetitionFieldTaxDocuments({
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.error-uploading"
               defaultMessage="We have not found any files. Please try again."
+            />
+          </Text>
+        </HStack>
+      ) : state === "FIELD_ALREADY_REPLIED_ERROR" ? (
+        <HStack alignItems="center" marginTop={2} color="red.600">
+          <ExclamationOutlineIcon boxSize={4} />
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="component.recipient-view-petition-field-tax-documents.error-field-already-replied"
+              defaultMessage="There is already a reply for this field."
             />
           </Text>
         </HStack>
