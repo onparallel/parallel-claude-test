@@ -8,7 +8,7 @@ import { PetitionFieldIndex, letters } from "@parallel/utils/fieldIndices";
 import { defaultFieldCondition } from "@parallel/utils/fieldLogic/conditions";
 import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { never } from "@parallel/utils/never";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions, isValueCompatible } from "@parallel/utils/petitionFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -134,15 +134,23 @@ export function PetitionFieldLogicConditionSubjectSelect({
       })}
       options={options as any}
       value={value}
-      onChange={(value) => {
-        assert(isDefined(value));
-        if (value.type === "FIELD") {
-          onChange(defaultFieldCondition(value.field));
-        } else if (value.type === "DYNAMIC_SELECT_OPTION") {
-          onChange(defaultFieldCondition([value.field, value.columnIndex]));
+      onChange={(_value) => {
+        assert(isDefined(_value));
+        if (_value.type === "FIELD") {
+          if (
+            isDefined(value) &&
+            value.type === "FIELD" &&
+            isValueCompatible(value.field.type, _value.field.type)
+          ) {
+            onChange(defaultFieldCondition(_value.field, condition.value));
+          } else {
+            onChange(defaultFieldCondition(_value.field));
+          }
+        } else if (_value.type === "DYNAMIC_SELECT_OPTION") {
+          onChange(defaultFieldCondition([_value.field, _value.columnIndex]));
         } else {
           onChange({
-            variableName: value.variableName,
+            variableName: _value.variableName,
             operator: "GREATER_THAN",
             value: 0,
           });

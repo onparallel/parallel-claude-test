@@ -58,43 +58,43 @@ export function PetitionFieldMathEditor({
   isReadOnly,
   onCreateVariable,
 }: PetitionFieldMathEditorProps) {
-  const defaultOperator = {
-    variable: "",
-    operator: "ADDITION",
-    operand: { type: "NUMBER", value: 0 },
-  } as PetitionFieldMathOperation;
-
   const allFields = useMemo(
     () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
     [petition.fields],
   );
-  const defaultVariableCondition = petition.variables.length
-    ? {
-        variableName: petition.variables[0].name,
-        operator: "GREATER_THAN",
-        value: 0,
-      }
-    : {};
+  const getDefaultMath = () => {
+    const index = allFields.findIndex((f) => f.id === field.id);
+    const referencedField =
+      allFields.slice(0, index).findLast((f) => !f.isReadOnly && f.parent === field.parent) ??
+      allFields.slice(0, index).findLast((f) => !f.isReadOnly)!;
+    const defaultCondition = isReadOnly
+      ? {}
+      : field.type === "HEADING"
+        ? (referencedField && defaultFieldCondition(referencedField)) ?? petition.variables.length
+          ? {
+              variableName: petition.variables[0].name,
+              operator: "GREATER_THAN",
+              value: 0,
+            }
+          : {}
+        : defaultFieldCondition(field);
 
-  const index = allFields.findIndex((f) => f.id === field.id);
-  const referencedField =
-    allFields.slice(0, index).findLast((f) => !f.isReadOnly && f.parent === field.parent) ??
-    allFields.slice(0, index).findLast((f) => !f.isReadOnly)!;
+    return {
+      operator: "AND",
+      conditions: [defaultCondition],
+      operations: [
+        {
+          variable: "",
+          operator: "ADDITION",
+          operand: { type: "NUMBER", value: 0 },
+        },
+      ],
+    } as PetitionFieldMath;
+  };
 
-  const defaultCondition =
-    field.type === "HEADING"
-      ? (referencedField && defaultFieldCondition(referencedField)) ?? defaultVariableCondition
-      : defaultFieldCondition(field);
-
-  const defaultFieldMath = {
-    operator: "AND",
-    conditions: [defaultCondition],
-    operations: [defaultOperator],
-  } as PetitionFieldMath;
-
-  const [math, setMath] = useState<PetitionFieldMath[]>(
-    (field.math as PetitionFieldMath[]) || [defaultFieldMath],
-  );
+  const [math, setMath] = useState<PetitionFieldMath[]>(() => {
+    return (field.math as PetitionFieldMath[]) || [getDefaultMath()];
+  });
 
   useEffect(() => {
     // Update math if field.math changes
@@ -137,7 +137,7 @@ export function PetitionFieldMathEditor({
             leftIcon={<PlusCircleIcon />}
             alignSelf="start"
             onClick={() => {
-              setMath((rows) => [...rows, defaultFieldMath]);
+              setMath((rows) => [...rows, getDefaultMath()]);
             }}
             isDisabled={isReadOnly || math.length >= MAX_CALCULATIONS}
           >

@@ -9,12 +9,15 @@ import { PetitionFieldLogicCondition } from "./types";
  */
 export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type" | "options">>(
   value: T | [T, number],
+  conditionValue?: string | number | string[] | null,
 ): PetitionFieldLogicCondition {
   const [field, column] = Array.isArray(value) ? value : [value];
+
   const isOnlyHasReplies =
     isFileTypeField(field.type) ||
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
     field.type === "FIELD_GROUP";
+
   return {
     fieldId: field.id,
     modifier: isOnlyHasReplies ? "NUMBER_OF_REPLIES" : "ANY",
@@ -27,7 +30,8 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
           : field.type === "DATE" || field.type === "DATE_TIME"
             ? "LESS_THAN"
             : "EQUAL",
-    value: defaultFieldConditionValue(field, column),
+    value:
+      conditionValue === undefined ? defaultFieldConditionValue(field, column) : conditionValue,
     column,
   };
 }

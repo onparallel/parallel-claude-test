@@ -691,6 +691,13 @@ function ConditionPredicateValueDate({
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState(condition.value as string | null);
+
+  useEffect(() => {
+    if (condition.value !== value) {
+      setValue(condition.value as string | null);
+    }
+  }, [condition.value]);
+
   return isReadOnly ? (
     isDefined(condition.value) ? (
       <FormattedDate value={condition.value as string} {...FORMATS.L} />
@@ -730,6 +737,18 @@ function ConditionPredicateValueDatetime({
       ? dateToDatetimeLocal(condition.value)
       : null,
   );
+
+  useEffect(() => {
+    const conditionValue =
+      condition.value && typeof condition.value === "string"
+        ? dateToDatetimeLocal(condition.value)
+        : null;
+
+    if (conditionValue !== value) {
+      setValue(conditionValue);
+    }
+  }, [condition.value]);
+
   const icon = (
     <HelpPopover marginLeft={0}>
       <Text fontSize="sm">
@@ -743,6 +762,7 @@ function ConditionPredicateValueDatetime({
       </Text>
     </HelpPopover>
   );
+
   return isReadOnly ? (
     isDefined(condition.value) ? (
       <>
@@ -786,6 +806,12 @@ function ConditionPredicateValueFloat({
   const intl = useIntl();
   const [value, setValue] = useState((condition.value as number) ?? 0);
 
+  useEffect(() => {
+    if ((!condition.value || condition.value === "0") && value) {
+      setValue(condition.value as number);
+    }
+  }, [condition.value]);
+
   return isReadOnly ? (
     isDefined(condition.value) ? (
       <FormattedNumber value={condition.value as number} />
@@ -817,16 +843,25 @@ function ConditionPredicateValueNumber({
   isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
+
   const { fieldsWithIndices } = usePetitionFieldLogicContext();
   const isFieldCondition = "fieldId" in condition;
   const referencedField = isFieldCondition
     ? fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0]
     : undefined;
+
   const [value, setValue] = useState((condition.value as number) ?? 0);
   const maxValue =
     isDefined(referencedField) && referencedField.type === "CHECKBOX"
       ? referencedField.options.values.length
       : Infinity;
+
+  useEffect(() => {
+    if ((!condition.value || condition.value === "0") && value) {
+      setValue(condition.value as number);
+    }
+  }, [condition.value]);
+
   useEffect(() => {
     if (maxValue < value) {
       setValue(maxValue);
@@ -836,6 +871,7 @@ function ConditionPredicateValueNumber({
       onChange({ ...condition, value: 0 });
     }
   }, [maxValue]);
+
   return isReadOnly ? (
     isDefined(condition.value) ? (
       <FormattedNumber value={condition.value as number} maximumFractionDigits={0} />
@@ -883,8 +919,10 @@ function ConditionPredicateValueSelect({
 }: ConditionPredicateProps) {
   const intl = useIntl();
   assert("fieldId" in condition);
+
   const { fieldsWithIndices } = usePetitionFieldLogicContext();
   const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)![0];
+
   const options = useMemo(() => {
     const values =
       referencedField.type === "SELECT"
@@ -899,8 +937,10 @@ function ConditionPredicateValueSelect({
       .sort((a, b) => a.localeCompare(b))
       .map((value) => toSimpleSelectOption(value)!);
   }, [referencedField.type, referencedField.options.values, condition.column]);
+
   const isMultiCondition =
     condition.operator === "IS_ONE_OF" || condition.operator === "NOT_IS_ONE_OF";
+
   return isReadOnly ? (
     isDefined(condition.value) &&
     (Array.isArray(condition.value) ? condition.value.length > 0 : true) ? (
@@ -951,6 +991,13 @@ function ConditionPredicateValueString({
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState(condition.value as string | null);
+
+  useEffect(() => {
+    if (!condition.value && value) {
+      setValue(condition.value as string | null);
+    }
+  }, [condition.value]);
+
   return isReadOnly ? (
     isDefined(condition.value) ? (
       <Box as="span" fontStyle="italic">
