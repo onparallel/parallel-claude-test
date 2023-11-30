@@ -29,6 +29,7 @@ import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { sort } from "remeda";
 
 interface ProfileSubscribersDialogData {
   subscribe: UserSelectSelection[];
@@ -66,7 +67,7 @@ function ProfileSubscribersDialog({
     profileIds.length > 1
       ? [me]
       : isSubscribed
-        ? users.sort((u) => (u.id === me.id ? -1 : 1))
+        ? sort(users, (u) => (u.id === me.id ? -1 : 1))
         : [me, ...users];
 
   const _handleSearchUsers = useSearchUsers();

@@ -22,7 +22,7 @@ import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, sort, sort } from "remeda";
 import fonts from "../../../utils/fonts.json";
 import { untranslated } from "@parallel/utils/untranslated";
 
@@ -82,7 +82,7 @@ export function DocumentThemeEditor({
 
   const sortedFonts = useMemo(
     () =>
-      fonts.sort(function (a, b) {
+      sort(fonts, function (a, b) {
         return a.family.localeCompare(b.family);
       }),
     [fonts],

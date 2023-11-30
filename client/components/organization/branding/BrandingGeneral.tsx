@@ -47,6 +47,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import fonts from "../../../utils/webSafeFonts.json";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
 import { BrandingGeneralPreview } from "./BrandingGeneralPreview";
+import { sort } from "remeda";
 
 interface BrandingGeneralProps {
   user: BrandingGeneral_UserFragment;
@@ -91,7 +92,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   const userCanEditBranding = useHasPermission("ORG_SETTINGS");
   const sortedFonts = useMemo(
     () =>
-      fonts.sort(function (a, b) {
+      sort(fonts, function (a, b) {
         return a[0].localeCompare(b[0]);
       }),
     [fonts],
