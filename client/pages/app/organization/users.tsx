@@ -65,7 +65,7 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, sort } from "remeda";
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
 const QUERY_STATE = {
@@ -779,33 +779,34 @@ function useOrganizationUsersTableColumns() {
           minWidth: "220px",
         },
         CellContent: ({ row }) => {
+          const groups = sort(row.userGroups, (a, b) => {
+            // type === ALL_USER always goes last
+            if (a.type === "ALL_USERS" && b.type !== "ALL_USERS") {
+              return 1;
+            }
+            if (a.type !== "ALL_USERS" && b.type === "ALL_USERS") {
+              return -1;
+            }
+
+            // groups with permissions show first
+            if (a.hasPermissions && !b.hasPermissions) {
+              return -1;
+            }
+            if (!a.hasPermissions && b.hasPermissions) {
+              return 1;
+            }
+
+            // then sort by name
+            if (a.name && b.name) {
+              return a.name.localeCompare(b.name);
+            }
+
+            // if all is the same it doesn't matter the order
+            return 0;
+          });
           return (
             <EnumerateList
-              values={row.userGroups.sort((a, b) => {
-                // type === ALL_USER always goes last
-                if (a.type === "ALL_USERS" && b.type !== "ALL_USERS") {
-                  return 1;
-                }
-                if (a.type !== "ALL_USERS" && b.type === "ALL_USERS") {
-                  return -1;
-                }
-
-                // groups with permissions show first
-                if (a.hasPermissions && !b.hasPermissions) {
-                  return -1;
-                }
-                if (!a.hasPermissions && b.hasPermissions) {
-                  return 1;
-                }
-
-                // then sort by name
-                if (a.name && b.name) {
-                  return a.name.localeCompare(b.name);
-                }
-
-                // if all is the same it doesn't matter the order
-                return 0;
-              })}
+              values={groups}
               maxItems={2}
               renderItem={({ value }, index) => {
                 return (
@@ -843,7 +844,9 @@ function useOrganizationUsersTableColumns() {
                     }
                     placement="bottom"
                   >
-                    <NormalLink as="span">{children}</NormalLink>
+                    <NormalLink as="span" whiteSpace="nowrap">
+                      {children}
+                    </NormalLink>
                   </SmallPopover>
                 );
               }}
