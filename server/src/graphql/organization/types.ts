@@ -102,8 +102,8 @@ export const OrganizationUsageLimit = objectType({
   sourceType: "db.OrganizationUsageLimit",
   definition(t) {
     t.nonNull.globalId("id", { prefixName: "OrganizationUsageLimit" });
-    t.nonNull.int("limit");
-    t.nonNull.int("used");
+    t.nonNull.float("limit");
+    t.nonNull.float("used");
     t.nonNull.duration("period");
     t.nonNull.datetime("periodStartDate", { resolve: (o) => o.period_start_date });
     t.nullable.datetime("periodEndDate", { resolve: (o) => o.period_end_date });
@@ -305,8 +305,8 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       args: { limitName: nonNull("OrganizationUsageLimitName") },
       resolve: async (root, { limitName }, ctx) => {
-        const limit = await ctx.organizations.loadCurrentOrganizationUsageLimit(root.id, limitName);
-        return !limit || limit.limit <= limit.used;
+        const usage = await ctx.organizations.loadCurrentOrganizationUsageLimit(root.id, limitName);
+        return !usage || usage.limit <= usage.used;
       },
     });
     t.nonNull.list.nonNull.field("pdfDocumentThemes", {

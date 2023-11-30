@@ -2365,11 +2365,11 @@ export type OrganizationUpdateInput = {
 export type OrganizationUsageLimit = {
   cycleNumber: Scalars["Int"]["output"];
   id: Scalars["GID"]["output"];
-  limit: Scalars["Int"]["output"];
+  limit: Scalars["Float"]["output"];
   period: Scalars["Duration"]["output"];
   periodEndDate: Maybe<Scalars["DateTime"]["output"]>;
   periodStartDate: Scalars["DateTime"]["output"];
-  used: Scalars["Int"]["output"];
+  used: Scalars["Float"]["output"];
 };
 
 export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";

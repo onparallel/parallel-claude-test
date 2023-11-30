@@ -2609,11 +2609,11 @@ input OrganizationUpdateInput {
 type OrganizationUsageLimit {
   cycleNumber: Int!
   id: GID!
-  limit: Int!
+  limit: Float!
   period: Duration!
   periodEndDate: DateTime
   periodStartDate: DateTime!
-  used: Int!
+  used: Float!
 }
 
 enum OrganizationUsageLimitName {

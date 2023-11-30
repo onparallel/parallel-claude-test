@@ -24,9 +24,9 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
     });
   },
   subject({ used, total, limitName }, intl: IntlShape) {
-    const petitionSendTotalCreditsUsed = limitName === "PETITION_SEND" && used === total;
+    const petitionSendTotalCreditsUsed = limitName === "PETITION_SEND" && used >= total;
     const petitionSendFewCreditsRemaining = limitName === "PETITION_SEND" && used < total;
-    const signatureTotalCreditsUsed = limitName === "SIGNATURIT_SHARED_APIKEY" && used === total;
+    const signatureTotalCreditsUsed = limitName === "SIGNATURIT_SHARED_APIKEY" && used >= total;
     const signatureFewCreditsRemaining = limitName === "SIGNATURIT_SHARED_APIKEY" && used < total;
 
     const value = used / total;
@@ -64,8 +64,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
     { senderName, used, total, limitName, orgName }: OrganizationLimitsReachedEmailProps,
     intl: IntlShape,
   ) {
-    const petitionSendTotalCreditsUsed = used === total && limitName === "PETITION_SEND";
-    const signatureTotalCreditsUsed = used === total && limitName === "SIGNATURIT_SHARED_APIKEY";
+    const petitionSendTotalCreditsUsed = used >= total && limitName === "PETITION_SEND";
+    const signatureTotalCreditsUsed = used >= total && limitName === "SIGNATURIT_SHARED_APIKEY";
     const petitionSendFewCreditsRemaining = used < total && limitName === "PETITION_SEND";
     const signatureFewCreditsRemaining = used < total && limitName === "SIGNATURIT_SHARED_APIKEY";
 
@@ -204,8 +204,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
     logoAlt,
     theme,
   }: OrganizationLimitsReachedEmailProps) {
-    const petitionSendTotalCreditsUsed = used === total && limitName === "PETITION_SEND";
-    const signatureTotalCreditsUsed = used === total && limitName === "SIGNATURIT_SHARED_APIKEY";
+    const petitionSendTotalCreditsUsed = used >= total && limitName === "PETITION_SEND";
+    const signatureTotalCreditsUsed = used >= total && limitName === "SIGNATURIT_SHARED_APIKEY";
     const petitionSendFewCreditsRemaining = used < total && limitName === "PETITION_SEND";
     const signatureFewCreditsRemaining = used < total && limitName === "SIGNATURIT_SHARED_APIKEY";
 

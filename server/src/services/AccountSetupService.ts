@@ -14,7 +14,7 @@ import { UserRepository } from "../db/repositories/UserRepository";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { IIntegrationsSetupService, INTEGRATIONS_SETUP_SERVICE } from "./IntegrationsSetupService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./ProfilesSetupService";
-import { ITiersService, TIERS_SERVICE } from "./TiersService";
+import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "./OrgLimitsService";
 import { PetitionViewRepository } from "../db/repositories/PetitionViewRepository";
 
 export const ACCOUNT_SETUP_SERVICE = Symbol.for("ACCOUNT_SETUP_SERVICE");
@@ -42,7 +42,7 @@ export class AccountSetupService implements IAccountSetupService {
     @inject(PetitionViewRepository) private views: PetitionViewRepository,
     @inject(INTEGRATIONS_SETUP_SERVICE) private integrationsSetup: IIntegrationsSetupService,
     @inject(PROFILES_SETUP_SERVICE) private profilesSetup: IProfilesSetupService,
-    @inject(TIERS_SERVICE) private tiers: ITiersService,
+    @inject(ORG_LIMITS_SERVICE) private orgLimits: IOrgLimitsService,
     @inject(I18N_SERVICE) private intl: II18nService,
   ) {}
 
@@ -138,7 +138,7 @@ export class AccountSetupService implements IAccountSetupService {
 
     await this.createAllUsersGroup(organization.id, createdBy);
 
-    await this.tiers.updateOrganizationTier(organization, tier, createdBy);
+    await this.orgLimits.updateOrganizationTier(organization, tier, createdBy);
     const owner = await this.createUser(
       {
         org_id: organization.id,

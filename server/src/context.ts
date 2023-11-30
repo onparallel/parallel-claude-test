@@ -59,7 +59,7 @@ import { IRedis, REDIS } from "./services/Redis";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
-import { ITiersService, TIERS_SERVICE } from "./services/TiersService";
+import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "./services/OrgLimitsService";
 
 @injectable()
 export class ApiContext {
@@ -79,7 +79,7 @@ export class ApiContext {
     @inject(PRINTER) public readonly printer: IPrinter,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
-    @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
+    @inject(ORG_LIMITS_SERVICE) public readonly orgLimits: IOrgLimitsService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
@@ -136,7 +136,7 @@ export class WorkerContext {
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(QUEUES_SERVICE) public readonly queues: IQueuesService,
-    @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
+    @inject(ORG_LIMITS_SERVICE) public readonly orgLimits: IOrgLimitsService,
     @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
     @inject(ORGANIZATION_LAYOUT_SERVICE)
     public readonly layouts: IOrganizationLayoutService,

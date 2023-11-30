@@ -85,7 +85,10 @@ import {
 } from "../../helpers/validators/validTextWithPlaceholders";
 import { validateFile } from "../../helpers/validators/validateFile";
 import { validateRegex } from "../../helpers/validators/validateRegex";
-import { userHasAccessToOrganizationTheme } from "../../organization/authorizers";
+import {
+  organizationHasEnoughPetitionSendCredits,
+  userHasAccessToOrganizationTheme,
+} from "../../organization/authorizers";
 import { contextUserHasPermission } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
@@ -1614,6 +1617,7 @@ export const sendPetition = mutationField("sendPetition", {
     userCanSendAs("senderId" as never),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
+    organizationHasEnoughPetitionSendCredits("petitionId", (args) => args.contactIdGroups.length),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1839,8 +1843,8 @@ export const sendPetition = mutationField("sendPetition", {
 
       ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
       return results.map((r) => omit(r, ["messages"]));
-    } catch (error: any) {
-      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+    } catch (error) {
+      if (error instanceof Error && error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           `Can't send the parallel due to lack of credits`,
           "PETITION_SEND_LIMIT_REACHED",

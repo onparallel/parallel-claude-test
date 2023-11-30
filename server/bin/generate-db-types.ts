@@ -284,10 +284,10 @@ function getColumnType(type: string, enums: Map<string, DbEnum>): string {
     case "float4":
     case "money":
     case "oid":
+    case "numeric":
       return "number";
     case "int8":
     case "float8":
-    case "numeric":
       return "string";
     case "bool":
       return "boolean";

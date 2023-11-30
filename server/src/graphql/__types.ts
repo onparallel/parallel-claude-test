@@ -1802,11 +1802,11 @@ export interface NexusGenFieldTypes {
     // field return type
     cycleNumber: number; // Int!
     id: NexusGenScalars["GID"]; // GID!
-    limit: number; // Int!
+    limit: number; // Float!
     period: NexusGenScalars["Duration"]; // Duration!
     periodEndDate: NexusGenScalars["DateTime"] | null; // DateTime
     periodStartDate: NexusGenScalars["DateTime"]; // DateTime!
-    used: number; // Int!
+    used: number; // Float!
   };
   OrganizationUsageLimitPagination: {
     // field return type
@@ -4021,11 +4021,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     cycleNumber: "Int";
     id: "GID";
-    limit: "Int";
+    limit: "Float";
     period: "Duration";
     periodEndDate: "DateTime";
     periodStartDate: "DateTime";
-    used: "Int";
+    used: "Float";
   };
   OrganizationUsageLimitPagination: {
     // field return type name

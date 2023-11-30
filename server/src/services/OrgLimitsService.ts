@@ -9,27 +9,24 @@ import {
 } from "../db/repositories/OrganizationRepository";
 import { SIGNATURE, SignatureService } from "./SignatureService";
 
-export const TIERS_SERVICE = Symbol.for("TIERS_SERVICE");
+export const ORG_LIMITS_SERVICE = Symbol.for("ORG_LIMITS_SERVICE");
 
 type Tier = Omit<OrganizationUsageDetails, "SIGNATURIT_SHARED_APIKEY"> & {
   FEATURE_FLAGS: { name: FeatureFlagName; value: boolean }[];
 };
 
-export interface ITiersService {
+export interface IOrgLimitsService {
   updateOrganizationTier(
     org: Pick<Organization, "id" | "usage_details">,
     tierKey: string,
     updatedBy: string,
     t?: Knex.Transaction,
   ): Promise<Tier>;
-  downgradeOrganizationPetitionSendLimit(
-    org: Pick<Organization, "id" | "usage_details">,
-    updatedBy: string,
-  ): Promise<void>;
+  renewOrganizationUsageLimits(updatedBy: string): Promise<void>;
 }
 
 @injectable()
-export class TiersService implements ITiersService {
+export class OrgLimitsService implements IOrgLimitsService {
   constructor(
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(FeatureFlagRepository)
@@ -112,27 +109,14 @@ export class TiersService implements ITiersService {
     return tier;
   }
 
-  async downgradeOrganizationPetitionSendLimit(
-    org: Pick<Organization, "id" | "usage_details">,
-    updatedBy: string,
-  ) {
-    await Promise.all([
-      this.organizations.updateOrganization(
-        org.id,
-        {
-          usage_details: {
-            ...org.usage_details,
-            PETITION_SEND: this.TIERS.FREE.PETITION_SEND,
-          },
-        },
-        updatedBy,
-      ),
-      this.organizations.upsertOrganizationUsageLimit(
-        org.id,
-        "PETITION_SEND",
-        this.TIERS.FREE.PETITION_SEND.limit,
-        this.TIERS.FREE.PETITION_SEND.duration,
-      ),
-    ]);
+  async renewOrganizationUsageLimits(updatedBy: string) {
+    const downgradedPetitionSendLimits =
+      await this.organizations.renewExpiredOrganizationUsageLimits(this.TIERS.FREE.PETITION_SEND);
+
+    await this.organizations.updateOrganizationUsageDetails(
+      downgradedPetitionSendLimits.map((limit) => limit.org_id),
+      { PETITION_SEND: this.TIERS.FREE.PETITION_SEND },
+      updatedBy,
+    );
   }
 }

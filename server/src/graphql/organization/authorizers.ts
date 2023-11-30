@@ -3,6 +3,7 @@ import { isDefined } from "remeda";
 import { OrganizationThemeType, OrganizationUsageLimitName } from "../../db/__types";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
+import { core } from "nexus";
 
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
   "Organization",
@@ -118,5 +119,38 @@ export function organizationHasOngoingUsagePeriod<
       return isDefined(limit);
     } catch {}
     return false;
+  };
+}
+
+export function organizationHasEnoughPetitionSendCredits<
+  TypeName extends string,
+  FieldName extends string,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
+>(
+  petitionIdArg: TPetitionIdArg,
+  contactGroupsLength: (args: core.ArgsValue<TypeName, FieldName>) => number,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+
+    const petition = await ctx.petitions.loadPetition(petitionId);
+
+    const creditsRequired = contactGroupsLength(args) - petition!.credits_used;
+
+    if (creditsRequired > 0) {
+      const usageLimit = await ctx.organizations.loadCurrentOrganizationUsageLimit(
+        petition!.org_id,
+        "PETITION_SEND",
+      );
+
+      if (!usageLimit || usageLimit.used + creditsRequired > usageLimit.limit) {
+        throw new ApolloError(
+          "You don't have enough credits to send all the petitions",
+          "PETITION_SEND_LIMIT_REACHED",
+        );
+      }
+    }
+
+    return true;
   };
 }

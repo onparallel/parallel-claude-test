@@ -368,11 +368,12 @@ export const updateOrganizationUserLimit = mutationField("updateOrganizationUser
   },
   authorize: superAdminAccess(),
   resolve: async (_, { orgId, limit }, ctx) => {
-    return await ctx.organizations.updateOrganizationUsageDetails(
+    const [org] = await ctx.organizations.updateOrganizationUsageDetails(
       orgId,
       { USER_LIMIT: limit },
       `User:${ctx.user!.id}`,
     );
+    return org;
   },
 });
 
@@ -443,7 +444,7 @@ export const updateOrganizationUsageDetails = mutationField("updateOrganizationU
     ),
   },
   resolve: async (_, args, ctx) => {
-    const org = await ctx.organizations.updateOrganizationUsageDetails(
+    const [org] = await ctx.organizations.updateOrganizationUsageDetails(
       args.orgId,
       {
         [args.limitName]: {
@@ -516,7 +517,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
       );
 
     return await ctx.organizations.withTransaction(async (t) => {
-      const organization = await ctx.organizations.updateOrganizationUsageDetails(
+      const [organization] = await ctx.organizations.updateOrganizationUsageDetails(
         orgId,
         {
           SIGNATURIT_SHARED_APIKEY: {

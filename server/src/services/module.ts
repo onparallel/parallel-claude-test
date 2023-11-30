@@ -51,7 +51,7 @@ import { IRedis, REDIS, Redis } from "./Redis";
 import { ISignatureService, SIGNATURE, SignatureService } from "./SignatureService";
 import { ISmtp, SMTP, Smtp } from "./Smtp";
 import { IStorageService, STORAGE_SERVICE, StorageService } from "./StorageService";
-import { ITiersService, TIERS_SERVICE, TiersService } from "./TiersService";
+import { IOrgLimitsService, ORG_LIMITS_SERVICE, OrgLimitsService } from "./OrgLimitsService";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
@@ -67,7 +67,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
   bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
-  bind<ITiersService>(TIERS_SERVICE).to(TiersService);
+  bind<IOrgLimitsService>(ORG_LIMITS_SERVICE).to(OrgLimitsService);
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);

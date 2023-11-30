@@ -340,17 +340,18 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
           remainingAttempts: result.remainingAttempts,
         };
-      } catch (error: any) {
-        if (error.message === "PETITION_SEND_LIMIT_REACHED") {
-          throw new ApolloError(
-            `Can't send the parallel due to lack of credits`,
-            "PETITION_SEND_LIMIT_REACHED",
-          );
-        } else if (error.message === "INVALID_TOKEN") {
-          throw new ApolloError("The token is no longer valid", "INVALID_TOKEN");
-        } else {
-          throw error;
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+            throw new ApolloError(
+              `Can't send the parallel due to lack of credits`,
+              "PETITION_SEND_LIMIT_REACHED",
+            );
+          } else if (error.message === "INVALID_TOKEN") {
+            throw new ApolloError("The token is no longer valid", "INVALID_TOKEN");
+          }
         }
+        throw error;
       }
     }, 2000);
   },
@@ -872,8 +873,8 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         }
 
         return RESULT.SUCCESS;
-      } catch (error: any) {
-        if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+      } catch (error) {
+        if (error instanceof Error && error.message === "PETITION_SEND_LIMIT_REACHED") {
           throw new ApolloError(
             `Can't send the parallel due to lack of credits`,
             "PETITION_SEND_LIMIT_REACHED",

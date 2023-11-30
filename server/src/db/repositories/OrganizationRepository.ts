@@ -12,7 +12,6 @@ import { Maybe, MaybeArray } from "../../util/types";
 import {
   CreateOrganization,
   CreateOrganizationTheme,
-  CreateOrganizationUsageLimit,
   FeatureFlagName,
   Organization,
   OrganizationStatus,
@@ -175,13 +174,14 @@ export class OrganizationRepository extends BaseRepository {
   }
 
   async updateOrganizationUsageDetails(
-    orgId: number,
+    orgId: MaybeArray<number>,
     details: Partial<OrganizationUsageDetails>,
     updatedBy: string,
     t?: Knex.Transaction,
   ) {
-    const [org] = await this.from("organization", t)
-      .where("id", orgId)
+    const ids = unMaybeArray(orgId);
+    return await this.from("organization", t)
+      .whereIn("id", ids)
       .update(
         {
           usage_details: this.knex.raw(/* sql */ `"usage_details" ||  ?::jsonb`, [
@@ -192,8 +192,6 @@ export class OrganizationRepository extends BaseRepository {
         },
         "*",
       );
-
-    return org;
   }
 
   async updateAppSumoLicense(orgId: number, payload: any, updatedBy: string, t?: Knex.Transaction) {
@@ -325,30 +323,6 @@ export class OrganizationRepository extends BaseRepository {
     }
   }
 
-  async getOrganizationExpiredUsageLimitsAndDetails() {
-    return await this.raw<
-      OrganizationUsageLimit & { usage_details: OrganizationUsageDetails }
-    >(/* sql */ `
-      select oul.*, o.usage_details
-        from organization_usage_limit oul
-        join organization o on o.id = oul.org_id
-      where period_end_date is null and ("period_start_date" at time zone 'UTC') + "period" < now()
-    `);
-  }
-
-  async createOrganizationUsageLimit(
-    orgId: number,
-    data: MaybeArray<Omit<CreateOrganizationUsageLimit, "org_id">>,
-    t?: Knex.Transaction,
-  ) {
-    const dataArr = unMaybeArray(data).map((d) => ({ org_id: orgId, ...d }));
-    return await this.insert(
-      "organization_usage_limit",
-      dataArr.map((d) => ({ ...d, period: this.interval(d.period) })),
-      t,
-    );
-  }
-
   async upsertOrganizationUsageLimit(
     orgId: number,
     limitName: OrganizationUsageLimitName,
@@ -356,24 +330,37 @@ export class OrganizationRepository extends BaseRepository {
     duration: Duration,
     t?: Knex.Transaction,
   ) {
-    return await this.raw(
-      /* sql */ `
-      ? 
-      ON CONFLICT (org_id, limit_name) WHERE period_end_date is NULL
-      DO UPDATE SET
-        "limit"=EXCLUDED.limit,
-        "period"=EXCLUDED.period
-      RETURNING *;`,
-      [
-        this.from("organization_usage_limit").insert({
+    const [currentLimit] = await this.from("organization_usage_limit", t)
+      .where({
+        org_id: orgId,
+        limit_name: limitName,
+        period_end_date: null,
+      })
+      .select("*");
+
+    if (isDefined(currentLimit)) {
+      const [updatedLimit] = await this.from("organization_usage_limit", t)
+        .where("id", currentLimit.id)
+        .update(
+          {
+            limit,
+            period: this.interval(duration),
+          },
+          "*",
+        );
+      return updatedLimit;
+    } else {
+      const [newLimit] = await this.from("organization_usage_limit", t)
+        .insert({
           org_id: orgId,
           limit_name: limitName,
-          period: this.interval(duration),
           limit,
-        }),
-      ],
-      t,
-    );
+          period: this.interval(duration),
+        })
+        .returning("*");
+
+      return newLimit;
+    }
   }
 
   async updateOrganizationCurrentUsageLimit(
@@ -393,21 +380,10 @@ export class OrganizationRepository extends BaseRepository {
     this._loadCurrentOrganizationUsageLimit.dataloader.clear({ orgId, limitName });
   }
 
-  async updateUsageLimitAsExpired(
-    orgUsageLimitId: number,
-    opts?: { expireNow: boolean },
-    t?: Knex.Transaction,
-  ) {
+  async updateUsageLimitAsExpired(orgUsageLimitId: number, t?: Knex.Transaction) {
     const [usageLimit] = await this.from("organization_usage_limit", t)
       .where("id", orgUsageLimitId)
-      .update(
-        {
-          period_end_date: opts?.expireNow
-            ? this.now()
-            : this.knex.raw(/* sql */ `"period_start_date" + "period"`),
-        },
-        "*",
-      );
+      .update({ period_end_date: this.now() }, "*");
 
     return usageLimit;
   }
@@ -421,17 +397,23 @@ export class OrganizationRepository extends BaseRepository {
     if (credits <= 0) {
       return 0;
     }
-    const [usage] = await this.from("organization_usage_limit", t)
-      .where({
-        period_end_date: null,
-        limit_name: limitName,
-        org_id: orgId,
-      })
-      .update({ used: this.knex.raw(`used + ?`, [credits]) }, "*");
 
-    if (!usage) {
-      throw new Error("ORGANIZATION_USAGE_LIMIT_EXPIRED");
-    }
+    const usage = await this.withTransaction(async (t) => {
+      const [usage] = await this.from("organization_usage_limit", t)
+        .where({
+          period_end_date: null,
+          limit_name: limitName,
+          org_id: orgId,
+        })
+        .update({ used: this.knex.raw(`used + ?`, [credits]) }, "*");
+
+      // check if org had enough credits before the update
+      if (!usage || usage.used - credits >= usage.limit) {
+        throw new Error("ORGANIZATION_USAGE_LIMIT_REACHED");
+      }
+
+      return usage;
+    }, t);
 
     // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
     for (const threshold of [100, 80]) {
@@ -461,7 +443,7 @@ export class OrganizationRepository extends BaseRepository {
       }
     }
 
-    return credits;
+    return usage;
   }
 
   async getOrganizationsWithFeatureFlag(name: FeatureFlagName) {
@@ -653,19 +635,16 @@ export class OrganizationRepository extends BaseRepository {
     const currentPeriod = await this.loadCurrentOrganizationUsageLimit(orgId, limitName, t);
     let newPeriodStartDate = new Date();
     if (currentPeriod) {
-      const oldLimit = await this.updateUsageLimitAsExpired(
-        currentPeriod.id,
-        { expireNow: true },
-        t,
-      );
+      const oldLimit = await this.updateUsageLimitAsExpired(currentPeriod.id, t);
       newPeriodStartDate = oldLimit.period_end_date!;
     }
-    await this.createOrganizationUsageLimit(
-      orgId,
+    await this.insert(
+      "organization_usage_limit",
       {
+        org_id: orgId,
         limit_name: limitName,
         limit,
-        period: duration,
+        period: this.interval(duration),
         period_start_date: newPeriodStartDate,
       },
       t,
@@ -684,6 +663,88 @@ export class OrganizationRepository extends BaseRepository {
         .orderBy("period_end_date", "desc")
         .select("*"),
       opts,
+    );
+  }
+
+  async renewExpiredOrganizationUsageLimits(freePetitionSendDetails: TUsageDetail) {
+    return await this.raw<OrganizationUsageLimit>(
+      /* sql */ `
+      -- select limits that are expired 
+      with current_limits as (
+        select
+          oul.*,
+          jsonb_extract_path(o.usage_details, limit_name::text) != 'null'::jsonb as has_usage_defined,
+          nullif(jsonb_extract_path(o.usage_details, limit_name::text, 'renewal_cycles'), 'null'::jsonb)::int as usage_renewal_cycles,
+          nullif(jsonb_extract_path(o.usage_details, limit_name::text, 'limit'), 'null'::jsonb)::int as usage_limit,
+          jsonb_extract_path(o.usage_details, limit_name::text, 'duration') as usage_duration
+        from organization_usage_limit oul
+        join organization o on o.id = oul.org_id
+        where
+          period_end_date is null
+          and ("period_start_date" at time zone 'UTC') + "period" < now()
+      ), 
+      -- limits that will be renewed (not counting downgrades)
+      renewable_limits as (
+        select * from current_limits 
+        where has_usage_defined
+          and (usage_renewal_cycles is null or cycle_number < usage_renewal_cycles)
+      ),
+      -- PETITION_SEND limits that will be downgraded to FREE tier
+      downgradeable_petition_limits as (
+        select * from current_limits cl
+        where cl.limit_name = 'PETITION_SEND'
+        and cl.id not in (select id from renewable_limits)
+      ),
+      -- grab every expired limit and set its period_end_date
+      -- if limit is renewable, subtract the excess from the used credits
+      updated_limits as (
+        update organization_usage_limit oul
+        set 
+          period_end_date = cl.period_start_date + cl.period,
+          used = (
+            case
+              when cl.id in (select id from renewable_limits)
+              then cl.used - greatest(0, cl.used - cl.limit) 
+              else cl.used 
+            end
+          )
+        from current_limits cl
+        where cl.id = oul.id
+        returning oul.* 
+      ),
+      renewed_limits as (
+        -- create new limits for renewable limits 
+        insert into organization_usage_limit ("org_id", "limit_name", "limit", "used", "period", "period_start_date", "cycle_number")
+          select 
+            rl.org_id, 
+            rl.limit_name, 
+            rl.usage_limit as "limit",
+            greatest(0, rl.used - rl.limit) as "used",
+            make_interval(
+              secs => coalesce((usage_duration->'seconds')::int, 0),
+              mins => coalesce((usage_duration->'minutes')::int, 0),
+              hours => coalesce((usage_duration->'hours')::int, 0),
+              days => coalesce((usage_duration->'days')::int, 0),
+              weeks => coalesce((usage_duration->'weeks')::int, 0),
+              months => coalesce((usage_duration->'months')::int, 0),
+              years => coalesce((usage_duration->'years')::int, 0)
+            ) as "period",
+            rl.period_start_date + rl.period as "period_start_date", 
+            rl.cycle_number + 1 as "cycle_number"
+          from renewable_limits rl
+        returning *
+      )
+      insert into organization_usage_limit ("org_id", "limit_name", "limit", "period", "period_start_date")
+        select 
+          dpl.org_id,
+          dpl.limit_name,
+          ?,
+          ?,
+          dpl.period_start_date + dpl.period
+        from downgradeable_petition_limits dpl
+      returning *;
+    `,
+      [freePetitionSendDetails.limit, this.interval(freePetitionSendDetails.duration)],
     );
   }
 }

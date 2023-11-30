@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
+import PostgresInterval from "postgres-interval";
 import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
@@ -90,6 +91,13 @@ import { Task } from "../TaskRepository";
 
 export class Mocks {
   constructor(public knex: Knex) {}
+
+  public interval(value: Duration) {
+    return this.knex.raw(
+      "?::interval",
+      Object.assign(PostgresInterval(), value).toPostgres(),
+    ) as any;
+  }
 
   async loadUserPermissionsByPetitionId(id: number): Promise<PetitionPermission[]> {
     const { rows: permissions } = await this.knex.raw(

@@ -963,8 +963,8 @@ export interface OrganizationUsageLimit {
   id: number; // int4
   org_id: number; // int4
   limit_name: OrganizationUsageLimitName; // organization_usage_limit_name
-  limit: number; // int4
-  used: number; // int4
+  limit: number; // numeric
+  used: number; // numeric
   period: Duration; // interval
   period_start_date: Date; // timestamptz
   period_end_date: Maybe<Date>; // timestamptz

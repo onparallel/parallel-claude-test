@@ -106,7 +106,7 @@ export const appsumo = Router()
             payload,
             `AppSumo:${payload.uuid}`,
           );
-          await req.context.tiers.updateOrganizationTier(
+          await req.context.orgLimits.updateOrganizationTier(
             org,
             payload.parallel_tier,
             `AppSumo:${payload.uuid}`,
@@ -147,7 +147,11 @@ export const appsumo = Router()
             `AppSumo:${payload.uuid}`,
           );
 
-          await req.context.tiers.updateOrganizationTier(org, "FREE", `AppSumo:${payload.uuid}`);
+          await req.context.orgLimits.updateOrganizationTier(
+            org,
+            "FREE",
+            `AppSumo:${payload.uuid}`,
+          );
         }
         await req.context.licenseCodes.updateAppSumoLicenseCodeByUUID(
           payload.uuid,
@@ -162,7 +166,7 @@ export const appsumo = Router()
           `AppSumo:${payload.uuid}`,
         );
 
-        await req.context.tiers.updateOrganizationTier(
+        await req.context.orgLimits.updateOrganizationTier(
           org!,
           payload.parallel_tier,
           `AppSumo:${payload.uuid}`,

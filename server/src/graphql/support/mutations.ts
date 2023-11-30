@@ -328,7 +328,11 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
   resolve: async (_, args, ctx) => {
     try {
       const org = await ctx.organizations.loadOrg(args.orgId);
-      const tier = await ctx.tiers.updateOrganizationTier(org!, args.tier, `User:${ctx.user!.id}`);
+      const tier = await ctx.orgLimits.updateOrganizationTier(
+        org!,
+        args.tier,
+        `User:${ctx.user!.id}`,
+      );
 
       return {
         result: RESULT.SUCCESS,
