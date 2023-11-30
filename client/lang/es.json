@@ -931,8 +931,8 @@
   },
   {
     "term": "component.confirm-discard-draft-dialog.discard-draft",
-    "definition": "Descartar",
-    "context": "Discard"
+    "definition": "Descartar borrador",
+    "context": "Discard draft"
   },
   {
     "term": "component.confirm-discard-draft-dialog.header",

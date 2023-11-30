@@ -43,7 +43,7 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, "KEEP" |
         <Button onClick={() => props.onResolve("DISCARD")} colorScheme="red" variant="ghost">
           <FormattedMessage
             id="component.confirm-discard-draft-dialog.discard-draft"
-            defaultMessage="Discard"
+            defaultMessage="Discard draft"
           />
         </Button>
       }

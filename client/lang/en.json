@@ -931,8 +931,8 @@
   },
   {
     "term": "component.confirm-discard-draft-dialog.discard-draft",
-    "definition": "Discard",
-    "context": "Discard"
+    "definition": "Discard draft",
+    "context": "Discard draft"
   },
   {
     "term": "component.confirm-discard-draft-dialog.header",
