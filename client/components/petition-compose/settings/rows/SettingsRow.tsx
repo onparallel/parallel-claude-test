@@ -1,4 +1,4 @@
-import { Center, FormControl, FormControlProps, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Center, FormControl, FormControlProps, FormLabel, HStack, Text } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { ReactNode } from "react";
 
@@ -39,13 +39,13 @@ export function SettingsRow({
         marginRight={4}
         minHeight={8}
       >
-        <Stack direction="row" alignItems="center">
+        <HStack>
           {icon ? <Center color={isActive ? "primary.600" : undefined}>{icon}</Center> : null}
           <Text as="span" whiteSpace="break-spaces">
             {label}
           </Text>
-          {description ? <HelpPopover>{description}</HelpPopover> : null}
-        </Stack>
+          {description ? <HelpPopover marginLeft={0}>{description}</HelpPopover> : null}
+        </HStack>
       </FormLabel>
       {children}
     </FormControl>
