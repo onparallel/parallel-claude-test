@@ -19,12 +19,12 @@ import { Divider } from "@parallel/components/common/Divider";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
 import { useSupportedPetitionLocales } from "@parallel/utils/locales";
+import { untranslated } from "@parallel/utils/untranslated";
 import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { isDefined, sort, sort } from "remeda";
+import { isDefined, sort } from "remeda";
 import fonts from "../../../utils/fonts.json";
-import { untranslated } from "@parallel/utils/untranslated";
 
 interface DocumentThemeEditorProps {
   canRestoreFonts: boolean;

@@ -405,7 +405,7 @@ export const PetitionComposeAttachments = Object.assign(
                     as={Reorder.Group}
                     axis="y"
                     values={list}
-                    onReorder={setList}
+                    onReorder={setList as any}
                   >
                     {list.map((item, i) => {
                       return (

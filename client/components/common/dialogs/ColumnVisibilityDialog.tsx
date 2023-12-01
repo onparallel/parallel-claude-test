@@ -85,7 +85,7 @@ function ColumnVisibilityDialog<T extends string>({
               as={Reorder.Group}
               axis="y"
               values={currentSelection}
-              onReorder={setCurrentSelection}
+              onReorder={setCurrentSelection as any}
               spacing={2}
             >
               {currentSelection.map((key) => {

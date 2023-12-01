@@ -509,7 +509,7 @@ function DraggableList({
         as={Reorder.Group}
         axis="y"
         values={list}
-        onReorder={setList}
+        onReorder={setList as any}
         spacing={0}
         borderBottom="1px"
         borderColor="gray.200"

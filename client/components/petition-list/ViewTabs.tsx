@@ -243,7 +243,7 @@ export const ViewTabs = Object.assign(
               layoutScroll
               axis="x"
               values={views.map((v) => v.id)}
-              onReorder={setViewIds}
+              onReorder={setViewIds as any}
               marginTop="-1px"
               flex={1}
               minWidth={MIN_TAB_WIDTH * (views.length + 1)}
