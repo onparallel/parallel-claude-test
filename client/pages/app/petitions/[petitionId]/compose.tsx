@@ -187,7 +187,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [updatePetition] = useMutation(PetitionCompose_updatePetitionDocument);
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
-      return await updatePetition({
+      await updatePetition({
         variables: {
           petitionId,
           data,
