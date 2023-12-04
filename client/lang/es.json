@@ -2371,12 +2371,12 @@
   },
   {
     "term": "component.feature-flag-descriptions.delegate-access-description",
-    "definition": "",
+    "definition": "Permite desactivar la funcionalidad de \"Invitar colaborador\" de la vista de destinatario",
     "context": "Allows turning off \"Invite collaborator\" on the recipient view"
   },
   {
     "term": "component.feature-flag-descriptions.delegate-access-name",
-    "definition": "",
+    "definition": "Ajuste \"Invitar colaborador\"",
     "context": "Setting \"Invite collaborator\""
   },
   {
