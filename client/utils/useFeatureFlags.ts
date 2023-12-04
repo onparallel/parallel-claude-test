@@ -335,25 +335,6 @@ export function useFeatureFlags() {
             }),
           },
           {
-            name: "FIELD_GROUP",
-            title: intl.formatMessage({
-              id: "generic.petition-field-type-field-group",
-              defaultMessage: "Group of fields",
-            }),
-            description: intl.formatMessage(
-              {
-                id: "component.feature-flag-descriptions.field-group-description",
-                defaultMessage: "Grants access to field {fieldName}",
-              },
-              {
-                fieldName: intl.formatMessage({
-                  id: "generic.petition-field-type-field-group",
-                  defaultMessage: "Group of fields",
-                }),
-              },
-            ),
-          },
-          {
             name: "SETTING_DELEGATE_ACCESS",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.delegate-access-name",
