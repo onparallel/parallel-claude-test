@@ -404,6 +404,7 @@ export type FeatureFlag =
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
+  | "SETTING_DELEGATE_ACCESS"
   | "SKIP_FORWARD_SECURITY"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
@@ -2508,6 +2509,8 @@ export interface Petition extends PetitionBase {
   isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -2689,6 +2692,8 @@ export interface PetitionBase {
   isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -3567,6 +3572,8 @@ export interface PetitionTemplate extends PetitionBase {
   isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"]["output"];
   /**
@@ -4092,6 +4099,8 @@ export interface PublicPetition extends Timestamps {
   id: Scalars["GID"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -5160,6 +5169,7 @@ export interface UpdatePetitionInput {
   emailBody?: InputMaybe<Scalars["JSON"]["input"]>;
   emailSubject?: InputMaybe<Scalars["String"]["input"]>;
   isCompletingMessageEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isDelegateAccessEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]["input"]>;
   locale?: InputMaybe<PetitionLocale>;
   name?: InputMaybe<Scalars["String"]["input"]>;
@@ -14292,6 +14302,7 @@ export type PetitionSettings_UserFragment = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
+  hasSettingDelegateAccess: boolean;
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
   hasAutoAnonymize: boolean;
@@ -14324,6 +14335,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   id: string;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
+  isDelegateAccessEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
@@ -14402,6 +14414,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
+  isDelegateAccessEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
@@ -29002,6 +29015,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
+  isDelegateAccessEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   isRestrictedWithPassword: boolean;
   emailSubject?: string | null;
@@ -29273,6 +29287,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   defaultPath: string;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
+  isDelegateAccessEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   isRestrictedWithPassword: boolean;
   path: string;
@@ -29635,6 +29650,7 @@ export type PetitionCompose_QueryFragment = {
     initials?: string | null;
     hasProfilesAccess: boolean;
     canCopyPetitionReplies: boolean;
+    hasSettingDelegateAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -29699,6 +29715,7 @@ export type PetitionCompose_updatePetitionMutation = {
         deadline?: string | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
+        isDelegateAccessEnabled: boolean;
         isRecipientViewContentsHidden: boolean;
         isRestricted: boolean;
         isRestrictedWithPassword: boolean;
@@ -29826,6 +29843,7 @@ export type PetitionCompose_updatePetitionMutation = {
         defaultPath: string;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
+        isDelegateAccessEnabled: boolean;
         isRecipientViewContentsHidden: boolean;
         isRestricted: boolean;
         isRestrictedWithPassword: boolean;
@@ -30964,6 +30982,7 @@ export type PetitionCompose_userQuery = {
     initials?: string | null;
     hasProfilesAccess: boolean;
     canCopyPetitionReplies: boolean;
+    hasSettingDelegateAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -31029,6 +31048,7 @@ export type PetitionCompose_petitionQuery = {
         deadline?: string | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
+        isDelegateAccessEnabled: boolean;
         isRecipientViewContentsHidden: boolean;
         isRestrictedWithPassword: boolean;
         emailSubject?: string | null;
@@ -31314,6 +31334,7 @@ export type PetitionCompose_petitionQuery = {
         defaultPath: string;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
+        isDelegateAccessEnabled: boolean;
         isRecipientViewContentsHidden: boolean;
         isRestrictedWithPassword: boolean;
         path: string;
@@ -39906,6 +39927,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
   petition: {
     __typename?: "PublicPetition";
+    isDelegateAccessEnabled: boolean;
     id: string;
     status: PetitionStatus;
     deadline?: string | null;
@@ -40507,6 +40529,7 @@ export type RecipientView_accessQuery = {
     hasClientPortalAccess: boolean;
     petition: {
       __typename?: "PublicPetition";
+      isDelegateAccessEnabled: boolean;
       id: string;
       status: PetitionStatus;
       deadline?: string | null;
@@ -47738,6 +47761,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     id
     locale
     skipForwardSecurity
+    isDelegateAccessEnabled
     isRecipientViewContentsHidden
     isRestricted
     isRestrictedWithPassword
@@ -48230,6 +48254,7 @@ export const SignatureConfigDialog_UserFragmentDoc = gql`
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
     id
+    hasSettingDelegateAccess: hasFeatureFlag(featureFlag: SETTING_DELEGATE_ACCESS)
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
@@ -50801,6 +50826,7 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
     petition {
       ...RecipientView_PublicPetition
+      isDelegateAccessEnabled
       recipients {
         ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
       }

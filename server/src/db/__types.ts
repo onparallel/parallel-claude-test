@@ -39,7 +39,8 @@ export type FeatureFlagName =
   | "FIELD_GROUP"
   | "CUSTOM_PROPERTIES"
   | "BULK_PETITION_SEND_TASK"
-  | "TEMPLATE_REPLIES_CSV_EXPORT_TASK";
+  | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
+  | "SETTING_DELEGATE_ACCESS";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -68,6 +69,7 @@ export const FeatureFlagNameValues = [
   "CUSTOM_PROPERTIES",
   "BULK_PETITION_SEND_TASK",
   "TEMPLATE_REPLIES_CSV_EXPORT_TASK",
+  "SETTING_DELEGATE_ACCESS",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";
@@ -1057,6 +1059,7 @@ export interface Petition {
   last_activity_at: Maybe<Date>; // timestamptz
   last_recipient_activity_at: Maybe<Date>; // timestamptz
   variables: Maybe<any>; // jsonb
+  enable_delegate_access: boolean; // bool
 }
 
 export type CreatePetition = PartialProps<
@@ -1105,6 +1108,7 @@ export type CreatePetition = PartialProps<
   | "last_activity_at"
   | "last_recipient_activity_at"
   | "variables"
+  | "enable_delegate_access"
 >;
 
 export interface PetitionAccess {

@@ -707,6 +707,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.completingMessageBody,
         args.data.skipForwardSecurity,
         args.data.isRecipientViewContentsHidden,
+        args.data.isDelegateAccessEnabled,
         args.data.anonymizeAfterMonths,
         args.data.anonymizePurpose,
         args.data.defaultPath,
@@ -727,6 +728,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.emailBody,
         args.data.emailSubject,
         args.data.isRecipientViewContentsHidden,
+        args.data.isDelegateAccessEnabled,
         args.data.locale,
         args.data.remindersConfig,
         args.data.signatureConfig,
@@ -765,6 +767,7 @@ export const updatePetition = mutationField("updatePetition", {
           });
           t.nullable.boolean("skipForwardSecurity");
           t.nullable.boolean("isRecipientViewContentsHidden");
+          t.nullable.boolean("isDelegateAccessEnabled");
           t.nullable.field("signatureConfig", { type: "SignatureConfigInput" });
           t.nullable.json("description");
           t.nullable.boolean("isCompletingMessageEnabled");
@@ -825,6 +828,7 @@ export const updatePetition = mutationField("updatePetition", {
       remindersConfig,
       skipForwardSecurity,
       isRecipientViewContentsHidden,
+      isDelegateAccessEnabled,
       signatureConfig,
       description,
       isCompletingMessageEnabled,
@@ -862,6 +866,9 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (isDefined(isRecipientViewContentsHidden)) {
       data.hide_recipient_view_contents = isRecipientViewContentsHidden;
+    }
+    if (isDefined(isDelegateAccessEnabled)) {
+      data.enable_delegate_access = isDelegateAccessEnabled;
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig;

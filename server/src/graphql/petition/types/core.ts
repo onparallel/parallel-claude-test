@@ -348,6 +348,10 @@ export const PetitionBase = interfaceType({
       type: "PetitionVariableResult",
       resolve: async (o, _, ctx) => await ctx.petitions.loadResolvedPetitionVariables(o.id),
     });
+    t.nonNull.boolean("isDelegateAccessEnabled", {
+      description: "Indicates whether delegate access is enabled for the recipient",
+      resolve: (o) => o.enable_delegate_access,
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

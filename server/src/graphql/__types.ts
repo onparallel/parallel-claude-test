@@ -341,6 +341,7 @@ export interface NexusGenInputs {
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
     isCompletingMessageEnabled?: boolean | null; // Boolean
+    isDelegateAccessEnabled?: boolean | null; // Boolean
     isRecipientViewContentsHidden?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
@@ -1849,6 +1850,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
+    isDelegateAccessEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
@@ -2344,6 +2346,7 @@ export interface NexusGenFieldTypes {
     imageUrl: string | null; // String
     isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
+    isDelegateAccessEnabled: boolean; // Boolean!
     isPublic: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
@@ -2664,6 +2667,7 @@ export interface NexusGenFieldTypes {
     hasUnreadComments: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isCompletingMessageEnabled: boolean; // Boolean!
+    isDelegateAccessEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     latestSignatureRequest: NexusGenRootTypes["PublicPetitionSignatureRequest"] | null; // PublicPetitionSignatureRequest
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
@@ -3304,6 +3308,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
+    isDelegateAccessEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
@@ -4068,6 +4073,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
+    isDelegateAccessEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
@@ -4563,6 +4569,7 @@ export interface NexusGenFieldTypeNames {
     imageUrl: "String";
     isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
+    isDelegateAccessEnabled: "Boolean";
     isPublic: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
@@ -4883,6 +4890,7 @@ export interface NexusGenFieldTypeNames {
     hasUnreadComments: "Boolean";
     id: "GID";
     isCompletingMessageEnabled: "Boolean";
+    isDelegateAccessEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     latestSignatureRequest: "PublicPetitionSignatureRequest";
     locale: "PetitionLocale";
@@ -5523,6 +5531,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
+    isDelegateAccessEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";

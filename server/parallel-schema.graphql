@@ -418,6 +418,7 @@ enum FeatureFlag {
   PUBLIC_PETITION_LINK_PREFILL_SECRET_UI
   REMOVE_PARALLEL_BRANDING
   REMOVE_WHY_WE_USE_PARALLEL
+  SETTING_DELEGATE_ACCESS
   SKIP_FORWARD_SECURITY
   TEMPLATE_REPLIES_CSV_EXPORT_TASK
   TEMPLATE_REPLIES_PREVIEW_URL
@@ -2784,6 +2785,11 @@ type Petition implements PetitionBase {
   isCompletingMessageEnabled: Boolean!
 
   """
+  Indicates whether delegate access is enabled for the recipient
+  """
+  isDelegateAccessEnabled: Boolean!
+
+  """
   Whether the contents card is hidden in the recipient view.
   """
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
@@ -3101,6 +3107,11 @@ interface PetitionBase {
   Wether the completion message will be shown to the recipients or not.
   """
   isCompletingMessageEnabled: Boolean!
+
+  """
+  Indicates whether delegate access is enabled for the recipient
+  """
+  isDelegateAccessEnabled: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.
@@ -4468,6 +4479,11 @@ type PetitionTemplate implements PetitionBase {
   isCompletingMessageEnabled: Boolean!
 
   """
+  Indicates whether delegate access is enabled for the recipient
+  """
+  isDelegateAccessEnabled: Boolean!
+
+  """
   Whether the template is publicly available or not
   """
   isPublic: Boolean!
@@ -5176,6 +5192,11 @@ type PublicPetition implements Timestamps {
   Wether the completion message will be shown to the recipients or not.
   """
   isCompletingMessageEnabled: Boolean!
+
+  """
+  Indicates whether delegate access is enabled for the recipient
+  """
+  isDelegateAccessEnabled: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.
@@ -6685,6 +6706,7 @@ input UpdatePetitionInput {
   emailBody: JSON
   emailSubject: String
   isCompletingMessageEnabled: Boolean
+  isDelegateAccessEnabled: Boolean
   isRecipientViewContentsHidden: Boolean
   locale: PetitionLocale
   name: String

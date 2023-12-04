@@ -845,6 +845,12 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       {
+        name: "SETTING_DELEGATE_ACCESS",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "SKIP_FORWARD_SECURITY",
         description: null,
         isDeprecated: false,

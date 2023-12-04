@@ -290,6 +290,10 @@ export const PublicPetition = objectType({
       type: "PetitionVariable",
       resolve: (o) => o.variables ?? [],
     });
+    t.nonNull.boolean("isDelegateAccessEnabled", {
+      description: "Indicates whether delegate access is enabled for the recipient",
+      resolve: (o) => o.enable_delegate_access,
+    });
   },
 });
 

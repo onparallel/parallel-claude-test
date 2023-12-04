@@ -89,6 +89,7 @@ interface RecipientViewHeaderProps {
   recipients: RecipientViewHeader_PublicContactFragment[];
   message: RecipientView_PublicPetitionMessageFragment | null | undefined;
   hasClientPortalAccess: boolean;
+  showDelegateAccess: boolean;
   pendingPetitions: number;
   keycode: string;
   isClosed: boolean;
@@ -102,6 +103,7 @@ export const RecipientViewHeader = Object.assign(
       message,
       recipients,
       hasClientPortalAccess,
+      showDelegateAccess,
       pendingPetitions,
       keycode,
       isClosed,
@@ -509,22 +511,24 @@ export const RecipientViewHeader = Object.assign(
                         type="conjunction"
                       />
                     </Box>
-                    <Flex alignItems="center">
-                      <Button variant="link" onClick={handleDelegateAccess}>
-                        <Text fontWeight="bold">
+                    {showDelegateAccess ? (
+                      <Flex alignItems="center">
+                        <Button variant="link" onClick={handleDelegateAccess}>
+                          <Text fontWeight="bold">
+                            <FormattedMessage
+                              id="recipient-view.invite-collaborator"
+                              defaultMessage="Invite collaborator"
+                            />
+                          </Text>
+                        </Button>
+                        <HelpPopover>
                           <FormattedMessage
-                            id="recipient-view.invite-collaborator"
-                            defaultMessage="Invite collaborator"
+                            id="recipient-view.invite-collaborator.help"
+                            defaultMessage="Use this option to request someone else to complete the information for you."
                           />
-                        </Text>
-                      </Button>
-                      <HelpPopover>
-                        <FormattedMessage
-                          id="recipient-view.invite-collaborator.help"
-                          defaultMessage="Use this option to request someone else to complete the information for you."
-                        />
-                      </HelpPopover>
-                    </Flex>
+                        </HelpPopover>
+                      </Flex>
+                    ) : null}
                   </Stack>
                 </Stack>
               </AccordionPanel>

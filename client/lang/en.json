@@ -2370,6 +2370,16 @@
     "context": "Custom solutions"
   },
   {
+    "term": "component.feature-flag-descriptions.delegate-access-description",
+    "definition": "Allows turning off \"Invite collaborator\" on the recipient view",
+    "context": "Allows turning off \"Invite collaborator\" on the recipient view"
+  },
+  {
+    "term": "component.feature-flag-descriptions.delegate-access-name",
+    "definition": "Setting \"Invite collaborator\"",
+    "context": "Setting \"Invite collaborator\""
+  },
+  {
     "term": "component.feature-flag-descriptions.developer-access-description",
     "definition": "Gives access to the developers view.",
     "context": "Gives access to the developers view."
@@ -5168,6 +5178,16 @@
     "term": "component.petition-settings.default-path",
     "definition": "Folder for created parallels:",
     "context": "Folder for created parallels:"
+  },
+  {
+    "term": "component.petition-settings.delegate-access",
+    "definition": "Allow inviting collaborators",
+    "context": "Allow inviting collaborators"
+  },
+  {
+    "term": "component.petition-settings.delegate-access-description",
+    "definition": "By enabling this, the recipient can invite a collaborator to help them respond.",
+    "context": "By enabling this, the recipient can invite a collaborator to help them respond."
   },
   {
     "term": "component.petition-settings.document-theme-label",

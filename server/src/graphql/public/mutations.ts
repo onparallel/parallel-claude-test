@@ -18,11 +18,11 @@ import { PetitionAccess, User } from "../../db/__types";
 import { Task } from "../../db/repositories/TaskRepository";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { stallFor } from "../../util/promises/stallFor";
 import {
   interpolatePlaceholdersInSlate,
   renderTextWithPlaceholders,
 } from "../../util/slate/placeholders";
-import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -553,6 +553,11 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     const access = ctx.access!;
     const recipient = ctx.contact!;
     const petitionId = access.petition_id;
+
+    const petition = await ctx.petitions.loadPetition(petitionId);
+    if (petition?.enable_delegate_access === false) {
+      throw new ForbiddenError("Delegate access is not enabled for this petition.");
+    }
 
     const [contactToDelegate] = await ctx.contacts.loadOrCreate(
       {

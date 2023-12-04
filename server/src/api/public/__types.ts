@@ -377,6 +377,7 @@ export type FeatureFlag =
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
+  | "SETTING_DELEGATE_ACCESS"
   | "SKIP_FORWARD_SECURITY"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
@@ -2411,6 +2412,11 @@ export type OwnershipTransferredEvent = PetitionEvent & {
 export type Petition = PetitionBase & {
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
+  /**
+   * Whether the contents card is hidden in the recipient view.
+   * @deprecated Don't use this
+   */
+  allow: Scalars["Boolean"]["output"];
   /** How many months to wait since the petition is closed to anonymize. */
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
@@ -2453,6 +2459,8 @@ export type Petition = PetitionBase & {
   isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -2594,6 +2602,11 @@ export type PetitionAttachmentsList = {
 };
 
 export type PetitionBase = {
+  /**
+   * Whether the contents card is hidden in the recipient view.
+   * @deprecated Don't use this
+   */
+  allow: Scalars["Boolean"]["output"];
   /** How many months to wait since the petition is closed to anonymize. */
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
@@ -2626,6 +2639,8 @@ export type PetitionBase = {
   isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -3074,6 +3089,7 @@ export type PetitionListView = {
 
 export type PetitionListViewColumn =
   | "createdAt"
+  | "fromTemplateId"
   | "lastActivityAt"
   | "lastRecipientActivityAt"
   | "name"
@@ -3083,8 +3099,7 @@ export type PetitionListViewColumn =
   | "sharedWith"
   | "signature"
   | "status"
-  | "tagsFilters"
-  | "template";
+  | "tagsFilters";
 
 export type PetitionListViewData = {
   columns: Maybe<Array<PetitionListViewColumn>>;
@@ -3415,6 +3430,11 @@ export type PetitionTaggedEvent = PetitionEvent & {
 
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
+  /**
+   * Whether the contents card is hidden in the recipient view.
+   * @deprecated Don't use this
+   */
+  allow: Scalars["Boolean"]["output"];
   /** How many months to wait since the petition is closed to anonymize. */
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
@@ -3458,6 +3478,8 @@ export type PetitionTemplate = PetitionBase & {
   isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"]["output"];
   /**
@@ -3949,6 +3971,8 @@ export type PublicPetition = Timestamps & {
   id: Scalars["GID"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
+  /** Indicates whether delegate access is enabled for the recipient */
+  isDelegateAccessEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this

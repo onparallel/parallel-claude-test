@@ -353,6 +353,17 @@ export function useFeatureFlags() {
               },
             ),
           },
+          {
+            name: "SETTING_DELEGATE_ACCESS",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.delegate-access-name",
+              defaultMessage: 'Setting "Invite collaborator"',
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.delegate-access-description",
+              defaultMessage: 'Allows turning off "Invite collaborator" on the recipient view',
+            }),
+          },
         ],
       },
     ],

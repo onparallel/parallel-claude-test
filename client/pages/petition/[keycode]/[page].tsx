@@ -235,6 +235,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               message={message}
               recipients={recipients}
               hasClientPortalAccess={access.hasClientPortalAccess}
+              showDelegateAccess={access.petition.isDelegateAccessEnabled}
               pendingPetitions={pending}
               keycode={keycode}
               isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
@@ -402,6 +403,7 @@ const _fragments = {
       fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
         petition {
           ...RecipientView_PublicPetition
+          isDelegateAccessEnabled
           recipients {
             ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
           }

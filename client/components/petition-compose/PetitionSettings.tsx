@@ -31,6 +31,7 @@ import {
   ShieldIcon,
   SignatureIcon,
   TimeIcon,
+  UserPlusIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionSettings_PetitionBaseFragment,
@@ -90,7 +91,7 @@ import { SettingsRow } from "./settings/rows/SettingsRow";
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
   petition: PetitionSettings_PetitionBaseFragment;
-  onUpdatePetition: (value: UpdatePetitionInput) => void;
+  onUpdatePetition: (value: UpdatePetitionInput) => Promise<void>;
   validPetitionFields: () => Promise<boolean>;
   onRefetch: () => Promise<any>;
 }
@@ -144,7 +145,7 @@ function _PetitionSettings({
         integrations: signatureIntegrations,
       });
 
-      onUpdatePetition({ signatureConfig });
+      await onUpdatePetition({ signatureConfig });
     } catch {}
   }
 
@@ -162,7 +163,7 @@ function _PetitionSettings({
             },
           });
         }
-        onUpdatePetition({ signatureConfig: null });
+        await onUpdatePetition({ signatureConfig: null });
       } catch {}
     }
   }
@@ -572,7 +573,7 @@ function _PetitionSettings({
             name="petition-locale"
             minWidth="120px"
             value={petition.locale}
-            onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
+            onChange={(e) => withError(() => onUpdatePetition({ locale: e.target.value as any }))}
           >
             {locales.map((locale) => (
               <option key={locale.key} value={locale.key}>
@@ -603,7 +604,9 @@ function _PetitionSettings({
         >
           <DeadlineInput
             value={petition.deadline ? new Date(petition.deadline) : null}
-            onChange={(value) => onUpdatePetition({ deadline: value?.toISOString() ?? null })}
+            onChange={(value) =>
+              withError(onUpdatePetition({ deadline: value?.toISOString() ?? null }))
+            }
           />
         </SettingsRow>
       ) : null}
@@ -748,10 +751,31 @@ function _PetitionSettings({
             />
           }
           isChecked={petition.isRecipientViewContentsHidden}
-          onChange={async (value) =>
-            await onUpdatePetition({ isRecipientViewContentsHidden: value })
+          onChange={(value) =>
+            withError(onUpdatePetition({ isRecipientViewContentsHidden: value }))
           }
           controlId="hide-recipient-view-contents"
+        />
+      ) : null}
+      {user.hasSettingDelegateAccess ? (
+        <SettingsRowSwitch
+          isDisabled={settingIsDisabled}
+          icon={<UserPlusIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.delegate-access"
+              defaultMessage="Allow inviting collaborators"
+            />
+          }
+          description={
+            <FormattedMessage
+              id="component.petition-settings.delegate-access-description"
+              defaultMessage="By enabling this, the recipient can invite a collaborator to help them respond."
+            />
+          }
+          isChecked={petition.isDelegateAccessEnabled}
+          onChange={(value) => withError(onUpdatePetition({ isDelegateAccessEnabled: value }))}
+          controlId="delegate-access"
         />
       ) : null}
       {petition.__typename === "Petition" && petition.fromTemplate ? (
@@ -811,6 +835,7 @@ const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
       id
+      hasSettingDelegateAccess: hasFeatureFlag(featureFlag: SETTING_DELEGATE_ACCESS)
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
       hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
@@ -842,6 +867,7 @@ const fragments = {
       id
       locale
       skipForwardSecurity
+      isDelegateAccessEnabled
       isRecipientViewContentsHidden
       isRestricted
       isRestrictedWithPassword
