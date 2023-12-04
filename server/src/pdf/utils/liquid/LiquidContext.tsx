@@ -100,7 +100,6 @@ function useCreateLiquid() {
 
   for (const tag of [
     "capture",
-    "comment",
     "cycle",
     "decrement",
     "echo",
