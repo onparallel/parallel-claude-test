@@ -70,6 +70,8 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           "recipient-first-name": contact?.first_name ?? "",
           "recipient-last-name": contact?.last_name ?? "",
           "created-at": petition.created_at,
+          "parallel-status": petition.status!,
+          "signature-status": petition.latest_signature_status ?? "",
         };
 
         function replyContent(r: { content: any; type: PetitionFieldType; escapeCommas: boolean }) {
@@ -236,6 +238,14 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
       {
         id: "created-at",
         title: "Created at",
+      },
+      {
+        id: "parallel-status",
+        title: "Parallel status",
+      },
+      {
+        id: "signature-status",
+        title: "Signature status",
       },
     ];
 
