@@ -17,7 +17,7 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { titleize } from "../../util/strings";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
-import { applyFieldVisibility } from "../../util/fieldLogic";
+import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
 
 function getPetitionSignatureStatus({
   status,
@@ -145,6 +145,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       );
 
       rows = petitions.map((petition, petitionIndex) => {
+        const logic = evaluateFieldLogic(composedPetitions[petitionIndex]);
         const petitionFields = applyFieldVisibility(composedPetitions[petitionIndex]).filter(
           (f) => f.type !== "HEADING",
         );
@@ -221,6 +222,20 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           row["preview-url"] = `${this.ctx.config.misc.parallelUrl}/${
             intl.locale
           }/app/petitions/${toGlobalId("Petition", petition.id)}/preview`;
+        }
+
+        for (const [name, value] of Object.entries(logic[0].finalVariables)) {
+          const columnId = `variable-${name}`;
+          let header = headers.find((h) => h.id === columnId);
+          if (!header) {
+            header = {
+              id: columnId,
+              title: name,
+            };
+            headers.splice(Object.keys(row).length, 0, header);
+          }
+
+          row[columnId] = isFinite(value) ? value.toString() : "";
         }
 
         function replyContent(r: Pick<PetitionFieldReply, "content" | "type">) {

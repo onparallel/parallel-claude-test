@@ -4,7 +4,7 @@ import { WorkerContext } from "../../context";
 import { UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
 import { getAllFieldsWithIndices } from "../../util/fieldIndices";
-import { applyFieldVisibility } from "../../util/fieldLogic";
+import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
@@ -32,6 +32,7 @@ export async function* getPetitionFiles(
       fieldIndex,
     ]),
   );
+  const logic = evaluateFieldLogic(composedPetition);
   const visibleFields = applyFieldVisibility(composedPetition);
   const allReplies = visibleFields
     .flatMap((f) => [
@@ -134,6 +135,8 @@ export async function* getPetitionFiles(
       excelWorkbook.addPetitionFieldReply(field);
     }
   }
+
+  excelWorkbook.addPetitionVariables(logic[0].finalVariables);
 
   for (const field of visibleFields) {
     yield* processField(field, options);

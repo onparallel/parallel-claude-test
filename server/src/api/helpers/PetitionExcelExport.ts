@@ -52,8 +52,18 @@ export class PetitionExcelExport {
     await this.fieldCommentsTab.init(this.locale);
   }
 
+  public addPetitionVariables(variables: Record<string, number>) {
+    this.textRepliesTab.addRows(
+      Object.entries(variables).map(([name, value]) => ({
+        title: name,
+        answer: isFinite(value) ? value : "",
+      })),
+    );
+  }
+
   public addPetitionFieldReply(field: ComposedPetitionField) {
-    this.textRepliesTab.addReply(this.extractCellContents(field));
+    const content = this.extractCellContents(field);
+    this.textRepliesTab.addRows({ title: content.title, answer: content.answer }, content.format);
   }
 
   private extractDynamicSelectReply(field: ComposedPetitionField) {

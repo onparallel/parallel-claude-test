@@ -40,8 +40,4 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       },
     ];
   }
-
-  public addReply(reply: TextReplyRow & { format?: { font: Partial<Excel.Font> } }) {
-    this.addRows(reply, reply.format);
-  }
 }

@@ -12,7 +12,7 @@ export abstract class ExcelWorksheet<T> {
     this.page = wb.addWorksheet(worksheetName);
   }
 
-  protected addRows(rows: MaybeArray<T>, format?: { font: Partial<Excel.Font> }) {
+  public addRows(rows: MaybeArray<T>, format?: { font: Partial<Excel.Font> }) {
     unMaybeArray(rows).forEach((row) => {
       this.page.addRow(row, "n").eachCell((cell) => {
         cell.alignment = { wrapText: true };
