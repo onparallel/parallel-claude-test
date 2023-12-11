@@ -630,7 +630,7 @@ export const PetitionHeader = Object.assign(
                       />
                     )}
                   </MenuItem>
-                  {isPetition && me.canCopyPetitionReplies ? (
+                  {isPetition ? (
                     <MenuItem
                       onClick={handleImportRepliesClick}
                       isDisabled={isAnonymized || myEffectivePermission === "READ"}
@@ -877,7 +877,6 @@ export const PetitionHeader = Object.assign(
             me {
               id
               hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-              canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
             }
           }
         `;

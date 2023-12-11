@@ -36,7 +36,6 @@ export class OrgLimitsService implements IOrgLimitsService {
 
   private readonly defaultAppSumoFFs: FeatureFlagName[] = [
     "CUSTOM_HOST_UI",
-    "DEVELOPER_ACCESS",
     "REMOVE_PARALLEL_BRANDING",
   ];
 

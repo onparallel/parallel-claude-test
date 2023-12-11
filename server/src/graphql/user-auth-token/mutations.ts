@@ -1,12 +1,11 @@
 import { list, mutationField, nonNull, objectType, stringArg } from "nexus";
 import { DatabaseError } from "pg";
+import { RESULT } from "../helpers/Result";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/Result";
-import { userHasFeatureFlag } from "../petition/authorizers";
-import { userHasAccessToAuthTokens } from "./authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
+import { userHasAccessToAuthTokens } from "./authorizers";
 
 export const generateUserAuthToken = mutationField("generateUserAuthToken", {
   description: "Generates a new API token for the context user",
@@ -19,10 +18,7 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
       },
     }),
   ),
-  authorize: authenticateAnd(
-    userHasFeatureFlag("DEVELOPER_ACCESS"),
-    contextUserHasPermission("INTEGRATIONS:CRUD_API"),
-  ),
+  authorize: authenticateAnd(contextUserHasPermission("INTEGRATIONS:CRUD_API")),
   args: {
     tokenName: nonNull(stringArg()),
   },
@@ -46,7 +42,6 @@ export const revokeUserAuthToken = mutationField("revokeUserAuthToken", {
   description: "Soft-deletes a given auth token, making it permanently unusable.",
   type: "Result",
   authorize: authenticateAnd(
-    userHasFeatureFlag("DEVELOPER_ACCESS"),
     contextUserHasPermission("INTEGRATIONS:CRUD_API"),
     userHasAccessToAuthTokens("authTokenIds"),
   ),

@@ -926,7 +926,6 @@ describe("GraphQL/UserGroups", () => {
 
     it("updates multiple permissions on a group", async () => {
       await mocks.createFeatureFlags([
-        { name: "DEVELOPER_ACCESS", default_value: true },
         { name: "PROFILES", default_value: true },
         { name: "ON_BEHALF_OF", default_value: true },
         { name: "GHOST_LOGIN", default_value: true },

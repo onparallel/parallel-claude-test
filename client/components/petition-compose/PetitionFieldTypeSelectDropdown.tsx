@@ -84,12 +84,11 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       const fieldCategories = useMemo(() => {
         const options = [
           {
-            // TODO: Change to Headings and groups and remove FF before release FIELD_GROUP
             category: intl.formatMessage({
               id: "component.petition-field-type-select-dropdown.category-headings",
-              defaultMessage: "Headings",
+              defaultMessage: "Headings and groups",
             }),
-            fields: ["HEADING", ...(user.hasFieldGroup ? ["FIELD_GROUP"] : [])],
+            fields: ["HEADING", "FIELD_GROUP"],
           },
           {
             category: intl.formatMessage({
@@ -329,7 +328,6 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
         fragment PetitionFieldTypeSelectDropdown_User on User {
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
           hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-          hasFieldGroup: hasFeatureFlag(featureFlag: FIELD_GROUP)
         }
       `,
     },

@@ -11,7 +11,6 @@ import { Table, TableColumn } from "@parallel/components/common/Table";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
-import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { DevelopersLayout } from "@parallel/components/layout/DevelopersLayout";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/dialogs/GenerateNewTokenDialog";
@@ -304,6 +303,5 @@ Tokens.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 export default compose(
   withDialogs,
   withPermission("INTEGRATIONS:CRUD_API"),
-  withFeatureFlag("DEVELOPER_ACCESS", "/app/organization"),
   withApolloData,
 )(Tokens);

@@ -41,7 +41,7 @@ export function UserSettingsLayout({
         }),
         path: "/app/settings/security",
       },
-      ...(me.hasDeveloperAccess && hasDeveloperPermissions
+      ...(hasDeveloperPermissions
         ? [
             {
               title: intl.formatMessage({
@@ -96,10 +96,6 @@ UserSettingsLayout.fragments = {
   Query: gql`
     fragment UserSettingsLayout_Query on Query {
       ...SidebarLayout_Query
-      me {
-        id
-        hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
-      }
     }
     ${SidebarLayout.fragments.Query}
   `,

@@ -129,33 +129,6 @@ describe("GraphQL/PetitionEventSubscription", () => {
 
   let subscriptionId: string;
   describe("createEventSubscription", () => {
-    beforeAll(async () => {
-      await mocks.createFeatureFlags([{ name: "DEVELOPER_ACCESS", default_value: true }]);
-    });
-
-    it("fails if trying to create a subscription without DEVELOPER_ACCESS feature flag", async () => {
-      await mocks.updateFeatureFlag("DEVELOPER_ACCESS", false);
-      const { data, errors } = await testClient.mutate({
-        mutation: gql`
-          mutation ($eventsUrl: String!, $name: String) {
-            createEventSubscription(eventsUrl: $eventsUrl, name: $name) {
-              id
-              name
-              eventsUrl
-              isEnabled
-            }
-          }
-        `,
-        variables: {
-          eventsUrl: "https://www.example.com/api",
-          name: "example",
-        },
-      });
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-      await mocks.updateFeatureFlag("DEVELOPER_ACCESS", true);
-    });
-
     it("creates and returns a new subscription for the user's petitions", async () => {
       const fetch = testClient.container.get<IFetchService>(FETCH_SERVICE);
       const spy = jest.spyOn(fetch, "fetch");

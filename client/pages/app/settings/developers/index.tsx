@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
-import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { DevelopersLayout } from "@parallel/components/layout/DevelopersLayout";
 import {
@@ -613,6 +612,5 @@ Subscriptions.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) =>
 export default compose(
   withDialogs,
   withPermission("INTEGRATIONS:CRUD_API"),
-  withFeatureFlag("DEVELOPER_ACCESS", "/app/organization"),
   withApolloData,
 )(Subscriptions);

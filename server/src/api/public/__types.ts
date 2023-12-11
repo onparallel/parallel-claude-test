@@ -2412,11 +2412,6 @@ export type OwnershipTransferredEvent = PetitionEvent & {
 export type Petition = PetitionBase & {
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
-  /**
-   * Whether the contents card is hidden in the recipient view.
-   * @deprecated Don't use this
-   */
-  allow: Scalars["Boolean"]["output"];
   /** How many months to wait since the petition is closed to anonymize. */
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
@@ -2602,11 +2597,6 @@ export type PetitionAttachmentsList = {
 };
 
 export type PetitionBase = {
-  /**
-   * Whether the contents card is hidden in the recipient view.
-   * @deprecated Don't use this
-   */
-  allow: Scalars["Boolean"]["output"];
   /** How many months to wait since the petition is closed to anonymize. */
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
@@ -3430,11 +3420,6 @@ export type PetitionTaggedEvent = PetitionEvent & {
 
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
-  /**
-   * Whether the contents card is hidden in the recipient view.
-   * @deprecated Don't use this
-   */
-  allow: Scalars["Boolean"]["output"];
   /** How many months to wait since the petition is closed to anonymize. */
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
@@ -4999,6 +4984,7 @@ export type UpdatePetitionInput = {
   emailBody?: InputMaybe<Scalars["JSON"]["input"]>;
   emailSubject?: InputMaybe<Scalars["String"]["input"]>;
   isCompletingMessageEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isDelegateAccessEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]["input"]>;
   locale?: InputMaybe<PetitionLocale>;
   name?: InputMaybe<Scalars["String"]["input"]>;

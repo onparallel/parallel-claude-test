@@ -60,17 +60,6 @@ export function validUserGroupPermissionsInput<TypeName extends string, FieldNam
       }
     }
 
-    const integrationsPermissions = permissions.filter((p) => p.name.startsWith("INTEGRATIONS:"));
-    if (integrationsPermissions.length > 0) {
-      const hasIntegrationsAccess = await ctx.featureFlags.userHasFeatureFlag(
-        ctx.user!.id,
-        "DEVELOPER_ACCESS",
-      );
-      if (!hasIntegrationsAccess) {
-        unknownNames.push(...integrationsPermissions.map((p) => p.name));
-      }
-    }
-
     if (permissions.some((p) => p.name === "USERS:GHOST_LOGIN")) {
       const hasGhostLoginAccess = await ctx.featureFlags.userHasFeatureFlag(
         ctx.user!.id,

@@ -277,18 +277,6 @@ export function useFeatureFlags() {
         }),
         featureFlags: [
           {
-            name: "DEVELOPER_ACCESS",
-            title: intl.formatMessage({
-              id: "component.feature-flag-descriptions.developer-access-name",
-              defaultMessage: "Developer access",
-            }),
-            description: intl.formatMessage({
-              id: "component.feature-flag-descriptions.developer-access-description",
-              defaultMessage: "Gives access to the developers view.",
-            }),
-          },
-
-          {
             name: "PUBLIC_PETITION_LINK_PREFILL_DATA",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.prefill-data-public-links-name",
@@ -309,17 +297,6 @@ export function useFeatureFlags() {
             description: intl.formatMessage({
               id: "component.feature-flag-descriptions.profiles-description",
               defaultMessage: "Grants access to profiles",
-            }),
-          },
-          {
-            name: "COPY_PETITION_REPLIES",
-            title: intl.formatMessage({
-              id: "component.feature-flag-descriptions.copy-petition-replies-name",
-              defaultMessage: "Import replies from another petition",
-            }),
-            description: intl.formatMessage({
-              id: "component.feature-flag-descriptions.copy-petition-replies-description",
-              defaultMessage: "Grants access import replies dialog in the petition",
             }),
           },
           {

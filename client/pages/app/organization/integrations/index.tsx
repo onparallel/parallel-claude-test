@@ -205,10 +205,7 @@ function OrganizationIntegrations() {
       isChecked: hasDownJones,
     },
     {
-      isDisabled:
-        !me.hasDeveloperAccess ||
-        (!userCanEditIntegrations && !userHasApiAccess) ||
-        !userHasApiAccess,
+      isDisabled: (!userCanEditIntegrations && !userHasApiAccess) || !userHasApiAccess,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
@@ -313,7 +310,6 @@ OrganizationIntegrations.queries = [
       me {
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-        hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
         hasDowJonesFeature: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
         organization {
           id

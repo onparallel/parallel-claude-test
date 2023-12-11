@@ -39,8 +39,6 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
       encryptionService,
       2,
     );
-
-    await mocks.createFeatureFlags([{ name: "DEVELOPER_ACCESS", default_value: true }]);
   });
 
   afterAll(async () => {

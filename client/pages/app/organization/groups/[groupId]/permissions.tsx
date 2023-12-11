@@ -327,42 +327,38 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             },
           ]
         : []),
-      ...(me.hasDeveloperAccess
-        ? [
-            {
-              category: intl.formatMessage({
-                id: "page.permissions-group.category-integrations",
-                defaultMessage: "Integrations",
-              }),
-              permissions: [
-                {
-                  name: "INTEGRATIONS:CRUD_INTEGRATIONS",
-                  title: intl.formatMessage({
-                    id: "page.permissions-group.integrations-crud",
-                    defaultMessage: "Create and manage integrations",
-                  }),
-                  description: intl.formatMessage({
-                    id: "page.permissions-group.integrations-crud-description",
-                    defaultMessage:
-                      "Grants users in this team permissions to manage the different integrations of the organization.",
-                  }),
-                },
-                {
-                  name: "INTEGRATIONS:CRUD_API",
-                  title: intl.formatMessage({
-                    id: "page.permissions-group.integrations-crud-api",
-                    defaultMessage: "Developer access",
-                  }),
-                  description: intl.formatMessage({
-                    id: "page.permissions-group.integrations-crud-api-description",
-                    defaultMessage:
-                      "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens.",
-                  }),
-                },
-              ],
-            },
-          ]
-        : []),
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-integrations",
+          defaultMessage: "Integrations",
+        }),
+        permissions: [
+          {
+            name: "INTEGRATIONS:CRUD_INTEGRATIONS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud",
+              defaultMessage: "Create and manage integrations",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud-description",
+              defaultMessage:
+                "Grants users in this team permissions to manage the different integrations of the organization.",
+            }),
+          },
+          {
+            name: "INTEGRATIONS:CRUD_API",
+            title: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud-api",
+              defaultMessage: "Developer access",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.integrations-crud-api-description",
+              defaultMessage:
+                "Grants users in this team permissions to access their Developers panel for managing subscriptions and API tokens.",
+            }),
+          },
+        ],
+      },
       {
         category: intl.formatMessage({
           id: "page.permissions-group.category-users",
@@ -798,7 +794,6 @@ const _queries = [
         permissions
         hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-        hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
         hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         organization {
           id

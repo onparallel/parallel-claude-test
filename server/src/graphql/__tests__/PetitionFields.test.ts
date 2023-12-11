@@ -54,10 +54,7 @@ describe("GraphQL/Petition Fields", () => {
       type: "TEXT",
     }));
 
-    await mocks.createFeatureFlags([
-      { name: "FIELD_GROUP", default_value: true },
-      { name: "DOW_JONES_KYC", default_value: true },
-    ]);
+    await mocks.createFeatureFlags([{ name: "DOW_JONES_KYC", default_value: true }]);
   });
 
   afterAll(async () => {

@@ -6596,7 +6596,6 @@ export type DevelopersLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -6764,12 +6763,7 @@ export type PetitionHeader_PetitionBaseFragment =
   | PetitionHeader_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionHeader_QueryFragment = {
-  me: {
-    __typename?: "User";
-    id: string;
-    hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
-  };
+  me: { __typename?: "User"; id: string; hasProfilesAccess: boolean };
 };
 
 export type PetitionHeader_PetitionBase_updatePath_Petition_Fragment = {
@@ -6896,7 +6890,6 @@ export type PetitionLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7120,7 +7113,6 @@ export type UserSettingsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -13088,7 +13080,6 @@ export type AddFieldPopover_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
-  hasFieldGroup: boolean;
 };
 
 export type PetitionComposeAttachments_PetitionAttachmentFragment = {
@@ -13705,7 +13696,6 @@ export type PetitionComposeField_UserFragment = {
   id: string;
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
-  hasFieldGroup: boolean;
 };
 
 export type PetitionComposeField_PetitionBase_Petition_Fragment = {
@@ -13944,7 +13934,6 @@ export type PetitionComposeFieldGroupChildren_UserFragment = {
   id: string;
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
-  hasFieldGroup: boolean;
 };
 
 export type PetitionComposeFieldGroupChildren_PetitionFieldFragment = {
@@ -13997,7 +13986,6 @@ export type PetitionComposeFieldList_UserFragment = {
   id: string;
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
-  hasFieldGroup: boolean;
 };
 
 export type PetitionComposeFieldList_PetitionFieldFragment = {
@@ -14277,14 +14265,12 @@ export type PetitionFieldTypeSelect_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
-  hasFieldGroup: boolean;
 };
 
 export type PetitionFieldTypeSelectDropdown_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
-  hasFieldGroup: boolean;
 };
 
 export type PetitionRemindersConfig_RemindersConfigFragment = {
@@ -15112,7 +15098,6 @@ export type PetitionComposeFieldSettings_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
-  hasFieldGroup: boolean;
 };
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
@@ -24311,7 +24296,6 @@ export type PermissionsGroup_userQuery = {
     initials?: string | null;
     hasOnBehalfOfAccess: boolean;
     hasProfilesAccess: boolean;
-    hasDeveloperAccess: boolean;
     hasLoginAsAccess: boolean;
     hasPermissionManagement: boolean;
     organization: {
@@ -24600,7 +24584,6 @@ export type OrganizationIntegrations_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
-    hasDeveloperAccess: boolean;
     hasDowJonesFeature: boolean;
     hasProfilesAccess: boolean;
     organization: {
@@ -26678,7 +26661,6 @@ export type PetitionActivity_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -28977,7 +28959,6 @@ export type PetitionActivity_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -29649,7 +29630,6 @@ export type PetitionCompose_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasSettingDelegateAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
@@ -29659,7 +29639,6 @@ export type PetitionCompose_QueryFragment = {
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
-    hasFieldGroup: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -30981,7 +30960,6 @@ export type PetitionCompose_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasSettingDelegateAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
@@ -30991,7 +30969,6 @@ export type PetitionCompose_userQuery = {
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
-    hasFieldGroup: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31660,7 +31637,6 @@ export type PetitionMessages_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -31704,7 +31680,6 @@ export type PetitionMessages_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -33176,7 +33151,6 @@ export type PetitionPreview_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -35399,7 +35373,6 @@ export type PetitionPreview_userQuery = {
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -36120,7 +36093,6 @@ export type PetitionReplies_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -37195,7 +37167,6 @@ export type PetitionReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
-    canCopyPetitionReplies: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -39444,7 +39415,6 @@ export type Account_QueryFragment = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -39528,7 +39498,6 @@ export type Account_userQuery = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -39693,7 +39662,6 @@ export type Subscriptions_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39768,7 +39736,6 @@ export type Tokens_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39811,7 +39778,6 @@ export type Settings_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -39862,7 +39828,6 @@ export type Security_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -44163,10 +44128,6 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
 export const UserSettingsLayout_QueryFragmentDoc = gql`
   fragment UserSettingsLayout_Query on Query {
     ...SidebarLayout_Query
-    me {
-      id
-      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
-    }
   }
   ${SidebarLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<UserSettingsLayout_QueryFragment, unknown>;
@@ -44963,7 +44924,6 @@ export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
   fragment PetitionFieldTypeSelectDropdown_User on User {
     hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
     hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-    hasFieldGroup: hasFeatureFlag(featureFlag: FIELD_GROUP)
   }
 ` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
 export const AddFieldPopover_UserFragmentDoc = gql`
@@ -47605,7 +47565,6 @@ export const PetitionHeader_QueryFragmentDoc = gql`
     me {
       id
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-      canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
     }
   }
 ` as unknown as DocumentNode<PetitionHeader_QueryFragment, unknown>;
@@ -54283,7 +54242,6 @@ export const PermissionsGroup_userDocument = gql`
       permissions
       hasOnBehalfOfAccess: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
       hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       organization {
         id
@@ -54377,7 +54335,6 @@ export const OrganizationIntegrations_userDocument = gql`
     me {
       id
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
       hasDowJonesFeature: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
       organization {
         id

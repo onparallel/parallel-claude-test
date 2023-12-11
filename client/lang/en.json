@@ -2335,16 +2335,6 @@
     "context": "Client portal"
   },
   {
-    "term": "component.feature-flag-descriptions.copy-petition-replies-description",
-    "definition": "Grants access import replies dialog in the petition",
-    "context": "Grants access import replies dialog in the petition"
-  },
-  {
-    "term": "component.feature-flag-descriptions.copy-petition-replies-name",
-    "definition": "Import replies from another petition",
-    "context": "Import replies from another petition"
-  },
-  {
     "term": "component.feature-flag-descriptions.custom-host-ui-description",
     "definition": "Remove the enterprise banners around the button to request a subdomain change.",
     "context": "Remove the enterprise banners around the button to request a subdomain change."
@@ -2378,16 +2368,6 @@
     "term": "component.feature-flag-descriptions.delegate-access-name",
     "definition": "Setting \"Invite collaborator\"",
     "context": "Setting \"Invite collaborator\""
-  },
-  {
-    "term": "component.feature-flag-descriptions.developer-access-description",
-    "definition": "Gives access to the developers view.",
-    "context": "Gives access to the developers view."
-  },
-  {
-    "term": "component.feature-flag-descriptions.developer-access-name",
-    "definition": "Developer access",
-    "context": "Developer access"
   },
   {
     "term": "component.feature-flag-descriptions.developers-solutions",
@@ -2438,11 +2418,6 @@
     "term": "component.feature-flag-descriptions.export-cuatrecasas-name",
     "definition": "Export Cuatrecasas",
     "context": "Export Cuatrecasas"
-  },
-  {
-    "term": "component.feature-flag-descriptions.field-group-description",
-    "definition": "Grants access to field {fieldName}",
-    "context": "Grants access to field {fieldName}"
   },
   {
     "term": "component.feature-flag-descriptions.ghost-login-description",
@@ -4441,8 +4416,8 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.category-headings",
-    "definition": "Headings",
-    "context": "Headings"
+    "definition": "Headings and groups",
+    "context": "Headings and groups"
   },
   {
     "term": "component.petition-field-type-select-dropdown.category-questions",
