@@ -120,12 +120,11 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
       });
 
       if (documents.pdf.length === 0) {
-        // should not happen
         return [
           {
             file_upload_id: null,
             request: modelRequestOutcome.modelRequest,
-            error: [],
+            error: modelRequestOutcome.noDocumentReasons,
           },
         ];
       }
