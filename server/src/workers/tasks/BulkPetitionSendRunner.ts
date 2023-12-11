@@ -89,6 +89,32 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                 user,
               );
 
+              // if recipient is set to be signer and its not already added to the signers list on the petition, add it
+              // template must have signature_config previously defined
+              if (
+                isDefined(row.recipientAsSigner) &&
+                row.recipientAsSigner !== "" &&
+                isDefined(petition.signature_config) &&
+                petition.signature_config.signersInfo.every(
+                  (signer) => signer.email !== contact.email,
+                )
+              ) {
+                await this.ctx.petitions.updatePetition(
+                  petition.id,
+                  {
+                    signature_config: {
+                      ...petition.signature_config,
+                      signersInfo: petition.signature_config.signersInfo.concat({
+                        email: contact.email,
+                        firstName: contact.first_name,
+                        lastName: contact.last_name ?? "",
+                      }),
+                    },
+                  },
+                  `User:${user.id}`,
+                );
+              }
+
               await this.ctx.petitions.prefillPetition(petition.id, row, user);
 
               const accesses = await this.ctx.petitions.createAccesses(
