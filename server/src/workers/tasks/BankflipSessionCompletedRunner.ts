@@ -38,7 +38,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
       }
 
       const replyContents = await pFlatMap(
-        summary.modelRequestOutcomes,
+        summary.modelRequestOutcomes.filter((o) => o.completed),
         async (model) => await this.extractAndUploadModelDocuments(metadata, model, createdBy),
         { concurrency: 2 },
       );
