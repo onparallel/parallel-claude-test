@@ -202,7 +202,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
                   profileTypeId,
                   profileTypeFieldId: profileTypeField.id,
                   data: {
-                    ...omit(data, ["expiryAlertAheadTime", "type"]),
+                    ...omit(data, ["expiryAlertAheadTime", "type", "alias"]),
+                    alias: data.alias || null,
                     expiryAlertAheadTime,
                   },
                 },
@@ -212,7 +213,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 variables: {
                   profileTypeId,
                   data: {
-                    ...omit(data, ["expiryAlertAheadTime"]),
+                    ...omit(data, ["expiryAlertAheadTime", "alias"]),
+                    alias: data.alias || null,
                     expiryAlertAheadTime,
                   },
                 },
