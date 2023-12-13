@@ -1,4 +1,4 @@
-import Analytics from "analytics-node";
+import { Analytics } from "@segment/analytics-node";
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
 import { CONFIG, Config } from "../config";
@@ -256,8 +256,9 @@ export class AnalyticsService implements IAnalyticsService {
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
   ) {
     if (config.analytics.writeKey) {
-      this.analytics = new Analytics(config.analytics.writeKey, {
-        enable: process.env.NODE_ENV === "production",
+      this.analytics = new Analytics({
+        writeKey: config.analytics.writeKey,
+        disable: process.env.NODE_ENV !== "production",
       });
     }
   }
