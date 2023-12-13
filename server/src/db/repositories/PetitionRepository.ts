@@ -7326,7 +7326,10 @@ export class PetitionRepository extends BaseRepository {
         )
         .whereNotNull("parent_petition_field_reply_id")
         .whereNull("deleted_at")
-        .orderBy("created_at")
+        .orderBy([
+          { column: "created_at", order: "asc" },
+          { column: "id", order: "asc" },
+        ])
         .select("*");
 
       const results = groupBy(

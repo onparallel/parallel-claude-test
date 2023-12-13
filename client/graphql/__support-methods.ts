@@ -759,12 +759,6 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       { name: "CLIENT_PORTAL", description: null, isDeprecated: false, deprecationReason: null },
-      {
-        name: "COPY_PETITION_REPLIES",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
       { name: "CUSTOM_HOST_UI", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "CUSTOM_PROPERTIES",
@@ -772,7 +766,6 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
-      { name: "DEVELOPER_ACCESS", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "DOCUSIGN_SANDBOX_PROVIDER",
         description: null,
@@ -792,7 +785,6 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
-      { name: "FIELD_GROUP", description: null, isDeprecated: false, deprecationReason: null },
       { name: "GHOST_LOGIN", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "HIDE_RECIPIENT_VIEW_CONTENTS",
