@@ -1437,6 +1437,10 @@ const _mutations = [
             attachments {
               id
             }
+            petition {
+              id
+              lastChangeAt
+            }
           }
         }
       }
@@ -1474,6 +1478,10 @@ const _mutations = [
         id
         attachments {
           id
+        }
+        petition {
+          id
+          lastChangeAt
         }
       }
     }

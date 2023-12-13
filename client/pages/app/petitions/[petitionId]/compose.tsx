@@ -1367,7 +1367,7 @@ const _mutations = [
         ...PetitionCompose_PetitionField
         petition {
           id
-          updatedAt
+          lastChangeAt
           ... on Petition {
             status
           }
@@ -1396,7 +1396,7 @@ const _mutations = [
           ... on Petition {
             status
           }
-          updatedAt
+          lastChangeAt
         }
       }
     }
@@ -1421,6 +1421,7 @@ const _mutations = [
           fields {
             id
           }
+          lastChangeAt
         }
       }
     }
@@ -1448,6 +1449,7 @@ const _mutations = [
               id
             }
           }
+          lastChangeAt
         }
       }
     }

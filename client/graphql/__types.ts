@@ -2517,6 +2517,8 @@ export interface Petition extends PetitionBase {
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
   lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  /** Time when the petition or any of its relations were last updated. */
+  lastChangeAt: Scalars["DateTime"]["output"];
   lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
@@ -2701,6 +2703,8 @@ export interface PetitionBase {
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
   /** @deprecated  */
   lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  /** Time when the petition or any of its relations were last updated. */
+  lastChangeAt: Scalars["DateTime"]["output"];
   /** @deprecated  */
   lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
@@ -3583,6 +3587,8 @@ export interface PetitionTemplate extends PetitionBase {
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
   /** @deprecated  */
   lastActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  /** Time when the petition or any of its relations were last updated. */
+  lastChangeAt: Scalars["DateTime"]["output"];
   /** @deprecated  */
   lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
@@ -6621,8 +6627,9 @@ export type DevelopersLayout_QueryFragment = {
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   name?: string | null;
-  updatedAt: string;
+  lastChangeAt: string;
   isRestricted: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -6633,8 +6640,9 @@ export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
 export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
+  id: string;
   name?: string | null;
-  updatedAt: string;
+  lastChangeAt: string;
   isRestricted: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -6695,7 +6703,7 @@ export type PetitionHeader_PetitionFragment = {
   isRestricted: boolean;
   isAnonymized: boolean;
   name?: string | null;
-  updatedAt: string;
+  lastChangeAt: string;
   path: string;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
@@ -6712,7 +6720,7 @@ export type PetitionHeader_PetitionTemplateFragment = {
   isPublic: boolean;
   isRestricted: boolean;
   name?: string | null;
-  updatedAt: string;
+  lastChangeAt: string;
   path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -6729,8 +6737,8 @@ export type PetitionHeader_PetitionBase_Petition_Fragment = {
   status: PetitionStatus;
   isRestricted: boolean;
   isAnonymized: boolean;
+  lastChangeAt: string;
   name?: string | null;
-  updatedAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
@@ -6747,8 +6755,8 @@ export type PetitionHeader_PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   isPublic: boolean;
   isRestricted: boolean;
+  lastChangeAt: string;
   name?: string | null;
-  updatedAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -6764,20 +6772,6 @@ export type PetitionHeader_QueryFragment = {
   me: { __typename?: "User"; id: string; hasProfilesAccess: boolean };
 };
 
-export type PetitionHeader_PetitionBase_updatePath_Petition_Fragment = {
-  __typename?: "Petition";
-  path: string;
-};
-
-export type PetitionHeader_PetitionBase_updatePath_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-  path: string;
-};
-
-export type PetitionHeader_PetitionBase_updatePathFragment =
-  | PetitionHeader_PetitionBase_updatePath_Petition_Fragment
-  | PetitionHeader_PetitionBase_updatePath_PetitionTemplate_Fragment;
-
 export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -6787,7 +6781,7 @@ export type PetitionHeader_reopenPetitionMutation = {
     __typename?: "Petition";
     id: string;
     status: PetitionStatus;
-    updatedAt: string;
+    lastChangeAt: string;
   };
 };
 
@@ -6842,7 +6836,7 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   isRestricted: boolean;
   isAnonymized: boolean;
-  updatedAt: string;
+  lastChangeAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
@@ -6860,7 +6854,7 @@ export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   isPublic: boolean;
   isRestricted: boolean;
-  updatedAt: string;
+  lastChangeAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -11346,12 +11340,14 @@ export type useEditTagsDialog_TagFragment = {
 export type useEditTagsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  lastChangeAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
 export type useEditTagsDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  lastChangeAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
@@ -11369,11 +11365,13 @@ export type useEditTagsDialog_tagPetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       };
 };
@@ -11388,11 +11386,13 @@ export type useEditTagsDialog_untagPetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       };
 };
@@ -11406,11 +11406,13 @@ export type useEditTagsDialog_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | null;
@@ -13116,6 +13118,7 @@ export type PetitionComposeAttachments_PetitionAttachmentsListFragment = {
 export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  lastChangeAt: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -13151,6 +13154,7 @@ export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
 export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  lastChangeAt: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -13198,6 +13202,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
     | {
         __typename?: "Petition";
         id: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -13247,6 +13252,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -13314,6 +13320,9 @@ export type PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutatio
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
+      petition:
+        | { __typename?: "Petition"; id: string; lastChangeAt: string }
+        | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     };
   }>;
@@ -13335,6 +13344,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
       | {
           __typename?: "Petition";
           id: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -13384,6 +13394,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
       | {
           __typename?: "PetitionTemplate";
           id: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -13449,6 +13460,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
       | {
           __typename?: "Petition";
           id: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -13498,6 +13510,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
       | {
           __typename?: "PetitionTemplate";
           id: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -13558,6 +13571,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
     | {
         __typename?: "Petition";
         id: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -13607,6 +13621,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -13854,6 +13869,9 @@ export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation
         __typename?: "PetitionField";
         id: string;
         attachments: Array<{ __typename?: "PetitionFieldAttachment"; id: string }>;
+        petition:
+          | { __typename?: "Petition"; id: string; lastChangeAt: string }
+          | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
       };
       file: {
         __typename?: "FileUpload";
@@ -13898,6 +13916,9 @@ export type PetitionComposeField_deletePetitionFieldAttachmentMutation = {
     __typename?: "PetitionField";
     id: string;
     attachments: Array<{ __typename?: "PetitionFieldAttachment"; id: string }>;
+    petition:
+      | { __typename?: "Petition"; id: string; lastChangeAt: string }
+      | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
   };
 };
 
@@ -14207,12 +14228,14 @@ export type PetitionComposeVariables_PetitionFieldFragment = {
 export type PetitionComposeVariables_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  lastChangeAt: string;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
 };
 
 export type PetitionComposeVariables_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  lastChangeAt: string;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
 };
 
@@ -14229,6 +14252,7 @@ export type PetitionComposeVariables_deletePetitionVariableMutation = {
   deletePetitionVariable: {
     __typename?: "Petition";
     id: string;
+    lastChangeAt: string;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   };
 };
@@ -14248,6 +14272,9 @@ export type PetitionComposeVariables_updatePetitionFieldMutation = {
     math?: Array<{ [key: string]: any }> | null;
     title?: string | null;
     type: PetitionFieldType;
+    petition:
+      | { __typename?: "Petition"; id: string; lastChangeAt: string }
+      | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
   };
 };
 
@@ -14543,6 +14570,7 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
     template: {
       __typename?: "PetitionTemplate";
       id: string;
+      lastChangeAt: string;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
   };
@@ -14574,6 +14602,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
     template: {
       __typename?: "PetitionTemplate";
       id: string;
+      lastChangeAt: string;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
   };
@@ -14674,12 +14703,14 @@ export type CopySignatureConfigDialog_PetitionSignerFragment = {
 export type CreateOrUpdatePetitionVariableDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  lastChangeAt: string;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
 };
 
 export type CreateOrUpdatePetitionVariableDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  lastChangeAt: string;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
 };
 
@@ -14696,6 +14727,7 @@ export type CreateOrUpdatePetitionVariableDialog_createPetitionVariableMutation 
   createPetitionVariable: {
     __typename?: "Petition";
     id: string;
+    lastChangeAt: string;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   };
 };
@@ -14710,6 +14742,7 @@ export type CreateOrUpdatePetitionVariableDialog_updatePetitionVariableMutation 
   updatePetitionVariable: {
     __typename?: "Petition";
     id: string;
+    lastChangeAt: string;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   };
 };
@@ -25634,7 +25667,7 @@ export type PetitionActivity_PetitionFragment = {
   locale: PetitionLocale;
   deadline?: string | null;
   isRestricted: boolean;
-  updatedAt: string;
+  lastChangeAt: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -26705,7 +26738,7 @@ export type PetitionActivity_updatePetitionMutation = {
         locale: PetitionLocale;
         deadline?: string | null;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -27866,7 +27899,7 @@ export type PetitionActivity_petitionQuery = {
         locale: PetitionLocale;
         deadline?: string | null;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -28997,13 +29030,13 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   isDelegateAccessEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   isRestrictedWithPassword: boolean;
+  lastChangeAt: string;
   emailSubject?: string | null;
   emailBody?: any | null;
   path: string;
   closedAt?: string | null;
   anonymizeAfterMonths?: number | null;
   anonymizePurpose?: string | null;
-  updatedAt: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -29269,10 +29302,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   isDelegateAccessEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   isRestrictedWithPassword: boolean;
+  lastChangeAt: string;
   path: string;
   anonymizeAfterMonths?: number | null;
   anonymizePurpose?: string | null;
-  updatedAt: string;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -29703,7 +29736,7 @@ export type PetitionCompose_updatePetitionMutation = {
         closedAt?: string | null;
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
-        updatedAt: string;
+        lastChangeAt: string;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
           id: string;
@@ -29828,7 +29861,7 @@ export type PetitionCompose_updatePetitionMutation = {
         path: string;
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
-        updatedAt: string;
+        lastChangeAt: string;
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
@@ -29905,7 +29938,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         isAnonymized: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -29933,7 +29966,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         locale: PetitionLocale;
         isPublic: boolean;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -29992,7 +30025,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           deadline?: string | null;
           isRestricted: boolean;
           isAnonymized: boolean;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -30015,7 +30048,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           locale: PetitionLocale;
           isPublic: boolean;
           isRestricted: boolean;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -30199,7 +30232,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           deadline?: string | null;
           isRestricted: boolean;
           isAnonymized: boolean;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -30222,7 +30255,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           locale: PetitionLocale;
           isPublic: boolean;
           isRestricted: boolean;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -30349,7 +30382,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         isAnonymized: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -30371,7 +30404,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         locale: PetitionLocale;
         isPublic: boolean;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -30418,13 +30451,13 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           __typename?: "Petition";
           status: PetitionStatus;
           id: string;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         }
       | {
           __typename?: "PetitionTemplate";
           id: string;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
     parent?: {
@@ -30556,13 +30589,13 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           __typename?: "Petition";
           status: PetitionStatus;
           id: string;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         }
       | {
           __typename?: "PetitionTemplate";
           id: string;
-          updatedAt: string;
+          lastChangeAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
     parent?: {
@@ -30693,11 +30726,13 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
       | {
           __typename?: "Petition";
           id: string;
+          lastChangeAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         }
       | {
           __typename?: "PetitionTemplate";
           id: string;
+          lastChangeAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
     parent?: {
@@ -30828,6 +30863,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
       | {
           __typename?: "Petition";
           id: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -30837,6 +30873,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
       | {
           __typename?: "PetitionTemplate";
           id: string;
+          lastChangeAt: string;
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -31026,13 +31063,13 @@ export type PetitionCompose_petitionQuery = {
         isDelegateAccessEnabled: boolean;
         isRecipientViewContentsHidden: boolean;
         isRestrictedWithPassword: boolean;
+        lastChangeAt: string;
         emailSubject?: string | null;
         emailBody?: any | null;
         path: string;
         closedAt?: string | null;
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
-        updatedAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -31312,10 +31349,10 @@ export type PetitionCompose_petitionQuery = {
         isDelegateAccessEnabled: boolean;
         isRecipientViewContentsHidden: boolean;
         isRestrictedWithPassword: boolean;
+        lastChangeAt: string;
         path: string;
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
-        updatedAt: string;
         organization: {
           __typename?: "Organization";
           id: string;
@@ -31566,7 +31603,7 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   isRestricted: boolean;
   isAnonymized: boolean;
-  updatedAt: string;
+  lastChangeAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
@@ -31590,7 +31627,7 @@ export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
   closingEmailBody?: any | null;
   name?: string | null;
   path: string;
-  updatedAt: string;
+  lastChangeAt: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -31719,7 +31756,7 @@ export type PetitionMessages_petitionQuery = {
         deadline?: string | null;
         isRestricted: boolean;
         isAnonymized: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
@@ -31742,7 +31779,7 @@ export type PetitionMessages_petitionQuery = {
         closingEmailBody?: any | null;
         name?: string | null;
         path: string;
-        updatedAt: string;
+        lastChangeAt: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -31786,7 +31823,7 @@ export type PetitionMessages_updatePetitionMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         isAnonymized: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
@@ -31809,7 +31846,7 @@ export type PetitionMessages_updatePetitionMutation = {
         closingEmailBody?: any | null;
         name?: string | null;
         path: string;
-        updatedAt: string;
+        lastChangeAt: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -32296,7 +32333,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   locale: PetitionLocale;
   deadline?: string | null;
   isRestricted: boolean;
-  updatedAt: string;
+  lastChangeAt: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -32749,7 +32786,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   isPublic: boolean;
   isRestricted: boolean;
-  updatedAt: string;
+  lastChangeAt: string;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   organization: {
     __typename?: "Organization";
@@ -33201,7 +33238,7 @@ export type PetitionPreview_updatePetitionMutation = {
         locale: PetitionLocale;
         deadline?: string | null;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -33653,7 +33690,7 @@ export type PetitionPreview_updatePetitionMutation = {
         locale: PetitionLocale;
         isPublic: boolean;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
         organization: {
           __typename?: "Organization";
@@ -34056,7 +34093,7 @@ export type PetitionPreview_completePetitionMutation = {
     locale: PetitionLocale;
     deadline?: string | null;
     isRestricted: boolean;
-    updatedAt: string;
+    lastChangeAt: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
       id: string;
@@ -34518,7 +34555,7 @@ export type PetitionPreview_petitionQuery = {
         locale: PetitionLocale;
         deadline?: string | null;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -34970,7 +35007,7 @@ export type PetitionPreview_petitionQuery = {
         locale: PetitionLocale;
         isPublic: boolean;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
         organization: {
           __typename?: "Organization";
@@ -35419,7 +35456,7 @@ export type PetitionReplies_PetitionFragment = {
   path: string;
   deadline?: string | null;
   isRestricted: boolean;
-  updatedAt: string;
+  lastChangeAt: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -36148,7 +36185,7 @@ export type PetitionReplies_updatePetitionMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         isAnonymized: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
@@ -36165,7 +36202,7 @@ export type PetitionReplies_updatePetitionMutation = {
         locale: PetitionLocale;
         isPublic: boolean;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -36190,7 +36227,7 @@ export type PetitionReplies_closePetitionMutation = {
     path: string;
     deadline?: string | null;
     isRestricted: boolean;
-    updatedAt: string;
+    lastChangeAt: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
       id: string;
@@ -36623,7 +36660,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     path: string;
     deadline?: string | null;
     isRestricted: boolean;
-    updatedAt: string;
+    lastChangeAt: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
       id: string;
@@ -37222,7 +37259,7 @@ export type PetitionReplies_petitionQuery = {
         path: string;
         deadline?: string | null;
         isRestricted: boolean;
-        updatedAt: string;
+        lastChangeAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -44135,11 +44172,6 @@ export const DevelopersLayout_QueryFragmentDoc = gql`
   }
   ${UserSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<DevelopersLayout_QueryFragment, unknown>;
-export const PetitionHeader_PetitionBase_updatePathFragmentDoc = gql`
-  fragment PetitionHeader_PetitionBase_updatePath on PetitionBase {
-    path
-  }
-` as unknown as DocumentNode<PetitionHeader_PetitionBase_updatePathFragment, unknown>;
 export const ReportsSidebarLayout_QueryFragmentDoc = gql`
   fragment ReportsSidebarLayout_Query on Query {
     ...SidebarLayout_Query
@@ -44981,6 +45013,7 @@ export const CreateOrUpdatePetitionVariableDialog_PetitionBaseFragmentDoc = gql`
       name
       defaultValue
     }
+    lastChangeAt
   }
 ` as unknown as DocumentNode<CreateOrUpdatePetitionVariableDialog_PetitionBaseFragment, unknown>;
 export const useAllFieldsWithIndices_PetitionFieldFragmentDoc = gql`
@@ -46112,8 +46145,9 @@ export const useConfirmDiscardDraftDialog_PetitionBaseFragmentDoc = gql`
 ` as unknown as DocumentNode<useConfirmDiscardDraftDialog_PetitionBaseFragment, unknown>;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
+    id
     name
-    updatedAt
+    lastChangeAt
     isRestricted
     myEffectivePermission {
       permissionType
@@ -46177,6 +46211,7 @@ export const useEditTagsDialog_PetitionBaseFragmentDoc = gql`
       id
       ...useEditTagsDialog_Tag
     }
+    lastChangeAt
   }
   ${useEditTagsDialog_TagFragmentDoc}
 ` as unknown as DocumentNode<useEditTagsDialog_PetitionBaseFragment, unknown>;
@@ -47985,6 +48020,7 @@ export const PetitionComposeAttachments_PetitionBaseFragmentDoc = gql`
     attachmentsList {
       ...PetitionComposeAttachments_PetitionAttachmentsList
     }
+    lastChangeAt
   }
   ${PetitionComposeAttachments_PetitionAttachmentsListFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeAttachments_PetitionBaseFragment, unknown>;
@@ -48138,6 +48174,7 @@ export const PetitionComposeVariables_PetitionBaseFragmentDoc = gql`
       name
       defaultValue
     }
+    lastChangeAt
   }
 ` as unknown as DocumentNode<PetitionComposeVariables_PetitionBaseFragment, unknown>;
 export const PetitionCompose_PetitionBaseFragmentDoc = gql`
@@ -51408,7 +51445,7 @@ export const PetitionHeader_reopenPetitionDocument = gql`
     reopenPetition(petitionId: $petitionId) {
       id
       status
-      updatedAt
+      lastChangeAt
     }
   }
 ` as unknown as DocumentNode<
@@ -52133,6 +52170,10 @@ export const PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocume
       }
       attachment {
         ...PetitionComposeAttachments_PetitionAttachment
+        petition {
+          id
+          lastChangeAt
+        }
       }
     }
   }
@@ -52236,6 +52277,10 @@ export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocumen
           attachments {
             id
           }
+          petition {
+            id
+            lastChangeAt
+          }
         }
       }
     }
@@ -52279,6 +52324,10 @@ export const PetitionComposeField_deletePetitionFieldAttachmentDocument = gql`
       id
       attachments {
         id
+      }
+      petition {
+        id
+        lastChangeAt
       }
     }
   }
@@ -52325,6 +52374,10 @@ export const PetitionComposeVariables_updatePetitionFieldDocument = gql`
     updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
       id
       ...PetitionComposeVariables_PetitionField
+      petition {
+        id
+        lastChangeAt
+      }
     }
   }
   ${PetitionComposeVariables_PetitionFieldFragmentDoc}
@@ -52400,6 +52453,7 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
         publicLink {
           id
         }
+        lastChangeAt
       }
     }
   }
@@ -52435,6 +52489,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
         publicLink {
           id
         }
+        lastChangeAt
       }
     }
   }
@@ -54997,7 +55052,7 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
       ...PetitionCompose_PetitionField
       petition {
         id
-        updatedAt
+        lastChangeAt
         ... on Petition {
           status
         }
@@ -55029,7 +55084,7 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
         ... on Petition {
           status
         }
-        updatedAt
+        lastChangeAt
       }
     }
   }
@@ -55057,6 +55112,7 @@ export const PetitionCompose_linkPetitionFieldChildrenDocument = gql`
         fields {
           id
         }
+        lastChangeAt
       }
     }
   }
@@ -55087,6 +55143,7 @@ export const PetitionCompose_unlinkPetitionFieldChildrenDocument = gql`
             id
           }
         }
+        lastChangeAt
       }
     }
   }

@@ -352,6 +352,10 @@ export const PetitionBase = interfaceType({
       description: "Indicates whether delegate access is enabled for the recipient",
       resolve: (o) => o.enable_delegate_access,
     });
+    t.datetime("lastChangeAt", {
+      description: "Time when the petition or any of its relations were last updated.",
+      resolve: (o) => o.last_change_at ?? o.updated_at, // TODO last_change_at remove fallback when column is made non-nullable
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

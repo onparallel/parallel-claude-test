@@ -1662,6 +1662,7 @@ export class PetitionRepository extends BaseRepository {
         {
           ...data,
           updated_at: this.now(),
+          last_change_at: this.now(),
           updated_by: updatedBy,
         },
         "*",
@@ -1692,6 +1693,7 @@ export class PetitionRepository extends BaseRepository {
         closed_at: this.now(),
         updated_at: this.now(),
         updated_by: updatedBy,
+        last_change_at: this.now(),
       },
       "*",
     );
@@ -1993,6 +1995,7 @@ export class PetitionRepository extends BaseRepository {
           closed_at: null,
           updated_at: this.now(),
           updated_by: updatedBy,
+          last_change_at: this.now(),
         },
         "*",
       );
@@ -2112,7 +2115,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
-    return await this.withTransaction(async (t) => {
+    await this.withTransaction(async (t) => {
       const fields = await this.from("petition_field", t)
         .update(
           {
@@ -2171,10 +2174,6 @@ export class PetitionRepository extends BaseRepository {
         `User:${user.id}`,
         t,
       );
-
-      const [petition] = await this.from("petition", t).where("id", petitionId).select("*");
-
-      return petition;
     });
   }
 
@@ -2494,6 +2493,7 @@ export class PetitionRepository extends BaseRepository {
         closed_at: null,
         updated_at: this.now(),
         updated_by: updatedBy,
+        last_change_at: this.now(),
       });
 
     // clear cache to make sure petition status is updated in next graphql calls
@@ -2758,6 +2758,7 @@ export class PetitionRepository extends BaseRepository {
               status: "COMPLETED",
               updated_at: this.now(),
               updated_by: updatedBy,
+              last_change_at: this.now(),
               ...extraData,
             },
             "*",
@@ -2845,6 +2846,7 @@ export class PetitionRepository extends BaseRepository {
             "credits_used",
             "last_activity_at",
             "last_recipient_activity_at",
+            "last_change_at",
             // avoid copying deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition.is_template
               ? (["deadline"] as const)
@@ -5811,6 +5813,7 @@ export class PetitionRepository extends BaseRepository {
         {
           updated_at: this.now(),
           updated_by: updatedBy,
+          last_change_at: this.now(),
         },
         "*",
       );
@@ -6618,7 +6621,8 @@ export class PetitionRepository extends BaseRepository {
         set
           "path" = concat(?::text, substring("path", length(?) + 1)),
           updated_at = NOW(),
-          updated_by = ?
+          updated_by = ?,
+          last_change_at = NOW()
         from user_petition_ids ids where ids.id = p.id;
       `,
       [
@@ -7387,22 +7391,30 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async createVariable(petitionId: number, data: PetitionVariable) {
+  async createVariable(petitionId: number, data: PetitionVariable, updatedBy: string) {
     const [petition] = await this.raw<Petition>(
       /* sql */ `
         update petition
         set 
-          variables = coalesce(variables, '[]') || jsonb_build_object('name', ?::text, 'default_value', ?::int)
+          variables = coalesce(variables, '[]') || jsonb_build_object('name', ?::text, 'default_value', ?::int),
+          last_change_at = now(),
+          updated_at = now(),
+          updated_by = ?
         where id = ?
         returning *;
       `,
-      [data.name, data.default_value, petitionId],
+      [data.name, data.default_value, updatedBy, petitionId],
     );
 
     return petition;
   }
 
-  async updateVariable(petitionId: number, key: string, data: Omit<PetitionVariable, "name">) {
+  async updateVariable(
+    petitionId: number,
+    key: string,
+    data: Omit<PetitionVariable, "name">,
+    updatedBy: string,
+  ) {
     const [petition] = await this.raw<Petition>(
       /* sql */ `
       update petition
@@ -7415,17 +7427,20 @@ export class PetitionRepository extends BaseRepository {
           end
         )
         from jsonb_array_elements(variables) as element
-        )
+        ),
+        last_change_at = now(),
+        updated_at = now(),
+        updated_by = ?
       where id = ?
       returning *;
       `,
-      [key, key, data.default_value, petitionId],
+      [key, key, data.default_value, updatedBy, petitionId],
     );
 
     return petition;
   }
 
-  async deleteVariable(petitionId: number, key: string) {
+  async deleteVariable(petitionId: number, key: string, updatedBy: string) {
     const [petition] = await this.raw<Petition>(
       /* sql */ `
       update petition
@@ -7436,11 +7451,14 @@ export class PetitionRepository extends BaseRepository {
           where element->>'name' != ?
         ), 
         '[]'::jsonb -- if there's no variables left, set it to empty array
-      )
+      ),
+      last_change_at = now(),
+      updated_at = now(),
+      updated_by = ?
       where id = ?
       returning *;
     `,
-      [key, petitionId],
+      [key, updatedBy, petitionId],
     );
 
     return petition;
@@ -7467,4 +7485,14 @@ export class PetitionRepository extends BaseRepository {
       });
     });
   });
+
+  async updatePetitionLastChangeAt(petitionId: number) {
+    const [petition] = await this.from("petition")
+      .where("id", petitionId)
+      .whereNull("deleted_at")
+      .update({ last_change_at: this.now() }, "*");
+
+    this.loadPetition.dataloader.clear(petitionId);
+    return petition;
+  }
 }

@@ -67,6 +67,8 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
         ),
       ]);
 
+      await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
+
       return { presignedPostData, attachment };
     },
   },
@@ -116,6 +118,8 @@ export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldA
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionFieldAttachment(args.attachmentId, ctx.user!);
+    await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
+
     return (await ctx.petitions.loadField(args.fieldId))!;
   },
 });
@@ -231,6 +235,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
         ctx.user!,
       );
 
+      await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
       ctx.petitions.loadPetitionAttachmentsByPetitionId.dataloader.clear(args.petitionId);
 
       return zip(presignedPostDataArray, attachments).map(([presignedPostData, attachment]) => ({
@@ -283,7 +288,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionAttachment(args.attachmentId, ctx.user!);
-    return (await ctx.petitions.loadPetition(args.petitionId))!;
+    return await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
   },
 });
 
@@ -376,11 +381,14 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
     type: nonNull("PetitionAttachmentType"),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.updatePetitionAttachmentType(
+    const petitionAttachment = await ctx.petitions.updatePetitionAttachmentType(
       args.petitionId,
       args.attachmentId,
       args.type,
       `User:${ctx.user!.id}`,
     );
+    await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
+
+    return petitionAttachment;
   },
 });

@@ -497,12 +497,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
         `User:${ctx.user!.id}`,
       );
 
-      const [petition] = await ctx.petitions.updatePetition(
-        args.petitionId,
-        {},
-        `User:${ctx.user!.id}`,
-      );
-      return petition;
+      return await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
     } catch (e) {
       if (e instanceof Error) {
         if (e.message === "INVALID_PETITION_FIELD_IDS") {
@@ -974,6 +969,8 @@ export const createPetitionField = mutationField("createPetitionField", {
       ctx.user!,
     );
 
+    await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
+
     return field;
   },
 });
@@ -992,8 +989,11 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
   },
-  resolve: async (_, args, ctx) => {
-    return await ctx.petitions.clonePetitionField(args.petitionId, args.fieldId, ctx.user!);
+  resolve: async (_, { petitionId, fieldId }, ctx) => {
+    const field = await ctx.petitions.clonePetitionField(petitionId, fieldId, ctx.user!);
+    await ctx.petitions.updatePetitionLastChangeAt(petitionId);
+
+    return field;
   },
 });
 
@@ -1054,7 +1054,9 @@ export const deletePetitionField = mutationField("deletePetitionField", {
       }
     }
 
-    return await ctx.petitions.deletePetitionField(args.petitionId, args.fieldId, ctx.user!);
+    await ctx.petitions.deletePetitionField(args.petitionId, args.fieldId, ctx.user!);
+
+    return await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
   },
 });
 
@@ -1312,6 +1314,8 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           ctx.petitions.loadPetitionFieldChildren.dataloader.clear(field.id);
         }
       }
+
+      await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
 
       return field;
     } catch (e) {
@@ -2075,6 +2079,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
       );
 
       await ctx.petitions.updatePetitionToPendingStatus(args.petitionId, `User:${ctx.user!.id}`);
+      ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
 
       return field;
     } catch (e) {
@@ -2282,7 +2287,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     },
     ctx,
   ) => {
-    return await ctx.petitions.createPublicPetitionLink(
+    const link = await ctx.petitions.createPublicPetitionLink(
       {
         template_id: templateId,
         title,
@@ -2295,6 +2300,10 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
       },
       `User:${ctx.user!.id}`,
     );
+
+    await ctx.petitions.updatePetitionLastChangeAt(templateId);
+
+    return link;
   },
 });
 
@@ -2352,11 +2361,15 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
       publicPetitionLinkData.petition_name_pattern = args.petitionNamePattern;
     }
 
-    return await ctx.petitions.updatePublicPetitionLink(
+    const publicLink = await ctx.petitions.updatePublicPetitionLink(
       args.publicPetitionLinkId,
       publicPetitionLinkData,
       `User:${ctx.user!.id}`,
     );
+
+    await ctx.petitions.updatePetitionLastChangeAt(publicLink.template_id);
+
+    return publicLink;
   },
 });
 
@@ -2639,6 +2652,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
 
       await ctx.petitions.updatePetitionToPendingStatus(petitionId, `User:${ctx.user!.id}`);
 
+      ctx.petitions.loadPetition.dataloader.clear(petitionId);
       ctx.petitions.loadFieldsForPetition.dataloader.clear(petitionId);
       ctx.petitions.loadPetitionFieldChildren.dataloader.clear(parentFieldId);
 
@@ -2702,6 +2716,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
 
       await ctx.petitions.updatePetitionToPendingStatus(petitionId, `User:${ctx.user!.id}`);
 
+      ctx.petitions.loadPetition.dataloader.clear(petitionId);
       ctx.petitions.loadFieldsForPetition.dataloader.clear(petitionId);
       ctx.petitions.loadPetitionFieldChildren.dataloader.clear(parentFieldId);
 

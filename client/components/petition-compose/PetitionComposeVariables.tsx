@@ -294,6 +294,7 @@ PetitionComposeVariables.fragments = {
         name
         defaultValue
       }
+      lastChangeAt
     }
   `,
 };
@@ -317,6 +318,10 @@ const _mutations = [
       updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
         id
         ...PetitionComposeVariables_PetitionField
+        petition {
+          id
+          lastChangeAt
+        }
       }
     }
     ${PetitionComposeVariables.fragments.PetitionField}

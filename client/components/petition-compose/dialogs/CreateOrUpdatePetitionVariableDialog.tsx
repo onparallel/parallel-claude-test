@@ -237,6 +237,7 @@ const _fragments = {
         name
         defaultValue
       }
+      lastChangeAt
     }
   `,
 };

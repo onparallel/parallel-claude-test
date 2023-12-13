@@ -41,7 +41,6 @@ import {
 import {
   PetitionActivity_petitionDocument,
   PetitionHeader_PetitionBaseFragment,
-  PetitionHeader_PetitionBase_updatePathFragmentDoc,
   PetitionHeader_QueryFragment,
   PetitionHeader_reopenPetitionDocument,
   PetitionHeader_updatePetitionPermissionSubscriptionDocument,
@@ -203,16 +202,8 @@ export const PetitionHeader = Object.assign(
             type: isPetition ? "PETITION" : "TEMPLATE",
             destination,
           },
-          update: (cache, { data }) => {
-            if (data?.movePetitions === "SUCCESS") {
-              cache.writeFragment({
-                id: petition.id,
-                fragment: PetitionHeader_PetitionBase_updatePathFragmentDoc,
-                data: { path: destination },
-              });
-            }
-          },
         });
+        onRefetch?.();
       } catch {}
     };
 
@@ -885,21 +876,13 @@ export const PetitionHeader = Object.assign(
   },
 );
 
-const _fragments = {
-  PetitionHeader_PetitionBase_updatePath: gql`
-    fragment PetitionHeader_PetitionBase_updatePath on PetitionBase {
-      path
-    }
-  `,
-};
-
 const _mutations = [
   gql`
     mutation PetitionHeader_reopenPetition($petitionId: GID!) {
       reopenPetition(petitionId: $petitionId) {
         id
         status
-        updatedAt
+        lastChangeAt
       }
     }
   `,

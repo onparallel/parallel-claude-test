@@ -95,6 +95,7 @@ useEditTagsDialog.fragments = {
         id
         ...useEditTagsDialog_Tag
       }
+      lastChangeAt
     }
   `,
 };

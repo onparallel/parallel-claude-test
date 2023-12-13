@@ -2462,6 +2462,8 @@ export type Petition = PetitionBase & {
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  /** Time when the petition or any of its relations were last updated. */
+  lastChangeAt: Scalars["DateTime"]["output"];
   lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
@@ -2638,6 +2640,8 @@ export type PetitionBase = {
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
   /** @deprecated  */
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  /** Time when the petition or any of its relations were last updated. */
+  lastChangeAt: Scalars["DateTime"]["output"];
   /** @deprecated  */
   lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */
@@ -3474,6 +3478,8 @@ export type PetitionTemplate = PetitionBase & {
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
   /** @deprecated  */
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  /** Time when the petition or any of its relations were last updated. */
+  lastChangeAt: Scalars["DateTime"]["output"];
   /** @deprecated  */
   lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The locale of the parallel. */

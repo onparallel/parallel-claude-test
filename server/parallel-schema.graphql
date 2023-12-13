@@ -2794,6 +2794,11 @@ type Petition implements PetitionBase {
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
   lastActivityAt: DateTime
+
+  """
+  Time when the petition or any of its relations were last updated.
+  """
+  lastChangeAt: DateTime!
   lastRecipientActivityAt: DateTime
 
   """
@@ -3118,6 +3123,11 @@ interface PetitionBase {
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
   lastActivityAt: DateTime @deprecated(reason: "")
+
+  """
+  Time when the petition or any of its relations were last updated.
+  """
+  lastChangeAt: DateTime!
   lastRecipientActivityAt: DateTime @deprecated(reason: "")
 
   """
@@ -4493,6 +4503,11 @@ type PetitionTemplate implements PetitionBase {
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
   lastActivityAt: DateTime @deprecated(reason: "")
+
+  """
+  Time when the petition or any of its relations were last updated.
+  """
+  lastChangeAt: DateTime!
   lastRecipientActivityAt: DateTime @deprecated(reason: "")
 
   """

@@ -978,6 +978,7 @@ const mutations = [
           publicLink {
             id
           }
+          lastChangeAt
         }
       }
     }
@@ -1010,6 +1011,7 @@ const mutations = [
           publicLink {
             id
           }
+          lastChangeAt
         }
       }
     }

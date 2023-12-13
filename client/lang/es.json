@@ -2745,6 +2745,11 @@
     "context": "Change name"
   },
   {
+    "term": "component.header-name-editable.last-saved-on",
+    "definition": "Último guardado: {date}",
+    "context": "Last saved on: {date}"
+  },
+  {
     "term": "component.hidden-field-dialog.body",
     "definition": "El campo que intentas previsualizar no es visible ahora mismo. Para que se muestre tienen que cumplirse las siguientes condiciones:",
     "context": "The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:"
@@ -12728,11 +12733,6 @@
     "term": "petition.header.compose-tab",
     "definition": "Editar",
     "context": "Compose"
-  },
-  {
-    "term": "petition.header.last-saved-on",
-    "definition": "Último guardado: {date}",
-    "context": "Last saved on: {date}"
   },
   {
     "term": "petition.header.messages-tab",

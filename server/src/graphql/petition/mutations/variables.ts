@@ -42,10 +42,14 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
     validateRegex((args) => args.data.name, "data.name", FIELD_REFERENCE_REGEX),
   ),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.createVariable(args.petitionId, {
-      name: args.data.name,
-      default_value: args.data.defaultValue,
-    });
+    return await ctx.petitions.createVariable(
+      args.petitionId,
+      {
+        name: args.data.name,
+        default_value: args.data.defaultValue,
+      },
+      `User:${ctx.user!.id}`,
+    );
   },
 });
 
@@ -70,9 +74,14 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
     ),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.updateVariable(args.petitionId, args.name, {
-      default_value: args.data.defaultValue,
-    });
+    return await ctx.petitions.updateVariable(
+      args.petitionId,
+      args.name,
+      {
+        default_value: args.data.defaultValue,
+      },
+      `User:${ctx.user!.id}`,
+    );
   },
 });
 
@@ -90,6 +99,6 @@ export const deletePetitionVariable = mutationField("deletePetitionVariable", {
     name: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.deleteVariable(args.petitionId, args.name);
+    return await ctx.petitions.deleteVariable(args.petitionId, args.name, `User:${ctx.user!.id}`);
   },
 });

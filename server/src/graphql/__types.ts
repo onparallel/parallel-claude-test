@@ -1855,6 +1855,7 @@ export interface NexusGenFieldTypes {
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    lastChangeAt: NexusGenScalars["DateTime"]; // DateTime!
     lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -2352,6 +2353,7 @@ export interface NexusGenFieldTypes {
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    lastChangeAt: NexusGenScalars["DateTime"]; // DateTime!
     lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -3313,6 +3315,7 @@ export interface NexusGenFieldTypes {
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    lastChangeAt: NexusGenScalars["DateTime"]; // DateTime!
     lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -4078,6 +4081,7 @@ export interface NexusGenFieldTypeNames {
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
     lastActivityAt: "DateTime";
+    lastChangeAt: "DateTime";
     lastRecipientActivityAt: "DateTime";
     locale: "PetitionLocale";
     metadata: "JSONObject";
@@ -4575,6 +4579,7 @@ export interface NexusGenFieldTypeNames {
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
     lastActivityAt: "DateTime";
+    lastChangeAt: "DateTime";
     lastRecipientActivityAt: "DateTime";
     locale: "PetitionLocale";
     metadata: "JSONObject";
@@ -5536,6 +5541,7 @@ export interface NexusGenFieldTypeNames {
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
     lastActivityAt: "DateTime";
+    lastChangeAt: "DateTime";
     lastRecipientActivityAt: "DateTime";
     locale: "PetitionLocale";
     metadata: "JSONObject";

@@ -520,6 +520,7 @@ export const PetitionComposeAttachments = Object.assign(
             attachmentsList {
               ...PetitionComposeAttachments_PetitionAttachmentsList
             }
+            lastChangeAt
           }
           ${this.PetitionAttachmentsList}
         `;
@@ -557,6 +558,10 @@ const _mutations = [
         }
         attachment {
           ...PetitionComposeAttachments_PetitionAttachment
+          petition {
+            id
+            lastChangeAt
+          }
         }
       }
     }

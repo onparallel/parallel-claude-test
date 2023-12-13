@@ -1054,6 +1054,7 @@ export interface Petition {
   last_recipient_activity_at: Maybe<Date>; // timestamptz
   variables: Maybe<any>; // jsonb
   enable_delegate_access: boolean; // bool
+  last_change_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -1103,6 +1104,7 @@ export type CreatePetition = PartialProps<
   | "last_recipient_activity_at"
   | "variables"
   | "enable_delegate_access"
+  | "last_change_at"
 >;
 
 export interface PetitionAccess {

@@ -119,10 +119,10 @@ export const HeaderNameEditable = Object.assign(
                       <Tooltip
                         label={intl.formatMessage(
                           {
-                            id: "petition.header.last-saved-on",
+                            id: "component.header-name-editable.last-saved-on",
                             defaultMessage: "Last saved on: {date}",
                           },
-                          { date: intl.formatDate(petition.updatedAt, FORMATS.FULL) },
+                          { date: intl.formatDate(petition.lastChangeAt, FORMATS.FULL) },
                         )}
                         isDisabled={state !== "SAVED"}
                         offset={[0, 4]}
@@ -171,8 +171,9 @@ export const HeaderNameEditable = Object.assign(
     fragments: {
       PetitionBase: gql`
         fragment HeaderNameEditable_PetitionBase on PetitionBase {
+          id
           name
-          updatedAt
+          lastChangeAt
           isRestricted
           myEffectivePermission {
             permissionType

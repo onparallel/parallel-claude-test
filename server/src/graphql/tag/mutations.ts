@@ -232,6 +232,7 @@ export const tagPetition = mutationField("tagPetition", {
           tag_names: [tag.name],
         },
       });
+      await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
     }
 
     return (await ctx.petitions.loadPetition(args.petitionId))!;
@@ -264,6 +265,7 @@ export const untagPetition = mutationField("untagPetition", {
           tag_names: [tag.name],
         },
       });
+      await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
     }
     return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
