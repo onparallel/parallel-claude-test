@@ -1767,6 +1767,7 @@ type Mutation {
     remindersConfig: RemindersConfigInput
     scheduledAt: DateTime
     senderId: GID
+    skipEmailSend: Boolean
     subject: String!
   ): [SendPetitionResult!]!
 

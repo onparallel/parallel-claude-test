@@ -6753,6 +6753,7 @@ export class PetitionRepository extends BaseRepository {
     petition: Pick<Petition, "id" | "name" | "reminders_config">,
     contactIds: number[],
     args: {
+      skipEmailSend?: boolean | null;
       remindersConfig?: PetitionAccessReminderConfig | null;
       scheduledAt?: Date | null;
       subject: string;
@@ -6785,10 +6786,10 @@ export class PetitionRepository extends BaseRepository {
       );
       const messages = await this.createMessages(
         petition.id,
-        args.scheduledAt ?? null,
+        args.skipEmailSend ? null : args.scheduledAt ?? null,
         accesses.map((access) => ({
           petition_access_id: access.id,
-          status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
+          status: args.skipEmailSend ? "PROCESSED" : args.scheduledAt ? "SCHEDULED" : "PROCESSING",
           email_subject: args.subject,
           email_body: JSON.stringify(args.body ?? []),
         })),

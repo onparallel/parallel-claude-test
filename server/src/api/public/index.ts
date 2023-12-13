@@ -1291,6 +1291,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $body: JSON!
           $scheduledAt: DateTime
           $remindersConfig: RemindersConfigInput
+          $skipEmailSend: Boolean
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
@@ -1309,6 +1310,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
             scheduledAt: $scheduledAt
             remindersConfig: $remindersConfig
             senderId: $senderId
+            skipEmailSend: $skipEmailSend
           ) {
             result
             petition {
@@ -1379,6 +1381,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           limit: 10,
           ...body.remindersConfig,
         },
+        skipEmailSend: body.skipEmailSend,
         ...getPetitionIncludesFromQuery(query),
       });
 

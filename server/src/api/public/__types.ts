@@ -1772,6 +1772,7 @@ export type MutationsendPetitionArgs = {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
   senderId?: InputMaybe<Scalars["GID"]["input"]>;
+  skipEmailSend?: InputMaybe<Scalars["Boolean"]["input"]>;
   subject: Scalars["String"]["input"];
 };
 
@@ -6712,6 +6713,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   body: Scalars["JSON"]["input"];
   scheduledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
   remindersConfig?: InputMaybe<RemindersConfigInput>;
+  skipEmailSend?: InputMaybe<Scalars["Boolean"]["input"]>;
   includeRecipients: Scalars["Boolean"]["input"];
   includeFields: Scalars["Boolean"]["input"];
   includeTags: Scalars["Boolean"]["input"];
@@ -9971,6 +9973,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $body: JSON!
     $scheduledAt: DateTime
     $remindersConfig: RemindersConfigInput
+    $skipEmailSend: Boolean
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
@@ -9989,6 +9992,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
       scheduledAt: $scheduledAt
       remindersConfig: $remindersConfig
       senderId: $senderId
+      skipEmailSend: $skipEmailSend
     ) {
       result
       petition {

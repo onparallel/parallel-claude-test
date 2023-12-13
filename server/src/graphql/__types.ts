@@ -6416,6 +6416,7 @@ export interface NexusGenArgTypes {
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
       senderId?: NexusGenScalars["GID"] | null; // GID
+      skipEmailSend?: boolean | null; // Boolean
       subject: string; // String!
     };
     sendPetitionClosedNotification: {

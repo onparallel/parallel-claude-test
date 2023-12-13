@@ -1652,6 +1652,7 @@ export const sendPetition = mutationField("sendPetition", {
         ],
       }),
     }),
+    skipEmailSend: booleanArg(),
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.contactIdGroups, "contactIdGroups"),
@@ -1811,6 +1812,7 @@ export const sendPetition = mutationField("sendPetition", {
             petition,
             contactIds,
             {
+              skipEmailSend: args.skipEmailSend,
               remindersConfig: args.remindersConfig,
               body: interpolatePlaceholdersInSlate(args.body, getValues),
               subject: messageSubject,
@@ -1830,15 +1832,15 @@ export const sendPetition = mutationField("sendPetition", {
 
       const successfulSends = results.filter((r) => r.result === "SUCCESS");
 
-      const messages = successfulSends.flatMap(
-        (s) => s.messages?.filter((m) => !isDefined(m.scheduled_at)) ?? [],
+      const messagesToProcess = successfulSends.flatMap(
+        (s) => s.messages?.filter((m) => m.status === "PROCESSING") ?? [],
       );
 
-      if (messages.length > 0) {
+      if (messagesToProcess.length > 0) {
         await Promise.all([
-          ctx.emails.sendPetitionMessageEmail(messages.map((m) => m.id)),
+          ctx.emails.sendPetitionMessageEmail(messagesToProcess.map((m) => m.id)),
           ctx.petitions.createEvent(
-            messages.map((message) => ({
+            messagesToProcess.map((message) => ({
               type: "MESSAGE_SENT",
               data: { petition_message_id: message.id },
               petition_id: message.petition_id,

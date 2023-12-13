@@ -1817,6 +1817,7 @@ export interface MutationsendPetitionArgs {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
   senderId?: InputMaybe<Scalars["GID"]["input"]>;
+  skipEmailSend?: InputMaybe<Scalars["Boolean"]["input"]>;
   subject: Scalars["String"]["input"];
 }
 

@@ -1073,6 +1073,10 @@ export const SendPetition = schema({
       type: "string",
       example: toGlobalId("User", 1003),
     },
+    skipEmailSend: {
+      description: "If `true`, the email will not be sent to the contacts",
+      type: "boolean",
+    },
   },
 } as const);
 
