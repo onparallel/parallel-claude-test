@@ -88,9 +88,6 @@ export function RecipientViewPetitionFieldShortText({
   const options = field.options as FieldOptions["SHORT_TEXT"];
 
   useEffect(() => {
-    if (field.multiple && field.replies.length > 0 && showNewReply) {
-      setShowNewReply(false);
-    }
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
       setValue("");
@@ -155,7 +152,7 @@ export function RecipientViewPetitionFieldShortText({
   const handleCreate = useDebouncedCallback(
     async (value: string, focusCreatedReply: boolean) => {
       if (!value) {
-        return;
+        return false;
       }
       setIsSaving(true);
       try {
@@ -164,7 +161,6 @@ export function RecipientViewPetitionFieldShortText({
           const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue("");
           if (focusCreatedReply) {
-            setShowNewReply(false);
             await waitFor(1);
             const newReplyElement = replyRefs[replyId].current!;
             if (options.format !== "EMAIL") {
@@ -184,10 +180,13 @@ export function RecipientViewPetitionFieldShortText({
           setHasAlreadyRepliedError(true);
         }
         onError(e);
+        return false;
+      } finally {
+        setIsSaving(false);
       }
-      setIsSaving(false);
+      return true;
     },
-    1000,
+    2000,
     [onCreateReply],
   );
 
@@ -215,8 +214,7 @@ export function RecipientViewPetitionFieldShortText({
         return;
       }
       if (isMetaReturn(event) && field.multiple) {
-        await handleCreate.immediate(value, true);
-        handleAddNewReply();
+        await handleCreate.immediate(value, false);
       } else if (event.key === "Backspace" && value === "") {
         if (field.replies.length > 0) {
           event.preventDefault();
@@ -232,8 +230,9 @@ export function RecipientViewPetitionFieldShortText({
       } else if (format?.validate && !format.validate(value)) {
         handleInvalidReply(field.id, true);
       } else {
-        await handleCreate.immediateIfPending(value, false);
-        setShowNewReply(false);
+        if (await handleCreate.immediateIfPending(value, false)) {
+          setShowNewReply(false);
+        }
       }
 
       if (!value && field.replies.length > 0) {

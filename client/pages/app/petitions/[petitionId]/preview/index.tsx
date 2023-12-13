@@ -368,6 +368,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       setShowRefreshRepliesAlert(true);
     } else if (isApolloError(error, "REPLY_ALREADY_DELETED_ERROR")) {
       await refetch();
+    } else if (isApolloError(error, "INVALID_REPLY_ERROR")) {
+      // handled in field component
     } else {
       throw error;
     }

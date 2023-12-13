@@ -70,9 +70,6 @@ export function RecipientViewPetitionFieldText({
   const options = field.options as FieldOptions["TEXT"];
 
   useEffect(() => {
-    if (field.multiple && field.replies.length > 0 && showNewReply) {
-      setShowNewReply(false);
-    }
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
       setValue("");
@@ -161,7 +158,7 @@ export function RecipientViewPetitionFieldText({
       }
       setIsSaving(false);
     },
-    1000,
+    2000,
     [onCreateReply],
   );
 

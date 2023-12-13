@@ -203,6 +203,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
       setShowRefreshRepliesAlert(true);
     } else if (isApolloError(error, "REPLY_ALREADY_DELETED_ERROR")) {
       await refetchAccess();
+    } else if (isApolloError(error, "INVALID_REPLY_ERROR")) {
+      // handled in field component
     } else {
       throw error;
     }
