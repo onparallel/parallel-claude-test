@@ -126,11 +126,28 @@
           }
         },
         {
-          "pid_file": "/var/run/parallel-task-worker-queue.pid",
+          "pid_file": "/var/run/parallel-task-worker-queue1.pid",
           "measurement": ["cpu_usage", "memory_rss"],
           "metrics_collection_interval": 10,
           "append_dimensions": {
-            "Process": "parallel-task-worker-queue"
+            "Process": "parallel-task-worker-queue1"
+          }
+        },
+        {
+          "pid_file": "/var/run/parallel-task-worker-queue2.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-task-worker-queue2"
+          }
+        },
+
+        {
+          "pid_file": "/var/run/parallel-task-worker-queue3.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-task-worker-queue3"
           }
         },
         {

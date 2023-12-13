@@ -43,6 +43,7 @@ createQueueWorker(
     await new Runner(ctx, task).runTask();
   },
   {
+    batchSize: 1,
     forkHandlers: true,
     forkTimeout: 1_800_000, // 30 min timeout for BulkPetitionSendRunner
     async onForkTimeout({ taskId }, ctx) {

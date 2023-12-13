@@ -1,0 +1,22 @@
+[Unit]
+Description="parallel task worker queue %i"
+PartOf=parallel-task-worker-queue.service
+After=parallel-task-worker-queue.service
+
+[Service]
+Environment=PORT=4000
+Environment=NODE_ENV=production
+Environment=ENV=#ENV#
+Environment=BUILD_ID=#BUILD_ID#
+Environment=INSTANCE_NUMBER=#INSTANCE_NUMBER#
+Environment=INSTANCE_NAME=#INSTANCE_NAME#@%i
+WorkingDirectory=/home/ec2-user/main/server
+Type=simple
+User=ec2-user
+ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/workers/task-worker.js start
+ExecStartPost=/bin/sh -c 'pgrep -xf "/usr/bin/node /home/ec2-user/main/server/dist/workers/task-worker.js start" | sudo tee /var/run/parallel-task-worker-queue%i.pid > /dev/null'
+Restart=always
+RuntimeMaxSec=1d
+
+[Install]
+WantedBy=parallel-task-worker-queue.service
