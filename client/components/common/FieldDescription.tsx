@@ -8,7 +8,7 @@ export const FieldDescription = chakraForwardRef<"div", { description?: string }
     const interpolated = useLiquid(description ?? "");
     return (
       <Box ref={ref} whiteSpace="pre-wrap" {...props}>
-        <MarkdownRender markdown={interpolated} />;
+        <MarkdownRender markdown={interpolated} />
       </Box>
     );
   },
