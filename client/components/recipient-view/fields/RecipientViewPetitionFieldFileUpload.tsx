@@ -323,7 +323,7 @@ function PetitionFieldFileUploadDropzone({
 }: PetitionFieldFileUploadDropzoneProps) {
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
 
-  const MAX_FILE_SIZE = 50 * 1024 * 1024;
+  const MAX_FILE_SIZE = 300 * 1024 * 1024;
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
   async function handleFileDrop(files: File[], rejected: FileRejection[]) {

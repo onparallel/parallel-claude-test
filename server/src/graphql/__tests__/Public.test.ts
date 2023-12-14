@@ -3301,7 +3301,7 @@ describe("GraphQL/Public", () => {
             data: {
               contentType: "text/plain",
               filename: "file.txt",
-              size: 50 * 1024 * 1024 + 1,
+              size: 300 * 1024 * 1024 + 1,
             },
           },
         );

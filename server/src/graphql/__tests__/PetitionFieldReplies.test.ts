@@ -2783,7 +2783,7 @@ describe("GraphQL/Petition Field Replies", () => {
           file: {
             contentType: "text/plain",
             filename: "my_file.txt",
-            size: 50 * 1024 * 1024 + 1,
+            size: 300 * 1024 * 1024 + 1,
           },
         },
       );

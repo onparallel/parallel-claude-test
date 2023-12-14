@@ -68,7 +68,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     petitionIsNotAnonymized("petitionId"),
   ),
   validateArgs: validateAnd(
-    validFileUploadInput((args) => args.file, { maxSizeBytes: 50 * 1024 * 1024 }, "file"),
+    validFileUploadInput((args) => args.file, { maxSizeBytes: 300 * 1024 * 1024 }, "file"),
     validateCreateFileReplyInput(
       (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
       "fieldId",
@@ -161,7 +161,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
   ),
   validateArgs: validFileUploadInput(
     (args) => args.file,
-    { maxSizeBytes: 50 * 1024 * 1024 },
+    { maxSizeBytes: 300 * 1024 * 1024 },
     "file",
   ),
   resolve: async (_, args, ctx) => {

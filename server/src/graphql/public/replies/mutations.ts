@@ -217,7 +217,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     ),
   ),
   validateArgs: validateAnd(
-    validFileUploadInput((args) => args.data, { maxSizeBytes: 50 * 1024 * 1024 }, "data"),
+    validFileUploadInput((args) => args.data, { maxSizeBytes: 300 * 1024 * 1024 }, "data"),
     validateCreateFileReplyInput(
       (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
       "fieldId",
