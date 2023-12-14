@@ -34,6 +34,86 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createAzureOpenAiIntegration",
+      description: "Creates a new Azure OpenAI integration on the provided organization",
+      args: [
+        {
+          name: "apiKey",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "endpoint",
+          description: "https://<resource name>.openai.azure.com/",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
+      name: "deleteAzureOpenAiIntegration",
+      description: "Removes the Azure OpenAI integration of the user's organization",
+      args: [
+        {
+          name: "id",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "exportPetitionToJson",
       description: "Exports basic petition + fields configuration as JSON object",
       args: [
@@ -811,6 +891,7 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
+      { name: "PETITION_SUMMARY", description: null, isDeprecated: false, deprecationReason: null },
       { name: "PROFILES", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "PUBLIC_PETITION_LINK_PREFILL_DATA",

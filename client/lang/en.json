@@ -2490,6 +2490,16 @@
     "context": "Signature Integration"
   },
   {
+    "term": "component.feature-flag-descriptions.petition-summary-description",
+    "definition": "Enables the creation of an AI Summary on the organization petitions.",
+    "context": "Enables the creation of an AI Summary on the organization petitions."
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-summary-name",
+    "definition": "Petition Summary",
+    "context": "Petition Summary"
+  },
+  {
     "term": "component.feature-flag-descriptions.prefill-data-public-links-description",
     "definition": "Allows you to pre-fill public links with data from the preview page.",
     "context": "Allows you to pre-fill public links with data from the preview page."
@@ -5093,6 +5103,41 @@
     "term": "component.petition-replies-filtered-fields.hidden-fields-explanation",
     "definition": "Fields not shown to the recipient because the visibility conditions are not met.",
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
+  },
+  {
+    "term": "component.petition-replies-summary.activate-petition-summary-support-message",
+    "definition": "Hi, I would like to get more information about how to generate a summary of my parallel with AI.",
+    "context": "Hi, I would like to get more information about how to generate a summary of my parallel with AI."
+  },
+  {
+    "term": "component.petition-replies-summary.error",
+    "definition": "The summary could not be generated. Please try again. If the error persists <a>contact our support team</a>.",
+    "context": "The summary could not be generated. Please try again. If the error persists <a>contact our support team</a>."
+  },
+  {
+    "term": "component.petition-replies-summary.error-support-message",
+    "definition": "Hi, I'm having trouble generating a summary for my parallel. Can you help me?",
+    "context": "Hi, I'm having trouble generating a summary for my parallel. Can you help me?"
+  },
+  {
+    "term": "component.petition-replies-summary.generate-summary",
+    "definition": "Generate Summary",
+    "context": "Generate Summary"
+  },
+  {
+    "term": "component.petition-replies-summary.no-summary-feature-body",
+    "definition": "Generate a summary with Parallel AI and draw conclusions from this process. Contact us to activate it in your organization.",
+    "context": "Generate a summary with Parallel AI and draw conclusions from this process. Contact us to activate it in your organization."
+  },
+  {
+    "term": "component.petition-replies-summary.no-summary-feature-heading",
+    "definition": "Discover Parallel AI",
+    "context": "Discover Parallel AI"
+  },
+  {
+    "term": "component.petition-replies-summary.no-summary-text",
+    "definition": "No summary has been generated yet.",
+    "context": "No summary has been generated yet."
   },
   {
     "term": "component.petition-select.placeholder-petition",
@@ -9935,6 +9980,11 @@
     "context": "The field is required"
   },
   {
+    "term": "generic.retry",
+    "definition": "Retry",
+    "context": "Retry"
+  },
+  {
     "term": "generic.root-petitions",
     "definition": "Parallels",
     "context": "Parallels"
@@ -11765,6 +11815,11 @@
     "context": "Close parallel"
   },
   {
+    "term": "page.replies.list-of-contents",
+    "definition": "List of contents",
+    "context": "List of contents"
+  },
+  {
     "term": "page.replies.message-sent-toast-description",
     "definition": "The message is on it's way",
     "context": "The message is on it's way"
@@ -11783,6 +11838,16 @@
     "term": "page.replies.open-profile-button",
     "definition": "Open profile",
     "context": "Open profile"
+  },
+  {
+    "term": "page.replies.summary-header",
+    "definition": "Summary",
+    "context": "Summary"
+  },
+  {
+    "term": "page.replies.summary-header-help",
+    "definition": "Generate a summary with Parallel AI to summarize the collected information.",
+    "context": "Generate a summary with Parallel AI to summarize the collected information."
   },
   {
     "term": "page.reports-overview.choose-date-range",

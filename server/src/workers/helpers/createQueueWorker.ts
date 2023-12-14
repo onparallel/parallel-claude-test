@@ -1,10 +1,10 @@
 import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { SQSClient } from "@aws-sdk/client-sqs";
-import { Consumer } from "sqs-consumer";
 import { fork } from "child_process";
 import { MaybePromise } from "nexus/dist/core";
 import { noop } from "remeda";
+import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
@@ -170,6 +170,9 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
             endpoint: process.env.NODE_ENV === "development" ? "http://localhost:9324" : undefined,
             logger: awsLogger(logger),
           }),
+        });
+        consumer.on("started", () => {
+          logger.info(`Queue ${name}: Queue worker started`);
         });
         consumer.on("error", (error) => {
           logger.error(error.stack);

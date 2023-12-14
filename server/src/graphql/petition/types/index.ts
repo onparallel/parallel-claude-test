@@ -8,3 +8,4 @@ export * from "./signature-request";
 export * from "./attachments";
 export * from "./filters";
 export * from "./variables";
+export * from "./ai-completion";

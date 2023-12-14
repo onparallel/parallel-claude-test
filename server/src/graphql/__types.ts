@@ -401,6 +401,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  AiCompletionLogStatus: db.AiCompletionLogStatus;
   BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult:
     | "INCORRECT_PASSWORD"
@@ -556,6 +557,7 @@ export interface NexusGenObjects {
   AccessDeactivatedEvent: petitionEvents.AccessDeactivatedEvent;
   AccessDelegatedEvent: petitionEvents.AccessDelegatedEvent;
   AccessOpenedEvent: petitionEvents.AccessOpenedEvent;
+  AiCompletionLog: db.AiCompletionLog;
   AsyncFieldCompletionResponse: {
     // root type
     type: string; // String!
@@ -1229,6 +1231,14 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
+  AiCompletionLog: {
+    // field return type
+    completion: string | null; // String
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    status: NexusGenEnums["AiCompletionLogStatus"]; // AiCompletionLogStatus!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
   AsyncFieldCompletionResponse: {
     // field return type
     type: string; // String!
@@ -1552,6 +1562,7 @@ export interface NexusGenFieldTypes {
     closeProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
+    createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
@@ -1573,6 +1584,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createPetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     createPetitionListView: NexusGenRootTypes["PetitionListView"]; // PetitionListView!
+    createPetitionSummaryTask: NexusGenRootTypes["Task"]; // Task!
     createPetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createProfile: NexusGenRootTypes["Profile"]; // Profile!
@@ -1590,6 +1602,7 @@ export interface NexusGenFieldTypes {
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
+    deleteAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
     deleteEventSubscriptionSignatureKeys: NexusGenEnums["Result"]; // Result!
@@ -1857,6 +1870,7 @@ export interface NexusGenFieldTypes {
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastChangeAt: NexusGenScalars["DateTime"]; // DateTime!
     lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
+    latestSummaryRequest: NexusGenRootTypes["AiCompletionLog"] | null; // AiCompletionLog
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
@@ -1874,6 +1888,7 @@ export interface NexusGenFieldTypes {
     signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][]; // [PetitionSignatureRequest!]!
     skipForwardSecurity: boolean; // Boolean!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
+    summaryConfig: NexusGenScalars["JSONObject"] | null; // JSONObject
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -3455,6 +3470,14 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
   };
+  AiCompletionLog: {
+    // field return type name
+    completion: "String";
+    createdAt: "DateTime";
+    id: "GID";
+    status: "AiCompletionLogStatus";
+    updatedAt: "DateTime";
+  };
   AsyncFieldCompletionResponse: {
     // field return type name
     type: "String";
@@ -3778,6 +3801,7 @@ export interface NexusGenFieldTypeNames {
     closeProfile: "Profile";
     completePetition: "Petition";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
+    createAzureOpenAiIntegration: "SupportMethodResponse";
     createBulkPetitionSendTask: "Task";
     createContact: "Contact";
     createDowJonesKycIntegration: "OrgIntegration";
@@ -3799,6 +3823,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldComment: "PetitionFieldComment";
     createPetitionFieldReplies: "PetitionFieldReply";
     createPetitionListView: "PetitionListView";
+    createPetitionSummaryTask: "Task";
     createPetitionVariable: "Petition";
     createPrintPdfTask: "Task";
     createProfile: "Profile";
@@ -3816,6 +3841,7 @@ export interface NexusGenFieldTypeNames {
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deactivateUser: "User";
+    deleteAzureOpenAiIntegration: "SupportMethodResponse";
     deleteContacts: "Result";
     deleteDowJonesKycIntegration: "Organization";
     deleteEventSubscriptionSignatureKeys: "Result";
@@ -4083,6 +4109,7 @@ export interface NexusGenFieldTypeNames {
     lastActivityAt: "DateTime";
     lastChangeAt: "DateTime";
     lastRecipientActivityAt: "DateTime";
+    latestSummaryRequest: "AiCompletionLog";
     locale: "PetitionLocale";
     metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";
@@ -4100,6 +4127,7 @@ export interface NexusGenFieldTypeNames {
     signatureRequests: "PetitionSignatureRequest";
     skipForwardSecurity: "Boolean";
     status: "PetitionStatus";
+    summaryConfig: "JSONObject";
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
@@ -5756,6 +5784,12 @@ export interface NexusGenArgTypes {
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
+    createAzureOpenAiIntegration: {
+      // args
+      apiKey: string; // String!
+      endpoint: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
+    };
     createBulkPetitionSendTask: {
       // args
       templateId: NexusGenScalars["GID"]; // GID!
@@ -5883,6 +5917,10 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["PetitionListViewDataInput"]; // PetitionListViewDataInput!
       name: string; // String!
     };
+    createPetitionSummaryTask: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     createPetitionVariable: {
       // args
       data: NexusGenInputs["CreatePetitionVariableInput"]; // CreatePetitionVariableInput!
@@ -5980,6 +6018,10 @@ export interface NexusGenArgTypes {
       tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
       transferToUserId: NexusGenScalars["GID"]; // GID!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deleteAzureOpenAiIntegration: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
     };
     deleteContacts: {
       // args
@@ -7267,6 +7309,7 @@ export interface NexusGenAbstractTypeMembers {
   ProfileFieldResponse: "ProfileFieldFile" | "ProfileFieldValue";
   TemplateDefaultPermission: "TemplateDefaultUserGroupPermission" | "TemplateDefaultUserPermission";
   Timestamps:
+    | "AiCompletionLog"
     | "Contact"
     | "Organization"
     | "PetitionAccess"
@@ -7291,6 +7334,7 @@ export interface NexusGenTypeInterfaces {
   AccessDeactivatedEvent: "PetitionEvent";
   AccessDelegatedEvent: "PetitionEvent";
   AccessOpenedEvent: "PetitionEvent";
+  AiCompletionLog: "Timestamps";
   CommentCreatedUserNotification: "PetitionUserNotification";
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";

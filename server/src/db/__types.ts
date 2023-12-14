@@ -9,6 +9,18 @@ type Maybe<T> = T | null;
 
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
 
+export type AiCompletionLogStatus = "PENDING" | "COMPLETED" | "FAILED";
+
+export const AiCompletionLogStatusValues = [
+  "PENDING",
+  "COMPLETED",
+  "FAILED",
+] as AiCompletionLogStatus[];
+
+export type AiCompletionLogType = "PETITION_SUMMARY";
+
+export const AiCompletionLogTypeValues = ["PETITION_SUMMARY"] as AiCompletionLogType[];
+
 export type ContactLocale = "en" | "es";
 
 export const ContactLocaleValues = ["en", "es"] as ContactLocale[];
@@ -37,7 +49,8 @@ export type FeatureFlagName =
   | "CUSTOM_PROPERTIES"
   | "BULK_PETITION_SEND_TASK"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
-  | "SETTING_DELEGATE_ACCESS";
+  | "SETTING_DELEGATE_ACCESS"
+  | "PETITION_SUMMARY";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -64,15 +77,22 @@ export const FeatureFlagNameValues = [
   "BULK_PETITION_SEND_TASK",
   "TEMPLATE_REPLIES_CSV_EXPORT_TASK",
   "SETTING_DELEGATE_ACCESS",
+  "PETITION_SUMMARY",
 ] as FeatureFlagName[];
 
-export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";
+export type IntegrationType =
+  | "SIGNATURE"
+  | "SSO"
+  | "USER_PROVISIONING"
+  | "DOW_JONES_KYC"
+  | "AI_COMPLETION";
 
 export const IntegrationTypeValues = [
   "SIGNATURE",
   "SSO",
   "USER_PROVISIONING",
   "DOW_JONES_KYC",
+  "AI_COMPLETION",
 ] as IntegrationType[];
 
 export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
@@ -409,7 +429,8 @@ export type TaskName =
   | "TEMPLATES_OVERVIEW_REPORT"
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
-  | "TEMPLATE_REPLIES_CSV_EXPORT";
+  | "TEMPLATE_REPLIES_CSV_EXPORT"
+  | "PETITION_SUMMARY";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -422,6 +443,7 @@ export const TaskNameValues = [
   "BANKFLIP_SESSION_COMPLETED",
   "BULK_PETITION_SEND",
   "TEMPLATE_REPLIES_CSV_EXPORT",
+  "PETITION_SUMMARY",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
@@ -512,6 +534,7 @@ export type UserStatus = "ACTIVE" | "INACTIVE" | "ON_HOLD";
 export const UserStatusValues = ["ACTIVE", "INACTIVE", "ON_HOLD"] as UserStatus[];
 
 export interface TableTypes {
+  ai_completion_log: AiCompletionLog;
   contact: Contact;
   contact_authentication: ContactAuthentication;
   contact_authentication_request: ContactAuthenticationRequest;
@@ -572,6 +595,7 @@ export interface TableTypes {
 }
 
 export interface TableCreateTypes {
+  ai_completion_log: CreateAiCompletionLog;
   contact: CreateContact;
   contact_authentication: CreateContactAuthentication;
   contact_authentication_request: CreateContactAuthenticationRequest;
@@ -632,6 +656,7 @@ export interface TableCreateTypes {
 }
 
 export interface TablePrimaryKeys {
+  ai_completion_log: "id";
   contact: "id";
   contact_authentication: "id";
   contact_authentication_request: "id";
@@ -690,6 +715,41 @@ export interface TablePrimaryKeys {
   user_group_permission: "id";
   user_petition_event_log: "id";
 }
+
+export interface AiCompletionLog {
+  id: number; // int4
+  integration_id: number; // int4
+  type: AiCompletionLogType; // ai_completion_log_type
+  status: AiCompletionLogStatus; // ai_completion_log_status
+  request_params: any; // jsonb
+  raw_response: Maybe<any>; // jsonb
+  completion: Maybe<string>; // text
+  error: Maybe<any>; // jsonb
+  request_tokens: Maybe<number>; // int4
+  response_tokens: Maybe<number>; // int4
+  cost: Maybe<string>; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deprecated_at: Maybe<Date>; // timestamptz
+}
+
+export type CreateAiCompletionLog = PartialProps<
+  Omit<AiCompletionLog, "id">,
+  | "status"
+  | "raw_response"
+  | "completion"
+  | "error"
+  | "request_tokens"
+  | "response_tokens"
+  | "cost"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deprecated_at"
+>;
 
 export interface Contact {
   id: number; // int4
@@ -1055,6 +1115,8 @@ export interface Petition {
   variables: Maybe<any>; // jsonb
   enable_delegate_access: boolean; // bool
   last_change_at: Maybe<Date>; // timestamptz
+  summary_config: Maybe<any>; // jsonb
+  summary_ai_completion_log_id: Maybe<number>; // int4
 }
 
 export type CreatePetition = PartialProps<
@@ -1105,6 +1167,8 @@ export type CreatePetition = PartialProps<
   | "variables"
   | "enable_delegate_access"
   | "last_change_at"
+  | "summary_config"
+  | "summary_ai_completion_log_id"
 >;
 
 export interface PetitionAccess {

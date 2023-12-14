@@ -188,3 +188,14 @@ export class InvalidCredentialsError extends Error {
     super(message);
   }
 }
+
+export class InvalidRequestError extends Error {
+  override name = "InvalidRequestError";
+
+  constructor(
+    public code: string,
+    message?: string,
+  ) {
+    super(message);
+  }
+}

@@ -1,8 +1,8 @@
 import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { RESULT } from "../helpers/Result";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/Result";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToIntegrations } from "./authorizers";

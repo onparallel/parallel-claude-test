@@ -1,0 +1,267 @@
+import { gql } from "@apollo/client";
+import {
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Button,
+  Center,
+  HStack,
+  Heading,
+  Image,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { RepeatIcon, SparklesIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+import {
+  PetitionRepliesSummary_PetitionFragment,
+  PetitionRepliesSummary_UserFragment,
+} from "@parallel/graphql/__types";
+import { usePetitionSummaryBackgroundTask } from "@parallel/utils/tasks/usePetitionSummaryBackgroundTask";
+import { useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
+import { CloseableAlert } from "../common/CloseableAlert";
+import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { MarkdownRender } from "../common/MarkdownRender";
+import { SupportButton } from "../common/SupportButton";
+import { SupportLink } from "../common/SupportLink";
+
+interface PetitionRepliesSummaryProps {
+  petition: PetitionRepliesSummary_PetitionFragment;
+  user: PetitionRepliesSummary_UserFragment;
+  onRefetch: () => void;
+}
+
+export const PetitionRepliesSummary = Object.assign(
+  chakraForwardRef<"div", PetitionRepliesSummaryProps>(function PetitionRepliesSummary(
+    { petition, user, onRefetch }: PetitionRepliesSummaryProps,
+    ref,
+  ) {
+    const intl = useIntl();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const request = petition.latestSummaryRequest;
+    const summary =
+      !isLoading && request?.status !== "PENDING" && isDefined(request?.completion)
+        ? request!.completion
+        : null;
+
+    const hasError = !isLoading && request?.status === "FAILED";
+    const generatePetitionSummaryBackgroundTask = usePetitionSummaryBackgroundTask();
+
+    const handleGenerateSummary = async () => {
+      setIsLoading(true);
+      try {
+        await generatePetitionSummaryBackgroundTask({ petitionId: petition.id });
+        onRefetch();
+        window.analytics?.track("Petition Summary Generated", {
+          petitionId: petition.id,
+          fromTemplateId: petition.fromTemplate?.id,
+        });
+      } catch (e) {
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleRegenerateSummary = async () => {
+      setIsLoading(true);
+      try {
+        await generatePetitionSummaryBackgroundTask({ petitionId: petition.id });
+        onRefetch();
+        window.analytics?.track("Petition Summary Regenerated", {
+          petitionId: petition.id,
+          fromTemplateId: petition.fromTemplate?.id,
+        });
+      } catch (e) {
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleCopySummary = () => {
+      window.analytics?.track("Petition Summary Copied", {
+        petitionId: petition.id,
+        fromTemplateId: petition.fromTemplate?.id,
+      });
+    };
+
+    return (
+      <Stack padding={4} spacing={4} paddingBottom={!isLoading && summary ? 0 : 4}>
+        {!user.hasSummaryAccess ? (
+          <>
+            <Stack textAlign="center" align="center">
+              <Image
+                width="125px"
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/summary-ai.svg`}
+              />
+              <Heading size="md" textAlign="center">
+                <FormattedMessage
+                  id="component.petition-replies-summary.no-summary-feature-heading"
+                  defaultMessage="Discover Parallel AI"
+                />
+              </Heading>
+              <Text>
+                <FormattedMessage
+                  id="component.petition-replies-summary.no-summary-feature-body"
+                  defaultMessage="Generate a summary with Parallel AI and draw conclusions from this process. Contact us to activate it in your organization."
+                />
+              </Text>
+            </Stack>
+
+            <Box alignSelf="center">
+              <SupportButton
+                colorScheme="primary"
+                message={intl.formatMessage({
+                  id: "component.petition-replies-summary.activate-petition-summary-support-message",
+                  defaultMessage:
+                    "Hi, I would like to get more information about how to generate a summary of my parallel with AI.",
+                })}
+              >
+                <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+              </SupportButton>
+            </Box>
+          </>
+        ) : isLoading ? (
+          <Center padding={4}>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="primary.500"
+              size="xl"
+            />
+          </Center>
+        ) : summary ? (
+          <>
+            <Box>
+              <MarkdownRender markdown={summary} />
+            </Box>
+            <Stack
+              position="sticky"
+              bottom={0}
+              paddingBottom={4}
+              paddingTop={2}
+              width="100%"
+              background="white"
+            >
+              <HStack>
+                <CopyToClipboardButton size="sm" text={summary} onClick={handleCopySummary} />
+                <IconButtonWithTooltip
+                  size="sm"
+                  label={intl.formatMessage({
+                    id: "generic.retry",
+                    defaultMessage: "Retry",
+                  })}
+                  onClick={handleRegenerateSummary}
+                  icon={<RepeatIcon />}
+                  isDisabled={!user.hasSummaryAccess || !isDefined(petition.summaryConfig)}
+                />
+              </HStack>
+              {hasError && <ErrorAlert />}
+            </Stack>
+          </>
+        ) : (
+          <>
+            <Text color="gray.500">
+              <FormattedMessage
+                id="component.petition-replies-summary.no-summary-text"
+                defaultMessage="No summary has been generated yet."
+              />
+            </Text>
+            <Box>
+              <Button
+                leftIcon={<SparklesIcon />}
+                colorScheme="primary"
+                onClick={handleGenerateSummary}
+                isDisabled={!user.hasSummaryAccess || !isDefined(petition.summaryConfig)}
+              >
+                <FormattedMessage
+                  id="component.petition-replies-summary.generate-summary"
+                  defaultMessage="Generate Summary"
+                />
+              </Button>
+            </Box>
+            {hasError && <ErrorAlert />}
+          </>
+        )}
+      </Stack>
+    );
+  }),
+  {
+    fragments: {
+      Petition: gql`
+        fragment PetitionRepliesSummary_Petition on Petition {
+          id
+          fromTemplate {
+            id
+          }
+          summaryConfig
+          latestSummaryRequest {
+            id
+            status
+            completion
+          }
+        }
+      `,
+      User: gql`
+        fragment PetitionRepliesSummary_User on User {
+          id
+          hasSummaryAccess: hasFeatureFlag(featureFlag: PETITION_SUMMARY)
+        }
+      `,
+    },
+  },
+);
+
+const _mutations = [
+  gql`
+    mutation PetitionRepliesSummary_createPetitionSummaryTask($petitionId: GID!) {
+      createPetitionSummaryTask(petitionId: $petitionId) {
+        id
+      }
+    }
+  `,
+];
+
+const _queries = [
+  gql`
+    query PetitionRepliesSummary_Petition($petitionId: GID!) {
+      petition(id: $petitionId) {
+        ...PetitionRepliesSummary_Petition
+      }
+    }
+    ${PetitionRepliesSummary.fragments.Petition}
+  `,
+];
+
+function ErrorAlert() {
+  const intl = useIntl();
+  return (
+    <CloseableAlert status="error" borderRadius="md">
+      <AlertIcon />
+      <AlertDescription>
+        <FormattedMessage
+          id="component.petition-replies-summary.error"
+          defaultMessage="The summary could not be generated. Please try again. If the error persists <a>contact our support team</a>."
+          values={{
+            a: (chunks: any) => (
+              <SupportLink
+                message={intl.formatMessage({
+                  id: "component.petition-replies-summary.error-support-message",
+                  defaultMessage:
+                    "Hi, I'm having trouble generating a summary for my parallel. Can you help me?",
+                })}
+              >
+                {chunks}
+              </SupportLink>
+            ),
+          }}
+        />
+      </AlertDescription>
+    </CloseableAlert>
+  );
+}

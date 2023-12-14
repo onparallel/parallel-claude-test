@@ -100,6 +100,18 @@ export type AccessOpenedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type AiCompletionLog = Timestamps & {
+  completion: Maybe<Scalars["String"]["output"]>;
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  status: AiCompletionLogStatus;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"]["output"];
+};
+
+export type AiCompletionLogStatus = "COMPLETED" | "FAILED" | "PENDING";
+
 export type AsyncFieldCompletionResponse = {
   type: Scalars["String"]["output"];
   url: Scalars["String"]["output"];
@@ -369,6 +381,7 @@ export type FeatureFlag =
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_SIGNATURE"
+  | "PETITION_SUMMARY"
   | "PROFILES"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -496,7 +509,12 @@ export type InputFeatureFlagNameValue = {
 };
 
 /** The types of integrations available. */
-export type IntegrationType = "DOW_JONES_KYC" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType =
+  | "AI_COMPLETION"
+  | "DOW_JONES_KYC"
+  | "SIGNATURE"
+  | "SSO"
+  | "USER_PROVISIONING";
 
 /** A public template on landing page */
 export type LandingTemplate = {
@@ -629,6 +647,8 @@ export type Mutation = {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /** Creates a new Azure OpenAI integration on the provided organization */
+  createAzureOpenAiIntegration: SupportMethodResponse;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
   createBulkPetitionSendTask: Task;
   /** Create a contact. */
@@ -671,6 +691,8 @@ export type Mutation = {
   createPetitionFieldReplies: Array<PetitionFieldReply>;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
+  /** Creates a Task for generating a petition summary with AI */
+  createPetitionSummaryTask: Task;
   /** Creates a new variable on the petition. */
   createPetitionVariable: Petition;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
@@ -701,6 +723,8 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
+  /** Removes the Azure OpenAI integration of the user's organization */
+  deleteAzureOpenAiIntegration: SupportMethodResponse;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
@@ -1104,6 +1128,12 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateAzureOpenAiIntegrationArgs = {
+  apiKey: Scalars["String"]["input"];
+  endpoint: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+};
+
 export type MutationcreateBulkPetitionSendTaskArgs = {
   templateId: Scalars["GID"]["input"];
   temporaryFileId: Scalars["GID"]["input"];
@@ -1231,6 +1261,10 @@ export type MutationcreatePetitionListViewArgs = {
   name: Scalars["String"]["input"];
 };
 
+export type MutationcreatePetitionSummaryTaskArgs = {
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationcreatePetitionVariableArgs = {
   data: CreatePetitionVariableInput;
   petitionId: Scalars["GID"]["input"];
@@ -1327,6 +1361,10 @@ export type MutationdeactivateUserArgs = {
   tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   transferToUserId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationdeleteAzureOpenAiIntegrationArgs = {
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteContactsArgs = {
@@ -2465,6 +2503,8 @@ export type Petition = PetitionBase & {
   /** Time when the petition or any of its relations were last updated. */
   lastChangeAt: Scalars["DateTime"]["output"];
   lastRecipientActivityAt: Maybe<Scalars["DateTime"]["output"]>;
+  /** The latest summary request for this petition */
+  latestSummaryRequest: Maybe<AiCompletionLog>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -2494,6 +2534,8 @@ export type Petition = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"]["output"];
   /** The status of the petition. */
   status: PetitionStatus;
+  /** The summary configuration for the petition. */
+  summaryConfig: Maybe<Scalars["JSONObject"]["output"]>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -4874,6 +4916,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "PETITION_SUMMARY"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_CSV_EXPORT"

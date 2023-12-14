@@ -2490,6 +2490,16 @@
     "context": "Signature Integration"
   },
   {
+    "term": "component.feature-flag-descriptions.petition-summary-description",
+    "definition": "Permite la creación de un resumen con IA en las peticiones de la organización.",
+    "context": "Enables the creation of an AI Summary on the organization petitions."
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-summary-name",
+    "definition": "Resumen de petición",
+    "context": "Petition Summary"
+  },
+  {
     "term": "component.feature-flag-descriptions.prefill-data-public-links-description",
     "definition": "Permite pre-rellenar los enlaces públicos con respuestas desde la vista de previsualizar.",
     "context": "Allows you to pre-fill public links with data from the preview page."
@@ -5093,6 +5103,41 @@
     "term": "component.petition-replies-filtered-fields.hidden-fields-explanation",
     "definition": "Campos no mostrados al destinatario por no cumplirse las condiciones necesarias.",
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
+  },
+  {
+    "term": "component.petition-replies-summary.activate-petition-summary-support-message",
+    "definition": "Hola, me gustaría obtener más información acerca de cómo generar un resumen de mi parallel con IA.",
+    "context": "Hi, I would like to get more information about how to generate a summary of my parallel with AI."
+  },
+  {
+    "term": "component.petition-replies-summary.error",
+    "definition": "No se ha podido generar el resumen. Inténtalo de nuevo. Si el error persiste, póngase en contacto con nuestro <a>equipo de soporte</a>.",
+    "context": "The summary could not be generated. Please try again. If the error persists <a>contact our support team</a>."
+  },
+  {
+    "term": "component.petition-replies-summary.error-support-message",
+    "definition": "Hola, tengo problemas para generar un resumen de mi parallel. ¿Puede ayudarme?",
+    "context": "Hi, I'm having trouble generating a summary for my parallel. Can you help me?"
+  },
+  {
+    "term": "component.petition-replies-summary.generate-summary",
+    "definition": "Generar resumen",
+    "context": "Generate Summary"
+  },
+  {
+    "term": "component.petition-replies-summary.no-summary-feature-body",
+    "definition": "Genera un resumen con Parallel IA y saca conclusiones de este proceso. Contacta con nosotros para activarlo en tu organización.",
+    "context": "Generate a summary with Parallel AI and draw conclusions from this process. Contact us to activate it in your organization."
+  },
+  {
+    "term": "component.petition-replies-summary.no-summary-feature-heading",
+    "definition": "Descubre Parallel AI",
+    "context": "Discover Parallel AI"
+  },
+  {
+    "term": "component.petition-replies-summary.no-summary-text",
+    "definition": "Aún no se ha generado ningún resumen.",
+    "context": "No summary has been generated yet."
   },
   {
     "term": "component.petition-select.placeholder-petition",
@@ -9935,6 +9980,11 @@
     "context": "The field is required"
   },
   {
+    "term": "generic.retry",
+    "definition": "Reintentar",
+    "context": "Retry"
+  },
+  {
     "term": "generic.root-petitions",
     "definition": "Parallels",
     "context": "Parallels"
@@ -11765,6 +11815,11 @@
     "context": "Close parallel"
   },
   {
+    "term": "page.replies.list-of-contents",
+    "definition": "List of contents",
+    "context": "List of contents"
+  },
+  {
     "term": "page.replies.message-sent-toast-description",
     "definition": "El mensaje está en camino",
     "context": "The message is on it's way"
@@ -11783,6 +11838,16 @@
     "term": "page.replies.open-profile-button",
     "definition": "Abrir perfil",
     "context": "Open profile"
+  },
+  {
+    "term": "page.replies.summary-header",
+    "definition": "Resumen",
+    "context": "Summary"
+  },
+  {
+    "term": "page.replies.summary-header-help",
+    "definition": "Genera un resumen con Parallel AI para resumir la información recogida.",
+    "context": "Generate a summary with Parallel AI to summarize the collected information."
   },
   {
     "term": "page.reports-overview.choose-date-range",

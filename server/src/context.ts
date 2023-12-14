@@ -21,6 +21,7 @@ import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticati
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
+import { AI_COMPLETION_SERVICE, AiCompletionService } from "./services/AiCompletionService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { AUTH, IAuth } from "./services/AuthService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
@@ -35,6 +36,7 @@ import {
   INTEGRATIONS_SETUP_SERVICE,
 } from "./services/IntegrationsSetupService";
 import { ILogger, LOGGER } from "./services/Logger";
+import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "./services/OrgLimitsService";
 import {
   IOrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
@@ -59,7 +61,6 @@ import { IRedis, REDIS } from "./services/Redis";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
-import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "./services/OrgLimitsService";
 
 @injectable()
 export class ApiContext {
@@ -91,6 +92,7 @@ export class ApiContext {
     public readonly petitionImportExport: IPetitionImportExportService,
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
     public readonly petitionMessageContext: PetitionMessageContextService,
+    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
 
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
@@ -146,6 +148,7 @@ export class WorkerContext {
     public readonly petitionMessageContext: PetitionMessageContextService,
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
+    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
 
     // Repositories
     public readonly contacts: ContactRepository,

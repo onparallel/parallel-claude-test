@@ -15,6 +15,7 @@ import { validateHexColor } from "../tag/validators";
 import { superAdminAccess } from "./authorizers";
 import { validatePublicTemplateCategories } from "./validators";
 import { DatabaseError } from "pg";
+import { validUrl } from "../helpers/validators/validUrl";
 
 export const forceUpdateSignatureOrganizationBrandings = mutationField(
   "forceUpdateSignatureOrganizationBrandings",
@@ -513,6 +514,75 @@ export const updateFeatureFlag = mutationField("updateFeatureFlag", {
         return { result: RESULT.FAILURE, message: `Unknown userId` };
       }
       return { result: RESULT.FAILURE, message: "Unknown error" };
+    }
+  },
+});
+
+export const createAzureOpenAiIntegration = mutationField("createAzureOpenAiIntegration", {
+  description: "Creates a new Azure OpenAI integration on the provided organization",
+  type: "SupportMethodResponse",
+  authorize: superAdminAccess(),
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    apiKey: nonNull(stringArg()),
+    endpoint: nonNull(stringArg({ description: "https://<resource name>.openai.azure.com/" })),
+  },
+  validateArgs: validateAnd(
+    validUrl((args) => args.endpoint, "endpoint"),
+    validateRegex((args) => args.endpoint, "endpoint", /^https:\/\/.+\.openai\.azure\.com\/$/),
+  ),
+  resolve: async (_, args, ctx) => {
+    try {
+      const integration = await ctx.integrationsSetup.createAzureOpenAiIntegration(
+        {
+          org_id: args.orgId,
+          name: "Open AI",
+          is_default: true,
+          settings: {
+            CREDENTIALS: { API_KEY: args.apiKey },
+            ENDPOINT: args.endpoint,
+          },
+        },
+        `User:${ctx.user!.id}`,
+      );
+
+      return {
+        result: RESULT.SUCCESS,
+        message: `Integration ${toGlobalId("OrgIntegration", integration.id)} created successfully`,
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});
+
+export const deleteAzureOpenAiIntegration = mutationField("deleteAzureOpenAiIntegration", {
+  description: "Removes the Azure OpenAI integration of the user's organization",
+  type: "SupportMethodResponse",
+  authorize: superAdminAccess(),
+  args: {
+    id: nonNull(globalIdArg("OrgIntegration")),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      await ctx.petitions.clearPetitionSummaryConfigWithIntegration(
+        args.id,
+        `User:${ctx.user!.id}`,
+      );
+      await ctx.integrations.deleteOrgIntegration(args.id, `User:${ctx.user!.id}`);
+
+      return {
+        result: RESULT.SUCCESS,
+        message: `Integration ${toGlobalId("OrgIntegration", args.id)} deleted successfully`,
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   },
 });

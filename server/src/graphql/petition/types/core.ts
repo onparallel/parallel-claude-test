@@ -503,6 +503,21 @@ export const Petition = objectType({
     t.nullable.datetime("lastRecipientActivityAt", {
       resolve: (o) => o.last_recipient_activity_at,
     });
+    t.nullable.jsonObject("summaryConfig", {
+      description: "The summary configuration for the petition.",
+      // don't expose config for now, just if it exists or not
+      resolve: (o) => (isDefined(o.summary_config) ? {} : null),
+    });
+    t.nullable.field("latestSummaryRequest", {
+      type: "AiCompletionLog",
+      description: "The latest summary request for this petition",
+      resolve: async (root, _, ctx) => {
+        if (!isDefined(root.summary_ai_completion_log_id)) {
+          return null;
+        }
+        return await ctx.petitions.loadPetitionSummaryRequest(root.summary_ai_completion_log_id);
+      },
+    });
   },
 });
 

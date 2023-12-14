@@ -53,8 +53,10 @@ import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
 import { validateReplyContent } from "../../util/validateReplyContent";
 import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
 import {
+  AiCompletionLog,
   Contact,
   ContactLocale,
+  CreateAiCompletionLog,
   CreatePetitionAccess,
   CreatePetitionAttachment,
   CreatePetitionContactNotification,
@@ -115,6 +117,7 @@ import {
   PetitionUserNotification,
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
+import { AiCompletionPrompt } from "../../services/ai-clients/AiCompletionClient";
 
 export interface PetitionVariable {
   name: string;
@@ -191,6 +194,12 @@ export interface PetitionSignatureConfig {
   minSigners: number;
   instructions?: string | null;
   signingMode: "PARALLEL" | "SEQUENTIAL";
+}
+
+export interface PetitionSummaryConfig {
+  integration_id: number;
+  prompt: AiCompletionPrompt[];
+  model: string;
 }
 
 type TemplateDefaultPermissionInput = {
@@ -2587,6 +2596,7 @@ export class PetitionRepository extends BaseRepository {
           | "petition_id"
           | "id"
           | "title"
+          | "description"
           | "from_petition_field_id"
           | "is_internal"
           | "position"
@@ -2616,6 +2626,7 @@ export class PetitionRepository extends BaseRepository {
           pf.petition_id,
           pf.id,
           pf.title,
+          pf.description,
           pf.from_petition_field_id,
           pf.is_internal,
           pf.position,
@@ -2847,6 +2858,7 @@ export class PetitionRepository extends BaseRepository {
             "last_activity_at",
             "last_recipient_activity_at",
             "last_change_at",
+            "summary_ai_completion_log_id",
             // avoid copying deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition.is_template
               ? (["deadline"] as const)
@@ -2887,6 +2899,13 @@ export class PetitionRepository extends BaseRepository {
               ? sourcePetition.default_path // if creating a petition from a template, use default_path
               : sourcePetition.path, // else, use path
           variables: this.json(sourcePetition.variables ?? []),
+          // copy summary config if creating a petition from a template and the template is from the same org
+          summary_config:
+            sourcePetition.is_template &&
+            data?.is_template === false &&
+            sourcePetition.org_id === owner.org_id
+              ? sourcePetition.summary_config
+              : null,
           ...data,
         },
         t,
@@ -7494,5 +7513,76 @@ export class PetitionRepository extends BaseRepository {
 
     this.loadPetition.dataloader.clear(petitionId);
     return petition;
+  }
+
+  async createAiCompletionLog(data: CreateAiCompletionLog, createdBy: string) {
+    const [row] = await this.insert("ai_completion_log", {
+      ...data,
+      created_by: createdBy,
+      created_at: this.now(),
+    }).returning("*");
+
+    return row;
+  }
+
+  async updateAiCompletionLog(id: number, data: Partial<AiCompletionLog>, updatedBy: string) {
+    const [row] = await this.from("ai_completion_log")
+      .where({ id })
+      .update({
+        ...data,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      })
+      .returning("*");
+
+    return row;
+  }
+
+  readonly loadPetitionSummaryRequest = this.buildLoadBy("ai_completion_log", "id", (q) =>
+    q.where({ type: "PETITION_SUMMARY", deprecated_at: null }),
+  );
+
+  async updatePetitionSummaryAiCompletionLogId(
+    petition: Pick<Petition, "id" | "summary_ai_completion_log_id">,
+    summaryId: number,
+    updatedBy: string,
+  ) {
+    if (isDefined(petition.summary_ai_completion_log_id)) {
+      await this.from("ai_completion_log")
+        .where({
+          id: petition.summary_ai_completion_log_id,
+          deprecated_at: null,
+        })
+        .update({
+          deprecated_at: this.now(),
+        });
+    }
+
+    await this.from("petition")
+      .where({
+        id: petition.id,
+        deleted_at: null,
+      })
+      .update({
+        summary_ai_completion_log_id: summaryId,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      });
+  }
+
+  async clearPetitionSummaryConfigWithIntegration(integrationId: number, updatedBy: string) {
+    await this.raw(
+      /* sql */ `
+      update petition
+      set 
+        summary_config = null,
+        updated_at = now(),
+        updated_by = ?
+      where deleted_at is null
+      and "summary_config" is not null
+      and ("summary_config"->>'integration_id')::int = ?
+    `,
+      [updatedBy, integrationId],
+    );
   }
 }

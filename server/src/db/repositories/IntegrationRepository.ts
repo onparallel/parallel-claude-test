@@ -4,13 +4,14 @@ import { isDefined, uniq } from "remeda";
 import { SignaturitBrandingIdKey } from "../../integrations/SignaturitIntegration";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
+import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
 
 export interface IntegrationProviders {
   SIGNATURE: "SIGNATURIT" | "DOCUSIGN";
   DOW_JONES_KYC: "DOW_JONES_KYC";
+  AI_COMPLETION: "AZURE_OPEN_AI";
 }
 
 export type SignatureProvider = IntegrationProviders["SIGNATURE"];
@@ -54,7 +55,14 @@ export type IntegrationSettings<
               PASSWORD: string;
             };
           }
-        : never;
+        : TType extends "AI_COMPLETION"
+          ? TProvider extends "AZURE_OPEN_AI"
+            ? {
+                CREDENTIALS: { API_KEY: string };
+                ENDPOINT: string;
+              }
+            : never
+          : never;
 
 export type IntegrationCredentials<
   TType extends IntegrationType,

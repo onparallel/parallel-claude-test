@@ -66,6 +66,28 @@ type AccessOpenedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
+type AiCompletionLog implements Timestamps {
+  completion: String
+
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  id: GID!
+  status: AiCompletionLogStatus!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+enum AiCompletionLogStatus {
+  COMPLETED
+  FAILED
+  PENDING
+}
+
 type AsyncFieldCompletionResponse {
   type: String!
   url: String!
@@ -410,6 +432,7 @@ enum FeatureFlag {
   PERMISSION_MANAGEMENT
   PETITION_ACCESS_RECIPIENT_URL_FIELD
   PETITION_SIGNATURE
+  PETITION_SUMMARY
   PROFILES
   PUBLIC_PETITION_LINK_PREFILL_DATA
   PUBLIC_PETITION_LINK_PREFILL_SECRET_UI
@@ -571,6 +594,7 @@ input InputFeatureFlagNameValue {
 The types of integrations available.
 """
 enum IntegrationType {
+  AI_COMPLETION
   DOW_JONES_KYC
   SIGNATURE
   SSO
@@ -822,6 +846,19 @@ type Mutation {
   ): [ProfileFieldFile!]!
 
   """
+  Creates a new Azure OpenAI integration on the provided organization
+  """
+  createAzureOpenAiIntegration(
+    apiKey: String!
+
+    """
+    https://<resource name>.openai.azure.com/
+    """
+    endpoint: String!
+    orgId: GID!
+  ): SupportMethodResponse!
+
+  """
   Creates a Task for creating, prefilling and sending petitions from a templateId
   """
   createBulkPetitionSendTask(templateId: GID!, temporaryFileId: GID!): Task!
@@ -1036,6 +1073,11 @@ type Mutation {
   createPetitionListView(data: PetitionListViewDataInput!, name: String!): PetitionListView!
 
   """
+  Creates a Task for generating a petition summary with AI
+  """
+  createPetitionSummaryTask(petitionId: GID!): Task!
+
+  """
   Creates a new variable on the petition.
   """
   createPetitionVariable(data: CreatePetitionVariableInput!, petitionId: GID!): Petition!
@@ -1141,6 +1183,11 @@ type Mutation {
     transferToUserId: GID!
     userIds: [GID!]!
   ): [User!]!
+
+  """
+  Removes the Azure OpenAI integration of the user's organization
+  """
+  deleteAzureOpenAiIntegration(id: GID!): SupportMethodResponse!
 
   """
   Delete contacts.
@@ -2802,6 +2849,11 @@ type Petition implements PetitionBase {
   lastRecipientActivityAt: DateTime
 
   """
+  The latest summary request for this petition
+  """
+  latestSummaryRequest: AiCompletionLog
+
+  """
   The locale of the parallel.
   """
   locale: PetitionLocale!
@@ -2865,6 +2917,11 @@ type Petition implements PetitionBase {
   The status of the petition.
   """
   status: PetitionStatus!
+
+  """
+  The summary configuration for the petition.
+  """
+  summaryConfig: JSONObject
 
   """
   The tags linked to the petition
@@ -6548,6 +6605,7 @@ enum TaskName {
   DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES
+  PETITION_SUMMARY
   PRINT_PDF
   TEMPLATES_OVERVIEW_REPORT
   TEMPLATE_REPLIES_CSV_EXPORT

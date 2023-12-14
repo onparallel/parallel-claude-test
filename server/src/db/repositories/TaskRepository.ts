@@ -67,6 +67,9 @@ export type TaskInput<TName extends TaskName> = {
   TEMPLATE_REPLIES_CSV_EXPORT: {
     template_id: number;
   };
+  PETITION_SUMMARY: {
+    petition_id: number;
+  };
 }[TName];
 
 export interface PetitionReportStatusCount {
@@ -157,6 +160,9 @@ export type TaskOutput<TName extends TaskName> = {
   };
   TEMPLATE_REPLIES_CSV_EXPORT: {
     temporary_file_id: number;
+  };
+  PETITION_SUMMARY: {
+    ai_completion_log_id: number;
   };
 }[TName];
 

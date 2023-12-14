@@ -4,6 +4,7 @@ import { CreateOrgIntegration } from "../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
+  IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
 import {
@@ -11,6 +12,7 @@ import {
   SignaturitIntegration,
 } from "../integrations/SignaturitIntegration";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
+import { AzureOpenAiIntegration } from "../integrations/AzureOpenAiIntegration";
 
 export const INTEGRATIONS_SETUP_SERVICE = Symbol.for("INTEGRATIONS_SETUP_SERVICE");
 export interface IIntegrationsSetupService {
@@ -30,6 +32,13 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"DOW_JONES_KYC", "DOW_JONES_KYC">>;
+  createAzureOpenAiIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "is_default" | "name"> & {
+      settings: IntegrationSettings<"AI_COMPLETION", "AZURE_OPEN_AI">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AZURE_OPEN_AI">>;
 }
 
 @injectable()
@@ -38,6 +47,7 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
     @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration,
+    @inject(AzureOpenAiIntegration) private azureOpenAiIntegration: AzureOpenAiIntegration,
   ) {}
 
   private async authenticateSignaturitApiKey(apiKey: string) {
@@ -99,5 +109,15 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
       createdBy,
       t,
     );
+  }
+
+  async createAzureOpenAiIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "is_default" | "name"> & {
+      settings: IntegrationSettings<"AI_COMPLETION", "AZURE_OPEN_AI">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction<any, any[]> | undefined,
+  ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AZURE_OPEN_AI">> {
+    return await this.azureOpenAiIntegration.createOrgIntegration(data, createdBy, t);
   }
 }

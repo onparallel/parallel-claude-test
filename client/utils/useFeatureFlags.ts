@@ -179,6 +179,18 @@ export function useFeatureFlags() {
                 "Enables the setting to create a DocuSign Sandbox integration on the organization.",
             }),
           },
+          {
+            name: "PETITION_SUMMARY",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.petition-summary-name",
+              defaultMessage: "Petition Summary",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.petition-summary-description",
+              defaultMessage:
+                "Enables the creation of an AI Summary on the organization petitions.",
+            }),
+          },
         ],
       },
       {

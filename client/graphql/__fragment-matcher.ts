@@ -105,6 +105,7 @@ const result: PossibleTypesResultData = {
       "TemplateDefaultUserPermission",
     ],
     Timestamps: [
+      "AiCompletionLog",
       "Contact",
       "Organization",
       "PetitionAccess",

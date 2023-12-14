@@ -1,5 +1,21 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, Flex, MenuItem, MenuList, Stack, Text, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Heading,
+  MenuItem,
+  MenuList,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
@@ -8,11 +24,13 @@ import {
   ListIcon,
   ProfilesIcon,
   RepeatIcon,
+  SparklesIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
-import { Card, CardHeader } from "@parallel/components/common/Card";
+import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ShareButton } from "@parallel/components/common/ShareButton";
@@ -42,6 +60,7 @@ import { PetitionRepliesFieldComments } from "@parallel/components/petition-repl
 import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies/PetitionRepliesFieldReply";
 import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
+import { PetitionRepliesSummary } from "@parallel/components/petition-replies/PetitionRepliesSummary";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
 import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
@@ -680,30 +699,73 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   />
                 ) : (
                   <Card {...extendFlexColumn}>
-                    <CardHeader
-                      leftIcon={<ListIcon fontSize="18px" role="presentation" />}
-                      rightAction={
-                        <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
-                      }
-                    >
-                      <FormattedMessage id="generic.contents" defaultMessage="Contents" />
-                    </CardHeader>
-                    <Box overflow="auto">
-                      <PetitionRepliesContents
-                        fieldsWithIndices={fieldsWithIndices}
-                        filter={filter}
-                        fieldLogic={fieldLogic}
-                        onFieldClick={handlePetitionContentsFieldClick}
-                        signatureStatus={petitionSignatureStatus}
-                        signatureEnvironment={petitionSignatureEnvironment}
-                        onSignatureStatusClick={handlePetitionContentsSignatureClick}
-                        onVariablesClick={
-                          petition.variables.length
-                            ? handlePetitionContentsVariablesClick
-                            : undefined
-                        }
-                      />
-                    </Box>
+                    <Tabs variant="enclosed" {...extendFlexColumn}>
+                      <TabList marginX="-1px" marginTop="-1px" flex="none">
+                        <Tab padding={4} lineHeight={5} fontWeight="bold">
+                          <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
+                          <FormattedMessage id="generic.contents" defaultMessage="Contents" />
+                        </Tab>
+                        <Tab padding={4} lineHeight={5} fontWeight="bold">
+                          <SparklesIcon fontSize="18px" marginRight={2} role="presentation" />
+                          <FormattedMessage
+                            id="page.replies.summary-header"
+                            defaultMessage="Summary"
+                          />
+                          <HelpPopover>
+                            <Text fontSize="sm">
+                              <FormattedMessage
+                                id="page.replies.summary-header-help"
+                                defaultMessage="Generate a summary with Parallel AI to summarize the collected information."
+                              />
+                            </Text>
+                          </HelpPopover>
+                        </Tab>
+                      </TabList>
+                      <TabPanels {...extendFlexColumn}>
+                        <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
+                          <HStack
+                            padding={4}
+                            paddingTop={3}
+                            paddingBottom={0}
+                            justify="space-between"
+                          >
+                            <Heading fontWeight={500} fontSize="xl">
+                              <FormattedMessage
+                                id="page.replies.list-of-contents"
+                                defaultMessage="List of contents"
+                              />
+                            </Heading>
+                            <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
+                          </HStack>
+                          <PetitionRepliesContents
+                            fieldsWithIndices={fieldsWithIndices}
+                            filter={filter}
+                            fieldLogic={fieldLogic}
+                            onFieldClick={handlePetitionContentsFieldClick}
+                            signatureStatus={petitionSignatureStatus}
+                            signatureEnvironment={petitionSignatureEnvironment}
+                            onSignatureStatusClick={handlePetitionContentsSignatureClick}
+                            onVariablesClick={
+                              petition.variables.length
+                                ? handlePetitionContentsVariablesClick
+                                : undefined
+                            }
+                          />
+                        </TabPanel>
+                        <TabPanel
+                          {...extendFlexColumn}
+                          padding={0}
+                          overflow="auto"
+                          position="relative"
+                        >
+                          <PetitionRepliesSummary
+                            petition={petition}
+                            user={me}
+                            onRefetch={refetch}
+                          />
+                        </TabPanel>
+                      </TabPanels>
+                    </Tabs>
                   </Card>
                 )}
               </Flex>
@@ -815,6 +877,7 @@ PetitionReplies.fragments = {
         ...useClosePetitionDialog_Petition
         ...useFieldLogic_PetitionBase
         ...LiquidScopeProvider_PetitionBase
+        ...PetitionRepliesSummary_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${ShareButton.fragments.PetitionBase}
@@ -827,6 +890,7 @@ PetitionReplies.fragments = {
       ${ProfileDrawer.fragments.Profile}
       ${ProfileDrawer.fragments.PetitionField}
       ${PetitionVariablesCard.fragments.PetitionBase}
+      ${PetitionRepliesSummary.fragments.Petition}
     `;
   },
   get PetitionField() {
@@ -1053,9 +1117,11 @@ PetitionReplies.queries = [
       }
       me {
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+        ...PetitionRepliesSummary_User
       }
     }
     ${PetitionReplies.fragments.Query}
+    ${PetitionRepliesSummary.fragments.User}
   `,
   gql`
     query PetitionReplies_petition($id: GID!) {

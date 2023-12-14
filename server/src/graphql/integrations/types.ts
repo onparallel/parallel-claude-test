@@ -1,8 +1,9 @@
 import { enumType, interfaceType, objectType } from "nexus";
+import { IntegrationTypeValues } from "../../db/__types";
 
 export const IntegrationType = enumType({
   name: "IntegrationType",
-  members: ["SIGNATURE", "SSO", "USER_PROVISIONING", "DOW_JONES_KYC"],
+  members: IntegrationTypeValues,
   description: "The types of integrations available.",
 });
 

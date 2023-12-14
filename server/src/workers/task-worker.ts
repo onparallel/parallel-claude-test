@@ -14,6 +14,7 @@ import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
 import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
+import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -26,6 +27,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   BANKFLIP_SESSION_COMPLETED: BankflipSessionCompletedRunner,
   BULK_PETITION_SEND: BulkPetitionSendRunner,
   TEMPLATE_REPLIES_CSV_EXPORT: TemplateRepliesCsvExportRunner,
+  PETITION_SUMMARY: PetitionSummaryRunner,
 };
 
 export interface TaskWorkerPayload {

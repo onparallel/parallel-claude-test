@@ -1,6 +1,7 @@
 import { PropsWithChildren, useContext, useMemo } from "react";
 import { isDefined } from "remeda";
 import { FieldLogicResult } from "../../../util/fieldLogic";
+import { buildPetitionVariablesLiquidScope } from "../../../util/liquidScope";
 import { LiquidScopeContext } from "./LiquidScopeProvider";
 
 export function LiquidPetitionVariableProvider({
@@ -15,25 +16,9 @@ export function LiquidPetitionVariableProvider({
       "<LiquidPetitionVariableProvider/> must be used within a <LiquidScopeProvider/>",
     );
   }
-  const scope = useMemo(
-    () =>
-      Object.assign(
-        {},
-        parent,
-        Object.fromEntries(
-          Object.keys(logic.finalVariables).map((key) => [
-            key,
-            {
-              after: logic.currentVariables[key],
-              before: logic.previousVariables[key],
-              toString() {
-                return logic.finalVariables[key];
-              },
-            },
-          ]),
-        ),
-      ),
-    [parent, logic],
-  );
+  const scope = useMemo(() => {
+    const petitionVariablesScope = buildPetitionVariablesLiquidScope(logic);
+    return Object.assign({}, parent, petitionVariablesScope);
+  }, [parent, logic]);
   return <LiquidScopeContext.Provider value={scope}>{children}</LiquidScopeContext.Provider>;
 }

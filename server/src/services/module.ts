@@ -4,6 +4,11 @@ import {
   AccountSetupService,
   IAccountSetupService,
 } from "./AccountSetupService";
+import {
+  AI_COMPLETION_SERVICE,
+  AiCompletionService,
+  IAiCompletionService,
+} from "./AiCompletionService";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./AnalyticsService";
 import { AUTH, Auth, IAuth } from "./AuthService";
 import { BANKFLIP_SERVICE, BankflipService, IBankflipService } from "./BankflipService";
@@ -83,4 +88,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IPetitionMessageContextService>(PETITION_MESSAGE_CONTEXT_SERVICE).to(
     PetitionMessageContextService,
   );
+  bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
 });

@@ -108,6 +108,19 @@ export interface AccessOpenedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
+export interface AiCompletionLog extends Timestamps {
+  __typename?: "AiCompletionLog";
+  completion?: Maybe<Scalars["String"]["output"]>;
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  status: AiCompletionLogStatus;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"]["output"];
+}
+
+export type AiCompletionLogStatus = "COMPLETED" | "FAILED" | "PENDING";
+
 export interface AsyncFieldCompletionResponse {
   __typename?: "AsyncFieldCompletionResponse";
   type: Scalars["String"]["output"];
@@ -396,6 +409,7 @@ export type FeatureFlag =
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_SIGNATURE"
+  | "PETITION_SUMMARY"
   | "PROFILES"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -532,7 +546,12 @@ export interface InputFeatureFlagNameValue {
 }
 
 /** The types of integrations available. */
-export type IntegrationType = "DOW_JONES_KYC" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType =
+  | "AI_COMPLETION"
+  | "DOW_JONES_KYC"
+  | "SIGNATURE"
+  | "SSO"
+  | "USER_PROVISIONING";
 
 /** A public template on landing page */
 export interface LandingTemplate {
@@ -674,6 +693,8 @@ export interface Mutation {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /** Creates a new Azure OpenAI integration on the provided organization */
+  createAzureOpenAiIntegration: SupportMethodResponse;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
   createBulkPetitionSendTask: Task;
   /** Create a contact. */
@@ -716,6 +737,8 @@ export interface Mutation {
   createPetitionFieldReplies: Array<PetitionFieldReply>;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
+  /** Creates a Task for generating a petition summary with AI */
+  createPetitionSummaryTask: Task;
   /** Creates a new variable on the petition. */
   createPetitionVariable: Petition;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
@@ -746,6 +769,8 @@ export interface Mutation {
   deactivateAccesses: Array<PetitionAccess>;
   /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
+  /** Removes the Azure OpenAI integration of the user's organization */
+  deleteAzureOpenAiIntegration: SupportMethodResponse;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
@@ -1149,6 +1174,12 @@ export interface MutationcopyFileReplyToProfileFieldFileArgs {
   profileTypeFieldId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreateAzureOpenAiIntegrationArgs {
+  apiKey: Scalars["String"]["input"];
+  endpoint: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+}
+
 export interface MutationcreateBulkPetitionSendTaskArgs {
   templateId: Scalars["GID"]["input"];
   temporaryFileId: Scalars["GID"]["input"];
@@ -1276,6 +1307,10 @@ export interface MutationcreatePetitionListViewArgs {
   name: Scalars["String"]["input"];
 }
 
+export interface MutationcreatePetitionSummaryTaskArgs {
+  petitionId: Scalars["GID"]["input"];
+}
+
 export interface MutationcreatePetitionVariableArgs {
   data: CreatePetitionVariableInput;
   petitionId: Scalars["GID"]["input"];
@@ -1372,6 +1407,10 @@ export interface MutationdeactivateUserArgs {
   tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   transferToUserId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationdeleteAzureOpenAiIntegrationArgs {
+  id: Scalars["GID"]["input"];
 }
 
 export interface MutationdeleteContactsArgs {
@@ -2520,6 +2559,8 @@ export interface Petition extends PetitionBase {
   /** Time when the petition or any of its relations were last updated. */
   lastChangeAt: Scalars["DateTime"]["output"];
   lastRecipientActivityAt?: Maybe<Scalars["DateTime"]["output"]>;
+  /** The latest summary request for this petition */
+  latestSummaryRequest?: Maybe<AiCompletionLog>;
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
@@ -2549,6 +2590,8 @@ export interface Petition extends PetitionBase {
   skipForwardSecurity: Scalars["Boolean"]["output"];
   /** The status of the petition. */
   status: PetitionStatus;
+  /** The summary configuration for the petition. */
+  summaryConfig?: Maybe<Scalars["JSONObject"]["output"]>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -5057,6 +5100,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "PETITION_SUMMARY"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_CSV_EXPORT"
@@ -18666,6 +18710,55 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
     fullName?: string | null;
     status: UserStatus;
   } | null;
+};
+
+export type PetitionRepliesSummary_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  summaryConfig?: { [key: string]: any } | null;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+  latestSummaryRequest?: {
+    __typename?: "AiCompletionLog";
+    id: string;
+    status: AiCompletionLogStatus;
+    completion?: string | null;
+  } | null;
+};
+
+export type PetitionRepliesSummary_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasSummaryAccess: boolean;
+};
+
+export type PetitionRepliesSummary_createPetitionSummaryTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type PetitionRepliesSummary_createPetitionSummaryTaskMutation = {
+  createPetitionSummaryTask: { __typename?: "Task"; id: string };
+};
+
+export type PetitionRepliesSummary_PetitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type PetitionRepliesSummary_PetitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        summaryConfig?: { [key: string]: any } | null;
+        fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+        latestSummaryRequest?: {
+          __typename?: "AiCompletionLog";
+          id: string;
+          status: AiCompletionLogStatus;
+          completion?: string | null;
+        } | null;
+      }
+    | { __typename?: "PetitionTemplate" }
+    | null;
 };
 
 export type DatesList_SignerStatusFragment = {
@@ -35453,6 +35546,7 @@ export type PetitionReplies_PetitionFragment = {
   status: PetitionStatus;
   locale: PetitionLocale;
   closingEmailBody?: any | null;
+  summaryConfig?: { [key: string]: any } | null;
   path: string;
   deadline?: string | null;
   isRestricted: boolean;
@@ -35868,6 +35962,13 @@ export type PetitionReplies_PetitionFragment = {
       fullName: string;
     } | null>;
   } | null;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+  latestSummaryRequest?: {
+    __typename?: "AiCompletionLog";
+    id: string;
+    status: AiCompletionLogStatus;
+    completion?: string | null;
+  } | null;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
@@ -36224,6 +36325,7 @@ export type PetitionReplies_closePetitionMutation = {
     status: PetitionStatus;
     locale: PetitionLocale;
     closingEmailBody?: any | null;
+    summaryConfig?: { [key: string]: any } | null;
     path: string;
     deadline?: string | null;
     isRestricted: boolean;
@@ -36638,6 +36740,13 @@ export type PetitionReplies_closePetitionMutation = {
         isPreset: boolean;
         fullName: string;
       } | null>;
+    } | null;
+    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+    latestSummaryRequest?: {
+      __typename?: "AiCompletionLog";
+      id: string;
+      status: AiCompletionLogStatus;
+      completion?: string | null;
     } | null;
     tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   };
@@ -36657,6 +36766,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     status: PetitionStatus;
     locale: PetitionLocale;
     closingEmailBody?: any | null;
+    summaryConfig?: { [key: string]: any } | null;
     path: string;
     deadline?: string | null;
     isRestricted: boolean;
@@ -37071,6 +37181,13 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         isPreset: boolean;
         fullName: string;
       } | null>;
+    } | null;
+    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+    latestSummaryRequest?: {
+      __typename?: "AiCompletionLog";
+      id: string;
+      status: AiCompletionLogStatus;
+      completion?: string | null;
     } | null;
     tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   };
@@ -37202,6 +37319,7 @@ export type PetitionReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
+    hasSummaryAccess: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -37256,6 +37374,7 @@ export type PetitionReplies_petitionQuery = {
         status: PetitionStatus;
         locale: PetitionLocale;
         closingEmailBody?: any | null;
+        summaryConfig?: { [key: string]: any } | null;
         path: string;
         deadline?: string | null;
         isRestricted: boolean;
@@ -37675,6 +37794,13 @@ export type PetitionReplies_petitionQuery = {
             isPreset: boolean;
             fullName: string;
           } | null>;
+        } | null;
+        fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
+        latestSummaryRequest?: {
+          __typename?: "AiCompletionLog";
+          id: string;
+          status: AiCompletionLogStatus;
+          completion?: string | null;
         } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
@@ -42711,6 +42837,27 @@ export type useExportRepliesTask_getTaskResultFileMutation = {
   getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
 };
 
+export type usePetitionSummaryBackgroundTask_createPetitionSummaryTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type usePetitionSummaryBackgroundTask_createPetitionSummaryTaskMutation = {
+  createPetitionSummaryTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type usePetitionSummaryBackgroundTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type usePetitionSummaryBackgroundTask_taskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
+};
+
 export type usePrintPdfTask_createPrintPdfTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -45189,6 +45336,12 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
   unknown
 >;
+export const PetitionRepliesSummary_UserFragmentDoc = gql`
+  fragment PetitionRepliesSummary_User on User {
+    id
+    hasSummaryAccess: hasFeatureFlag(featureFlag: PETITION_SUMMARY)
+  }
+` as unknown as DocumentNode<PetitionRepliesSummary_UserFragment, unknown>;
 export const useCuatrecasasExport_PetitionFieldFragmentDoc = gql`
   fragment useCuatrecasasExport_PetitionField on PetitionField {
     title
@@ -49541,6 +49694,20 @@ export const useClosePetitionDialog_PetitionFragmentDoc = gql`
   }
   ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<useClosePetitionDialog_PetitionFragment, unknown>;
+export const PetitionRepliesSummary_PetitionFragmentDoc = gql`
+  fragment PetitionRepliesSummary_Petition on Petition {
+    id
+    fromTemplate {
+      id
+    }
+    summaryConfig
+    latestSummaryRequest {
+      id
+      status
+      completion
+    }
+  }
+` as unknown as DocumentNode<PetitionRepliesSummary_PetitionFragment, unknown>;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
@@ -49581,6 +49748,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...useClosePetitionDialog_Petition
     ...useFieldLogic_PetitionBase
     ...LiquidScopeProvider_PetitionBase
+    ...PetitionRepliesSummary_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionRepliesField_PetitionFieldFragmentDoc}
@@ -49597,6 +49765,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${useClosePetitionDialog_PetitionFragmentDoc}
   ${useFieldLogic_PetitionBaseFragmentDoc}
   ${LiquidScopeProvider_PetitionBaseFragmentDoc}
+  ${PetitionRepliesSummary_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFragment, unknown>;
 export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   fragment PetitionReplies_PetitionField on PetitionField {
@@ -52961,6 +53130,27 @@ export const PetitionRepliesFieldComments_petitionFieldQueryDocument = gql`
   PetitionRepliesFieldComments_petitionFieldQueryQuery,
   PetitionRepliesFieldComments_petitionFieldQueryQueryVariables
 >;
+export const PetitionRepliesSummary_createPetitionSummaryTaskDocument = gql`
+  mutation PetitionRepliesSummary_createPetitionSummaryTask($petitionId: GID!) {
+    createPetitionSummaryTask(petitionId: $petitionId) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionRepliesSummary_createPetitionSummaryTaskMutation,
+  PetitionRepliesSummary_createPetitionSummaryTaskMutationVariables
+>;
+export const PetitionRepliesSummary_PetitionDocument = gql`
+  query PetitionRepliesSummary_Petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...PetitionRepliesSummary_Petition
+    }
+  }
+  ${PetitionRepliesSummary_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionRepliesSummary_PetitionQuery,
+  PetitionRepliesSummary_PetitionQueryVariables
+>;
 export const PetitionSignaturesCard_updatePetitionSignatureConfigDocument = gql`
   mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
     $petitionId: GID!
@@ -55533,9 +55723,11 @@ export const PetitionReplies_userDocument = gql`
     }
     me {
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+      ...PetitionRepliesSummary_User
     }
   }
   ${PetitionReplies_QueryFragmentDoc}
+  ${PetitionRepliesSummary_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_userQuery, PetitionReplies_userQueryVariables>;
 export const PetitionReplies_petitionDocument = gql`
   query PetitionReplies_petition($id: GID!) {
@@ -56744,6 +56936,30 @@ export const useExportRepliesTask_getTaskResultFileDocument = gql`
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileMutation,
   useExportRepliesTask_getTaskResultFileMutationVariables
+>;
+export const usePetitionSummaryBackgroundTask_createPetitionSummaryTaskDocument = gql`
+  mutation usePetitionSummaryBackgroundTask_createPetitionSummaryTask($petitionId: GID!) {
+    createPetitionSummaryTask(petitionId: $petitionId) {
+      id
+      status
+      progress
+    }
+  }
+` as unknown as DocumentNode<
+  usePetitionSummaryBackgroundTask_createPetitionSummaryTaskMutation,
+  usePetitionSummaryBackgroundTask_createPetitionSummaryTaskMutationVariables
+>;
+export const usePetitionSummaryBackgroundTask_taskDocument = gql`
+  query usePetitionSummaryBackgroundTask_task($id: GID!) {
+    task(id: $id) {
+      id
+      status
+      output
+    }
+  }
+` as unknown as DocumentNode<
+  usePetitionSummaryBackgroundTask_taskQuery,
+  usePetitionSummaryBackgroundTask_taskQueryVariables
 >;
 export const usePrintPdfTask_createPrintPdfTaskDocument = gql`
   mutation usePrintPdfTask_createPrintPdfTask($petitionId: GID!) {

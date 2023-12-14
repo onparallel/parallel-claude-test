@@ -38,7 +38,7 @@ export async function retry<TResult>(
 }
 
 export class StopRetryError extends Error {
-  constructor(public override cause: Error) {
+  constructor(public override cause: unknown) {
     super();
   }
 }

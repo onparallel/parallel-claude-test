@@ -14,6 +14,7 @@ import { validExportFileRenamePattern } from "../helpers/validators/validTextWit
 import {
   petitionHasRepliableFields,
   petitionIsNotAnonymized,
+  petitionsAreOfTypePetition,
   petitionsAreOfTypeTemplate,
   userHasAccessToPetitions,
   userHasEnabledIntegration,
@@ -379,3 +380,29 @@ export const createTemplateRepliesCsvExportTask = mutationField(
     },
   },
 );
+
+export const createPetitionSummaryTask = mutationField("createPetitionSummaryTask", {
+  description: "Creates a Task for generating a petition summary with AI",
+  type: "Task",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PETITION_SUMMARY"),
+    userHasAccessToPetitions("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionsAreOfTypePetition("petitionId"),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, { petitionId }, ctx) => {
+    return await ctx.tasks.createTask(
+      {
+        name: "PETITION_SUMMARY",
+        user_id: ctx.user!.id,
+        input: {
+          petition_id: petitionId,
+        },
+      },
+      `User:${ctx.user!.id}`,
+    );
+  },
+});

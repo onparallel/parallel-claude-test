@@ -16,6 +16,7 @@ import { OrganizationUsageDetails } from "../repositories/OrganizationRepository
 import {
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
+  PetitionSummaryConfig,
   PetitionVariable,
 } from "../repositories/PetitionRepository";
 import type * as db from "../__types";
@@ -33,6 +34,7 @@ export interface TableTypes
         db.Petition,
         {
           signature_config: PetitionSignatureConfig | null;
+          summary_config: PetitionSummaryConfig | null;
           variables: PetitionVariable[] | null;
         }
       >;
@@ -61,6 +63,7 @@ export interface TableCreateTypes
         db.CreatePetition,
         {
           signature_config?: PetitionSignatureConfig | null;
+          summary_config?: PetitionSummaryConfig | null;
           variables?: PetitionVariable[] | null;
         }
       >;
