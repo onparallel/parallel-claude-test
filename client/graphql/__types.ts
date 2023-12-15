@@ -34166,9 +34166,6 @@ export type PetitionPreview_updatePetitionMutation = {
 
 export type PetitionPreview_completePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  additionalSigners?: InputMaybe<
-    Array<PublicPetitionSignerDataInput> | PublicPetitionSignerDataInput
-  >;
   message?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
@@ -55555,16 +55552,8 @@ export const PetitionPreview_updatePetitionDocument = gql`
   PetitionPreview_updatePetitionMutationVariables
 >;
 export const PetitionPreview_completePetitionDocument = gql`
-  mutation PetitionPreview_completePetition(
-    $petitionId: GID!
-    $additionalSigners: [PublicPetitionSignerDataInput!]
-    $message: String
-  ) {
-    completePetition(
-      petitionId: $petitionId
-      additionalSigners: $additionalSigners
-      message: $message
-    ) {
+  mutation PetitionPreview_completePetition($petitionId: GID!, $message: String) {
+    completePetition(petitionId: $petitionId, message: $message) {
       ...PetitionPreview_PetitionBase
     }
   }

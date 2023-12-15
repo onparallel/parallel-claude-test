@@ -93,23 +93,19 @@ export class SignatureService implements ISignatureService {
     const isAccess = "keycode" in starter;
     const updatedBy = isAccess ? `Contact:${starter.contact_id}` : `User:${starter.id}`;
 
-    let updatedPetition = null;
-
-    if ((signatureConfig.additionalSignersInfo ?? [])?.length > 0) {
-      [updatedPetition] = await this.petitions.updatePetition(
-        petitionId,
-        { signature_config: signatureConfig },
-        updatedBy,
-      );
-    }
+    const [updatedPetition] = await this.petitions.updatePetition(
+      petitionId,
+      { signature_config: signatureConfig },
+      updatedBy,
+    );
 
     await this.cancelPendingSignatureRequests(petitionId, starter);
 
     const signatureRequest = await this.petitions.createPetitionSignature(petitionId, {
       signature_config: {
         ...omit(signatureConfig, ["additionalSignersInfo"]),
-        signersInfo: signatureConfig.signersInfo.concat(
-          signatureConfig.additionalSignersInfo ?? [],
+        signersInfo: (signatureConfig.additionalSignersInfo ?? []).concat(
+          signatureConfig.signersInfo,
         ),
       },
     });

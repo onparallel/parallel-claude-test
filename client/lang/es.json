@@ -7811,7 +7811,7 @@
   },
   {
     "term": "component.signature-sent-alert.petition-signature-request-sent-alert-sequential",
-    "definition": "<b>Documento enviado para firmar</b> a {name} ({email}){count, plural, =0{} =1{, <a># más</a> recibirá} other{, <a># más</a> recibirán}} el documento después de que firme el anterior.",
+    "definition": "<b>Documento enviado para firmar</b> a {name} ({email}){count, plural, =0{} =1{, <a># más</a> recibirá el documento después de que firme el anterior} other{, <a># más</a> recibirán el documento después de que firme el anterior}}.",
     "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{, <a># more</a> will receive the document after the one before has signed}}."
   },
   {

@@ -764,16 +764,8 @@ const _mutations = [
     ${_fragments.PetitionBase}
   `,
   gql`
-    mutation PetitionPreview_completePetition(
-      $petitionId: GID!
-      $additionalSigners: [PublicPetitionSignerDataInput!]
-      $message: String
-    ) {
-      completePetition(
-        petitionId: $petitionId
-        additionalSigners: $additionalSigners
-        message: $message
-      ) {
+    mutation PetitionPreview_completePetition($petitionId: GID!, $message: String) {
+      completePetition(petitionId: $petitionId, message: $message) {
         ...PetitionPreview_PetitionBase
       }
     }

@@ -35,7 +35,7 @@ export function RecipientViewSignatureSentAlert({
   onRefetch,
 }: RecipientViewSignatureSentAlertProps) {
   const signers = petition.signatureConfig?.signers ?? [];
-  const totalSigners = signers.concat(petition.signatureConfig?.additionalSigners ?? []);
+  const totalSigners = (petition.signatureConfig?.additionalSigners ?? []).concat(signers);
 
   const showSignatureStatusDialog = useSignatureStatusDialog();
   async function handleCheckStatusClick() {
