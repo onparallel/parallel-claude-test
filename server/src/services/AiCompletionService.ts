@@ -72,6 +72,7 @@ export class AiCompletionService implements IAiCompletionService {
           completion: response.completion,
           request_tokens: response.requestTokens,
           response_tokens: response.responseTokens,
+          request_duration_ms: response.requestDurationMs,
           cost: response.totalCost,
         },
         createdBy,

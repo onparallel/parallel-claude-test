@@ -12,6 +12,7 @@ export interface AiCompletionResponse {
   completion: string;
   requestTokens: number;
   responseTokens: number;
+  requestDurationMs: number;
   totalCost: string;
 }
 

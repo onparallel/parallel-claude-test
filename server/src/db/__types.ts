@@ -733,6 +733,7 @@ export interface AiCompletionLog {
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
   deprecated_at: Maybe<Date>; // timestamptz
+  request_duration_ms: Maybe<number>; // int4
 }
 
 export type CreateAiCompletionLog = PartialProps<
@@ -749,6 +750,7 @@ export type CreateAiCompletionLog = PartialProps<
   | "updated_at"
   | "updated_by"
   | "deprecated_at"
+  | "request_duration_ms"
 >;
 
 export interface Contact {

@@ -5,6 +5,7 @@ import {
   AzureOpenAiModel,
 } from "../../integrations/AzureOpenAiIntegration";
 import { StopRetryError, retry } from "../../util/retry";
+import { withStopwatch } from "../../util/stopwatch";
 import { AiCompletionOptions, AiCompletionPrompt, IAiCompletionClient } from "./AiCompletionClient";
 
 interface AzureOpenAiClientParams {
@@ -61,11 +62,14 @@ export class AzureOpenAiClient implements IAiCompletionClient<AzureOpenAiClientP
         async (i) => {
           try {
             const model = i === 0 ? params.model : context.defaultModel;
-            const completion = await client.getChatCompletions(model, params.prompt, {
-              n: 1, // ensure there is only 1 choice in response
-            });
+            const { result: completion, time } = await withStopwatch(
+              async () =>
+                await client.getChatCompletions(model, params.prompt, {
+                  n: 1, // ensure there is only 1 choice in response
+                }),
+            );
 
-            return { completion, model };
+            return { completion, model, time };
           } catch (e) {
             if (this.isModelNotFoundError(e)) {
               throw e;
@@ -92,6 +96,7 @@ export class AzureOpenAiClient implements IAiCompletionClient<AzureOpenAiClientP
         requestTokens,
         responseTokens,
         totalCost,
+        requestDurationMs: response.time,
       };
     });
   }
