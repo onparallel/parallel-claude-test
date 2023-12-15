@@ -3,7 +3,7 @@ import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { IntlShape, useIntl } from "react-intl";
 
-const TYPES = <Record<ProfileTypeFieldType, (intl: IntlShape) => string>>{
+const TYPES: Record<ProfileTypeFieldType, (intl: IntlShape) => string> = {
   SHORT_TEXT: (intl) =>
     intl.formatMessage({
       id: "generic.profile-type-field-type.short-text",
