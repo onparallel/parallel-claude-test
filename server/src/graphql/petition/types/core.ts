@@ -354,7 +354,7 @@ export const PetitionBase = interfaceType({
     });
     t.datetime("lastChangeAt", {
       description: "Time when the petition or any of its relations were last updated.",
-      resolve: (o) => o.last_change_at ?? o.updated_at, // TODO last_change_at remove fallback when column is made non-nullable
+      resolve: (o) => o.last_change_at,
     });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),

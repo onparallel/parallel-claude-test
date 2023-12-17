@@ -1116,7 +1116,7 @@ export interface Petition {
   last_recipient_activity_at: Maybe<Date>; // timestamptz
   variables: Maybe<any>; // jsonb
   enable_delegate_access: boolean; // bool
-  last_change_at: Maybe<Date>; // timestamptz
+  last_change_at: Date; // timestamptz
   summary_config: Maybe<any>; // jsonb
   summary_ai_completion_log_id: Maybe<number>; // int4
 }
