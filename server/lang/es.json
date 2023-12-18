@@ -566,7 +566,7 @@
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",
-    "definition": "Nos alegra que que {orgName} esté acelerando sus procesos con Parallel. Pero parece que ya has usado gran parte de los parallels incluidos en tu plan.",
+    "definition": "Nos alegra que {orgName} esté acelerando sus procesos con Parallel. Pero parece que ya has usado gran parte de los parallels incluidos en tu plan.",
     "context": "We are glad that {orgName} is speeding up its processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan."
   },
   {
