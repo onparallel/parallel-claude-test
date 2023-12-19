@@ -6,7 +6,7 @@ const DATA_CACHE: Record<string, Record<string, string>> = {};
 
 export function useLoadCountryNames(locale: string) {
   const [data, setData] = useState<{
-    countries: Record<string, string> | null;
+    countries: Record<string, string | [name: string, alias: string]> | null;
     loading: boolean;
   }>({
     countries: null,

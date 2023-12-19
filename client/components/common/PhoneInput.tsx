@@ -120,13 +120,13 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
     setCountry(country);
     onBlur?.(value, { country, isValid });
   };
-
+  const countryName = country ? countries?.[country] : undefined;
   return (
     <InputGroup>
       <InputLeftElement pointerEvents="none" color={inputValue ? undefined : "gray.400"}>
         {country ? (
           <Image
-            alt={countries?.[country]}
+            alt={Array.isArray(countryName) ? countryName[0] : countryName}
             boxSize={6}
             src={`${
               process.env.NEXT_PUBLIC_ASSETS_URL

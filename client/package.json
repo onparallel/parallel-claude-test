@@ -16,6 +16,7 @@
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../client/{components,pages,utils}/**/*.{ts,tsx}' --output '../client/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../client/lang' --output-raw '../client/public/static/lang' --output-compiled '../client/public/static/lang/compiled'",
     "download-flag-emojis": "yarn workspace @parallel/bin download-flag-emojis --output '../client/public/static/countries/flags'",
+    "download-countries-i18n": "yarn workspace @parallel/bin download-countries-i18n --locales en es --output '../client/public/static/countries'",
     "storybook": "storybook dev --port 6006",
     "_strip-js": "yarn workspace @parallel/bin strip-js"
   },

@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "rimraf dist && tsc --project tsconfig.json",
+    "download-countries-i18n": "node dist/download-countries-i18n.js",
     "download-flag-emojis": "node dist/download-flag-emojis.js",
     "download-fonts": "node dist/download-fonts.js",
     "extract-i18n-terms": "node dist/extract-i18n-terms.js",

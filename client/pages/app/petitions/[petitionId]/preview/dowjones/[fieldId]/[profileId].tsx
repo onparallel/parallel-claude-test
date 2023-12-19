@@ -362,6 +362,10 @@ function ProfileResultPerson({
   const intl = useIntl();
 
   const { countries } = useLoadCountryNames(intl.locale);
+  const getCountryName = (code: string) => {
+    const name = countries?.[code];
+    return isDefined(name) ? (Array.isArray(name) ? name[0] : name) : undefined;
+  };
 
   const { placeOfBirth, citizenship, residence, jurisdiction, isDeceased, dateOfBirth } =
     data ?? {};
@@ -375,7 +379,7 @@ function ProfileResultPerson({
 
   const birthFlag = placeOfBirthCountryCode ? (
     <Image
-      alt={countries?.[placeOfBirthCountryCode]}
+      alt={getCountryName(placeOfBirthCountryCode)}
       boxSize={6}
       src={`${
         process.env.NEXT_PUBLIC_ASSETS_URL
@@ -385,7 +389,7 @@ function ProfileResultPerson({
 
   const citizenshipFlag = citizenshipCountryCode ? (
     <Image
-      alt={countries?.[citizenshipCountryCode]}
+      alt={getCountryName(citizenshipCountryCode)}
       boxSize={6}
       src={`${
         process.env.NEXT_PUBLIC_ASSETS_URL
@@ -395,7 +399,7 @@ function ProfileResultPerson({
 
   const residentFlag = residentCountryCode ? (
     <Image
-      alt={countries?.[residentCountryCode]}
+      alt={getCountryName(residentCountryCode)}
       boxSize={6}
       src={`${
         process.env.NEXT_PUBLIC_ASSETS_URL
@@ -405,7 +409,7 @@ function ProfileResultPerson({
 
   const jurisdictionFlag = jurisdictionCountryCode ? (
     <Image
-      alt={countries?.[jurisdictionCountryCode]}
+      alt={getCountryName(jurisdictionCountryCode)}
       boxSize={6}
       src={`${
         process.env.NEXT_PUBLIC_ASSETS_URL
@@ -449,7 +453,7 @@ function ProfileResultPerson({
         </Text>
         <HStack>
           {birthFlag}
-          <Text>{placeOfBirthCountryCode ? countries?.[placeOfBirthCountryCode] : "-"}</Text>
+          <Text>{placeOfBirthCountryCode ? getCountryName(placeOfBirthCountryCode) : "-"}</Text>
         </HStack>
       </Stack>
 
@@ -463,7 +467,7 @@ function ProfileResultPerson({
         </Text>
         <HStack>
           {citizenshipFlag}
-          <Text>{citizenshipCountryCode ? countries?.[citizenshipCountryCode] : "-"}</Text>
+          <Text>{citizenshipCountryCode ? getCountryName(citizenshipCountryCode) : "-"}</Text>
         </HStack>
       </Stack>
 
@@ -477,7 +481,7 @@ function ProfileResultPerson({
         </Text>
         <HStack>
           {residentFlag}
-          <Text>{residentCountryCode ? countries?.[residentCountryCode] : "-"}</Text>
+          <Text>{residentCountryCode ? getCountryName(residentCountryCode) : "-"}</Text>
         </HStack>
       </Stack>
 
@@ -491,7 +495,7 @@ function ProfileResultPerson({
         </Text>
         <HStack>
           {jurisdictionFlag}
-          <Text>{jurisdictionCountryCode ? countries?.[jurisdictionCountryCode] : "-"}</Text>
+          <Text>{jurisdictionCountryCode ? getCountryName(jurisdictionCountryCode) : "-"}</Text>
         </HStack>
       </Stack>
 
