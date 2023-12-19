@@ -5,13 +5,13 @@
 nodejs_version="18" # https://nodejs.org/en
 nginx_version="1.24.0" # http://nginx.org/en/download.html
 fail2ban_version="1.0.2" # https://github.com/fail2ban/fail2ban/releases
-modsecurity_version="3.0.10" # https://github.com/SpiderLabs/ModSecurity/releases
+modsecurity_version="3.0.11" # https://github.com/SpiderLabs/ModSecurity/releases
 modsecurity_nginx_version="1.0.3" # https://github.com/SpiderLabs/ModSecurity-nginx/releases
 coreruleset_version="3.3.4" # https://github.com/coreruleset/coreruleset/releases
-ngx_devel_kit_version="0.3.2" # https://github.com/vision5/ngx_devel_kit/releases
+ngx_devel_kit_version="0.3.3" # https://github.com/vision5/ngx_devel_kit/releases
 set_misc_nginx_module_version="0.33" # https://github.com/openresty/set-misc-nginx-module/tags
-headers_more_nginx_module_version="0.34" # https://github.com/openresty/headers-more-nginx-module/tags
-image_exiftool_version="12.65" # https://exiftool.org/
+headers_more_nginx_module_version="0.36" # https://github.com/openresty/headers-more-nginx-module/tags
+image_exiftool_version="12.70" # https://exiftool.org/
 
 echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
@@ -37,8 +37,8 @@ function download_and_untar() {
 }
 
 echo "Installing node.js"
-curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | sudo bash -
-sudo yum install -y nodejs
+sudo yum install https://rpm.nodesource.com/pub_${nodejs_version}.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
+sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
 sudo npm install -g npm@latest
 
 echo "Installing yarn"
