@@ -5,12 +5,12 @@ import pMap from "p-map";
 import {
   countBy,
   filter,
-  findLast,
   groupBy,
   indexBy,
   isDefined,
   map,
   mapValues,
+  minBy,
   omit,
   partition,
   pipe,
@@ -23,6 +23,7 @@ import { RESULT } from "../../graphql";
 import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
+import { AiCompletionPrompt } from "../../services/ai-clients/AiCompletionClient";
 import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import {
@@ -117,7 +118,6 @@ import {
   PetitionUserNotification,
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
-import { AiCompletionPrompt } from "../../services/ai-clients/AiCompletionClient";
 
 export interface PetitionVariable {
   name: string;
@@ -6511,40 +6511,56 @@ export class PetitionRepository extends BaseRepository {
   }
 
   private async getPetitionTimes(petitionIds: number[]) {
-    const events = await this.from("petition_event")
-      .whereIn("petition_id", petitionIds)
-      .whereIn("type", [
-        "ACCESS_ACTIVATED",
-        "REPLY_CREATED",
-        "PETITION_COMPLETED",
-        "PETITION_CLOSED",
-        "SIGNATURE_STARTED",
-        "SIGNATURE_COMPLETED",
-      ])
-      .orderBy("created_at", "ASC")
-      .select("*");
+    const events = await this.raw<{
+      petition_id: number;
+      type: PetitionEventType;
+      min: Date;
+      max: Date;
+    }>(
+      /* sql */ `
+      select 
+        "petition_id",
+        "type",
+        min("created_at"),
+        max("created_at")
+      from "petition_event"
+      where "type" in ?
+        and "petition_id" in ?
+      group by 
+        "petition_id",
+        "type"
+    `,
+      [
+        this.sqlIn([
+          "ACCESS_ACTIVATED",
+          "REPLY_CREATED",
+          "PETITION_COMPLETED",
+          "PETITION_CLOSED",
+          "SIGNATURE_STARTED",
+          "SIGNATURE_COMPLETED",
+        ]),
+        this.sqlIn(petitionIds),
+      ],
+    );
 
     const eventsByPetitionId = groupBy(events, (e) => e.petition_id);
 
     return petitionIds.map((petitionId) => {
       const events = eventsByPetitionId[petitionId] ?? [];
       // first ACCESS_ACTIVATED or REPLY_CREATED event marks the first time the petition moved to PENDING status
-      const pendingAt = events
-        .find((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED")
-        ?.created_at.getTime();
-      const completedAt = findLast(
+      const pendingAt = pipe(
         events,
-        (e) => e.type === "PETITION_COMPLETED",
-      )?.created_at.getTime();
-      const closedAt = findLast(events, (e) => e.type === "PETITION_CLOSED")?.created_at.getTime();
-      const signatureStartedAt = findLast(
-        events,
-        (e) => e.type === "SIGNATURE_STARTED",
-      )?.created_at.getTime();
-      const signatureCompletedAt = findLast(
-        events,
-        (e) => e.type === "SIGNATURE_COMPLETED",
-      )?.created_at.getTime();
+        filter((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED"),
+        map((e) => e.min.getTime()),
+        minBy((t) => t),
+      );
+
+      const completedAt = events.find((e) => e.type === "PETITION_COMPLETED")?.max.getTime();
+      const closedAt = events.find((e) => e.type === "PETITION_CLOSED")?.max.getTime();
+      const signatureStartedAt = events.find((e) => e.type === "SIGNATURE_STARTED")?.max.getTime();
+      const signatureCompletedAt = events
+        .find((e) => e.type === "SIGNATURE_COMPLETED")
+        ?.max.getTime();
 
       return {
         pending_to_complete:
