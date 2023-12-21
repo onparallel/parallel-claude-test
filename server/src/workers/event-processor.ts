@@ -23,4 +23,5 @@ createQueueWorker(
     .register(analyticsEventListener)
     .register(petitionActivityListener)
     .listen(),
+  { batchSize: 10 },
 );
