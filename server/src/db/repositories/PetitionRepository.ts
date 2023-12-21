@@ -118,6 +118,7 @@ import {
   PetitionUserNotification,
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
+import { retry } from "../../util/retry";
 
 export interface PetitionVariable {
   name: string;
@@ -6440,9 +6441,12 @@ export class PetitionRepository extends BaseRepository {
     const petitionsWithStats = await pMapChunk(
       orgPetitions,
       async (chunk) => {
-        return zip(chunk, await this.getPetitionTimes(chunk.map((p) => p.id))).map(
-          ([petition, stats]) => ({ ...petition, ...stats }),
-        );
+        return zip(
+          chunk,
+          await retry(async () => await this.getPetitionTimes(chunk.map((p) => p.id)), {
+            maxRetries: 2,
+          }),
+        ).map(([petition, stats]) => ({ ...petition, ...stats }));
       },
       { chunkSize: 200, concurrency: 5 },
     );
