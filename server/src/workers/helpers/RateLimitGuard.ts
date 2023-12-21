@@ -11,7 +11,7 @@ export class RateLimitGuard {
   private buckets: Record<string, RateLimitBucket> = {};
 
   constructor(rateLimitPerSecond: number) {
-    this.intervalInNs = BigInt(1e9 / rateLimitPerSecond);
+    this.intervalInNs = BigInt(Math.ceil(1e9 / rateLimitPerSecond));
   }
 
   waitUntilAllowed(bucketName = "undefined"): Promise<void> {
