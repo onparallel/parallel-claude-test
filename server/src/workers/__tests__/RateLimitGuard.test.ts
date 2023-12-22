@@ -12,7 +12,7 @@ describe("RateLimitGuard", () => {
   });
 
   it("ratelimits acccordingly on burst calls", async () => {
-    const rateLimit = 10;
+    const rateLimit = 14;
     const guard = new RateLimitGuard(rateLimit);
     const start = process.hrtime.bigint();
     const spy = jest.fn();
@@ -32,7 +32,7 @@ describe("RateLimitGuard", () => {
   });
 
   it("ratelimits acccordingly on random calls", async () => {
-    const rateLimit = 10;
+    const rateLimit = 14;
     const guard = new RateLimitGuard(rateLimit);
     const spy = jest.fn();
     let lastCall = 0n;
