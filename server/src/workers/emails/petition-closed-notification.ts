@@ -1,15 +1,15 @@
-import { Readable } from "stream";
+import { createReadStream } from "fs";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionClosedNotification from "../../emails/emails/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import {
   renderSlateWithPlaceholdersToHtml,
   renderSlateWithPlaceholdersToText,
 } from "../../util/slate/placeholders";
-import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
 
 export async function petitionClosedNotification(
@@ -92,23 +92,26 @@ export async function petitionClosedNotification(
     });
 
     if (payload.attach_pdf_export) {
+      const filename = sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf");
       const owner = await context.petitions.loadPetitionOwner(petition.id);
-      const documentStream = await context.printer.petitionExport(owner!.id, {
+      const binderPath = await context.petitionBinder.createBinder(owner!.id, {
         petitionId: petition.id,
         documentTitle: payload.pdf_export_title ?? "",
+        maxOutputSize: 18 * 1024 * 1024,
+        outputFileName: filename,
       });
       const path = random(16);
 
       const res = await context.storage.temporaryFiles.uploadFile(
         path,
         "application/pdf",
-        documentStream as Readable,
+        createReadStream(binderPath),
       );
       const attachment = await context.files.createTemporaryFile(
         {
           path,
           content_type: "application/pdf",
-          filename: sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf"),
+          filename,
           size: res["ContentLength"]!.toString(),
         },
         `User:${sender.id}`,

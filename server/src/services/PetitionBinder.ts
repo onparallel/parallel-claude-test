@@ -40,7 +40,7 @@ interface PetitionBinderOptions {
 }
 
 export interface IPetitionBinder {
-  createBinder(petitionId: number, options: PetitionBinderOptions): Promise<string>;
+  createBinder(userId: number, options: PetitionBinderOptions): Promise<string>;
 }
 
 export const PETITION_BINDER = Symbol.for("PETITION_BINDER");
