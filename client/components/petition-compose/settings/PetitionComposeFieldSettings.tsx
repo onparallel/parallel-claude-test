@@ -265,7 +265,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                 {isFileTypeField(field.type) ? (
                   <AttachFilesToPdfSettingsRow
                     isDisabled={isReadOnly}
-                    isChecked={field.showActivityInPdf}
+                    isChecked={field.options.attachToPdf}
                     onChange={handleFieldEdit}
                   />
                 ) : null}
