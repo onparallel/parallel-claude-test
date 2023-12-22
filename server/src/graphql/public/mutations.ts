@@ -335,6 +335,14 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
               maxAge: 60 * 60 * 24 * 365 * 10 * 1000,
             },
           );
+
+          await ctx.petitions.createEvent({
+            type: "ACCESS_OPENED",
+            petition_id: ctx.access!.petition_id,
+            data: {
+              petition_access_id: ctx.access!.id,
+            },
+          });
         }
         return {
           result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
