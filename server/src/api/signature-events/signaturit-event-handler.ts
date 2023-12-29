@@ -10,7 +10,7 @@ import { SignaturitEvents } from "../../services/signature-clients/SignaturitCli
 import { fromGlobalId } from "../../util/globalId";
 import { Replace } from "../../util/types";
 
-export interface SignaturItEventBody {
+export interface SignaturitEventBody {
   document: {
     created_at: string;
     decline_reason?: string; // only for document_declined event type
@@ -32,7 +32,7 @@ export interface SignaturItEventBody {
 }
 
 const HANDLERS: Partial<
-  Record<SignaturitEvents, (ctx: ApiContext, data: SignaturItEventBody, petitionId: number) => void>
+  Record<SignaturitEvents, (ctx: ApiContext, data: SignaturitEventBody, petitionId: number) => void>
 > = {
   document_opened: documentOpened,
   document_signed: documentSigned,
@@ -47,7 +47,7 @@ export const signaturitEventHandlers: RequestHandler = Router()
   .use(urlencoded({ extended: true }))
   .post("/:petitionId/events", async (req, res, next) => {
     try {
-      const body = req.body as SignaturItEventBody;
+      const body = req.body as SignaturitEventBody;
       const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
         `SIGNATURIT/${body.document.signature.id}`,
       );
@@ -74,7 +74,7 @@ export const signaturitEventHandlers: RequestHandler = Router()
   });
 
 /** a signer opened the signing page on the signature provider */
-async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+async function documentOpened(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [signer, signerIndex] = await findSigner(signature!.signature_config, data.document, ctx);
 
@@ -94,7 +94,7 @@ async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petiti
 }
 
 /** the document was signed by any of the assigned signers */
-async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+async function documentSigned(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [signer, signerIndex] = await findSigner(signature.signature_config, data.document, ctx);
 
@@ -114,7 +114,7 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
-async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+async function documentDeclined(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [canceller, cancellerIndex] = await findSigner(
     signature.signature_config,
@@ -139,7 +139,7 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
 }
 
 /** audit trail has been completed, audit trail and signed document are ready to be downloaded */
-async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+async function auditTrailCompleted(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
   const {
     id: documentId,
     signature: { id: signatureId },
@@ -152,7 +152,7 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
   await ctx.signature.storeAuditTrail(signature, `${signatureId}/${documentId}`);
 }
 
-async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+async function emailDelivered(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [, signerIndex] = await findSigner(signature.signature_config, data.document, ctx);
   await ctx.petitions.updatePetitionSignatureSignerStatusByExternalId(
@@ -169,7 +169,7 @@ async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petiti
   );
 }
 
-async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+async function emailOpened(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
   await upsertSignatureDeliveredEvent(
     petitionId,
     data,
@@ -178,7 +178,7 @@ async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionI
   );
 }
 
-async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+async function emailBounced(ctx: ApiContext, data: SignaturitEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
 
   const [, signerIndex] = await findSigner(signature.signature_config, data.document, ctx);
@@ -221,7 +221,7 @@ async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {
   return signature;
 }
 
-async function appendEventLogs(ctx: ApiContext, data: SignaturItEventBody): Promise<void> {
+async function appendEventLogs(ctx: ApiContext, data: SignaturitEventBody): Promise<void> {
   // data.document.events contain the complete list of events since signature was started
   // we just want to append the last event to the log
   delete data.document.events;
@@ -235,7 +235,7 @@ async function findSigner(
     PetitionSignatureConfig,
     { signersInfo: (PetitionSignatureConfigSigner & { externalId: string })[] }
   >,
-  document: SignaturItEventBody["document"],
+  document: SignaturitEventBody["document"],
   ctx: ApiContext,
 ): Promise<[PetitionSignatureConfigSigner & { externalId: string }, number]> {
   let signerIndex = signatureConfig.signersInfo.findIndex(
@@ -265,7 +265,7 @@ async function findSigner(
 
 async function upsertSignatureDeliveredEvent(
   petitionId: number,
-  body: SignaturItEventBody,
+  body: SignaturitEventBody,
   data: Pick<
     SignatureDeliveredEvent["data"],
     "email_delivered_at" | "email_opened_at" | "email_bounced_at"
@@ -330,7 +330,7 @@ async function syncSignatureRequestSigners(signatureExternalId: string, ctx: Api
     >
   > = {};
 
-  const eventLogs = signatureRequest.event_logs as SignaturItEventBody[];
+  const eventLogs = signatureRequest.event_logs as SignaturitEventBody[];
 
   for (const signer of newSignersInfo) {
     const signerIndex = newSignersInfo.findIndex((s) => s.externalId === signer.externalId);

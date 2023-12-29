@@ -492,7 +492,7 @@ export const modifyCurrentUsagePeriod = mutationField("modifyCurrentUsagePeriod"
 });
 
 export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
-  description: `Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.`,
+  description: `Shares our Signaturit production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.`,
   type: "Organization",
   args: {
     orgId: nonNull(globalIdArg("Organization")),

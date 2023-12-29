@@ -288,7 +288,7 @@ export class SignaturitClient implements ISignatureClient {
             show_csv: context.showCsv ? 1 : 0,
             logo: await downloadImageBase64(templateData.logoUrl),
             layout_color: templateData.theme.color,
-            templates: await this.buildSignaturItBrandingTemplates(locale, templateData),
+            templates: await this.buildSignaturitBrandingTemplates(locale, templateData),
           });
         },
         { concurrency: 1 },
@@ -313,14 +313,14 @@ export class SignaturitClient implements ISignatureClient {
             defaultMessage: "Open document",
           }),
         },
-        templates: await this.buildSignaturItBrandingTemplates(locale, templateData),
+        templates: await this.buildSignaturitBrandingTemplates(locale, templateData),
       });
 
       return branding.id;
     });
   }
 
-  private async buildSignaturItBrandingTemplates(
+  private async buildSignaturitBrandingTemplates(
     locale: ContactLocale,
     templateData: OrganizationLayout,
   ): Promise<SignaturitBrandingParams<true>["templates"]> {
@@ -574,7 +574,7 @@ interface SignaturitSignatureParams {
   /** List with signature recipients containing name, email and extra requirements for the signature process if needed. */
   recipients?: Array<
     SignaturitRecipient & {
-      widgets?: SignaturItWidget[];
+      widgets?: SignaturitWidget[];
     }
   >;
   /** List with email recipients containing name and email for people that will receive a copy of the signed document when the process is completed. */
@@ -585,7 +585,7 @@ interface SignaturitSignatureParams {
   type?: "simple" | "advanced" | "smart";
 }
 
-interface SignaturItWidget {
+interface SignaturitWidget {
   page?: number; // range 1...N
   editable?: number; // 0 or 1
   required?: number; // 0 or 1

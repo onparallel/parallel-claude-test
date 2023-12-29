@@ -1842,7 +1842,7 @@ type Mutation {
   setUserDelegates(delegateIds: [GID!]!): User!
 
   """
-  Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.
+  Shares our Signaturit production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.
   """
   shareSignaturitApiKey(
     duration: Duration!

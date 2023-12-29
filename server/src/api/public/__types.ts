@@ -894,6 +894,7 @@ export type Mutation = {
   shareSignaturitApiKey: Organization;
   /** Triggered by new users that want to sign up into Parallel */
   signUp: User;
+
   /** Enables/disables security stamp on documents for Signaturit integrations. */
   signaturitIntegrationShowSecurityStamp: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
