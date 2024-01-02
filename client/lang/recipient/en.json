@@ -980,41 +980,6 @@
     "context": "Suggested:"
   },
   {
-    "term": "component.table-page.n-selected",
-    "definition": "{count} selected",
-    "context": "{count} selected"
-  },
-  {
-    "term": "component.table.change-sorting",
-    "definition": "Change sorting for \"{column}\"",
-    "context": "Change sorting for \"{column}\""
-  },
-  {
-    "term": "component.table.filter",
-    "definition": "Filter \"{column}\"",
-    "context": "Filter \"{column}\""
-  },
-  {
-    "term": "component.table.filter-button",
-    "definition": "Filter",
-    "context": "Filter"
-  },
-  {
-    "term": "component.table.filter-header",
-    "definition": "Filter",
-    "context": "Filter"
-  },
-  {
-    "term": "component.table.sort-button",
-    "definition": "Sort",
-    "context": "Sort"
-  },
-  {
-    "term": "component.table.sort-by",
-    "definition": "Sort by \"{column}\"",
-    "context": "Sort by \"{column}\""
-  },
-  {
     "term": "component.task-progress-dialog.unknown-task.confirm",
     "definition": "Get result",
     "context": "Get result"
@@ -1135,11 +1100,6 @@
     "context": "Close"
   },
   {
-    "term": "generic.collapse",
-    "definition": "Collapse",
-    "context": "Collapse"
-  },
-  {
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
@@ -1213,11 +1173,6 @@
     "term": "generic.empty-heading",
     "definition": "Untitled heading",
     "context": "Untitled heading"
-  },
-  {
-    "term": "generic.expand",
-    "definition": "Expand",
-    "context": "Expand"
   },
   {
     "term": "generic.for-example",

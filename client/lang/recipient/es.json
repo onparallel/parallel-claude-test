@@ -980,41 +980,6 @@
     "context": "Suggested:"
   },
   {
-    "term": "component.table-page.n-selected",
-    "definition": "",
-    "context": "{count} selected"
-  },
-  {
-    "term": "component.table.change-sorting",
-    "definition": "",
-    "context": "Change sorting for \"{column}\""
-  },
-  {
-    "term": "component.table.filter",
-    "definition": "",
-    "context": "Filter \"{column}\""
-  },
-  {
-    "term": "component.table.filter-button",
-    "definition": "",
-    "context": "Filter"
-  },
-  {
-    "term": "component.table.filter-header",
-    "definition": "",
-    "context": "Filter"
-  },
-  {
-    "term": "component.table.sort-button",
-    "definition": "",
-    "context": "Sort"
-  },
-  {
-    "term": "component.table.sort-by",
-    "definition": "",
-    "context": "Sort by \"{column}\""
-  },
-  {
     "term": "component.task-progress-dialog.unknown-task.confirm",
     "definition": "",
     "context": "Get result"
@@ -1135,11 +1100,6 @@
     "context": "Close"
   },
   {
-    "term": "generic.collapse",
-    "definition": "",
-    "context": "Collapse"
-  },
-  {
     "term": "generic.comments-button-label",
     "definition": "",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
@@ -1213,11 +1173,6 @@
     "term": "generic.empty-heading",
     "definition": "",
     "context": "Untitled heading"
-  },
-  {
-    "term": "generic.expand",
-    "definition": "",
-    "context": "Expand"
   },
   {
     "term": "generic.for-example",

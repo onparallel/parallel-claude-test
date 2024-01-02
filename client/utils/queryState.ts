@@ -1,4 +1,4 @@
-import { TableSorting, TableSortingDirection } from "@parallel/components/common/Table";
+import type { TableSorting, TableSortingDirection } from "@parallel/components/common/Table";
 import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
