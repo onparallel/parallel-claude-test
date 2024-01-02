@@ -1,0 +1,2152 @@
+[
+  {
+    "term": "component.add-new-signer-dialog.header",
+    "definition": "Enter the signer's information",
+    "context": "Enter the signer's information"
+  },
+  {
+    "term": "component.checkbox-type-label.exact",
+    "definition": "Choose {max, plural, =1{# option} other{# options}}",
+    "context": "Choose {max, plural, =1{# option} other{# options}}"
+  },
+  {
+    "term": "component.checkbox-type-label.range",
+    "definition": "Choose between {min, number} and {max, number} options",
+    "context": "Choose between {min, number} and {max, number} options"
+  },
+  {
+    "term": "component.checkbox-type-label.unlimited",
+    "definition": "Choose as many options as you want",
+    "context": "Choose as many options as you want"
+  },
+  {
+    "term": "component.checkbox-type-label.up-to",
+    "definition": "Choose up to {max, plural, =1{# option} other{# options}}",
+    "context": "Choose up to {max, plural, =1{# option} other{# options}}"
+  },
+  {
+    "term": "component.completing-message-dialog.go-to-pending-processes-button",
+    "definition": "Go to my pending processes",
+    "context": "Go to my pending processes"
+  },
+  {
+    "term": "component.completing-message-dialog.go-to-processes-button",
+    "definition": "Go to my processes",
+    "context": "Go to my processes"
+  },
+  {
+    "term": "component.completing-message-dialog.pending-processes-count",
+    "definition": "You have {count, plural, =1{# pending process} other{# pending processes}}",
+    "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
+    "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
+    "context": "If this option is disabled, only the indicated people will be able to sign the document."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-label",
+    "definition": "Allow recipients to add additional signers",
+    "context": "Allow recipients to add additional signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.contact-select-placeholder",
+    "definition": "Add a contact to sign",
+    "context": "Add a contact to sign"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.edit-signers-header",
+    "definition": "Edit signers",
+    "context": "Edit signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.include-message",
+    "definition": "Include message",
+    "context": "Include message"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.message-placeholder",
+    "definition": "Write here a message for the signers...",
+    "context": "Write here a message for the signers..."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.min-signers",
+    "definition": "Add at least {count, plural, =1{# signer} other{# signers}}",
+    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.no-signers-added",
+    "definition": "You have not added any signers",
+    "context": "You have not added any signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.no-signers-set",
+    "definition": "We will send the document to the following contacts:",
+    "context": "We will send the document to the following contacts:"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.no-signers-set-sequential",
+    "definition": "We will send the document to sign to each contact after the one before has signed:",
+    "context": "We will send the document to sign to each contact after the one before has signed:"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.preset-signers",
+    "definition": "{names} will sign together with the signers you add.",
+    "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.preset-signers-sequential",
+    "definition": "{names} will sign after the other signers.",
+    "context": "{names} will sign after the other signers."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.signer-added-by-recipient",
+    "definition": "Signers added by the recipient",
+    "context": "Signers added by the recipient"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.start-signature-header",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.header",
+    "definition": "You already added this email for {signersList}. You can modify the name and add it again.",
+    "context": "You already added this email for {signersList}. You can modify the name and add it again."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.title",
+    "definition": "Confirm the signer's information",
+    "context": "Confirm the signer's information"
+  },
+  {
+    "term": "component.contact-select.bounced-email-tooltip",
+    "definition": "Previously bounced email",
+    "context": "Previously bounced email"
+  },
+  {
+    "term": "component.contact-select.create-new-contact",
+    "definition": "Create new contact for: <b>{email}</b>",
+    "context": "Create new contact for: <b>{email}</b>"
+  },
+  {
+    "term": "component.contact-select.enter-email",
+    "definition": "You can also enter a valid email.",
+    "context": "You can also enter a valid email."
+  },
+  {
+    "term": "component.contact-select.no-options",
+    "definition": "We could not find any existing contacts for <em>{search}</em>",
+    "context": "We could not find any existing contacts for <em>{search}</em>"
+  },
+  {
+    "term": "component.contact-select.search-hint",
+    "definition": "Search for existing contacts or enter a valid email.",
+    "context": "Search for existing contacts or enter a valid email."
+  },
+  {
+    "term": "component.date-time.a-moment-ago",
+    "definition": "a moment ago",
+    "context": "a moment ago"
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-1",
+    "definition": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}",
+    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-2",
+    "definition": "We will send them an email with instructions on how to proceed.",
+    "context": "We will send them an email with instructions on how to proceed."
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-title",
+    "definition": "Invite collaborator",
+    "context": "Invite collaborator"
+  },
+  {
+    "term": "component.error-dialog.header",
+    "definition": "Error",
+    "context": "Error"
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.action-required-from-user",
+    "definition": "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically.",
+    "context": "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.blocked-credentials",
+    "definition": "The Public Administration has blocked your access for security reasons. Please, try again later.",
+    "context": "The Public Administration has blocked your access for security reasons. Please, try again later."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.document-not-found",
+    "definition": "We couldn't find the requested document in the Public Administration",
+    "context": "We couldn't find the requested document in the Public Administration"
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.generic",
+    "definition": "An unknown error happened.",
+    "context": "An unknown error happened."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.parallel-send-limit-reached",
+    "definition": "We couldn't create the file because you reached the limit of parallels you can send.",
+    "context": "We couldn't create the file because you reached the limit of parallels you can send."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.timeout",
+    "definition": "The Public Administration took too long to process your request. Please, try again.",
+    "context": "The Public Administration took too long to process your request. Please, try again."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-aborted",
+    "definition": "You cancelled the request before it could finish. Please, try again.",
+    "context": "You cancelled the request before it could finish. Please, try again."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-not-registered",
+    "definition": "The user is not registered in the Public Administration",
+    "context": "The user is not registered in the Public Administration"
+  },
+  {
+    "term": "component.field-comment.message-not-available",
+    "definition": "Message not available",
+    "context": "Message not available"
+  },
+  {
+    "term": "component.file-icon.audio-file",
+    "definition": "Audio file",
+    "context": "Audio file"
+  },
+  {
+    "term": "component.file-icon.document-file",
+    "definition": "Document file",
+    "context": "Document file"
+  },
+  {
+    "term": "component.file-icon.image-file",
+    "definition": "Image file",
+    "context": "Image file"
+  },
+  {
+    "term": "component.file-icon.other-file",
+    "definition": "File",
+    "context": "File"
+  },
+  {
+    "term": "component.file-icon.pdf-file",
+    "definition": "PDF file",
+    "context": "PDF file"
+  },
+  {
+    "term": "component.file-icon.spreadsheet-file",
+    "definition": "Spreadsheet file",
+    "context": "Spreadsheet file"
+  },
+  {
+    "term": "component.file-icon.upload-failed",
+    "definition": "This file did not upload correctly",
+    "context": "This file did not upload correctly"
+  },
+  {
+    "term": "component.file-icon.video-file",
+    "definition": "Video file",
+    "context": "Video file"
+  },
+  {
+    "term": "component.file-icon.zip-file",
+    "definition": "Zip file",
+    "context": "Zip file"
+  },
+  {
+    "term": "component.internal-field-badge.popover",
+    "definition": "The internal fields will not be visible to the recipient.",
+    "context": "The internal fields will not be visible to the recipient."
+  },
+  {
+    "term": "component.internal-field-badge.text",
+    "definition": "Int",
+    "context": "Int"
+  },
+  {
+    "term": "component.message-email-body-form-control.required-error",
+    "definition": "Customizing the initial message improves the response time of the recipients",
+    "context": "Customizing the initial message improves the response time of the recipients"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.body",
+    "definition": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?",
+    "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.confirm-button",
+    "definition": "Yes, start again",
+    "context": "Yes, start again"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.header",
+    "definition": "Overwrite documentation",
+    "context": "Overwrite documentation"
+  },
+  {
+    "term": "component.print-pdf-task.confirm",
+    "definition": "Download PDF",
+    "context": "Download PDF"
+  },
+  {
+    "term": "component.print-pdf-task.header",
+    "definition": "Generating PDF file...",
+    "context": "Generating PDF file..."
+  },
+  {
+    "term": "component.react-select.loading",
+    "definition": "Loading...",
+    "context": "Loading..."
+  },
+  {
+    "term": "component.recipient-portal-header.hello-name",
+    "definition": "Hello, {name}!",
+    "context": "Hello, {name}!"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.all-processes",
+    "definition": "All processes",
+    "context": "All processes"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.completed-processes",
+    "definition": "Completed processes",
+    "context": "Completed processes"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.pending-processes",
+    "definition": "Pending processes",
+    "context": "Pending processes"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.add-signer-button",
+    "definition": "Add signers",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.confirmation-text",
+    "definition": "We will send the document to the following contacts:",
+    "context": "We will send the document to the following contacts:"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.confirmation-text-sequential",
+    "definition": "We will send the document to sign to each contact after the one before has signed:",
+    "context": "We will send the document to sign to each contact after the one before has signed:"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.header",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.include-message",
+    "definition": "Include message",
+    "context": "Include message"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.message-placeholder",
+    "definition": "Write here a message for the signers...",
+    "context": "Write here a message for the signers..."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.min-signers",
+    "definition": "Add at least {count, plural, =1{# signer} other{# signers}}",
+    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.preset-signers-added",
+    "definition": "{names} will sign together with the signers you add.",
+    "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.preset-signers-added-sequential",
+    "definition": "{names} will sign after the signers you add.",
+    "context": "{names} will sign after the signers you add."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
+    "definition": "You haven't added any signers yet",
+    "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access",
+    "definition": "Access",
+    "context": "Access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-already-sent",
+    "definition": "Access could not be resent",
+    "context": "Access could not be resent"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-already-sent-body",
+    "definition": "There is already an access sent to <b>{email}</b> recently. Please check your inbox or spam.",
+    "context": "There is already an access sent to <b>{email}</b> recently. Please check your inbox or spam."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-sent",
+    "definition": "Access sent",
+    "context": "Access sent"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-sent-body",
+    "definition": "We have sent a access to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it.",
+    "context": "We have sent a access to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.change-email",
+    "definition": "Change email",
+    "context": "Change email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email",
+    "definition": "Existing email",
+    "context": "Existing email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body",
+    "definition": "There is already an access associated to {email}. You can access again from the previously received mail.",
+    "context": "There is already an access associated to {email}. You can access again from the previously received mail."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body-question",
+    "definition": "If you can't find the initial email, we will resend you the access again. What do you want to do?",
+    "context": "If you can't find the initial email, we will resend you the access again. What do you want to do?"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.has-shared-with-you",
+    "definition": "{ownerName} has shared with you this link.",
+    "context": "{ownerName} has shared with you this link."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.heading",
+    "definition": "Enter your data to access",
+    "context": "Enter your data to access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.resend-access",
+    "definition": "Resend access",
+    "context": "Resend access"
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.body-1",
+    "definition": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>.",
+    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.body-2",
+    "definition": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need.",
+    "context": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need."
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.faq",
+    "definition": "See more frequently asked questions",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.header",
+    "definition": "Why do we ask for this data?",
+    "context": "Why do we ask for this data?"
+  },
+  {
+    "term": "component.recipient-view-content-card.comment-count",
+    "definition": "{commentCount, plural, =1 {# comment} other {# comments}}",
+    "context": "{commentCount, plural, =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.add-another-reply",
+    "definition": "Add another reply",
+    "context": "Add another reply"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.files-uploaded",
+    "definition": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
+    "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted",
+    "definition": "{count, plural, =1 {1 reply submitted} other {# replies submitted}}",
+    "context": "{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox",
+    "definition": "Reply submitted",
+    "context": "Reply submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-count",
+    "definition": "{count} submitted",
+    "context": "{count} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
+    "definition": "{count}/{total} submitted",
+    "context": "{count}/{total} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.change-zone",
+    "definition": "Change",
+    "context": "Change"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.restore-defaults",
+    "definition": "Restore default",
+    "context": "Restore default"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.select-timezone",
+    "definition": "Select the time zone you need.",
+    "context": "Select the time zone you need."
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.using-timezone",
+    "definition": "You are using the time zone {timezone}.",
+    "context": "You are using the time zone {timezone}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.add-button",
+    "definition": "Add {groupName}",
+    "context": "Add {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.confirm-delete-group",
+    "definition": "Do you want to remove {groupName}?",
+    "context": "Do you want to remove {groupName}?"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.edit-field",
+    "definition": "Edit field",
+    "context": "Edit field"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-confirmation-button",
+    "definition": "Remove",
+    "context": "Remove"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-reply-button",
+    "definition": "Remove {groupName}",
+    "context": "Remove {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.only-numbers",
+    "definition": "Numeric {multiple, select, true{answers} other {answer}}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-max-description",
+    "definition": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-description",
+    "definition": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-max-description",
+    "definition": "Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.approved-file",
+    "definition": "This file has been approved",
+    "context": "This file has been approved"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.approved-reply",
+    "definition": "This reply has been approved",
+    "context": "This reply has been approved"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.download-label",
+    "definition": "Download file",
+    "context": "Download file"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.file-incomplete",
+    "definition": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}.",
+    "context": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.rejected-file",
+    "definition": "This file has been rejected",
+    "context": "This file has been rejected"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.rejected-reply",
+    "definition": "This reply has been rejected",
+    "context": "This reply has been rejected"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.remove-reply-label",
+    "definition": "Remove reply",
+    "context": "Remove reply"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.reply-saved-on",
+    "definition": "Reply saved on {date}",
+    "context": "Reply saved on {date}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.select-placeholder",
+    "definition": "Select an option",
+    "context": "Select an option"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.text-placeholder",
+    "definition": "Enter your answer",
+    "context": "Enter your answer"
+  },
+  {
+    "term": "component.recipient-view-petition-field-short-text.format-error",
+    "definition": "Please, enter a valid {format}.",
+    "context": "Please, enter a valid {format}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.error-field-already-replied",
+    "definition": "There is already a reply for this field.",
+    "context": "There is already a reply for this field."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.error-uploading",
+    "definition": "We have not found any files. Please try again.",
+    "context": "We have not found any files. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.follow-steps-description",
+    "definition": "Follow the steps to upload the documentation you need.",
+    "context": "Follow the steps to upload the documentation you need."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.loading-documentation",
+    "definition": "Please, wait while we upload the documentation...",
+    "context": "Please, wait while we upload the documentation..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-again-button",
+    "definition": "Start again",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-button",
+    "definition": "Start",
+    "context": "Start"
+  },
+  {
+    "term": "component.recipient-view-petition-status-alert.petition-closed-alert",
+    "definition": "This parallel has been closed. If you need to make any changes, please reach out to {name}.",
+    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
+  },
+  {
+    "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
+    "definition": "<b>Information completed!</b> We have notified {name} for review and validation.",
+    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
+  },
+  {
+    "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
+    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.description",
+    "definition": "There is a more recent version of this page. Refresh to see all added replies.",
+    "context": "There is a more recent version of this page. Refresh to see all added replies."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.refetch-button",
+    "definition": "Refresh replies",
+    "context": "Refresh replies"
+  },
+  {
+    "term": "component.recipient-view-signature-sent-alert.check-status-button",
+    "definition": "Check status",
+    "context": "Check status"
+  },
+  {
+    "term": "component.recipient-view.reminder-submit",
+    "definition": "Remember to click Finalize when you finish entering all the information.",
+    "context": "Remember to click Finalize when you finish entering all the information."
+  },
+  {
+    "term": "component.rich-text-editor.add-link-header",
+    "definition": "Add link",
+    "context": "Add link"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-required-url",
+    "definition": "A valid link is required",
+    "context": "A valid link is required"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-text-to-show",
+    "definition": "Text to show (optional)",
+    "context": "Text to show (optional)"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-url",
+    "definition": "URL link",
+    "context": "URL link"
+  },
+  {
+    "term": "component.rich-text-editor.bold",
+    "definition": "Bold",
+    "context": "Bold"
+  },
+  {
+    "term": "component.rich-text-editor.font-size",
+    "definition": "Font size",
+    "context": "Font size"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-body",
+    "definition": "Body",
+    "context": "Body"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-heading",
+    "definition": "Heading",
+    "context": "Heading"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-subheading",
+    "definition": "Subheading",
+    "context": "Subheading"
+  },
+  {
+    "term": "component.rich-text-editor.italic",
+    "definition": "Italic",
+    "context": "Italic"
+  },
+  {
+    "term": "component.rich-text-editor.link",
+    "definition": "Link",
+    "context": "Link"
+  },
+  {
+    "term": "component.rich-text-editor.list",
+    "definition": "Bullet list",
+    "context": "Bullet list"
+  },
+  {
+    "term": "component.rich-text-editor.ordered-list",
+    "definition": "Numbered list",
+    "context": "Numbered list"
+  },
+  {
+    "term": "component.rich-text-editor.personalize",
+    "definition": "Personalize",
+    "context": "Personalize"
+  },
+  {
+    "term": "component.rich-text-editor.underline",
+    "definition": "Underline",
+    "context": "Underline"
+  },
+  {
+    "term": "component.search-input.placeholder",
+    "definition": "Search...",
+    "context": "Search..."
+  },
+  {
+    "term": "component.signature-config-dialog.add-instructions-help",
+    "definition": "Instructions help other users and recipients understand who has to sign the document.",
+    "context": "Instructions help other users and recipients understand who has to sign the document."
+  },
+  {
+    "term": "component.signature-config-dialog.add-instructions-label",
+    "definition": "Add instructions",
+    "context": "Add instructions"
+  },
+  {
+    "term": "component.signature-config-dialog.allow-additional-signers-help",
+    "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
+    "context": "If this option is disabled, only the indicated people will be able to sign the document."
+  },
+  {
+    "term": "component.signature-config-dialog.allow-additional-signers-label",
+    "definition": "Allow recipients to add additional signers",
+    "context": "Allow recipients to add additional signers"
+  },
+  {
+    "term": "component.signature-config-dialog.contact-select-add-contact-to-sign-placeholder",
+    "definition": "Add a contact to sign",
+    "context": "Add a contact to sign"
+  },
+  {
+    "term": "component.signature-config-dialog.header-help-link",
+    "definition": "More about eSignature",
+    "context": "More about eSignature"
+  },
+  {
+    "term": "component.signature-config-dialog.header-subtitle",
+    "definition": "Sign a PDF document with all the replies using one of our integrated eSignature providers.",
+    "context": "Sign a PDF document with all the replies using one of our integrated eSignature providers."
+  },
+  {
+    "term": "component.signature-config-dialog.include-fixed-signers-template-label",
+    "definition": "Include contacts who always sign the document",
+    "context": "Include contacts who always sign the document"
+  },
+  {
+    "term": "component.signature-config-dialog.instructions-label",
+    "definition": "Instructions",
+    "context": "Instructions"
+  },
+  {
+    "term": "component.signature-config-dialog.instructions-placeholder",
+    "definition": "e.g. Add your company's legal representatives as signers",
+    "context": "e.g. Add your company's legal representatives as signers"
+  },
+  {
+    "term": "component.signature-config-dialog.min-signers-label",
+    "definition": "This document will have at least {input} {count, plural, =1{signer} other{signers}}",
+    "context": "This document will have at least {input} {count, plural, =1{signer} other{signers}}"
+  },
+  {
+    "term": "component.signature-config-dialog.no-signers-added",
+    "definition": "You haven't added any signers yet",
+    "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.signature-config-dialog.provider-label",
+    "definition": "eSignature provider",
+    "context": "eSignature provider"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-label",
+    "definition": "When do you want the eSignature to start?",
+    "context": "When do you want the eSignature to start?"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-no",
+    "definition": "After the parallel is completed",
+    "context": "After the parallel is completed"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-no-explainer",
+    "definition": "The signature process will start when all the information has been completed.",
+    "context": "The signature process will start when all the information has been completed."
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-yes",
+    "definition": "After reviewing the information",
+    "context": "After reviewing the information"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-yes-explainer",
+    "definition": "After reviewing the information you will have to start the signature manually.",
+    "context": "After reviewing the information you will have to start the signature manually."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-same-time-help",
+    "definition": "All the signers will receive the document at the same time.",
+    "context": "All the signers will receive the document at the same time."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-same-time-label",
+    "definition": "All at the same time",
+    "context": "All at the same time"
+  },
+  {
+    "term": "component.signature-config-dialog.sending-sequential-help",
+    "definition": "Each signer will receive the document after the one before has signed.",
+    "context": "Each signer will receive the document after the one before has signed."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-sequential-label",
+    "definition": "In order, signing one by one",
+    "context": "In order, signing one by one"
+  },
+  {
+    "term": "component.signature-config-dialog.sending-type-label",
+    "definition": "How do you want Parallel to send the signatures?",
+    "context": "How do you want Parallel to send the signatures?"
+  },
+  {
+    "term": "component.signature-config-dialog.step-1-header",
+    "definition": "eSignature configuration",
+    "context": "eSignature configuration"
+  },
+  {
+    "term": "component.signature-config-dialog.step-2-header",
+    "definition": "Set up document signatures",
+    "context": "Set up document signatures"
+  },
+  {
+    "term": "component.signature-config-dialog.step-3-header",
+    "definition": "Add signers",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.signature-config-dialog.template-alert",
+    "definition": "These signers will be assigned to all parallels created from this template.",
+    "context": "These signers will be assigned to all parallels created from this template."
+  },
+  {
+    "term": "component.signature-config-dialog.title-help",
+    "definition": "Include a title on the signing document. It will also be used as the name of the file once signed.",
+    "context": "Include a title on the signing document. It will also be used as the name of the file once signed."
+  },
+  {
+    "term": "component.signature-config-dialog.title-label",
+    "definition": "Title of the document",
+    "context": "Title of the document"
+  },
+  {
+    "term": "component.signature-config-dialog.title-placeholder",
+    "definition": "Enter a title...",
+    "context": "Enter a title..."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-completed-alert-2",
+    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
+    "definition": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed.",
+    "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert",
+    "definition": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}.",
+    "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert-sequential",
+    "definition": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{, <a># more</a> will receive the document after the one before has signed}}.",
+    "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{, <a># more</a> will receive the document after the one before has signed}}."
+  },
+  {
+    "term": "component.signature-status-badge.bounced",
+    "definition": "Bounced",
+    "context": "Bounced"
+  },
+  {
+    "term": "component.signature-status-badge.canceled",
+    "definition": "Canceled",
+    "context": "Canceled"
+  },
+  {
+    "term": "component.signature-status-badge.not-started",
+    "definition": "Not started",
+    "context": "Not started"
+  },
+  {
+    "term": "component.signature-status-badge.pending",
+    "definition": "Pending signature",
+    "context": "Pending signature"
+  },
+  {
+    "term": "component.signature-status-badge.signed",
+    "definition": "Signed",
+    "context": "Signed"
+  },
+  {
+    "term": "component.signature-status-dialog.body",
+    "definition": "We have sent the document to these signers.",
+    "context": "We have sent the document to these signers."
+  },
+  {
+    "term": "component.signature-status-dialog.body-sequential",
+    "definition": "We have sent the document to the first contact, the rest will receive the signature after the one before has signed.",
+    "context": "We have sent the document to the first contact, the rest will receive the signature after the one before has signed."
+  },
+  {
+    "term": "component.signature-status-dialog.header",
+    "definition": "Signature started",
+    "context": "Signature started"
+  },
+  {
+    "term": "component.suggested-signers.header",
+    "definition": "Suggested:",
+    "context": "Suggested:"
+  },
+  {
+    "term": "component.table-page.n-selected",
+    "definition": "{count} selected",
+    "context": "{count} selected"
+  },
+  {
+    "term": "component.table.change-sorting",
+    "definition": "Change sorting for \"{column}\"",
+    "context": "Change sorting for \"{column}\""
+  },
+  {
+    "term": "component.table.filter",
+    "definition": "Filter \"{column}\"",
+    "context": "Filter \"{column}\""
+  },
+  {
+    "term": "component.table.filter-button",
+    "definition": "Filter",
+    "context": "Filter"
+  },
+  {
+    "term": "component.table.filter-header",
+    "definition": "Filter",
+    "context": "Filter"
+  },
+  {
+    "term": "component.table.sort-button",
+    "definition": "Sort",
+    "context": "Sort"
+  },
+  {
+    "term": "component.table.sort-by",
+    "definition": "Sort by \"{column}\"",
+    "context": "Sort by \"{column}\""
+  },
+  {
+    "term": "component.task-progress-dialog.unknown-task.confirm",
+    "definition": "Get result",
+    "context": "Get result"
+  },
+  {
+    "term": "component.task-progress-dialog.unknown-task.header",
+    "definition": "Please wait...",
+    "context": "Please wait..."
+  },
+  {
+    "term": "component.timezone-select.other",
+    "definition": "Other",
+    "context": "Other"
+  },
+  {
+    "term": "component.use-create-contact.create-contact",
+    "definition": "Create contact",
+    "context": "Create contact"
+  },
+  {
+    "term": "component.use-create-contact.force-contact-body",
+    "definition": "We could not verify this email address. You may not be able to send emails to this address.",
+    "context": "We could not verify this email address. You may not be able to send emails to this address."
+  },
+  {
+    "term": "component.use-create-contact.force-contact-header",
+    "definition": "Failed to verify email",
+    "context": "Failed to verify email"
+  },
+  {
+    "term": "component.use-create-contact.force-contact-question",
+    "definition": "Do you still want to create the contact?",
+    "context": "Do you still want to create the contact?"
+  },
+  {
+    "term": "component.user-dropdown-empty.invite-button",
+    "definition": "Invite people",
+    "context": "Invite people"
+  },
+  {
+    "term": "component.user-dropdown-empty.no-options",
+    "definition": "Can't find someone?",
+    "context": "Can't find someone?"
+  },
+  {
+    "term": "component.user-dropdown-empty.no-options-contact-admin",
+    "definition": "Contact with <a>the owner</a> of your organization to create them an account.",
+    "context": "Contact with <a>the owner</a> of your organization to create them an account."
+  },
+  {
+    "term": "component.user-dropdown-empty.search-hint",
+    "definition": "Search for existing users",
+    "context": "Search for existing users"
+  },
+  {
+    "term": "component.user-dropdown-empty.search-hint-include-groups",
+    "definition": "Search for existing users and teams",
+    "context": "Search for existing users and teams"
+  },
+  {
+    "term": "component.user-select.user-group-icon-alt",
+    "definition": "Team",
+    "context": "Team"
+  },
+  {
+    "term": "contacts.create-new-contact.header",
+    "definition": "Enter the contact details",
+    "context": "Enter the contact details"
+  },
+  {
+    "term": "error.404.header",
+    "definition": "We can't seem to find the page you're looking for.",
+    "context": "We can't seem to find the page you're looking for."
+  },
+  {
+    "term": "error.404.helpful-links",
+    "definition": "Here are some helpful links instead:",
+    "context": "Here are some helpful links instead:"
+  },
+  {
+    "term": "error.main-header",
+    "definition": "Oops!",
+    "context": "Oops!"
+  },
+  {
+    "term": "footer.slogan",
+    "definition": "Work better with",
+    "context": "Work better with"
+  },
+  {
+    "term": "generic.accept",
+    "definition": "Accept",
+    "context": "Accept"
+  },
+  {
+    "term": "generic.add",
+    "definition": "Add",
+    "context": "Add"
+  },
+  {
+    "term": "generic.attached-file",
+    "definition": "Attached file: {filename}",
+    "context": "Attached file: {filename}"
+  },
+  {
+    "term": "generic.cancel",
+    "definition": "Cancel",
+    "context": "Cancel"
+  },
+  {
+    "term": "generic.clear",
+    "definition": "Clear",
+    "context": "Clear"
+  },
+  {
+    "term": "generic.close",
+    "definition": "Close",
+    "context": "Close"
+  },
+  {
+    "term": "generic.collapse",
+    "definition": "Collapse",
+    "context": "Collapse"
+  },
+  {
+    "term": "generic.comments-button-label",
+    "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+    "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "generic.continue",
+    "definition": "Continue",
+    "context": "Continue"
+  },
+  {
+    "term": "generic.delete",
+    "definition": "Delete",
+    "context": "Delete"
+  },
+  {
+    "term": "generic.deleted-contact",
+    "definition": "Deleted contact",
+    "context": "Deleted contact"
+  },
+  {
+    "term": "generic.deleted-field",
+    "definition": "Deleted field",
+    "context": "Deleted field"
+  },
+  {
+    "term": "generic.deleted-user-group",
+    "definition": "Deleted team",
+    "context": "Deleted team"
+  },
+  {
+    "term": "generic.document-not-available",
+    "definition": "Document not available",
+    "context": "Document not available"
+  },
+  {
+    "term": "generic.done",
+    "definition": "Done",
+    "context": "Done"
+  },
+  {
+    "term": "generic.dropzone-default",
+    "definition": "Drag files here, or click to select them",
+    "context": "Drag files here, or click to select them"
+  },
+  {
+    "term": "generic.dropzone-error-file-too-large",
+    "definition": "The file is too large. Maximum size allowed {size}",
+    "context": "The file is too large. Maximum size allowed {size}"
+  },
+  {
+    "term": "generic.edit",
+    "definition": "Edit",
+    "context": "Edit"
+  },
+  {
+    "term": "generic.email",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
+    "term": "generic.email-example",
+    "definition": "email@example.com",
+    "context": "email@example.com"
+  },
+  {
+    "term": "generic.email-message-placeholder",
+    "definition": "Write a message to include in the email",
+    "context": "Write a message to include in the email"
+  },
+  {
+    "term": "generic.empty-heading",
+    "definition": "Untitled heading",
+    "context": "Untitled heading"
+  },
+  {
+    "term": "generic.expand",
+    "definition": "Expand",
+    "context": "Expand"
+  },
+  {
+    "term": "generic.for-example",
+    "definition": "E.g. {example}",
+    "context": "E.g. {example}"
+  },
+  {
+    "term": "generic.forms.company-email-placeholder",
+    "definition": "example@company.com",
+    "context": "example@company.com"
+  },
+  {
+    "term": "generic.forms.email-label",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
+    "term": "generic.forms.email-placeholder",
+    "definition": "name@example.com",
+    "context": "name@example.com"
+  },
+  {
+    "term": "generic.forms.first-name-label",
+    "definition": "First name",
+    "context": "First name"
+  },
+  {
+    "term": "generic.forms.invalid-email-error",
+    "definition": "Please, enter a valid email",
+    "context": "Please, enter a valid email"
+  },
+  {
+    "term": "generic.forms.invalid-first-name-error",
+    "definition": "Please, enter the first name",
+    "context": "Please, enter the first name"
+  },
+  {
+    "term": "generic.forms.invalid-last-name-error",
+    "definition": "Please, enter the last name",
+    "context": "Please, enter the last name"
+  },
+  {
+    "term": "generic.forms.last-name-label",
+    "definition": "Last name",
+    "context": "Last name"
+  },
+  {
+    "term": "generic.forms.message-label",
+    "definition": "Message",
+    "context": "Message"
+  },
+  {
+    "term": "generic.forms.required-first-name-error",
+    "definition": "First name is required",
+    "context": "First name is required"
+  },
+  {
+    "term": "generic.forms.required-last-name-error",
+    "definition": "Last name is required",
+    "context": "Last name is required"
+  },
+  {
+    "term": "generic.go-back",
+    "definition": "Go back",
+    "context": "Go back"
+  },
+  {
+    "term": "generic.go-to-page",
+    "definition": "Go to page {page}",
+    "context": "Go to page {page}"
+  },
+  {
+    "term": "generic.group-name-fallback-reply",
+    "definition": "Reply",
+    "context": "Reply"
+  },
+  {
+    "term": "generic.help",
+    "definition": "Help",
+    "context": "Help"
+  },
+  {
+    "term": "generic.language-catalan",
+    "definition": "Catalan",
+    "context": "Catalan"
+  },
+  {
+    "term": "generic.language-english",
+    "definition": "English",
+    "context": "English"
+  },
+  {
+    "term": "generic.language-italian",
+    "definition": "Italian",
+    "context": "Italian"
+  },
+  {
+    "term": "generic.language-portuguese",
+    "definition": "Portuguese",
+    "context": "Portuguese"
+  },
+  {
+    "term": "generic.language-spanish",
+    "definition": "Spanish",
+    "context": "Spanish"
+  },
+  {
+    "term": "generic.more-options",
+    "definition": "More options...",
+    "context": "More options..."
+  },
+  {
+    "term": "generic.n-group-members",
+    "definition": "{count, plural, =1 {1 member} other {# members}}",
+    "context": "{count, plural, =1 {1 member} other {# members}}"
+  },
+  {
+    "term": "generic.n-more",
+    "definition": "{count} more",
+    "context": "{count} more"
+  },
+  {
+    "term": "generic.next-page",
+    "definition": "Next page",
+    "context": "Next page"
+  },
+  {
+    "term": "generic.no-results",
+    "definition": "No results",
+    "context": "No results"
+  },
+  {
+    "term": "generic.ok",
+    "definition": "OK",
+    "context": "OK"
+  },
+  {
+    "term": "generic.optional",
+    "definition": "Optional",
+    "context": "Optional"
+  },
+  {
+    "term": "generic.options",
+    "definition": "Options...",
+    "context": "Options..."
+  },
+  {
+    "term": "generic.petition-field-type-checkbox",
+    "definition": "Multiple choice",
+    "context": "Multiple choice"
+  },
+  {
+    "term": "generic.petition-field-type-conditional-select",
+    "definition": "Conditional select",
+    "context": "Conditional select"
+  },
+  {
+    "term": "generic.petition-field-type-date",
+    "definition": "Date",
+    "context": "Date"
+  },
+  {
+    "term": "generic.petition-field-type-date-and-time",
+    "definition": "Date and time",
+    "context": "Date and time"
+  },
+  {
+    "term": "generic.petition-field-type-dow-jones-kyc-research",
+    "definition": "Search in Dow Jones",
+    "context": "Search in Dow Jones"
+  },
+  {
+    "term": "generic.petition-field-type-field-group",
+    "definition": "Group of fields",
+    "context": "Group of fields"
+  },
+  {
+    "term": "generic.petition-field-type-file-upload",
+    "definition": "Documents and files",
+    "context": "Documents and files"
+  },
+  {
+    "term": "generic.petition-field-type-heading",
+    "definition": "Text block",
+    "context": "Text block"
+  },
+  {
+    "term": "generic.petition-field-type-number",
+    "definition": "Numbers",
+    "context": "Numbers"
+  },
+  {
+    "term": "generic.petition-field-type-phone",
+    "definition": "Phone number",
+    "context": "Phone number"
+  },
+  {
+    "term": "generic.petition-field-type-select",
+    "definition": "Select",
+    "context": "Select"
+  },
+  {
+    "term": "generic.petition-field-type-short-text",
+    "definition": "Short replies",
+    "context": "Short replies"
+  },
+  {
+    "term": "generic.petition-field-type-tax-documents",
+    "definition": "Tax documents",
+    "context": "Tax documents"
+  },
+  {
+    "term": "generic.petition-field-type-text",
+    "definition": "Long replies",
+    "context": "Long replies"
+  },
+  {
+    "term": "generic.please-try-again-later",
+    "definition": "Please try again later",
+    "context": "Please try again later"
+  },
+  {
+    "term": "generic.previous-page",
+    "definition": "Previous page",
+    "context": "Previous page"
+  },
+  {
+    "term": "generic.reload-data",
+    "definition": "Reload",
+    "context": "Reload"
+  },
+  {
+    "term": "generic.remove",
+    "definition": "Remove",
+    "context": "Remove"
+  },
+  {
+    "term": "generic.reply-not-available",
+    "definition": "Reply not available",
+    "context": "Reply not available"
+  },
+  {
+    "term": "generic.reply-not-submitted",
+    "definition": "Reply not sent",
+    "context": "Reply not sent"
+  },
+  {
+    "term": "generic.required-field",
+    "definition": "Required field",
+    "context": "Required field"
+  },
+  {
+    "term": "generic.save",
+    "definition": "Save",
+    "context": "Save"
+  },
+  {
+    "term": "generic.saving-changes",
+    "definition": "Saving...",
+    "context": "Saving..."
+  },
+  {
+    "term": "generic.select-an-option",
+    "definition": "Select an option",
+    "context": "Select an option"
+  },
+  {
+    "term": "generic.send",
+    "definition": "Send",
+    "context": "Send"
+  },
+  {
+    "term": "generic.show-more-less",
+    "definition": "Show {more, select, true {more} other {less}}",
+    "context": "Show {more, select, true {more} other {less}}"
+  },
+  {
+    "term": "generic.signature-demo-environment-long",
+    "definition": "Test environment",
+    "context": "Test environment"
+  },
+  {
+    "term": "generic.something-went-wrong",
+    "definition": "Something went wrong",
+    "context": "Something went wrong"
+  },
+  {
+    "term": "generic.submit",
+    "definition": "Submit",
+    "context": "Submit"
+  },
+  {
+    "term": "generic.thanks",
+    "definition": "Thanks",
+    "context": "Thanks"
+  },
+  {
+    "term": "generic.understood",
+    "definition": "Understood",
+    "context": "Understood"
+  },
+  {
+    "term": "generic.unexpected-error-happened",
+    "definition": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+    "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help."
+  },
+  {
+    "term": "generic.unknown",
+    "definition": "Unknown",
+    "context": "Unknown"
+  },
+  {
+    "term": "generic.untitled",
+    "definition": "Untitled",
+    "context": "Untitled"
+  },
+  {
+    "term": "generic.untitled-field",
+    "definition": "Untitled field",
+    "context": "Untitled field"
+  },
+  {
+    "term": "generic.you",
+    "definition": "You",
+    "context": "You"
+  },
+  {
+    "term": "header.user-menu-button",
+    "definition": "User menu",
+    "context": "User menu"
+  },
+  {
+    "term": "layout.privacy-link",
+    "definition": "Privacy",
+    "context": "Privacy"
+  },
+  {
+    "term": "layout.terms-and-conditions-link",
+    "definition": "Terms and conditions",
+    "context": "Terms and conditions"
+  },
+  {
+    "term": "page.maintenance.description",
+    "definition": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible.",
+    "context": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible."
+  },
+  {
+    "term": "page.maintenance.header",
+    "definition": "Parallel is under maintenance",
+    "context": "Parallel is under maintenance"
+  },
+  {
+    "term": "page.opt-out.answer-no-reminders",
+    "definition": "I will upload the information but I do not want to receive any more emails",
+    "context": "I will upload the information but I do not want to receive any more emails"
+  },
+  {
+    "term": "page.opt-out.answer-not-interested",
+    "definition": "I am not interested in this service anymore",
+    "context": "I am not interested in this service anymore"
+  },
+  {
+    "term": "page.opt-out.answer-not-requested",
+    "definition": "I have not requested this service",
+    "context": "I have not requested this service"
+  },
+  {
+    "term": "page.opt-out.answer-other",
+    "definition": "Other",
+    "context": "Other"
+  },
+  {
+    "term": "page.opt-out.answer-spam",
+    "definition": "I consider this is spam",
+    "context": "I consider this is spam"
+  },
+  {
+    "term": "page.opt-out.answer-wrong-person",
+    "definition": "I am not the person to complete this information",
+    "context": "I am not the person to complete this information"
+  },
+  {
+    "term": "page.opt-out.done-body",
+    "definition": "We have informed the sender and you will not receive any more reminders related with this process.",
+    "context": "We have informed the sender and you will not receive any more reminders related with this process."
+  },
+  {
+    "term": "page.opt-out.done-title",
+    "definition": "Done!",
+    "context": "Done!"
+  },
+  {
+    "term": "page.opt-out.feedback-title",
+    "definition": "Please let us know why you would like to stop receiving reminders related with this process.",
+    "context": "Please let us know why you would like to stop receiving reminders related with this process."
+  },
+  {
+    "term": "page.opt-out.opt-out-button",
+    "definition": "Confirm",
+    "context": "Confirm"
+  },
+  {
+    "term": "page.opt-out.other-error-message",
+    "definition": "Please, enter a reason",
+    "context": "Please, enter a reason"
+  },
+  {
+    "term": "page.opt-out.other-placeholder",
+    "definition": "Indicate other reasons",
+    "context": "Indicate other reasons"
+  },
+  {
+    "term": "page.opt-out.review-before-opt-out",
+    "definition": "Before opting out from receiving reminders, check the requested information.",
+    "context": "Before opting out from receiving reminders, check the requested information."
+  },
+  {
+    "term": "page.opt-out.review-button",
+    "definition": "Review the information",
+    "context": "Review the information"
+  },
+  {
+    "term": "page.opt-out.title",
+    "definition": "Opt out from emails",
+    "context": "Opt out from emails"
+  },
+  {
+    "term": "page.update-browser.header",
+    "definition": "Unsupported browser",
+    "context": "Unsupported browser"
+  },
+  {
+    "term": "page.update-browser.text-1",
+    "definition": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:",
+    "context": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
+  },
+  {
+    "term": "page.update-browser.text-2",
+    "definition": "If the error persists, please contact the person who sent you this link.",
+    "context": "If the error persists, please contact the person who sent you this link."
+  },
+  {
+    "term": "petition.replies.download-file-error-dialog.body",
+    "definition": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
+    "context": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed."
+  },
+  {
+    "term": "petition.replies.download-file-error-dialog.header",
+    "definition": "Error downloading {filename}",
+    "context": "Error downloading {filename}"
+  },
+  {
+    "term": "petition.signature-successful.subtitle",
+    "definition": "We have sent a signed copy of the document to your email.",
+    "context": "We have sent a signed copy of the document to your email."
+  },
+  {
+    "term": "petition.signature-successful.title",
+    "definition": "Document signed successfully",
+    "context": "Document signed successfully"
+  },
+  {
+    "term": "placeholder-plugin.deleted-field",
+    "definition": "This field has been deleted. Nothing will show here.",
+    "context": "This field has been deleted. Nothing will show here."
+  },
+  {
+    "term": "placeholder-plugin.field-without-replies",
+    "definition": "This field has no replies. Nothing will show here.",
+    "context": "This field has no replies. Nothing will show here."
+  },
+  {
+    "term": "public-petition-email-exists.body",
+    "definition": "There is already an ongoing process associated to this email. If you start a new process, you will have to fill the information from scratch. What would you like to do?",
+    "context": "There is already an ongoing process associated to this email. If you start a new process, you will have to fill the information from scratch. What would you like to do?"
+  },
+  {
+    "term": "public-petition-email-exists.continue-existing-button",
+    "definition": "Continue existing process",
+    "context": "Continue existing process"
+  },
+  {
+    "term": "public-petition-email-exists.new-petition-button",
+    "definition": "Start again",
+    "context": "Start again"
+  },
+  {
+    "term": "public-petition-email-exists.title",
+    "definition": "Existing email",
+    "context": "Existing email"
+  },
+  {
+    "term": "public-petition-email-sent.body.explanation-1",
+    "definition": "We have sent an email to {email} with access to complete the information. This will help us verify your email and ensure your privacy and security.",
+    "context": "We have sent an email to {email} with access to complete the information. This will help us verify your email and ensure your privacy and security."
+  },
+  {
+    "term": "public-petition-email-sent.body.explanation-2",
+    "definition": "Can't find our email? Check your spam folder and if you don't find it contact with the person who shared you the link.",
+    "context": "Can't find our email? Check your spam folder and if you don't find it contact with the person who shared you the link."
+  },
+  {
+    "term": "public-petition-email-sent.body.explanation-existing-process",
+    "definition": "You have an existing process with this email ({email}). We have resent you the access so you can continue with it.",
+    "context": "You have an existing process with this email ({email}). We have resent you the access so you can continue with it."
+  },
+  {
+    "term": "public-petition-email-sent.title",
+    "definition": "Check your inbox",
+    "context": "Check your inbox"
+  },
+  {
+    "term": "public-petition-reminder.body.explanation-1",
+    "definition": "We have sent a reminder to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it.",
+    "context": "We have sent a reminder to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it."
+  },
+  {
+    "term": "public-petition-reminder.body.explanation-2",
+    "definition": "Can't find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link.",
+    "context": "Can't find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
+  },
+  {
+    "term": "public-petition-reminder.title",
+    "definition": "Reminder sent",
+    "context": "Reminder sent"
+  },
+  {
+    "term": "public-petition.help.explanation-1",
+    "definition": "If you have found this link or someone has sent it to you, it means that they need some information. For security, we need to identify you and so we can <b>associate your email to a secure portal</b> where you can complete it.",
+    "context": "If you have found this link or someone has sent it to you, it means that they need some information. For security, we need to identify you and so we can <b>associate your email to a secure portal</b> where you can complete it."
+  },
+  {
+    "term": "public-petition.help.explanation-2",
+    "definition": "In addition, we will send you an <b>email with the link</b> so that you can return and continue at any time.",
+    "context": "In addition, we will send you an <b>email with the link</b> so that you can return and continue at any time."
+  },
+  {
+    "term": "public-petition.help.form-title",
+    "definition": "Enter your data to access",
+    "context": "Enter your data to access"
+  },
+  {
+    "term": "public-petition.help.more-faq",
+    "definition": "See more frequently asked questions",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "public-petition.help.request-access-button",
+    "definition": "Request access",
+    "context": "Request access"
+  },
+  {
+    "term": "public-petition.help.title",
+    "definition": "Why do we ask for this data?",
+    "context": "Why do we ask for this data?"
+  },
+  {
+    "term": "public.home-link",
+    "definition": "Home",
+    "context": "Home"
+  },
+  {
+    "term": "public.public-petition-link-unavailable.description",
+    "definition": "Contact with {fullName} <{email}> to continue.",
+    "context": "Contact with {fullName} <{email}> to continue."
+  },
+  {
+    "term": "public.public-petition-link-unavailable.title",
+    "definition": "This process is closed",
+    "context": "This process is closed"
+  },
+  {
+    "term": "public.public-petition.error--reminder-description",
+    "definition": "You can only send one reminder each 24 hours",
+    "context": "You can only send one reminder each 24 hours"
+  },
+  {
+    "term": "public.public-petition.error-reminder-title",
+    "definition": "Reminder already sent",
+    "context": "Reminder already sent"
+  },
+  {
+    "term": "public.slogan.alternative",
+    "definition": "Create your own <b>Parallel</b>",
+    "context": "Create your own <b>Parallel</b>"
+  },
+  {
+    "term": "public.support.faq",
+    "definition": "FAQ",
+    "context": "FAQ"
+  },
+  {
+    "term": "public.support.support-center",
+    "definition": "Support center",
+    "context": "Support center"
+  },
+  {
+    "term": "public.terms.title",
+    "definition": "Terms & Conditions",
+    "context": "Terms & Conditions"
+  },
+  {
+    "term": "recipient-view.cant-find-email-help",
+    "definition": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you.",
+    "context": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you."
+  },
+  {
+    "term": "recipient-view.change-email",
+    "definition": "Change email",
+    "context": "Change email"
+  },
+  {
+    "term": "recipient-view.client-portal.all",
+    "definition": "All",
+    "context": "All"
+  },
+  {
+    "term": "recipient-view.client-portal.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "recipient-view.client-portal.my-processes",
+    "definition": "My processes",
+    "context": "My processes"
+  },
+  {
+    "term": "recipient-view.client-portal.no-results",
+    "definition": "No results found for your search",
+    "context": "No results found for your search"
+  },
+  {
+    "term": "recipient-view.client-portal.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "recipient-view.client-portal.requested-by",
+    "definition": "Requested by {name}, on {date}",
+    "context": "Requested by {name}, on {date}"
+  },
+  {
+    "term": "recipient-view.client-portal.search-placeholder",
+    "definition": "Search...",
+    "context": "Search..."
+  },
+  {
+    "term": "recipient-view.complete-petition.error-message",
+    "definition": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers.",
+    "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
+  },
+  {
+    "term": "recipient-view.contents-header",
+    "definition": "Contents",
+    "context": "Contents"
+  },
+  {
+    "term": "recipient-view.created-with",
+    "definition": "Created with {parallel}",
+    "context": "Created with {parallel}"
+  },
+  {
+    "term": "recipient-view.doubts-button",
+    "definition": "Questions?",
+    "context": "Questions?"
+  },
+  {
+    "term": "recipient-view.expired-code-description",
+    "definition": "The code has expired. Please try again.",
+    "context": "The code has expired. Please try again."
+  },
+  {
+    "term": "recipient-view.expired-code-title",
+    "definition": "Expired code",
+    "context": "Expired code"
+  },
+  {
+    "term": "recipient-view.export-to-pdf",
+    "definition": "Export to PDF",
+    "context": "Export to PDF"
+  },
+  {
+    "term": "recipient-view.field-comments.cta",
+    "definition": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here",
+    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
+  },
+  {
+    "term": "recipient-view.field-comments.cta-with-name",
+    "definition": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here",
+    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
+  },
+  {
+    "term": "recipient-view.field-comments.placeholder",
+    "definition": "Ask here your questions and doubts",
+    "context": "Ask here your questions and doubts"
+  },
+  {
+    "term": "recipient-view.field-comments.undefined-field",
+    "definition": "Something unexpected happened. Please, refresh the page and try again.",
+    "context": "Something unexpected happened. Please, refresh the page and try again."
+  },
+  {
+    "term": "recipient-view.first-time.finalize-whenever-body",
+    "definition": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel.",
+    "context": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel."
+  },
+  {
+    "term": "recipient-view.first-time.finalize-whenever-title",
+    "definition": "Finalize whenever you want",
+    "context": "Finalize whenever you want"
+  },
+  {
+    "term": "recipient-view.first-time.intro",
+    "definition": "How to fill in your information",
+    "context": "How to fill in your information"
+  },
+  {
+    "term": "recipient-view.first-time.replies-saved-body",
+    "definition": "The information you enter will be saved automatically and synchronized with the sender.",
+    "context": "The information you enter will be saved automatically and synchronized with the sender."
+  },
+  {
+    "term": "recipient-view.first-time.replies-saved-title",
+    "definition": "Your replies auto-saved",
+    "context": "Your replies auto-saved"
+  },
+  {
+    "term": "recipient-view.first-time.send-doubts-body",
+    "definition": "You can add any questions you have on the corresponding field and your sender will respond them.",
+    "context": "You can add any questions you have on the corresponding field and your sender will respond them."
+  },
+  {
+    "term": "recipient-view.first-time.send-doubts-title",
+    "definition": "Send your questions",
+    "context": "Send your questions"
+  },
+  {
+    "term": "recipient-view.go-to-my-processes",
+    "definition": "Go to my processes",
+    "context": "Go to my processes"
+  },
+  {
+    "term": "recipient-view.guide-me",
+    "definition": "Guide me",
+    "context": "Guide me"
+  },
+  {
+    "term": "recipient-view.in-order-to",
+    "definition": "To",
+    "context": "To"
+  },
+  {
+    "term": "recipient-view.invite-collaborator",
+    "definition": "Invite collaborator",
+    "context": "Invite collaborator"
+  },
+  {
+    "term": "recipient-view.invite-collaborator.help",
+    "definition": "Use this option to request someone else to complete the information for you.",
+    "context": "Use this option to request someone else to complete the information for you."
+  },
+  {
+    "term": "recipient-view.last-saved-info",
+    "definition": "Your answers are automatically saved.",
+    "context": "Your answers are automatically saved."
+  },
+  {
+    "term": "recipient-view.last-saved-info-date",
+    "definition": "<b>Last saved:</b> {date}",
+    "context": "<b>Last saved:</b> {date}"
+  },
+  {
+    "term": "recipient-view.last-saved-time",
+    "definition": "Last saved {time}",
+    "context": "Last saved {time}"
+  },
+  {
+    "term": "recipient-view.last-saved-time-short",
+    "definition": "Saved {time}",
+    "context": "Saved {time}"
+  },
+  {
+    "term": "recipient-view.petition-delegated.toast-body",
+    "definition": "We have sent an email to {email} with instructions to access this parallel.",
+    "context": "We have sent an email to {email} with instructions to access this parallel."
+  },
+  {
+    "term": "recipient-view.petition-delegated.toast-header",
+    "definition": "Access delegated",
+    "context": "Access delegated"
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.header",
+    "definition": "It seems that this page is no longer available.",
+    "context": "It seems that this page is no longer available."
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.text",
+    "definition": "If you need to access it, please reach out to the person that sent it to you.",
+    "context": "If you need to access it, please reach out to the person that sent it to you."
+  },
+  {
+    "term": "recipient-view.petition-subject",
+    "definition": "Subject",
+    "context": "Subject"
+  },
+  {
+    "term": "recipient-view.progress",
+    "definition": "Progress {current}/{total}",
+    "context": "Progress {current}/{total}"
+  },
+  {
+    "term": "recipient-view.remaining-attempts",
+    "definition": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}",
+    "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
+  },
+  {
+    "term": "recipient-view.request-information",
+    "definition": "Information",
+    "context": "Information"
+  },
+  {
+    "term": "recipient-view.requested-by",
+    "definition": "Requested by",
+    "context": "Requested by"
+  },
+  {
+    "term": "recipient-view.review-before-sign.body-1",
+    "definition": "This parallel requires an <b>eSignature</b> in order to be completed.",
+    "context": "This parallel requires an <b>eSignature</b> in order to be completed."
+  },
+  {
+    "term": "recipient-view.review-before-sign.body-2",
+    "definition": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}",
+    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
+  },
+  {
+    "term": "recipient-view.review-before-sign.header",
+    "definition": "Review and sign",
+    "context": "Review and sign"
+  },
+  {
+    "term": "recipient-view.send-code",
+    "definition": "Send verification code",
+    "context": "Send verification code"
+  },
+  {
+    "term": "recipient-view.submit-and-sign-button-short",
+    "definition": "Finalize and sign",
+    "context": "Finalize and sign"
+  },
+  {
+    "term": "recipient-view.submit-button-short",
+    "definition": "Finalize",
+    "context": "Finalize"
+  },
+  {
+    "term": "recipient-view.unread-comments",
+    "definition": "There's unread comments",
+    "context": "There's unread comments"
+  },
+  {
+    "term": "recipient-view.verify-1",
+    "definition": "It looks like you are trying to access this page from a new device.",
+    "context": "It looks like you are trying to access this page from a new device."
+  },
+  {
+    "term": "recipient-view.verify-2",
+    "definition": "To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}.",
+    "context": "To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
+  },
+  {
+    "term": "recipient-view.verify-button",
+    "definition": "Verify code",
+    "context": "Verify code"
+  },
+  {
+    "term": "recipient-view.verify-title",
+    "definition": "Enter verification code",
+    "context": "Enter verification code"
+  },
+  {
+    "term": "user-group.all-members.description",
+    "definition": "This team contains all users from the organization.",
+    "context": "This team contains all users from the organization."
+  },
+  {
+    "term": "util.use-short-text-formats.email",
+    "definition": "email",
+    "context": "email"
+  },
+  {
+    "term": "util.use-short-text-formats.es-dni",
+    "definition": "national ID number",
+    "context": "national ID number"
+  },
+  {
+    "term": "util.use-short-text-formats.es-nif",
+    "definition": "tax ID number",
+    "context": "tax ID number"
+  },
+  {
+    "term": "util.use-short-text-formats.es-postalcode",
+    "definition": "postal code",
+    "context": "postal code"
+  },
+  {
+    "term": "util.use-short-text-formats.es-ssn",
+    "definition": "social security number",
+    "context": "social security number"
+  },
+  {
+    "term": "util.use-short-text-formats.group-generic",
+    "definition": "Generic",
+    "context": "Generic"
+  },
+  {
+    "term": "util.use-short-text-formats.iban",
+    "definition": "IBAN account number",
+    "context": "IBAN account number"
+  },
+  {
+    "term": "util.use-short-text-formats.us-postalcode",
+    "definition": "zip code",
+    "context": "zip code"
+  },
+  {
+    "term": "util.use-short-text-formats.us-ssn",
+    "definition": "social security number",
+    "context": "social security number"
+  }
+]

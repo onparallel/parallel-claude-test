@@ -1,23 +1,37 @@
 import { I18nProps } from "@parallel/components/common/I18nProvider";
-import languages from "@parallel/lang/languages.json";
 import { promises as fs } from "fs";
-import Document, { DocumentContext, Head, Html, Main, NextScript } from "next/document";
+import Document, {
+  DocumentContext,
+  DocumentInitialProps,
+  Head,
+  Html,
+  Main,
+  NextScript,
+} from "next/document";
 import { outdent } from "outdent";
 import { IntlConfig } from "react-intl";
 import { isDefined } from "remeda";
 
 const MESSAGES_CACHE = new Map<string, IntlConfig["messages"]>();
 
-async function loadMessages(locale: string): Promise<IntlConfig["messages"]> {
+async function loadMessages(locale: string, isRecipient: boolean): Promise<IntlConfig["messages"]> {
   if (process.env.NODE_ENV !== "production") {
     // on development load uncompiled files for faster dev cycle
-    const path = process.env.ROOT + `/lang/${locale}.json`;
+    const path =
+      process.env.ROOT +
+      "/lang" +
+      (isRecipient && !["en", "es"].includes(locale) ? "/recipient" : "") +
+      `/${locale}.json`;
     const messages = await fs.readFile(path, { encoding: "utf-8" });
     return Object.fromEntries<string>(JSON.parse(messages).map((t: any) => [t.term, t.definition]));
   } else {
     if (!MESSAGES_CACHE.has(locale)) {
       // on production load compiled files
-      const path = process.env.ROOT + `/public/static/lang/compiled/${locale}.json`;
+      const path =
+        process.env.ROOT +
+        "/public/static/lang" +
+        (isRecipient ? "/recipient" : "") +
+        `/compiled/${locale}.json`;
       const messages = await fs.readFile(path, { encoding: "utf-8" });
       MESSAGES_CACHE.set(locale, JSON.parse(messages));
     }
@@ -45,41 +59,53 @@ const POLYFILLS_INTL = [
   "Intl.RelativeTimeFormat",
 ];
 
-type MyDocumentProps = I18nProps;
+interface MyDocumentProps extends I18nProps {
+  isRecipientPage: boolean;
+}
 
 class MyDocument extends Document<MyDocumentProps> {
-  static override async getInitialProps(ctx: DocumentContext) {
+  static override async getInitialProps(
+    ctx: DocumentContext,
+  ): Promise<DocumentInitialProps & MyDocumentProps> {
     const { renderPage, locale } = ctx;
+    const isRecipientPage =
+      ["/maintenance", "/thanks", "/update", "/404"].includes(ctx.pathname) ||
+      ["/petition/", "/pp/"].some((prefix) => ctx.pathname.startsWith(prefix));
     if (!isDefined(locale)) {
       ctx.res!.writeHead(302, { Location: "/" }).end();
-      return {} as any;
+      return { html: "" } as any;
+    } else if (!isRecipientPage && !["en", "es"].includes(locale)) {
+      ctx.res!.writeHead(302, { Location: ctx.asPath }).end();
+      return { html: "" } as any;
     }
-    const messages = await loadMessages(locale);
+    const messages = await loadMessages(locale, isRecipientPage);
     ctx.renderPage = () =>
       renderPage({
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        enhanceApp: (App) => (props) => <App {...props} {...{ locale, messages }} />,
+        enhanceApp: (App) => (props) => (
+          <App {...props} {...{ locale, messages, isRecipientPage }} />
+        ),
       });
     const initialProps = await Document.getInitialProps(ctx);
-    return { ...initialProps, locale, messages };
+    return {
+      ...initialProps,
+      locale,
+      messages,
+      isRecipientPage,
+    };
   }
 
   override render() {
-    const { locale, messages } = this.props;
+    const { locale, messages, isRecipientPage: isRecipient } = this.props;
     const polyfillsUrl = `https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
       [
         ...POLYFILLS,
         ...POLYFILLS_INTL.flatMap((polyfill) => [polyfill, `${polyfill}.~locale.${locale}`]),
       ].join(","),
     )}`;
-    const polyfillsUrlIntl = `https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
-      POLYFILLS_INTL.flatMap((polyfill) =>
-        languages
-          .filter((lang) => lang.locale !== locale)
-          .map((lang) => `${polyfill}.~locale.${lang.locale}`),
-      ).join(","),
-    )}`;
-    const localeDataUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.js?v=${process.env.BUILD_ID}`;
+    const localeDataUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${
+      isRecipient ? "recipient/" : ""
+    }compiled/${locale}.js?v=${process.env.BUILD_ID}`;
     return (
       <Html>
         <Head>
@@ -108,7 +134,6 @@ class MyDocument extends Document<MyDocumentProps> {
         <body>
           <Main />
           <script src={polyfillsUrl} crossOrigin="anonymous" />
-          <script src={polyfillsUrlIntl} async defer crossOrigin="anonymous" />
           {process.env.NODE_ENV === "production" ? (
             <script src={localeDataUrl} crossOrigin="anonymous" />
           ) : (

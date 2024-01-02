@@ -6,7 +6,7 @@ import { Knex } from "knex";
 import pMap from "p-map";
 import { OrganizationUsageLimitName } from "../db/__types";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
-import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/ProfilesExpiringPropertiesEmail";
+import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/app/ProfilesExpiringPropertiesEmail";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { unMaybeArray } from "../util/arrays";
 import { Maybe, MaybeArray } from "../util/types";

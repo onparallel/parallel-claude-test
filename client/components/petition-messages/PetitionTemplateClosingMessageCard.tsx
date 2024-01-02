@@ -22,7 +22,16 @@ interface PetitionTemplateClosingMessageCardProps {
   onUpdatePetition: (data: UpdatePetitionInput) => void;
 }
 
-const messages: Record<PetitionLocale, string> = {
+export const PETITION_CLOSING_DEFAULT_MESSAGE: Record<PetitionLocale, string> = {
+  ca: outdent`
+    Estimat/da {{contact-first-name}},
+    
+    Us comuniquem que hem revisat tota la informació que us vam requerir i us confirmem que està tot correcte.
+    
+    Quedem a la vostra completa disposició per aclarir o comentar qualsevol aspecte que considereu oportú.
+    
+    Rebeu una cordial salutació.
+ `,
   en: outdent`
     Dear {{contact-first-name}},
 
@@ -41,6 +50,24 @@ const messages: Record<PetitionLocale, string> = {
     
     Reciba un cordial saludo.
   `,
+  it: outdent`
+    Gentile {{contact-first-name}},
+  
+    La informiamo che abbiamo esaminato tutte le informazioni che le abbiamo richiesto e le confermiamo che è tutto corretto.
+    
+    Siamo a sua completa disposizione per chiarire o commentare qualsiasi aspetto che ritenga opportuno.
+    
+    Cordiali saluti.
+  `,
+  pt: outdent`
+    Caro(a) {{contact-first-name}},
+  
+    Informamos que revimos todas as informações que lhe solicitamos e confirmamos que está tudo correto.
+    
+    Estamos à sua inteira disposição para esclarecer ou comentar qualquer aspeto que considere oportuno.
+    
+    Com os melhores cumprimentos.
+  `,
 };
 
 export const PetitionTemplateClosingMessageCard = Object.assign(
@@ -49,7 +76,10 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
       const placeholders = usePetitionMessagePlaceholderOptions({ petition });
       const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
         petition.closingEmailBody ??
-          textWithPlaceholderToSlateNodes(messages[petition.locale], placeholders),
+          textWithPlaceholderToSlateNodes(
+            PETITION_CLOSING_DEFAULT_MESSAGE[petition.locale],
+            placeholders,
+          ),
       );
 
       const handleclosingEmailBodyChange = (value: RichTextEditorValue) => {

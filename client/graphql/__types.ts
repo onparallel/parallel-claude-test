@@ -413,6 +413,9 @@ export type FeatureFlag =
   | "PROFILES"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
+  | "RECIPIENT_LANG_CA"
+  | "RECIPIENT_LANG_IT"
+  | "RECIPIENT_LANG_PT"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
@@ -936,7 +939,7 @@ export interface Mutation {
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
   setUserDelegates: User;
-  /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
+  /** Shares our Signaturit production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
   shareSignaturitApiKey: Organization;
   /** Triggered by new users that want to sign up into Parallel */
   signUp: User;
@@ -2421,8 +2424,11 @@ export interface OrganizationPdfDocumentThemeInput {
 }
 
 export interface OrganizationPdfDocumentThemeInputLegalText {
+  ca?: InputMaybe<Scalars["JSON"]["input"]>;
   en?: InputMaybe<Scalars["JSON"]["input"]>;
   es?: InputMaybe<Scalars["JSON"]["input"]>;
+  it?: InputMaybe<Scalars["JSON"]["input"]>;
+  pt?: InputMaybe<Scalars["JSON"]["input"]>;
 }
 
 /** The status of the organization. */
@@ -3299,7 +3305,7 @@ export interface PetitionListViewSortInput {
 }
 
 /** The locale used for rendering the petition to the contact. */
-export type PetitionLocale = "en" | "es";
+export type PetitionLocale = "ca" | "en" | "es" | "it" | "pt";
 
 /** A petition message */
 export interface PetitionMessage extends CreatedAt {
@@ -7924,6 +7930,9 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
 export type BrandingDocumentTheme_UserFragment = {
   __typename?: "User";
   id: string;
+  hasRecipientLangCA: boolean;
+  hasRecipientLangIT: boolean;
+  hasRecipientLangPT: boolean;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8071,6 +8080,13 @@ export type BrandingGeneralPreview_UserFragment = {
       fontFamily?: string | null;
     };
   };
+};
+
+export type DocumentThemeEditor_UserFragment = {
+  __typename?: "User";
+  hasRecipientLangCA: boolean;
+  hasRecipientLangIT: boolean;
+  hasRecipientLangPT: boolean;
 };
 
 export type DocumentThemePreview_OrganizationFragment = {
@@ -14361,6 +14377,9 @@ export type PetitionSettings_UserFragment = {
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
   hasAutoAnonymize: boolean;
+  hasRecipientLangCA: boolean;
+  hasRecipientLangIT: boolean;
+  hasRecipientLangPT: boolean;
   hasPetitionSignature: boolean;
   hasPrefillSecret: boolean;
   organization: {
@@ -15732,6 +15751,13 @@ export type FolderCard_PetitionFolderFragment = {
   minimumPermissionType: PetitionPermissionType;
   folderId: string;
   folderName: string;
+};
+
+export type NewPetitionLanguageFilter_UserFragment = {
+  __typename?: "User";
+  hasRecipientLangCA: boolean;
+  hasRecipientLangIT: boolean;
+  hasRecipientLangPT: boolean;
 };
 
 export type PublicTemplateCard_PetitionTemplateFragment = {
@@ -24043,6 +24069,9 @@ export type OrganizationBranding_userQuery = {
     initials?: string | null;
     hasProfilesAccess: boolean;
     hasRemovedParallelBranding: boolean;
+    hasRecipientLangCA: boolean;
+    hasRecipientLangIT: boolean;
+    hasRecipientLangPT: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -29758,6 +29787,9 @@ export type PetitionCompose_QueryFragment = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
+    hasRecipientLangCA: boolean;
+    hasRecipientLangIT: boolean;
+    hasRecipientLangPT: boolean;
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
@@ -31092,6 +31124,9 @@ export type PetitionCompose_userQuery = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
+    hasRecipientLangCA: boolean;
+    hasRecipientLangIT: boolean;
+    hasRecipientLangPT: boolean;
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
@@ -38626,6 +38661,9 @@ export type NewPetition_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasProfilesAccess: boolean;
+    hasRecipientLangCA: boolean;
+    hasRecipientLangIT: boolean;
+    hasRecipientLangPT: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -42096,6 +42134,13 @@ export type LiquidScopeProvider_PublicPetitionFieldFragment = {
   alias?: string | null;
 };
 
+export type useAvailablePetitionLocales_UserFragment = {
+  __typename?: "User";
+  hasRecipientLangCA: boolean;
+  hasRecipientLangIT: boolean;
+  hasRecipientLangPT: boolean;
+};
+
 export type usePetitionCommentsMutations_getUsersOrGroupsQueryVariables = Exact<{
   ids: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
 }>;
@@ -44599,6 +44644,19 @@ export const BrandingDocumentTheme_OrganizationThemeFragmentDoc = gql`
     isDefault
   }
 ` as unknown as DocumentNode<BrandingDocumentTheme_OrganizationThemeFragment, unknown>;
+export const useAvailablePetitionLocales_UserFragmentDoc = gql`
+  fragment useAvailablePetitionLocales_User on User {
+    hasRecipientLangCA: hasFeatureFlag(featureFlag: RECIPIENT_LANG_CA)
+    hasRecipientLangIT: hasFeatureFlag(featureFlag: RECIPIENT_LANG_IT)
+    hasRecipientLangPT: hasFeatureFlag(featureFlag: RECIPIENT_LANG_PT)
+  }
+` as unknown as DocumentNode<useAvailablePetitionLocales_UserFragment, unknown>;
+export const DocumentThemeEditor_UserFragmentDoc = gql`
+  fragment DocumentThemeEditor_User on User {
+    ...useAvailablePetitionLocales_User
+  }
+  ${useAvailablePetitionLocales_UserFragmentDoc}
+` as unknown as DocumentNode<DocumentThemeEditor_UserFragment, unknown>;
 export const BrandingDocumentTheme_UserFragmentDoc = gql`
   fragment BrandingDocumentTheme_User on User {
     id
@@ -44608,9 +44666,11 @@ export const BrandingDocumentTheme_UserFragmentDoc = gql`
         ...BrandingDocumentTheme_OrganizationTheme
       }
     }
+    ...DocumentThemeEditor_User
   }
   ${DocumentThemePreview_OrganizationFragmentDoc}
   ${BrandingDocumentTheme_OrganizationThemeFragmentDoc}
+  ${DocumentThemeEditor_UserFragmentDoc}
 ` as unknown as DocumentNode<BrandingDocumentTheme_UserFragment, unknown>;
 export const OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc = gql`
   fragment OverrideWithOrganizationTheme_OrganizationBrandThemeData on OrganizationBrandThemeData {
@@ -45266,6 +45326,12 @@ export const PetitionListTagFilter_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 ` as unknown as DocumentNode<PetitionListTagFilter_TagFragment, unknown>;
+export const NewPetitionLanguageFilter_UserFragmentDoc = gql`
+  fragment NewPetitionLanguageFilter_User on User {
+    ...useAvailablePetitionLocales_User
+  }
+  ${useAvailablePetitionLocales_UserFragmentDoc}
+` as unknown as DocumentNode<NewPetitionLanguageFilter_UserFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {
     content
@@ -48402,6 +48468,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
+    ...useAvailablePetitionLocales_User
     ...TestModeSignatureBadge_User
     ...PublicLinkSettingsDialog_User
     organization {
@@ -48420,6 +48487,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
     }
     ...SignatureConfigDialog_User
   }
+  ${useAvailablePetitionLocales_UserFragmentDoc}
   ${TestModeSignatureBadge_UserFragmentDoc}
   ${PublicLinkSettingsDialog_UserFragmentDoc}
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
@@ -55839,8 +55907,12 @@ export const NewPetition_userDocument = gql`
       totalCount
     }
     publicTemplateCategories
+    me {
+      ...NewPetitionLanguageFilter_User
+    }
   }
   ${AppLayout_QueryFragmentDoc}
+  ${NewPetitionLanguageFilter_UserFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_userQuery, NewPetition_userQueryVariables>;
 export const NewPetition_templateDocument = gql`
   query NewPetition_template($templateId: GID!) {

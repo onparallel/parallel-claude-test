@@ -21,9 +21,9 @@ export type AiCompletionLogType = "PETITION_SUMMARY";
 
 export const AiCompletionLogTypeValues = ["PETITION_SUMMARY"] as AiCompletionLogType[];
 
-export type ContactLocale = "en" | "es";
+export type ContactLocale = "en" | "es" | "ca" | "it" | "pt";
 
-export const ContactLocaleValues = ["en", "es"] as ContactLocale[];
+export const ContactLocaleValues = ["en", "es", "ca", "it", "pt"] as ContactLocale[];
 
 export type FeatureFlagName =
   | "PETITION_SIGNATURE"
@@ -50,7 +50,10 @@ export type FeatureFlagName =
   | "BULK_PETITION_SEND_TASK"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "SETTING_DELEGATE_ACCESS"
-  | "PETITION_SUMMARY";
+  | "PETITION_SUMMARY"
+  | "RECIPIENT_LANG_CA"
+  | "RECIPIENT_LANG_IT"
+  | "RECIPIENT_LANG_PT";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -78,6 +81,9 @@ export const FeatureFlagNameValues = [
   "TEMPLATE_REPLIES_CSV_EXPORT_TASK",
   "SETTING_DELEGATE_ACCESS",
   "PETITION_SUMMARY",
+  "RECIPIENT_LANG_CA",
+  "RECIPIENT_LANG_IT",
+  "RECIPIENT_LANG_PT",
 ] as FeatureFlagName[];
 
 export type IntegrationType =

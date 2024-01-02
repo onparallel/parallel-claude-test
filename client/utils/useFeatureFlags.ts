@@ -1,6 +1,7 @@
 import { FeatureFlag } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
+import { useSupportedPetitionLocales } from "./locales";
 
 interface FeatureFlagCategorized {
   category: string;
@@ -17,6 +18,7 @@ interface FeatureFlagInformation {
 
 export function useFeatureFlags() {
   const intl = useIntl();
+  const locales = useSupportedPetitionLocales();
   return useMemo<FeatureFlagCategorized[]>(
     () => [
       {
@@ -334,6 +336,26 @@ export function useFeatureFlags() {
               defaultMessage: 'Allows turning off "Invite collaborator" on the recipient view',
             }),
           },
+          ...(["ca", "it", "pt"] as const).map((locale) => {
+            const lang = locales.find((l) => l.key === locale)!.localizedLabel;
+            return {
+              name: `RECIPIENT_LANG_${locale.toUpperCase() as Uppercase<typeof locale>}` as const,
+              title: intl.formatMessage(
+                {
+                  id: "component.feature-flag-descriptions.recipient-lang-generic",
+                  defaultMessage: "Recipient language: {lang}",
+                },
+                { lang },
+              ),
+              description: intl.formatMessage(
+                {
+                  id: "component.feature-flag-descriptions.recipient-lang-generic-description",
+                  defaultMessage: "Allows selecting {lang} as the recipient language",
+                },
+                { lang },
+              ),
+            };
+          }),
         ],
       },
     ],

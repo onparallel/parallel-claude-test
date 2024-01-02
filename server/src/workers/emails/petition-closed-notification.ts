@@ -2,7 +2,7 @@ import { createReadStream } from "fs";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionClosedNotification from "../../emails/emails/PetitionClosedNotification";
+import PetitionClosedNotification from "../../emails/emails/recipient/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";

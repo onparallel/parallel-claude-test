@@ -46,9 +46,9 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
-import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
-import { useSupportedPetitionLocales } from "@parallel/utils/locales";
+import { useAvailablePetitionLocales } from "@parallel/utils/locales";
+import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
@@ -77,8 +77,6 @@ import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
 } from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
-import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
-import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
 import {
   CompliancePeriodDialog,
   useCompliancePeriodDialog,
@@ -87,6 +85,8 @@ import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
 import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
 import { SettingsRow } from "./settings/rows/SettingsRow";
+import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
+import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -103,7 +103,7 @@ function _PetitionSettings({
   onUpdatePetition,
   validPetitionFields,
 }: PetitionSettingsProps) {
-  const locales = useSupportedPetitionLocales();
+  const locales = useAvailablePetitionLocales(user);
   const intl = useIntl();
 
   const signatureIntegrations = user.organization.signatureIntegrations.items;
@@ -839,6 +839,7 @@ const fragments = {
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
       hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
+      ...useAvailablePetitionLocales_User
       ...TestModeSignatureBadge_User
       ...PublicLinkSettingsDialog_User
       organization {
@@ -857,6 +858,7 @@ const fragments = {
       }
       ...SignatureConfigDialog_User
     }
+    ${useAvailablePetitionLocales.fragments.User}
     ${TestModeSignatureBadge.fragments.User}
     ${PublicLinkSettingsDialog.fragments.User}
     ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
@@ -918,6 +920,7 @@ const fragments = {
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
   `,
 };
+
 const mutations = [
   gql`
     mutation PetitionSettings_updateTemplateDocumentTheme($templateId: GID!, $orgThemeId: GID!) {

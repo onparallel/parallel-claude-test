@@ -357,6 +357,7 @@ function NewPetition() {
                     flex="1 0 auto"
                   />
                   <NewPetitionLanguageFilter
+                    user={me}
                     value={locale}
                     onChange={handleLocaleChange}
                     backgroundColor="white"
@@ -448,6 +449,7 @@ function NewPetition() {
                   gridColumn="1"
                 />
                 <NewPetitionLanguageFilter
+                  user={me}
                   value={locale}
                   onChange={handleLocaleChange}
                   backgroundColor="white"
@@ -573,8 +575,12 @@ NewPetition.queries = [
         totalCount
       }
       publicTemplateCategories
+      me {
+        ...NewPetitionLanguageFilter_User
+      }
     }
     ${AppLayout.fragments.Query}
+    ${NewPetitionLanguageFilter.fragments.User}
   `,
   gql`
     query NewPetition_template($templateId: GID!) {

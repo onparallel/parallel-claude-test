@@ -2,7 +2,8 @@ node_modules
 
 client/.next
 client/.env.local
-client/public/static/lang
+client/public/static/lang/**/*.js
+client/public/static/lang/**/*.json
 client/tsconfig.tsbuildinfo
 client/tracing
 

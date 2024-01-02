@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   Menu,
@@ -9,16 +10,21 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PetitionLocale } from "@parallel/graphql/__types";
-import { useSupportedPetitionLocales } from "@parallel/utils/locales";
+import { NewPetitionLanguageFilter_UserFragment, PetitionLocale } from "@parallel/graphql/__types";
+import { useAvailablePetitionLocales } from "@parallel/utils/locales";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { FormattedMessage } from "react-intl";
 
-interface NewPetitionLanguageFilterProps extends ValueProps<PetitionLocale> {}
+interface NewPetitionLanguageFilterProps extends ValueProps<PetitionLocale> {
+  user: NewPetitionLanguageFilter_UserFragment;
+}
 
-export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionLanguageFilterProps>(
-  function NewPetitionLanguageFilter({ value, onChange, ...props }, ref) {
-    const locales = useSupportedPetitionLocales();
+export const NewPetitionLanguageFilter = Object.assign(
+  chakraForwardRef<"button", NewPetitionLanguageFilterProps>(function NewPetitionLanguageFilter(
+    { value, onChange, user, ...props },
+    ref,
+  ) {
+    const locales = useAvailablePetitionLocales(user);
 
     return (
       <Menu matchWidth={true}>
@@ -58,5 +64,15 @@ export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionL
         </Portal>
       </Menu>
     );
+  }),
+  {
+    fragments: {
+      User: gql`
+        fragment NewPetitionLanguageFilter_User on User {
+          ...useAvailablePetitionLocales_User
+        }
+        ${useAvailablePetitionLocales.fragments.User}
+      `,
+    },
   },
 );

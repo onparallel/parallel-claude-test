@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import SignatureCancelledRequestErrorEmail from "../../emails/emails/SignatureCancelledRequestErrorEmail";
+import SignatureCancelledRequestErrorEmail from "../../emails/emails/app/SignatureCancelledRequestErrorEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";

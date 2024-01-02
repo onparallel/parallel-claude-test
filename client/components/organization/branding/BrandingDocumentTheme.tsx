@@ -232,6 +232,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
         {!userHasPermission ? <RestrictedFeatureAlert /> : null}
         <FormProvider {...form}>
           <DocumentThemeEditor
+            user={user}
             themeId={selectedTheme.id}
             canRestoreFonts={canRestoreFonts}
             onRestoreFonts={handleRestoreFonts}
@@ -259,8 +260,10 @@ BrandingDocumentTheme.fragments = {
             ...BrandingDocumentTheme_OrganizationTheme
           }
         }
+        ...DocumentThemeEditor_User
       }
       ${DocumentThemePreview.fragments.Organization}
+      ${DocumentThemeEditor.fragments.User}
       ${this.OrganizationTheme}
     `;
   },

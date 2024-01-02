@@ -18,6 +18,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
+import { ContactLocaleValues } from "../../db/__types";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -89,8 +90,7 @@ export const OrganizationPdfDocumentThemeInput = inputObjectType({
       type: inputObjectType({
         name: "OrganizationPdfDocumentThemeInputLegalText",
         definition(t) {
-          t.json("es");
-          t.json("en");
+          ContactLocaleValues.forEach((l) => t.json(l));
         },
       }),
     });

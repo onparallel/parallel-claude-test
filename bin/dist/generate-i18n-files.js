@@ -13,16 +13,28 @@ const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const log_1 = require("./utils/log");
 const run_1 = require("./utils/run");
-async function generate(locales, input, rawOutput, compiledOutput) {
+async function generate(locales, input, pickMissingFrom, rawOutput, compiledOutput) {
+    var _a;
     // store the values used in the default (first) locale to make sure they
     // are used in all the other locales
     const values = {};
     for (const locale of locales) {
         const terms = await (0, json_1.readJson)(path_1.default.join(input, `${locale}.json`));
+        let extendedTranslations = {};
+        if (pickMissingFrom) {
+            try {
+                const extended = await (0, json_1.readJson)(path_1.default.join(pickMissingFrom, `${locale}.json`));
+                extendedTranslations = Object.fromEntries(extended.map((t) => [t.term, t.definition]));
+            }
+            catch (e) {
+                extendedTranslations = {};
+            }
+        }
         const raw = {};
         const compiled = {};
         let missing = 0;
-        for (const { term, definition } of terms) {
+        for (const { term, definition: _definition } of terms) {
+            const definition = _definition === "" ? (_a = extendedTranslations[term]) !== null && _a !== void 0 ? _a : "" : _definition;
             if (definition === "") {
                 missing += 1;
             }
@@ -88,7 +100,7 @@ function getValues(elements) {
     }));
 }
 async function main() {
-    const { locales, input, outputRaw, outputCompiled } = await yargs_1.default
+    const { locales, input, outputRaw, outputCompiled, pickMissingFrom } = await yargs_1.default
         .option("locales", {
         required: true,
         array: true,
@@ -100,6 +112,10 @@ async function main() {
         type: "string",
         description: "Directory with the translated term files",
     })
+        .option("pick-missing-from", {
+        type: "string",
+        description: "Directory with the extended translations",
+    })
         .option("output-raw", {
         required: false,
         type: "string",
@@ -110,6 +126,6 @@ async function main() {
         type: "string",
         description: "Directory to place generated compiled json files",
     }).argv;
-    await generate(locales, input, outputRaw, outputCompiled);
+    await generate(locales, input, pickMissingFrom, outputRaw, outputCompiled);
 }
 (0, run_1.run)(main);

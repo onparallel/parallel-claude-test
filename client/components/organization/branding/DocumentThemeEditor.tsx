@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   FormControl,
@@ -18,7 +19,8 @@ import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
-import { useSupportedPetitionLocales } from "@parallel/utils/locales";
+import { DocumentThemeEditor_UserFragment, PetitionLocale } from "@parallel/graphql/__types";
+import { useAvailablePetitionLocales } from "@parallel/utils/locales";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -27,6 +29,7 @@ import { isDefined, sort } from "remeda";
 import fonts from "../../../utils/fonts.json";
 
 interface DocumentThemeEditorProps {
+  user: DocumentThemeEditor_UserFragment;
   canRestoreFonts: boolean;
   onRestoreFonts: () => Promise<void>;
   isDisabled?: boolean;
@@ -52,15 +55,13 @@ export interface DocumentThemeEditorData {
   title1FontSize: number;
   title2FontSize: number;
   showLogo: boolean;
-  legalText: {
-    en: any;
-    es: any;
-  };
+  legalText: Record<PetitionLocale, any>;
 }
 
 export function DocumentThemeEditor({
-  canRestoreFonts: canResetFonts,
-  onRestoreFonts: onResetFonts,
+  user,
+  canRestoreFonts,
+  onRestoreFonts,
   isDisabled,
   themeId,
 }: DocumentThemeEditorProps) {
@@ -78,7 +79,7 @@ export function DocumentThemeEditor({
     return () => unsubscribe();
   }, [watch]);
 
-  const locales = useSupportedPetitionLocales();
+  const locales = useAvailablePetitionLocales(user);
 
   const sortedFonts = useMemo(
     () =>
@@ -273,7 +274,7 @@ export function DocumentThemeEditor({
         ))}
       </Stack>
       <HStack justifyContent="flex-end">
-        <Button variant="link" onClick={onResetFonts} isDisabled={!canResetFonts || isDisabled}>
+        <Button variant="link" onClick={onRestoreFonts} isDisabled={!canRestoreFonts || isDisabled}>
           <FormattedMessage
             id="component.document-theme-editor.restore-defaults"
             defaultMessage="Restore defaults"
@@ -308,7 +309,7 @@ export function DocumentThemeEditor({
               <TabPanel key={key}>
                 <Controller
                   control={control}
-                  name={`legalText.${key as "es" | "en"}`}
+                  name={`legalText.${key}`}
                   render={({ field: { onChange, value, onBlur } }) => (
                     <RichTextEditor
                       id={`legal-text-editor-${key}-${themeId}`}
@@ -328,3 +329,11 @@ export function DocumentThemeEditor({
     </Stack>
   );
 }
+
+DocumentThemeEditor.fragments = {
+  User: gql`
+    fragment DocumentThemeEditor_User on User {
+      ...useAvailablePetitionLocales_User
+    }
+  `,
+};

@@ -3,9 +3,11 @@ import { inject, injectable } from "inversify";
 import { ContactLocale } from "../db/__types";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { buildPdf } from "../pdf/buildPdf";
-import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/AnnexCoverPage";
-import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/ImageToPdf";
-import PetitionExport, { PetitionExportInitialData } from "../pdf/documents/PetitionExport";
+import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/recipient/AnnexCoverPage";
+import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/recipient/ImageToPdf";
+import PetitionExport, {
+  PetitionExportInitialData,
+} from "../pdf/documents/recipient/PetitionExport";
 import { toGlobalId } from "../util/globalId";
 import { AUTH, IAuth } from "./AuthService";
 

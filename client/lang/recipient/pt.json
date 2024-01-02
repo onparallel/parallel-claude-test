@@ -1,0 +1,2152 @@
+[
+  {
+    "term": "component.add-new-signer-dialog.header",
+    "definition": "{tone, select, INFORMAL{Introduza} other{Introduza}} os dados do signatário",
+    "context": "Enter the signer's information"
+  },
+  {
+    "term": "component.checkbox-type-label.exact",
+    "definition": "{tone, select, INFORMAL{Escolha} other{Escolha}} {max, plural, =1{# opção} other{# opções}}",
+    "context": "Choose {max, plural, =1{# option} other{# options}}"
+  },
+  {
+    "term": "component.checkbox-type-label.range",
+    "definition": "{tone, select, INFORMAL{Escolha} other{Escolha}} entre {min, number} e {max, number} opções",
+    "context": "Choose between {min, number} and {max, number} options"
+  },
+  {
+    "term": "component.checkbox-type-label.unlimited",
+    "definition": "{tone, select, INFORMAL{Escolha tantas opções quanto quiser} other{Escolha tantas opções quanto desejar}}",
+    "context": "Choose as many options as you want"
+  },
+  {
+    "term": "component.checkbox-type-label.up-to",
+    "definition": "{tone, select, INFORMAL{Escolha} other{Escolha}} até {max, plural, =1{# opção} other{# opções}}",
+    "context": "Choose up to {max, plural, =1{# option} other{# options}}"
+  },
+  {
+    "term": "component.completing-message-dialog.go-to-pending-processes-button",
+    "definition": "Ir para os meus processos pendentes",
+    "context": "Go to my pending processes"
+  },
+  {
+    "term": "component.completing-message-dialog.go-to-processes-button",
+    "definition": "Ir para os meus processos",
+    "context": "Go to my processes"
+  },
+  {
+    "term": "component.completing-message-dialog.pending-processes-count",
+    "definition": "{tone, select, INFORMAL{Tens} other{Tem}} {count, plural, =1{# processo pendente} other{# processos pendentes}}",
+    "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
+    "definition": "Se esta opção estiver desativada, apenas as pessoas indicadas poderão assinar o documento.",
+    "context": "If this option is disabled, only the indicated people will be able to sign the document."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-label",
+    "definition": "Permitir que os destinatários adicionem mais signatários",
+    "context": "Allow recipients to add additional signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.contact-select-placeholder",
+    "definition": "Adicione um contacto para assinar",
+    "context": "Add a contact to sign"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.edit-signers-header",
+    "definition": "Editar signatários",
+    "context": "Edit signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.include-message",
+    "definition": "Incluir mensagem",
+    "context": "Include message"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.message-placeholder",
+    "definition": "Escreva aqui uma mensagem para os signatários...",
+    "context": "Write here a message for the signers..."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.min-signers",
+    "definition": "Adicione pelo menos {count, plural, =1{# signatário} other{# signatários}}",
+    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.no-signers-added",
+    "definition": "Ainda não adicionou signatários",
+    "context": "You have not added any signers"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.no-signers-set",
+    "definition": "Enviaremos o documento aos seguintes contactos:",
+    "context": "We will send the document to the following contacts:"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.no-signers-set-sequential",
+    "definition": "Ao iniciar a assinatura, cada contacto receberá o documento após o anterior assinar:",
+    "context": "We will send the document to sign to each contact after the one before has signed:"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.preset-signers",
+    "definition": "{names} {count, plural, =1{assinará} other {assinarão}} juntamente com os signatários que adicionares.",
+    "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.preset-signers-sequential",
+    "definition": "{names} {count, plural, =1{assinará} other {assinarão}} após os signatários que adicionares.",
+    "context": "{names} will sign after the other signers."
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.signer-added-by-recipient",
+    "definition": "Signatários adicionados pelo destinatário",
+    "context": "Signers added by the recipient"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Iniciar assinatura",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.start-signature-header",
+    "definition": "Iniciar a assinatura",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.header",
+    "definition": "Já adicionaste este email para {signersList}. Podes modificar o nome e adicioná-lo novamente.",
+    "context": "You already added this email for {signersList}. You can modify the name and add it again."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.title",
+    "definition": "Confirme os dados do signatário",
+    "context": "Confirm the signer's information"
+  },
+  {
+    "term": "component.contact-select.bounced-email-tooltip",
+    "definition": "Email anteriormente devolvido",
+    "context": "Previously bounced email"
+  },
+  {
+    "term": "component.contact-select.create-new-contact",
+    "definition": "Criar novo contacto para: <b>{email}</b>",
+    "context": "Create new contact for: <b>{email}</b>"
+  },
+  {
+    "term": "component.contact-select.enter-email",
+    "definition": "Também podes introduzir um email válido.",
+    "context": "You can also enter a valid email."
+  },
+  {
+    "term": "component.contact-select.no-options",
+    "definition": "Não conseguimos encontrar nenhum contacto com <em>{search}</em>",
+    "context": "We could not find any existing contacts for <em>{search}</em>"
+  },
+  {
+    "term": "component.contact-select.search-hint",
+    "definition": "Procura contactos existentes ou insere um email válido",
+    "context": "Search for existing contacts or enter a valid email."
+  },
+  {
+    "term": "component.date-time.a-moment-ago",
+    "definition": "há um momento",
+    "context": "a moment ago"
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-1",
+    "definition": "{tone, select, INFORMAL{Preenche os dados da pessoa a quem queres convidar como colaborador.} other{Por favor, preencha os dados da pessoa a quem deseja delegar o seu acesso.}}",
+    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-subtitle-2",
+    "definition": "{tone, select, INFORMAL{Enviaremos um email com instruções para que possa aceder.} other{Enviaremos um email com instruções sobre como proceder.}}",
+    "context": "We will send them an email with instructions on how to proceed."
+  },
+  {
+    "term": "component.delegate-access-dialog.invite-collaborator-title",
+    "definition": "Convidar colaborador",
+    "context": "Invite collaborator"
+  },
+  {
+    "term": "component.error-dialog.header",
+    "definition": "Erro",
+    "context": "Error"
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.action-required-from-user",
+    "definition": "Não é possível recuperar os dados necessários para obter esta informação. Não foi possível obter os seus dados de forma automática.",
+    "context": "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.blocked-credentials",
+    "definition": "A Administração Pública bloqueou o seu acesso por motivos de segurança. Por favor, tente novamente mais tarde.",
+    "context": "The Public Administration has blocked your access for security reasons. Please, try again later."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.document-not-found",
+    "definition": "Não conseguimos encontrar o documento solicitado na Administração Pública",
+    "context": "We couldn't find the requested document in the Public Administration"
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.generic",
+    "definition": "Ocorreu um erro desconhecido.",
+    "context": "An unknown error happened."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.parallel-send-limit-reached",
+    "definition": "Não conseguimos gerar o ficheiro porque atingiste o limite de parallels que podes enviar.",
+    "context": "We couldn't create the file because you reached the limit of parallels you can send."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.timeout",
+    "definition": "A Administração Pública demorou demasiado tempo a processar o seu pedido. Por favor, tente novamente.",
+    "context": "The Public Administration took too long to process your request. Please, try again."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-aborted",
+    "definition": "O pedido foi cancelado antes de poder ser completado. Por favor, tente novamente.",
+    "context": "You cancelled the request before it could finish. Please, try again."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-not-registered",
+    "definition": "O utilizador não está registado na Administração Pública",
+    "context": "The user is not registered in the Public Administration"
+  },
+  {
+    "term": "component.field-comment.message-not-available",
+    "definition": "Mensagem não disponível",
+    "context": "Message not available"
+  },
+  {
+    "term": "component.file-icon.audio-file",
+    "definition": "Ficheiro de áudio",
+    "context": "Audio file"
+  },
+  {
+    "term": "component.file-icon.document-file",
+    "definition": "Documento de texto",
+    "context": "Document file"
+  },
+  {
+    "term": "component.file-icon.image-file",
+    "definition": "Ficheiro de imagem",
+    "context": "Image file"
+  },
+  {
+    "term": "component.file-icon.other-file",
+    "definition": "Ficheiro",
+    "context": "File"
+  },
+  {
+    "term": "component.file-icon.pdf-file",
+    "definition": "Ficheiro PDF",
+    "context": "PDF file"
+  },
+  {
+    "term": "component.file-icon.spreadsheet-file",
+    "definition": "Ficheiro de folha de cálculo",
+    "context": "Spreadsheet file"
+  },
+  {
+    "term": "component.file-icon.upload-failed",
+    "definition": "Este ficheiro não foi carregado corretamente",
+    "context": "This file did not upload correctly"
+  },
+  {
+    "term": "component.file-icon.video-file",
+    "definition": "Ficheiro de vídeo",
+    "context": "Video file"
+  },
+  {
+    "term": "component.file-icon.zip-file",
+    "definition": "Ficheiro ZIP",
+    "context": "Zip file"
+  },
+  {
+    "term": "component.internal-field-badge.popover",
+    "definition": "Os campos internos não serão visíveis para o destinatário.",
+    "context": "The internal fields will not be visible to the recipient."
+  },
+  {
+    "term": "component.internal-field-badge.text",
+    "definition": "Int",
+    "context": "Int"
+  },
+  {
+    "term": "component.message-email-body-form-control.required-error",
+    "definition": "Personalizar a mensagem inicial melhora o tempo de resposta dos destinatários",
+    "context": "Customizing the initial message improves the response time of the recipients"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.body",
+    "definition": "{tone, select, INFORMAL{Já foi completado um carregamento. Se continuares, voltarás ao processo inicial e a documentação atual será sobrescrita. Tens a certeza que queres começar de novo?} other{O processo de carregamento foi completado pelo menos uma vez. Se continuar, voltará ao processo inicial e a documentação atual será sobrescrita. Tem a certeza de que quer começar de novo?}}",
+    "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.confirm-button",
+    "definition": "Sim, começar de novo",
+    "context": "Yes, start again"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.header",
+    "definition": "Sobrescrever documentação",
+    "context": "Overwrite documentation"
+  },
+  {
+    "term": "component.print-pdf-task.confirm",
+    "definition": "Descarregar PDF",
+    "context": "Download PDF"
+  },
+  {
+    "term": "component.print-pdf-task.header",
+    "definition": "A gerar ficheiro PDF...",
+    "context": "Generating PDF file..."
+  },
+  {
+    "term": "component.react-select.loading",
+    "definition": "A carregar...",
+    "context": "Loading..."
+  },
+  {
+    "term": "component.recipient-portal-header.hello-name",
+    "definition": "Olá, {name}!",
+    "context": "Hello, {name}!"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.all-processes",
+    "definition": "Todos os processos",
+    "context": "All processes"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.completed-processes",
+    "definition": "Processos completados",
+    "context": "Completed processes"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.pending-processes",
+    "definition": "Processos pendentes",
+    "context": "Pending processes"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.add-signer-button",
+    "definition": "Adicionar signatários",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.confirmation-text",
+    "definition": "Enviaremos o documento aos seguintes contactos:",
+    "context": "We will send the document to the following contacts:"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.confirmation-text-sequential",
+    "definition": "Ao iniciar a assinatura, cada contacto receberá o documento após o anterior assinar:",
+    "context": "We will send the document to sign to each contact after the one before has signed:"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.header",
+    "definition": "Iniciar a assinatura",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.include-message",
+    "definition": "Incluir mensagem",
+    "context": "Include message"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.message-placeholder",
+    "definition": "{tone, select, INFORMAL {Escreve} other {Escreva}} aqui uma mensagem para os signatários...",
+    "context": "Write here a message for the signers..."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.min-signers",
+    "definition": "Adicione pelo menos {count, plural, =1{# signatário} other{# signatários}}",
+    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.preset-signers-added",
+    "definition": "{names} {count, plural, =1{assinará} other {assinarão}} juntamente com os signatários que adicionares.",
+    "context": "{names} will sign together with the signers you add."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.preset-signers-added-sequential",
+    "definition": "{names} {count, plural, =1{assinará} other {assinarão}} após os signatários que adicionares.",
+    "context": "{names} will sign after the signers you add."
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
+    "definition": "Ainda não adicionaste signatários",
+    "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.recipient-view-confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Iniciar assinatura",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access",
+    "definition": "Aceder",
+    "context": "Access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-already-sent",
+    "definition": "Não foi possível reenviar o acesso",
+    "context": "Access could not be resent"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-already-sent-body",
+    "definition": "Já foi enviado um acesso ao <b>{email}</b> recentemente. Por favor, verifica na tua caixa de entrada ou spam.",
+    "context": "There is already an access sent to <b>{email}</b> recently. Please check your inbox or spam."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-sent",
+    "definition": "Acesso enviado",
+    "context": "Access sent"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-sent-body",
+    "definition": "Enviámos um acesso a <b>{email}</b> com um link para o seu processo em curso para que possa aceder e continuar a completá-lo.",
+    "context": "We have sent a access to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.change-email",
+    "definition": "Alterar e-mail",
+    "context": "Change email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email",
+    "definition": "E-mail existente",
+    "context": "Existing email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body",
+    "definition": "O e-mail {email} já tem um acesso. {tone, select, INFORMAL {Pode voltar a aceder a partir do e-mail anterior que lhe enviamos.} other {Pode acessar novamente a partir do e-mail recebido anteriormente.}}",
+    "context": "There is already an access associated to {email}. You can access again from the previously received mail."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body-question",
+    "definition": "{tone, select, INFORMAL {Se não consegue encontrar o e-mail inicial, iremos reenviar-lhe o acesso. O que deseja fazer?} other {Se não encontrar o referido e-mail, reenviar-lhe-emos o acesso. O que deseja fazer?}}",
+    "context": "If you can't find the initial email, we will resend you the access again. What do you want to do?"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.has-shared-with-you",
+    "definition": "{ownerName} {tone, select, INFORMAL {partilhou consigo} other {partilhou consigo}} este link.",
+    "context": "{ownerName} has shared with you this link."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.heading",
+    "definition": "Introduza {tone, select, INFORMAL {os seus} other {os seus}} dados para aceder",
+    "context": "Enter your data to access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.resend-access",
+    "definition": "Reenviar acesso",
+    "context": "Resend access"
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.body-1",
+    "definition": "{tone, select, INFORMAL{Se lhe foi partilhado este link, significa que lhe vão solicitar informação. Uma vez identificado, <b>poderá aceder e completar</b>.} other{Se recebeu este link, quer dizer que alguém lhe solicita informação. Após identificar-se, <b>poderá aceder e completar</b>.}}",
+    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.body-2",
+    "definition": "Este link é pessoal e único, pelo que não pode ser partilhado. {tone, select, INFORMAL{Uma vez lá dentro, poderá convidar os colaboradores de que necessita.} other{Uma vez dentro, poderá convidar os colaboradores que necessite.}}",
+    "context": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need."
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.faq",
+    "definition": "Ver mais perguntas frequentes",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.header",
+    "definition": "Por que é que solicitamos estes dados?",
+    "context": "Why do we ask for this data?"
+  },
+  {
+    "term": "component.recipient-view-content-card.comment-count",
+    "definition": "{commentCount, plural, =1 {# comentário} other {# comentários}}",
+    "context": "{commentCount, plural, =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.add-another-reply",
+    "definition": "Adicionar outra resposta",
+    "context": "Add another reply"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.files-uploaded",
+    "definition": "{count, plural, =0 {Nenhum ficheiro foi carregado ainda} =1 {1 ficheiro carregado} other {# ficheiros carregados}}",
+    "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted",
+    "definition": "{count, plural, =1 {1 resposta enviada} other {# respostas enviadas}}",
+    "context": "{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox",
+    "definition": "Resposta enviada",
+    "context": "Reply submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-count",
+    "definition": "{count, plural, =1 {# enviada} other {# enviadas}}",
+    "context": "{count} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
+    "definition": "{count}/{total} enviadas",
+    "context": "{count}/{total} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.change-zone",
+    "definition": "Alterar",
+    "context": "Change"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.restore-defaults",
+    "definition": "Restaurar padrões",
+    "context": "Restore default"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.select-timezone",
+    "definition": "Selecione o fuso horário aplicável.",
+    "context": "Select the time zone you need."
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.using-timezone",
+    "definition": "Está a utilizar o fuso horário {timezone}.",
+    "context": "You are using the time zone {timezone}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.add-button",
+    "definition": "Adicionar {groupName}",
+    "context": "Add {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.confirm-delete-group",
+    "definition": "{tone, select, INFORMAL {Deseja} other {Deseja}} eliminar {groupName}?",
+    "context": "Do you want to remove {groupName}?"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.edit-field",
+    "definition": "Editar campo",
+    "context": "Edit field"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-confirmation-button",
+    "definition": "Eliminar",
+    "context": "Remove"
+  },
+  {
+    "term": "component.recipient-view-petition-field-group.remove-reply-button",
+    "definition": "Eliminar {groupName}",
+    "context": "Remove {groupName}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.only-numbers",
+    "definition": "{multiple, select, true{Respostas numéricas} other {Resposta numérica}}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-max-description",
+    "definition": "{multiple, select, true{Respostas numéricas inferiores ou iguais} other {Resposta numérica inferior ou igual}} a {max, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-description",
+    "definition": "{multiple, select, true{Respostas numéricas superiores ou iguais} other {Resposta numérica superior ou igual}} a {min, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-max-description",
+    "definition": "{multiple, select, true{Respostas numéricas} other {Resposta numérica}} entre {min, number} e {max, number}, ambos incluídos",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.approved-file",
+    "definition": "Este ficheiro foi aprovado",
+    "context": "This file has been approved"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.approved-reply",
+    "definition": "Esta resposta foi aprovada",
+    "context": "This reply has been approved"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.download-label",
+    "definition": "Descarregar ficheiro",
+    "context": "Download file"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.file-incomplete",
+    "definition": "{tone, select, INFORMAL {Houve um erro ao carregar o ficheiro. Tente novamente, por favor} other {Ocorreu um erro no carregamento do ficheiro. Por favor, carregue-o novamente}}.",
+    "context": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.rejected-file",
+    "definition": "Este ficheiro foi rejeitado",
+    "context": "This file has been rejected"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.rejected-reply",
+    "definition": "Esta resposta foi rejeitada",
+    "context": "This reply has been rejected"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.remove-reply-label",
+    "definition": "Eliminar resposta",
+    "context": "Remove reply"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.reply-saved-on",
+    "definition": "Resposta guardada em {date}",
+    "context": "Reply saved on {date}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.select-placeholder",
+    "definition": "Escolha uma opção",
+    "context": "Select an option"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.text-placeholder",
+    "definition": "A sua resposta",
+    "context": "Enter your answer"
+  },
+  {
+    "term": "component.recipient-view-petition-field-short-text.format-error",
+    "definition": "Por favor, introduza um {format} válido.",
+    "context": "Please, enter a valid {format}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.error-field-already-replied",
+    "definition": "Já existe uma resposta para este campo.",
+    "context": "There is already a reply for this field."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.error-uploading",
+    "definition": "Não encontrámos nenhum ficheiro. Por favor, tente novamente.",
+    "context": "We have not found any files. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.follow-steps-description",
+    "definition": "{tone, select, INFORMAL {Siga os passos para carregar a documentação necessária} other {Siga as instruções para carregar a documentação necessária}}.",
+    "context": "Follow the steps to upload the documentation you need."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.loading-documentation",
+    "definition": "Por favor, {tone, select, INFORMAL {aguarde} other {aguarde}} enquanto carregamos a documentação...",
+    "context": "Please, wait while we upload the documentation..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-again-button",
+    "definition": "Começar de novo",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-button",
+    "definition": "Começar",
+    "context": "Start"
+  },
+  {
+    "term": "component.recipient-view-petition-status-alert.petition-closed-alert",
+    "definition": "Este parallel foi encerrado. Se deseja realizar alterações, por favor, contacte {name}.",
+    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
+  },
+  {
+    "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
+    "definition": "{tone, select, INFORMAL{<b>Informação completada!</b> Avisámos {name} para que a revise e valide.} other{<b>Informação completada,</b> notificámos {name} para a revisão e validação.}}",
+    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
+  },
+  {
+    "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
+    "definition": "{tone, select, INFORMAL{Se realiza alguma alteração} other{Se efectuar alguma alteração}}, não {tone, select, INFORMAL{esqueça} other{esqueça}} de clicar novamente no botão <b>Finalizar</b>.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.description",
+    "definition": "Há uma versão mais recente desta página. {tone, select, INFORMAL{Atualize} other{Atualize}} para ver todas as respostas adicionadas.",
+    "context": "There is a more recent version of this page. Refresh to see all added replies."
+  },
+  {
+    "term": "component.recipient-view-refresh-replies-alert.refetch-button",
+    "definition": "Atualizar respostas",
+    "context": "Refresh replies"
+  },
+  {
+    "term": "component.recipient-view-signature-sent-alert.check-status-button",
+    "definition": "Ver estado",
+    "context": "Check status"
+  },
+  {
+    "term": "component.recipient-view.reminder-submit",
+    "definition": "{tone, select, INFORMAL{Lembre-se de finalizar quando preencher todos os campos.} other{Lembre-se de finalizar após preencher todos os campos.}}",
+    "context": "Remember to click Finalize when you finish entering all the information."
+  },
+  {
+    "term": "component.rich-text-editor.add-link-header",
+    "definition": "Adicionar link",
+    "context": "Add link"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-required-url",
+    "definition": "É necessário um link URL válido",
+    "context": "A valid link is required"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-text-to-show",
+    "definition": "Texto a mostrar (opcional)",
+    "context": "Text to show (optional)"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-url",
+    "definition": "Link URL",
+    "context": "URL link"
+  },
+  {
+    "term": "component.rich-text-editor.bold",
+    "definition": "Negrito",
+    "context": "Bold"
+  },
+  {
+    "term": "component.rich-text-editor.font-size",
+    "definition": "Tamanho do texto",
+    "context": "Font size"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-body",
+    "definition": "Parágrafo",
+    "context": "Body"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-heading",
+    "definition": "Cabeçalho",
+    "context": "Heading"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-subheading",
+    "definition": "Sub-cabeçalho",
+    "context": "Subheading"
+  },
+  {
+    "term": "component.rich-text-editor.italic",
+    "definition": "Itálico",
+    "context": "Italic"
+  },
+  {
+    "term": "component.rich-text-editor.link",
+    "definition": "Link",
+    "context": "Link"
+  },
+  {
+    "term": "component.rich-text-editor.list",
+    "definition": "Lista com marcadores",
+    "context": "Bullet list"
+  },
+  {
+    "term": "component.rich-text-editor.ordered-list",
+    "definition": "Lista numerada",
+    "context": "Numbered list"
+  },
+  {
+    "term": "component.rich-text-editor.personalize",
+    "definition": "Personalizar",
+    "context": "Personalize"
+  },
+  {
+    "term": "component.rich-text-editor.underline",
+    "definition": "Sublinhado",
+    "context": "Underline"
+  },
+  {
+    "term": "component.search-input.placeholder",
+    "definition": "Procurar...",
+    "context": "Search..."
+  },
+  {
+    "term": "component.signature-config-dialog.add-instructions-help",
+    "definition": "As instruções ajudarão os demais utilizadores e destinatários a saber quem tem de assinar este documento.",
+    "context": "Instructions help other users and recipients understand who has to sign the document."
+  },
+  {
+    "term": "component.signature-config-dialog.add-instructions-label",
+    "definition": "Adicionar instruções",
+    "context": "Add instructions"
+  },
+  {
+    "term": "component.signature-config-dialog.allow-additional-signers-help",
+    "definition": "Se esta opção estiver desativada, apenas as pessoas indicadas poderão assinar o documento.",
+    "context": "If this option is disabled, only the indicated people will be able to sign the document."
+  },
+  {
+    "term": "component.signature-config-dialog.allow-additional-signers-label",
+    "definition": "Permitir que os destinatários adicionem mais signatários",
+    "context": "Allow recipients to add additional signers"
+  },
+  {
+    "term": "component.signature-config-dialog.contact-select-add-contact-to-sign-placeholder",
+    "definition": "Adiciona um contacto para assinar",
+    "context": "Add a contact to sign"
+  },
+  {
+    "term": "component.signature-config-dialog.header-help-link",
+    "definition": "Mais sobre a assinatura",
+    "context": "More about eSignature"
+  },
+  {
+    "term": "component.signature-config-dialog.header-subtitle",
+    "definition": "Assine um documento PDF com todas as respostas usando um dos nossos fornecedores de assinatura digital integrados.",
+    "context": "Sign a PDF document with all the replies using one of our integrated eSignature providers."
+  },
+  {
+    "term": "component.signature-config-dialog.include-fixed-signers-template-label",
+    "definition": "Incluir contactos que assinem sempre o documento",
+    "context": "Include contacts who always sign the document"
+  },
+  {
+    "term": "component.signature-config-dialog.instructions-label",
+    "definition": "Instruções",
+    "context": "Instructions"
+  },
+  {
+    "term": "component.signature-config-dialog.instructions-placeholder",
+    "definition": "Ex: Adiciona como signatários os representantes legais da tua empresa",
+    "context": "e.g. Add your company's legal representatives as signers"
+  },
+  {
+    "term": "component.signature-config-dialog.min-signers-label",
+    "definition": "Este documento terá pelo menos {input} {count, plural, =1{assinante} other{assinantes}}",
+    "context": "This document will have at least {input} {count, plural, =1{signer} other{signers}}"
+  },
+  {
+    "term": "component.signature-config-dialog.no-signers-added",
+    "definition": "Ainda não adicionaste nenhum assinante",
+    "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.signature-config-dialog.provider-label",
+    "definition": "Fornecedor de assinatura digital",
+    "context": "eSignature provider"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-label",
+    "definition": "Quando desejas que comece a assinatura?",
+    "context": "When do you want the eSignature to start?"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-no",
+    "definition": "Após concluir o parallel",
+    "context": "After the parallel is completed"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-no-explainer",
+    "definition": "O processo de assinatura começará quando toda a informação estiver completa.",
+    "context": "The signature process will start when all the information has been completed."
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-yes",
+    "definition": "Após rever a informação",
+    "context": "After reviewing the information"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-yes-explainer",
+    "definition": "Após rever a informação, terás de iniciar a assinatura manualmente.",
+    "context": "After reviewing the information you will have to start the signature manually."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-same-time-help",
+    "definition": "Os signatários receberão o documento para assinar ao mesmo tempo.",
+    "context": "All the signers will receive the document at the same time."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-same-time-label",
+    "definition": "Ao mesmo tempo",
+    "context": "All at the same time"
+  },
+  {
+    "term": "component.signature-config-dialog.sending-sequential-help",
+    "definition": "Cada signatário receberá o documento após o anterior ter assinado.",
+    "context": "Each signer will receive the document after the one before has signed."
+  },
+  {
+    "term": "component.signature-config-dialog.sending-sequential-label",
+    "definition": "Sequencial, um a um",
+    "context": "In order, signing one by one"
+  },
+  {
+    "term": "component.signature-config-dialog.sending-type-label",
+    "definition": "Como desejas que as assinaturas sejam enviadas?",
+    "context": "How do you want Parallel to send the signatures?"
+  },
+  {
+    "term": "component.signature-config-dialog.step-1-header",
+    "definition": "Configurações de assinatura digital",
+    "context": "eSignature configuration"
+  },
+  {
+    "term": "component.signature-config-dialog.step-2-header",
+    "definition": "Configura as assinaturas do documento",
+    "context": "Set up document signatures"
+  },
+  {
+    "term": "component.signature-config-dialog.step-3-header",
+    "definition": "Editar assinantes",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.signature-config-dialog.template-alert",
+    "definition": "Estes signatários serão atribuídos a todos os parallels criados a partir desta modelo.",
+    "context": "These signers will be assigned to all parallels created from this template."
+  },
+  {
+    "term": "component.signature-config-dialog.title-help",
+    "definition": "Inclui um título no documento a ser assinado. Também será usado como nome do arquivo uma vez assinado.",
+    "context": "Include a title on the signing document. It will also be used as the name of the file once signed."
+  },
+  {
+    "term": "component.signature-config-dialog.title-label",
+    "definition": "Título do documento",
+    "context": "Title of the document"
+  },
+  {
+    "term": "component.signature-config-dialog.title-placeholder",
+    "definition": "Escreve um título...",
+    "context": "Enter a title..."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-completed-alert-2",
+    "definition": "{tone, select, INFORMAL{Se realizares alguma alteração} other{Se realizar alguma alteração}}, não {tone, select, INFORMAL{esqueças} other{esqueça}} de clicar novamente no botão <b>Finalizar</b>.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
+    "definition": "<b>Assinatura digital pendente,</b> {tone, select, INFORMAL{enviaremos o documento para assinar quando a informação for revista.} other{enviaremos o documento para assinar uma vez que a informação tenha sido revista.}}",
+    "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert",
+    "definition": "<b>Documento enviado para assinatura</b> a {name} ({email}){count, plural, =0{} other{ e <a># mais</a>}}.",
+    "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert-sequential",
+    "definition": "<b>Documento enviado para assinatura</b> a {name} ({email}){count, plural, =0{} =1{, <a># mais</a> receberá o documento após o anterior ter assinado} other{, <a># mais</a> receberão o documento após o anterior ter assinado}}.",
+    "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{, <a># more</a> will receive the document after the one before has signed}}."
+  },
+  {
+    "term": "component.signature-status-badge.bounced",
+    "definition": "Rejeitado",
+    "context": "Bounced"
+  },
+  {
+    "term": "component.signature-status-badge.canceled",
+    "definition": "Cancelado",
+    "context": "Canceled"
+  },
+  {
+    "term": "component.signature-status-badge.not-started",
+    "definition": "Não iniciado",
+    "context": "Not started"
+  },
+  {
+    "term": "component.signature-status-badge.pending",
+    "definition": "Pendente de assinatura",
+    "context": "Pending signature"
+  },
+  {
+    "term": "component.signature-status-badge.signed",
+    "definition": "Assinado",
+    "context": "Signed"
+  },
+  {
+    "term": "component.signature-status-dialog.body",
+    "definition": "Enviámos o documento a estes assinantes.",
+    "context": "We have sent the document to these signers."
+  },
+  {
+    "term": "component.signature-status-dialog.body-sequential",
+    "definition": "Enviámos o documento ao primeiro contacto, os restantes receberão a assinatura depois do anterior ter assinado.",
+    "context": "We have sent the document to the first contact, the rest will receive the signature after the one before has signed."
+  },
+  {
+    "term": "component.signature-status-dialog.header",
+    "definition": "Assinatura iniciada",
+    "context": "Signature started"
+  },
+  {
+    "term": "component.suggested-signers.header",
+    "definition": "Sugerido:",
+    "context": "Suggested:"
+  },
+  {
+    "term": "component.table-page.n-selected",
+    "definition": "{count, plural, =1 {1 selecionado} other {# selecionados}}",
+    "context": "{count} selected"
+  },
+  {
+    "term": "component.table.change-sorting",
+    "definition": "Alterar direção de ordenação para \"{column}\"",
+    "context": "Change sorting for \"{column}\""
+  },
+  {
+    "term": "component.table.filter",
+    "definition": "Filtrar \"{column}\"",
+    "context": "Filter \"{column}\""
+  },
+  {
+    "term": "component.table.filter-button",
+    "definition": "Filtrar",
+    "context": "Filter"
+  },
+  {
+    "term": "component.table.filter-header",
+    "definition": "Filtro",
+    "context": "Filter"
+  },
+  {
+    "term": "component.table.sort-button",
+    "definition": "Ordenar",
+    "context": "Sort"
+  },
+  {
+    "term": "component.table.sort-by",
+    "definition": "Ordenar por \"{column}\"",
+    "context": "Sort by \"{column}\""
+  },
+  {
+    "term": "component.task-progress-dialog.unknown-task.confirm",
+    "definition": "Ver resultado",
+    "context": "Get result"
+  },
+  {
+    "term": "component.task-progress-dialog.unknown-task.header",
+    "definition": "Por favor, aguarde...",
+    "context": "Please wait..."
+  },
+  {
+    "term": "component.timezone-select.other",
+    "definition": "Outros",
+    "context": "Other"
+  },
+  {
+    "term": "component.use-create-contact.create-contact",
+    "definition": "Criar contacto",
+    "context": "Create contact"
+  },
+  {
+    "term": "component.use-create-contact.force-contact-body",
+    "definition": "O domínio do email não pôde ser verificado. Se for criado, pode não ser possível enviar emails para este endereço.",
+    "context": "We could not verify this email address. You may not be able to send emails to this address."
+  },
+  {
+    "term": "component.use-create-contact.force-contact-header",
+    "definition": "Não foi possível verificar o email",
+    "context": "Failed to verify email"
+  },
+  {
+    "term": "component.use-create-contact.force-contact-question",
+    "definition": "Ainda queres criar o contacto?",
+    "context": "Do you still want to create the contact?"
+  },
+  {
+    "term": "component.user-dropdown-empty.invite-button",
+    "definition": "Convidar pessoas",
+    "context": "Invite people"
+  },
+  {
+    "term": "component.user-dropdown-empty.no-options",
+    "definition": "Não encontras alguém?",
+    "context": "Can't find someone?"
+  },
+  {
+    "term": "component.user-dropdown-empty.no-options-contact-admin",
+    "definition": "Contacta com <a>o proprietário</a> da tua organização para criar uma conta.",
+    "context": "Contact with <a>the owner</a> of your organization to create them an account."
+  },
+  {
+    "term": "component.user-dropdown-empty.search-hint",
+    "definition": "Procura por utilizadores existentes",
+    "context": "Search for existing users"
+  },
+  {
+    "term": "component.user-dropdown-empty.search-hint-include-groups",
+    "definition": "Procura por utilizadores e equipas existentes",
+    "context": "Search for existing users and teams"
+  },
+  {
+    "term": "component.user-select.user-group-icon-alt",
+    "definition": "Equipa",
+    "context": "Team"
+  },
+  {
+    "term": "contacts.create-new-contact.header",
+    "definition": "Introduz os dados do contacto",
+    "context": "Enter the contact details"
+  },
+  {
+    "term": "error.404.header",
+    "definition": "Não conseguimos encontrar a página que procuras.",
+    "context": "We can't seem to find the page you're looking for."
+  },
+  {
+    "term": "error.404.helpful-links",
+    "definition": "Aqui estão alguns links que podem ser úteis:",
+    "context": "Here are some helpful links instead:"
+  },
+  {
+    "term": "error.main-header",
+    "definition": "Opa",
+    "context": "Oops!"
+  },
+  {
+    "term": "footer.slogan",
+    "definition": "Trabalha melhor com",
+    "context": "Work better with"
+  },
+  {
+    "term": "generic.accept",
+    "definition": "Aceitar",
+    "context": "Accept"
+  },
+  {
+    "term": "generic.add",
+    "definition": "Adicionar",
+    "context": "Add"
+  },
+  {
+    "term": "generic.attached-file",
+    "definition": "Ficheiro anexado: {filename}",
+    "context": "Attached file: {filename}"
+  },
+  {
+    "term": "generic.cancel",
+    "definition": "Cancelar",
+    "context": "Cancel"
+  },
+  {
+    "term": "generic.clear",
+    "definition": "Limpar",
+    "context": "Clear"
+  },
+  {
+    "term": "generic.close",
+    "definition": "Fechar",
+    "context": "Close"
+  },
+  {
+    "term": "generic.collapse",
+    "definition": "Encolher",
+    "context": "Collapse"
+  },
+  {
+    "term": "generic.comments-button-label",
+    "definition": "{commentCount, plural, =0 {Sem comentários} =1 {# comentário} other {# comentários}}",
+    "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "generic.continue",
+    "definition": "Continuar",
+    "context": "Continue"
+  },
+  {
+    "term": "generic.delete",
+    "definition": "Eliminar",
+    "context": "Delete"
+  },
+  {
+    "term": "generic.deleted-contact",
+    "definition": "Contacto eliminado",
+    "context": "Deleted contact"
+  },
+  {
+    "term": "generic.deleted-field",
+    "definition": "Campo eliminado",
+    "context": "Deleted field"
+  },
+  {
+    "term": "generic.deleted-user-group",
+    "definition": "Equipa eliminada",
+    "context": "Deleted team"
+  },
+  {
+    "term": "generic.document-not-available",
+    "definition": "Documento não disponível",
+    "context": "Document not available"
+  },
+  {
+    "term": "generic.done",
+    "definition": "Pronto",
+    "context": "Done"
+  },
+  {
+    "term": "generic.dropzone-default",
+    "definition": "Arrasta ficheiros para aqui ou clica para os selecionar",
+    "context": "Drag files here, or click to select them"
+  },
+  {
+    "term": "generic.dropzone-error-file-too-large",
+    "definition": "O ficheiro é demasiado grande. Tamanho máximo permitido {size}",
+    "context": "The file is too large. Maximum size allowed {size}"
+  },
+  {
+    "term": "generic.edit",
+    "definition": "Editar",
+    "context": "Edit"
+  },
+  {
+    "term": "generic.email",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
+    "term": "generic.email-example",
+    "definition": "email@exemplo.com",
+    "context": "email@example.com"
+  },
+  {
+    "term": "generic.email-message-placeholder",
+    "definition": "Escreve uma mensagem para incluir no email",
+    "context": "Write a message to include in the email"
+  },
+  {
+    "term": "generic.empty-heading",
+    "definition": "Cabeçalho vazio",
+    "context": "Untitled heading"
+  },
+  {
+    "term": "generic.expand",
+    "definition": "Expandir",
+    "context": "Expand"
+  },
+  {
+    "term": "generic.for-example",
+    "definition": "Por exemplo, {example}",
+    "context": "E.g. {example}"
+  },
+  {
+    "term": "generic.forms.company-email-placeholder",
+    "definition": "exemplo@empresa.pt",
+    "context": "example@company.com"
+  },
+  {
+    "term": "generic.forms.email-label",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
+    "term": "generic.forms.email-placeholder",
+    "definition": "nome@exemplo.com",
+    "context": "name@example.com"
+  },
+  {
+    "term": "generic.forms.first-name-label",
+    "definition": "Primeiro nome",
+    "context": "First name"
+  },
+  {
+    "term": "generic.forms.invalid-email-error",
+    "definition": "Por favor, introduza um correio eletrónico válido",
+    "context": "Please, enter a valid email"
+  },
+  {
+    "term": "generic.forms.invalid-first-name-error",
+    "definition": "Por favor, introduza o nome",
+    "context": "Please, enter the first name"
+  },
+  {
+    "term": "generic.forms.invalid-last-name-error",
+    "definition": "Por favor, introduza o apelido",
+    "context": "Please, enter the last name"
+  },
+  {
+    "term": "generic.forms.last-name-label",
+    "definition": "Apelidos",
+    "context": "Last name"
+  },
+  {
+    "term": "generic.forms.message-label",
+    "definition": "Mensagem",
+    "context": "Message"
+  },
+  {
+    "term": "generic.forms.required-first-name-error",
+    "definition": "O nome é um campo obrigatório",
+    "context": "First name is required"
+  },
+  {
+    "term": "generic.forms.required-last-name-error",
+    "definition": "O apelido é um campo obrigatório",
+    "context": "Last name is required"
+  },
+  {
+    "term": "generic.go-back",
+    "definition": "Voltar atrás",
+    "context": "Go back"
+  },
+  {
+    "term": "generic.go-to-page",
+    "definition": "Ir para a página {page}",
+    "context": "Go to page {page}"
+  },
+  {
+    "term": "generic.group-name-fallback-reply",
+    "definition": "Resposta",
+    "context": "Reply"
+  },
+  {
+    "term": "generic.help",
+    "definition": "Ajuda",
+    "context": "Help"
+  },
+  {
+    "term": "generic.language-catalan",
+    "definition": "Catalão",
+    "context": "Catalan"
+  },
+  {
+    "term": "generic.language-english",
+    "definition": "Inglês",
+    "context": "English"
+  },
+  {
+    "term": "generic.language-italian",
+    "definition": "Italiano",
+    "context": "Italian"
+  },
+  {
+    "term": "generic.language-portuguese",
+    "definition": "Português",
+    "context": "Portuguese"
+  },
+  {
+    "term": "generic.language-spanish",
+    "definition": "Espanhol",
+    "context": "Spanish"
+  },
+  {
+    "term": "generic.more-options",
+    "definition": "Mais opções...",
+    "context": "More options..."
+  },
+  {
+    "term": "generic.n-group-members",
+    "definition": "{count, plural, =1 {1 membro} other {# membros}}",
+    "context": "{count, plural, =1 {1 member} other {# members}}"
+  },
+  {
+    "term": "generic.n-more",
+    "definition": "{count} mais",
+    "context": "{count} more"
+  },
+  {
+    "term": "generic.next-page",
+    "definition": "Página seguinte",
+    "context": "Next page"
+  },
+  {
+    "term": "generic.no-results",
+    "definition": "Sem resultados",
+    "context": "No results"
+  },
+  {
+    "term": "generic.ok",
+    "definition": "Aceitar",
+    "context": "OK"
+  },
+  {
+    "term": "generic.optional",
+    "definition": "Opcional",
+    "context": "Optional"
+  },
+  {
+    "term": "generic.options",
+    "definition": "Opções...",
+    "context": "Options..."
+  },
+  {
+    "term": "generic.petition-field-type-checkbox",
+    "definition": "Opções",
+    "context": "Multiple choice"
+  },
+  {
+    "term": "generic.petition-field-type-conditional-select",
+    "definition": "Desdobrável condicional",
+    "context": "Conditional select"
+  },
+  {
+    "term": "generic.petition-field-type-date",
+    "definition": "Data",
+    "context": "Date"
+  },
+  {
+    "term": "generic.petition-field-type-date-and-time",
+    "definition": "Data e hora",
+    "context": "Date and time"
+  },
+  {
+    "term": "generic.petition-field-type-dow-jones-kyc-research",
+    "definition": "Pesquisar na Dow Jones",
+    "context": "Search in Dow Jones"
+  },
+  {
+    "term": "generic.petition-field-type-field-group",
+    "definition": "Grupo de questões",
+    "context": "Group of fields"
+  },
+  {
+    "term": "generic.petition-field-type-file-upload",
+    "definition": "Documentos e ficheiros",
+    "context": "Documents and files"
+  },
+  {
+    "term": "generic.petition-field-type-heading",
+    "definition": "Bloco de texto",
+    "context": "Text block"
+  },
+  {
+    "term": "generic.petition-field-type-number",
+    "definition": "Números",
+    "context": "Numbers"
+  },
+  {
+    "term": "generic.petition-field-type-phone",
+    "definition": "Telefone",
+    "context": "Phone number"
+  },
+  {
+    "term": "generic.petition-field-type-select",
+    "definition": "Desdobrável",
+    "context": "Select"
+  },
+  {
+    "term": "generic.petition-field-type-short-text",
+    "definition": "Respostas curtas",
+    "context": "Short replies"
+  },
+  {
+    "term": "generic.petition-field-type-tax-documents",
+    "definition": "Documentos fiscais",
+    "context": "Tax documents"
+  },
+  {
+    "term": "generic.petition-field-type-text",
+    "definition": "Respostas longas",
+    "context": "Long replies"
+  },
+  {
+    "term": "generic.please-try-again-later",
+    "definition": "Por favor, tente de novo mais tarde",
+    "context": "Please try again later"
+  },
+  {
+    "term": "generic.previous-page",
+    "definition": "Página anterior",
+    "context": "Previous page"
+  },
+  {
+    "term": "generic.reload-data",
+    "definition": "Refrescar",
+    "context": "Reload"
+  },
+  {
+    "term": "generic.remove",
+    "definition": "Remover",
+    "context": "Remove"
+  },
+  {
+    "term": "generic.reply-not-available",
+    "definition": "Resposta não disponível",
+    "context": "Reply not available"
+  },
+  {
+    "term": "generic.reply-not-submitted",
+    "definition": "Resposta não enviada",
+    "context": "Reply not sent"
+  },
+  {
+    "term": "generic.required-field",
+    "definition": "Campo obrigatório",
+    "context": "Required field"
+  },
+  {
+    "term": "generic.save",
+    "definition": "Guardar",
+    "context": "Save"
+  },
+  {
+    "term": "generic.saving-changes",
+    "definition": "A guardar...",
+    "context": "Saving..."
+  },
+  {
+    "term": "generic.select-an-option",
+    "definition": "Selecione uma opção",
+    "context": "Select an option"
+  },
+  {
+    "term": "generic.send",
+    "definition": "Enviar",
+    "context": "Send"
+  },
+  {
+    "term": "generic.show-more-less",
+    "definition": "Mostrar {more, select, true {mais} other {menos}}",
+    "context": "Show {more, select, true {more} other {less}}"
+  },
+  {
+    "term": "generic.signature-demo-environment-long",
+    "definition": "Ambiente de teste",
+    "context": "Test environment"
+  },
+  {
+    "term": "generic.something-went-wrong",
+    "definition": "Algo falhou",
+    "context": "Something went wrong"
+  },
+  {
+    "term": "generic.submit",
+    "definition": "Enviar",
+    "context": "Submit"
+  },
+  {
+    "term": "generic.thanks",
+    "definition": "Obrigado",
+    "context": "Thanks"
+  },
+  {
+    "term": "generic.understood",
+    "definition": "Entendido",
+    "context": "Understood"
+  },
+  {
+    "term": "generic.unexpected-error-happened",
+    "definition": "Ocorreu um erro inesperado. Por favor, atualize esta janela e, se persistir, contacte o apoio para o podermos ajudar.",
+    "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help."
+  },
+  {
+    "term": "generic.unknown",
+    "definition": "Desconhecido",
+    "context": "Unknown"
+  },
+  {
+    "term": "generic.untitled",
+    "definition": "Sem título",
+    "context": "Untitled"
+  },
+  {
+    "term": "generic.untitled-field",
+    "definition": "Campo sem título",
+    "context": "Untitled field"
+  },
+  {
+    "term": "generic.you",
+    "definition": "Tu",
+    "context": "You"
+  },
+  {
+    "term": "header.user-menu-button",
+    "definition": "Menu de utilizador",
+    "context": "User menu"
+  },
+  {
+    "term": "layout.privacy-link",
+    "definition": "Privacidade",
+    "context": "Privacy"
+  },
+  {
+    "term": "layout.terms-and-conditions-link",
+    "definition": "Termos e condições",
+    "context": "Terms and conditions"
+  },
+  {
+    "term": "page.maintenance.description",
+    "definition": "O Parallel encontra-se em manutenção programada e retomará a atividade normal o mais breve possível.",
+    "context": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible."
+  },
+  {
+    "term": "page.maintenance.header",
+    "definition": "O Parallel encontra-se em manutenção",
+    "context": "Parallel is under maintenance"
+  },
+  {
+    "term": "page.opt-out.answer-no-reminders",
+    "definition": "Vou carregar a informação mas não quero continuar a receber mais e-mails",
+    "context": "I will upload the information but I do not want to receive any more emails"
+  },
+  {
+    "term": "page.opt-out.answer-not-interested",
+    "definition": "Já não estou interessado no serviço",
+    "context": "I am not interested in this service anymore"
+  },
+  {
+    "term": "page.opt-out.answer-not-requested",
+    "definition": "Não solicitei este serviço",
+    "context": "I have not requested this service"
+  },
+  {
+    "term": "page.opt-out.answer-other",
+    "definition": "Outro",
+    "context": "Other"
+  },
+  {
+    "term": "page.opt-out.answer-spam",
+    "definition": "Considero que é correio não solicitado (spam)",
+    "context": "I consider this is spam"
+  },
+  {
+    "term": "page.opt-out.answer-wrong-person",
+    "definition": "Não sou a pessoa adequada para completar esta informação",
+    "context": "I am not the person to complete this information"
+  },
+  {
+    "term": "page.opt-out.done-body",
+    "definition": "Informámos o remetente e não receberá mais lembretes deste processo.",
+    "context": "We have informed the sender and you will not receive any more reminders related with this process."
+  },
+  {
+    "term": "page.opt-out.done-title",
+    "definition": "Concluído!",
+    "context": "Done!"
+  },
+  {
+    "term": "page.opt-out.feedback-title",
+    "definition": "Por favor, poderia indicar-nos o motivo para não querer continuar a receber lembretes deste processo?",
+    "context": "Please let us know why you would like to stop receiving reminders related with this process."
+  },
+  {
+    "term": "page.opt-out.opt-out-button",
+    "definition": "Confirmar",
+    "context": "Confirm"
+  },
+  {
+    "term": "page.opt-out.other-error-message",
+    "definition": "Por favor, escolha um motivo",
+    "context": "Please, enter a reason"
+  },
+  {
+    "term": "page.opt-out.other-placeholder",
+    "definition": "Indicar outros motivos",
+    "context": "Indicate other reasons"
+  },
+  {
+    "term": "page.opt-out.review-before-opt-out",
+    "definition": "Antes de cancelar o envio de lembretes, verifique a informação solicitada.",
+    "context": "Before opting out from receiving reminders, check the requested information."
+  },
+  {
+    "term": "page.opt-out.review-button",
+    "definition": "Rever a informação",
+    "context": "Review the information"
+  },
+  {
+    "term": "page.opt-out.title",
+    "definition": "Cancelar e-mails",
+    "context": "Opt out from emails"
+  },
+  {
+    "term": "page.update-browser.header",
+    "definition": "Navegador não suportado",
+    "context": "Unsupported browser"
+  },
+  {
+    "term": "page.update-browser.text-1",
+    "definition": "Está a utilizar um navegador antigo. Recomendamos que atualize o seu navegador ou descarregue a última versão de um dos seguintes browsers:",
+    "context": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
+  },
+  {
+    "term": "page.update-browser.text-2",
+    "definition": "Se o erro persistir, por favor contacte a pessoa que lhe enviou este link.",
+    "context": "If the error persists, please contact the person who sent you this link."
+  },
+  {
+    "term": "petition.replies.download-file-error-dialog.body",
+    "definition": "Ocorreu um problema a gerar a ligação de descarga de {filename}. Isto normalmente significa que o carregamento do ficheiro por parte do utilizador falhou.",
+    "context": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed."
+  },
+  {
+    "term": "petition.replies.download-file-error-dialog.header",
+    "definition": "Erro ao descarregar {filename}",
+    "context": "Error downloading {filename}"
+  },
+  {
+    "term": "petition.signature-successful.subtitle",
+    "definition": "Enviamos uma cópia assinada do documento para o seu email.",
+    "context": "We have sent a signed copy of the document to your email."
+  },
+  {
+    "term": "petition.signature-successful.title",
+    "definition": "Documento assinado corretamente",
+    "context": "Document signed successfully"
+  },
+  {
+    "term": "placeholder-plugin.deleted-field",
+    "definition": "Este campo foi eliminado. Nada será mostrado aqui.",
+    "context": "This field has been deleted. Nothing will show here."
+  },
+  {
+    "term": "placeholder-plugin.field-without-replies",
+    "definition": "Este campo não tem respostas. Nada será mostrado aqui.",
+    "context": "This field has no replies. Nothing will show here."
+  },
+  {
+    "term": "public-petition-email-exists.body",
+    "definition": "Já existe um processo em curso associado a este email. Se iniciar um novo, terá que preencher a informação do zero. O que deseja fazer?",
+    "context": "There is already an ongoing process associated to this email. If you start a new process, you will have to fill the information from scratch. What would you like to do?"
+  },
+  {
+    "term": "public-petition-email-exists.continue-existing-button",
+    "definition": "Continuar existente",
+    "context": "Continue existing process"
+  },
+  {
+    "term": "public-petition-email-exists.new-petition-button",
+    "definition": "Começar de novo",
+    "context": "Start again"
+  },
+  {
+    "term": "public-petition-email-exists.title",
+    "definition": "Email existente",
+    "context": "Existing email"
+  },
+  {
+    "term": "public-petition-email-sent.body.explanation-1",
+    "definition": "Enviamos um email para {email} com o acesso para completar a informação. Isso ajudará a verificar o seu email e a garantir a privacidade e segurança dos seus dados.",
+    "context": "We have sent an email to {email} with access to complete the information. This will help us verify your email and ensure your privacy and security."
+  },
+  {
+    "term": "public-petition-email-sent.body.explanation-2",
+    "definition": "Não encontra o nosso email? Verifique a sua pasta de spam e, se não estiver lá, entre em contacto com a pessoa que lhe partilhou o link.",
+    "context": "Can't find our email? Check your spam folder and if you don't find it contact with the person who shared you the link."
+  },
+  {
+    "term": "public-petition-email-sent.body.explanation-existing-process",
+    "definition": "Já existe um processo com este email ({email}). Reenviamos o acesso para que possa continuar a completá-lo.",
+    "context": "You have an existing process with this email ({email}). We have resent you the access so you can continue with it."
+  },
+  {
+    "term": "public-petition-email-sent.title",
+    "definition": "Verifique a sua caixa de entrada",
+    "context": "Check your inbox"
+  },
+  {
+    "term": "public-petition-reminder.body.explanation-1",
+    "definition": "Enviamos um lembrete para <b>{email}</b> com um link para o seu processo em curso para que possa aceder e continuar a completá-lo.",
+    "context": "We have sent a reminder to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it."
+  },
+  {
+    "term": "public-petition-reminder.body.explanation-2",
+    "definition": "Não encontra o nosso email? Verifique a sua pasta de spam e, se não estiver lá, entre em contacto com a pessoa que lhe partilhou o link.",
+    "context": "Can't find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
+  },
+  {
+    "term": "public-petition-reminder.title",
+    "definition": "Lembrete enviado",
+    "context": "Reminder sent"
+  },
+  {
+    "term": "public-petition.help.explanation-1",
+    "definition": "Se lhe enviaram ou se encontrou este link, significa que precisam de lhe pedir informações. Por segurança, precisamos de o identificar para <b>associar o seu email a um portal seguro</b> onde poderá completá-las.",
+    "context": "If you have found this link or someone has sent it to you, it means that they need some information. For security, we need to identify you and so we can <b>associate your email to a secure portal</b> where you can complete it."
+  },
+  {
+    "term": "public-petition.help.explanation-2",
+    "definition": "Além disso, enviaremos um <b>email com o link</b> para que possa voltar e terminar de completar quando quiser.",
+    "context": "In addition, we will send you an <b>email with the link</b> so that you can return and continue at any time."
+  },
+  {
+    "term": "public-petition.help.form-title",
+    "definition": "Insira os seus dados para aceder",
+    "context": "Enter your data to access"
+  },
+  {
+    "term": "public-petition.help.more-faq",
+    "definition": "Ver mais perguntas frequentes",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "public-petition.help.request-access-button",
+    "definition": "Solicitar acesso",
+    "context": "Request access"
+  },
+  {
+    "term": "public-petition.help.title",
+    "definition": "Por que pedimos estes dados?",
+    "context": "Why do we ask for this data?"
+  },
+  {
+    "term": "public.home-link",
+    "definition": "Início",
+    "context": "Home"
+  },
+  {
+    "term": "public.public-petition-link-unavailable.description",
+    "definition": "Contacte com {fullName} <{email}> para poder continuar.",
+    "context": "Contact with {fullName} <{email}> to continue."
+  },
+  {
+    "term": "public.public-petition-link-unavailable.title",
+    "definition": "Este processo está fechado",
+    "context": "This process is closed"
+  },
+  {
+    "term": "public.public-petition.error--reminder-description",
+    "definition": "Só pode enviar um lembrete a cada 24 horas",
+    "context": "You can only send one reminder each 24 hours"
+  },
+  {
+    "term": "public.public-petition.error-reminder-title",
+    "definition": "Lembrete já enviado",
+    "context": "Reminder already sent"
+  },
+  {
+    "term": "public.slogan.alternative",
+    "definition": "Crie o seu próprio <b>Parallel</b>",
+    "context": "Create your own <b>Parallel</b>"
+  },
+  {
+    "term": "public.support.faq",
+    "definition": "FAQ - Perguntas mais frequentes",
+    "context": "FAQ"
+  },
+  {
+    "term": "public.support.support-center",
+    "definition": "Centro de suporte",
+    "context": "Support center"
+  },
+  {
+    "term": "public.terms.title",
+    "definition": "Termos e condições",
+    "context": "Terms & Conditions"
+  },
+  {
+    "term": "recipient-view.cant-find-email-help",
+    "definition": "{tone, select, INFORMAL{<b>Não encontra o nosso email?</b> Verifique a pasta de spam e, se não estiver lá, contacte a pessoa que partilhou o link consigo.} other{<b>Se não encontrar o email</b> verifique a pasta de spam e, se não estiver lá, contacte a pessoa que lhe partilhou o link.}}",
+    "context": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you."
+  },
+  {
+    "term": "recipient-view.change-email",
+    "definition": "Mudar email",
+    "context": "Change email"
+  },
+  {
+    "term": "recipient-view.client-portal.all",
+    "definition": "Todos",
+    "context": "All"
+  },
+  {
+    "term": "recipient-view.client-portal.completed",
+    "definition": "Completados",
+    "context": "Completed"
+  },
+  {
+    "term": "recipient-view.client-portal.my-processes",
+    "definition": "Meus processos",
+    "context": "My processes"
+  },
+  {
+    "term": "recipient-view.client-portal.no-results",
+    "definition": "Não há resultados para a sua pesquisa",
+    "context": "No results found for your search"
+  },
+  {
+    "term": "recipient-view.client-portal.pending",
+    "definition": "Pendentes",
+    "context": "Pending"
+  },
+  {
+    "term": "recipient-view.client-portal.requested-by",
+    "definition": "Solicitado por {name}, em {date}",
+    "context": "Requested by {name}, on {date}"
+  },
+  {
+    "term": "recipient-view.client-portal.search-placeholder",
+    "definition": "Pesquisar...",
+    "context": "Search..."
+  },
+  {
+    "term": "recipient-view.complete-petition.error-message",
+    "definition": "Parece que o parallel foi atualizado desde a última vez que acedeu. Por favor, atualize o seu navegador e tente novamente. Não perderá as suas respostas enviadas.",
+    "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
+  },
+  {
+    "term": "recipient-view.contents-header",
+    "definition": "Conteúdo",
+    "context": "Contents"
+  },
+  {
+    "term": "recipient-view.created-with",
+    "definition": "Criado com {parallel}",
+    "context": "Created with {parallel}"
+  },
+  {
+    "term": "recipient-view.doubts-button",
+    "definition": "Dúvidas?",
+    "context": "Questions?"
+  },
+  {
+    "term": "recipient-view.expired-code-description",
+    "definition": "O código expirou. Por favor, tente novamente.",
+    "context": "The code has expired. Please try again."
+  },
+  {
+    "term": "recipient-view.expired-code-title",
+    "definition": "Código expirado",
+    "context": "Expired code"
+  },
+  {
+    "term": "recipient-view.export-to-pdf",
+    "definition": "Exportar para PDF",
+    "context": "Export to PDF"
+  },
+  {
+    "term": "recipient-view.field-comments.cta",
+    "definition": "{tone, select, INFORMAL{Alguma dúvida? Pergunte por aqui} other{Tem alguma dúvida? Pergunte por aqui}}",
+    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
+  },
+  {
+    "term": "recipient-view.field-comments.cta-with-name",
+    "definition": "{tone, select, INFORMAL{Alguma dúvida? Pergunte aqui a {name}} other{Tem alguma dúvida? Pergunte aqui a {name}}}",
+    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
+  },
+  {
+    "term": "recipient-view.field-comments.placeholder",
+    "definition": "{tone, select, INFORMAL{Escreva aqui as suas} other{Escreva aqui as suas}} dúvidas e perguntas",
+    "context": "Ask here your questions and doubts"
+  },
+  {
+    "term": "recipient-view.field-comments.undefined-field",
+    "definition": "Algo inesperado aconteceu. Por favor, atualize a página e tente novamente.",
+    "context": "Something unexpected happened. Please, refresh the page and try again."
+  },
+  {
+    "term": "recipient-view.first-time.finalize-whenever-body",
+    "definition": "A partir do email ou copiando o link desta página, {tone, select, INFORMAL{poderá fechar e voltar para terminar de completar quando quiser.} other{ poderá voltar para terminar de completar a informação noutro momento.}}",
+    "context": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel."
+  },
+  {
+    "term": "recipient-view.first-time.finalize-whenever-title",
+    "definition": "{tone, select, INFORMAL{Complete ao seu ritmo} other{Finalize quando desejar}}",
+    "context": "Finalize whenever you want"
+  },
+  {
+    "term": "recipient-view.first-time.intro",
+    "definition": "{tone, select, INFORMAL{Como completar a sua informação} other{Complete a sua informação}}",
+    "context": "How to fill in your information"
+  },
+  {
+    "term": "recipient-view.first-time.replies-saved-body",
+    "definition": "{tone, select, INFORMAL{A informação será automaticamente guardada à medida que a adicionar em cada campo.} other{A informação será automaticamente guardada e sincronizada com o seu remetente à medida que a adicionar.}}",
+    "context": "The information you enter will be saved automatically and synchronized with the sender."
+  },
+  {
+    "term": "recipient-view.first-time.replies-saved-title",
+    "definition": "Guardamos automaticamente as {tone, select, INFORMAL{suas} other{suas}} respostas",
+    "context": "Your replies auto-saved"
+  },
+  {
+    "term": "recipient-view.first-time.send-doubts-body",
+    "definition": "{tone, select, INFORMAL{Pode deixar as suas dúvidas e comentários diretamente no campo e o seu remetente responderá.} other{Pode deixar as suas dúvidas e comentários diretamente no campo e o seu remetente responderá.}}",
+    "context": "You can add any questions you have on the corresponding field and your sender will respond them."
+  },
+  {
+    "term": "recipient-view.first-time.send-doubts-title",
+    "definition": "{tone, select, INFORMAL{Não fique com dúvidas} other{Envie as suas dúvidas}}",
+    "context": "Send your questions"
+  },
+  {
+    "term": "recipient-view.go-to-my-processes",
+    "definition": "Ir para os meus processos",
+    "context": "Go to my processes"
+  },
+  {
+    "term": "recipient-view.guide-me",
+    "definition": "Orientar-me",
+    "context": "Guide me"
+  },
+  {
+    "term": "recipient-view.in-order-to",
+    "definition": "Para",
+    "context": "To"
+  },
+  {
+    "term": "recipient-view.invite-collaborator",
+    "definition": "Convidar colaborador",
+    "context": "Invite collaborator"
+  },
+  {
+    "term": "recipient-view.invite-collaborator.help",
+    "definition": "Use esta opção para solicitar a outra pessoa que complete a informação por si.",
+    "context": "Use this option to request someone else to complete the information for you."
+  },
+  {
+    "term": "recipient-view.last-saved-info",
+    "definition": "As suas respostas são guardadas automaticamente.",
+    "context": "Your answers are automatically saved."
+  },
+  {
+    "term": "recipient-view.last-saved-info-date",
+    "definition": "<b>Último guardado:</b> {date}",
+    "context": "<b>Last saved:</b> {date}"
+  },
+  {
+    "term": "recipient-view.last-saved-time",
+    "definition": "Último guardado {time}",
+    "context": "Last saved {time}"
+  },
+  {
+    "term": "recipient-view.last-saved-time-short",
+    "definition": "Guardado {time}",
+    "context": "Saved {time}"
+  },
+  {
+    "term": "recipient-view.petition-delegated.toast-body",
+    "definition": "Enviamos um email para {email} com instruções para aceder a este parallel.",
+    "context": "We have sent an email to {email} with instructions to access this parallel."
+  },
+  {
+    "term": "recipient-view.petition-delegated.toast-header",
+    "definition": "Acesso delegado",
+    "context": "Access delegated"
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.header",
+    "definition": "Parece que esta página já não está disponível.",
+    "context": "It seems that this page is no longer available."
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.text",
+    "definition": "Se precisar de aceder, por favor, contacte a pessoa que lhe enviou.",
+    "context": "If you need to access it, please reach out to the person that sent it to you."
+  },
+  {
+    "term": "recipient-view.petition-subject",
+    "definition": "Motivo",
+    "context": "Subject"
+  },
+  {
+    "term": "recipient-view.progress",
+    "definition": "Progresso {current}/{total}",
+    "context": "Progress {current}/{total}"
+  },
+  {
+    "term": "recipient-view.remaining-attempts",
+    "definition": "Tem {attempts, plural, =1{uma tentativa mais} other{# tentativas mais}}",
+    "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
+  },
+  {
+    "term": "recipient-view.request-information",
+    "definition": "Informação",
+    "context": "Information"
+  },
+  {
+    "term": "recipient-view.requested-by",
+    "definition": "Solicitado por",
+    "context": "Requested by"
+  },
+  {
+    "term": "recipient-view.review-before-sign.body-1",
+    "definition": "{tone, select, INFORMAL{Para completar este parallel é necessária uma <b>assinatura digital</b>.} other{Este parallel requer uma <b>assinatura digital</b> para ser completado.}}",
+    "context": "This parallel requires an <b>eSignature</b> in order to be completed."
+  },
+  {
+    "term": "recipient-view.review-before-sign.body-2",
+    "definition": "{tone, select, INFORMAL{Notificámos o {name} para que reveja as respostas. Quando tudo estiver validado, enviaremos um email com o documento para assinar às pessoas indicadas.} other{Notificámos o {name} para proceder à revisão das respostas e uma vez validadas enviaremos um email com o documento a assinar às pessoas correspondentes.}}",
+    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
+  },
+  {
+    "term": "recipient-view.review-before-sign.header",
+    "definition": "Revisão e assinatura",
+    "context": "Review and sign"
+  },
+  {
+    "term": "recipient-view.send-code",
+    "definition": "Enviar código de verificação",
+    "context": "Send verification code"
+  },
+  {
+    "term": "recipient-view.submit-and-sign-button-short",
+    "definition": "Finalizar e assinar",
+    "context": "Finalize and sign"
+  },
+  {
+    "term": "recipient-view.submit-button-short",
+    "definition": "Finalizar",
+    "context": "Finalize"
+  },
+  {
+    "term": "recipient-view.unread-comments",
+    "definition": "Existem comentários por ler",
+    "context": "There's unread comments"
+  },
+  {
+    "term": "recipient-view.verify-1",
+    "definition": "Parece que {tone, select, INFORMAL{estás} other{está}} a tentar aceder a esta página a partir de um novo dispositivo.",
+    "context": "It looks like you are trying to access this page from a new device."
+  },
+  {
+    "term": "recipient-view.verify-2",
+    "definition": "Para assegurar a privacidade dos {tone, select, INFORMAL{teus} other{seus}} dados, precisamos que {tone, select, INFORMAL{verifiques a tua} other{verifique a sua}} identidade mediante o código que {tone, select, INFORMAL{te chegará ao teu} other{lhe chegará ao seu}} email {email}.",
+    "context": "To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
+  },
+  {
+    "term": "recipient-view.verify-button",
+    "definition": "Verificar código",
+    "context": "Verify code"
+  },
+  {
+    "term": "recipient-view.verify-title",
+    "definition": "{tone, select, INFORMAL{Introduce} other{Introduza}} o código de verificação",
+    "context": "Enter verification code"
+  },
+  {
+    "term": "user-group.all-members.description",
+    "definition": "Este grupo contém todos os utilizadores da organização.",
+    "context": "This team contains all users from the organization."
+  },
+  {
+    "term": "util.use-short-text-formats.email",
+    "definition": "correio eletrónico",
+    "context": "email"
+  },
+  {
+    "term": "util.use-short-text-formats.es-dni",
+    "definition": "DNI/NIE",
+    "context": "national ID number"
+  },
+  {
+    "term": "util.use-short-text-formats.es-nif",
+    "definition": "NIF",
+    "context": "tax ID number"
+  },
+  {
+    "term": "util.use-short-text-formats.es-postalcode",
+    "definition": "código postal",
+    "context": "postal code"
+  },
+  {
+    "term": "util.use-short-text-formats.es-ssn",
+    "definition": "número da segurança social",
+    "context": "social security number"
+  },
+  {
+    "term": "util.use-short-text-formats.group-generic",
+    "definition": "Genérico",
+    "context": "Generic"
+  },
+  {
+    "term": "util.use-short-text-formats.iban",
+    "definition": "número da conta IBAN",
+    "context": "IBAN account number"
+  },
+  {
+    "term": "util.use-short-text-formats.us-postalcode",
+    "definition": "código postal",
+    "context": "zip code"
+  },
+  {
+    "term": "util.use-short-text-formats.us-ssn",
+    "definition": "número da segurança social",
+    "context": "social security number"
+  }
+]

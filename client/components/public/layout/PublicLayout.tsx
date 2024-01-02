@@ -1,5 +1,4 @@
 import { Box, Flex } from "@chakra-ui/react";
-import languages from "@parallel/lang/languages.json";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe } from "@parallel/utils/types";
 import Head from "next/head";
@@ -78,13 +77,11 @@ export function PublicLayout({
         src="https://unpkg.com/@segment/consent-manager@5.5.0/standalone/consent-manager.js"
         strategy="afterInteractive"
       />
-      {(canonicalLocale ? [canonicalLocale] : languages.map((lang) => lang.locale)).map(
-        (locale) => (
-          <Head key={locale}>
-            <link rel="alternate" hrefLang={locale} href={buildUrl(pathname, query, locale)} />
-          </Head>
-        ),
-      )}
+      {(canonicalLocale ? [canonicalLocale] : ["en", "es"]).map((locale) => (
+        <Head key={locale}>
+          <link rel="alternate" hrefLang={locale} href={buildUrl(pathname, query, locale)} />
+        </Head>
+      ))}
       <Head>
         <meta property="og:title" content={og?.title ?? title} />
         <meta property="og:type" content={og?.type ?? "website"} />
@@ -97,12 +94,8 @@ export function PublicLayout({
           }
         />
         <meta property="og:description" content={og?.description ?? description} />
-        {languages.map((lang) => (
-          <meta
-            key={lang.locale}
-            property={lang.locale === locale ? "og:locale" : "og:locale:alternate"}
-            content={lang.locale}
-          />
+        {["en", "es"].map((l) => (
+          <meta key={l} property={l === locale ? "og:locale" : "og:locale:alternate"} content={l} />
         ))}
       </Head>
       <Flex direction="column" minHeight="100vh">

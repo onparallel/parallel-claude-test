@@ -40,11 +40,10 @@ async function parseArgs(req: Request, storyPath: string) {
 }
 
 app
-  .get("/documents/:document", async (req, res, next) => {
+  .get("/documents/*", async (req, res, next) => {
+    const document = (req.params as any)[0] as string;
     const query = new URLSearchParams(req.query as any);
-    const url = encodeURIComponent(
-      `http://localhost:5000/documents/${req.params.document}/file.pdf?${query}`,
-    );
+    const url = encodeURIComponent(`http://localhost:5000/pdf/${document}?${query}`);
     res.send(/* html */ `
       <html>
       <body>
@@ -54,7 +53,8 @@ app
       </html>
     `);
   })
-  .get("/documents/:document/file.pdf", async (req, res, next) => {
+  .get("/pdf/*", async (req, res, next) => {
+    const document = (req.params as any)[0] as string;
     try {
       // clear cache
       for (const entry of Object.keys(require.cache)) {
@@ -62,7 +62,6 @@ app
           delete require.cache[entry];
         }
       }
-      const document = req.params.document;
 
       if (
         typeof req.query.locale !== "string" ||
@@ -97,7 +96,7 @@ app
     }
   });
 
-app.get("/emails/:email", async (req, res, next) => {
+app.get("/emails/*", async (req, res, next) => {
   try {
     // clear cache
     for (const entry of Object.keys(require.cache)) {
@@ -105,7 +104,7 @@ app.get("/emails/:email", async (req, res, next) => {
         delete require.cache[entry];
       }
     }
-    const name = req.params.email;
+    const name = (req.params as any)[0] as string;
     if (
       typeof req.query.locale !== "string" ||
       !ContactLocaleValues.includes(req.query.locale as any)

@@ -36,13 +36,19 @@ interface PetitionTemplateCompletingMessageCardProps {
 }
 
 const messagesSubject: Record<PetitionLocale, string> = {
+  ca: "Gràcies per haver completat",
   en: "Thank you for completing",
   es: "Gracias por completar",
+  it: "Grazie per aver completato",
+  pt: "Obrigado por completar",
 };
 
 const messagesBody: Record<PetitionLocale, string> = {
+  ca: "Hem informat a {{ user-first-name }} que s'ha completat la informació per continuar amb el procés",
   en: "We informed {{ user-first-name }} that you have completed the information to continue with the process",
   es: "Hemos informado a {{ user-first-name }} de que se ha completado la información para continuar con el proceso",
+  it: "Abbiamo informato {{ user-first-name }} che le informazioni sono state completate per continuare con il processo",
+  pt: "Informámos {{ user-first-name }} de que completou a informação para continuar com o processo",
 };
 
 export const PetitionTemplateCompletingMessageCard = Object.assign(

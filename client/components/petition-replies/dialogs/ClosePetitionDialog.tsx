@@ -12,13 +12,13 @@ import {
 import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionLocale, useClosePetitionDialog_PetitionFragment } from "@parallel/graphql/__types";
-import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/textWithPlaceholder";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
+import { PETITION_CLOSING_DEFAULT_MESSAGE } from "@parallel/components/petition-messages/PetitionTemplateClosingMessageCard";
+import { useClosePetitionDialog_PetitionFragment } from "@parallel/graphql/__types";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/textWithPlaceholder";
 import { Maybe } from "@parallel/utils/types";
-import { outdent } from "outdent";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../../common/HelpPopover";
@@ -35,27 +35,6 @@ interface ClosePetitionDialogNotification {
   pdfExportTitle: Maybe<string>;
 }
 
-const messages: Record<PetitionLocale, string> = {
-  en: outdent`
-    Dear {{contact-first-name}},
-
-    We have reviewed all the information that we requested, and we can confirm that everything is correct.
-
-    Let us know if you have any questions or comments.
-    
-    Best regards.
-  `,
-  es: outdent`
-    Apreciado/a {{contact-first-name}},
-
-    Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
-    
-    Quedamos a su entera disposición para aclarar o comentar cualquier aspecto que considere oportuno.
-    
-    Reciba un cordial saludo.
-  `,
-};
-
 export function ClosePetitionDialog({
   petition,
   requiredMessage,
@@ -66,7 +45,7 @@ export function ClosePetitionDialog({
   const [message, setMessage] = useState(
     petition.closingEmailBody ??
       (textWithPlaceholderToSlateNodes(
-        messages[petition.locale],
+        PETITION_CLOSING_DEFAULT_MESSAGE[petition.locale],
         placeholders,
       ) as RichTextEditorValue),
   );

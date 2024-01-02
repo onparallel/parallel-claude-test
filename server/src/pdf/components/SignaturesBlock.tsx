@@ -8,6 +8,7 @@ import { useTheme } from "../utils/ThemeProvider";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";
 import { RichTextBlock } from "./RichTextBlock";
 import { SignatureBox, SignatureBoxProps } from "./SignatureBox";
+import { ContactLocale } from "../../db/__types";
 
 interface SignaturesBlockProps {
   signatureConfig: SignaturesBlock_SignatureConfigFragment;
@@ -164,7 +165,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
   return (
     <View style={style} wrap={false}>
       <View style={[styles.text]}>
-        <RichTextBlock>{theme.legalText[intl.locale as "es" | "en"]}</RichTextBlock>
+        <RichTextBlock>{theme.legalText[intl.locale as ContactLocale]}</RichTextBlock>
       </View>
       {chunk(signers, 3).map((row, i) => (
         <View key={i} style={{ flexDirection: "row", marginTop: "5mm" }}>

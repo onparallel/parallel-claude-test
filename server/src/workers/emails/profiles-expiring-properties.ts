@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import ProfilesExpiringPropertiesEmail from "../../emails/emails/ProfilesExpiringPropertiesEmail";
+import ProfilesExpiringPropertiesEmail from "../../emails/emails/app/ProfilesExpiringPropertiesEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { LocalizableUserText } from "../../graphql";
 

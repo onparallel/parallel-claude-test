@@ -9,7 +9,7 @@ import { PetitionField, PetitionFieldReply } from "../db/__types";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { fromGlobalId, toGlobalId } from "./globalId";
 import { Maybe, UnwrapArray } from "./types";
-import { TableTypes } from "../db/helpers/BaseRepository";
+import type { TableTypes } from "../db/helpers/BaseRepository";
 
 type PetitionFieldVisibilityType = "SHOW" | "HIDE";
 

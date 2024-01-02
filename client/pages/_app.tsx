@@ -7,7 +7,7 @@ import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect, useRef } from "react";
 
-type MyAppProps = AppProps & I18nProps;
+interface MyAppProps extends AppProps, I18nProps {}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {

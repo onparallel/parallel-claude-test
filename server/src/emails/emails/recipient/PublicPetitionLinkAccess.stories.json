@@ -1,0 +1,51 @@
+{
+  "title": "Recipient Emails",
+  "stories": [
+    {
+      "name": "Public Petition Link Access",
+      "parameters": {
+        "server": {
+          "id": "emails/recipient/PublicPetitionLinkAccess"
+        }
+      },
+      "args": {
+        "emailSubject": "First email subject",
+        "name": "Derek",
+        "fullName": "Derek Lou",
+        "senderName": "Mariano Rodriguez",
+        "petitionTitle": "Some petition title",
+        "bodyHtml": "Buenos días Juan, <br/><br/>Tal y como comentamos, te mando la información que necesitamos de cara a tu próxima incorporación con nosotros para prepararte el contrato y darte de alta en la Seguridad Social.<br/><br/>Si tienes cualquier duda me dices,<br/><br/>Gracias y un abrazo!<br/><br/>Luisa.",
+        "bodyPlainText": "Buenos días Juan, \nTal y como comentamos, te mando la información que necesitamos de cara a tu próxima incorporación con nosotros para prepararte el contrato y darte de alta en la Seguridad Social. \nSi tienes cualquier duda me dices, \nGracias y un abrazo! \nLuisa",
+        "keycode": "asdfghjkl",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "https://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel",
+        "removeWhyWeUseParallel": false,
+        "removeParallelBranding": false,
+        "theme": {
+          "color": "#f75959",
+          "fontFamily": "Trebuchet MS, Helvetica, sans-serif",
+          "preferredTone": "FORMAL"
+        }
+      },
+      "argTypes": {
+        "emailSubject": { "control": { "type": "text" } },
+        "senderName": { "control": { "type": "text" } },
+        "name": { "control": { "type": "text" } },
+        "fullName": { "control": { "type": "text" } },
+        "petitionTitle": { "control": { "type": "text" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
+        "keycode": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } },
+        "removeWhyWeUseParallel": { "control": { "type": "boolean" } },
+        "removeParallelBranding": { "control": { "type": "boolean" } },
+        "theme": { "control": { "type": "object" } }
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { countBy } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionReminder from "../../emails/emails/PetitionReminder";
+import PetitionReminder from "../../emails/emails/recipient/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { applyFieldVisibility } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";

@@ -2530,6 +2530,16 @@
     "context": "Profiles"
   },
   {
+    "term": "component.feature-flag-descriptions.recipient-lang-generic",
+    "definition": "Idioma de destinatario: {lang}",
+    "context": "Recipient language: {lang}"
+  },
+  {
+    "term": "component.feature-flag-descriptions.recipient-lang-generic-description",
+    "definition": "Permite seleccionar {lang} como idioma en las comunicaciones con el destinatario",
+    "context": "Allows selecting {lang} as the recipient language"
+  },
+  {
     "term": "component.feature-flag-descriptions.remove-parallel-branding-description",
     "definition": "Elmina todo el branding de Parallel de vista de destinatario y correos (incluido el \"¿Por qué usamos Parallel?\")",
     "context": "Eliminates all Parallel branding from recipient and mailing view (including \"Why we use Parallel?\")"
@@ -8865,16 +8875,6 @@
     "context": "Oops!"
   },
   {
-    "term": "error.maintenance.description",
-    "definition": "Parallel se encuentra en mantenimiento programado y se retomará la actividad normal lo antes posible.",
-    "context": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible."
-  },
-  {
-    "term": "error.maintenance.header",
-    "definition": "Parallel se encuentra en mantenimiento",
-    "context": "Parallel is under maintenance"
-  },
-  {
     "term": "error.unknown-error.header",
     "definition": "Ocurrió un error y ya hemos notificado a nuestros desarrolladores.",
     "context": "An error happened and our developers have already been notified."
@@ -9593,6 +9593,31 @@
     "term": "generic.language",
     "definition": "Idioma",
     "context": "Language"
+  },
+  {
+    "term": "generic.language-catalan",
+    "definition": "Catalán",
+    "context": "Catalan"
+  },
+  {
+    "term": "generic.language-english",
+    "definition": "Inglés",
+    "context": "English"
+  },
+  {
+    "term": "generic.language-italian",
+    "definition": "Italiano",
+    "context": "Italian"
+  },
+  {
+    "term": "generic.language-portuguese",
+    "definition": "Portugués",
+    "context": "Portuguese"
+  },
+  {
+    "term": "generic.language-spanish",
+    "definition": "Español",
+    "context": "Spanish"
   },
   {
     "term": "generic.last-active-at",
@@ -11078,6 +11103,16 @@
     "term": "page.groups.title",
     "definition": "Equipos",
     "context": "Teams"
+  },
+  {
+    "term": "page.maintenance.description",
+    "definition": "Parallel se encuentra en mantenimiento programado y se retomará la actividad normal lo antes posible.",
+    "context": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible."
+  },
+  {
+    "term": "page.maintenance.header",
+    "definition": "Parallel se encuentra en mantenimiento",
+    "context": "Parallel is under maintenance"
   },
   {
     "term": "page.opt-out.answer-no-reminders",
@@ -13190,11 +13225,6 @@
     "context": "Home"
   },
   {
-    "term": "public.home.title",
-    "definition": "Automatiza flujos de trabajo con clientes",
-    "context": "Automate your workflows with clients"
-  },
-  {
     "term": "public.login-button",
     "definition": "Acceso",
     "context": "Login"
@@ -13758,16 +13788,6 @@
     "term": "settings.api-tokens.generate-new-token",
     "definition": "Crear token",
     "context": "Create token"
-  },
-  {
-    "term": "supported-locales.english",
-    "definition": "Inglés",
-    "context": "English"
-  },
-  {
-    "term": "supported-locales.spanish",
-    "definition": "Español",
-    "context": "Spanish"
   },
   {
     "term": "template.description-edit.header",

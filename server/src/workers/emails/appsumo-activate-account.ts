@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import AppSumoActivateAccount from "../../emails/emails/AppSumoActivateAccount";
+import AppSumoActivateAccount from "../../emails/emails/app/AppSumoActivateAccount";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 

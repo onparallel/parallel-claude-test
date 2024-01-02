@@ -13,6 +13,7 @@ import { run } from "./utils/run";
 async function generate(
   locales: string[],
   input: string,
+  pickMissingFrom: string | undefined,
   rawOutput: string | null,
   compiledOutput: string | null,
 ) {
@@ -21,10 +22,20 @@ async function generate(
   const values: { [term: string]: string[] } = {};
   for (const locale of locales) {
     const terms = await readJson<Term[]>(path.join(input, `${locale}.json`));
+    let extendedTranslations: { [term: string]: string } = {};
+    if (pickMissingFrom) {
+      try {
+        const extended = await readJson<Term[]>(path.join(pickMissingFrom, `${locale}.json`));
+        extendedTranslations = Object.fromEntries(extended.map((t) => [t.term, t.definition]));
+      } catch (e) {
+        extendedTranslations = {};
+      }
+    }
     const raw: { [term: string]: string } = {};
     const compiled: { [term: string]: MessageFormatElement[] } = {};
     let missing = 0;
-    for (const { term, definition } of terms) {
+    for (const { term, definition: _definition } of terms) {
+      const definition = _definition === "" ? extendedTranslations[term] ?? "" : _definition;
       if (definition === "") {
         missing += 1;
       }
@@ -104,7 +115,7 @@ function getValues(elements: MessageFormatElement[]): string[] {
 }
 
 async function main() {
-  const { locales, input, outputRaw, outputCompiled } = await yargs
+  const { locales, input, outputRaw, outputCompiled, pickMissingFrom } = await yargs
     .option("locales", {
       required: true,
       array: true,
@@ -116,6 +127,10 @@ async function main() {
       type: "string",
       description: "Directory with the translated term files",
     })
+    .option("pick-missing-from", {
+      type: "string",
+      description: "Directory with the extended translations",
+    })
     .option("output-raw", {
       required: false,
       type: "string",
@@ -126,7 +141,8 @@ async function main() {
       type: "string",
       description: "Directory to place generated compiled json files",
     }).argv;
-  await generate(locales, input, outputRaw as string, outputCompiled as string);
+
+  await generate(locales, input, pickMissingFrom, outputRaw as string, outputCompiled as string);
 }
 
 run(main);

@@ -291,7 +291,7 @@ function Login() {
   );
 }
 
-Login.mutations = [
+const _mutations = [
   gql`
     mutation Login_resendVerificationEmail($email: String!, $locale: UserLocale!) {
       resendVerificationEmail(email: $email, locale: $locale)
@@ -299,7 +299,7 @@ Login.mutations = [
   `,
 ];
 
-Login.queries = [
+const _queries = [
   gql`
     query Login_currentUser {
       me {

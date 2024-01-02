@@ -1,7 +1,7 @@
 import { WorkerContext } from "../../context";
 import { OrganizationUsageLimitName } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import OrganizationLimitsReachedEmail from "../../emails/emails/OrganizationLimitsReachedEmail";
+import OrganizationLimitsReachedEmail from "../../emails/emails/app/OrganizationLimitsReachedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 
 export async function organizationLimitsReached(

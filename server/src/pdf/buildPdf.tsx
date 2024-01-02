@@ -46,12 +46,27 @@ function init() {
 }
 
 async function createHyphenationCallback(locale: ContactLocale) {
-  const pattern =
-    locale === "en"
-      ? await import("hyphen/patterns/en-us")
-      : locale === "es"
-        ? await import("hyphen/patterns/es")
-        : (null as never);
+  let pattern;
+  switch (locale) {
+    case "en":
+      pattern = await import("hyphen/patterns/en-us");
+      break;
+    case "es":
+      pattern = await import("hyphen/patterns/es");
+      break;
+    case "it":
+      pattern = await import("hyphen/patterns/it");
+      break;
+    case "pt":
+      pattern = await import("hyphen/patterns/pt");
+      break;
+    case "ca":
+      pattern = await import("hyphen/patterns/ca");
+      break;
+    default:
+      pattern = null as never;
+      break;
+  }
   const SOFT_HYPHEN = "\u00ad";
   const hyphenator = hyphen(pattern);
   const splitHyphen = (word: string) => word.split(SOFT_HYPHEN);

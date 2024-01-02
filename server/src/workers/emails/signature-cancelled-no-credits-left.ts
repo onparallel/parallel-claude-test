@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import SignatureCancelledNoCreditsLeftEmail from "../../emails/emails/SignatureCancelledNoCreditsLeftEmail";
+import SignatureCancelledNoCreditsLeftEmail from "../../emails/emails/app/SignatureCancelledNoCreditsLeftEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 

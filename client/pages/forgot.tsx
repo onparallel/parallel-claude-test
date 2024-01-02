@@ -240,7 +240,7 @@ function Forgot() {
   );
 }
 
-Forgot.mutations = [
+const _mutations = [
   gql`
     mutation Forgot_resendVerificationEmail($email: String!, $locale: UserLocale!) {
       resendVerificationEmail(email: $email, locale: $locale)
@@ -252,5 +252,9 @@ Forgot.mutations = [
     }
   `,
 ];
+
+Forgot.getInitialProps = async () => {
+  // Avoid SSG
+};
 
 export default withApolloData(Forgot);

@@ -1,33 +1,18 @@
+import { extract } from "@formatjs/cli-lib";
 import chalk from "chalk";
-import { execSync } from "child_process";
-import { promises as fs } from "fs";
+import detective from "detective-typescript";
+import { sync as globSync } from "fast-glob";
+import { readFile } from "fs/promises";
 import path from "path";
-import yargs from "yargs";
 import { readJson, writeJson } from "./utils/json";
 import { run } from "./utils/run";
-
-const isWindows = process.platform === "win32";
+import yargs from "yargs";
+import { isDefined } from "remeda";
 
 export interface Term {
   term: string;
   definition: string;
   context: string;
-}
-
-async function extract(locales: string[], input: string, output: string) {
-  const terms = await extractTerms(input);
-  let first = true;
-  for (const locale of locales) {
-    const data = await loadLocaleData(output, locale);
-    if (first) {
-      logStats(terms, data);
-    }
-    const updated = updateLocaleData(first, data, terms);
-    await writeJson(path.join(output, `${locale}.json`), updated, {
-      pretty: true,
-    });
-    first = false;
-  }
 }
 
 interface MessageDescriptor {
@@ -40,26 +25,39 @@ interface MessageDescriptor {
   col: number;
 }
 
-async function extractTerms(input: string) {
-  try {
-    const tmpFileName = "lang_tmp.json";
-    execSync(
-      `formatjs extract \
-       --ignore='../**/*.d.ts' \
-       --extract-source-location \
-       --additional-function-names getLocalizableUserText \
-       --throws \
-       --out-file ${tmpFileName} \
-      ${isWindows ? input : `'${input}'`}`,
-      { encoding: "utf-8" },
-    );
-    const terms = await readJson<Record<string, MessageDescriptor>>(tmpFileName);
-    await fs.unlink(tmpFileName);
-    return terms;
-  } catch (error: any) {
-    console.log(chalk`[ {red error} ]`, error.stderr);
-    throw error;
+async function extractTerms(cwd: string, glob: string | string[]) {
+  const queue = globSync(glob, {
+    cwd,
+    ignore: ["../**/*.d.ts"],
+  }).map((file) => path.resolve(cwd, file));
+  const files = new Set<string>();
+  let file: string | undefined;
+  while ((file = queue.pop())) {
+    files.add(file);
+    const source = await readFile(file, { encoding: "utf-8" });
+    const dependencies = detective(source, { jsx: true, skipTypeImports: true });
+    for (const dependecy of dependencies) {
+      if (dependecy.startsWith("@parallel/")) {
+        const [resolved] = globSync(
+          path.resolve(cwd, dependecy.replace("@parallel/", "./")) + ".{ts,tsx}",
+        );
+        if (isDefined(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+          queue.push(resolved);
+        }
+      } else if (dependecy.startsWith("./") || dependecy.startsWith("../")) {
+        const [resolved] = globSync(path.resolve(path.dirname(file), dependecy) + ".{ts,tsx}");
+        if (isDefined(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+          queue.push(resolved);
+        }
+      }
+    }
   }
+  const result = await extract([...files.values()], {
+    throws: true,
+    extractSourceLocation: true,
+    additionalFunctionNames: ["getLocalizableUserText"],
+  });
+  return JSON.parse(result);
 }
 
 async function loadLocaleData(dir: string, locale: string) {
@@ -80,7 +78,7 @@ async function loadLocaleData(dir: string, locale: string) {
 }
 
 function updateLocaleData(
-  isDefault: boolean,
+  locale: string,
   data: Map<string, Term>,
   terms: Record<string, MessageDescriptor>,
 ) {
@@ -93,7 +91,7 @@ function updateLocaleData(
           definition: "",
           context: "",
         };
-    if (isDefault) {
+    if (locale === "en") {
       entry!.definition = term.defaultMessage;
     }
     entry!.context = term.description || term.defaultMessage;
@@ -117,7 +115,12 @@ function logStats(terms: Record<string, MessageDescriptor>, data: Map<string, Te
 }
 
 async function main() {
-  const { locales, input, output } = await yargs
+  const { cwd, locales, input, output } = await yargs
+    .option("cwd", {
+      required: true,
+      type: "string",
+      description: "The working directory",
+    })
     .option("locales", {
       required: true,
       array: true,
@@ -127,6 +130,7 @@ async function main() {
     .option("input", {
       required: true,
       type: "string",
+      array: true,
       description: "Files to extract terms from",
     })
     .option("output", {
@@ -135,7 +139,20 @@ async function main() {
       description: "Directory to place the extracted terms",
     }).argv;
 
-  await extract(locales, input, output);
+  const terms = await extractTerms(path.resolve(cwd), input);
+  let first = true;
+  const outputDir = path.join(process.cwd(), cwd, output);
+  for (const locale of locales) {
+    const data = await loadLocaleData(outputDir, locale);
+    if (first) {
+      logStats(terms, data);
+    }
+    const updated = updateLocaleData(locale, data, terms);
+    await writeJson(path.join(outputDir, `${locale}.json`), updated, {
+      pretty: true,
+    });
+    first = false;
+  }
 }
 
 run(main);

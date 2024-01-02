@@ -2,7 +2,7 @@ import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import TransferParallelsEmail from "../../emails/emails/TransferParallelsEmail";
+import TransferParallelsEmail from "../../emails/emails/app/TransferParallelsEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 

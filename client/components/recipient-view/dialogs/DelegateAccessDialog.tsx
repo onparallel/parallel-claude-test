@@ -31,6 +31,14 @@ interface DelegateAccessDialogData {
 }
 
 const messages: Record<PetitionLocale, (organization: string, contactName: string) => string> = {
+  ca: (organization, contactName) => outdent`
+    Hola,
+  
+    M'han demanat aquesta informació de ${organization} a través de Parallel. Podries ajudar-me, si us plau, a completar-la?
+    
+    Gràcies,
+    ${contactName}.
+  `,
   en: (organization, contactName) => outdent`
     Hello,
 
@@ -45,6 +53,22 @@ const messages: Record<PetitionLocale, (organization: string, contactName: strin
     Me han pedido esta información de ${organization} a través de Parallel. ¿Podrías ayudarme por favor a completarla?
     
     Gracias,
+    ${contactName}.
+  `,
+  it: (organization, contactName) => outdent`
+    Ciao,
+
+    Mi hanno chiesto queste informazioni su ${organization} tramite Parallel. Potresti aiutarmi a completarle, per favore?
+    
+    Grazie,
+    ${contactName}.
+  `,
+  pt: (organization, contactName) => outdent`
+    Olá,
+  
+    Foi-me solicitada esta informação sobre a ${organization} através da Parallel. Poderia ajudar-me a completá-la, por favor?
+  
+    Obrigado,
     ${contactName}.
   `,
 };

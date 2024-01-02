@@ -618,7 +618,7 @@ const _Petition = {
     locale: {
       description: "The locale of the parallel",
       type: "string",
-      enum: ["en", "es"],
+      enum: ["ca", "en", "es", "it", "pt"],
       example: "en",
     },
     createdAt: {
@@ -742,7 +742,7 @@ const _Template = {
     locale: {
       description: "The locale of the template",
       type: "string",
-      enum: ["en", "es"],
+      enum: ["ca", "en", "es", "it", "pt"],
       example: "en",
     },
     createdAt: {

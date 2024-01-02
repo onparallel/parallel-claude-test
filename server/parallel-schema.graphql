@@ -436,6 +436,9 @@ enum FeatureFlag {
   PROFILES
   PUBLIC_PETITION_LINK_PREFILL_DATA
   PUBLIC_PETITION_LINK_PREFILL_SECRET_UI
+  RECIPIENT_LANG_CA
+  RECIPIENT_LANG_IT
+  RECIPIENT_LANG_PT
   REMOVE_PARALLEL_BRANDING
   REMOVE_WHY_WE_USE_PARALLEL
   SETTING_DELEGATE_ACCESS
@@ -2606,8 +2609,11 @@ input OrganizationPdfDocumentThemeInput {
 }
 
 input OrganizationPdfDocumentThemeInputLegalText {
+  ca: JSON
   en: JSON
   es: JSON
+  it: JSON
+  pt: JSON
 }
 
 """
@@ -4005,8 +4011,11 @@ input PetitionListViewSortInput {
 The locale used for rendering the petition to the contact.
 """
 enum PetitionLocale {
+  ca
   en
   es
+  it
+  pt
 }
 
 """

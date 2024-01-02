@@ -3,47 +3,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cli_lib_1 = require("@formatjs/cli-lib");
 const chalk_1 = __importDefault(require("chalk"));
-const child_process_1 = require("child_process");
-const fs_1 = require("fs");
+const detective_typescript_1 = __importDefault(require("detective-typescript"));
+const fast_glob_1 = require("fast-glob");
+const promises_1 = require("fs/promises");
 const path_1 = __importDefault(require("path"));
-const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const run_1 = require("./utils/run");
-const isWindows = process.platform === "win32";
-async function extract(locales, input, output) {
-    const terms = await extractTerms(input);
-    let first = true;
-    for (const locale of locales) {
-        const data = await loadLocaleData(output, locale);
-        if (first) {
-            logStats(terms, data);
+const yargs_1 = __importDefault(require("yargs"));
+const remeda_1 = require("remeda");
+async function extractTerms(cwd, glob) {
+    const queue = (0, fast_glob_1.sync)(glob, {
+        cwd,
+        ignore: ["../**/*.d.ts"],
+    }).map((file) => path_1.default.resolve(cwd, file));
+    const files = new Set();
+    let file;
+    while ((file = queue.pop())) {
+        files.add(file);
+        const source = await (0, promises_1.readFile)(file, { encoding: "utf-8" });
+        const dependencies = (0, detective_typescript_1.default)(source, { jsx: true, skipTypeImports: true });
+        for (const dependecy of dependencies) {
+            if (dependecy.startsWith("@parallel/")) {
+                const [resolved] = (0, fast_glob_1.sync)(path_1.default.resolve(cwd, dependecy.replace("@parallel/", "./")) + ".{ts,tsx}");
+                if ((0, remeda_1.isDefined)(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+                    queue.push(resolved);
+                }
+            }
+            else if (dependecy.startsWith("./") || dependecy.startsWith("../")) {
+                const [resolved] = (0, fast_glob_1.sync)(path_1.default.resolve(path_1.default.dirname(file), dependecy) + ".{ts,tsx}");
+                if ((0, remeda_1.isDefined)(resolved) && !files.has(resolved) && !queue.includes(resolved)) {
+                    queue.push(resolved);
+                }
+            }
         }
-        const updated = updateLocaleData(first, data, terms);
-        await (0, json_1.writeJson)(path_1.default.join(output, `${locale}.json`), updated, {
-            pretty: true,
-        });
-        first = false;
     }
-}
-async function extractTerms(input) {
-    try {
-        const tmpFileName = "lang_tmp.json";
-        (0, child_process_1.execSync)(`formatjs extract \
-       --ignore='../**/*.d.ts' \
-       --extract-source-location \
-       --additional-function-names getLocalizableUserText \
-       --throws \
-       --out-file ${tmpFileName} \
-      ${isWindows ? input : `'${input}'`}`, { encoding: "utf-8" });
-        const terms = await (0, json_1.readJson)(tmpFileName);
-        await fs_1.promises.unlink(tmpFileName);
-        return terms;
-    }
-    catch (error) {
-        console.log((0, chalk_1.default) `[ {red error} ]`, error.stderr);
-        throw error;
-    }
+    const result = await (0, cli_lib_1.extract)([...files.values()], {
+        throws: true,
+        extractSourceLocation: true,
+        additionalFunctionNames: ["getLocalizableUserText"],
+    });
+    return JSON.parse(result);
 }
 async function loadLocaleData(dir, locale) {
     try {
@@ -63,7 +64,7 @@ async function loadLocaleData(dir, locale) {
         }
     }
 }
-function updateLocaleData(isDefault, data, terms) {
+function updateLocaleData(locale, data, terms) {
     const updated = new Map();
     for (const [id, term] of Object.entries(terms)) {
         const entry = data.has(id)
@@ -73,7 +74,7 @@ function updateLocaleData(isDefault, data, terms) {
                 definition: "",
                 context: "",
             };
-        if (isDefault) {
+        if (locale === "en") {
             entry.definition = term.defaultMessage;
         }
         entry.context = term.description || term.defaultMessage;
@@ -95,7 +96,12 @@ function logStats(terms, data) {
     }
 }
 async function main() {
-    const { locales, input, output } = await yargs_1.default
+    const { cwd, locales, input, output } = await yargs_1.default
+        .option("cwd", {
+        required: true,
+        type: "string",
+        description: "The working directory",
+    })
         .option("locales", {
         required: true,
         array: true,
@@ -105,6 +111,7 @@ async function main() {
         .option("input", {
         required: true,
         type: "string",
+        array: true,
         description: "Files to extract terms from",
     })
         .option("output", {
@@ -112,6 +119,19 @@ async function main() {
         type: "string",
         description: "Directory to place the extracted terms",
     }).argv;
-    await extract(locales, input, output);
+    const terms = await extractTerms(path_1.default.resolve(cwd), input);
+    let first = true;
+    const outputDir = path_1.default.join(process.cwd(), cwd, output);
+    for (const locale of locales) {
+        const data = await loadLocaleData(outputDir, locale);
+        if (first) {
+            logStats(terms, data);
+        }
+        const updated = updateLocaleData(locale, data, terms);
+        await (0, json_1.writeJson)(path_1.default.join(outputDir, `${locale}.json`), updated, {
+            pretty: true,
+        });
+        first = false;
+    }
 }
 (0, run_1.run)(main);

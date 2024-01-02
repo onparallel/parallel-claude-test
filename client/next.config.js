@@ -10,7 +10,7 @@ const config = {
     ignoreDuringBuilds: true,
   },
   i18n: {
-    locales: ["en", "es"],
+    locales: ["en", "es", "ca", "it", "pt"],
     defaultLocale: "en",
   },
   generateBuildId: process.env.BUILD_ID ? () => process.env.BUILD_ID : undefined,

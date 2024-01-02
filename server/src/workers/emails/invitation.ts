@@ -1,7 +1,7 @@
 import { WorkerContext } from "../../context";
 import { UserLocale } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import Invitation from "../../emails/emails/Invitation";
+import Invitation from "../../emails/emails/app/Invitation";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 

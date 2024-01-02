@@ -1,7 +1,7 @@
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import InternalSignaturitAccountDepletedCredits from "../../emails/emails/InternalSignaturitAccountDepletedCredits";
+import InternalSignaturitAccountDepletedCredits from "../../emails/emails/app/InternalSignaturitAccountDepletedCredits";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { toGlobalId } from "../../util/globalId";

@@ -194,8 +194,11 @@ export interface NexusGenInputs {
   };
   OrganizationPdfDocumentThemeInputLegalText: {
     // input type
+    ca?: NexusGenScalars["JSON"] | null; // JSON
     en?: NexusGenScalars["JSON"] | null; // JSON
     es?: NexusGenScalars["JSON"] | null; // JSON
+    it?: NexusGenScalars["JSON"] | null; // JSON
+    pt?: NexusGenScalars["JSON"] | null; // JSON
   };
   OrganizationUpdateInput: {
     // input type

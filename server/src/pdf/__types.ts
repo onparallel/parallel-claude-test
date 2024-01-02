@@ -385,6 +385,9 @@ export type FeatureFlag =
   | "PROFILES"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
+  | "RECIPIENT_LANG_CA"
+  | "RECIPIENT_LANG_IT"
+  | "RECIPIENT_LANG_PT"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
@@ -2370,8 +2373,11 @@ export type OrganizationPdfDocumentThemeInput = {
 };
 
 export type OrganizationPdfDocumentThemeInputLegalText = {
+  ca?: InputMaybe<Scalars["JSON"]["input"]>;
   en?: InputMaybe<Scalars["JSON"]["input"]>;
   es?: InputMaybe<Scalars["JSON"]["input"]>;
+  it?: InputMaybe<Scalars["JSON"]["input"]>;
+  pt?: InputMaybe<Scalars["JSON"]["input"]>;
 };
 
 /** The status of the organization. */
@@ -3203,7 +3209,7 @@ export type PetitionListViewSortInput = {
 };
 
 /** The locale used for rendering the petition to the contact. */
-export type PetitionLocale = "en" | "es";
+export type PetitionLocale = "ca" | "en" | "es" | "it" | "pt";
 
 /** A petition message */
 export type PetitionMessage = CreatedAt & {

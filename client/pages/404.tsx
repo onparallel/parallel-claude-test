@@ -1,22 +1,11 @@
 import { List, ListItem, Text } from "@chakra-ui/react";
-import { useSetLocale } from "@parallel/components/common/I18nProvider";
 import { NormalLink } from "@parallel/components/common/Link";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
-import languages from "@parallel/lang/languages.json";
-import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export default function Custom404() {
-  const setLocale = useSetLocale();
   const intl = useIntl();
 
-  useEffect(() => {
-    const match = document.location.pathname.match(/^\/([a-z-]*)\//i);
-    const locale = match?.[1]?.toLowerCase();
-    if (locale && languages.some((l) => l.locale === locale) && locale !== "en") {
-      setLocale(locale);
-    }
-  }, []);
   return (
     <ErrorPage
       header={

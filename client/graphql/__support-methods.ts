@@ -906,6 +906,24 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       {
+        name: "RECIPIENT_LANG_CA",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "RECIPIENT_LANG_IT",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "RECIPIENT_LANG_PT",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "REMOVE_PARALLEL_BRANDING",
         description: null,
         isDeprecated: false,

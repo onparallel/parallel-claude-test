@@ -11,7 +11,7 @@ import {
   stringArg,
 } from "nexus";
 import { isDefined, pick } from "remeda";
-import { Organization, OrganizationTheme } from "../../db/__types";
+import { ContactLocaleValues, Organization, OrganizationTheme } from "../../db/__types";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { fullName } from "../../util/fullName";
 import { removeKeys } from "../../util/remedaExtensions";
@@ -160,7 +160,7 @@ export function validateTheme<TypeName extends string, FieldName extends string>
       validateHexColor((args) => prop(args)?.[`${p}Color`], `${argName}.${p}Color`),
       inRange((args) => prop(args)?.[`${p}FontSize`], `${argName}.${p}FontSize`, 5, 72),
     ]),
-    ...["es", "en"].map((p) =>
+    ...ContactLocaleValues.map((p) =>
       validRichTextContent(
         (args) => prop(args)?.legalText?.[p],
         undefined, // this legal text cannot contain PetitionField references

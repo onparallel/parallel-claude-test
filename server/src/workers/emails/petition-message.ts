@@ -1,7 +1,7 @@
 import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionMessage from "../../emails/emails/PetitionMessage";
+import PetitionMessage from "../../emails/emails/recipient/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";

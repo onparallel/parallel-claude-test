@@ -1,0 +1,382 @@
+[
+  {
+    "term": "access-delegated-email.subject",
+    "definition": "{senderName} {tone, select, INFORMAL{t'ha} other{l'ha}} convidat a col·laborar en {subject, select, null{el teu parallel} other{{subject}}}",
+    "context": "{senderName} has invited you to collaborate on {subject, select, null{a parallel} other{{subject}}}"
+  },
+  {
+    "term": "access-delegated.text",
+    "definition": "{senderName} ({senderEmail}) {tone, select, INFORMAL{t'ha convidat a col·laborar junts per completar} other{l'ha sol·licitat que completi}} la informació sol·licitada per {petitionOwnerFullName} ({petitionOwnerEmail}):",
+    "context": "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
+  },
+  {
+    "term": "closing-thanks.regards",
+    "definition": "{tone, select, INFORMAL{Salutacions.} other{Rebi una cordial salutació.}}",
+    "context": "{tone, select, INFORMAL{Regards.} other{Best regards.}}"
+  },
+  {
+    "term": "closing-thanks.thank-you",
+    "definition": "Moltes gràcies.",
+    "context": "Thank you very much."
+  },
+  {
+    "term": "closing.sender",
+    "definition": "L'equip de Parallel.",
+    "context": "The Parallel team."
+  },
+  {
+    "term": "closing.text",
+    "definition": "Salutacions,",
+    "context": "Regards,"
+  },
+  {
+    "term": "component.greeting-new-user",
+    "definition": "{name, select, null {Hola! 👋} other {Hola {name}! 👋}}",
+    "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
+  },
+  {
+    "term": "component.why-we-use-parallel.autosave-body",
+    "definition": "{tone, select, INFORMAL{Les teves <b>respostes s'autoguarden i sincronitzen</b> amb el remitent perquè puguis tancar i tornar a completar-ho quan vulguis.} other{Cada <b>resposta s'autoguarda i sincronitza</b> amb el remitent per permetre-li tancar en qualsevol moment i acabar de completar-ho més endavant.}}",
+    "context": "Every <b>response is saved automatically and synchronized</b> with your sender, allowing you to exit at any time and resume later."
+  },
+  {
+    "term": "component.why-we-use-parallel.autosave-title",
+    "definition": "{tone, select, INFORMAL{Pots completar-ho al teu ritme} other{Autoguardem les seves respostes}}",
+    "context": "Your replies auto-saved"
+  },
+  {
+    "term": "component.why-we-use-parallel.invite-body",
+    "definition": "{tone, select, INFORMAL{Només podran entrar a l'enllaç usuaris amb accés. Si ho necessites, pots <b>convidar col·laboradors</b> perquè t'ajudin a completar la informació.} other{Només usuaris amb permís podran accedir a l'enllaç. Si ho necessita, pot <b>convidar col·laboradors</b> per completar la informació col·laborativament.}}",
+    "context": "Only allowed users will be able to access the link. Once inside, they can <b>invite the collaborators</b> they need to help complete the information."
+  },
+  {
+    "term": "component.why-we-use-parallel.invite-title",
+    "definition": "{tone, select, INFORMAL{Convida els col·laboradors que necessitis} other{Convidi col·laboradors}}",
+    "context": "Invite collaborators"
+  },
+  {
+    "term": "component.why-we-use-parallel.security-body",
+    "definition": "{tone, select, INFORMAL{Parallel és un espai privat on pots <b>compartir informació i documents</b> de forma segura.} other{Parallel és un espai privat on <b>compartir informació i documents</b> amb tercers de forma segura.}}",
+    "context": "Parallel is a private space where you can <b>share information and documents</b> with third parties securely."
+  },
+  {
+    "term": "component.why-we-use-parallel.security-title",
+    "definition": "Espai segur per a {tone, select, INFORMAL{la teva} other{la seva}} informació",
+    "context": "Private portal for your information"
+  },
+  {
+    "term": "component.why-we-use-parallel.title",
+    "definition": "Per què utilitzem Parallel?",
+    "context": "Why we use Parallel?"
+  },
+  {
+    "term": "disclaimer",
+    "definition": "Aquest és un correu enviat mitjançant Parallel del compte verificat {email}",
+    "context": "This is an email sent via Parallel from the verified account {email}"
+  },
+  {
+    "term": "document.annex-cover-page.title",
+    "definition": "Annex {n}",
+    "context": "Annex {n}"
+  },
+  {
+    "term": "document.petition-export.default-group-name",
+    "definition": "Resposta",
+    "context": "Reply"
+  },
+  {
+    "term": "document.petition-export.file-not-found",
+    "definition": "(No trobat)",
+    "context": "(Not found)"
+  },
+  {
+    "term": "document.petition-export.file-pending-review",
+    "definition": "(Pendent de revisió)",
+    "context": "(Pending review)"
+  },
+  {
+    "term": "document.petition-export.no-files",
+    "definition": "No s'ha pujat cap arxiu.",
+    "context": "No files have been submitted."
+  },
+  {
+    "term": "document.petition-export.no-replies",
+    "definition": "No s'ha enviat cap resposta.",
+    "context": "No replies have been submitted."
+  },
+  {
+    "term": "document.petition-export.reply-approved-by",
+    "definition": "Aprovat per {name} el {date}",
+    "context": "Approved by {name} on {date}"
+  },
+  {
+    "term": "document.petition-export.reply-updated-by",
+    "definition": "Respost per {name} el {date}",
+    "context": "Reply by {name} on {date}"
+  },
+  {
+    "term": "document.petition-export.view-replies-in-nd",
+    "definition": "Veure respostes a ND",
+    "context": "See answers in ND"
+  },
+  {
+    "term": "footer.slogan",
+    "definition": "Treballa millor amb",
+    "context": "Work better with"
+  },
+  {
+    "term": "footer.slogan.alternative",
+    "definition": "{tone, select, INFORMAL{Crea el teu propi <b>parallel</b>} other{Creï el seu propi <b>parallel</b>}}",
+    "context": "Create your own <b>parallel</b>"
+  },
+  {
+    "term": "from.parallel-team",
+    "definition": "Parallel",
+    "context": "Parallel"
+  },
+  {
+    "term": "from.via-parallel",
+    "definition": "{senderName} via Parallel",
+    "context": "{senderName} via Parallel"
+  },
+  {
+    "term": "gdpr.processor-disclaimer",
+    "definition": "D'acord amb el que disposa el Reglament (UE) 2016/679 del Parlament Europeu i del Consell de 27 d'abril de 2016 relatiu a la protecció de les persones físiques pel que fa al tractament de dades personals i a la lliure circulació d'aquestes dades, se l'informa que Parallel Solutions, SL li ha enviat aquest correu en compliment de l'encàrrec rebut per a la prestació del servei de gestió de fluxos d'informació. Pot posar-se en contacte amb el responsable de tractament per a l'exercici dels seus drets.",
+    "context": "Under the provisions of Regulation (EU) 2016/679 of the European Parliament and of the Council of April 27, 2016 regarding the protection of natural persons with regard to the processing of personal data and on the free movement of such data, you are informed that Parallel Solutions, SL has sent you this email in fulfillment of the order received for the provision of services regarding the management of information workflows. You can contact the data controller to exercise your rights."
+  },
+  {
+    "term": "generic.complete-information-button",
+    "definition": "{tone, select, INFORMAL{Completa la informació} other{Completi aquí la informació}}",
+    "context": "Complete the information"
+  },
+  {
+    "term": "generic.complete-information-click-link",
+    "definition": "Si us plau, fes clic en l'enllaç següent per respondre al parallel.",
+    "context": "Please click the link below to complete the information."
+  },
+  {
+    "term": "generic.deleted-contact",
+    "definition": "Contacte esborrat",
+    "context": "Deleted Contact"
+  },
+  {
+    "term": "generic.deleted-user",
+    "definition": "Usuari esborrat",
+    "context": "Deleted user"
+  },
+  {
+    "term": "generic.submit-text.with-deadline",
+    "definition": "Aquesta informació ha estat sol·licitada per abans del {deadline}.",
+    "context": "This information has been requested to be submitted before {deadline}."
+  },
+  {
+    "term": "generic.untitled-field",
+    "definition": "Camp sense nom",
+    "context": "Untitled field"
+  },
+  {
+    "term": "greeting-contact",
+    "definition": "{tone, select, INFORMAL{Hola {name},} other{Benvolgut/da {fullName},}}",
+    "context": "{tone, select, INFORMAL{Hello {name},} other{Dear {fullName},}}"
+  },
+  {
+    "term": "greeting-reminder",
+    "definition": "{tone, select, INFORMAL{Hola, {name}!} other{Benvolgut/da {fullName},}}",
+    "context": "{tone, select, INFORMAL{Hello {name}!} other{Dear {fullName},}}"
+  },
+  {
+    "term": "greeting-user",
+    "definition": "{name, select, null {Hola,} other {Hola {name},}}",
+    "context": "{name, select, null {Hi,} other {Hi {name},}}"
+  },
+  {
+    "term": "layout.privacy-link",
+    "definition": "Privadesa",
+    "context": "Privacy"
+  },
+  {
+    "term": "layout.stop-reminders",
+    "definition": "Deixa de rebre recordatoris",
+    "context": "Stop receiving reminders"
+  },
+  {
+    "term": "layout.terms-and-conditions-link",
+    "definition": "Termes i condicions",
+    "context": "Terms and conditions"
+  },
+  {
+    "term": "new-petition.text",
+    "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) t'ha compartit aquest enllaç:} other{{senderName} ({senderEmail}) li ha compartit aquest enllaç:}}",
+    "context": "{senderName} ({senderEmail}) has shared this link with you."
+  },
+  {
+    "term": "new-petition.text-multiple-recipients",
+    "definition": "{senderName} ({senderEmail}) ha compartit aquest enllaç amb {list}.",
+    "context": "{senderName} ({senderEmail}) has shared this link with {list}."
+  },
+  {
+    "term": "new-petition.text-multiple-recipients.with-you",
+    "definition": "{tone, select, INFORMAL{amb tu} other{amb vostè}}",
+    "context": "you"
+  },
+  {
+    "term": "petition-closed-notification.subject",
+    "definition": "{senderName} ha confirmat la recepció de la informació.",
+    "context": "{senderName} confirmed receipt of the information."
+  },
+  {
+    "term": "petition-closed-notification.text",
+    "definition": "{senderName} ({senderEmail}) ha rebut la informació.",
+    "context": "{senderName} ({senderEmail}) has received the information."
+  },
+  {
+    "term": "petition-comments-contact-notification.access-button",
+    "definition": "{tone, select, INFORMAL{Fes clic aquí per respondre} other{Facis clic aquí per respondre}}",
+    "context": "Click here to reply"
+  },
+  {
+    "term": "petition-comments-contact-notification.access-click-link",
+    "definition": "Segueix l'enllaç següent per llegir i respondre als comentaris.",
+    "context": "Follow the link below link to read and reply to the comments."
+  },
+  {
+    "term": "petition-comments-contact-notification.intro-text",
+    "definition": "{tone, select, INFORMAL{Tens {count, plural, =1{# comentari nou} other{# comentaris nous}} en {subject, select, null{el teu parallel} other{{subject}}}:} other{Té {count, plural, =1{# comentari nou} other{# comentaris nous}} en {subject, select, null{el seu parallel} other{{subject}}}:}}",
+    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your parallel} other{{subject}}}:"
+  },
+  {
+    "term": "petition-comments-contact-notification.subject",
+    "definition": "{tone, select, INFORMAL{Nous comentaris en {subject, select, null{el teu parallel} other{{subject}}}} other{Té comentaris nous en {subject, select, null{el seu parallel} other{{subject}}}}}",
+    "context": "New comments on {subject, select, null{your parallel} other{{subject}}}"
+  },
+  {
+    "term": "petition-reminder.reminder",
+    "definition": "[Recordatori]",
+    "context": "[Reminder]"
+  },
+  {
+    "term": "petition-reminder.subject",
+    "definition": "Recorda que {senderName} t'ha enviat un parallel",
+    "context": "Remember that {senderName} sent you a parallel"
+  },
+  {
+    "term": "public-petition-link.text-1",
+    "definition": "{tone, select, INFORMAL{T'enviem l'accés que has sol·licitat al formulari de {petitionTitle}.} other{Li enviem l'accés sol·licitat al formulari de {petitionTitle}.}}",
+    "context": "We send you the requested access to {petitionTitle}."
+  },
+  {
+    "term": "public-petition-link.text-2",
+    "definition": "{tone, select, INFORMAL{Les teves respostes s'aniran guardant automàticament a la plataforma, podent tornar i continuar el procés més tard a través del mateix enllaç.} other{La informació s'anirà guardant automàticament a la plataforma, podent continuar el procés més tard a través del mateix enllaç.}}",
+    "context": "The information will be automatically saved on the platform, and you can continue the process later through the same link."
+  },
+  {
+    "term": "public-petition-link.text-3",
+    "definition": "{tone, select, INFORMAL{Si tens qualsevol dubte o comentari pots deixar-los en els espais assenyalats de la plataforma.} other{Per a qualsevol dubte o comentari pot comunicar-se amb nosaltres en els espais assenyalats en la pròpia plataforma.}}",
+    "context": "If you have any questions or comments you can contact us in the designated spaces on the platform."
+  },
+  {
+    "term": "reminder.click-finalize",
+    "definition": "Si ja has pujat tota la informació, fes clic a <b>Finalitzar</b> a la pàgina.",
+    "context": "If you already submitted all the information, click <b>Finalize</b> on the page."
+  },
+  {
+    "term": "reminder.pending-fields-count",
+    "definition": "{tone, select, INFORMAL{Tens {pending}/{total} camps pendents.} other{En aquest moment hi ha {pending}/{total} camps pendents.}}",
+    "context": "{tone, select, INFORMAL{You have} other{There are currently}} {pending}/{total} fields pending."
+  },
+  {
+    "term": "reminder.text",
+    "definition": "{tone, select, INFORMAL{Et recordem que {senderName} ({senderEmail}) t'ha compartit un enllaç on queda informació pendent de completar.} other{Li recordem que {senderName} ({senderEmail}) li ha compartit un enllaç del qual queda informació pendent de completar.}}",
+    "context": "We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted."
+  },
+  {
+    "term": "signature-cancelled.subject",
+    "definition": "Sol·licitud de signatura cancel·lada",
+    "context": "Cancelled signature request"
+  },
+  {
+    "term": "signature-cancelled.text",
+    "definition": "{tone, select, INFORMAL{El teu remitent ha cancel·lat el procés de signatura enviat a través de {signatureProvider}.} other{El procés de signatura enviat a través de {signatureProvider} ha estat cancel·lat pel remitent.}}",
+    "context": "The signing process sent through {signatureProvider} has been cancelled by the sender."
+  },
+  {
+    "term": "signature-client.open-document",
+    "definition": "Obrir document",
+    "context": "Open document"
+  },
+  {
+    "term": "signature-completed.subject",
+    "definition": "Sol·licitud de signatura completada",
+    "context": "Signature request completed"
+  },
+  {
+    "term": "signature-completed.text",
+    "definition": "{tone, select, INFORMAL{T'adjuntem una còpia del document que acabes de signar a través de {signatureProvider}.} other{Adjuntem una còpia del document acabat de signar a través de {signatureProvider}.}}",
+    "context": "Please find attached a copy of the document you just signed through {signatureProvider}."
+  },
+  {
+    "term": "signature-reminder.external-link",
+    "definition": "Per revisar i signar el document, fes clic en l'enllaç següent:",
+    "context": "To review and sign it, click on the following link:"
+  },
+  {
+    "term": "signature-reminder.subject",
+    "definition": "Recordatori de signatura",
+    "context": "Signature reminder"
+  },
+  {
+    "term": "signature-reminder.text",
+    "definition": "{tone, select, INFORMAL{Has rebut una petició per signar un document amb el nom de {documentName}} other{Té una sol·licitud de signatura pendent per signar un document amb el nom de {documentName}}}",
+    "context": "You have a pending signature request to sign a document titled {documentName}."
+  },
+  {
+    "term": "signature-requested.external-link",
+    "definition": "Per revisar i signar el document, faci clic a l'enllaç següent:",
+    "context": "To review and sign it, click on the following link:"
+  },
+  {
+    "term": "signature-requested.subject",
+    "definition": "Sol·licitud de firma",
+    "context": "Signature requested"
+  },
+  {
+    "term": "signature-requested.text",
+    "definition": "{tone, select, INFORMAL{Has} other{Ha}} rebut una petició per signar un document amb el nom de {documentName}.",
+    "context": "You have received a signature request to sign a document titled {documentName}."
+  },
+  {
+    "term": "verification-code-request.code-label",
+    "definition": "Codi de verificació:",
+    "context": "Verification code:"
+  },
+  {
+    "term": "verification-code-request.device",
+    "definition": "{browserName} a {osName}",
+    "context": "{browserName} on {osName}"
+  },
+  {
+    "term": "verification-code-request.device-label",
+    "definition": "Dispositiu:",
+    "context": "Device:"
+  },
+  {
+    "term": "verification-code-request.expiry",
+    "definition": "Aquest codi de verificació caducarà en 30 minuts, {tone, select, INFORMAL{intenta} other{intenti}} utilitzar-lo el més aviat possible.",
+    "context": "This verification code will expire in 30 minutes, please make sure you use it as soon as possible."
+  },
+  {
+    "term": "verification-code-request.instructions",
+    "definition": "Si us plau, {tone, select, INFORMAL{utilitza} other{utilitzi}} el següent codi de verificació en el dispositiu nou.",
+    "context": "Please use the following verification code on the unrecognized device."
+  },
+  {
+    "term": "verification-code-request.instructions-contact",
+    "definition": "Si us plau, {tone, select, INFORMAL{utilitza} other{utilitzi}} el següent codi de verificació per accedir a la informació:",
+    "context": "Please use the following verification code to access the information:"
+  },
+  {
+    "term": "verification-code-request.subject",
+    "definition": "{code} és {tone, select, INFORMAL{el teu} other{el seu}} codi de verificació a Parallel",
+    "context": "{code} is your verification code on Parallel"
+  }
+]

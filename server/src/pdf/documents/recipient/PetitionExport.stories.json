@@ -1,0 +1,24 @@
+{
+  "title": "Documents",
+  "stories": [
+    {
+      "name": "Petition Export",
+      "parameters": {
+        "server": {
+          "id": "documents/recipient/PetitionExport"
+        }
+      },
+      "args": {
+        "documentTitle": "Título del documento",
+        "showSignatureBoxes": true,
+        "includeNetDocumentsLinks": false
+      },
+      "argTypes": {
+        "petitionId": { "control": { "type": "text" } },
+        "documentTitle": { "control": { "type": "text" } },
+        "showSignatureBoxes": { "control": { "type": "boolean" } },
+        "includeNetDocumentsLinks": { "control": { "type": "boolean" } }
+      }
+    }
+  ]
+}

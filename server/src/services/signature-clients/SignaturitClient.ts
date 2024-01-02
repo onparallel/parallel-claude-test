@@ -11,10 +11,10 @@ import { ContactLocale } from "../../db/__types";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
-import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
-import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
-import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
-import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
+import SignatureCancelledEmail from "../../emails/emails/recipient/SignatureCancelledEmail";
+import SignatureCompletedEmail from "../../emails/emails/recipient/SignatureCompletedEmail";
+import SignatureReminderEmail from "../../emails/emails/recipient/SignatureReminderEmail";
+import SignatureRequestedEmail from "../../emails/emails/recipient/SignatureRequestedEmail";
 import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import {
   SignaturitBrandingIdKey,
