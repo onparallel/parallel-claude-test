@@ -5619,6 +5619,7 @@ export type MapFieldsTable_PetitionFieldReplyFragment = {
   content: { [key: string]: any };
   isAnonymized: boolean;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
 };
 
 export type MapFieldsTable_PetitionFieldFragment = {
@@ -5652,6 +5653,7 @@ export type MapFieldsTable_PetitionFieldFragment = {
       status: PetitionFieldReplyStatus;
       isAnonymized: boolean;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
     }>;
     parent?: { __typename?: "PetitionField"; id: string } | null;
     children?: Array<{
@@ -5670,6 +5672,7 @@ export type MapFieldsTable_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     isAnonymized: boolean;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
   }>;
   parent?: { __typename?: "PetitionField"; id: string } | null;
 };
@@ -5693,6 +5696,7 @@ export type MapFieldsTable_PetitionFieldDataFragment = {
     status: PetitionFieldReplyStatus;
     isAnonymized: boolean;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
   }>;
   parent?: { __typename?: "PetitionField"; id: string } | null;
   children?: Array<{
@@ -11544,6 +11548,7 @@ export type ImportRepliesDialog_petitionQuery = {
                 field: { __typename?: "PetitionField"; id: string };
                 replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
               }> | null;
+              field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
             }>;
             parent?: {
               __typename?: "PetitionField";
@@ -11571,6 +11576,7 @@ export type ImportRepliesDialog_petitionQuery = {
               replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
             }> | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+            field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
           }>;
           parent?: {
             __typename?: "PetitionField";
@@ -11618,6 +11624,7 @@ export type ImportRepliesDialog_petitionQuery = {
                 field: { __typename?: "PetitionField"; id: string };
                 replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
               }> | null;
+              field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
             }>;
             parent?: {
               __typename?: "PetitionField";
@@ -11645,6 +11652,7 @@ export type ImportRepliesDialog_petitionQuery = {
               replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
             }> | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+            field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
           }>;
           parent?: {
             __typename?: "PetitionField";
@@ -44181,6 +44189,10 @@ export const MapFieldsTable_PetitionFieldReplyFragmentDoc = gql`
     isAnonymized
     parent {
       id
+    }
+    field {
+      id
+      type
     }
     ...getReplyContents_PetitionFieldReply
   }

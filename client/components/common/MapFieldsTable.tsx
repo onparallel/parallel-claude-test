@@ -14,13 +14,7 @@ import {
   VisuallyHidden,
   useMergeRefs,
 } from "@chakra-ui/react";
-import {
-  ArrowBackIcon,
-  BusinessIcon,
-  EyeOffIcon,
-  ForbiddenIcon,
-  UserIcon,
-} from "@parallel/chakra/icons";
+import { ArrowBackIcon, EyeOffIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import {
@@ -226,6 +220,10 @@ export const MapFieldsTable = Object.assign(
             isAnonymized
             parent {
               id
+            }
+            field {
+              id
+              type
             }
             ...getReplyContents_PetitionFieldReply
           }
@@ -492,9 +490,8 @@ function TableRow({
                         return (
                           <FieldReplies
                             key={index}
-                            reply={reply}
-                            type={field.type}
-                            options={field.options}
+                            sourceReply={reply}
+                            targetField={field}
                             showOnlyFirstReply={hasMultipleRepliesConflict}
                           />
                         );
@@ -547,27 +544,28 @@ function TableRow({
 }
 
 function FieldReplies({
-  reply,
-  type,
-  options,
+  sourceReply,
+  targetField,
   showOnlyFirstReply,
 }: {
-  reply: MapFieldsTable_PetitionFieldReplyFragment;
-  type: PetitionFieldType;
-  options: {
-    [key: string]: any;
-  };
+  sourceReply: MapFieldsTable_PetitionFieldReplyFragment;
+  targetField: MapFieldsTable_PetitionFieldDataFragment;
   showOnlyFirstReply?: boolean;
 }) {
   const intl = useIntl();
 
+  // Need to pass the type from the "source" to obtain the correct format
+  // for the options, we need to pass the "target" options to obtain the valid final format that will be imported
   const contents = getReplyContents({
     intl,
-    reply,
-    petitionField: { type, options } as getReplyContents_PetitionFieldFragment,
+    reply: sourceReply,
+    petitionField: {
+      type: sourceReply.field!.type,
+      options: targetField.options,
+    } as getReplyContents_PetitionFieldFragment,
   });
 
-  if (!contents) return null;
+  if (!contents || !Array.isArray(contents)) return null;
 
   return (
     <>
@@ -588,9 +586,10 @@ function FieldReplies({
         }
         return (
           <Fragment key={i}>
-            {reply.isAnonymized || (type === "ES_TAX_DOCUMENTS" && content.error) ? (
-              <ReplyNotAvailable type={type} />
-            ) : isFileTypeField(type) && type !== "DOW_JONES_KYC" ? (
+            {sourceReply.isAnonymized ||
+            (sourceReply.field!.type === "ES_TAX_DOCUMENTS" && content.error) ? (
+              <ReplyNotAvailable type={sourceReply.field!.type} />
+            ) : isFileTypeField(targetField.type) ? (
               <Flex gap={2} alignItems="center" minHeight={6}>
                 <VisuallyHidden>
                   {intl.formatMessage({
@@ -612,33 +611,6 @@ function FieldReplies({
                   color="gray.500"
                 >
                   <FileSize value={content.size} />
-                </Text>
-              </Flex>
-            ) : type === "DOW_JONES_KYC" ? (
-              <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
-                <VisuallyHidden>
-                  {intl.formatMessage({
-                    id: "generic.name",
-                    defaultMessage: "Name",
-                  })}
-                </VisuallyHidden>
-                <Text as="span">
-                  <Text as="span" display="inline-block" marginRight={2}>
-                    {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
-                  </Text>
-                  {content.entity.name}
-                  {" - "}
-                  <Text
-                    as="span"
-                    aria-label={intl.formatMessage({
-                      id: "generic.file-size",
-                      defaultMessage: "File size",
-                    })}
-                    fontSize="sm"
-                    color="gray.500"
-                  >
-                    <FileSize value={content.size} />
-                  </Text>
                 </Text>
               </Flex>
             ) : (
