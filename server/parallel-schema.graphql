@@ -2767,6 +2767,7 @@ type Petition implements PetitionBase {
   The current signature request.
   """
   currentSignatureRequest: PetitionSignatureRequest
+  customLists: [PetitionCustomList!]!
 
   """
   Custom user properties
@@ -3131,6 +3132,7 @@ interface PetitionBase {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  customLists: [PetitionCustomList!]!
 
   """
   Custom user properties
@@ -3348,6 +3350,11 @@ type PetitionCreatedEvent implements PetitionEvent {
   petition: Petition
   type: PetitionEventType!
   user: User
+}
+
+type PetitionCustomList {
+  name: String!
+  values: [String!]!
 }
 
 type PetitionDeletedEvent implements PetitionEvent {
@@ -4491,6 +4498,7 @@ type PetitionTemplate implements PetitionBase {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  customLists: [PetitionCustomList!]!
 
   """
   Custom user properties
@@ -5246,6 +5254,7 @@ type PublicPetition implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  customLists: [PetitionCustomList!]!
 
   """
   The deadline of the petition.

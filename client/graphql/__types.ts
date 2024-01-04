@@ -2528,6 +2528,7 @@ export interface Petition extends PetitionBase {
   createdAt: Scalars["DateTime"]["output"];
   /** The current signature request. */
   currentSignatureRequest?: Maybe<PetitionSignatureRequest>;
+  customLists: Array<PetitionCustomList>;
   /** Custom user properties */
   customProperties: Scalars["JSONObject"]["output"];
   /** The deadline of the petition. */
@@ -2723,6 +2724,7 @@ export interface PetitionBase {
   completingMessageSubject?: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  customLists: Array<PetitionCustomList>;
   /** Custom user properties */
   customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf?: Maybe<User>;
@@ -2868,6 +2870,12 @@ export interface PetitionCreatedEvent extends PetitionEvent {
   petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
+}
+
+export interface PetitionCustomList {
+  __typename?: "PetitionCustomList";
+  name: Scalars["String"]["output"];
+  values: Array<Scalars["String"]["output"]>;
 }
 
 export interface PetitionDeletedEvent extends PetitionEvent {
@@ -3596,6 +3604,7 @@ export interface PetitionTemplate extends PetitionBase {
   completingMessageSubject?: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  customLists: Array<PetitionCustomList>;
   /** Custom user properties */
   customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf?: Maybe<User>;
@@ -4142,6 +4151,7 @@ export interface PublicPetition extends Timestamps {
   completingMessageSubject?: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  customLists: Array<PetitionCustomList>;
   /** The deadline of the petition. */
   deadline?: Maybe<Scalars["DateTime"]["output"]>;
   /** The field definition of the petition. */
@@ -13804,6 +13814,7 @@ export type PetitionComposeField_PetitionBase_Petition_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionComposeField_PetitionBase_PetitionTemplate_Fragment = {
@@ -13831,6 +13842,7 @@ export type PetitionComposeField_PetitionBase_PetitionTemplate_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionComposeField_PetitionBaseFragment =
@@ -14208,6 +14220,7 @@ export type PetitionComposeFieldList_PetitionBase_Petition_Fragment = {
     }>;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionComposeFieldList_PetitionBase_PetitionTemplate_Fragment = {
@@ -14278,6 +14291,7 @@ export type PetitionComposeFieldList_PetitionBase_PetitionTemplate_Fragment = {
     }>;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionComposeFieldList_PetitionBaseFragment =
@@ -14861,6 +14875,7 @@ export type useEditPetitionFieldCalculationsDialog_PetitionBase_Petition_Fragmen
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useEditPetitionFieldCalculationsDialog_PetitionBase_PetitionTemplate_Fragment = {
@@ -14892,6 +14907,7 @@ export type useEditPetitionFieldCalculationsDialog_PetitionBase_PetitionTemplate
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useEditPetitionFieldCalculationsDialog_PetitionBaseFragment =
@@ -14922,6 +14938,7 @@ export type HiddenFieldDialog_PetitionBase_Petition_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type HiddenFieldDialog_PetitionBase_PetitionTemplate_Fragment = {
@@ -14948,6 +14965,7 @@ export type HiddenFieldDialog_PetitionBase_PetitionTemplate_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type HiddenFieldDialog_PetitionBaseFragment =
@@ -15005,6 +15023,7 @@ export type PetitionFieldLogicContext_PetitionBase_Petition_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionFieldLogicContext_PetitionBase_PetitionTemplate_Fragment = {
@@ -15031,6 +15050,7 @@ export type PetitionFieldLogicContext_PetitionBase_PetitionTemplate_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionFieldLogicContext_PetitionBaseFragment =
@@ -15077,6 +15097,7 @@ export type PetitionFieldMathEditor_PetitionBase_Petition_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionFieldMathEditor_PetitionBase_PetitionTemplate_Fragment = {
@@ -15107,6 +15128,7 @@ export type PetitionFieldMathEditor_PetitionBase_PetitionTemplate_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionFieldMathEditor_PetitionBaseFragment =
@@ -15151,6 +15173,7 @@ export type PetitionFieldVisibilityEditor_PetitionBase_Petition_Fragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionFieldVisibilityEditor_PetitionBase_PetitionTemplate_Fragment = {
@@ -15177,6 +15200,7 @@ export type PetitionFieldVisibilityEditor_PetitionBase_PetitionTemplate_Fragment
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionFieldVisibilityEditor_PetitionBaseFragment =
@@ -16157,6 +16181,7 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
@@ -16279,6 +16304,7 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PreviewPetitionField_PetitionBaseFragment =
@@ -17495,6 +17521,7 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
@@ -17617,6 +17644,7 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PreviewPetitionFieldGroup_PetitionBaseFragment =
@@ -18241,6 +18269,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
@@ -19046,6 +19075,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
@@ -19256,6 +19286,11 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           }> | null;
         }>;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -19515,6 +19550,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       }> | null;
     }>;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
 };
 
@@ -19725,6 +19761,11 @@ export type PetitionSignaturesCard_petitionQuery = {
           }> | null;
         }>;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
       }
     | { __typename?: "PetitionTemplate" }
     | null;
@@ -20835,6 +20876,7 @@ export type RecipientViewContentsCard_PublicPetitionFragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type RecipientViewContentsCard_PetitionBase_Petition_Fragment = {
@@ -20923,6 +20965,7 @@ export type RecipientViewContentsCard_PetitionBase_Petition_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type RecipientViewContentsCard_PetitionBase_PetitionTemplate_Fragment = {
@@ -21011,6 +21054,7 @@ export type RecipientViewContentsCard_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type RecipientViewContentsCard_PetitionBaseFragment =
@@ -21233,6 +21277,7 @@ export type RecipientViewProgressFooter_PetitionFragment = {
   }>;
   signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type RecipientViewProgressFooter_PetitionFieldFragment = {
@@ -21399,6 +21444,7 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
   }>;
   signatureConfig?: { __typename?: "PublicSignatureConfig"; review: boolean } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
@@ -21732,6 +21778,7 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
       }> | null;
     }>;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
   granter?: { __typename?: "PublicUser"; fullName: string } | null;
   contact?: { __typename?: "PublicContact"; id: string } | null;
@@ -22300,6 +22347,7 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type RecipientViewPetitionFieldLayout_PetitionFieldFragment = {
@@ -29416,6 +29464,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   } | null;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
@@ -29646,6 +29695,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       isPreset: boolean;
     } | null>;
   } | null;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type PetitionCompose_PetitionBaseFragment =
@@ -31470,6 +31520,11 @@ export type PetitionCompose_petitionQuery = {
         } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
       }
     | {
         __typename: "PetitionTemplate";
@@ -31714,6 +31769,11 @@ export type PetitionCompose_petitionQuery = {
             isPreset: boolean;
           } | null>;
         } | null;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
       }
     | null;
 };
@@ -32888,6 +32948,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     } | null;
   } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   effectivePermissions: Array<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -33299,6 +33360,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     } | null>;
   } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
@@ -33793,6 +33855,11 @@ export type PetitionPreview_updatePetitionMutation = {
           } | null;
         } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -34203,6 +34270,11 @@ export type PetitionPreview_updatePetitionMutation = {
           } | null>;
         } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       };
 };
@@ -34645,6 +34717,7 @@ export type PetitionPreview_completePetitionMutation = {
       } | null;
     } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     effectivePermissions: Array<{
       __typename?: "EffectivePetitionUserPermission";
       isSubscribed: boolean;
@@ -35107,6 +35180,11 @@ export type PetitionPreview_petitionQuery = {
           } | null;
         } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -35517,6 +35595,11 @@ export type PetitionPreview_petitionQuery = {
           } | null>;
         } | null;
         variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       }
     | null;
@@ -36002,6 +36085,7 @@ export type PetitionReplies_PetitionFragment = {
       fullName: string;
     } | null>;
   } | null;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
   latestSummaryRequest?: {
     __typename?: "AiCompletionLog";
@@ -36781,6 +36865,7 @@ export type PetitionReplies_closePetitionMutation = {
         fullName: string;
       } | null>;
     } | null;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
     latestSummaryRequest?: {
       __typename?: "AiCompletionLog";
@@ -37222,6 +37307,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         fullName: string;
       } | null>;
     } | null;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
     latestSummaryRequest?: {
       __typename?: "AiCompletionLog";
@@ -37835,6 +37921,11 @@ export type PetitionReplies_petitionQuery = {
             fullName: string;
           } | null>;
         } | null;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
         fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
         latestSummaryRequest?: {
           __typename?: "AiCompletionLog";
@@ -40271,6 +40362,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
       }>;
     } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
   granter?: {
     __typename?: "PublicUser";
@@ -40484,6 +40576,7 @@ export type RecipientView_PublicPetitionFragment = {
     }>;
   } | null;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type RecipientView_PublicUserFragment = {
@@ -40685,6 +40778,7 @@ export type RecipientView_publicCompletePetitionMutation = {
       }>;
     } | null;
     variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   };
 };
 
@@ -40873,6 +40967,11 @@ export type RecipientView_accessQuery = {
         }>;
       } | null;
       variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      customLists: Array<{
+        __typename?: "PetitionCustomList";
+        name: string;
+        values: Array<string>;
+      }>;
     };
     granter?: {
       __typename?: "PublicUser";
@@ -41615,6 +41714,7 @@ export type useAllFieldsWithIndices_PetitionFieldFragment = {
 export type useFieldLogic_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fields: Array<{
     __typename?: "PublicPetitionField";
     id: string;
@@ -41718,6 +41818,7 @@ export type useFieldLogic_PublicPetitionFieldInnerFragment = {
 export type useFieldLogic_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -41795,6 +41896,7 @@ export type useFieldLogic_PetitionBase_Petition_Fragment = {
 export type useFieldLogic_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -43199,6 +43301,7 @@ export type useGetPetitionPages_PublicPetitionFragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useGetPetitionPages_PetitionBase_Petition_Fragment = {
@@ -43278,6 +43381,7 @@ export type useGetPetitionPages_PetitionBase_Petition_Fragment = {
     }>;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment = {
@@ -43357,6 +43461,7 @@ export type useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment = {
     }>;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type useGetPetitionPages_PetitionBaseFragment =
@@ -43500,6 +43605,7 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
@@ -43620,6 +43726,7 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type usePetitionCanFinalize_PetitionBaseFragment =
@@ -43697,6 +43804,7 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
     }> | null;
   }>;
   variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
 };
 
 export type usePetitionComposeFieldReorder_PetitionFieldFragment = {
@@ -45287,6 +45395,10 @@ export const PetitionFieldLogicContext_PetitionBaseFragmentDoc = gql`
     variables {
       name
       defaultValue
+    }
+    customLists {
+      name
+      values
     }
   }
   ${PetitionFieldLogicContext_PetitionFieldFragmentDoc}
@@ -48886,6 +48998,10 @@ export const useFieldLogic_PetitionBaseFragmentDoc = gql`
       name
       defaultValue
     }
+    customLists {
+      name
+      values
+    }
     fields {
       ...useFieldLogic_PetitionField
     }
@@ -50718,6 +50834,10 @@ export const useFieldLogic_PublicPetitionFragmentDoc = gql`
     variables {
       name
       defaultValue
+    }
+    customLists {
+      name
+      values
     }
     fields {
       ...useFieldLogic_PublicPetitionField

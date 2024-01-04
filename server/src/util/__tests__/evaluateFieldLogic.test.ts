@@ -23,6 +23,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -60,6 +61,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -97,6 +99,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -137,6 +140,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -178,6 +182,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
     });
@@ -220,6 +225,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, false].map((isVisible) => ({ isVisible })));
@@ -263,6 +269,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, false].map((isVisible) => ({ isVisible })));
@@ -322,6 +329,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -378,6 +386,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -426,6 +435,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true].map((isVisible) => ({ isVisible })));
@@ -493,6 +503,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true, true].map((isVisible) => ({ isVisible })));
@@ -556,6 +567,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
@@ -619,6 +631,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
@@ -701,6 +714,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true, false, false].map((isVisible) => ({ isVisible })));
@@ -764,6 +778,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
@@ -829,6 +844,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
@@ -892,6 +908,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, false, true].map((isVisible) => ({ isVisible })));
@@ -957,6 +974,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       });
 
       expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
@@ -1006,6 +1024,7 @@ describe("evaluateFieldLogic", () => {
           { name: "score", default_value: 0 },
           { name: "price", default_value: 50 },
         ],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1061,6 +1080,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "score", default_value: 100 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1163,6 +1183,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "score", default_value: 100 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1250,6 +1271,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "total", default_value: 0 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1311,6 +1333,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "total", default_value: 0 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1367,6 +1390,7 @@ describe("evaluateFieldLogic", () => {
           { name: "total", default_value: 10 },
           { name: "score", default_value: 100 },
         ],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1452,6 +1476,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "price", default_value: 0 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1521,6 +1546,7 @@ describe("evaluateFieldLogic", () => {
           { name: "score", default_value: 0 },
           { name: "price", default_value: 1.5 },
         ],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1571,6 +1597,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "score", default_value: 0 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1632,6 +1659,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "score", default_value: 0 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -1779,6 +1807,7 @@ describe("evaluateFieldLogic", () => {
           { name: "total", default_value: 0 },
           { name: "score", default_value: 1 },
         ],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -2054,6 +2083,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "edad", default_value: 0 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -2267,6 +2297,7 @@ describe("evaluateFieldLogic", () => {
           { name: "score", default_value: 1 },
           { name: "price", default_value: 2 },
         ],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([
@@ -2414,6 +2445,7 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [{ name: "score", default_value: 0 }],
+        custom_lists: [],
       });
 
       expect(fields).toEqual([

@@ -95,6 +95,17 @@ const PETITION_JSON_SCHEMA = {
             },
           },
         },
+        customLists: {
+          type: "array",
+          items: {
+            type: "object",
+            required: ["name", "values"],
+            properties: {
+              name: { type: "string" },
+              values: { type: "array", items: { type: "string" } },
+            },
+          },
+        },
       },
     },
   },
@@ -126,6 +137,7 @@ interface PetitionJson {
   templateDescription: Maybe<string>;
   fields: PetitionFieldJson[];
   variables: { name: string; defaultValue: number }[];
+  customLists: { name: string; values: string[] }[];
 }
 
 export interface IPetitionImportExportService {
@@ -241,6 +253,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
         name: v.name,
         defaultValue: v.default_value,
       })),
+      customLists: petition.custom_lists ?? [],
     };
   }
 
@@ -303,6 +316,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
             name: v.name,
             default_value: v.defaultValue,
           })),
+          custom_lists: json.customLists ?? [],
         },
         user,
         true,

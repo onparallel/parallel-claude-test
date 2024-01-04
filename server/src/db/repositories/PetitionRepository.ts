@@ -125,6 +125,11 @@ export interface PetitionVariable {
   default_value: number;
 }
 
+export interface PetitionCustomList {
+  name: string;
+  values: string[];
+}
+
 type PetitionType = "PETITION" | "TEMPLATE";
 
 interface PetitionSharedWithFilter {
@@ -1511,7 +1516,8 @@ export class PetitionRepository extends BaseRepository {
           document_organization_theme_id: defaultDocumentTheme.id,
           status: data.is_template ? null : data.status ?? "DRAFT",
           variables: this.json(data.variables ?? []),
-          ...omit(data, ["status", "variables"]),
+          custom_lists: this.json(data.custom_lists ?? []),
+          ...omit(data, ["status", "variables", "custom_lists"]),
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
         },
@@ -2695,57 +2701,73 @@ export class PetitionRepository extends BaseRepository {
     return petitionIds.map((id) => variablesByPetitionId[id]?.variables ?? []);
   }
 
+  async getPetitionCustomLists(petitionIds: number[]) {
+    const petitionCustomLists = await this.from("petition")
+      .whereIn("id", petitionIds)
+      .whereNull("deleted_at")
+      .select(["id", "custom_lists"]);
+
+    const customListsByPetitionId = indexBy(petitionCustomLists, (v) => v.id);
+
+    return petitionIds.map((id) => customListsByPetitionId[id]?.custom_lists ?? []);
+  }
+
   async getComposedPetitionFieldsAndVariables(petitionIds: number[]) {
-    const [fieldsWithRepliesByPetition, variablesByPetition] = await Promise.all([
-      this.getPetitionFieldsWithReplies(petitionIds),
-      this.getPetitionVariables(petitionIds),
-    ]);
+    const [fieldsWithRepliesByPetition, variablesByPetition, customListsByPetition] =
+      await Promise.all([
+        this.getPetitionFieldsWithReplies(petitionIds),
+        this.getPetitionVariables(petitionIds),
+        this.getPetitionCustomLists(petitionIds),
+      ]);
 
-    return zip(fieldsWithRepliesByPetition, variablesByPetition).map(
-      ([fieldsWithReplies, variables]) => {
-        const [fields, children] = partition(
-          fieldsWithReplies,
-          (f) => f.parent_petition_field_id === null,
-        );
+    return pipe(
+      fieldsWithRepliesByPetition,
+      zip(variablesByPetition),
+      zip(customListsByPetition),
+    ).map(([[fieldsWithReplies, variables], customLists]) => {
+      const [fields, children] = partition(
+        fieldsWithReplies,
+        (f) => f.parent_petition_field_id === null,
+      );
 
-        return {
-          fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
-            const fieldChildren =
+      return {
+        fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
+          const fieldChildren =
+            field.type === "FIELD_GROUP"
+              ? pipe(
+                  children,
+                  filter((c) => c.parent_petition_field_id! === field.id),
+                  sortBy([(f) => f.position, "asc"]),
+                  map((child) => ({
+                    ...child,
+                    parent: field,
+                  })),
+                )
+              : [];
+
+          const fieldReplies = field.replies.map((reply) => ({
+            ...reply,
+            children:
               field.type === "FIELD_GROUP"
-                ? pipe(
-                    children,
-                    filter((c) => c.parent_petition_field_id! === field.id),
-                    sortBy([(f) => f.position, "asc"]),
-                    map((child) => ({
-                      ...child,
-                      parent: field,
-                    })),
-                  )
-                : [];
+                ? fieldChildren.map((child) => ({
+                    field: child,
+                    replies: child.replies.filter(
+                      (cr) => cr.parent_petition_field_reply_id === reply.id,
+                    ),
+                  }))
+                : null,
+          }));
 
-            const fieldReplies = field.replies.map((reply) => ({
-              ...reply,
-              children:
-                field.type === "FIELD_GROUP"
-                  ? fieldChildren.map((child) => ({
-                      field: child,
-                      replies: child.replies.filter(
-                        (cr) => cr.parent_petition_field_reply_id === reply.id,
-                      ),
-                    }))
-                  : null,
-            }));
-
-            return {
-              ...field,
-              children: field.type === "FIELD_GROUP" ? fieldChildren : null,
-              replies: fieldReplies,
-            };
-          }),
-          variables,
-        };
-      },
-    );
+          return {
+            ...field,
+            children: field.type === "FIELD_GROUP" ? fieldChildren : null,
+            replies: fieldReplies,
+          };
+        }),
+        variables,
+        custom_lists: customLists,
+      };
+    });
   }
 
   async completePetition(
@@ -2900,6 +2922,7 @@ export class PetitionRepository extends BaseRepository {
               ? sourcePetition.default_path // if creating a petition from a template, use default_path
               : sourcePetition.path, // else, use path
           variables: this.json(sourcePetition.variables ?? []),
+          custom_lists: this.json(sourcePetition.custom_lists ?? []),
           // copy summary config if creating a petition from a template and the template is from the same org
           summary_config:
             sourcePetition.is_template &&

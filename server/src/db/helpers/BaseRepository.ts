@@ -14,6 +14,7 @@ import { CreateSystemEvent, SystemEvent } from "../events/SystemEvent";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
 import {
+  PetitionCustomList,
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
   PetitionSummaryConfig,
@@ -35,7 +36,8 @@ export interface TableTypes
         {
           signature_config: PetitionSignatureConfig | null;
           summary_config: PetitionSummaryConfig | null;
-          variables: PetitionVariable[] | null;
+          variables: PetitionVariable[];
+          custom_lists: PetitionCustomList[] | null;
         }
       >;
       petition_signature_request: Replace<

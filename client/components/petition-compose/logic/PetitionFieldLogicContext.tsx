@@ -5,6 +5,7 @@ import {
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { PropsWithChildren, createContext, useContext, useMemo } from "react";
+import { pick } from "remeda";
 
 interface PetitionFieldLogicContextProps {
   field: PetitionFieldLogicContext_PetitionFieldFragment;
@@ -12,7 +13,8 @@ interface PetitionFieldLogicContextProps {
   includeSelf?: boolean;
 }
 
-interface UsePetitionFieldLogicContext {
+interface UsePetitionFieldLogicContext
+  extends Pick<PetitionFieldLogicContext_PetitionBaseFragment, "variables" | "customLists"> {
   fieldWithIndex: [
     field: PetitionFieldLogicContext_PetitionFieldFragment,
     fieldIndex: PetitionFieldIndex,
@@ -21,7 +23,6 @@ interface UsePetitionFieldLogicContext {
     field: PetitionFieldLogicContext_PetitionFieldFragment,
     fieldIndex: PetitionFieldIndex,
   ][];
-  variables: PetitionFieldLogicContext_PetitionBaseFragment["variables"];
 }
 
 const _PetitionFieldLogicContext = createContext<UsePetitionFieldLogicContext | undefined>(
@@ -42,7 +43,7 @@ export function PetitionFieldLogicContext({
       fieldsWithIndices: fieldsWithIndices
         .slice(0, includeSelf ? fieldIndex + 1 : fieldIndex)
         .filter(([f]) => !f.isReadOnly),
-      variables: petition.variables,
+      ...pick(petition, ["variables", "customLists"]),
     };
   }, [fieldsWithIndices, petition.variables]);
 
@@ -66,6 +67,10 @@ PetitionFieldLogicContext.fragments = {
         variables {
           name
           defaultValue
+        }
+        customLists {
+          name
+          values
         }
       }
       ${this.PetitionField}

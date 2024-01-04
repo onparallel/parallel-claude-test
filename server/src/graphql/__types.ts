@@ -779,6 +779,10 @@ export interface NexusGenObjects {
   PetitionCompletedEvent: petitionEvents.PetitionCompletedEvent;
   PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
   PetitionCreatedEvent: petitionEvents.PetitionCreatedEvent;
+  PetitionCustomList: {
+    name: string;
+    values: string[];
+  };
   PetitionDeletedEvent: petitionEvents.PetitionDeletedEvent;
   PetitionDisassociatedEvent: profileEvents.PetitionDisassociatedEvent;
   PetitionEventPagination: {
@@ -1853,6 +1857,7 @@ export interface NexusGenFieldTypes {
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
+    customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
@@ -2022,6 +2027,11 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionCustomList: {
+    // field return type
+    name: string; // String!
+    values: string[]; // [String!]!
   };
   PetitionDeletedEvent: {
     // field return type
@@ -2349,6 +2359,7 @@ export interface NexusGenFieldTypes {
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     defaultPath: string; // String!
@@ -2682,6 +2693,7 @@ export interface NexusGenFieldTypes {
     completingMessageBody: string | null; // String
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
     hasUnreadComments: boolean; // Boolean!
@@ -3318,6 +3330,7 @@ export interface NexusGenFieldTypes {
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
@@ -4092,6 +4105,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageSubject: "String";
     createdAt: "DateTime";
     currentSignatureRequest: "PetitionSignatureRequest";
+    customLists: "PetitionCustomList";
     customProperties: "JSONObject";
     deadline: "DateTime";
     defaultOnBehalf: "User";
@@ -4261,6 +4275,11 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
     user: "User";
+  };
+  PetitionCustomList: {
+    // field return type name
+    name: "String";
+    values: "String";
   };
   PetitionDeletedEvent: {
     // field return type name
@@ -4588,6 +4607,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageBody: "JSON";
     completingMessageSubject: "String";
     createdAt: "DateTime";
+    customLists: "PetitionCustomList";
     customProperties: "JSONObject";
     defaultOnBehalf: "User";
     defaultPath: "String";
@@ -4921,6 +4941,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageBody: "String";
     completingMessageSubject: "String";
     createdAt: "DateTime";
+    customLists: "PetitionCustomList";
     deadline: "DateTime";
     fields: "PublicPetitionField";
     hasUnreadComments: "Boolean";
@@ -5557,6 +5578,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageBody: "JSON";
     completingMessageSubject: "String";
     createdAt: "DateTime";
+    customLists: "PetitionCustomList";
     customProperties: "JSONObject";
     defaultOnBehalf: "User";
     effectivePermissions: "EffectivePetitionUserPermission";

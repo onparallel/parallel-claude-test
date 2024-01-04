@@ -26,6 +26,8 @@ import {
 } from "./types";
 import { UnwrapArray } from "../types";
 
+type PetitionSelection = useFieldLogic_PetitionBaseFragment | useFieldLogic_PublicPetitionFragment;
+
 type PetitionFieldSelection =
   | useFieldLogic_PublicPetitionFieldFragment
   | useFieldLogic_PetitionFieldFragment;
@@ -50,7 +52,7 @@ export interface FieldLogicChildLogicResult extends FieldLogic {}
  * passed array of fields.
  */
 export function useFieldLogic(
-  petition: useFieldLogic_PetitionBaseFragment | useFieldLogic_PublicPetitionFragment,
+  petition: PetitionSelection,
   usePreviewReplies = false,
 ): FieldLogicResult[] {
   return useMemo(
@@ -96,9 +98,14 @@ export function useFieldLogic(
           function evaluateCondition(condition: PetitionFieldLogicCondition) {
             if ("fieldId" in condition) {
               const referencedField = fieldsById[condition.fieldId];
-              return fieldConditionIsMet(condition, referencedField, getReplies(referencedField));
+              return fieldConditionIsMet(
+                condition,
+                referencedField,
+                getReplies(referencedField),
+                petition,
+              );
             } else {
-              return variableConditionIsMet(condition, currentVariables);
+              return variableConditionIsMet(condition, currentVariables, petition);
             }
           }
 
@@ -188,9 +195,10 @@ export function useFieldLogic(
                       condition,
                       referencedField,
                       getReplies(referencedField),
+                      petition,
                     );
                   } else {
-                    return variableConditionIsMet(condition, currentVariables);
+                    return variableConditionIsMet(condition, currentVariables, petition);
                   }
                 }
 
@@ -284,6 +292,7 @@ function fieldConditionIsMet(
   condition: PetitionFieldLogicFieldCondition,
   field: Pick<PetitionFieldSelection, "type" | "options">,
   replies: any[],
+  petition: PetitionSelection,
 ) {
   const { operator, value, modifier } = condition;
   function evaluator(reply: any) {
@@ -292,7 +301,7 @@ function fieldConditionIsMet(
         ? reply.content.value?.[condition.column]?.[1] ?? null
         : reply.content.value;
 
-    return evaluatePredicate(_value, operator, value);
+    return evaluatePredicate(_value, operator, value, petition);
   }
 
   const { type, options } = field;
@@ -309,7 +318,7 @@ function fieldConditionIsMet(
         options,
         replies,
       });
-      return evaluatePredicate(completed.length, operator, value);
+      return evaluatePredicate(completed.length, operator, value, petition);
     default:
       return false;
   }
@@ -318,15 +327,17 @@ function fieldConditionIsMet(
 function variableConditionIsMet(
   condition: PetitionFieldLogicVariableCondition,
   currentVariables: Record<string, number>,
+  petition: PetitionSelection,
 ) {
   const { operator, value, variableName } = condition;
-  return evaluatePredicate(currentVariables[variableName], operator, value);
+  return evaluatePredicate(currentVariables[variableName], operator, value, petition);
 }
 
 function evaluatePredicate(
   reply: string | number | string[],
   operator: PetitionFieldLogicConditionOperator,
   value: string | string[] | number | null,
+  petition: PetitionSelection,
 ) {
   try {
     if (reply === undefined || value === undefined || value === null) {
@@ -382,21 +393,28 @@ function evaluatePredicate(
         assert(typeof _value === "string");
         return _reply.endsWith(_value);
       case "CONTAIN":
+      case "NOT_CONTAIN": {
         assert(typeof _reply === "string");
         assert(typeof _value === "string");
-        return _reply.includes(_value);
-      case "NOT_CONTAIN":
-        assert(typeof _reply === "string");
-        assert(typeof _value === "string");
-        return !_reply.includes(_value);
+        const result = _reply.includes(_value);
+        return operator.startsWith("NOT_") ? !result : result;
+      }
       case "IS_ONE_OF":
+      case "NOT_IS_ONE_OF": {
         assert(typeof _reply === "string");
         assert(Array.isArray(_value));
-        return _value.includes(_reply);
-      case "NOT_IS_ONE_OF":
+        const result = _value.includes(_reply);
+        return operator.startsWith("NOT_") ? !result : result;
+      }
+      case "IS_IN_LIST":
+      case "NOT_IS_IN_LIST": {
         assert(typeof _reply === "string");
-        assert(Array.isArray(_value));
-        return !_value.includes(_reply);
+        assert(typeof value === "string");
+        const list = petition.customLists.find((l) => l.name === value);
+        assert(isDefined(list));
+        const result = list.values.some((v) => v.toLowerCase() === _reply);
+        return operator.startsWith("NOT_") ? !result : result;
+      }
       default:
         return false;
     }
@@ -446,6 +464,10 @@ useFieldLogic.fragments = {
         name
         defaultValue
       }
+      customLists {
+        name
+        values
+      }
       fields {
         ...useFieldLogic_PublicPetitionField
       }
@@ -491,6 +513,10 @@ useFieldLogic.fragments = {
       variables {
         name
         defaultValue
+      }
+      customLists {
+        name
+        values
       }
       fields {
         ...useFieldLogic_PetitionField

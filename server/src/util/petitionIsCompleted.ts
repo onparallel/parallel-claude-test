@@ -1,5 +1,5 @@
 import { PetitionField, PetitionFieldReply } from "../db/__types";
-import { PetitionVariable } from "../db/repositories/PetitionRepository";
+import { PetitionCustomList, PetitionVariable } from "../db/repositories/PetitionRepository";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { applyFieldVisibility } from "./fieldLogic";
 import { Maybe } from "./types";
@@ -29,6 +29,7 @@ interface PartialField extends InnerPartialField {
 interface PartialPetition {
   fields: PartialField[];
   variables: PetitionVariable[];
+  custom_lists: PetitionCustomList[];
 }
 
 export function petitionIsCompleted(petition: PartialPetition, publicContext?: boolean) {

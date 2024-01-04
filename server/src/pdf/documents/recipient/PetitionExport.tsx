@@ -522,6 +522,7 @@ function groupFieldsByPages<T extends PetitionExport_PetitionBaseFragment>(
       name: v.name,
       default_value: v.defaultValue,
     })),
+    custom_lists: petition.customLists,
   });
 
   const pages: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] = [];
@@ -599,6 +600,10 @@ PetitionExport.fragments = {
         variables {
           name
           defaultValue
+        }
+        customLists {
+          name
+          values
         }
         __typename
       }

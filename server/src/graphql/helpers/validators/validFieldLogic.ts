@@ -34,6 +34,8 @@ const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = {
             "NOT_CONTAIN",
             "IS_ONE_OF",
             "NOT_IS_ONE_OF",
+            "IS_IN_LIST",
+            "NOT_IS_IN_LIST",
             "LESS_THAN",
             "LESS_THAN_OR_EQUAL",
             "GREATER_THAN",
@@ -293,7 +295,7 @@ export function validateFieldLogic<
                 : getDynamicSelectValues(referencedField.options.values, c.column!);
             assertOneOf(
               c.operator,
-              ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF"],
+              ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF", "IS_IN_LIST", "NOT_IS_IN_LIST"],
               `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
             );
             assert(
@@ -303,7 +305,9 @@ export function validateFieldLogic<
                   options.includes(c.value)) ||
                 (["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(c.operator) &&
                   Array.isArray(c.value) &&
-                  c.value.every((v) => options.includes(v))),
+                  c.value.every((v) => options.includes(v))) ||
+                (["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(c.operator) &&
+                  typeof c.value === "string"),
               `Invalid value ${c.value} for field of type ${
                 referencedField.type
               }. Should be one of: ${options.join(", ")}`,

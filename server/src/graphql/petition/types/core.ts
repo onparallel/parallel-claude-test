@@ -348,6 +348,10 @@ export const PetitionBase = interfaceType({
       type: "PetitionVariableResult",
       resolve: async (o, _, ctx) => await ctx.petitions.loadResolvedPetitionVariables(o.id),
     });
+    t.nonNull.list.nonNull.field("customLists", {
+      type: "PetitionCustomList",
+      resolve: (o) => o.custom_lists ?? [],
+    });
     t.nonNull.boolean("isDelegateAccessEnabled", {
       description: "Indicates whether delegate access is enabled for the recipient",
       resolve: (o) => o.enable_delegate_access,
@@ -1335,4 +1339,40 @@ export const FoldersInput = inputObjectType({
     t.nonNull.field("type", { type: "PetitionBaseType" });
     t.nonNull.list.nonNull.id("folderIds");
   },
+});
+
+export const PetitionVariable = objectType({
+  name: "PetitionVariable",
+  definition(t) {
+    t.nonNull.string("name");
+    t.nonNull.int("defaultValue", { resolve: (o) => o.default_value });
+  },
+  sourceType: /* ts */ `{
+    name: string;
+    default_value: number;
+  }`,
+});
+
+export const PetitionVariableResult = objectType({
+  name: "PetitionVariableResult",
+  definition(t) {
+    t.nonNull.string("name");
+    t.nullable.int("value", { resolve: (o) => o.value });
+  },
+  sourceType: /* ts */ `{
+    name: string;
+    value: number | null;
+  }`,
+});
+
+export const PetitionCustomList = objectType({
+  name: "PetitionCustomList",
+  definition(t) {
+    t.nonNull.string("name");
+    t.nonNull.list.string("values", { resolve: (o) => o.values });
+  },
+  sourceType: /* ts */ `{
+    name: string;
+    values: string[];
+  }`,
 });

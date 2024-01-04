@@ -42,6 +42,8 @@ export type PetitionFieldLogicConditionOperator =
   | "NOT_CONTAIN"
   | "IS_ONE_OF"
   | "NOT_IS_ONE_OF"
+  | "IS_IN_LIST"
+  | "NOT_IS_IN_LIST"
   | "LESS_THAN"
   | "LESS_THAN_OR_EQUAL"
   | "GREATER_THAN"

@@ -4590,6 +4590,11 @@
     "context": "has replies"
   },
   {
+    "term": "component.petition-field-visibility-editor.is-in-list-select",
+    "definition": "{modifier, select, ALL {están en la lista} other {está en la lista}}",
+    "context": "{modifier, select, ALL {are in list} other {is in list}}"
+  },
+  {
     "term": "component.petition-field-visibility-editor.is-one-of-select",
     "definition": "{modifier, select, ALL {son una de} other {es una de}}",
     "context": "{modifier, select, ALL {are one of} other {is one of}}"
@@ -4638,6 +4643,11 @@
     "term": "component.petition-field-visibility-editor.not-have-reply",
     "definition": "no tiene respuestas",
     "context": "does not have replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-is-in-list-select",
+    "definition": "{modifier, select, ALL {no están en la lista} other {no está en la lista}}",
+    "context": "{modifier, select, ALL {are not in list} other {is not in list}}"
   },
   {
     "term": "component.petition-field-visibility-editor.not-is-one-of-select",

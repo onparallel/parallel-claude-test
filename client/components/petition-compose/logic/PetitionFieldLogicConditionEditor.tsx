@@ -242,6 +242,7 @@ function ConditionPredicate({
   const {
     fieldsWithIndices,
     fieldWithIndex: [field],
+    customLists,
   } = usePetitionFieldLogicContext();
   const isFieldCondition = "fieldId" in condition;
   const isVariableCondition = "variableName" in condition;
@@ -393,6 +394,31 @@ function ConditionPredicate({
               value: "NOT_IS_ONE_OF",
             },
           );
+          if (customLists.length > 0) {
+            options.push(
+              {
+                label: intl.formatMessage(
+                  {
+                    id: "component.petition-field-visibility-editor.is-in-list-select",
+                    defaultMessage: "{modifier, select, ALL {are in list} other {is in list}}",
+                  },
+                  { modifier: condition.modifier },
+                ),
+                value: "IS_IN_LIST",
+              },
+              {
+                label: intl.formatMessage(
+                  {
+                    id: "component.petition-field-visibility-editor.not-is-in-list-select",
+                    defaultMessage:
+                      "{modifier, select, ALL {are not in list} other {is not in list}}",
+                  },
+                  { modifier: condition.modifier },
+                ),
+                value: "NOT_IS_IN_LIST",
+              },
+            );
+          }
         } else if (
           isDefined(referencedField) &&
           !isFileTypeField(referencedField.type) &&
@@ -529,42 +555,45 @@ function ConditionPredicate({
       condition.modifier !== "NUMBER_OF_REPLIES"
     ) {
       assert("fieldId" in condition);
+      const value =
+        ["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(condition.operator) &&
+        !["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(operator)
+          ? null
+          : condition.value;
       onChange({
         ...condition,
         operator,
         value:
-          ["EQUAL", "NOT_EQUAL"].includes(operator) && Array.isArray(condition.value)
-            ? condition.value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column)
-            : ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) &&
-                typeof condition.value === "string"
-              ? [condition.value]
-              : condition.value,
+          ["EQUAL", "NOT_EQUAL"].includes(operator) && Array.isArray(value)
+            ? value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column)
+            : ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) && typeof value === "string"
+              ? [value]
+              : ["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(operator)
+                ? customLists?.[0]?.name ?? null
+                : value,
+      });
+    } else if (
+      isFieldCondition &&
+      isDefined(referencedField) &&
+      (condition.modifier === "NUMBER_OF_REPLIES" || condition.operator === "NUMBER_OF_SUBREPLIES")
+    ) {
+      // override existing "has replies/does not have replies"
+      const defaultValue = defaultFieldConditionValue(referencedField, condition.column);
+      onChange({
+        ...condition,
+        operator,
+        modifier: "ANY",
+        value: ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
+          ? isDefined(defaultValue) && typeof defaultValue === "string"
+            ? [defaultValue]
+            : null
+          : defaultValue,
       });
     } else {
-      if (
-        isFieldCondition &&
-        isDefined(referencedField) &&
-        (condition.modifier === "NUMBER_OF_REPLIES" ||
-          condition.operator === "NUMBER_OF_SUBREPLIES")
-      ) {
-        // override existing "has replies/does not have replies"
-        const defaultValue = defaultFieldConditionValue(referencedField, condition.column);
-        onChange({
-          ...condition,
-          operator,
-          modifier: "ANY",
-          value: ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
-            ? isDefined(defaultValue) && typeof defaultValue === "string"
-              ? [defaultValue]
-              : null
-            : defaultValue,
-        });
-      } else {
-        onChange({
-          ...condition,
-          operator,
-        });
-      }
+      onChange({
+        ...condition,
+        operator,
+      });
     }
   };
 
@@ -635,6 +664,13 @@ function ConditionPredicate({
           condition.operator === "NUMBER_OF_SUBREPLIES" ||
           !isDefined(referencedField) ? (
           <ConditionPredicateValueNumber
+            value={condition}
+            onChange={onChange}
+            isReadOnly={isReadOnly}
+            showErrors={showErrors}
+          />
+        ) : condition.operator === "IS_IN_LIST" || condition.operator === "NOT_IS_IN_LIST" ? (
+          <ConditionPredicateListSelect
             value={condition}
             onChange={onChange}
             isReadOnly={isReadOnly}
@@ -1028,6 +1064,49 @@ function ConditionPredicateValueString({
       })}
       isDisabled={isReadOnly}
       opacity={isReadOnly ? "1 !important" : undefined}
+    />
+  );
+}
+
+function ConditionPredicateListSelect({
+  showErrors,
+  value: condition,
+  onChange,
+  isReadOnly,
+}: ConditionPredicateProps) {
+  const intl = useIntl();
+  const { customLists } = usePetitionFieldLogicContext();
+
+  const options = useMemo(() => {
+    return customLists.map(({ name }) => toSimpleSelectOption(name)!);
+  }, [customLists]);
+
+  return isReadOnly ? (
+    isDefined(condition.value) ? (
+      <Box as="span" fontStyle="italic">
+        {'"'}
+        {condition.value}
+        {'"'}
+      </Box>
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    )
+  ) : (
+    <SimpleSelect
+      size="sm"
+      options={options}
+      onChange={(value) => onChange({ ...condition, value })}
+      value={condition.value as string | null}
+      isReadOnly={isReadOnly}
+      isInvalid={showErrors && condition.value === null}
+      styles={{ valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }) }}
+      isSearchable={false}
+      placeholder={intl.formatMessage({
+        id: "generic.select-an-option",
+        defaultMessage: "Select an option",
+      })}
     />
   );
 }

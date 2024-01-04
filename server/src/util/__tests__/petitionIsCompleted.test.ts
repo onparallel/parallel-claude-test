@@ -89,6 +89,7 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       }),
     ).toBeTrue();
   });
@@ -220,6 +221,7 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       }),
     ).toBeTrue();
   });
@@ -442,6 +444,7 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       }),
     ).toBeTrue();
   });
@@ -701,6 +704,7 @@ describe("petitionIsCompleted", () => {
             },
           ],
           variables: [],
+          custom_lists: [],
         },
         true,
       ),
@@ -962,6 +966,7 @@ describe("petitionIsCompleted", () => {
             },
           ],
           variables: [],
+          custom_lists: [],
         },
         false,
       ),
@@ -1063,6 +1068,7 @@ describe("petitionIsCompleted", () => {
             },
           ],
           variables: [],
+          custom_lists: [],
         },
         true,
       ),
@@ -1186,6 +1192,7 @@ describe("petitionIsCompleted", () => {
             },
           ],
           variables: [],
+          custom_lists: [],
         },
         true,
       ),
@@ -1237,6 +1244,7 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       }),
     ).toBeFalse();
   });
@@ -1377,6 +1385,7 @@ describe("petitionIsCompleted", () => {
           },
         ],
         variables: [],
+        custom_lists: [],
       }),
     ).toBeFalse();
   });

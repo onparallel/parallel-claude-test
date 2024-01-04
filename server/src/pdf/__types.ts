@@ -893,7 +893,7 @@ export type Mutation = {
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
   setUserDelegates: User;
-  /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
+  /** Shares our Signaturit production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
   shareSignaturitApiKey: Organization;
   /** Triggered by new users that want to sign up into Parallel */
   signUp: User;
@@ -2472,6 +2472,7 @@ export type Petition = PetitionBase & {
   createdAt: Scalars["DateTime"]["output"];
   /** The current signature request. */
   currentSignatureRequest: Maybe<PetitionSignatureRequest>;
+  customLists: Array<PetitionCustomList>;
   /** Custom user properties */
   customProperties: Scalars["JSONObject"]["output"];
   /** The deadline of the petition. */
@@ -2659,6 +2660,7 @@ export type PetitionBase = {
   completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  customLists: Array<PetitionCustomList>;
   /** Custom user properties */
   customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
@@ -2796,6 +2798,11 @@ export type PetitionCreatedEvent = PetitionEvent & {
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
+};
+
+export type PetitionCustomList = {
+  name: Scalars["String"]["output"];
+  values: Array<Scalars["String"]["output"]>;
 };
 
 export type PetitionDeletedEvent = PetitionEvent & {
@@ -3486,6 +3493,7 @@ export type PetitionTemplate = PetitionBase & {
   completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  customLists: Array<PetitionCustomList>;
   /** Custom user properties */
   customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
@@ -3998,6 +4006,7 @@ export type PublicPetition = Timestamps & {
   completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  customLists: Array<PetitionCustomList>;
   /** The deadline of the petition. */
   deadline: Maybe<Scalars["DateTime"]["output"]>;
   /** The field definition of the petition. */
@@ -5440,6 +5449,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
   organization: { name: string; logoUrl: string | null };
   selectedDocumentTheme: { data: { [key: string]: any } };
   variables: Array<{ name: string; defaultValue: number }>;
+  customLists: Array<{ name: string; values: Array<string> }>;
 };
 
 export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
@@ -5561,6 +5571,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
   organization: { name: string; logoUrl: string | null };
   selectedDocumentTheme: { data: { [key: string]: any } };
   variables: Array<{ name: string; defaultValue: number }>;
+  customLists: Array<{ name: string; values: Array<string> }>;
 };
 
 export type PetitionExport_PetitionBaseFragment =
@@ -5843,6 +5854,7 @@ export type PetitionExport_petitionQuery = {
         organization: { name: string; logoUrl: string | null };
         selectedDocumentTheme: { data: { [key: string]: any } };
         variables: Array<{ name: string; defaultValue: number }>;
+        customLists: Array<{ name: string; values: Array<string> }>;
       }
     | {
         __typename: "PetitionTemplate";
@@ -5969,6 +5981,7 @@ export type PetitionExport_petitionQuery = {
         organization: { name: string; logoUrl: string | null };
         selectedDocumentTheme: { data: { [key: string]: any } };
         variables: Array<{ name: string; defaultValue: number }>;
+        customLists: Array<{ name: string; values: Array<string> }>;
       }
     | null;
 };
@@ -6188,6 +6201,10 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
     variables {
       name
       defaultValue
+    }
+    customLists {
+      name
+      values
     }
     __typename
   }

@@ -9,7 +9,7 @@ import { PetitionField, PetitionFieldReply } from "../db/__types";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { fromGlobalId, toGlobalId } from "./globalId";
 import { Maybe, UnwrapArray } from "./types";
-import type { TableTypes } from "../db/helpers/BaseRepository";
+import type { PetitionCustomList, PetitionVariable } from "../db/repositories/PetitionRepository";
 
 type PetitionFieldVisibilityType = "SHOW" | "HIDE";
 
@@ -56,6 +56,8 @@ type PetitionFieldLogicConditionOperator =
   | "NOT_CONTAIN"
   | "IS_ONE_OF"
   | "NOT_IS_ONE_OF"
+  | "IS_IN_LIST"
+  | "NOT_IS_IN_LIST"
   | "LESS_THAN"
   | "LESS_THAN_OR_EQUAL"
   | "GREATER_THAN"
@@ -127,8 +129,9 @@ interface FieldLogicPetitionFieldInput<TID = number | string> extends PetitionFi
 }
 
 interface FieldLogicPetitionInput<TID = number | string> {
-  variables: TableTypes["petition"]["variables"];
+  variables: PetitionVariable[];
   fields: FieldLogicPetitionFieldInput<TID>[];
+  custom_lists: PetitionCustomList[];
 }
 
 /** maps fieldIds inside logic condition from globalId to number and vice-versa */
@@ -230,12 +233,20 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
               [];
       }
 
-      function evaluateCondition(condition: PetitionFieldLogicCondition) {
+      function evaluateCondition(
+        condition: PetitionFieldLogicCondition,
+        petition: FieldLogicPetitionInput,
+      ) {
         if ("fieldId" in condition) {
           const referencedField = fieldsById[condition.fieldId];
-          return fieldConditionIsMet(condition, referencedField, getReplies(referencedField));
+          return fieldConditionIsMet(
+            condition,
+            referencedField,
+            getReplies(referencedField),
+            petition,
+          );
         } else {
-          return variableConditionIsMet(condition, currentVariables);
+          return variableConditionIsMet(condition, currentVariables, petition);
         }
       }
 
@@ -259,7 +270,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
         if (field.visibility) {
           const { conditions, operator, type } = field.visibility as PetitionFieldVisibility;
           const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
-            evaluateCondition(c),
+            evaluateCondition(c, petition),
           );
           visibilitiesById[field.id] = type === "SHOW" ? result : !result;
         } else {
@@ -268,7 +279,7 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
         if (visibilitiesById[field.id] && isDefined(field.math)) {
           for (const { conditions, operator, operations } of field.math as PetitionFieldMath[]) {
             const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
-              evaluateCondition(c),
+              evaluateCondition(c, petition),
             );
             if (conditionsApply) {
               for (const operation of operations) {
@@ -311,9 +322,14 @@ export function evaluateFieldLogic<T extends FieldLogicPetitionInput>(
             function evaluateCondition(condition: PetitionFieldLogicCondition) {
               if ("fieldId" in condition) {
                 const referencedField = fieldsById[condition.fieldId];
-                return fieldConditionIsMet(condition, referencedField, getReplies(referencedField));
+                return fieldConditionIsMet(
+                  condition,
+                  referencedField,
+                  getReplies(referencedField),
+                  petition,
+                );
               } else {
-                return variableConditionIsMet(condition, currentVariables);
+                return variableConditionIsMet(condition, currentVariables, petition);
               }
             }
 
@@ -404,6 +420,7 @@ function fieldConditionIsMet(
   condition: PetitionFieldLogicFieldCondition,
   field: PetitionFieldInner,
   replies: any[],
+  petition: FieldLogicPetitionInput,
 ) {
   const { operator, value, modifier } = condition;
   function evaluator(reply: any) {
@@ -412,7 +429,7 @@ function fieldConditionIsMet(
         ? reply.content.value?.[condition.column]?.[1] ?? null
         : reply.content.value;
 
-    return evaluatePredicate(_value, operator, value);
+    return evaluatePredicate(_value, operator, value, petition);
   }
 
   const { type, options } = field;
@@ -429,7 +446,7 @@ function fieldConditionIsMet(
         options,
         replies,
       });
-      return evaluatePredicate(completed.length, operator, value);
+      return evaluatePredicate(completed.length, operator, value, petition);
     default:
       return false;
   }
@@ -438,15 +455,17 @@ function fieldConditionIsMet(
 function variableConditionIsMet(
   condition: PetitionFieldLogicVariableCondition,
   currentVariables: Record<string, number>,
+  petition: FieldLogicPetitionInput,
 ) {
   const { operator, value, variableName } = condition;
-  return evaluatePredicate(currentVariables[variableName], operator, value);
+  return evaluatePredicate(currentVariables[variableName], operator, value, petition);
 }
 
 function evaluatePredicate(
   reply: string | number | string[],
   operator: PetitionFieldLogicConditionOperator,
   value: string | string[] | number | null,
+  petition: FieldLogicPetitionInput,
 ) {
   try {
     if (reply === undefined || value === undefined || value === null) {
@@ -502,21 +521,28 @@ function evaluatePredicate(
         assert(typeof _value === "string");
         return _reply.endsWith(_value);
       case "CONTAIN":
+      case "NOT_CONTAIN": {
         assert(typeof _reply === "string");
         assert(typeof _value === "string");
-        return _reply.includes(_value);
-      case "NOT_CONTAIN":
-        assert(typeof _reply === "string");
-        assert(typeof _value === "string");
-        return !_reply.includes(_value);
+        const result = _reply.includes(_value);
+        return operator.startsWith("NOT_") ? !result : result;
+      }
       case "IS_ONE_OF":
+      case "NOT_IS_ONE_OF": {
         assert(typeof _reply === "string");
         assert(Array.isArray(_value));
-        return _value.includes(_reply);
-      case "NOT_IS_ONE_OF":
+        const result = _value.includes(_reply);
+        return operator.startsWith("NOT_") ? !result : result;
+      }
+      case "IS_IN_LIST":
+      case "NOT_IS_IN_LIST": {
         assert(typeof _reply === "string");
-        assert(Array.isArray(_value));
-        return !_value.includes(_reply);
+        assert(typeof value === "string");
+        const list = petition.custom_lists?.find((l) => l.name === value);
+        assert(isDefined(list));
+        const result = list.values.some((v) => v.toLowerCase() === _reply);
+        return operator.startsWith("NOT_") ? !result : result;
+      }
       default:
         return false;
     }

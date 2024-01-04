@@ -1125,6 +1125,7 @@ export interface Petition {
   last_change_at: Date; // timestamptz
   summary_config: Maybe<any>; // jsonb
   summary_ai_completion_log_id: Maybe<number>; // int4
+  custom_lists: Maybe<any>; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -1177,6 +1178,7 @@ export type CreatePetition = PartialProps<
   | "last_change_at"
   | "summary_config"
   | "summary_ai_completion_log_id"
+  | "custom_lists"
 >;
 
 export interface PetitionAccess {
