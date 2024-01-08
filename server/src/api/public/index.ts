@@ -1670,12 +1670,18 @@ api
       description: outdent`
         Submits a reply on a given field of the parallel.
       `,
-      body: Body([JsonBodyContent(SubmitReply), FormDataBodyContent(SubmitFileReply)], {
-        description: outdent`
+      body: Body(
+        [
+          JsonBodyContent(SubmitReply),
+          FormDataBodyContent(SubmitFileReply, { example: { reply: "<binary data>" } }),
+        ],
+        {
+          description: outdent`
         ${replyBodyDescription}
         - For \`FIELD_GROUP\` fields, you need to first create an 'empty' reply on the field. Then call this endpoint again, passing the id of the child field and the id of the empty reply as the \`parentReplyId\`. Every reply with the same \`parentReplyId\` will be grouped together.
         `,
-      }),
+        },
+      ),
       responses: {
         201: SuccessResponse(PetitionFieldReply),
         400: ErrorResponse({ description: "Invalid parameters" }),
@@ -1803,9 +1809,15 @@ api
         409: ErrorResponse({ description: "The reply cannot be updated." }),
       },
       tags: ["Parallel replies"],
-      body: Body([JsonBodyContent(UpdateReply), FormDataBodyContent(UpdateFileReply)], {
-        description: replyBodyDescription,
-      }),
+      body: Body(
+        [
+          JsonBodyContent(UpdateReply),
+          FormDataBodyContent(UpdateFileReply, { example: { reply: "<binary data>" } }),
+        ],
+        {
+          description: replyBodyDescription,
+        },
+      ),
     },
     async ({ client, body, params, files }) => {
       const { petition } = await client.request(UpdateReply_petitionDocument, {

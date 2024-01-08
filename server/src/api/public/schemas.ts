@@ -1143,10 +1143,11 @@ const _NumberReplySubmitContent = {
 
 const _FileUploadReplySubmitContent = {
   title: "FileUploadReplyContent",
-  type: "object",
+  type: "string",
   format: "binary",
   description:
     "For fields of type `FILE_UPLOAD`. The content of this reply is the file to be uploaded.",
+  example: "<binary data>",
 } as const;
 
 const _CheckboxReplySubmitContent = {

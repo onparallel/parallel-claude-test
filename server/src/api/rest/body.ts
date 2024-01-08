@@ -6,6 +6,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
 import { buildValidateSchema, JsonSchemaFor } from "./schemas";
+import { OpenAPIV3 } from "openapi-types";
 
 export interface BodyOptions {
   description?: string;
@@ -28,7 +29,10 @@ export function JsonBodyContent<T>(schema: JsonSchemaFor<T>): RestBodyContent<T>
   };
 }
 
-export function FormDataBodyContent<T>(schema: JsonSchemaFor<T>): RestBodyContent<T> {
+export function FormDataBodyContent<T>(
+  schema: JsonSchemaFor<T>,
+  other?: Pick<OpenAPIV3.MediaTypeObject, "example" | "examples">,
+): RestBodyContent<T> {
   const validate = buildValidateSchema(schema);
   return {
     contentType: "multipart/form-data",
@@ -62,6 +66,7 @@ export function FormDataBodyContent<T>(schema: JsonSchemaFor<T>): RestBodyConten
       context.body = body;
       context.files = files;
     },
+    ...other,
   };
 }
 
@@ -76,7 +81,7 @@ export function Body<T extends RestBodyContent<any>>(
       description,
       required,
       content: Object.fromEntries(
-        _contents.map(({ contentType, schema }) => [contentType, { schema: schema as any }]),
+        _contents.map(({ contentType, validate, ...rest }) => [contentType, rest as any]),
       ),
     },
     validate: (req: Request, context: RestApiContext) => {

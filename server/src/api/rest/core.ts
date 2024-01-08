@@ -34,7 +34,8 @@ export interface RestBody<T> {
   validate: (req: Request, context: RestApiContext) => void;
 }
 
-export interface RestBodyContent<T> {
+export interface RestBodyContent<T>
+  extends Pick<OpenAPIV3.MediaTypeObject, "example" | "examples"> {
   contentType: string;
   schema: JsonSchemaFor<T>;
   validate: (req: Request, context: RestApiContext) => void;
