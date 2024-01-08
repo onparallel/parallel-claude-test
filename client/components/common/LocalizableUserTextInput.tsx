@@ -14,6 +14,8 @@ import {
   Portal,
   Spacer,
   Text,
+  useFormControl,
+  useTheme,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -91,9 +93,28 @@ interface LocaleSelectProps
 function LocaleSelect({ value, onChange, localizableUserText, ...props }: LocaleSelectProps) {
   const locales = useSupportedUserLocales();
   const current = locales.find((l) => l.key === value)!;
+  const _props = useFormControl(props);
+  const theme = useTheme();
   return (
     <Menu placement="bottom-end">
-      <MenuButton as={Button} rightIcon={<ChevronDownIcon />} {...props}>
+      <MenuButton
+        as={Button}
+        rightIcon={<ChevronDownIcon />}
+        {..._props}
+        sx={{
+          "[data-invalid]:not([data-focus]) &": {
+            boxShadow: `0 0 0 1px ${theme.colors.red[500]}`,
+            border: "1px solid",
+            borderColor: "red.500",
+          },
+          "[data-focus] &": {
+            boxShadow: `0 0 0 1px ${theme.colors.blue[500]}`,
+            border: "1px solid",
+            borderColor: "blue.500",
+            zIndex: 1,
+          },
+        }}
+      >
         <Image
           alt={current.localizedLabel}
           boxSize={6}
