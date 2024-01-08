@@ -102,12 +102,12 @@ function LocaleSelect({ value, onChange, localizableUserText, ...props }: Locale
         rightIcon={<ChevronDownIcon />}
         {..._props}
         sx={{
-          "[data-invalid]:not([data-focus]) &": {
+          _invalid: {
             boxShadow: `0 0 0 1px ${theme.colors.red[500]}`,
             border: "1px solid",
             borderColor: "red.500",
           },
-          "[data-focus] &": {
+          "input:focus + &": {
             boxShadow: `0 0 0 1px ${theme.colors.blue[500]}`,
             border: "1px solid",
             borderColor: "blue.500",
