@@ -95,6 +95,7 @@ export function PreviewPetitionFieldGroup({
 
   const replies =
     isCacheOnly && field.__typename === "PetitionField" ? field.previewReplies : field.replies;
+
   return (
     <>
       <RecipientViewPetitionFieldGroupLayout
@@ -116,9 +117,13 @@ export function PreviewPetitionFieldGroup({
               field={field}
               index={index}
               isDisabled={groupHasSomeApprovedReply}
-              onRemoveReply={() => {
-                onDeleteReply(group.id);
-              }}
+              onRemoveReply={
+                replies.length > 1 || field.optional
+                  ? () => {
+                      onDeleteReply(group.id);
+                    }
+                  : undefined
+              }
               id={`reply-${group.id}`}
             >
               {zip(group.children!, groupLogic).map(([{ field, replies }, logic]) => {

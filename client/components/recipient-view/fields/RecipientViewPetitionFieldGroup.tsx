@@ -104,9 +104,13 @@ export function RecipientViewPetitionFieldGroup({
             key={index}
             field={field}
             index={index}
-            onRemoveReply={async () => {
-              await onDeleteReply(group.id);
-            }}
+            onRemoveReply={
+              field.replies.length > 1 || field.optional
+                ? async () => {
+                    await onDeleteReply(group.id);
+                  }
+                : undefined
+            }
             id={`reply-${group.id}`}
           >
             {zip(group.children!, groupLogic).map(([{ field, replies }, logic]) => {
@@ -405,7 +409,7 @@ export function RecipientViewPetitionFieldGroupCard({
   const tone = useTone();
   return (
     <Card as={Stack} padding={4} spacing={4} position="relative" id={id}>
-      <HStack>
+      <HStack minHeight="32px">
         <Text width="100%">
           {field.options.groupName ??
             intl.formatMessage({
@@ -414,7 +418,7 @@ export function RecipientViewPetitionFieldGroupCard({
             })}{" "}
           {index + 1}
         </Text>
-        {!field.optional && index === 0 ? null : (
+        {isDefined(onRemoveReply) ? (
           <ConfimationPopover
             description={
               <FormattedMessage
@@ -465,7 +469,7 @@ export function RecipientViewPetitionFieldGroupCard({
               isDisabled={isDisabled}
             />
           </ConfimationPopover>
-        )}
+        ) : null}
       </HStack>
       {children}
     </Card>
