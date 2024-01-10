@@ -6,6 +6,7 @@ import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
+import { applyFieldVisibility } from "../../util/fieldLogic";
 
 interface AliasedPetitionField extends PetitionField {
   alias: string;
@@ -58,9 +59,9 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
         );
 
       rows = petitions.map((petition, petitionIndex) => {
-        const aliasedPetitionFields = petitionsComposedFields[petitionIndex].fields.filter(
-          (f) => f.type !== "HEADING" && isDefined(f.alias),
-        );
+        const aliasedPetitionFields = applyFieldVisibility(
+          petitionsComposedFields[petitionIndex],
+        ).filter((f) => f.type !== "HEADING" && isDefined(f.alias));
 
         const [contact] = petitionsAccessesContacts[petitionIndex].filter(isDefined);
 
