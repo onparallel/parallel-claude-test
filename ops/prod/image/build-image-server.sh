@@ -13,7 +13,7 @@ set_misc_nginx_module_version="0.33" # https://github.com/openresty/set-misc-ngi
 headers_more_nginx_module_version="0.36" # https://github.com/openresty/headers-more-nginx-module/tags
 image_exiftool_version="12.70" # https://exiftool.org/
 
-echo "Adding public keys"
+# Add public keys
 cat authorized_keys >> .ssh/authorized_keys
 rm authorized_keys
 
@@ -37,8 +37,8 @@ function download_and_untar() {
 }
 
 echo "Installing node.js"
-sudo yum install https://rpm.nodesource.com/pub_${nodejs_version}.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
-sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
+sudo curl -fsSL https://rpm.nodesource.com/setup_${nodejs_version}.x | sudo bash -
+sudo yum install nodejs -y
 sudo npm install -g npm@latest
 
 echo "Installing yarn"

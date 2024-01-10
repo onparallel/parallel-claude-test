@@ -7,7 +7,7 @@ const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 async function main() {
-    const { commit: _commit, env, skipBuild, skipPrune, } = await yargs_1.default
+    const { commit: _commit, env, forceBuild, skipPrune, } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
         required: true,
@@ -19,10 +19,10 @@ async function main() {
         choices: ["staging", "production"],
         description: "The environment for the build",
     })
-        .option("skip-build", {
+        .option("force-build", {
         default: false,
         type: "boolean",
-        description: "Wether to skip the build step",
+        description: "Forces rebuild if build aready exists",
     })
         .option("skip-prune", {
         default: false,
@@ -31,7 +31,7 @@ async function main() {
     }).argv;
     const commit = _commit.slice(0, 7);
     for (const command of [
-        ...(skipBuild ? [] : [`yarn build-release --commit ${commit} --env ${env}`]),
+        `yarn build-release --commit ${commit} --env ${env} --force ${forceBuild}`,
         `yarn launch-instance --commit ${commit} --env ${env}`,
         `yarn switch-release --commit ${commit} --env ${env}`,
         ...(skipPrune ? [] : [`yarn prune-instances --env ${env}`]),

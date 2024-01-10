@@ -1,12 +1,11 @@
 ## Server image
 
-The server image is built by copying all files inside `ops/prod/image` in a vanilla Amazon Linux instance and running
+The server image is built by running the build-image script
 
 ```
-cd ops/prod/image
-scp -i ~/.ssh/ops.pem * ec2-user@[INSTANCE_IP]:~
-ssh ec2-user@[INSTANCE_IP]
-./build.sh
+cd bin
+yarn tac --code xxxxxx
+yarn build-image --image [server|builder]
 ```
 
 This script will install all the dependencies needed, including:

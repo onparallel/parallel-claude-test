@@ -6,7 +6,7 @@ async function main() {
   const {
     commit: _commit,
     env,
-    skipBuild,
+    forceBuild,
     skipPrune,
   } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
@@ -20,10 +20,10 @@ async function main() {
       choices: ["staging", "production"],
       description: "The environment for the build",
     })
-    .option("skip-build", {
+    .option("force-build", {
       default: false,
       type: "boolean",
-      description: "Wether to skip the build step",
+      description: "Forces rebuild if build aready exists",
     })
     .option("skip-prune", {
       default: false,
@@ -34,7 +34,7 @@ async function main() {
   const commit = _commit.slice(0, 7);
 
   for (const command of [
-    ...(skipBuild ? [] : [`yarn build-release --commit ${commit} --env ${env}`]),
+    `yarn build-release --commit ${commit} --env ${env} --force ${forceBuild}`,
     `yarn launch-instance --commit ${commit} --env ${env}`,
     `yarn switch-release --commit ${commit} --env ${env}`,
     ...(skipPrune ? [] : [`yarn prune-instances --env ${env}`]),
