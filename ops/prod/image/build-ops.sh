@@ -1,8 +1,5 @@
 sudo hostnamectl set-hostname ops
 
-# versions
-nodejs_version="18" # https://nodejs.org/en
-
 # Add public keys
 cat authorized_keys >> .ssh/authorized_keys
 rm authorized_keys
@@ -21,7 +18,7 @@ sudo mkdir -p /nfs/parallel
 sudo mount -t efs -o tls -O _netdev fs-05b0e1c4df3ecd227:/ /nfs/parallel
 
 # Installing node.js
-sudo curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
 sudo yum install nodejs -y
 sudo npm install -g npm@latest
 
