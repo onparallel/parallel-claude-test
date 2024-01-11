@@ -1,5 +1,5 @@
 {
- "Description": "(SO0023) - Serverless Image Handler. Version v6.2.1",
+ "Description": "(SO0023) - Serverless Image Handler. Version v6.2.4",
  "Metadata": {
   "AWS::CloudFormation::Interface": {
    "ParameterGroups": [
@@ -616,26 +616,26 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.1/1d9c0f7ba21ae4df4d9f33af092ffe6bf4c806ea06398e947419c4e7f091d52b.zip"
+     "S3Key": "serverless-image-handler/v6.2.4/7278c37d53d02767769a1431225a7cc1b11b2d776285d693044ec5f12f0fb7f7.zip"
     },
+    "Description": "serverless-image-handler (custom-v6.2.4): Custom resource",
+    "Environment": {
+     "Variables": {
+      "SOLUTION_ID": "SO0023",
+      "RETRY_SECONDS": "5",
+      "SOLUTION_VERSION": "custom-v6.2.4",
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+     }
+    },
+    "Handler": "index.handler",
+    "MemorySize": 128,
     "Role": {
      "Fn::GetAtt": [
       "CommonResourcesCustomResourcesCustomResourceRole8958A1ED",
       "Arn"
      ]
     },
-    "Description": "serverless-image-handler (custom-v6.2.1): Custom resource",
-    "Environment": {
-     "Variables": {
-      "SOLUTION_ID": "SO0023",
-      "RETRY_SECONDS": "5",
-      "SOLUTION_VERSION": "custom-v6.2.1",
-      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
-     }
-    },
-    "Handler": "index.handler",
-    "MemorySize": 128,
-    "Runtime": "nodejs16.x",
+    "Runtime": "nodejs20.x",
     "Tags": [
      {
       "Key": "SolutionId",
@@ -848,7 +848,7 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.1/f8e422c63159c82c409e8254300a3134e020892c27382902d4c8c0a5b35d0a06.zip"
+     "S3Key": "serverless-image-handler/v6.2.4/3fb6287214999ddeafa7cd0e3e58bc5144c8678bb720f3b5e45e8fd32f333eb3.zip"
     },
     "Description": "/opt/awscli/aws"
    },
@@ -872,7 +872,7 @@
      }
     ],
     "SourceObjectKeys": [
-     "serverless-image-handler/v6.2.1/297994e5975cd83b2ec43f52720181be7d5daf08af8987cc4d5749f99db8f777.zip"
+     "serverless-image-handler/v6.2.4/c301c2cce52bb1b36720a115d657907f3ec9fa20bd385b4d81bf451fbe77fe4b.zip"
     ],
     "DestinationBucketName": {
      "Ref": "FrontEndDistributionToS3S3Bucket3A171D78"
@@ -1300,15 +1300,9 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.1/9300d82297ae116d24832b5639cedf6e459d7d87d7f14d1d45da9b296c7f0730.zip"
+     "S3Key": "serverless-image-handler/v6.2.4/038de8c90d1db3969d0c4dd85e410204967e05edb17bd88773006f4161723b33.zip"
     },
-    "Role": {
-     "Fn::GetAtt": [
-      "BackEndImageHandlerFunctionRoleABF81E5C",
-      "Arn"
-     ]
-    },
-    "Description": "serverless-image-handler (custom-v6.2.1): Performs image edits and manipulations",
+    "Description": "serverless-image-handler (custom-v6.2.4): Performs image edits and manipulations",
     "Environment": {
      "Variables": {
       "AUTO_WEBP": {
@@ -1348,14 +1342,20 @@
     },
     "Handler": "index.handler",
     "MemorySize": 1024,
-    "Runtime": "nodejs16.x",
+    "Role": {
+     "Fn::GetAtt": [
+      "BackEndImageHandlerFunctionRoleABF81E5C",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
     "Tags": [
      {
       "Key": "SolutionId",
       "Value": "SO0023"
      }
     ],
-    "Timeout": 900
+    "Timeout": 29
    },
    "DependsOn": [
     "BackEndImageHandlerFunctionRoleABF81E5C"
@@ -1444,7 +1444,7 @@
        "CookieBehavior": "none"
       },
       "EnableAcceptEncodingBrotli": false,
-      "EnableAcceptEncodingGzip": true,
+      "EnableAcceptEncodingGzip": false,
       "HeadersConfig": {
        "HeaderBehavior": "whitelist",
        "Headers": [
@@ -1552,16 +1552,24 @@
     ]
    },
    "Metadata": {
-    "aws:cdk:path": "ServerlessImageHandlerStack/BackEnd/ImageHandlerCloudFrontApiGatewayLambda/LambdaRestApi/Resource"
+    "aws:cdk:path": "ServerlessImageHandlerStack/BackEnd/ImageHandlerCloudFrontApiGatewayLambda/LambdaRestApi/Resource",
+    "cfn_nag": {
+     "rules_to_suppress": [
+      {
+       "id": "W59",
+       "reason": "AWS::ApiGateway::Method AuthorizationType is set to 'NONE' because API Gateway behind CloudFront does not support AWS_IAM authentication"
+      }
+     ]
+    }
    }
   },
-  "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiDeployment663240D66584d676be04ebe2a700bf25ee9db761": {
+  "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiDeployment663240D61343e995ad000d194ae3a76fe872a15f": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
+    "Description": "Automatically created by the RestApi construct",
     "RestApiId": {
      "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109"
-    },
-    "Description": "Automatically created by the RestApi construct"
+    }
    },
    "DependsOn": [
     "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiproxyANY8F9763E1",
@@ -1574,7 +1582,7 @@
      "rules_to_suppress": [
       {
        "id": "W45",
-       "reason": "ApiGateway has AccessLogging enabled in AWS::ApiGateway::Stage resource, but cfn_nag checkes for it in AWS::ApiGateway::Deployment resource"
+       "reason": "ApiGateway has AccessLogging enabled in AWS::ApiGateway::Stage resource, but cfn_nag checks for it in AWS::ApiGateway::Deployment resource"
       }
      ]
     }
@@ -1583,9 +1591,6 @@
   "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiDeploymentStageimageB55D20E3": {
    "Type": "AWS::ApiGateway::Stage",
    "Properties": {
-    "RestApiId": {
-     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109"
-    },
     "AccessLogSetting": {
      "DestinationArn": {
       "Fn::GetAtt": [
@@ -1596,7 +1601,7 @@
      "Format": "{\"requestId\":\"$context.requestId\",\"ip\":\"$context.identity.sourceIp\",\"user\":\"$context.identity.user\",\"caller\":\"$context.identity.caller\",\"requestTime\":\"$context.requestTime\",\"httpMethod\":\"$context.httpMethod\",\"resourcePath\":\"$context.resourcePath\",\"status\":\"$context.status\",\"protocol\":\"$context.protocol\",\"responseLength\":\"$context.responseLength\"}"
     },
     "DeploymentId": {
-     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiDeployment663240D66584d676be04ebe2a700bf25ee9db761"
+     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiDeployment663240D61343e995ad000d194ae3a76fe872a15f"
     },
     "MethodSettings": [
      {
@@ -1606,6 +1611,9 @@
       "ResourcePath": "/*"
      }
     ],
+    "RestApiId": {
+     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109"
+    },
     "StageName": "image",
     "Tags": [
      {
@@ -1724,14 +1732,8 @@
   "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiproxyANY8F9763E1": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
-    "HttpMethod": "ANY",
-    "ResourceId": {
-     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiproxyBDF0A131"
-    },
-    "RestApiId": {
-     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109"
-    },
     "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
     "Integration": {
      "IntegrationHttpMethod": "POST",
      "Type": "AWS_PROXY",
@@ -1758,18 +1760,16 @@
        ]
       ]
      }
+    },
+    "ResourceId": {
+     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiproxyBDF0A131"
+    },
+    "RestApiId": {
+     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109"
     }
    },
    "Metadata": {
-    "aws:cdk:path": "ServerlessImageHandlerStack/BackEnd/ImageHandlerCloudFrontApiGatewayLambda/LambdaRestApi/Default/{proxy+}/ANY/Resource",
-    "cfn_nag": {
-     "rules_to_suppress": [
-      {
-       "id": "W59",
-       "reason": "AWS::ApiGateway::Method AuthorizationType is set to 'NONE' because API Gateway behind CloudFront does not support AWS_IAM authentication"
-      }
-     ]
-    }
+    "aws:cdk:path": "ServerlessImageHandlerStack/BackEnd/ImageHandlerCloudFrontApiGatewayLambda/LambdaRestApi/Default/{proxy+}/ANY/Resource"
    }
   },
   "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiANYApiPermissionServerlessImageHandlerStackBackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiF7C63563ANY3D47D314": {
@@ -1859,17 +1859,8 @@
   "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiANYE4494B31": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
-    "HttpMethod": "ANY",
-    "ResourceId": {
-     "Fn::GetAtt": [
-      "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109",
-      "RootResourceId"
-     ]
-    },
-    "RestApiId": {
-     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109"
-    },
     "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
     "Integration": {
      "IntegrationHttpMethod": "POST",
      "Type": "AWS_PROXY",
@@ -1896,18 +1887,19 @@
        ]
       ]
      }
+    },
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApi5A77D109"
     }
    },
    "Metadata": {
-    "aws:cdk:path": "ServerlessImageHandlerStack/BackEnd/ImageHandlerCloudFrontApiGatewayLambda/LambdaRestApi/Default/ANY/Resource",
-    "cfn_nag": {
-     "rules_to_suppress": [
-      {
-       "id": "W59",
-       "reason": "AWS::ApiGateway::Method AuthorizationType is set to 'NONE' because API Gateway behind CloudFront does not support AWS_IAM authentication"
-      }
-     ]
-    }
+    "aws:cdk:path": "ServerlessImageHandlerStack/BackEnd/ImageHandlerCloudFrontApiGatewayLambda/LambdaRestApi/Default/ANY/Resource"
    }
   },
   "BackEndImageHandlerCloudFrontApiGatewayLambdaLambdaRestApiUsagePlan76CA1E70": {
@@ -2289,13 +2281,7 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.1/9eb41a5505d37607ac419321497a4f8c21cf0ee1f9b4a6b29aa04301aea5c7fd.zip"
-    },
-    "Role": {
-     "Fn::GetAtt": [
-      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
-      "Arn"
-     ]
+     "S3Key": "serverless-image-handler/v6.2.4/0b1f5aa55d045066ed91316b823a808060c12737e0575ab7cefe2335324108b0.zip"
     },
     "Environment": {
      "Variables": {
@@ -2308,6 +2294,12 @@
       "Ref": "CommonResourcesCustomResourcesDeployWebsiteAwsCliLayerBC025F39"
      }
     ],
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
+      "Arn"
+     ]
+    },
     "Runtime": "python3.9",
     "Tags": [
      {
@@ -2345,6 +2337,7 @@
   "AppRegistry968496A3": {
    "Type": "AWS::ServiceCatalogAppRegistry::Application",
    "Properties": {
+    "Description": "Service Catalog application to track and manage all your resources for the solution serverless-image-handler",
     "Name": {
      "Fn::Join": [
       "-",
@@ -2362,13 +2355,12 @@
       ]
      ]
     },
-    "Description": "Service Catalog application to track and manage all your resources for the solution serverless-image-handler",
     "Tags": {
      "SolutionId": "SO0023",
      "Solutions:ApplicationType": "AWS-Solutions",
      "Solutions:SolutionID": "SO0023",
      "Solutions:SolutionName": "serverless-image-handler",
-     "Solutions:SolutionVersion": "custom-v6.2.1"
+     "Solutions:SolutionVersion": "custom-v6.2.4"
     }
    },
    "Metadata": {
@@ -2398,10 +2390,11 @@
    "Properties": {
     "Attributes": {
      "applicationType": "AWS-Solutions",
-     "version": "custom-v6.2.1",
+     "version": "custom-v6.2.4",
      "solutionID": "SO0023",
      "solutionName": "serverless-image-handler"
     },
+    "Description": "Attribute group for solution information",
     "Name": {
      "Fn::Join": [
       "",
@@ -2413,7 +2406,6 @@
       ]
      ]
     },
-    "Description": "Attribute group for solution information",
     "Tags": {
      "SolutionId": "SO0023"
     }
@@ -2445,7 +2437,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/3VT227bMAz9lr7batJuwx7npmhRIN2CpNtroMiso0S2PF2aGYL/fRRtxw6QvpgXkxQPeXjHwvevLMxu+MmmIj+mSu5Y2DgujsnivVpxw0twYKLxyutaVkVUF7rKpZO6SjBvGyQvWVhpJUVDWZ221gqiGWWbKF7ucr6tdA4Hy36SePKVoCr2fhu4teAsy6JIcqiVbkqoHHvw4gju8exoMZqFzvvALSSdGl/qtU6M/UztoREW8Mf5fdSXvAHzB4yN9gZxKnD6ImIFppSW/g/uNhFK+/zdaGw0PErrjNx5SvhlZCGrTAiw9iXHvqWjZhYx4SkmfBZxUWbBxR5GKFOzy1/DXw92gvaKG0HrwrKw1MWz0b4mvL3eJryWBXdw4g0La8zJaklzXdKgeg8tslfHXVC7o4W8KWjlnYLx2hsBVG1l9L9m8PTVOv0V3F7nxLBO+20xe6U4Tf3CwGFpTxQA8yEFCO44QkNiGiji2Braa1bXCJsPixteQmppIc/uzHVjhvNMLj2T8LY9g0mIoBEg3YK3TpdXYfWEV5FXWzwToSTLTnahJFGNVuVd7RHNLOWq3nM2u/nR3+FtlJ+C7MPDFOdl79jwl/lQz2pFZMLK+HHGC2fpgZG8acCjGqn5pjf3E16k/c1MA5AIz93fN90xZUqk65HYVbx/drC3H/Nv7G7G5jcHK2VqcKmyBLbu5H+PKnyFlgQAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/3VUUW/iMAz+LXtPswJ379d12jSJ3SHY3SsyqSmBNMnFyThU9b+fkhYoEnvyZ9dObH9fOuXtZDLh+QMcKRPVIVNyw9uVB3Fg5VYvwEGDHl103sFaqesIS6Mr6aXRDI60biU0vF0YJcUpVfVoaRRGN9qOKWg2Fay1qXBP/GcyL0GLdArN1i0QoSdeRMMqtMqcGtSePwVxQP98CXSMZrzto09AyHoYbxpQb679jP1zI7wtt/pyf7nVczih+4OOor+SulbozU3GAl0jKX0/hzsmlAnV1hntefssyTu5Cangl5O11IUQSPRWofbSp2bKWPASC77KuDmmBLHD6yhjt69f4t+ANJr2TrhjytTE27mpX50JNs074I6BlTV4PMKJt0skX1iZ9jpPixoiicgBXrlI7V69lYc6Ud6DJZIJTmA6beHMv9M5MpzW43f0O1MlhfXoN0GNCwVp6zdOIYQJSQLoPqVAAR6UqcFah3Vc2ynxWlirpIAzceebCiIj5CVc+H7NeNnJbWSU3nWXYVgSaBwwvYVA3jR3xxoEr6Ku1nAkoSQvjlQqmaSWqAreBt+xb995/vAjPkEyKvFOmTCavAvC02N6mxedZS3N+FVFH2Y1G1GYDfIeJxRWvvZfP0xP6pjz+5kdm+RTnmeg7A7O3YnqkJr5cvtDejsm4HapXcfiL4Dv6fFzmvNJzvOHPUmZuaC9bJAve/sfTLeo4pkEAAA="
    },
    "Metadata": {
     "aws:cdk:path": "ServerlessImageHandlerStack/CDKMetadata/Default"
