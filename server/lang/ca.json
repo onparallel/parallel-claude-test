@@ -155,6 +155,11 @@
     "context": "Please click the link below to complete the information."
   },
   {
+    "term": "generic.copy",
+    "definition": "còpia",
+    "context": "copy"
+  },
+  {
     "term": "generic.deleted-contact",
     "definition": "Contacte esborrat",
     "context": "Deleted Contact"

@@ -20,7 +20,7 @@
     "test": "jest --runInBand",
     "extract-i18n-terms": "yarn concurrently \"yarn:extract-i18n-terms:* start\"",
     "extract-i18n-terms:app": "yarn workspace @parallel/bin extract-i18n-terms --cwd '../server' --locales en es --input '../server/src/**/*.{ts,tsx}' --output '../server/lang'",
-    "extract-i18n-terms:recipient": "yarn workspace @parallel/bin extract-i18n-terms --cwd '../server' --locales ca it pt --input '../server/src/emails/emails/recipient/**/*.{ts,tsx}' '../server/src/pdf/documents/recipient/**/*.{ts,tsx}' --output '../server/lang'",
+    "extract-i18n-terms:recipient": "yarn workspace @parallel/bin extract-i18n-terms --cwd '../server' --locales ca it pt --input '../server/src/emails/emails/recipient/**/*.{ts,tsx}' '../server/src/pdf/documents/recipient/**/*.{ts,tsx}' '../server/lang/recipient-additional-terms.ts' --output '../server/lang'",
     "generate-i18n-files": "yarn concurrently \"yarn:generate-i18n-files:* start\"",
     "generate-i18n-files:app": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../server/lang' --output-compiled '../server/lang/compiled'",
     "generate-i18n-files:recipient": "yarn workspace @parallel/bin generate-i18n-files --locales ca it pt --input '../server/lang' --output-compiled '../server/lang/compiled'",
