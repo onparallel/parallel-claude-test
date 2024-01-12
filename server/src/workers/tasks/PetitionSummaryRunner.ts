@@ -46,7 +46,9 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       throw new Error("Integration not found or type is not AI_COMPLETION");
     }
 
-    const scope = await this.buildPetitionSummaryLiquidScope(petition);
+    const intl = await this.ctx.i18n.getIntl(petition.recipient_locale);
+
+    const scope = await this.buildPetitionSummaryLiquidScope(petition, intl);
     const liquid = createLiquid();
 
     const summary = await this.ctx.aiCompletion.processAiCompletion(
@@ -56,7 +58,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
         model: summaryConfig.model,
         prompt: summaryConfig.prompt.map((message) => ({
           role: message.role,
-          content: liquid.parseAndRenderSync(message.content, scope),
+          content: liquid.parseAndRenderSync(message.content, scope, { globals: { intl } }),
         })),
       },
       `User:${user.id}`,
@@ -73,8 +75,8 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
 
   private async buildPetitionSummaryLiquidScope(
     petition: Pick<Petition, "id" | "org_id" | "recipient_locale">,
+    intl: IntlShape,
   ) {
-    const intl = await this.ctx.i18n.getIntl(petition.recipient_locale);
     const [composedPetition] = await this.ctx.petitions.getComposedPetitionFieldsAndVariables([
       petition.id,
     ]);
@@ -106,7 +108,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
           })),
         })),
       },
-      intl as IntlShape,
+      intl,
     );
 
     function replyContent(type: PetitionFieldType, content: any) {
@@ -126,10 +128,14 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       .map(([[field, index, childrenFieldIndexes], logic]) => ({
         title: field.title,
         description: field.description
-          ? liquid.parseAndRenderSync(field.description, {
-              ...petitionFieldsScope,
-              ...buildPetitionVariablesLiquidScope(logic),
-            })
+          ? liquid.parseAndRenderSync(
+              field.description,
+              {
+                ...petitionFieldsScope,
+                ...buildPetitionVariablesLiquidScope(logic),
+              },
+              { globals: { intl } },
+            )
           : null,
         type: field.type,
         index,
@@ -144,12 +150,16 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
               field: {
                 title: field.title,
                 description: field.description
-                  ? liquid.parseAndRenderSync(field.description, {
-                      ...petitionFieldsScope,
-                      ...buildPetitionVariablesLiquidScope(
-                        logic.groupChildrenLogic![groupIndex][childReplyIndex],
-                      ),
-                    })
+                  ? liquid.parseAndRenderSync(
+                      field.description,
+                      {
+                        ...petitionFieldsScope,
+                        ...buildPetitionVariablesLiquidScope(
+                          logic.groupChildrenLogic![groupIndex][childReplyIndex],
+                        ),
+                      },
+                      { globals: { intl } },
+                    )
                   : null,
                 type: field.type,
                 index: childrenFieldIndexes?.[childReplyIndex],

@@ -1,8 +1,7 @@
-import { createIntl, IntlShape } from "@formatjs/intl";
 import DataLoader from "dataloader";
 import { injectable } from "inversify";
 import pMap from "p-map";
-import { createIntlCache } from "react-intl";
+import { IntlShape, createIntl, createIntlCache } from "react-intl";
 import { zip } from "remeda";
 import { ContactLocale, UserLocale, UserLocaleValues } from "../db/__types";
 import { LocalizableUserText } from "../graphql";
