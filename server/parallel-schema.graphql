@@ -5132,6 +5132,7 @@ enum ProfileTypeFieldType {
   FILE
   NUMBER
   PHONE
+  SELECT
   SHORT_TEXT
   TEXT
 }
@@ -6820,12 +6821,18 @@ input UpdateProfileTypeFieldInput {
   isExpirable: Boolean
   name: LocalizableUserText
   options: JSONObject
+  substitutions: [UpdateProfileTypeFieldSelectOptionsSubstitution!]
 }
 
 input UpdateProfileTypeFieldPermissionInput {
   permission: ProfileTypeFieldPermissionType!
   userGroupId: GID
   userId: GID
+}
+
+input UpdateProfileTypeFieldSelectOptionsSubstitution {
+  new: String
+  old: String!
 }
 
 input UpdateTagInput {

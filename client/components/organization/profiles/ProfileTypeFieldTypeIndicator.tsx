@@ -1,11 +1,8 @@
-import { HStack, Text, Tooltip } from "@chakra-ui/react";
+import { HStack, Icon, Text, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
-import {
-  useProfileTypeFieldTypeColor,
-  useProfileTypeFieldTypeLabel,
-} from "@parallel/utils/profileFields";
-import { ProfileTypeFieldTypeIcon } from "./ProfileTypeFieldTypeIcon";
+import { PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
+import { useIntl } from "react-intl";
 
 export interface ProfileTypeFieldTypeIndicatorProps {
   type: ProfileTypeFieldType;
@@ -21,11 +18,11 @@ export const ProfileTypeFieldTypeIndicator = chakraForwardRef<
   { type, fieldIndex, isTooltipDisabled, hideIcon, ...props }: ProfileTypeFieldTypeIndicatorProps,
   ref,
 ) {
-  const label = useProfileTypeFieldTypeLabel(type);
-  const color = useProfileTypeFieldTypeColor(type);
+  const intl = useIntl();
+  const { label, color, icon } = PROFILE_TYPE_FIELD_CONFIG[type];
 
   return (
-    <Tooltip label={label} isDisabled={isTooltipDisabled}>
+    <Tooltip label={label(intl)} isDisabled={isTooltipDisabled}>
       <HStack
         ref={ref}
         backgroundColor={color}
@@ -39,9 +36,7 @@ export const ProfileTypeFieldTypeIndicator = chakraForwardRef<
         justifyContent="space-between"
         {...props}
       >
-        {hideIcon ? null : (
-          <ProfileTypeFieldTypeIcon type={type} boxSize="16px" role="presentation" />
-        )}
+        {hideIcon ? null : <Icon as={icon} boxSize="16px" role="presentation" />}
         <Text width={5} as="span" fontSize="xs" marginLeft={hideIcon ? 0 : 0.5} textAlign="center">
           {fieldIndex}
         </Text>

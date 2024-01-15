@@ -1245,6 +1245,21 @@
     "context": "Remove field from group"
   },
   {
+    "term": "component.confirm-update-profile-type-select-field-dialog.remove-option-body",
+    "definition": "The following options have been removed, this action will affect all profiles that had any of these options selected, how do you want to proceed?",
+    "context": "The following options have been removed, this action will affect all profiles that had any of these options selected, how do you want to proceed?"
+  },
+  {
+    "term": "component.confirm-update-profile-type-select-field-dialog.remove-option-placeholder",
+    "definition": "Remove from all profiles",
+    "context": "Remove from all profiles"
+  },
+  {
+    "term": "component.confirm-update-profile-type-select-field-dialog.removed-options-header",
+    "definition": "Removed options",
+    "context": "Removed options"
+  },
+  {
     "term": "component.contact-list-header.create-contact-button",
     "definition": "Create contact",
     "context": "Create contact"
@@ -1535,19 +1550,34 @@
     "context": "Set as default theme"
   },
   {
-    "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog.description",
+    "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-description",
     "definition": "There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?",
     "context": "There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
   },
   {
-    "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog.header",
+    "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-header",
     "definition": "Remove expiration dates",
     "context": "Remove expiration dates"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.add-option-button",
+    "definition": "Add option",
+    "context": "Add option"
   },
   {
     "term": "component.create-or-update-property-dialog.edit-profile-type-field",
     "definition": "Edit property",
     "context": "Edit property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.enable-colored-options",
+    "definition": "Enable colored options",
+    "context": "Enable colored options"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.enable-colored-options-help",
+    "definition": "This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification.",
+    "context": "This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification."
   },
   {
     "term": "component.create-or-update-property-dialog.expiration",
@@ -1575,9 +1605,34 @@
     "context": "Use only letters, numbers or _"
   },
   {
+    "term": "component.create-or-update-property-dialog.options-alias-error",
+    "definition": "The field is required and only accepts letters, numbers or _",
+    "context": "The field is required and only accepts letters, numbers or _"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.options-label",
+    "definition": "Label",
+    "context": "Label"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.options-value-label",
+    "definition": "Internal value",
+    "context": "Internal value"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.options-value-label-help",
+    "definition": "This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain.",
+    "context": "This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
+  },
+  {
     "term": "component.create-or-update-property-dialog.property-name",
     "definition": "Property name",
     "context": "Property name"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.remove-option-button",
+    "definition": "Remove option",
+    "context": "Remove option"
   },
   {
     "term": "component.create-or-update-property-dialog.type-of-property",
@@ -5790,6 +5845,11 @@
     "context": "Show suggestions"
   },
   {
+    "term": "component.profile-field-select.placeholder",
+    "definition": "Select an option",
+    "context": "Select an option"
+  },
+  {
     "term": "component.profile-field-suggestion.popover",
     "definition": "Suggested reply from:",
     "context": "Suggested reply from:"
@@ -5825,7 +5885,7 @@
     "context": "Deleted"
   },
   {
-    "term": "component.profile-form.max-files-exceeded-error.message",
+    "term": "component.profile-form.max-files-exceeded-error",
     "definition": "You exceeded the maximum amount of files you can upload on the field.",
     "context": "You exceeded the maximum amount of files you can upload on the field."
   },
@@ -9245,6 +9305,11 @@
     "context": "Download report"
   },
   {
+    "term": "generic.drag-to-sort",
+    "definition": "Drag to sort",
+    "context": "Drag to sort"
+  },
+  {
     "term": "generic.dropzone-default",
     "definition": "Drag files here, or click to select them",
     "context": "Drag files here, or click to select them"
@@ -9710,6 +9775,11 @@
     "context": "{count} more"
   },
   {
+    "term": "generic.n-profiles",
+    "definition": "{count, plural, one {# profile} other {# profiles}}",
+    "context": "{count, plural, one {# profile} other {# profiles}}"
+  },
+  {
     "term": "generic.name",
     "definition": "Name",
     "context": "Name"
@@ -9955,32 +10025,37 @@
     "context": "Previous page"
   },
   {
-    "term": "generic.profile-type-field-type.date",
+    "term": "generic.profile-type-field-type-date",
     "definition": "Date",
     "context": "Date"
   },
   {
-    "term": "generic.profile-type-field-type.file-upload",
+    "term": "generic.profile-type-field-type-file-upload",
     "definition": "Documents and files",
     "context": "Documents and files"
   },
   {
-    "term": "generic.profile-type-field-type.number",
+    "term": "generic.profile-type-field-type-number",
     "definition": "Numbers",
     "context": "Numbers"
   },
   {
-    "term": "generic.profile-type-field-type.phone",
+    "term": "generic.profile-type-field-type-phone",
     "definition": "Phone number",
     "context": "Phone number"
   },
   {
-    "term": "generic.profile-type-field-type.short-text",
+    "term": "generic.profile-type-field-type-select",
+    "definition": "Select",
+    "context": "Select"
+  },
+  {
+    "term": "generic.profile-type-field-type-short-text",
     "definition": "Short text",
     "context": "Short text"
   },
   {
-    "term": "generic.profile-type-field-type.text",
+    "term": "generic.profile-type-field-type-text",
     "definition": "Long text",
     "context": "Long text"
   },

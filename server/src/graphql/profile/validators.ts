@@ -82,6 +82,12 @@ const MAX_TEXT_SIZE = 10_000;
 export function validateProfileFieldValue(field: TableTypes["profile_type_field"], content: any) {
   const ajv = new Ajv();
   switch (field.type) {
+    case "SELECT": {
+      if (!field.options.values.find((option: any) => content.value === option.value)) {
+        throw new Error("Value need to be a valid option");
+      }
+      return;
+    }
     case "SHORT_TEXT": {
       const valid = ajv.validate(stringValueSchema(MAX_SHORT_TEXT_SIZE), content);
       if (!valid) {

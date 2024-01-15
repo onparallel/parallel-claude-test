@@ -4,12 +4,12 @@ import { scalarType } from "nexus";
 import { isDefined } from "remeda";
 import { UserLocale, UserLocaleValues } from "../../../db/__types";
 
-const LOCALIZABLE_USER_TEXT_SCHEMA = {
+export const LOCALIZABLE_USER_TEXT_SCHEMA = {
   type: "object",
-  properties: Object.fromEntries(UserLocaleValues.map((key) => [key, { type: "string" }])),
+  properties: { en: { type: "string" }, es: { type: "string" } },
   additionalProperties: false,
-  anyOf: UserLocaleValues.map((key) => ({ required: [key] })),
-};
+  anyOf: [{ required: ["en"] }, { required: ["es"] }],
+} as const;
 
 export type LocalizableUserText = { [locale in UserLocale]?: string };
 

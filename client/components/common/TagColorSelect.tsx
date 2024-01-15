@@ -1,7 +1,13 @@
 import { Box, Stack, Text } from "@chakra-ui/react";
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { components, CSSObjectWithLabel, OptionProps, SingleValueProps } from "react-select";
+import {
+  CSSObjectWithLabel,
+  OptionProps,
+  SelectInstance,
+  SingleValueProps,
+  components,
+} from "react-select";
 import { SimpleOption, SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
 
 export const DEFAULT_COLORS = [
@@ -77,27 +83,29 @@ export type TagColorSelectProps = Omit<
   "options" | "components" | "styles"
 >;
 
-export function TagColorSelect(props: TagColorSelectProps) {
-  const options = useTagColors();
-  return (
-    <SimpleSelect
-      options={options}
-      components={{ SingleValue, Option } as any}
-      styles={{
-        valueContainer: (styles: CSSObjectWithLabel) => ({
-          ...styles,
-          flexWrap: "nowrap",
-        }),
-        option: (styles: CSSObjectWithLabel) => ({
-          ...styles,
-          display: "flex",
-          padding: "0.25rem 1rem",
-        }),
-      }}
-      {...props}
-    />
-  );
-}
+export const TagColorSelect = forwardRef<SelectInstance<string, false>, TagColorSelectProps>(
+  function TagColorSelect(props, ref) {
+    const options = useTagColors();
+    return (
+      <SimpleSelect
+        options={options}
+        components={{ SingleValue, Option } as any}
+        styles={{
+          valueContainer: (styles: CSSObjectWithLabel) => ({
+            ...styles,
+            flexWrap: "nowrap",
+          }),
+          option: (styles: CSSObjectWithLabel) => ({
+            ...styles,
+            display: "flex",
+            padding: "0.25rem 1rem",
+          }),
+        }}
+        {...props}
+      />
+    );
+  },
+);
 
 function TagColorOption({ color }: { color: SimpleOption }) {
   return (

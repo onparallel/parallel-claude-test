@@ -31,12 +31,16 @@ import { LocalizableUserText } from "./LocalizableUserTextRender";
 
 interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, false> {
   inputRef?: Ref<HTMLInputElement>;
+  inputProps?: any;
   onBlur?: () => void;
   placeholder?: string;
 }
 
 export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserTextInputProps>(
-  function ({ value, onChange, onBlur, inputRef: _inputRef, placeholder, ...props }, ref) {
+  function (
+    { value, onChange, onBlur, inputRef: _inputRef, inputProps, placeholder, ...props },
+    ref,
+  ) {
     const intl = useIntl();
     const inputRef = useRef<HTMLInputElement>(null);
     const mergedInputRef = useMergedRef(inputRef, ...(_inputRef ? [_inputRef] : []));
@@ -71,6 +75,7 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
           value={inputValue}
           onBlur={onBlur}
           onChange={handleValueChange}
+          {...(inputProps as any)}
         />
         <InputRightAddon
           as={LocaleSelect}

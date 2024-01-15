@@ -397,7 +397,14 @@ export const ProfileTypeFieldPermissionTypeValues = [
   "WRITE",
 ] as ProfileTypeFieldPermissionType[];
 
-export type ProfileTypeFieldType = "TEXT" | "SHORT_TEXT" | "FILE" | "DATE" | "PHONE" | "NUMBER";
+export type ProfileTypeFieldType =
+  | "TEXT"
+  | "SHORT_TEXT"
+  | "FILE"
+  | "DATE"
+  | "PHONE"
+  | "NUMBER"
+  | "SELECT";
 
 export const ProfileTypeFieldTypeValues = [
   "TEXT",
@@ -406,6 +413,7 @@ export const ProfileTypeFieldTypeValues = [
   "DATE",
   "PHONE",
   "NUMBER",
+  "SELECT",
 ] as ProfileTypeFieldType[];
 
 export type SystemEventType =

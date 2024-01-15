@@ -25,6 +25,12 @@ export interface SimpleOption<T extends string = string> extends OptionBase {
   label: string;
 }
 
+export type SimpleSelectInstance<
+  T extends string = string,
+  IsMulti extends boolean = false,
+  OptionType extends SimpleOption<T> = SimpleOption<T>,
+> = SelectInstance<OptionType, IsMulti>;
+
 export interface SimpleSelectProps<
   T extends string = string,
   IsMulti extends boolean = false,
@@ -96,7 +102,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
   OptionType extends SimpleOption<T> = SimpleOption<T>,
 >(
   props: SimpleSelectProps<T, IsMulti, OptionType> &
-    RefAttributes<SelectInstance<OptionType, false>>,
+    RefAttributes<SimpleSelectInstance<T, IsMulti, OptionType>>,
 ) => ReactElement;
 
 export function useSimpleSelectOptions<T extends string = string>(

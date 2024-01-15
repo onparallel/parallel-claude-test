@@ -4,6 +4,7 @@ import { FieldDateIcon } from "@parallel/chakra/icons";
 import {
   LocalizableUserText,
   LocalizableUserTextRender,
+  localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import {
   ProfileField_PetitionFieldFragment,
@@ -43,6 +44,9 @@ import { ProfileFieldNumber } from "./ProfileFieldNumber";
 import { ProfileFieldPhone } from "./ProfileFieldPhone";
 import { ProfileFieldShortText } from "./ProfileFieldShortText";
 import { ProfileFieldText } from "./ProfileFieldText";
+import { ProfileFieldSelect } from "./ProfileFieldSelect";
+import { useSupportedUserLocales } from "@parallel/utils/locales";
+import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 
 export interface ProfileFieldProps {
   index: number;
@@ -115,6 +119,7 @@ export function ProfileField(props: ProfileFieldProps) {
   ) {
     fieldIsEmpty = false;
   }
+  const locales = useSupportedUserLocales();
 
   const needsExpirationDialog =
     field.isExpirable && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate);
@@ -126,6 +131,25 @@ export function ProfileField(props: ProfileFieldProps) {
         }
         if (field.type === "FILE") {
           return !isDefined(reply.content.error);
+        } else if (field.type === "SELECT") {
+          // Match by label or value, check all locales
+
+          const options = field.options as ProfileTypeFieldOptions["SELECT"];
+          return (
+            isDefined(reply.content.value) &&
+            options.values.some(({ label, value }) => {
+              return (
+                locales.some(({ key }) => {
+                  const _label = localizableUserTextRender({
+                    value: label,
+                    locale: key,
+                    default: "",
+                  });
+                  return _label === reply.content.value;
+                }) || value === reply.content.value
+              );
+            })
+          );
         } else {
           return isDefined(reply.content.value);
         }
@@ -179,6 +203,7 @@ export function ProfileField(props: ProfileFieldProps) {
            *   de perfiles de tipo DATE_TIME)
            * - Los campos CHECKBOX tienen varias respuestas, de ahí todos los unMaybeArray, para
            *   gestionar el caso ese
+           * - SELECT se tiene que buscar el value en el array de options, y el text es el label
            * - El resto de campos se toma directamente el value que deberia ser siempre string
            */
           return unMaybeArray(
@@ -212,33 +237,53 @@ export function ProfileField(props: ProfileFieldProps) {
                             timeZone: "UTC",
                           }),
                   }
-                : unMaybeArray(
-                    petitionField.type === "DATE_TIME"
-                      ? `${intl.formatDate(reply.content.value as string, {
-                          timeZone: reply.content.timezone,
-                          ...FORMATS["L+LT"],
-                        })} (${prettifyTimezone(reply.content.timezone)})`
-                      : petitionField.type === "CHECKBOX"
-                        ? (reply.content.value as string[])
-                        : (reply.content.value as string),
-                  ).map((text) => ({ text, value: text })),
+                : petitionField.type === "SELECT"
+                  ? {
+                      text: reply.content.value,
+                      value: (field.options as ProfileTypeFieldOptions["SELECT"]).values.filter(
+                        ({ label, value }) => {
+                          return (
+                            locales.some(({ key }) => {
+                              const _label = localizableUserTextRender({
+                                value: label,
+                                locale: key,
+                                default: "",
+                              });
+                              return _label === reply.content.value;
+                            }) || value === reply.content.value
+                          );
+                        },
+                      )[0].value,
+                    }
+                  : unMaybeArray(
+                      petitionField.type === "DATE_TIME"
+                        ? `${intl.formatDate(reply.content.value as string, {
+                            timeZone: reply.content.timezone,
+                            ...FORMATS["L+LT"],
+                          })} (${prettifyTimezone(reply.content.timezone)})`
+                        : petitionField.type === "CHECKBOX"
+                          ? (reply.content.value as string[])
+                          : (reply.content.value as string),
+                    ).map((text) => ({ text, value: text })),
           )
             .filter(({ value }) => content?.value !== value)
-            .map(({ value, text }, i) => (
-              <ProfileFieldSuggestion
-                key={`${reply.id}-${i}`}
-                petitionField={petitionField}
-                petitionFieldIndex={fieldIndex}
-                onClick={() => {
-                  setValue(`fields.${index}.content.value`, value, { shouldDirty: true });
-                  if (needsExpirationDialog) {
-                    showModifyExpirationDialog({ isDirty: true });
-                  }
-                }}
-              >
-                {text}
-              </ProfileFieldSuggestion>
-            ));
+            .map(({ value, text }, i) => {
+              return (
+                <ProfileFieldSuggestion
+                  key={`${reply.id}-${i}`}
+                  petitionField={petitionField}
+                  petitionFieldIndex={fieldIndex}
+                  onClick={() => {
+                    setValue(`fields.${index}.content.value`, value, { shouldDirty: true });
+                    if (needsExpirationDialog) {
+                      showModifyExpirationDialog({ isDirty: true });
+                    }
+                  }}
+                >
+                  {text}
+                </ProfileFieldSuggestion>
+              );
+            });
         }
       });
   });
@@ -316,6 +361,8 @@ export function ProfileField(props: ProfileFieldProps) {
           <ProfileFieldText {...commonProps} />
         ) : field.type === "SHORT_TEXT" ? (
           <ProfileFieldShortText {...commonProps} />
+        ) : field.type === "SELECT" ? (
+          <ProfileFieldSelect {...commonProps} control={control} />
         ) : null}
         {expiryDate && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate) ? (
           <HStack marginTop={1} marginLeft={1} color="gray.700" spacing={1.5}>

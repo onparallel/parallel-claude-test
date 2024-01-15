@@ -1,6 +1,8 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { ProfileTypeFieldType } from "../__types";
+import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
+import { FromSchema } from "json-schema-to-ts";
 
 const SCHEMAS = {
   TEXT: {
@@ -41,6 +43,31 @@ const SCHEMAS = {
     additionalProperties: false,
     properties: {},
   },
+  SELECT: {
+    type: "object",
+    required: ["values"],
+    additionalProperties: false,
+    properties: {
+      values: {
+        type: "array",
+        minItems: 1,
+        items: {
+          type: "object",
+          required: ["label", "value"],
+          properties: {
+            label: LOCALIZABLE_USER_TEXT_SCHEMA,
+            value: { type: "string" },
+            color: { type: "string" },
+          },
+        },
+      },
+      showOptionsWithColors: { type: ["boolean", "null"] },
+    },
+  },
+} as const;
+
+export type ProfileTypeFieldOptions = {
+  [K in keyof typeof SCHEMAS]: FromSchema<(typeof SCHEMAS)[K]>;
 };
 
 export function validateProfileTypeFieldOptions(type: ProfileTypeFieldType, options: any) {

@@ -55,7 +55,9 @@ export function ProfileFieldInputGroup({
         }}
       >
         {children}
-        {(browserName === "Firefox" && field.type === "DATE") || isDisabled ? null : (
+        {(browserName === "Firefox" && field.type === "DATE") ||
+        field.type === "SELECT" ||
+        isDisabled ? null : (
           <InputRightElement pointerEvents="none">
             <Flex className="edit-icon" opacity={0} transitionDuration="normal" color="gray.600">
               <EditIcon boxSize={4} />

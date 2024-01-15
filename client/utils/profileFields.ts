@@ -1,66 +1,97 @@
-import { useTheme } from "@chakra-ui/react";
-import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { ComponentWithAs, IconProps } from "@chakra-ui/react";
+import {
+  FieldDateIcon,
+  FieldFileUploadIcon,
+  FieldNumberIcon,
+  FieldPhoneIcon,
+  FieldSelectIcon,
+  FieldShortTextIcon,
+  FieldTextIcon,
+} from "@parallel/chakra/icons";
+import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
-import { IntlShape, useIntl } from "react-intl";
+import { IntlShape } from "react-intl";
+import { Maybe } from "./types";
 
-const TYPES: Record<ProfileTypeFieldType, (intl: IntlShape) => string> = {
-  SHORT_TEXT: (intl) =>
-    intl.formatMessage({
-      id: "generic.profile-type-field-type.short-text",
-      defaultMessage: "Short text",
-    }),
-  TEXT: (intl) =>
-    intl.formatMessage({
-      id: "generic.profile-type-field-type.text",
-      defaultMessage: "Long text",
-    }),
-  NUMBER: (intl) =>
-    intl.formatMessage({
-      id: "generic.profile-type-field-type.number",
-      defaultMessage: "Numbers",
-    }),
-  PHONE: (intl) =>
-    intl.formatMessage({
-      id: "generic.profile-type-field-type.phone",
-      defaultMessage: "Phone number",
-    }),
-  DATE: (intl) =>
-    intl.formatMessage({
-      id: "generic.profile-type-field-type.date",
-      defaultMessage: "Date",
-    }),
-  FILE: (intl) =>
-    intl.formatMessage({
-      id: "generic.profile-type-field-type.file-upload",
-      defaultMessage: "Documents and files",
-    }),
-};
-
-export function useProfileTypeFieldTypes() {
-  return useSimpleSelectOptions<ProfileTypeFieldType>(
-    (intl) =>
-      (["SHORT_TEXT", "TEXT", "NUMBER", "PHONE", "DATE", "FILE"] as ProfileTypeFieldType[]).map(
-        (type) => ({ value: type, label: TYPES[type](intl) }),
-      ),
-    [],
-  );
+export interface ProfileTypeFieldOptions {
+  DATE: {
+    useReplyAsExpiryDate?: Maybe<boolean>;
+  };
+  SELECT: {
+    values: { label: LocalizableUserText; value: string; color?: string }[];
+    showOptionsWithColors?: Maybe<boolean>;
+  };
 }
 
-export function useProfileTypeFieldTypeLabel(type: ProfileTypeFieldType) {
-  const intl = useIntl();
-  return TYPES[type](intl);
-}
+export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
+  SHORT_TEXT: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-short-text",
+        defaultMessage: "Short text",
+      }),
+    icon: FieldShortTextIcon,
+    color: "yellow.400",
+  },
+  TEXT: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-text",
+        defaultMessage: "Long text",
+      }),
+    icon: FieldTextIcon,
+    color: "yellow.500",
+  },
+  NUMBER: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-number",
+        defaultMessage: "Numbers",
+      }),
+    icon: FieldNumberIcon,
+    color: "orange.500",
+  },
+  PHONE: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-phone",
+        defaultMessage: "Phone number",
+      }),
+    icon: FieldPhoneIcon,
+    color: "orange.400",
+  },
+  DATE: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-date",
+        defaultMessage: "Date",
+      }),
+    icon: FieldDateIcon,
+    color: "orange.300",
+  },
+  FILE: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-file-upload",
+        defaultMessage: "Documents and files",
+      }),
+    icon: FieldFileUploadIcon,
+    color: "teal.400",
+  },
+  SELECT: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-select",
+        defaultMessage: "Select",
+      }),
+    icon: FieldSelectIcon,
+    color: "pink.400",
+  },
+} as Record<
+  ProfileTypeFieldType,
+  { icon: ComponentWithAs<"svg", IconProps>; label: (intl: IntlShape) => string; color: string }
+>);
 
-export function useProfileTypeFieldTypeColor(type: ProfileTypeFieldType) {
-  const theme = useTheme();
-  return (
-    {
-      FILE: theme.colors.teal[400],
-      TEXT: theme.colors.yellow[500],
-      SHORT_TEXT: theme.colors.yellow[400],
-      NUMBER: theme.colors.orange[500],
-      PHONE: theme.colors.orange[400],
-      DATE: theme.colors.orange[300],
-    } as Record<ProfileTypeFieldType, string>
-  )[type];
-}
+export const PROFILE_TYPE_FIELDS = Object.freeze(
+  Object.keys(PROFILE_TYPE_FIELD_CONFIG) as ProfileTypeFieldType[],
+);

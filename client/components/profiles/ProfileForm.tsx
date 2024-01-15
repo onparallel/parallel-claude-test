@@ -87,6 +87,7 @@ const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]
   PHONE: ["PHONE"],
   SHORT_TEXT: ["SHORT_TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
   TEXT: ["SHORT_TEXT", "TEXT", "SELECT", "CHECKBOX", "PHONE", "NUMBER", "DATE", "DATE_TIME"],
+  SELECT: ["SELECT", "CHECKBOX"],
 };
 
 function normalize(alias: string) {
@@ -327,7 +328,7 @@ export const ProfileForm = Object.assign(
               await withError(
                 showErrorDialog({
                   message: intl.formatMessage({
-                    id: "component.profile-form.max-files-exceeded-error.message",
+                    id: "component.profile-form.max-files-exceeded-error",
                     defaultMessage:
                       "You exceeded the maximum amount of files you can upload on the field.",
                   }),

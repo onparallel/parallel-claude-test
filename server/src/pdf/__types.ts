@@ -3929,7 +3929,14 @@ export type ProfileTypeFieldPermission = {
 
 export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
-export type ProfileTypeFieldType = "DATE" | "FILE" | "NUMBER" | "PHONE" | "SHORT_TEXT" | "TEXT";
+export type ProfileTypeFieldType =
+  | "DATE"
+  | "FILE"
+  | "NUMBER"
+  | "PHONE"
+  | "SELECT"
+  | "SHORT_TEXT"
+  | "TEXT";
 
 export type ProfileTypeFilter = {
   onlyArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -5071,12 +5078,18 @@ export type UpdateProfileTypeFieldInput = {
   isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
+  substitutions?: InputMaybe<Array<UpdateProfileTypeFieldSelectOptionsSubstitution>>;
 };
 
 export type UpdateProfileTypeFieldPermissionInput = {
   permission: ProfileTypeFieldPermissionType;
   userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
   userId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
+export type UpdateProfileTypeFieldSelectOptionsSubstitution = {
+  new?: InputMaybe<Scalars["String"]["input"]>;
+  old: Scalars["String"]["input"];
 };
 
 export type UpdateTagInput = {

@@ -369,12 +369,18 @@ export interface NexusGenInputs {
     isExpirable?: boolean | null; // Boolean
     name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
+    substitutions?: NexusGenInputs["UpdateProfileTypeFieldSelectOptionsSubstitution"][] | null; // [UpdateProfileTypeFieldSelectOptionsSubstitution!]
   };
   UpdateProfileTypeFieldPermissionInput: {
     // input type
     permission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
     userGroupId?: NexusGenScalars["GID"] | null; // GID
     userId?: NexusGenScalars["GID"] | null; // GID
+  };
+  UpdateProfileTypeFieldSelectOptionsSubstitution: {
+    // input type
+    new?: string | null; // String
+    old: string; // String!
   };
   UpdateTagInput: {
     // input type

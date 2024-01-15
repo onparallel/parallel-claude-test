@@ -150,7 +150,7 @@ describe("GraphQL/Profiles", () => {
     profileType0Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[0].id,
-      6,
+      7,
       (i) =>
         [
           {
@@ -197,6 +197,33 @@ describe("GraphQL/Profiles", () => {
             permission: "WRITE" as const,
             expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
             options: {},
+          },
+          {
+            name: json({ en: "Risk", es: "Riesgo" }),
+            type: "SELECT" as const,
+            alias: "RISK",
+            is_expirable: false,
+            permission: "WRITE" as const,
+            options: {
+              values: [
+                {
+                  id: "1",
+                  label: { en: "Low", es: "Bajo" },
+                  value: "low",
+                },
+                {
+                  id: "2",
+                  label: { en: "Medium", es: "Medio" },
+                  value: "medium",
+                },
+                {
+                  id: "3",
+                  label: { en: "High", es: "Alto" },
+                  value: "high",
+                },
+              ],
+              showOptionsWithColors: true,
+            },
           },
         ][i],
     );
@@ -457,6 +484,36 @@ describe("GraphQL/Profiles", () => {
             files: null,
             value: { expiryDate: "2024-10-28", content: { value: "AA1234567" } },
           },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+              name: { en: "Risk", es: "Riesgo" },
+              options: {
+                values: [
+                  {
+                    id: "1",
+                    label: { en: "Low", es: "Bajo" },
+                    value: "low",
+                  },
+                  {
+                    id: "2",
+                    label: { en: "Medium", es: "Medio" },
+                    value: "medium",
+                  },
+                  {
+                    id: "3",
+                    label: { en: "High", es: "Alto" },
+                    value: "high",
+                  },
+                ],
+                showOptionsWithColors: true,
+              },
+              isExpirable: false,
+              isUsedInProfileName: false,
+            },
+            files: null,
+            value: null,
+          },
         ],
         events: {
           items: [
@@ -618,6 +675,14 @@ describe("GraphQL/Profiles", () => {
             field: {
               id: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
               myPermission: "HIDDEN",
+            },
+            files: null,
+            value: null,
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+              myPermission: "WRITE",
             },
             files: null,
             value: null,
@@ -906,6 +971,10 @@ describe("GraphQL/Profiles", () => {
               alias: "PASSPORT",
               myPermission: "WRITE",
             },
+            {
+              alias: "RISK",
+              myPermission: "WRITE",
+            },
           ],
         },
       });
@@ -973,6 +1042,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "PASSPORT",
+              myPermission: "READ",
+            },
+            {
+              alias: "RISK",
               myPermission: "READ",
             },
           ],
@@ -1060,6 +1133,10 @@ describe("GraphQL/Profiles", () => {
               alias: "PASSPORT",
               myPermission: "READ",
             },
+            {
+              alias: "RISK",
+              myPermission: "HIDDEN",
+            },
           ],
         },
       });
@@ -1136,6 +1213,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "PASSPORT",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "RISK",
               myPermission: "HIDDEN",
             },
           ],
@@ -1245,6 +1326,10 @@ describe("GraphQL/Profiles", () => {
             },
             {
               alias: "PASSPORT",
+              myPermission: "HIDDEN",
+            },
+            {
+              alias: "RISK",
               myPermission: "HIDDEN",
             },
           ],
@@ -3116,6 +3201,42 @@ describe("GraphQL/Profiles", () => {
             {
               profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
               content: { value: "0800-333-parallel" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to pass wrong option value to SELECT value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiryDate
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+              content: { value: "wrong_value" },
             },
           ],
         },
@@ -5337,6 +5458,12 @@ describe("GraphQL/Profiles", () => {
             myPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "RISK",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -5443,6 +5570,12 @@ describe("GraphQL/Profiles", () => {
             alias: "PASSPORT",
             defaultPermission: "WRITE",
             myPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "RISK",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
             permissions: [],
           },
         ],
@@ -5555,6 +5688,12 @@ describe("GraphQL/Profiles", () => {
           },
           {
             alias: "PASSPORT",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "RISK",
             myPermission: "WRITE",
             defaultPermission: "WRITE",
             permissions: [],
@@ -5673,6 +5812,12 @@ describe("GraphQL/Profiles", () => {
             defaultPermission: "WRITE",
             permissions: [],
           },
+          {
+            alias: "RISK",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
         ],
       });
     });
@@ -5776,6 +5921,12 @@ describe("GraphQL/Profiles", () => {
           },
           {
             alias: "PASSPORT",
+            myPermission: "WRITE",
+            defaultPermission: "WRITE",
+            permissions: [],
+          },
+          {
+            alias: "RISK",
             myPermission: "WRITE",
             defaultPermission: "WRITE",
             permissions: [],

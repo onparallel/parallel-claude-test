@@ -44,7 +44,11 @@ export function localizableUserTextRender({
     _locale,
     intl ? asSupportedUserLocale(intl.locale) : null,
     "en" as UserLocale,
-    Object.keys(value)[0] as UserLocale,
-  ].find((l) => isDefined(l) && isDefined(value[l]));
+    ...(Object.keys(value) as UserLocale[]),
+  ].find((l) => isDefined(l) && isDefined(value[l]) && value[l]!.length > 0);
   return isDefined(locale) ? value[locale]?.trim() || _default : _default;
+}
+
+export function isValidLocalizableUserText(label: { [key: string]: string }) {
+  return Object.values(label).some((value) => value!.trim().length > 0);
 }

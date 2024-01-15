@@ -11,7 +11,7 @@ import {
 } from "nexus";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
-import { indexBy, isDefined, zip } from "remeda";
+import { differenceWith, indexBy, isDefined, pipe, zip } from "remeda";
 import {
   CreateProfileType,
   CreateProfileTypeField,
@@ -21,6 +21,7 @@ import {
   ProfileTypeField,
 } from "../../db/__types";
 import {
+  ProfileTypeFieldOptions,
   defaultProfileTypeFieldOptions,
   validateProfileTypeFieldOptions,
 } from "../../db/helpers/profileTypeFieldOptions";
@@ -290,6 +291,15 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           t.nullable.boolean("isExpirable");
           t.nullable.duration("expiryAlertAheadTime");
           t.nullable.jsonObject("options");
+          t.nullable.list.nonNull.field("substitutions", {
+            type: inputObjectType({
+              name: "UpdateProfileTypeFieldSelectOptionsSubstitution",
+              definition(t) {
+                t.nonNull.string("old");
+                t.nullable.string("new");
+              },
+            }),
+          });
         },
       }).asArg(),
     ),
@@ -328,8 +338,57 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
       try {
         const options = { ...profileTypeField.options, ...args.data.options };
         validateProfileTypeFieldOptions(profileTypeField.type, options);
+
+        if (profileTypeField.type === "SELECT") {
+          /* 
+            when removing options from a SELECT field, we need to make sure that
+            every profile_field_value using those options are updated to use the substitution.
+
+            If the removed option is being used and does not have any substitution, throw an error
+            so the user can choose a substitution for the option and try again.
+          */
+          const removedOptionsWithoutSubstitutions = pipe(
+            profileTypeField.options.values as { value: string }[],
+            differenceWith(
+              args.data.options.values as { value: string }[],
+              (a, b) => a.value === b.value,
+            ),
+            differenceWith(args.data.substitutions ?? [], (a, b) => a.value === b.old),
+          );
+
+          if (removedOptionsWithoutSubstitutions.length > 0) {
+            const usedProfileFieldValues = await ctx.profiles.getProfileFieldValueCountWithContent(
+              profileTypeField.id,
+              removedOptionsWithoutSubstitutions.map((o) => o.value),
+            );
+            if (Object.keys(usedProfileFieldValues).length > 0) {
+              const removedOptions = (
+                profileTypeField.options as ProfileTypeFieldOptions["SELECT"]
+              ).values
+                .filter((value) => usedProfileFieldValues[value.value])
+                .map((value) => ({ ...value, count: usedProfileFieldValues[value.value] }));
+
+              throw new ApolloError(
+                "Cannot remove options that have values associated with them.",
+                "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR",
+                { options: removedOptions },
+              );
+            }
+          }
+          if (isDefined(args.data.substitutions) && args.data.substitutions.length > 0) {
+            await ctx.profiles.updateProfileFieldValueContentByProfileFieldTypeId(
+              profileTypeField.id,
+              args.data.substitutions,
+              ctx.user!.id,
+            );
+          }
+        }
+
         updateData.options = options;
       } catch (e) {
+        if (e instanceof ApolloError) {
+          throw e;
+        }
         if (e instanceof Error) {
           throw new ArgValidationError(info, "data.options", e.message);
         }

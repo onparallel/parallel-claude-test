@@ -1,6 +1,17 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, omit, partition, pick, sortBy, times, uniq } from "remeda";
+import {
+  groupBy,
+  indexBy,
+  isDefined,
+  mapToObj,
+  omit,
+  partition,
+  pick,
+  sortBy,
+  times,
+  uniq,
+} from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -1672,5 +1683,84 @@ export class ProfileRepository extends BaseRepository {
       .select("id");
 
     return profiles.map((p) => p.id);
+  }
+
+  async getProfileFieldValueCountWithContent(profileTypeFieldId: number, content: string[]) {
+    const rows = await this.raw<{ value: string; count: number }>(
+      /* sql */ `
+      select content->>'value' as "value", count(*)::int as "count"
+      from profile_field_value
+      where profile_type_field_id = ? and deleted_at is null and removed_at is null and content->>'value' in ?
+      group by content->>'value'
+    `,
+      [profileTypeFieldId, this.sqlIn(content)],
+    );
+    return mapToObj(rows, (r) => [r.value, r.count]);
+  }
+
+  async updateProfileFieldValueContentByProfileFieldTypeId(
+    profileTypeFieldId: number,
+    data: {
+      old: string;
+      new?: string | null;
+    }[],
+    userId: number,
+  ) {
+    return await this.withTransaction(async (t) => {
+      const previousValues = await this.from("profile_field_value", t)
+        .whereNull("deleted_at")
+        .whereNull("removed_at")
+        .where("profile_type_field_id", profileTypeFieldId)
+        .whereRaw(/* sql */ `content->>'value' in ?`, this.sqlIn(data.map((d) => d.old)))
+        .update({ removed_at: this.now(), removed_by_user_id: userId })
+        .returning("*");
+
+      const fieldsWithContent = previousValues
+        .filter((f) => data.find((d) => d.old === f.content.value && isDefined(d.new)))
+        .map((f) => ({ ...f, newContent: data.find((d) => d.old === f.content.value)!.new }));
+
+      if (fieldsWithContent.length) {
+        const currentValues = await this.insert(
+          "profile_field_value",
+          fieldsWithContent.map((f) => ({
+            profile_id: f.profile_id,
+            profile_type_field_id: f.profile_type_field_id,
+            type: f.type,
+            content: JSON.stringify({ value: f.newContent }),
+            created_by_user_id: userId,
+            expiry_date: f.expiry_date,
+          })),
+          t,
+        );
+
+        const profileType = await this.loadProfileTypeForProfileId.raw(
+          currentValues[0].profile_id,
+          t,
+        );
+
+        const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
+        const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
+
+        await this.createEvent(
+          currentValues.map((f) => {
+            const current = currentByPtfId[f.profile_type_field_id] as ProfileFieldValue;
+            const previous = previousByPtfId[f.profile_type_field_id] as ProfileFieldValue;
+
+            return {
+              org_id: profileType!.org_id,
+              profile_id: f.profile_id,
+              type: "PROFILE_FIELD_VALUE_UPDATED",
+              data: {
+                user_id: userId,
+                profile_type_field_id: f.profile_type_field_id,
+                current_profile_field_value_id: current?.id ?? null,
+                previous_profile_field_value_id: previous?.id ?? null,
+              },
+            };
+          }),
+          t,
+        );
+      }
+    });
   }
 }

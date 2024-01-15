@@ -71,3 +71,57 @@ export async function removeFieldType(knex: Knex, fieldName: string) {
     drop type petition_field_type_old;
   `);
 }
+
+export async function addProfileTypeFieldType(knex: Knex, fieldName: string) {
+  await knex.schema.raw(/* sql */ `
+    alter type profile_type_field_type add value '${fieldName}';
+  `);
+}
+
+export async function removeProfileTypeFieldType(knex: Knex, fieldName: string) {
+  await knex.from("profile_field_value").where("type", fieldName).delete();
+  await knex.from("profile_field_file").where("type", fieldName).delete();
+  const fields = await knex.from("profile_type_field").where("type", fieldName).select("id");
+  const fieldIds = fields.map((f) => f.id);
+
+  await knex
+    .from("profile_type_field_permission")
+    .whereIn("profile_type_field_id", fieldIds)
+    .delete();
+
+  await knex.from("profile_type_field").whereIn("id", fieldIds).delete();
+
+  if (fieldIds.length > 0) {
+    await knex
+      .from("profile_event")
+      .whereIn("type", [
+        "PROFILE_FIELD_VALUE_UPDATED",
+        "PROFILE_FIELD_FILE_ADDED",
+        "PROFILE_FIELD_FILE_REMOVED",
+        "PROFILE_FIELD_EXPIRY_UPDATED",
+      ])
+      .whereRaw(/* sql */ `("data"->>'profile_type_field_id')::int in ?`, [
+        knex.raw(...sqlIn(fieldIds, "int")),
+      ])
+      .delete();
+  }
+
+  const { rows } = await knex.raw<{
+    rows: { field_type: string }[];
+  }>(/* sql */ `
+    select unnest(enum_range(NULL::profile_type_field_type)) as field_type
+  `);
+
+  await knex.raw(/* sql */ `
+    alter type profile_type_field_type rename to profile_type_field_type_old;
+    create type profile_type_field_type as enum (${rows
+      .map((r) => r.field_type)
+      .filter((f) => f !== fieldName)
+      .map((f) => `'${f}'`)
+      .join(",")});
+    alter table profile_field_file alter column "type" type profile_type_field_type using "type"::varchar::profile_type_field_type;
+    alter table profile_field_value alter column "type" type profile_type_field_type using "type"::varchar::profile_type_field_type;
+    alter table profile_type_field alter column "type" type profile_type_field_type using "type"::varchar::profile_type_field_type;
+    drop type profile_type_field_type_old;
+  `);
+}
