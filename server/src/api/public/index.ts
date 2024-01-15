@@ -2057,7 +2057,7 @@ api
         ~~~bash
         curl -s -L -XGET \\
           -H 'Authorization: Bearer <your API token>' \\
-          'http://www.onparallel.com/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
+          'https://www.onparallel.com/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
           > image.png
         ~~~
       `,
@@ -2116,7 +2116,7 @@ api
         ~~~bash
         curl -s -L -XGET \\
           -H 'Authorization: Bearer <your API token>' \\
-          'http://www.onparallel.com/api/v1/petitions/{petitionId}/export?format=pdf' \\
+          'https://www.onparallel.com/api/v1/petitions/{petitionId}/export?format=pdf' \\
           > image.png
         ~~~
       `,
@@ -2566,7 +2566,7 @@ api
         ~~~bash
         curl -s -L -XGET \\
           -H 'Authorization: Bearer <your API token>' \\
-          'http://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/document' \\
+          'https://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/document' \\
           > signed.pdf
         ~~~
       `,
@@ -2622,7 +2622,7 @@ api
       ~~~bash
       curl -s -L -XGET \\
         -H 'Authorization: Bearer <your API token>' \\
-        'http://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/audit' \\
+        'https://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/audit' \\
         > audit-trail.pdf
       ~~~
     `,
