@@ -1,6 +1,6 @@
-import { IntlShape } from "@formatjs/intl";
 import { formatInTimeZone } from "date-fns-tz";
 import Excel from "exceljs";
+import { IntlShape } from "react-intl";
 import { isDefined, minBy, partition, sortBy } from "remeda";
 import { Readable } from "stream";
 import {
@@ -11,13 +11,13 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
+import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { titleize } from "../../util/strings";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
-import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
 
 function getPetitionSignatureStatus({
   status,

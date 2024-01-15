@@ -1,6 +1,6 @@
-import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import pMap from "p-map";
+import { IntlShape } from "react-intl";
 import { ApiContext, WorkerContext } from "../../context";
 import {
   Contact,

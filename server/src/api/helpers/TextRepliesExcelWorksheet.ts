@@ -1,5 +1,5 @@
-import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
+import { IntlShape } from "react-intl";
 import { ApiContext, WorkerContext } from "../../context";
 import { UserLocale } from "../../db/__types";
 import { Maybe } from "../../util/types";

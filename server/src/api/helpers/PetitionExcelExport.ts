@@ -1,5 +1,5 @@
-import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
+import { IntlShape } from "react-intl";
 import { Readable } from "stream";
 import { ApiContext, WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
