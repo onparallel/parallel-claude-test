@@ -7,6 +7,7 @@ import {
 import { StopRetryError, retry } from "../../util/retry";
 import { withStopwatch } from "../../util/stopwatch";
 import { AiCompletionOptions, AiCompletionPrompt, IAiCompletionClient } from "./AiCompletionClient";
+import { InvalidRequestError } from "../../integrations/GenericIntegration";
 
 interface AzureOpenAiClientParams {
   model: AzureOpenAiModel;
@@ -23,24 +24,16 @@ export class AzureOpenAiClient implements IAiCompletionClient<AzureOpenAiClientP
     this.integrationId = integrationId;
   }
 
-  // TODO PetitionSummary: update this when moving to Azure client
+  // PRICES IN EUROS
   private readonly PRICE_PER_TOKEN: Record<
     AzureOpenAiModel,
     { input: BigNumber; output: BigNumber }
   > = {
-    "gpt-4": {
-      input: BigNumber("0.03").dividedBy(1000),
-      output: BigNumber("0.06").dividedBy(1000),
-    },
-    "gpt-4-32k": {
-      input: BigNumber("0.06").dividedBy(1000),
-      output: BigNumber("0.12").dividedBy(1000),
-    },
-    "gpt-4-1106-preview": {
+    "gpt-4-turbo": {
       input: BigNumber("0.01").dividedBy(1000),
-      output: BigNumber("0.03").dividedBy(1000),
+      output: BigNumber("0.028").dividedBy(1000),
     },
-    "gpt-3.5-turbo-1106": {
+    "gpt-35-turbo": {
       input: BigNumber("0.001").dividedBy(1000),
       output: BigNumber("0.002").dividedBy(1000),
     },
@@ -72,7 +65,7 @@ export class AzureOpenAiClient implements IAiCompletionClient<AzureOpenAiClientP
             return { completion, model, time };
           } catch (e) {
             if (this.isModelNotFoundError(e)) {
-              throw e;
+              throw new InvalidRequestError(e.code, e.message);
             } else {
               throw new StopRetryError(e);
             }
@@ -101,16 +94,13 @@ export class AzureOpenAiClient implements IAiCompletionClient<AzureOpenAiClientP
     });
   }
 
-  private isModelNotFoundError(e: unknown): e is { type: string; code: string; message: string } {
+  private isModelNotFoundError(e: unknown): e is { code: string; message: string } {
     return (
       !!e &&
       typeof e === "object" &&
-      "type" in e &&
-      typeof e.type === "string" &&
-      e.type === "invalid_request_error" &&
       "code" in e &&
       typeof e.code === "string" &&
-      e.code === "model_not_found"
+      e.code === "DeploymentNotFound"
     );
   }
 }
