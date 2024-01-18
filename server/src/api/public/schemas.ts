@@ -1268,10 +1268,16 @@ export const ListOfPetitionFieldsWithReplies = ListOf(_PetitionFieldWithReplies)
 
 export const PetitionFieldReply = schema(_PetitionFieldReply);
 
-export const FieldReplyDownloadContent = schema({
-  type: "string",
-  example: "Jon Snow",
-  description: "The text-content of the reply, or a download URL for `FILE` replies",
+export const FileDownload = schema({
+  type: "object",
+  description: "The generated temporary file URL",
+  required: ["file"],
+  additionalProperties: false,
+  properties: {
+    file: {
+      type: "string",
+    },
+  },
 } as const);
 
 const PetitionEventSchemas = {

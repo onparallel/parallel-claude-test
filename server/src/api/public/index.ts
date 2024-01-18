@@ -174,6 +174,7 @@ import {
   CreateProfile,
   CreateProfileFieldValue,
   CreateSubscription,
+  FileDownload,
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfPetitionEvents,
@@ -2062,14 +2063,21 @@ api
         ~~~
       `,
       tags: ["Parallel replies"],
+      query: {
+        noredirect: booleanParam({
+          required: false,
+          description: "If param is true, response will be a temporary link.",
+        }),
+      },
       responses: {
+        201: SuccessResponse(FileDownload),
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         400: ErrorResponse({
           description: `Reply {replyId} is not of "FILE" type`,
         }),
       },
     },
-    async ({ client, params }) => {
+    async ({ client, params, query }) => {
       try {
         const _mutation = gql`
           mutation DownloadFileReply_fileUploadReplyDownloadLink(
@@ -2085,7 +2093,14 @@ api
           DownloadFileReply_fileUploadReplyDownloadLinkDocument,
           params,
         );
-        return Redirect(result.fileUploadReplyDownloadLink.url!);
+        if (query.noredirect) {
+          return Created(
+            { file: result.fileUploadReplyDownloadLink.url! },
+            result.fileUploadReplyDownloadLink.url!,
+          );
+        } else {
+          return Redirect(result.fileUploadReplyDownloadLink.url!);
+        }
       } catch (error) {
         if (containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
           throw new BadRequestError(`Reply "${params.replyId}" is not of "FILE" type`);
@@ -2126,9 +2141,14 @@ api
           required: true,
           description: "The format of the export.",
         }),
+        noredirect: booleanParam({
+          required: false,
+          description: "If param is true, response will be a temporary link.",
+        }),
       },
       tags: ["Parallel replies"],
       responses: {
+        201: SuccessResponse(FileDownload),
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         500: ErrorResponse({ description: "Error generating the file" }),
       },
@@ -2155,7 +2175,11 @@ api
           );
           await waitForTask(client, result.createExportRepliesTask);
           const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
-          return Redirect(url);
+          if (query.noredirect) {
+            return Created({ file: url }, url);
+          } else {
+            return Redirect(url);
+          }
         } catch (error) {
           throw error;
         }
@@ -2173,7 +2197,11 @@ api
         });
         await waitForTask(client, result.createPrintPdfTask);
         const url = await getTaskResultFileUrl(client, result.createPrintPdfTask);
-        return Redirect(url);
+        if (query.noredirect) {
+          return Created({ file: url }, url);
+        } else {
+          return Redirect(url);
+        }
       } else {
         return null as never;
       }
@@ -2570,7 +2598,14 @@ api
           > signed.pdf
         ~~~
       `,
+      query: {
+        noredirect: booleanParam({
+          required: false,
+          description: "If param is true, response will be a temporary link.",
+        }),
+      },
       responses: {
+        201: SuccessResponse(FileDownload),
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         400: ErrorResponse({
           description: "The signed document is not yet ready to be downloaded",
@@ -2578,7 +2613,7 @@ api
       },
       tags: ["Signatures"],
     },
-    async ({ client, params }) => {
+    async ({ client, params, query }) => {
       gql`
         mutation DownloadSignedDocument_downloadSignedDoc($signatureId: GID!) {
           signedPetitionDownloadLink(petitionSignatureRequestId: $signatureId) {
@@ -2596,7 +2631,14 @@ api
       if (signedPetitionDownloadLink.result === "FAILURE") {
         throw new BadRequestError("The signed document is not yet ready to be downloaded");
       } else {
-        return Redirect(signedPetitionDownloadLink.url!);
+        if (query.noredirect) {
+          return Created(
+            { file: signedPetitionDownloadLink.url! },
+            signedPetitionDownloadLink.url!,
+          );
+        } else {
+          return Redirect(signedPetitionDownloadLink.url!);
+        }
       }
     },
   );
@@ -2610,23 +2652,30 @@ api
       operationId: "DownloadAuditTrail",
       summary: "Download the audit trail",
       description: outdent`
-      Download the audit trail.
-
-      ### Important
-      Note that *there will be a redirect* to a temporary download endpoint on
-      AWS S3 so make sure to configure your HTTP client to follow redirects.
-
-      For example if you were to use curl you would need to provide the
-      \`-L\` flag, e.g.:
-
-      ~~~bash
-      curl -s -L -XGET \\
-        -H 'Authorization: Bearer <your API token>' \\
-        'https://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/audit' \\
-        > audit-trail.pdf
-      ~~~
-    `,
+        Download the audit trail.
+  
+        ### Important
+        Note that *there will be a redirect* to a temporary download endpoint on
+        AWS S3 so make sure to configure your HTTP client to follow redirects.
+  
+        For example if you were to use curl you would need to provide the
+        \`-L\` flag, e.g.:
+  
+        ~~~bash
+        curl -s -L -XGET \\
+          -H 'Authorization: Bearer <your API token>' \\
+          'https://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/audit' \\
+          > audit-trail.pdf
+        ~~~
+      `,
+      query: {
+        noredirect: booleanParam({
+          required: false,
+          description: "If param is true, response will be a temporary link.",
+        }),
+      },
       responses: {
+        201: SuccessResponse(FileDownload),
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         400: ErrorResponse({
           description: "The document is not yet ready to be downloaded",
@@ -2634,7 +2683,7 @@ api
       },
       tags: ["Signatures"],
     },
-    async ({ client, params }) => {
+    async ({ client, params, query }) => {
       gql`
         mutation DownloadSignedDocument_downloadAuditTrail($signatureId: GID!) {
           signedPetitionDownloadLink(
@@ -2655,7 +2704,14 @@ api
       if (signedPetitionDownloadLink.result === "FAILURE") {
         throw new BadRequestError("The document is not yet ready to be downloaded");
       } else {
-        return Redirect(signedPetitionDownloadLink.url!);
+        if (query.noredirect) {
+          return Created(
+            { file: signedPetitionDownloadLink.url! },
+            signedPetitionDownloadLink.url!,
+          );
+        } else {
+          return Redirect(signedPetitionDownloadLink.url!);
+        }
       }
     },
   );
