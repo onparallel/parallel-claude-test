@@ -55,15 +55,15 @@ export const PetitionRepliesSummary = Object.assign(
     const handleGenerateSummary = async () => {
       setIsLoading(true);
       try {
+        window.analytics?.track("Petition Summary Generate Click", {
+          petitionId: petition.id,
+          fromTemplateId: petition.fromTemplate?.id,
+        });
         await generatePetitionSummaryBackgroundTask(
           { petitionId: petition.id },
           { timeout: 120_000 },
         );
         onRefetch();
-        window.analytics?.track("Petition Summary Generated", {
-          petitionId: petition.id,
-          fromTemplateId: petition.fromTemplate?.id,
-        });
       } catch (e) {
       } finally {
         setIsLoading(false);
@@ -73,12 +73,15 @@ export const PetitionRepliesSummary = Object.assign(
     const handleRegenerateSummary = async () => {
       setIsLoading(true);
       try {
-        await generatePetitionSummaryBackgroundTask({ petitionId: petition.id });
-        onRefetch();
-        window.analytics?.track("Petition Summary Regenerated", {
+        window.analytics?.track("Petition Summary Regenerate Click", {
           petitionId: petition.id,
           fromTemplateId: petition.fromTemplate?.id,
         });
+        await generatePetitionSummaryBackgroundTask(
+          { petitionId: petition.id },
+          { timeout: 120_000 },
+        );
+        onRefetch();
       } catch (e) {
       } finally {
         setIsLoading(false);
@@ -86,7 +89,7 @@ export const PetitionRepliesSummary = Object.assign(
     };
 
     const handleCopySummary = () => {
-      window.analytics?.track("Petition Summary Copied", {
+      window.analytics?.track("Petition Summary Copy Click", {
         petitionId: petition.id,
         fromTemplateId: petition.fromTemplate?.id,
       });
