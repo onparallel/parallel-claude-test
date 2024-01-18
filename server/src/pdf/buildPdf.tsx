@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { IntlConfig, IntlProvider } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
 import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
-import families from "./utils/fonts.json";
+import fonts from "./utils/fonts.json";
 import { ContactLocale } from "../db/__types";
 import hyphen from "hyphen";
 import { isDefined } from "remeda";
@@ -11,9 +11,21 @@ import { isDefined } from "remeda";
 let hasInit = false;
 
 function init() {
+  const families = [
+    {
+      family: "Arial Unicode MS",
+      fonts: [
+        { src: "700.ttf", fontWeight: 700 },
+        { src: "regular.ttf" },
+        { src: "italic.ttf", fontStyle: "italic" },
+      ],
+    },
+    ...fonts,
+  ];
   for (const f of families) {
     const fonts = f.fonts.map((font) => ({
       ...font,
+      fontWeight: font.fontWeight ?? 400,
       src: `${process.env.ASSETS_URL!}/static/fonts/pdf/${encodeURIComponent(f.family)}/${
         font.src
       }`,

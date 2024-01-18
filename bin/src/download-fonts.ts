@@ -1,23 +1,20 @@
-import fetch from "node-fetch";
-import { run } from "./utils/run";
-import pMap from "p-map";
-import yargs from "yargs";
-import { tmpdir } from "os";
-import { mkdir, rm } from "fs/promises";
 import { createWriteStream } from "fs";
+import { mkdir, rm } from "fs/promises";
+import fetch from "node-fetch";
+import pMap from "p-map";
 import { join } from "path";
-import { token } from "./utils/token";
-import { execSync } from "child_process";
+import yargs from "yargs";
 import { writeJson } from "./utils/json";
+import { run } from "./utils/run";
 
-const SELECTION = [
+const SELECTION: (string | [name: string, alias: string])[] = [
   "IBM Plex Sans",
   "Roboto Slab",
   "Merriweather",
   "Playfair Display",
   "Lora",
   "PT Serif",
-  "Source Serif Pro",
+  ["Source Serif 4", "Source Serif Pro"],
   "IBM Plex Serif",
   "Cormorant Garamond",
   "Alegreya",
@@ -29,7 +26,7 @@ const SELECTION = [
   "Lato",
   "Montserrat",
   "Poppins",
-  "Source Sans Pro",
+  ["Source Sans 3", "Source Sans Pro"],
   "Noto Sans",
   "Raleway",
   "Nunito",
@@ -58,15 +55,14 @@ async function main() {
     })}`,
   );
   const { items: fonts } = (await res.json()) as { items: Font[] };
-  const dir = join(tmpdir(), `download-fonts-${token(16)}`);
-  await mkdir(dir);
   const results = [] as any[];
   await pMap(
     SELECTION,
     async (family) => {
-      const familyDir = join(output, family);
+      const [name, alias] = Array.isArray(family) ? family : [family, family];
+      const familyDir = join(output, alias);
       const result = {
-        family,
+        family: alias,
         fonts: [] as any[],
       };
       results.push(result);
@@ -74,8 +70,8 @@ async function main() {
         await rm(familyDir, { recursive: true });
       } catch {}
       await mkdir(familyDir);
-      const { files } = fonts.find((f) => f.family === family)!;
-      console.log(`Transforming ${family}`);
+      console.log(`Downloading ${name}`);
+      const { files } = fonts.find((f) => f.family === name)!;
       for (const [descriptor, url] of Object.entries(files)) {
         const sourceUrl = `${descriptor}.ttf`;
         if (descriptor === "regular") {
@@ -97,13 +93,10 @@ async function main() {
           }
         }
         const res = await fetch(url);
-        const name = token(16);
-        const path = join(dir, `${name}.ttf`);
-        await new Promise((resolve, reject) =>
-          res.body.pipe(createWriteStream(path)).on("error", reject).on("close", resolve),
-        );
         const dest = join(familyDir, `${descriptor}.ttf`);
-        execSync(`fontforge -lang=ff -c 'Open($1); Generate($2); Close();' '${path}' '${dest}'`);
+        await new Promise((resolve, reject) =>
+          res.body.pipe(createWriteStream(dest)).on("error", reject).on("close", resolve),
+        );
       }
     },
     {
@@ -111,7 +104,6 @@ async function main() {
     },
   );
   await writeJson(join(output, "fonts.json"), results);
-  await rm(dir, { recursive: true });
 }
 
 run(main);
