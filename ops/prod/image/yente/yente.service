@@ -1,0 +1,13 @@
+[Unit]
+Description=Run yente
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/ec2-user/yente
+ExecStart=/usr/local/bin/docker-compose -f /home/ec2-user/yente/docker-compose.yml up -d --remove-orphans
+ExecStop=/usr/local/bin/docker-compose -f /home/ec2-user/yente/docker-compose.yml down
+
+[Install]
+WantedBy=multi-user.target
