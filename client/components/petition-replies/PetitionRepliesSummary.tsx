@@ -55,7 +55,10 @@ export const PetitionRepliesSummary = Object.assign(
     const handleGenerateSummary = async () => {
       setIsLoading(true);
       try {
-        await generatePetitionSummaryBackgroundTask({ petitionId: petition.id });
+        await generatePetitionSummaryBackgroundTask(
+          { petitionId: petition.id },
+          { timeout: 120_000 },
+        );
         onRefetch();
         window.analytics?.track("Petition Summary Generated", {
           petitionId: petition.id,
