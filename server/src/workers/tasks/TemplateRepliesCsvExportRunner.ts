@@ -7,6 +7,7 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
 import { applyFieldVisibility } from "../../util/fieldLogic";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 
 interface AliasedPetitionField extends PetitionField {
   alias: string;
@@ -53,10 +54,11 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
     let rows: Record<string, Maybe<string | Date>>[] = [];
 
     if (petitions.length > 0) {
-      const petitionsComposedFields =
-        await this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(
-          petitions.map((p) => p.id),
-        );
+      const petitionsComposedFields = await pMapChunk(
+        petitions.map((p) => p.id),
+        async (ids) => await this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
+        { chunkSize: 50, concurrency: 1 },
+      );
 
       rows = petitions.map((petition, petitionIndex) => {
         const aliasedPetitionFields = applyFieldVisibility(
