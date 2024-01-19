@@ -4362,7 +4362,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  private async deleteCommentCreatedNotifications(
+  async deleteCommentCreatedNotifications(
     petitionId: number,
     commentIds: number[],
     t?: Knex.Transaction,

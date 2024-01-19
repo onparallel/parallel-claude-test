@@ -110,6 +110,17 @@ async function createCommentPublishedUserNotifications(
       })),
     ),
   ]);
+
+  // there is a chance the comments were deleted right after creating notifications,
+  // so we need to check again if the comment still exists
+  comment = await ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id, {
+    refresh: true,
+  });
+  if (!isDefined(comment)) {
+    await ctx.petitions.deleteCommentCreatedNotifications(event.petition_id, [
+      event.data.petition_field_comment_id,
+    ]);
+  }
 }
 
 async function createPetitionMessageBouncedUserNotifications(
