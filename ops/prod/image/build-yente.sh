@@ -9,6 +9,10 @@ secret=$(aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:
 username=$(echo $secret | jq -r .username)
 password=$(echo $secret | jq -r .password)
 sudo htpasswd -bBc /etc/nginx/.htpasswd "$username" "$password"
+secret=$(aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:eu-central-1:749273139513:secret:development/third-party-4RdbmB | jq --raw-output .SecretString)
+username=$(echo $secret | jq -r .YENTE.USER)
+password=$(echo $secret | jq -r .YENTE.PASSWORD)
+sudo htpasswd -bBc /etc/nginx/.htpasswd "$username" "$password"
 
 sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
