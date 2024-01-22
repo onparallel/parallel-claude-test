@@ -709,13 +709,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                           <SparklesIcon fontSize="18px" marginRight={2} role="presentation" />
                           <FormattedMessage
                             id="page.replies.summary-header"
-                            defaultMessage="Summary"
+                            defaultMessage="Analyze with Mike"
                           />
                           <HelpPopover>
                             <Text fontSize="sm">
                               <FormattedMessage
                                 id="page.replies.summary-header-help"
-                                defaultMessage="Generate a summary with Parallel AI to summarize the collected information."
+                                defaultMessage="Mike AI analyzes the replies to extract conclusions."
                               />
                             </Text>
                           </HelpPopover>

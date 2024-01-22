@@ -5196,23 +5196,23 @@
   },
   {
     "term": "component.petition-replies-summary.generate-summary",
-    "definition": "Generar resumen",
-    "context": "Generate Summary"
+    "definition": "Analizar",
+    "context": "Analyze"
   },
   {
     "term": "component.petition-replies-summary.no-summary-feature-body",
-    "definition": "Genera un resumen con Parallel IA y saca conclusiones de este proceso. Contacta con nosotros para activarlo en tu organización.",
-    "context": "Generate a summary with Parallel AI and draw conclusions from this process. Contact us to activate it in your organization."
+    "definition": "Deja que Mike AI analice las respuestas y saque conclusiones de este proceso. Contacta con nosotros para más información.",
+    "context": "Let Mike AI analyze the answers and draw conclusions from this process. Contact us for more information."
   },
   {
     "term": "component.petition-replies-summary.no-summary-feature-heading",
-    "definition": "Descubre Parallel AI",
-    "context": "Discover Parallel AI"
+    "definition": "Te presentamos a Mike AI",
+    "context": "Introducing Mike AI"
   },
   {
     "term": "component.petition-replies-summary.no-summary-text",
     "definition": "Aún no se ha generado ningún resumen.",
-    "context": "No summary has been generated yet."
+    "context": "Mike AI can analyze the answers and draw conclusions from this process."
   },
   {
     "term": "component.petition-select.placeholder-petition",
@@ -11961,13 +11961,13 @@
   },
   {
     "term": "page.replies.summary-header",
-    "definition": "Resumen",
-    "context": "Summary"
+    "definition": "Analizar con Mike",
+    "context": "Analyze with Mike"
   },
   {
     "term": "page.replies.summary-header-help",
-    "definition": "Genera un resumen con Parallel AI para resumir la información recogida.",
-    "context": "Generate a summary with Parallel AI to summarize the collected information."
+    "definition": "Mike AI analiza las respuestas para sacar conclusiones del proceso.",
+    "context": "Mike AI analyzes the replies to extract conclusions."
   },
   {
     "term": "page.reports-overview.choose-date-range",

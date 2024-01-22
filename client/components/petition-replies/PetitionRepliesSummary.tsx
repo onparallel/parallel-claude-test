@@ -107,13 +107,13 @@ export const PetitionRepliesSummary = Object.assign(
               <Heading size="md" textAlign="center">
                 <FormattedMessage
                   id="component.petition-replies-summary.no-summary-feature-heading"
-                  defaultMessage="Discover Parallel AI"
+                  defaultMessage="Introducing Mike AI"
                 />
               </Heading>
               <Text>
                 <FormattedMessage
                   id="component.petition-replies-summary.no-summary-feature-body"
-                  defaultMessage="Generate a summary with Parallel AI and draw conclusions from this process. Contact us to activate it in your organization."
+                  defaultMessage="Let Mike AI analyze the answers and draw conclusions from this process. Contact us for more information."
                 />
               </Text>
             </Stack>
@@ -175,7 +175,7 @@ export const PetitionRepliesSummary = Object.assign(
             <Text color="gray.500">
               <FormattedMessage
                 id="component.petition-replies-summary.no-summary-text"
-                defaultMessage="No summary has been generated yet."
+                defaultMessage="Mike AI can analyze the answers and draw conclusions from this process."
               />
             </Text>
             <Box>
@@ -187,7 +187,7 @@ export const PetitionRepliesSummary = Object.assign(
               >
                 <FormattedMessage
                   id="component.petition-replies-summary.generate-summary"
-                  defaultMessage="Generate Summary"
+                  defaultMessage="Analyze"
                 />
               </Button>
             </Box>
