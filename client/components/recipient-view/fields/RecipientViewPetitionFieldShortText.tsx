@@ -163,7 +163,7 @@ export function RecipientViewPetitionFieldShortText({
           if (focusCreatedReply) {
             await waitFor(1);
             const newReplyElement = replyRefs[replyId].current!;
-            if (options.format !== "EMAIL") {
+            if (newReplyElement && options.format !== "EMAIL") {
               Object.assign(newReplyElement, selection);
               newReplyElement?.setSelectionRange(
                 newReplyElement.value.length,
