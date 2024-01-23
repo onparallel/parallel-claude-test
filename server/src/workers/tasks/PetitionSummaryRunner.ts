@@ -1,8 +1,10 @@
 import { IntlShape } from "react-intl";
-import { isDefined, zip } from "remeda";
+import { identity, isDefined, mapToObj, mapValues, pick, pipe, uniq, zip } from "remeda";
 import { Petition, PetitionFieldType } from "../../db/__types";
+import { zipX } from "../../util/arrays";
 import { getFieldsWithIndices } from "../../util/fieldIndices";
 import { evaluateFieldLogic } from "../../util/fieldLogic";
+import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { createLiquid } from "../../util/liquid";
@@ -80,6 +82,25 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     const [composedPetition] = await this.ctx.petitions.getComposedPetitionFieldsAndVariables([
       petition.id,
     ]);
+    const events = await this.ctx.petitions.getLastPetitionReplyStatusChangeEvents([petition.id]);
+    const userIds = uniq(events.map((e) => e.data.user_id).filter(isDefined));
+    const userDataById = pipe(
+      userIds,
+      zip(await this.ctx.users.loadUserDataByUserId(userIds)),
+      mapToObj(identity),
+    );
+    const eventsByReplyId = mapToObj(events, (e) => [e.data.petition_field_reply_id, e]);
+    const reviewedByByReplyId = mapValues(eventsByReplyId, (e) => {
+      const user = isDefined(e.data.user_id) ? userDataById[e.data.user_id] : null;
+      return (
+        user && {
+          full_name: fullName(user.first_name, user.last_name),
+          ...pick(user, ["first_name", "last_name", "email"]),
+        }
+      );
+    });
+    const reviewedAtByReplyId = mapValues(eventsByReplyId, (e) => e.created_at);
+
     const organization = await this.ctx.organizations.loadOrg(petition.org_id);
 
     const fileUploadReferences: {
@@ -139,36 +160,56 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
           : null,
         type: field.type,
         index,
-        replies: field.replies.map((reply, groupIndex) => ({
-          content: replyContent(field.type, reply.content),
-          children: reply.children
-            ?.filter?.(
-              (_, childReplyIndex) =>
-                logic.groupChildrenLogic?.[groupIndex][childReplyIndex].isVisible,
-            )
-            .map(({ field, replies }, childReplyIndex) => ({
-              field: {
-                title: field.title,
-                description: field.description
-                  ? liquid.parseAndRenderSync(
-                      field.description,
-                      {
-                        ...petitionFieldsScope,
-                        ...buildPetitionVariablesLiquidScope(
-                          logic.groupChildrenLogic![groupIndex][childReplyIndex],
-                        ),
-                      },
-                      { globals: { intl } },
-                    )
-                  : null,
-                type: field.type,
-                index: childrenFieldIndexes?.[childReplyIndex],
-              },
-              replies: replies.map((reply) => ({
+        replies:
+          field.type === "FIELD_GROUP"
+            ? zip(field.replies, logic.groupChildrenLogic!).map(([reply, childLogic]) => ({
                 content: replyContent(field.type, reply.content),
+                children: zipX(reply.children!, childLogic, childrenFieldIndexes!)
+                  .filter(([_, logic]) => logic.isVisible)
+                  .map(([{ field, replies }, logic, childIndex]) => ({
+                    field: {
+                      title: field.title,
+                      description: field.description
+                        ? liquid.parseAndRenderSync(
+                            field.description,
+                            {
+                              ...petitionFieldsScope,
+                              ...buildPetitionVariablesLiquidScope(logic),
+                            },
+                            { globals: { intl } },
+                          )
+                        : null,
+                      type: field.type,
+                      index: childIndex,
+                    },
+                    replies: replies.map((reply) => ({
+                      content: replyContent(field.type, reply.content),
+                      status: reply.status,
+                      reviewed_by: reviewedByByReplyId[reply.id as any],
+                      reviewed_at: reviewedAtByReplyId[reply.id as any],
+                    })),
+                    variables: Object.keys(logic.finalVariables).map((key) => [
+                      key,
+                      {
+                        after: logic.currentVariables[key],
+                        before: logic.previousVariables[key],
+                      },
+                    ]),
+                  })),
+              }))
+            : field.replies.map((reply) => ({
+                content: replyContent(field.type, reply.content),
+                status: reply.status,
+                reviewed_by: reviewedByByReplyId[reply.id as any],
+                reviewed_at: reviewedAtByReplyId[reply.id as any],
               })),
-            })),
-        })),
+        variables: Object.keys(logic.finalVariables).map((key) => [
+          key,
+          {
+            after: logic.currentVariables[key],
+            before: logic.previousVariables[key],
+          },
+        ]),
       }));
 
     // load every file upload referenced in petition and modify the object to include the file upload info inside scope

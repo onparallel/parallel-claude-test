@@ -1,11 +1,16 @@
 import { IntlShape } from "react-intl";
 import { FORMATS, prettifyTimezone } from "../../../util/dates";
 
+const INTL = Symbol("intl");
+
 abstract class LiquidValue<T> {
+  [intl: symbol]: IntlShape;
   constructor(
-    protected intl: IntlShape,
+    intl: IntlShape,
     public readonly content: T,
-  ) {}
+  ) {
+    this[INTL] = intl;
+  }
 
   abstract toString(): string;
 }
@@ -16,7 +21,7 @@ export class DateTimeLiquidValue extends LiquidValue<{
   value: string;
 }> {
   toString() {
-    return `${this.intl.formatDate(new Date(this.content.value), {
+    return `${this[INTL].formatDate(new Date(this.content.value), {
       timeZone: this.content.timezone,
       ...FORMATS["LLL"],
     })} (${prettifyTimezone(this.content.timezone)})`;
@@ -25,7 +30,7 @@ export class DateTimeLiquidValue extends LiquidValue<{
 
 export class DateLiquidValue extends LiquidValue<{ value: string }> {
   toString() {
-    return this.intl.formatDate(new Date(this.content.value), {
+    return this[INTL].formatDate(new Date(this.content.value), {
       timeZone: "UTC",
       ...FORMATS["LL"],
     });

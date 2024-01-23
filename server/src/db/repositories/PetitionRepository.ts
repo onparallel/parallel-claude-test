@@ -24,7 +24,7 @@ import { validateReferencingFieldsPositions } from "../../graphql/helpers/valida
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { AiCompletionPrompt } from "../../services/ai-clients/AiCompletionClient";
-import { average, unMaybeArray } from "../../util/arrays";
+import { average, unMaybeArray, zipX } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import {
   PetitionFieldMath,
@@ -42,6 +42,7 @@ import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { PetitionAccessReminderConfig, calculateNextReminder } from "../../util/reminderUtils";
+import { retry } from "../../util/retry";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import {
@@ -118,7 +119,6 @@ import {
   PetitionUserNotification,
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
-import { retry } from "../../util/retry";
 
 export interface PetitionVariable {
   name: string;
@@ -2712,6 +2712,22 @@ export class PetitionRepository extends BaseRepository {
     return petitionIds.map((id) => customListsByPetitionId[id]?.custom_lists ?? []);
   }
 
+  async getLastPetitionReplyStatusChangeEvents(petitionIds: number[]) {
+    const rows = await this.raw<ReplyStatusChangedEvent & { rn: number }>(
+      /* sql */ `
+      with ordered_events as (
+        select *,
+          row_number() over (partition by "data"->>'petition_field_reply_id' order by created_at desc) as rn
+        from petition_event
+        where petition_id in ? and type = 'REPLY_STATUS_CHANGED'
+      )
+      select * from ordered_events where rn = 1;
+    `,
+      [this.sqlIn(petitionIds)],
+    );
+    return rows.map(omit(["rn"])) as ReplyStatusChangedEvent[];
+  }
+
   async getComposedPetitionFieldsAndVariables(petitionIds: number[]) {
     const [fieldsWithRepliesByPetition, variablesByPetition, customListsByPetition] =
       await Promise.all([
@@ -2720,54 +2736,52 @@ export class PetitionRepository extends BaseRepository {
         this.getPetitionCustomLists(petitionIds),
       ]);
 
-    return pipe(
-      fieldsWithRepliesByPetition,
-      zip(variablesByPetition),
-      zip(customListsByPetition),
-    ).map(([[fieldsWithReplies, variables], customLists]) => {
-      const [fields, children] = partition(
-        fieldsWithReplies,
-        (f) => f.parent_petition_field_id === null,
-      );
+    return zipX(fieldsWithRepliesByPetition, variablesByPetition, customListsByPetition).map(
+      ([fieldsWithReplies, variables, customLists]) => {
+        const [fields, children] = partition(
+          fieldsWithReplies,
+          (f) => f.parent_petition_field_id === null,
+        );
 
-      return {
-        fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
-          const fieldChildren =
-            field.type === "FIELD_GROUP"
-              ? pipe(
-                  children,
-                  filter((c) => c.parent_petition_field_id! === field.id),
-                  sortBy([(f) => f.position, "asc"]),
-                  map((child) => ({
-                    ...child,
-                    parent: field,
-                  })),
-                )
-              : [];
-
-          const fieldReplies = field.replies.map((reply) => ({
-            ...reply,
-            children:
+        return {
+          fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
+            const fieldChildren =
               field.type === "FIELD_GROUP"
-                ? fieldChildren.map((child) => ({
-                    field: child,
-                    replies: child.replies.filter(
-                      (cr) => cr.parent_petition_field_reply_id === reply.id,
-                    ),
-                  }))
-                : null,
-          }));
+                ? pipe(
+                    children,
+                    filter((c) => c.parent_petition_field_id! === field.id),
+                    sortBy([(f) => f.position, "asc"]),
+                    map((child) => ({
+                      ...child,
+                      parent: field,
+                    })),
+                  )
+                : [];
 
-          return {
-            ...field,
-            children: field.type === "FIELD_GROUP" ? fieldChildren : null,
-            replies: fieldReplies,
-          };
-        }),
-        variables,
-        custom_lists: customLists,
-      };
-    });
+            const fieldReplies = field.replies.map((reply) => ({
+              ...reply,
+              children:
+                field.type === "FIELD_GROUP"
+                  ? fieldChildren.map((child) => ({
+                      field: child,
+                      replies: child.replies.filter(
+                        (cr) => cr.parent_petition_field_reply_id === reply.id,
+                      ),
+                    }))
+                  : null,
+            }));
+
+            return {
+              ...field,
+              children: field.type === "FIELD_GROUP" ? fieldChildren : null,
+              replies: fieldReplies,
+            };
+          }),
+          variables,
+          custom_lists: customLists,
+        };
+      },
+    );
   }
 
   async completePetition(
