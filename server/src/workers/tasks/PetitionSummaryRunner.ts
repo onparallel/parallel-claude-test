@@ -188,13 +188,15 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
                       reviewed_by: reviewedByByReplyId[reply.id as any],
                       reviewed_at: reviewedAtByReplyId[reply.id as any],
                     })),
-                    variables: Object.keys(logic.finalVariables).map((key) => [
-                      key,
-                      {
-                        after: logic.currentVariables[key],
-                        before: logic.previousVariables[key],
-                      },
-                    ]),
+                    variables: Object.fromEntries(
+                      Object.keys(logic.finalVariables).map((key) => [
+                        key,
+                        {
+                          after: logic.currentVariables[key],
+                          before: logic.previousVariables[key],
+                        },
+                      ]),
+                    ),
                   })),
               }))
             : field.replies.map((reply) => ({
@@ -203,13 +205,15 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
                 reviewed_by: reviewedByByReplyId[reply.id as any],
                 reviewed_at: reviewedAtByReplyId[reply.id as any],
               })),
-        variables: Object.keys(logic.finalVariables).map((key) => [
-          key,
-          {
-            after: logic.currentVariables[key],
-            before: logic.previousVariables[key],
-          },
-        ]),
+        variables: Object.fromEntries(
+          Object.keys(logic.finalVariables).map((key) => [
+            key,
+            {
+              after: logic.currentVariables[key],
+              before: logic.previousVariables[key],
+            },
+          ]),
+        ),
       }));
 
     // load every file upload referenced in petition and modify the object to include the file upload info inside scope
