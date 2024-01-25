@@ -607,6 +607,8 @@ export function useStartAsyncFieldCompletion() {
             isAnonymized: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            parent: null,
+            children: [],
           },
         ]);
 
@@ -634,6 +636,7 @@ export function useStartAsyncFieldCompletion() {
                           isAnonymized: false,
                           createdAt: new Date().toISOString(),
                           updatedAt: new Date().toISOString(),
+                          parent: { id: parentReplyId },
                         },
                       ],
                     };

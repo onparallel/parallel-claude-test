@@ -889,6 +889,8 @@ export interface Mutation {
   publicRemindersOptOut: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   publicResetTempPassword: Result;
+  /** Retries the completion of error replies for an async field */
+  publicRetryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access */
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
@@ -925,6 +927,8 @@ export interface Mutation {
   /** Restores a deleted petition if it's not already anonymized. */
   restoreDeletedPetition: SupportMethodResponse;
   restoreLogin: Result;
+  /** Retries the completion of error replies for an async field */
+  retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
   /** Moves a profile to DELETION_SCHEDULED status */
@@ -1745,6 +1749,12 @@ export interface MutationpublicResetTempPasswordArgs {
   locale: UserLocale;
 }
 
+export interface MutationpublicRetryAsyncFieldCompletionArgs {
+  fieldId: Scalars["GID"]["input"];
+  keycode: Scalars["ID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+}
+
 export interface MutationpublicSendReminderArgs {
   contactEmail: Scalars["String"]["input"];
   keycode?: InputMaybe<Scalars["ID"]["input"]>;
@@ -1837,6 +1847,12 @@ export interface MutationresetUserPasswordArgs {
 }
 
 export interface MutationrestoreDeletedPetitionArgs {
+  petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationretryAsyncFieldCompletionArgs {
+  fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 }
 
@@ -17008,6 +17024,20 @@ export type PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutation = {
   };
 };
 
+export type PreviewPetitionField_retryAsyncFieldCompletionMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+}>;
+
+export type PreviewPetitionField_retryAsyncFieldCompletionMutation = {
+  retryAsyncFieldCompletion: {
+    __typename?: "AsyncFieldCompletionResponse";
+    type: string;
+    url: string;
+  };
+};
+
 export type PreviewPetitionFieldMutations_deletePetitionReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   replyId: Scalars["GID"]["input"];
@@ -22073,10 +22103,25 @@ export type RecipientViewPetitionField_publicUpdatePetitionFieldRepliesMutation 
 export type RecipientViewPetitionField_publicStartAsyncFieldCompletionMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
   fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
 export type RecipientViewPetitionField_publicStartAsyncFieldCompletionMutation = {
   publicStartAsyncFieldCompletion: {
+    __typename?: "AsyncFieldCompletionResponse";
+    type: string;
+    url: string;
+  };
+};
+
+export type PreviewPetitionField_publicretryAsyncFieldCompletionMutationVariables = Exact<{
+  keycode: Scalars["ID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+}>;
+
+export type PreviewPetitionField_publicretryAsyncFieldCompletionMutation = {
+  publicRetryAsyncFieldCompletion: {
     __typename?: "AsyncFieldCompletionResponse";
     type: string;
     url: string;
@@ -53098,6 +53143,25 @@ export const PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument = 
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutation,
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutationVariables
 >;
+export const PreviewPetitionField_retryAsyncFieldCompletionDocument = gql`
+  mutation PreviewPetitionField_retryAsyncFieldCompletion(
+    $petitionId: GID!
+    $fieldId: GID!
+    $parentReplyId: GID
+  ) {
+    retryAsyncFieldCompletion(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      parentReplyId: $parentReplyId
+    ) {
+      type
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionField_retryAsyncFieldCompletionMutation,
+  PreviewPetitionField_retryAsyncFieldCompletionMutationVariables
+>;
 export const PreviewPetitionFieldMutations_deletePetitionReplyDocument = gql`
   mutation PreviewPetitionFieldMutations_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
     deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
@@ -54032,8 +54096,13 @@ export const RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument 
   mutation RecipientViewPetitionField_publicStartAsyncFieldCompletion(
     $keycode: ID!
     $fieldId: GID!
+    $parentReplyId: GID
   ) {
-    publicStartAsyncFieldCompletion(keycode: $keycode, fieldId: $fieldId) {
+    publicStartAsyncFieldCompletion(
+      keycode: $keycode
+      fieldId: $fieldId
+      parentReplyId: $parentReplyId
+    ) {
       type
       url
     }
@@ -54041,6 +54110,25 @@ export const RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument 
 ` as unknown as DocumentNode<
   RecipientViewPetitionField_publicStartAsyncFieldCompletionMutation,
   RecipientViewPetitionField_publicStartAsyncFieldCompletionMutationVariables
+>;
+export const PreviewPetitionField_publicretryAsyncFieldCompletionDocument = gql`
+  mutation PreviewPetitionField_publicretryAsyncFieldCompletion(
+    $keycode: ID!
+    $fieldId: GID!
+    $parentReplyId: GID
+  ) {
+    publicRetryAsyncFieldCompletion(
+      keycode: $keycode
+      fieldId: $fieldId
+      parentReplyId: $parentReplyId
+    ) {
+      type
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionField_publicretryAsyncFieldCompletionMutation,
+  PreviewPetitionField_publicretryAsyncFieldCompletionMutationVariables
 >;
 export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument = gql`
   mutation RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLink(

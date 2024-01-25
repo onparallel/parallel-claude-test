@@ -61,6 +61,13 @@ export interface PreviewPetitionFieldGroupProps
     type: string;
     url: string;
   }>;
+  onRetryAsyncFieldCompletion: (
+    fieldId: string,
+    parentReplyId: string,
+  ) => Promise<{
+    type: string;
+    url: string;
+  }>;
   petition: PreviewPetitionFieldGroup_PetitionBaseFragment;
   showErrors: boolean;
   fieldLogic: FieldLogicResult;
@@ -80,6 +87,7 @@ export function PreviewPetitionFieldGroup({
   onDownloadFileUploadReply,
   onCreateFileReply,
   onStartAsyncFieldCompletion,
+  onRetryAsyncFieldCompletion,
   onRefreshField,
   showErrors,
   onError,
@@ -149,6 +157,7 @@ export function PreviewPetitionFieldGroup({
                       onDownloadFileUploadReply={onDownloadFileUploadReply}
                       onCreateFileReply={onCreateFileReply}
                       onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
+                      onRetryAsyncFieldCompletion={onRetryAsyncFieldCompletion}
                       onRefreshField={onRefreshField}
                       onError={onError}
                     />
@@ -218,6 +227,13 @@ function PreviewPetitionFieldGroupField(props: {
     type: string;
     url: string;
   }>;
+  onRetryAsyncFieldCompletion: (
+    fieldId: string,
+    parentReplyId: string,
+  ) => Promise<{
+    type: string;
+    url: string;
+  }>;
   onRefreshField: () => void;
   onError: (error: any) => void;
 }) {
@@ -227,6 +243,7 @@ function PreviewPetitionFieldGroupField(props: {
     onDownloadFileUploadReply,
     onCreateFileReply,
     onStartAsyncFieldCompletion,
+    onRetryAsyncFieldCompletion,
     onRefreshField,
     onDeleteReply,
     onUpdateReply,
@@ -286,6 +303,9 @@ function PreviewPetitionFieldGroupField(props: {
           onDownloadReply={onDownloadFileUploadReply}
           onStartAsyncFieldCompletion={async () => {
             return await onStartAsyncFieldCompletion(field.id, parentReplyId);
+          }}
+          onRetryAsyncFieldCompletion={async () => {
+            return await onRetryAsyncFieldCompletion(field.id, parentReplyId);
           }}
           onRefreshField={onRefreshField}
           isCacheOnly={isCacheOnly}

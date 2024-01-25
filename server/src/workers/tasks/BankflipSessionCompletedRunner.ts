@@ -14,7 +14,11 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION_COMPLETED"> {
   async run() {
-    const { bankflip_session_id: sessionId, org_id: orgId } = this.task.input;
+    const {
+      bankflip_session_id: sessionId,
+      org_id: orgId,
+      retry_errors: retryErrors,
+    } = this.task.input;
     const metadata = await this.ctx.bankflip.fetchSessionMetadata(
       toGlobalId("Organization", orgId),
       sessionId,
@@ -43,18 +47,68 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         { concurrency: 2 },
       );
 
-      await this.ctx.petitions.createPetitionFieldReply(
-        petitionId,
-        replyContents.map((content) => ({
-          petition_field_id: fieldId,
-          type: "ES_TAX_DOCUMENTS",
-          parent_petition_field_reply_id: parentReplyId,
-          content: { ...content, bankflip_session_id: sessionId },
-          user_id: userId,
-          petition_access_id: petitionAccessId,
-        })),
-        createdBy,
-      );
+      if (!retryErrors) {
+        await this.ctx.petitions.createPetitionFieldReply(
+          petitionId,
+          replyContents.map((content) => ({
+            petition_field_id: fieldId,
+            type: "ES_TAX_DOCUMENTS",
+            parent_petition_field_reply_id: parentReplyId,
+            content: { ...content, bankflip_session_id: sessionId },
+            user_id: userId,
+            petition_access_id: petitionAccessId,
+          })),
+          createdBy,
+        );
+      } else {
+        // fetch replies with request that have previously errored
+        // and try to update their content with the new data
+        const errorReplies = (await this.ctx.petitions.loadRepliesForField(fieldId)).filter(
+          (r) =>
+            isDefined(r.content.error) &&
+            Array.isArray(r.content.error) &&
+            r.content.error[0]?.reason !== "document_not_found" &&
+            r.parent_petition_field_reply_id === parentReplyId &&
+            r.status !== "APPROVED",
+        );
+
+        const updateData = errorReplies
+          .map((r) => ({
+            id: r.id,
+            content: replyContents.filter(
+              (c) => JSON.stringify(c.request.model) === JSON.stringify(r.content.request.model),
+            ),
+          }))
+          .filter((d) => d.content.length > 0);
+
+        const updater = isDefined(userId)
+          ? await this.ctx.users.loadUser(userId)
+          : await this.ctx.petitions.loadAccess(petitionAccessId!);
+
+        for (const data of updateData) {
+          const [updateReplyContent, ...newRepliesContent] = data.content;
+          await this.ctx.petitions.updatePetitionFieldRepliesContent(
+            petitionId,
+            [{ id: data.id, content: updateReplyContent }],
+            updater!,
+          );
+
+          if (newRepliesContent.length > 0) {
+            await this.ctx.petitions.createPetitionFieldReply(
+              petitionId,
+              newRepliesContent.map((content) => ({
+                petition_field_id: fieldId,
+                type: "ES_TAX_DOCUMENTS",
+                parent_petition_field_reply_id: parentReplyId,
+                content: { ...content, bankflip_session_id: sessionId },
+                user_id: userId,
+                petition_access_id: petitionAccessId,
+              })),
+              createdBy,
+            );
+          }
+        }
+      }
 
       return {
         success: true,

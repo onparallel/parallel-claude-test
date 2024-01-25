@@ -55,6 +55,7 @@ export type TaskInput<TName extends TaskName> = {
   BANKFLIP_SESSION_COMPLETED: {
     bankflip_session_id: string;
     org_id: number;
+    retry_errors?: boolean;
   };
   /**
    * creates, prefills and sends petitions from a template_id.

@@ -4,11 +4,15 @@ import { useIntl } from "react-intl";
 
 type ErrorReason =
   | "user_aborted"
+  | "user_blocked"
   | "blocked_credentials"
+  | "user_unknown"
   | "user_not_registered"
   | "document_not_found"
   | "timeout"
-  | "generic";
+  | "generic"
+  | "mfa_method_not_supported"
+  | "action_required_from_user";
 
 interface EsTaxDocumentsContentErrorMessageProps {
   error: { reason: ErrorReason }[];
@@ -23,18 +27,27 @@ export function EsTaxDocumentsContentErrorMessage({
         id: "component.es-tax-documents-content-error-message.user-aborted",
         defaultMessage: "You cancelled the request before it could finish. Please, try again.",
       }),
+      user_blocked: intl.formatMessage({
+        id: "component.es-tax-documents-content-error-message.user-blocked",
+        defaultMessage:
+          "The Public Administration has blocked the user access for security reasons.",
+      }),
       blocked_credentials: intl.formatMessage({
         id: "component.es-tax-documents-content-error-message.blocked-credentials",
         defaultMessage:
-          "The Public Administration has blocked your access for security reasons. Please, try again later.",
+          "The Public Administration has blocked the user access for security reasons. Please, try again later.",
+      }),
+      user_unknown: intl.formatMessage({
+        id: "component.es-tax-documents-content-error-message.user-unknown",
+        defaultMessage: "The user is not known in the Public Administration.",
       }),
       user_not_registered: intl.formatMessage({
         id: "component.es-tax-documents-content-error-message.user-not-registered",
-        defaultMessage: "The user is not registered in the Public Administration",
+        defaultMessage: "The user is not registered in the Public Administration.",
       }),
       document_not_found: intl.formatMessage({
         id: "component.es-tax-documents-content-error-message.document-not-found",
-        defaultMessage: "We couldn't find the requested document in the Public Administration",
+        defaultMessage: "We couldn't find the requested document in the Public Administration.",
       }),
       timeout: intl.formatMessage({
         id: "component.es-tax-documents-content-error-message.timeout",
@@ -55,12 +68,19 @@ export function EsTaxDocumentsContentErrorMessage({
         id: "component.es-tax-documents-content-error-message.generic",
         defaultMessage: "An unknown error happened.",
       }),
+      mfa_method_not_supported: intl.formatMessage({
+        id: "component.es-tax-documents-content-error-message.mfa-method-not-supported",
+        defaultMessage:
+          "The user has an uncommon multi factor authentication method which is not currently supported.",
+      }),
     }),
     [intl.locale],
   );
+
+  const reason = error[0].reason;
   return (
-    <Text color="red.500" fontSize="xs">
-      {reasons[error[0].reason]}
+    <Text color={reason === "document_not_found" ? "gray.500" : "red.500"} fontSize="xs">
+      {reasons[reason] ?? reasons.generic}
     </Text>
   );
 }

@@ -80,6 +80,8 @@ export const BANKFLIP_SERVICE = Symbol.for("BANKFLIP_SERVICE");
 export interface IBankflipService {
   /** called to start a session with Bankflip to request a person's documents */
   createSession(metadata: SessionMetadata): Promise<CreateSessionResponse>;
+  /** creates a 'retry' session, picking from the field only the model requests that resulted on an error */
+  createRetrySession(metadata: SessionMetadata): Promise<CreateSessionResponse>;
   /** webhook callback for when document extraction has finished and the session is completed */
   webhookSecret(orgId: string): string;
   fetchSessionMetadata(orgId: string, sessionId: string): Promise<SessionMetadata>;
@@ -161,29 +163,52 @@ export class BankflipService implements IBankflipService {
     if (!field?.options.requests) {
       throw new Error(`Expected to have models configured in PetitionField:${fieldId}`);
     }
-    const petition = await this.petitions.loadPetition(field.petition_id);
-    const organization = await this.organizations.loadOrg(petition!.org_id);
-    const hasRemoveParallelBranding = await this.featureFlags.orgHasFeatureFlag(
-      organization!.id,
-      "REMOVE_PARALLEL_BRANDING",
-    );
 
-    const customization: any = {};
-    if (hasRemoveParallelBranding) {
-      customization["companyName"] = organization!.name;
-      const customLogoPath = await this.organizations.loadOrgIconPath(organization!.id);
-      if (isDefined(customLogoPath)) {
-        customization["companyLogo"] = await this.images.getImageUrl(customLogoPath, {
-          resize: { height: 150, width: 150, fit: "fill" },
-        });
-      }
-    }
+    const orgId = fromGlobalId(metadata.orgId, "Organization").id;
+    const customization = await this.buildBankflipCustomization(orgId);
 
     return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
       method: "POST",
       body: JSON.stringify({
         requests: field.options.requests,
         webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}`,
+        customization,
+        metadata,
+      }),
+    });
+  }
+
+  async createRetrySession(metadata: SessionMetadata) {
+    const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
+    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
+    const parentReplyId = metadata.parentReplyId
+      ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
+      : null;
+    const fieldReplies = await this.petitions.loadRepliesForField(fieldId);
+
+    const requests = fieldReplies
+      .filter(
+        (r) =>
+          isDefined(r.content.error) &&
+          Array.isArray(r.content.error) &&
+          r.content.error[0]?.reason !== "document_not_found" &&
+          r.parent_petition_field_reply_id === parentReplyId &&
+          r.status !== "APPROVED",
+      )
+      .map((r) => r.content.request);
+
+    if (requests.length === 0) {
+      throw new Error("NOTHING_TO_RETRY_ERROR");
+    }
+
+    const orgId = fromGlobalId(metadata.orgId, "Organization").id;
+    const customization = await this.buildBankflipCustomization(orgId);
+
+    return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
+      method: "POST",
+      body: JSON.stringify({
+        requests,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}/retry`,
         customization,
         metadata,
       }),
@@ -205,5 +230,26 @@ export class BankflipService implements IBankflipService {
 
   async fetchJsonDocumentContents(orgId: string, documentId: string) {
     return await this.apiRequest<any>(orgId, `/document/${documentId}/content`);
+  }
+
+  private async buildBankflipCustomization(orgId: number) {
+    const organization = await this.organizations.loadOrg(orgId);
+    const hasRemoveParallelBranding = await this.featureFlags.orgHasFeatureFlag(
+      orgId,
+      "REMOVE_PARALLEL_BRANDING",
+    );
+
+    const customization: any = {};
+    if (hasRemoveParallelBranding) {
+      customization["companyName"] = organization!.name;
+      const customLogoPath = await this.organizations.loadOrgIconPath(organization!.id);
+      if (isDefined(customLogoPath)) {
+        customization["companyLogo"] = await this.images.getImageUrl(customLogoPath, {
+          resize: { height: 150, width: 150, fit: "fill" },
+        });
+      }
+    }
+
+    return customization;
   }
 }

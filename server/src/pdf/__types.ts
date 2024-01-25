@@ -843,6 +843,8 @@ export type Mutation = {
   publicRemindersOptOut: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   publicResetTempPassword: Result;
+  /** Retries the completion of error replies for an async field */
+  publicRetryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access */
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
@@ -879,6 +881,8 @@ export type Mutation = {
   /** Restores a deleted petition if it's not already anonymized. */
   restoreDeletedPetition: SupportMethodResponse;
   restoreLogin: Result;
+  /** Retries the completion of error replies for an async field */
+  retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
   /** Moves a profile to DELETION_SCHEDULED status */
@@ -1699,6 +1703,12 @@ export type MutationpublicResetTempPasswordArgs = {
   locale: UserLocale;
 };
 
+export type MutationpublicRetryAsyncFieldCompletionArgs = {
+  fieldId: Scalars["GID"]["input"];
+  keycode: Scalars["ID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+};
+
 export type MutationpublicSendReminderArgs = {
   contactEmail: Scalars["String"]["input"];
   keycode?: InputMaybe<Scalars["ID"]["input"]>;
@@ -1791,6 +1801,12 @@ export type MutationresetUserPasswordArgs = {
 };
 
 export type MutationrestoreDeletedPetitionArgs = {
+  petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationretryAsyncFieldCompletionArgs = {
+  fieldId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 

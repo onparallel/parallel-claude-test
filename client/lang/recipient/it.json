@@ -175,24 +175,44 @@
     "context": "Error"
   },
   {
+    "term": "component.es-tax-documents-change-person-dialog.body",
+    "definition": "Continua per eliminare tutti i documenti e ottenere i dati di un'altra persona.",
+    "context": "Continue to delete all documents and obtain the data of another person."
+  },
+  {
+    "term": "component.es-tax-documents-change-person-dialog.confirm-button",
+    "definition": "Elimina e ricomincia",
+    "context": "Delete and start again"
+  },
+  {
+    "term": "component.es-tax-documents-change-person-dialog.header",
+    "definition": "Cambia persona",
+    "context": "Change person"
+  },
+  {
     "term": "component.es-tax-documents-content-error-message.action-required-from-user",
     "definition": "Non è possibile recuperare i dati di affiliazione necessari per ottenere queste informazioni. I tuoi dati non sono stati ottenuti automaticamente.",
     "context": "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically."
   },
   {
     "term": "component.es-tax-documents-content-error-message.blocked-credentials",
-    "definition": "L'Amministrazione Pubblica ha bloccato il tuo accesso per motivi di sicurezza. Si prega di riprovare più tardi.",
-    "context": "The Public Administration has blocked your access for security reasons. Please, try again later."
+    "definition": "L'Amministrazione Pubblica ha bloccato l'accesso dell'utente per motivi di sicurezza. Si prega di riprovare più tardi.",
+    "context": "The Public Administration has blocked the user access for security reasons. Please, try again later."
   },
   {
     "term": "component.es-tax-documents-content-error-message.document-not-found",
-    "definition": "Non siamo riusciti a trovare il documento richiesto nell'Amministrazione Pubblica",
-    "context": "We couldn't find the requested document in the Public Administration"
+    "definition": "Non siamo riusciti a trovare il documento richiesto nell'Amministrazione Pubblica.",
+    "context": "We couldn't find the requested document in the Public Administration."
   },
   {
     "term": "component.es-tax-documents-content-error-message.generic",
     "definition": "Si è verificato un errore sconosciuto.",
     "context": "An unknown error happened."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.mfa-method-not-supported",
+    "definition": "L'utente ha un metodo di autenticazione a più fattori non comune che attualmente non è supportato.",
+    "context": "The user has an uncommon multi factor authentication method which is not currently supported."
   },
   {
     "term": "component.es-tax-documents-content-error-message.parallel-send-limit-reached",
@@ -210,9 +230,19 @@
     "context": "You cancelled the request before it could finish. Please, try again."
   },
   {
+    "term": "component.es-tax-documents-content-error-message.user-blocked",
+    "definition": "L'Amministrazione Pubblica ha bloccato l'accesso dell'utente per motivi di sicurezza.",
+    "context": "The Public Administration has blocked the user access for security reasons."
+  },
+  {
     "term": "component.es-tax-documents-content-error-message.user-not-registered",
-    "definition": "L'utente non è registrato nell'Amministrazione Pubblica",
-    "context": "The user is not registered in the Public Administration"
+    "definition": "L'utente non è registrato nell'Amministrazione Pubblica.",
+    "context": "The user is not registered in the Public Administration."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-unknown",
+    "definition": "L'utente non è noto nell'Amministrazione Pubblica.",
+    "context": "The user is not known in the Public Administration."
   },
   {
     "term": "component.field-comment.message-not-available",
@@ -278,21 +308,6 @@
     "term": "component.message-email-body-form-control.required-error",
     "definition": "Personalizzare il messaggio iniziale migliora i tempi di risposta dei destinatari",
     "context": "Customizing the initial message improves the response time of the recipients"
-  },
-  {
-    "term": "component.overwrite-documentation-dialog.body",
-    "definition": "{tone, select, INFORMAL{È già stato completato un caricamento. Se continui, tornerai al processo iniziale e la documentazione attuale sarà sovrascritta. Sei sicuro di voler ricominciare?} other{Il processo di caricamento è stato completato almeno una volta. Se prosegue, tornerà al processo iniziale e la documentazione attuale sarà sovrascritta. È sicuro di voler ricominciare?}}",
-    "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
-  },
-  {
-    "term": "component.overwrite-documentation-dialog.confirm-button",
-    "definition": "Sì, ricomincia",
-    "context": "Yes, start again"
-  },
-  {
-    "term": "component.overwrite-documentation-dialog.header",
-    "definition": "Sovrascrivi documentazione",
-    "context": "Overwrite documentation"
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -620,6 +635,11 @@
     "context": "Please, enter a valid {format}."
   },
   {
+    "term": "component.recipient-view-petition-field-tax-documents.change-person-button",
+    "definition": "Cambia persona",
+    "context": "Change person"
+  },
+  {
     "term": "component.recipient-view-petition-field-tax-documents.error-field-already-replied",
     "definition": "Esiste già una risposta per questo campo.",
     "context": "There is already a reply for this field."
@@ -640,9 +660,9 @@
     "context": "Please, wait while we upload the documentation..."
   },
   {
-    "term": "component.recipient-view-petition-field-tax-documents.start-again-button",
-    "definition": "Inizia di nuovo",
-    "context": "Start again"
+    "term": "component.recipient-view-petition-field-tax-documents.retry-button",
+    "definition": "Riprova",
+    "context": "Retry"
   },
   {
     "term": "component.recipient-view-petition-field-tax-documents.start-button",

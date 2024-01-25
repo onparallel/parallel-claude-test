@@ -1,21 +1,23 @@
-import { Box, Button, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
+import { NormalLink } from "@parallel/components/common/Link";
 import { useTone } from "@parallel/components/common/ToneProvider";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { isDefined } from "@udecode/plate-common";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { useOverwriteDocumentationDialog } from "../dialogs/OverwriteDocumentationDialog";
+import { pick, zip } from "remeda";
+import { useEsTaxDocumentsChangePersonDialog } from "../dialogs/EsTaxDocumentsChangePersonDialog";
 import { RecipientViewPetitionFieldReplyFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldTaxDocumentsProps
   extends Omit<
@@ -23,13 +25,15 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
-  onDeleteReply: (replyId: string) => void;
+  onDeleteReply: (replyId: string) => Promise<void>;
   onDownloadReply: (replyId: string) => void;
   isCacheOnly?: boolean;
   onStartAsyncFieldCompletion: () => Promise<{ type: string; url: string }>;
+  onRetryAsyncFieldCompletion: () => Promise<{ type: string; url: string }>;
   onRefreshField: () => void;
   onError: (error: any) => void;
   isInvalid?: boolean;
+  hideDeleteReplyButton?: boolean;
 }
 
 export function RecipientViewPetitionFieldTaxDocuments({
@@ -40,10 +44,12 @@ export function RecipientViewPetitionFieldTaxDocuments({
   onDownloadReply,
   onCommentsButtonClick,
   onStartAsyncFieldCompletion,
+  onRetryAsyncFieldCompletion,
   onRefreshField,
   onError,
   isInvalid,
   isCacheOnly,
+  hideDeleteReplyButton,
 }: RecipientViewPetitionFieldTaxDocumentsProps) {
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
@@ -59,6 +65,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING" | "FIELD_ALREADY_REPLIED_ERROR">(
     "IDLE",
   );
+  const [requestType, setRequestType] = useState<"START" | "RETRY" | null>(null);
 
   useEffect(() => {
     if (state === "FIELD_ALREADY_REPLIED_ERROR") {
@@ -69,12 +76,24 @@ export function RecipientViewPetitionFieldTaxDocuments({
   // ready means bankflip exported all requested docs and sent event to our webhook to start uploading replies
   const [bankflipSessionReady, setBankflipSessionReady] = useState(false);
 
-  const showOverwriteDocumentationDialog = useOverwriteDocumentationDialog();
+  const repliesBefore = useMemo(
+    () => field.replies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
+    [field.replies.length],
+  );
 
   const popupRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (field.replies.length > 0) {
+      const someChange =
+        field.replies.length !== repliesBefore.length ||
+        zip(repliesBefore, field.replies.map(pick(["id", "updatedAt"]))).some(([before, after]) => {
+          return before.updatedAt !== after.updatedAt;
+        });
+
+      if (
+        (requestType === "START" && field.replies.length > 0 && bankflipSessionReady) ||
+        (requestType === "RETRY" && someChange && bankflipSessionReady)
+      ) {
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
@@ -89,7 +108,12 @@ export function RecipientViewPetitionFieldTaxDocuments({
       }
     },
     5000,
-    [onRefreshField, state, field.replies.length, bankflipSessionReady],
+    [
+      onRefreshField,
+      state,
+      field.replies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
+      bankflipSessionReady,
+    ],
   );
 
   useWindowEvent(
@@ -120,19 +144,17 @@ export function RecipientViewPetitionFieldTaxDocuments({
         await handleDeletePetitionReply({ replyId: reply.id });
       }
       setBankflipSessionReady(false);
+      setRequestType("START");
       setState("FETCHING");
       popupRef.current = await openNewWindow(
         async () => {
           const data = await onStartAsyncFieldCompletion();
-          if (data.type === "CACHE") {
-            throw new Error("CLOSE");
-          } else {
-            return data!.url;
-          }
+          return data!.url;
         },
         centeredPopup({ height: 800, width: 700 }),
       );
       if (isCacheOnly) {
+        popupRef.current.close();
         setState("IDLE");
       }
     } catch (e) {
@@ -145,13 +167,40 @@ export function RecipientViewPetitionFieldTaxDocuments({
     }
   };
 
-  const handleStartAgain = async () => {
+  const handleRetryRequest = async () => {
     try {
-      await showOverwriteDocumentationDialog({ tone });
-      await handleStart();
+      setBankflipSessionReady(false);
+      setRequestType("RETRY");
+      setState("FETCHING");
+      popupRef.current = await openNewWindow(
+        async () => {
+          const data = await onRetryAsyncFieldCompletion();
+          return data!.url;
+        },
+        centeredPopup({ height: 800, width: 700 }),
+      );
+      if (isCacheOnly) {
+        popupRef.current.close();
+        setState("IDLE");
+      }
     } catch {}
   };
 
+  const hasErrorDocuments = field.replies.some(
+    (r) =>
+      isDefined(r.content.error) &&
+      Array.isArray(r.content.error) &&
+      r.content.error[0]?.reason !== "document_not_found",
+  );
+
+  const showChangePersonDialog = useEsTaxDocumentsChangePersonDialog();
+
+  const handleChangePerson = async () => {
+    try {
+      await showChangePersonDialog({ tone });
+      await handleStart();
+    } catch {}
+  };
   const handleCancelClick = () => {
     setState("IDLE");
     popupRef.current?.close();
@@ -201,7 +250,11 @@ export function RecipientViewPetitionFieldTaxDocuments({
                   type="ES_TAX_DOCUMENTS"
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id]}
-                  onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
+                  onRemove={
+                    !hideDeleteReplyButton
+                      ? () => handleDeletePetitionReply({ replyId: reply.id })
+                      : undefined
+                  }
                   onDownload={onDownloadReply}
                   isDownloadDisabled={isCacheOnly || reply.isAnonymized}
                 />
@@ -210,12 +263,12 @@ export function RecipientViewPetitionFieldTaxDocuments({
           </AnimatePresence>
         </List>
       ) : null}
-      <Box marginTop={2}>
-        {field.replies.length ? (
+      <Flex marginTop={2} justifyContent="space-between" alignItems="baseline">
+        {hasErrorDocuments ? (
           <Button
             variant="outline"
             width="min-content"
-            onClick={handleStartAgain}
+            onClick={handleRetryRequest}
             isDisabled={
               isDisabled ||
               state === "FETCHING" ||
@@ -223,11 +276,11 @@ export function RecipientViewPetitionFieldTaxDocuments({
             }
           >
             <FormattedMessage
-              id="component.recipient-view-petition-field-tax-documents.start-again-button"
-              defaultMessage="Start again"
+              id="component.recipient-view-petition-field-tax-documents.retry-button"
+              defaultMessage="Retry"
             />
           </Button>
-        ) : (
+        ) : field.replies.length === 0 ? (
           <Button
             variant="outline"
             width="min-content"
@@ -240,8 +293,18 @@ export function RecipientViewPetitionFieldTaxDocuments({
               defaultMessage="Start"
             />
           </Button>
+        ) : (
+          <Box />
         )}
-      </Box>
+        {field.replies.length > 0 && state === "IDLE" ? (
+          <NormalLink role="button" onClick={handleChangePerson}>
+            <FormattedMessage
+              id="component.recipient-view-petition-field-tax-documents.change-person-button"
+              defaultMessage="Change person"
+            />
+          </NormalLink>
+        ) : null}
+      </Flex>
       {state === "ERROR" ? (
         <HStack alignItems="center" marginTop={2} color="red.600">
           <ExclamationOutlineIcon boxSize={4} />

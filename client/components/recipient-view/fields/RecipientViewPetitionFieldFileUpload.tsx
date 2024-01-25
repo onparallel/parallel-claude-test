@@ -229,9 +229,9 @@ export function RecipientViewPetitionFieldReplyFileUpload({
             />
           </Center>
         ) : (
-          <Text fontSize="xs">
+          <>
             {uploadHasFailed ? (
-              <Text as="span" color="red.600">
+              <Text as="span" color="red.600" fontSize="xs">
                 <FormattedMessage
                   id="component.recipient-view-petition-field-reply.file-incomplete"
                   defaultMessage="There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."
@@ -245,7 +245,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
             ) : (
               <DateTime value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
             )}
-          </Text>
+          </>
         )}
       </Box>
       {reply.status !== "PENDING" ? (

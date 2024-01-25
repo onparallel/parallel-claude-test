@@ -1676,6 +1676,7 @@ export interface NexusGenFieldTypes {
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicRemindersOptOut: NexusGenEnums["Result"]; // Result!
     publicResetTempPassword: NexusGenEnums["Result"]; // Result!
+    publicRetryAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     publicSendReminder: NexusGenEnums["Result"]; // Result!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicStartAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
@@ -1695,6 +1696,7 @@ export interface NexusGenFieldTypes {
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreDeletedPetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreLogin: NexusGenEnums["Result"]; // Result!
+    retryAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     scheduleProfileForDeletion: NexusGenRootTypes["Profile"][]; // [Profile!]!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
@@ -3924,6 +3926,7 @@ export interface NexusGenFieldTypeNames {
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicRemindersOptOut: "Result";
     publicResetTempPassword: "Result";
+    publicRetryAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     publicSendReminder: "Result";
     publicSendVerificationCode: "VerificationCodeRequest";
     publicStartAsyncFieldCompletion: "AsyncFieldCompletionResponse";
@@ -3943,6 +3946,7 @@ export interface NexusGenFieldTypeNames {
     resetUserPassword: "SupportMethodResponse";
     restoreDeletedPetition: "SupportMethodResponse";
     restoreLogin: "Result";
+    retryAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     revokeUserAuthToken: "Result";
     scheduleProfileForDeletion: "Profile";
     sendPetition: "SendPetitionResult";
@@ -6383,6 +6387,12 @@ export interface NexusGenArgTypes {
       email: string; // String!
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
     };
+    publicRetryAsyncFieldCompletion: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      keycode: string; // ID!
+      parentReplyId?: NexusGenScalars["GID"] | null; // GID
+    };
     publicSendReminder: {
       // args
       contactEmail: string; // String!
@@ -6476,6 +6486,12 @@ export interface NexusGenArgTypes {
     };
     restoreDeletedPetition: {
       // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    retryAsyncFieldCompletion: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      parentReplyId?: NexusGenScalars["GID"] | null; // GID
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     revokeUserAuthToken: {

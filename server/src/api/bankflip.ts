@@ -20,10 +20,8 @@ const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
   }
 };
 
-export const bankflip = Router().post(
-  "/:orgId",
-  json({ verify: verifyHMAC }),
-  async (req, res, next) => {
+export const bankflip = Router()
+  .post("/:orgId", json({ verify: verifyHMAC }), async (req, res, next) => {
     try {
       const body = req.body as BankflipWebhookEvent;
       if (body.name === "SESSION_COMPLETED") {
@@ -41,5 +39,24 @@ export const bankflip = Router().post(
       req.context.logger.error(error.message, { stack: error.stack });
       next(error);
     }
-  },
-);
+  })
+  .post("/:orgId/retry", json({ verify: verifyHMAC }), async (req, res, next) => {
+    try {
+      const body = req.body as BankflipWebhookEvent;
+      if (body.name === "SESSION_COMPLETED") {
+        await req.context.tasks.createTask({
+          name: "BANKFLIP_SESSION_COMPLETED",
+          input: {
+            bankflip_session_id: body.payload.sessionId,
+            org_id: fromGlobalId(req.params.orgId, "Organization").id,
+            retry_errors: true,
+          },
+        });
+      }
+
+      res.sendStatus(200).end();
+    } catch (error: any) {
+      req.context.logger.error(error.message, { stack: error.stack });
+      next(error);
+    }
+  });

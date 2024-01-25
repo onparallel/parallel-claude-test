@@ -175,24 +175,44 @@
     "context": "Error"
   },
   {
+    "term": "component.es-tax-documents-change-person-dialog.body",
+    "definition": "Continuar para apagar todos os documentos e obter os dados de outra pessoa.",
+    "context": "Continue to delete all documents and obtain the data of another person."
+  },
+  {
+    "term": "component.es-tax-documents-change-person-dialog.confirm-button",
+    "definition": "Apagar e começar de novo",
+    "context": "Delete and start again"
+  },
+  {
+    "term": "component.es-tax-documents-change-person-dialog.header",
+    "definition": "Mudar de pessoa",
+    "context": "Change person"
+  },
+  {
     "term": "component.es-tax-documents-content-error-message.action-required-from-user",
     "definition": "Não é possível recuperar os dados necessários para obter esta informação. Não foi possível obter os seus dados de forma automática.",
     "context": "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically."
   },
   {
     "term": "component.es-tax-documents-content-error-message.blocked-credentials",
-    "definition": "A Administração Pública bloqueou o seu acesso por motivos de segurança. Por favor, tente novamente mais tarde.",
-    "context": "The Public Administration has blocked your access for security reasons. Please, try again later."
+    "definition": "A Administração Pública bloqueou o acesso do utilizador por motivos de segurança. Por favor, tente novamente mais tarde.",
+    "context": "The Public Administration has blocked the user access for security reasons. Please, try again later."
   },
   {
     "term": "component.es-tax-documents-content-error-message.document-not-found",
-    "definition": "Não conseguimos encontrar o documento solicitado na Administração Pública",
-    "context": "We couldn't find the requested document in the Public Administration"
+    "definition": "Não conseguimos encontrar o documento solicitado na Administração Pública.",
+    "context": "We couldn't find the requested document in the Public Administration."
   },
   {
     "term": "component.es-tax-documents-content-error-message.generic",
     "definition": "Ocorreu um erro desconhecido.",
     "context": "An unknown error happened."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.mfa-method-not-supported",
+    "definition": "O utilizador tem um método de autenticação de múltiplos fatores incomum que não é atualmente suportado.",
+    "context": "The user has an uncommon multi factor authentication method which is not currently supported."
   },
   {
     "term": "component.es-tax-documents-content-error-message.parallel-send-limit-reached",
@@ -210,9 +230,19 @@
     "context": "You cancelled the request before it could finish. Please, try again."
   },
   {
+    "term": "component.es-tax-documents-content-error-message.user-blocked",
+    "definition": "A Administração Pública bloqueou o acesso do utilizador por motivos de segurança.",
+    "context": "The Public Administration has blocked the user access for security reasons."
+  },
+  {
     "term": "component.es-tax-documents-content-error-message.user-not-registered",
-    "definition": "O utilizador não está registado na Administração Pública",
-    "context": "The user is not registered in the Public Administration"
+    "definition": "O utilizador não está registado na Administração Pública.",
+    "context": "The user is not registered in the Public Administration."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-unknown",
+    "definition": "O utilizador não é conhecido na Administração Pública.",
+    "context": "The user is not known in the Public Administration."
   },
   {
     "term": "component.field-comment.message-not-available",
@@ -278,21 +308,6 @@
     "term": "component.message-email-body-form-control.required-error",
     "definition": "Personalizar a mensagem inicial melhora o tempo de resposta dos destinatários",
     "context": "Customizing the initial message improves the response time of the recipients"
-  },
-  {
-    "term": "component.overwrite-documentation-dialog.body",
-    "definition": "{tone, select, INFORMAL{Já foi completado um carregamento. Se continuares, voltarás ao processo inicial e a documentação atual será sobrescrita. Tens a certeza que queres começar de novo?} other{O processo de carregamento foi completado pelo menos uma vez. Se continuar, voltará ao processo inicial e a documentação atual será sobrescrita. Tem a certeza de que quer começar de novo?}}",
-    "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
-  },
-  {
-    "term": "component.overwrite-documentation-dialog.confirm-button",
-    "definition": "Sim, começar de novo",
-    "context": "Yes, start again"
-  },
-  {
-    "term": "component.overwrite-documentation-dialog.header",
-    "definition": "Sobrescrever documentação",
-    "context": "Overwrite documentation"
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -620,6 +635,11 @@
     "context": "Please, enter a valid {format}."
   },
   {
+    "term": "component.recipient-view-petition-field-tax-documents.change-person-button",
+    "definition": "Mudar de pessoa",
+    "context": "Change person"
+  },
+  {
     "term": "component.recipient-view-petition-field-tax-documents.error-field-already-replied",
     "definition": "Já existe uma resposta para este campo.",
     "context": "There is already a reply for this field."
@@ -640,9 +660,9 @@
     "context": "Please, wait while we upload the documentation..."
   },
   {
-    "term": "component.recipient-view-petition-field-tax-documents.start-again-button",
-    "definition": "Começar de novo",
-    "context": "Start again"
+    "term": "component.recipient-view-petition-field-tax-documents.retry-button",
+    "definition": "Tentar novamente",
+    "context": "Retry"
   },
   {
     "term": "component.recipient-view-petition-field-tax-documents.start-button",

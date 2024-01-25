@@ -6,6 +6,7 @@ import {
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
+  PreviewPetitionField_retryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
@@ -45,6 +46,7 @@ import {
 } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
+import { pick } from "remeda";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -231,6 +233,20 @@ export function PreviewPetitionField({
     });
   };
 
+  const [retryAsyncFieldCompletion] = useMutation(
+    PreviewPetitionField_retryAsyncFieldCompletionDocument,
+  );
+  const handleRetryAsyncFieldCompletion = async (_fieldId?: string, parentReplyId?: string) => {
+    const { data } = await retryAsyncFieldCompletion({
+      variables: {
+        petitionId,
+        fieldId: _fieldId ?? fieldId,
+        parentReplyId,
+      },
+    });
+    return pick(data!.retryAsyncFieldCompletion, ["type", "url"]);
+  };
+
   const { refetch } = useQuery(PreviewPetitionField_PetitionFieldDocument, {
     skip: true,
   });
@@ -267,6 +283,7 @@ export function PreviewPetitionField({
         onDownloadFileUploadReply={handleDownloadFileUploadReply}
         onRefreshField={handleRefreshAsyncField}
         onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+        onRetryAsyncFieldCompletion={handleRetryAsyncFieldCompletion}
         isCacheOnly={isCacheOnly}
         petition={petition}
         showErrors={showErrors}
@@ -309,6 +326,7 @@ export function PreviewPetitionField({
           {...commonProps}
           onDownloadReply={handleDownloadFileUploadReply}
           onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+          onRetryAsyncFieldCompletion={handleRetryAsyncFieldCompletion}
           onRefreshField={handleRefreshAsyncField}
           isCacheOnly={isCacheOnly}
         />
@@ -389,6 +407,22 @@ PreviewPetitionField.mutations = [
         fieldId: $fieldId
         attachmentId: $attachmentId
       ) {
+        url
+      }
+    }
+  `,
+  gql`
+    mutation PreviewPetitionField_retryAsyncFieldCompletion(
+      $petitionId: GID!
+      $fieldId: GID!
+      $parentReplyId: GID
+    ) {
+      retryAsyncFieldCompletion(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        parentReplyId: $parentReplyId
+      ) {
+        type
         url
       }
     }

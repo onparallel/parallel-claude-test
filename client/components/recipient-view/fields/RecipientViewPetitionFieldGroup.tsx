@@ -62,6 +62,13 @@ export interface RecipientViewPetitionFieldGroupProps
     type: string;
     url: string;
   }>;
+  onRetryAsyncFieldCompletion: (
+    fieldId: string,
+    parentReplyId: string,
+  ) => Promise<{
+    type: string;
+    url: string;
+  }>;
   showErrors: boolean;
   petition: RecipientViewPetitionFieldGroup_PublicPetitionFragment;
   fieldLogic: FieldLogicResult;
@@ -80,6 +87,7 @@ export function RecipientViewPetitionFieldGroup({
   onDownloadFileUploadReply,
   onCreateFileReply,
   onStartAsyncFieldCompletion,
+  onRetryAsyncFieldCompletion,
   showErrors,
   petition,
   onError,
@@ -134,6 +142,7 @@ export function RecipientViewPetitionFieldGroup({
                     onDownloadFileUploadReply={onDownloadFileUploadReply}
                     onCreateFileReply={onCreateFileReply}
                     onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
+                    onRetryAsyncFieldCompletion={onRetryAsyncFieldCompletion}
                     onRefreshField={onRefreshField}
                     onError={onError}
                   />
@@ -162,7 +171,17 @@ function RecipientViewPetitionFieldGroupField(props: {
   ) => Promise<string | undefined>;
   onDownloadFileUploadReply: (replyId: string) => void;
   onCreateFileReply: (content: File[], fieldId: string, parentReplyId: string) => void;
-  onStartAsyncFieldCompletion: () => Promise<{
+  onStartAsyncFieldCompletion: (
+    fieldId: string,
+    parentReplyId: string,
+  ) => Promise<{
+    type: string;
+    url: string;
+  }>;
+  onRetryAsyncFieldCompletion: (
+    fieldId: string,
+    parentReplyId: string,
+  ) => Promise<{
     type: string;
     url: string;
   }>;
@@ -175,6 +194,7 @@ function RecipientViewPetitionFieldGroupField(props: {
     onDownloadFileUploadReply,
     onCreateFileReply,
     onStartAsyncFieldCompletion,
+    onRetryAsyncFieldCompletion,
     onRefreshField,
     onDeleteReply,
     onCreateReply,
@@ -235,8 +255,14 @@ function RecipientViewPetitionFieldGroupField(props: {
         <RecipientViewPetitionFieldTaxDocuments
           {...commonProps}
           onDownloadReply={onDownloadFileUploadReply}
-          onStartAsyncFieldCompletion={onStartAsyncFieldCompletion}
+          onStartAsyncFieldCompletion={async () =>
+            await onStartAsyncFieldCompletion(field.id, parentReplyId)
+          }
+          onRetryAsyncFieldCompletion={async () =>
+            await onRetryAsyncFieldCompletion(field.id, parentReplyId)
+          }
           onRefreshField={onRefreshField}
+          hideDeleteReplyButton
         />
       ) : null}
     </Box>

@@ -2,6 +2,7 @@ import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
+  PreviewPetitionField_publicretryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionAccessFragment,
   RecipientViewPetitionField_PublicPetitionFieldDocument,
@@ -42,6 +43,7 @@ import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionF
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 import { useCreateFileUploadReply } from "./clientMutations";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { pick } from "remeda";
 
 export interface RecipientViewPetitionFieldProps
   extends Omit<
@@ -219,14 +221,29 @@ export function RecipientViewPetitionField({
     RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument,
   );
 
-  const handleStartAsyncFieldCompletion = async () => {
+  const handleStartAsyncFieldCompletion = async (_fieldId?: string, parentReplyId?: string) => {
     const { data } = await publicStartAsyncFieldCompletion({
       variables: {
-        fieldId: props.field.id,
+        fieldId: _fieldId ?? props.field.id,
         keycode: props.keycode,
+        parentReplyId,
       },
     });
     return data!.publicStartAsyncFieldCompletion;
+  };
+
+  const [publicRetryAsyncFieldCompletion] = useMutation(
+    PreviewPetitionField_publicretryAsyncFieldCompletionDocument,
+  );
+  const handleRetryAsyncFieldCompletion = async (_fieldId?: string, parentReplyId?: string) => {
+    const { data } = await publicRetryAsyncFieldCompletion({
+      variables: {
+        keycode: props.keycode,
+        fieldId: _fieldId ?? props.field.id,
+        parentReplyId,
+      },
+    });
+    return pick(data!.publicRetryAsyncFieldCompletion, ["type", "url"]);
   };
 
   const { refetch } = useQuery(RecipientViewPetitionField_PublicPetitionFieldDocument, {
@@ -262,6 +279,7 @@ export function RecipientViewPetitionField({
         onCreateFileReply={handleCreateFileUploadReply}
         onDownloadFileUploadReply={handleDownloadFileUploadReply}
         onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+        onRetryAsyncFieldCompletion={handleRetryAsyncFieldCompletion}
         petition={props.access.petition}
         fieldLogic={fieldLogic!}
       />
@@ -301,7 +319,9 @@ export function RecipientViewPetitionField({
           {...commonProps}
           onDownloadReply={handleDownloadFileUploadReply}
           onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+          onRetryAsyncFieldCompletion={handleRetryAsyncFieldCompletion}
           onRefreshField={handleRefreshAsyncField}
+          hideDeleteReplyButton
         />
       ) : null}
     </RecipientViewPetitionFieldCard>
@@ -464,8 +484,29 @@ RecipientViewPetitionField.mutations = [
     mutation RecipientViewPetitionField_publicStartAsyncFieldCompletion(
       $keycode: ID!
       $fieldId: GID!
+      $parentReplyId: GID
     ) {
-      publicStartAsyncFieldCompletion(keycode: $keycode, fieldId: $fieldId) {
+      publicStartAsyncFieldCompletion(
+        keycode: $keycode
+        fieldId: $fieldId
+        parentReplyId: $parentReplyId
+      ) {
+        type
+        url
+      }
+    }
+  `,
+  gql`
+    mutation PreviewPetitionField_publicretryAsyncFieldCompletion(
+      $keycode: ID!
+      $fieldId: GID!
+      $parentReplyId: GID
+    ) {
+      publicRetryAsyncFieldCompletion(
+        keycode: $keycode
+        fieldId: $fieldId
+        parentReplyId: $parentReplyId
+      ) {
         type
         url
       }

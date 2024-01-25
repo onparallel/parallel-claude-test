@@ -29,6 +29,7 @@ import {
   replyBelongsToAccess,
   replyBelongsToExternalField,
 } from "../authorizers";
+import { ApolloError } from "../../helpers/errors";
 
 export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetitionFieldReplies", {
   description: "Creates replies on a petition field as recipient.",
@@ -343,5 +344,48 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       type: "WINDOW",
       url: session.widgetLink,
     };
+  },
+});
+
+export const publicRetryAsyncFieldCompletion = mutationField("publicRetryAsyncFieldCompletion", {
+  description: "Retries the completion of error replies for an async field",
+  type: "AsyncFieldCompletionResponse",
+  args: {
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    parentReplyId: globalIdArg("PetitionFieldReply"),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      fieldBelongsToAccess("fieldId"),
+      fieldIsExternal("fieldId"),
+      fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
+    ),
+  ),
+  resolve: async (_, { fieldId, parentReplyId }, ctx) => {
+    try {
+      const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
+      const session = await ctx.bankflip.createRetrySession({
+        petitionId: toGlobalId("Petition", petition!.id),
+        orgId: toGlobalId("Organization", petition!.org_id),
+        fieldId: toGlobalId("PetitionField", fieldId),
+        accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+        parentReplyId: isDefined(parentReplyId)
+          ? toGlobalId("PetitionFieldReply", parentReplyId)
+          : null,
+      });
+
+      return {
+        type: "WINDOW",
+        url: session.widgetLink,
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message === "NOTHING_TO_RETRY_ERROR") {
+        throw new ApolloError("Nothing to retry", "NOTHING_TO_RETRY_ERROR");
+      }
+
+      throw error;
+    }
   },
 });

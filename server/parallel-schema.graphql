@@ -1662,6 +1662,15 @@ type Mutation {
   publicResetTempPassword(email: String!, locale: UserLocale!): Result!
 
   """
+  Retries the completion of error replies for an async field
+  """
+  publicRetryAsyncFieldCompletion(
+    fieldId: GID!
+    keycode: ID!
+    parentReplyId: GID
+  ): AsyncFieldCompletionResponse!
+
+  """
   Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access
   """
   publicSendReminder(
@@ -1792,6 +1801,15 @@ type Mutation {
   """
   restoreDeletedPetition(petitionId: GID!): SupportMethodResponse!
   restoreLogin: Result!
+
+  """
+  Retries the completion of error replies for an async field
+  """
+  retryAsyncFieldCompletion(
+    fieldId: GID!
+    parentReplyId: GID
+    petitionId: GID!
+  ): AsyncFieldCompletionResponse!
 
   """
   Soft-deletes a given auth token, making it permanently unusable.
