@@ -243,7 +243,12 @@ export function RecipientViewPetitionFieldReplyFileUpload({
             ) : type === "ES_TAX_DOCUMENTS" && reply.content.error ? (
               <EsTaxDocumentsContentErrorMessage error={reply.content.error} />
             ) : (
-              <DateTime value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
+              <DateTime
+                fontSize="xs"
+                value={reply.createdAt}
+                format={FORMATS.LLL}
+                useRelativeTime
+              />
             )}
           </>
         )}
