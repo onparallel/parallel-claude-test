@@ -94,6 +94,16 @@ function useCreateLiquid() {
       },
     );
 
+    engine.registerFilter("append_obj", function (value: any[], ...args: any[]) {
+      const obj: any = {};
+      for (let i = 0; i < args.length; i += 2) {
+        const key = args[i];
+        const value = args[i + 1];
+        obj[key] = value;
+      }
+      return [...value, obj];
+    });
+
     for (const filter of ["escape", "escape_once", "url_decode", "newline_to_br", "strip_html"]) {
       engine.registerFilter(filter, function () {
         throw new Error(`filter "${filter}" disabled`);
