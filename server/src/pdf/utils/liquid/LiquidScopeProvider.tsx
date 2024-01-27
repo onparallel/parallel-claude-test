@@ -44,6 +44,7 @@ LiquidScopeProvider.fragments = {
       type
       multiple
       alias
+      options
     }
   `,
 };

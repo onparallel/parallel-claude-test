@@ -36,3 +36,16 @@ export class DateLiquidValue extends LiquidValue<{ value: string }> {
     });
   }
 }
+
+export class WithLabelLiquidValue extends LiquidValue<{ value: string }> {
+  constructor(
+    intl: IntlShape,
+    content: { value: string },
+    public label: string,
+  ) {
+    super(intl, content);
+  }
+  toString() {
+    return this.content.value;
+  }
+}

@@ -5368,8 +5368,8 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
     type: PetitionFieldType;
     multiple: boolean;
     alias: string | null;
-    title: string | null;
     options: { [key: string]: any };
+    title: string | null;
     description: string | null;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -5389,8 +5389,8 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
           type: PetitionFieldType;
           multiple: boolean;
           alias: string | null;
-          title: string | null;
           options: { [key: string]: any };
+          title: string | null;
           description: string | null;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -5490,8 +5490,8 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
     type: PetitionFieldType;
     multiple: boolean;
     alias: string | null;
-    title: string | null;
     options: { [key: string]: any };
+    title: string | null;
     description: string | null;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -5511,8 +5511,8 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
           type: PetitionFieldType;
           multiple: boolean;
           alias: string | null;
-          title: string | null;
           options: { [key: string]: any };
+          title: string | null;
           description: string | null;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -5767,8 +5767,8 @@ export type PetitionExport_petitionQuery = {
           type: PetitionFieldType;
           multiple: boolean;
           alias: string | null;
-          title: string | null;
           options: { [key: string]: any };
+          title: string | null;
           description: string | null;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -5788,8 +5788,8 @@ export type PetitionExport_petitionQuery = {
                 type: PetitionFieldType;
                 multiple: boolean;
                 alias: string | null;
-                title: string | null;
                 options: { [key: string]: any };
+                title: string | null;
                 description: string | null;
                 showInPdf: boolean;
                 showActivityInPdf: boolean;
@@ -5894,8 +5894,8 @@ export type PetitionExport_petitionQuery = {
           type: PetitionFieldType;
           multiple: boolean;
           alias: string | null;
-          title: string | null;
           options: { [key: string]: any };
+          title: string | null;
           description: string | null;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -5915,8 +5915,8 @@ export type PetitionExport_petitionQuery = {
                 type: PetitionFieldType;
                 multiple: boolean;
                 alias: string | null;
-                title: string | null;
                 options: { [key: string]: any };
+                title: string | null;
                 description: string | null;
                 showInPdf: boolean;
                 showActivityInPdf: boolean;
@@ -6022,10 +6022,17 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
     type: PetitionFieldType;
     multiple: boolean;
     alias: string | null;
+    options: { [key: string]: any };
     replies: Array<{
       content: { [key: string]: any };
       children: Array<{
-        field: { id: string; type: PetitionFieldType; multiple: boolean; alias: string | null };
+        field: {
+          id: string;
+          type: PetitionFieldType;
+          multiple: boolean;
+          alias: string | null;
+          options: { [key: string]: any };
+        };
         replies: Array<{ content: { [key: string]: any } }>;
       }> | null;
     }>;
@@ -6039,10 +6046,17 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
     type: PetitionFieldType;
     multiple: boolean;
     alias: string | null;
+    options: { [key: string]: any };
     replies: Array<{
       content: { [key: string]: any };
       children: Array<{
-        field: { id: string; type: PetitionFieldType; multiple: boolean; alias: string | null };
+        field: {
+          id: string;
+          type: PetitionFieldType;
+          multiple: boolean;
+          alias: string | null;
+          options: { [key: string]: any };
+        };
         replies: Array<{ content: { [key: string]: any } }>;
       }> | null;
     }>;
@@ -6058,6 +6072,7 @@ export type LiquidScopeProvider_PetitionFieldFragment = {
   type: PetitionFieldType;
   multiple: boolean;
   alias: string | null;
+  options: { [key: string]: any };
 };
 
 export const PetitionExport_PetitionFieldInnerFragmentDoc = gql`
@@ -6177,6 +6192,7 @@ export const LiquidScopeProvider_PetitionFieldFragmentDoc = gql`
     type
     multiple
     alias
+    options
   }
 ` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldFragment, unknown>;
 export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`

@@ -1,12 +1,17 @@
 import { IntlShape } from "react-intl";
 import { isDefined, zip } from "remeda";
-import { PetitionField, PetitionFieldType } from "../db/__types";
-import { DateLiquidValue, DateTimeLiquidValue } from "../pdf/utils/liquid/LiquidValue";
+import { PetitionField } from "../db/__types";
+import {
+  DateLiquidValue,
+  DateTimeLiquidValue,
+  WithLabelLiquidValue,
+} from "../pdf/utils/liquid/LiquidValue";
 import { getFieldsWithIndices } from "./fieldIndices";
 import { FieldLogicResult } from "./fieldLogic";
 import { isFileTypeField } from "./isFileTypeField";
 
-interface InnerPetitionFieldLiquidScope extends Pick<PetitionField, "type" | "multiple" | "alias"> {
+interface InnerPetitionFieldLiquidScope
+  extends Pick<PetitionField, "type" | "multiple" | "alias" | "options"> {
   id: string;
 }
 
@@ -29,12 +34,39 @@ interface PetitionLiquidScope {
   fields: PetitionFieldLiquidScope[];
 }
 
-function getReplyValue(type: PetitionFieldType, content: any, intl: IntlShape) {
-  switch (type) {
+function getReplyValue(
+  field: Pick<PetitionField, "type" | "options">,
+  content: any,
+  intl: IntlShape,
+) {
+  switch (field.type) {
     case "DATE":
       return new DateLiquidValue(intl, content);
     case "DATE_TIME":
       return new DateTimeLiquidValue(intl, content);
+    case "SELECT":
+      const options = field.options as { labels?: string[]; values: string[] };
+      if (isDefined(options.labels)) {
+        const label =
+          zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
+        return new WithLabelLiquidValue(intl, content, label);
+      } else {
+        return new WithLabelLiquidValue(intl, content, content.value);
+      }
+    case "CHECKBOX": {
+      const options = field.options as { labels?: string[]; values: string[] };
+      if (isDefined(options.labels)) {
+        return (content.value ?? []).map((value: string) => {
+          const label =
+            zip(options.labels!, options.values).find(([, v]) => v === value)?.[0] ?? "";
+          return new WithLabelLiquidValue(intl, { value }, label);
+        });
+      } else {
+        return (content.value ?? []).map((value: string) => {
+          return new WithLabelLiquidValue(intl, { value }, value);
+        });
+      }
+    }
     default:
       return content.value;
   }
@@ -54,7 +86,7 @@ export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, in
           r.children!,
           childrenFieldIndices!,
         )) {
-          const values = _replies.map((r) => getReplyValue(field.type, r.content, intl));
+          const values = _replies.map((r) => getReplyValue(field, r.content, intl));
           scope._[fieldIndex] = (scope._[fieldIndex] ?? []).concat(values);
           if (isDefined(field.alias)) {
             scope[field.alias] = scope._[fieldIndex];
@@ -70,7 +102,7 @@ export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, in
         return reply;
       });
     } else {
-      values = replies.map((r) => getReplyValue(field.type, r.content, intl));
+      values = replies.map((r) => getReplyValue(field, r.content, intl));
     }
     const value = field.multiple ? values : values?.[0];
     if (field.type !== "HEADING" && !isFileTypeField(field.type)) {

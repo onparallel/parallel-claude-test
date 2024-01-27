@@ -42177,6 +42177,7 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
+    options: { [key: string]: any };
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
@@ -42188,6 +42189,7 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
           type: PetitionFieldType;
           multiple: boolean;
           alias?: string | null;
+          options: { [key: string]: any };
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
       }> | null;
@@ -42203,6 +42205,7 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
           type: PetitionFieldType;
           multiple: boolean;
           alias?: string | null;
+          options: { [key: string]: any };
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
       }> | null;
@@ -42219,6 +42222,7 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
+    options: { [key: string]: any };
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       content: { [key: string]: any };
@@ -42230,6 +42234,7 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
           type: PetitionFieldType;
           multiple: boolean;
           alias?: string | null;
+          options: { [key: string]: any };
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
       }> | null;
@@ -42245,6 +42250,7 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
           type: PetitionFieldType;
           multiple: boolean;
           alias?: string | null;
+          options: { [key: string]: any };
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
       }> | null;
@@ -42262,6 +42268,7 @@ export type LiquidScopeProvider_PetitionFieldFragment = {
   type: PetitionFieldType;
   multiple: boolean;
   alias?: string | null;
+  options: { [key: string]: any };
 };
 
 export type LiquidScopeProvider_PublicPetitionFragment = {
@@ -42273,6 +42280,7 @@ export type LiquidScopeProvider_PublicPetitionFragment = {
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
+    options: { [key: string]: any };
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
       content: { [key: string]: any };
@@ -42284,6 +42292,7 @@ export type LiquidScopeProvider_PublicPetitionFragment = {
           type: PetitionFieldType;
           multiple: boolean;
           alias?: string | null;
+          options: { [key: string]: any };
         };
         replies: Array<{
           __typename?: "PublicPetitionFieldReply";
@@ -42300,6 +42309,7 @@ export type LiquidScopeProvider_PublicPetitionFieldFragment = {
   type: PetitionFieldType;
   multiple: boolean;
   alias?: string | null;
+  options: { [key: string]: any };
 };
 
 export type useAvailablePetitionLocales_UserFragment = {
@@ -49329,6 +49339,7 @@ export const LiquidScopeProvider_PetitionFieldFragmentDoc = gql`
     type
     multiple
     alias
+    options
   }
 ` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldFragment, unknown>;
 export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
@@ -50999,6 +51010,7 @@ export const LiquidScopeProvider_PublicPetitionFieldFragmentDoc = gql`
     type
     multiple
     alias
+    options
   }
 ` as unknown as DocumentNode<LiquidScopeProvider_PublicPetitionFieldFragment, unknown>;
 export const LiquidScopeProvider_PublicPetitionFragmentDoc = gql`

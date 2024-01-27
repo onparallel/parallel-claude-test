@@ -2,15 +2,15 @@ import { gql } from "@apollo/client";
 import {
   LiquidScopeProvider_PetitionBaseFragment,
   LiquidScopeProvider_PublicPetitionFragment,
-  PetitionFieldType,
+  PetitionField,
 } from "@parallel/graphql/__types";
-import { createContext, PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren, createContext, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
 import { PetitionFieldIndex, useFieldsWithIndices } from "../fieldIndices";
 import { isFileTypeField } from "../isFileTypeField";
 import { ArrayUnionToUnion, UnwrapArray } from "../types";
-import { DateLiquidValue, DateTimeLiquidValue } from "./LiquidValue";
+import { DateLiquidValue, DateTimeLiquidValue, WithLabelLiquidValue } from "./LiquidValue";
 
 export const LiquidScopeContext = createContext<Record<string, any> | null>(null);
 
@@ -44,7 +44,7 @@ export function LiquidScopeProvider({
             UnwrapArray<Exclude<ArrayUnionToUnion<typeof replies>["children"], null | undefined>>,
             PetitionFieldIndex
           >(r.children! as any, childrenFieldIndices!)) {
-            const values = _replies.map((r) => getReplyValue(field.type, r.content));
+            const values = _replies.map((r) => getReplyValue(field, r.content));
             scope._[fieldIndex] = (scope._[fieldIndex] ?? []).concat(values);
             if (isDefined(field.alias)) {
               scope[field.alias] = scope._[fieldIndex];
@@ -60,7 +60,7 @@ export function LiquidScopeProvider({
           return reply;
         });
       } else {
-        values = replies.map((r) => getReplyValue(field.type, r.content));
+        values = replies.map((r) => getReplyValue(field, r.content));
       }
       const value = field.multiple ? values : values?.[0];
       if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
@@ -72,12 +72,35 @@ export function LiquidScopeProvider({
     }
     return scope;
 
-    function getReplyValue(type: PetitionFieldType, content: any) {
-      switch (type) {
+    function getReplyValue(field: Pick<PetitionField, "type" | "options">, content: any) {
+      switch (field.type) {
         case "DATE":
           return new DateLiquidValue(intl, content);
         case "DATE_TIME":
           return new DateTimeLiquidValue(intl, content);
+        case "SELECT":
+          const options = field.options as { labels?: string[]; values: string[] };
+          if (isDefined(options.labels)) {
+            const label =
+              zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
+            return new WithLabelLiquidValue(intl, content, label);
+          } else {
+            return new WithLabelLiquidValue(intl, content, content.value);
+          }
+        case "CHECKBOX": {
+          const options = field.options as { labels?: string[]; values: string[] };
+          if (isDefined(options.labels)) {
+            return (content.value ?? []).map((value: string) => {
+              const label =
+                zip(options.labels!, options.values).find(([, v]) => v === value)?.[0] ?? "";
+              return new WithLabelLiquidValue(intl, { value }, label);
+            });
+          } else {
+            return (content.value ?? []).map((value: string) => {
+              return new WithLabelLiquidValue(intl, { value }, value);
+            });
+          }
+        }
         default:
           return content.value;
       }
@@ -121,6 +144,7 @@ LiquidScopeProvider.fragments = {
       type
       multiple
       alias
+      options
     }
   `,
   PublicPetition: gql`
@@ -146,6 +170,7 @@ LiquidScopeProvider.fragments = {
       type
       multiple
       alias
+      options
     }
   `,
 };
