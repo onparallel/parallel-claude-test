@@ -65,7 +65,16 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
     >
       <Box marginX="auto" width="100%" maxWidth="container.md" paddingX={4} paddingBottom={16}>
         <Box paddingY={4}>
-          <SearchInput ref={inputRef} value={search} onChange={(e) => setSearch(e.target.value)} />
+          <SearchInput
+            ref={inputRef}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setSelected(filteredAdminSupportMethods?.[0] ?? null);
+              }
+            }}
+          />
         </Box>
         <Stack>
           {filteredAdminSupportMethods.map((method) => (
