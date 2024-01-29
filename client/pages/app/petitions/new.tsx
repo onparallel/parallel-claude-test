@@ -1,7 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { Container, Grid, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { PathBreadcrumbs } from "@parallel/components/common/PathBreadcrumbs";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
@@ -10,11 +9,11 @@ import {
   SearchInOptions,
 } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { SearchInput } from "@parallel/components/common/SearchInput";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
 import { EmptyFolderIllustration } from "@parallel/components/petition-common/EmptyFolderIllustration";
-import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
+import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
 import { FolderCard } from "@parallel/components/petition-new/FolderCard";
 import { GridInfiniteScrollList } from "@parallel/components/petition-new/GridInfiniteScrollList";
 import { NewPetitionCategoryFilter } from "@parallel/components/petition-new/NewPetitionCategoryFilter";
@@ -28,6 +27,7 @@ import {
 } from "@parallel/components/petition-new/NewPetitionSharedFilter";
 import { PublicTemplateCard } from "@parallel/components/petition-new/PublicTemplateCard";
 import { TemplateCard } from "@parallel/components/petition-new/TemplateCard";
+import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import {
   NewPetition_templateDocument,
   NewPetition_templatesDocument,
@@ -40,13 +40,13 @@ import {
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { SUPPORTED_PETITION_LOCALES } from "@parallel/utils/locales";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useHasPermission } from "@parallel/utils/useHasPermission";
 import {
+  QueryStateFrom,
   boolean,
   parseQuery,
-  QueryStateFrom,
   string,
   useBuildStateUrl,
   useQueryState,
@@ -54,6 +54,7 @@ import {
 } from "@parallel/utils/queryState";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -64,7 +65,7 @@ const QUERY_STATE = {
     .orDefault("/"),
   search: string(),
   searchIn: values<SearchInOptions>(["EVERYWHERE", "CURRENT_FOLDER"]).orDefault("EVERYWHERE"),
-  lang: values<PetitionLocale | "ALL">(["en", "es", "ALL"]),
+  lang: values<PetitionLocale | "ALL">([...SUPPORTED_PETITION_LOCALES, "ALL"]),
   public: boolean().orDefault(false),
   owner: boolean(),
   category: string(),

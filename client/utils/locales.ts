@@ -112,6 +112,8 @@ const PETITION_LOCALES: Locale<PetitionLocale>[] = [
   },
 ];
 
+export const SUPPORTED_PETITION_LOCALES = PETITION_LOCALES.map((l) => l.key);
+
 export function useSupportedPetitionLocales() {
   const intl = useIntl();
   return useMemo(
