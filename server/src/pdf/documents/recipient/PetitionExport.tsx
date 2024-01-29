@@ -83,11 +83,16 @@ export default function PetitionExport({
     //   objectFit: "contain",
     //   objectPositionX: 0,
     // },
-    documentStart: {
+    header: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       marginBottom: "10mm",
+    },
+    content: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "5mm",
     },
     documentLogo: {
       width: "84mm",
@@ -97,9 +102,6 @@ export default function PetitionExport({
     documentTitle: {
       marginTop: "10mm",
       textAlign: "center",
-    },
-    signaturesBlock: {
-      marginTop: "4mm",
     },
     footer: {
       position: "absolute",
@@ -146,9 +148,9 @@ export default function PetitionExport({
         <ThemeProvider theme={theme}>
           <Document>
             {pages.map((page, i) => (
-              <Page key={i} style={styles.page} wrap>
+              <Page key={i} style={styles.page}>
                 {i === 0 ? (
-                  <View style={styles.documentStart}>
+                  <View style={styles.header}>
                     {theme.showLogo ? (
                       <Image
                         src={
@@ -171,32 +173,33 @@ export default function PetitionExport({
                     ) : null}
                   </View>
                 ) : null}
-                {page
-                  .filter((x) => notEmptyHeading(x.field))
-                  .map(({ field, logic }) => {
-                    return (
-                      <LiquidPetitionVariableProvider key={field.id} logic={logic}>
-                        <PetitionExportField
-                          field={field}
-                          replies={field.replies}
-                          theme={petition.selectedDocumentTheme.data as PdfDocumentTheme}
-                          isPetition={petition.__typename === "Petition"}
-                          includeNetDocumentsLinks={includeNetDocumentsLinks}
-                          fieldLogic={logic}
-                        />
-                      </LiquidPetitionVariableProvider>
-                    );
-                  })}
-                {i === pages.length - 1 &&
-                showSignatureBoxes &&
-                petition.__typename === "Petition" &&
-                isDefined(petition.currentSignatureRequest) ? (
-                  <SignaturesBlock
-                    signatureConfig={petition.currentSignatureRequest.signatureConfig}
-                    templateId={petition.fromTemplate?.id ?? null}
-                    style={styles.signaturesBlock}
-                  />
-                ) : null}
+                <View style={styles.content}>
+                  {page
+                    .filter((x) => notEmptyHeading(x.field))
+                    .map(({ field, logic }) => {
+                      return (
+                        <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                          <PetitionExportField
+                            field={field}
+                            replies={field.replies}
+                            theme={petition.selectedDocumentTheme.data as PdfDocumentTheme}
+                            isPetition={petition.__typename === "Petition"}
+                            includeNetDocumentsLinks={includeNetDocumentsLinks}
+                            fieldLogic={logic}
+                          />
+                        </LiquidPetitionVariableProvider>
+                      );
+                    })}
+                  {i === pages.length - 1 &&
+                  showSignatureBoxes &&
+                  petition.__typename === "Petition" &&
+                  isDefined(petition.currentSignatureRequest) ? (
+                    <SignaturesBlock
+                      signatureConfig={petition.currentSignatureRequest.signatureConfig}
+                      templateId={petition.fromTemplate?.id ?? null}
+                    />
+                  ) : null}
+                </View>
                 <View
                   fixed
                   style={styles.footer}
@@ -297,7 +300,7 @@ function PetitionExportField({
     : replies;
 
   return (
-    <View style={{ marginBottom: "5mm" }}>
+    <View>
       {field.type === "HEADING" ? (
         <View>
           {field.title ? (

@@ -13,10 +13,9 @@ import { ContactLocale } from "../../db/__types";
 interface SignaturesBlockProps {
   signatureConfig: SignaturesBlock_SignatureConfigFragment;
   templateId?: string | null;
-  style?: Style | Style[];
 }
 
-export function SignaturesBlock({ signatureConfig, templateId, style }: SignaturesBlockProps) {
+export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlockProps) {
   const theme = useTheme();
   const intl = useIntl();
 
@@ -163,7 +162,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
   ];
 
   return (
-    <View style={style} wrap={false}>
+    <View wrap={false}>
       <View style={[styles.text]}>
         <RichTextBlock>{theme.legalText[intl.locale as ContactLocale]}</RichTextBlock>
       </View>
