@@ -367,7 +367,7 @@ export async function waitForTask(client: GraphQLClient, task: TaskType) {
     ${TaskFragment}
   `;
   const interval = 1_000;
-  const maxTime = performance.now() + 30_000;
+  const maxTime = performance.now() + 45_000;
   while (performance.now() < maxTime) {
     const result = await client.request(waitForTask_TaskDocument, {
       id: task.id,
