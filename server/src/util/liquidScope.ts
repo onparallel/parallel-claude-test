@@ -51,7 +51,7 @@ function getReplyValue(
           zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
         return new WithLabelLiquidValue(intl, content, label);
       } else {
-        return new WithLabelLiquidValue(intl, content, content.value);
+        return content.value;
       }
     case "CHECKBOX": {
       const options = field.options as { labels?: string[]; values: string[] };
@@ -62,9 +62,7 @@ function getReplyValue(
           return new WithLabelLiquidValue(intl, { value }, label);
         });
       } else {
-        return (content.value ?? []).map((value: string) => {
-          return new WithLabelLiquidValue(intl, { value }, value);
-        });
+        return content.value;
       }
     }
     default:
