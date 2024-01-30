@@ -4,6 +4,11 @@ import { SlateNode } from "./render";
 export function paragraphIsEmpty(node: SlateNode) {
   return node?.children?.length === 1 && node.children[0]?.text === "";
 }
+
+export function isEmptyRTEValue(value: SlateNode[]) {
+  return value.length === 1 && paragraphIsEmpty(value[0]);
+}
+
 export function fromPlainText(value: string): SlateNode[] {
   return value.split("\n").map((line) => ({ type: "paragraph", children: [{ text: line }] }));
 }

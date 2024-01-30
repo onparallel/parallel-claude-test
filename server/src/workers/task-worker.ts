@@ -48,8 +48,8 @@ createQueueWorker(
     batchSize: 1,
     forkHandlers: true,
     forkTimeout: 1_800_000, // 30 min timeout for BulkPetitionSendRunner
-    async onForkTimeout({ taskId }, ctx) {
-      await ctx.tasks.taskFailed(taskId, { message: "Timeout" }, ctx.config.instanceName);
+    async onForkError(signal, { taskId }, ctx) {
+      await ctx.tasks.taskFailed(taskId, { message: signal }, ctx.config.instanceName);
     },
   },
 );

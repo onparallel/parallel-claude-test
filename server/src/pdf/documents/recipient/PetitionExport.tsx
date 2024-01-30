@@ -190,16 +190,16 @@ export default function PetitionExport({
                         </LiquidPetitionVariableProvider>
                       );
                     })}
-                  {i === pages.length - 1 &&
-                  showSignatureBoxes &&
-                  petition.__typename === "Petition" &&
-                  isDefined(petition.currentSignatureRequest) ? (
-                    <SignaturesBlock
-                      signatureConfig={petition.currentSignatureRequest.signatureConfig}
-                      templateId={petition.fromTemplate?.id ?? null}
-                    />
-                  ) : null}
                 </View>
+                {i === pages.length - 1 &&
+                showSignatureBoxes &&
+                petition.__typename === "Petition" &&
+                isDefined(petition.currentSignatureRequest) ? (
+                  <SignaturesBlock
+                    signatureConfig={petition.currentSignatureRequest.signatureConfig}
+                    templateId={petition.fromTemplate?.id ?? null}
+                  />
+                ) : null}
                 <View
                   fixed
                   style={styles.footer}

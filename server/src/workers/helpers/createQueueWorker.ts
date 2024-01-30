@@ -32,7 +32,8 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
 export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
   forkHandlers?: boolean;
   forkTimeout?: number;
-  onForkTimeout?: (
+  onForkError?: (
+    signal: NodeJS.Signals,
     message: QueueWorkerPayload<Q>,
     context: WorkerContext,
     config: Config["queueWorkers"][Q],
@@ -54,11 +55,11 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
 
   const script = process.argv[1];
 
-  const { parser, forkHandlers, forkTimeout, onForkTimeout, batchSize } = {
+  const { parser, forkHandlers, forkTimeout, onForkError, batchSize } = {
     parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
     forkHandlers: false,
     forkTimeout: 120_000,
-    onForkTimeout: noop,
+    onForkError: noop,
     batchSize: 3,
     ...options,
   };
@@ -123,17 +124,15 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                       ).on("close", (code, signal) => {
                         if (code === 0) {
                           resolve();
-                        } else if (signal === "SIGTERM") {
-                          reject("SIGTERM");
                         } else {
-                          reject();
+                          reject(signal);
                         }
                       });
                     });
                   } catch (e) {
-                    if (e === "SIGTERM") {
-                      logger.error("Timeout processing task");
-                      await onForkTimeout?.(
+                    if (typeof e === "string") {
+                      await onForkError?.(
+                        e as NodeJS.Signals,
                         parser(message.Body!),
                         container.get<WorkerContext>(WorkerContext),
                         queueConfig,

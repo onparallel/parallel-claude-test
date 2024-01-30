@@ -9,6 +9,7 @@ import { SignaturesBlock_SignatureConfigFragment } from "../__types";
 import { RichTextBlock } from "./RichTextBlock";
 import { SignatureBox, SignatureBoxProps } from "./SignatureBox";
 import { ContactLocale } from "../../db/__types";
+import { isEmptyRTEValue, paragraphIsEmpty } from "../../util/slate/utils";
 
 interface SignaturesBlockProps {
   signatureConfig: SignaturesBlock_SignatureConfigFragment;
@@ -160,14 +161,19 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
       date,
     })),
   ];
-
+  const legalText = theme.legalText[intl.locale as ContactLocale];
   return (
-    <View wrap={false}>
-      <View style={[styles.text]}>
-        <RichTextBlock>{theme.legalText[intl.locale as ContactLocale]}</RichTextBlock>
-      </View>
+    <View
+      style={{ paddingTop: "4mm", display: "flex", flexDirection: "column", gap: "5mm" }}
+      wrap={false}
+    >
+      {isDefined(legalText) && !isEmptyRTEValue(legalText) ? (
+        <View style={[styles.text]}>
+          <RichTextBlock>{legalText}</RichTextBlock>
+        </View>
+      ) : null}
       {chunk(signers, 3).map((row, i) => (
-        <View key={i} style={{ flexDirection: "row", marginTop: "5mm" }}>
+        <View key={i} style={{ flexDirection: "row" }}>
           {row.map((signer, i) => (
             <View key={i} style={{ flex: 1, marginLeft: i === 0 ? 0 : "5mm" }}>
               <SignatureBox {...signer} />

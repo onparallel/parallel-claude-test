@@ -424,15 +424,15 @@ createQueueWorker(
   },
   {
     forkHandlers: true,
-    async onForkTimeout(message: SignatureWorkerPayload, context) {
+    async onForkError(signal, message: SignatureWorkerPayload, context) {
       if (message.type === "start-signature-process") {
         await context.petitions.updatePetitionSignatureRequestAsCancelled(
           message.payload.petitionSignatureRequestId,
           {
             cancel_reason: "REQUEST_ERROR",
             cancel_data: {
-              error: "fork process timed out",
-              error_code: "TIMEOUT",
+              error: "fork process error",
+              error_code: signal,
             },
           },
         );
