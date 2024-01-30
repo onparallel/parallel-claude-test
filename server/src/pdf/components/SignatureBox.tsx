@@ -40,6 +40,7 @@ export function SignatureBox({
       color: "#FFFFFF",
       fontSize: 8,
       position: "absolute",
+      fontFamily: "Times-Roman",
       top: 0,
       left: 0,
     },
