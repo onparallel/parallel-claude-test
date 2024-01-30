@@ -25,17 +25,17 @@ async function loadMessages(locale: string, isRecipient: boolean): Promise<IntlC
     const messages = await fs.readFile(path, { encoding: "utf-8" });
     return Object.fromEntries<string>(JSON.parse(messages).map((t: any) => [t.term, t.definition]));
   } else {
-    if (!MESSAGES_CACHE.has(locale)) {
-      // on production load compiled files
-      const path =
-        process.env.ROOT +
-        "/public/static/lang" +
-        (isRecipient ? "/recipient" : "") +
-        `/compiled/${locale}.json`;
+    // on production load compiled files
+    const path =
+      process.env.ROOT +
+      "/public/static/lang" +
+      (isRecipient ? "/recipient" : "") +
+      `/compiled/${locale}.json`;
+    if (!MESSAGES_CACHE.has(path)) {
       const messages = await fs.readFile(path, { encoding: "utf-8" });
-      MESSAGES_CACHE.set(locale, JSON.parse(messages));
+      MESSAGES_CACHE.set(path, JSON.parse(messages));
     }
-    return MESSAGES_CACHE.get(locale)!;
+    return MESSAGES_CACHE.get(path)!;
   }
 }
 
