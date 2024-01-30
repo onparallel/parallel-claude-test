@@ -1,15 +1,14 @@
 import { StyleSheet, View } from "@react-pdf/renderer";
-import { Style } from "@react-pdf/types";
 import gql from "graphql-tag";
 import { useIntl } from "react-intl";
 import { chunk, isDefined, times } from "remeda";
+import { ContactLocale } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
-import { useTheme } from "../utils/ThemeProvider";
+import { isEmptyRTEValue } from "../../util/slate/utils";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";
+import { useTheme } from "../utils/ThemeProvider";
 import { RichTextBlock } from "./RichTextBlock";
 import { SignatureBox, SignatureBoxProps } from "./SignatureBox";
-import { ContactLocale } from "../../db/__types";
-import { isEmptyRTEValue, paragraphIsEmpty } from "../../util/slate/utils";
 
 interface SignaturesBlockProps {
   signatureConfig: SignaturesBlock_SignatureConfigFragment;

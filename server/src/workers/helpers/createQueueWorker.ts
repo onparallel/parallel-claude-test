@@ -2,7 +2,6 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { fork } from "child_process";
-import { MaybePromise } from "nexus/dist/core";
 import { noop } from "remeda";
 import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
@@ -19,6 +18,7 @@ import { EmailSenderWorkerPayload } from "../email-sender";
 import { EventProcessorPayload } from "../event-processor";
 import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
+import { MaybePromise } from "../../util/types";
 
 export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;
@@ -31,7 +31,16 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
 
 export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
   forkHandlers?: boolean;
-  forkTimeout?: number;
+  /**
+   * Time in ms after which the process is killed with SIGTERM
+   */
+  forkTimeout?:
+    | number
+    | ((
+        payload: QueueWorkerPayload<Q>,
+        context: WorkerContext,
+        config: Config["queueWorkers"][Q],
+      ) => MaybePromise<number>);
   onForkError?: (
     signal: NodeJS.Signals,
     message: QueueWorkerPayload<Q>,
@@ -112,6 +121,14 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
               const duration = await stopwatch(async () => {
                 if (forkHandlers) {
                   try {
+                    const timeout =
+                      typeof forkTimeout === "number"
+                        ? forkTimeout
+                        : await forkTimeout(
+                            parser(message.Body!),
+                            container.get<WorkerContext>(WorkerContext),
+                            queueConfig,
+                          );
                     return await new Promise<void>((resolve, reject) => {
                       fork(
                         script,
@@ -120,7 +137,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                           message.Body!,
                           ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
                         ],
-                        { stdio: "inherit", timeout: forkTimeout, env: process.env },
+                        { stdio: "inherit", timeout, env: process.env },
                       ).on("close", (code, signal) => {
                         if (code === 0) {
                           resolve();

@@ -47,7 +47,14 @@ createQueueWorker(
   {
     batchSize: 1,
     forkHandlers: true,
-    forkTimeout: 1_800_000, // 30 min timeout for BulkPetitionSendRunner
+    forkTimeout: async ({ taskId }, ctx) => {
+      const task = await ctx.tasks.loadTask(taskId);
+      if (task?.name === "BULK_PETITION_SEND") {
+        return 30 * 60_000;
+      } else {
+        return 2 * 60_000;
+      }
+    },
     async onForkError(signal, { taskId }, ctx) {
       await ctx.tasks.taskFailed(taskId, { message: signal }, ctx.config.instanceName);
     },
