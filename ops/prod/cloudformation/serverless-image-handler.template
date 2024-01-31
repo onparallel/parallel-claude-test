@@ -1,5 +1,5 @@
 {
- "Description": "(SO0023) - Serverless Image Handler. Version v6.2.4",
+ "Description": "(SO0023) - Serverless Image Handler. Version v6.2.5",
  "Metadata": {
   "AWS::CloudFormation::Interface": {
    "ParameterGroups": [
@@ -394,6 +394,22 @@
         {
          "Ref": "AWS::Region"
         },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
         "me-south-1"
        ]
       },
@@ -404,7 +420,11 @@
         },
         "sa-east-1"
        ]
-      },
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
       {
        "Fn::Equals": [
         {
@@ -420,11 +440,7 @@
         },
         "us-east-2"
        ]
-      }
-     ]
-    },
-    {
-     "Fn::Or": [
+      },
       {
        "Fn::Equals": [
         {
@@ -616,14 +632,14 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.4/7278c37d53d02767769a1431225a7cc1b11b2d776285d693044ec5f12f0fb7f7.zip"
+     "S3Key": "serverless-image-handler/v6.2.5/8614b6686589285c7132e6bd0eb09c28e4d0fbb79f95cba6055240e778adf9c9.zip"
     },
-    "Description": "serverless-image-handler (custom-v6.2.4): Custom resource",
+    "Description": "serverless-image-handler (custom-v6.2.5): Custom resource",
     "Environment": {
      "Variables": {
       "SOLUTION_ID": "SO0023",
       "RETRY_SECONDS": "5",
-      "SOLUTION_VERSION": "custom-v6.2.4",
+      "SOLUTION_VERSION": "custom-v6.2.5",
       "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
      }
     },
@@ -848,7 +864,7 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.4/3fb6287214999ddeafa7cd0e3e58bc5144c8678bb720f3b5e45e8fd32f333eb3.zip"
+     "S3Key": "serverless-image-handler/v6.2.5/3fb6287214999ddeafa7cd0e3e58bc5144c8678bb720f3b5e45e8fd32f333eb3.zip"
     },
     "Description": "/opt/awscli/aws"
    },
@@ -872,12 +888,15 @@
      }
     ],
     "SourceObjectKeys": [
-     "serverless-image-handler/v6.2.4/c301c2cce52bb1b36720a115d657907f3ec9fa20bd385b4d81bf451fbe77fe4b.zip"
+     "serverless-image-handler/v6.2.5/c301c2cce52bb1b36720a115d657907f3ec9fa20bd385b4d81bf451fbe77fe4b.zip"
     ],
     "DestinationBucketName": {
      "Ref": "FrontEndDistributionToS3S3Bucket3A171D78"
     },
-    "Prune": true
+    "Prune": true,
+    "Exclude": [
+     "demo-ui-config.js"
+    ]
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -1300,9 +1319,9 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.4/038de8c90d1db3969d0c4dd85e410204967e05edb17bd88773006f4161723b33.zip"
+     "S3Key": "serverless-image-handler/v6.2.5/8c050ceb94125d3a6bb91cf9c6fc6604a16e214b9bb1aa8310d2345d86a3f0c1.zip"
     },
-    "Description": "serverless-image-handler (custom-v6.2.4): Performs image edits and manipulations",
+    "Description": "serverless-image-handler (custom-v6.2.5): Performs image edits and manipulations",
     "Environment": {
      "Variables": {
       "AUTO_WEBP": {
@@ -2281,7 +2300,7 @@
      "S3Bucket": {
       "Fn::Sub": "solutions-${AWS::Region}"
      },
-     "S3Key": "serverless-image-handler/v6.2.4/0b1f5aa55d045066ed91316b823a808060c12737e0575ab7cefe2335324108b0.zip"
+     "S3Key": "serverless-image-handler/v6.2.5/e976a796f036a5efbf44b99e44cfb5a961df08d8dbf7cd37e60bf216fb982a00.zip"
     },
     "Environment": {
      "Variables": {
@@ -2360,7 +2379,7 @@
      "Solutions:ApplicationType": "AWS-Solutions",
      "Solutions:SolutionID": "SO0023",
      "Solutions:SolutionName": "serverless-image-handler",
-     "Solutions:SolutionVersion": "custom-v6.2.4"
+     "Solutions:SolutionVersion": "custom-v6.2.5"
     }
    },
    "Metadata": {
@@ -2390,7 +2409,7 @@
    "Properties": {
     "Attributes": {
      "applicationType": "AWS-Solutions",
-     "version": "custom-v6.2.4",
+     "version": "custom-v6.2.5",
      "solutionID": "SO0023",
      "solutionName": "serverless-image-handler"
     },
@@ -2437,7 +2456,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/3VUUW/iMAz+LXtPswJ379d12jSJ3SHY3SsyqSmBNMnFyThU9b+fkhYoEnvyZ9dObH9fOuXtZDLh+QMcKRPVIVNyw9uVB3Fg5VYvwEGDHl103sFaqesIS6Mr6aXRDI60biU0vF0YJcUpVfVoaRRGN9qOKWg2Fay1qXBP/GcyL0GLdArN1i0QoSdeRMMqtMqcGtSePwVxQP98CXSMZrzto09AyHoYbxpQb679jP1zI7wtt/pyf7nVczih+4OOor+SulbozU3GAl0jKX0/hzsmlAnV1hntefssyTu5Cangl5O11IUQSPRWofbSp2bKWPASC77KuDmmBLHD6yhjt69f4t+ANJr2TrhjytTE27mpX50JNs074I6BlTV4PMKJt0skX1iZ9jpPixoiicgBXrlI7V69lYc6Ud6DJZIJTmA6beHMv9M5MpzW43f0O1MlhfXoN0GNCwVp6zdOIYQJSQLoPqVAAR6UqcFah3Vc2ynxWlirpIAzceebCiIj5CVc+H7NeNnJbWSU3nWXYVgSaBwwvYVA3jR3xxoEr6Ku1nAkoSQvjlQqmaSWqAreBt+xb995/vAjPkEyKvFOmTCavAvC02N6mxedZS3N+FVFH2Y1G1GYDfIeJxRWvvZfP0xP6pjz+5kdm+RTnmeg7A7O3YnqkJr5cvtDejsm4HapXcfiL4Dv6fFzmvNJzvOHPUmZuaC9bJAve/sfTLeo4pkEAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/3VTTW/bMAz9LbnLatIM2I5zXbQYkG5B0u0aMDLjqpUlTZSaBYL/+yDZiR2gPfGR4jefbnlcLL7xOJ/BkQpRvxVK7nncehBvrDroNTho0aNLyhNYK3WTYGV0Lb00msGRdlFCy+PaKClOOapHG6MwqUl2TEG7r2GnTY2vxH9m8RC0yFlouYtAhJ54mQSr0SpzalF7fhfEG/r7i6FjtOSxt94BIethqjSgXoz9TPVzIzxWB32pXx30Ck7o/qCjpG+lbhR6c+WxRtdKyu9nc8eEMqE+OKM9j/eSvJP7kAN+OdlIXQqBRD9q1F763EyVAh5SwGceV2kqEC84jjJV+/gN/g1Ik2k/MHdMmYZ4XJnm0Zlg87wD7hhY2YDHI5x43CD50sq811Ve1GDJhxzgeIvc7qhtPTT55D3YIJngBOZsa2f+nc6WIVuPn9C/mDozrEe/CRpcK8hbv1JKIUzIFED3LgUK8KBMA9Y6bNLaTvmupbVKCjgf7lypJDJCXsyl79eMl51cWybuXXcZhmWCpgHzXwjkTfvhWAPhVeLVDo4klOTlkSolM9XyqYK3wXdsXoCyL8Dns+/DP7xJ8tMhB/c4nfO6965jX76e85FRmUxUCKPJuyA85QIjeYtISz5S89lslxNeFMOfmTqUVj72r8+mZ8qUSB97dh1L/5+/0s377ZwvFnw+eyUpCxe0ly3yTS//A7OTsQWXBAAA"
    },
    "Metadata": {
     "aws:cdk:path": "ServerlessImageHandlerStack/CDKMetadata/Default"
