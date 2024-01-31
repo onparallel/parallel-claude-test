@@ -267,6 +267,7 @@ export function useFeatureFlags() {
               defaultMessage:
                 "Allows obtaining the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity.",
             }),
+            articleId: 8837461,
           },
 
           {
