@@ -200,7 +200,10 @@ export class SignaturitClient implements ISignatureClient {
         return response;
       } catch (error) {
         if (
-          error instanceof Error &&
+          !!error &&
+          typeof error === "object" &&
+          "message" in error &&
+          typeof error.message === "string" &&
           error.message === "Account depleted all it's advanced signature requests"
         ) {
           await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
