@@ -24,7 +24,6 @@ const ENHANCED_MONITORING = true;
 const ec2 = new client_ec2_1.EC2Client({});
 const AMI_NAMES = {
     server: () => `parallel-server-${(0, timestamp_1.timestamp)()}`,
-    ops: () => `parallel-ops-${(0, timestamp_1.timestamp)()}`,
     builder: () => `parallel-builder-${(0, timestamp_1.timestamp)()}`,
 };
 async function main() {
@@ -94,7 +93,12 @@ async function main() {
           -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o "StrictHostKeyChecking=no" \
-          ${path_1.default.resolve(__dirname, `../../ops/prod/image/*`)} ec2-user@${ipAddress}:~`, { stdio: "inherit" });
+          ${path_1.default.resolve(__dirname, `../../ops/prod/image/build-image-${image}.sh`)} ec2-user@${ipAddress}:~`, { stdio: "inherit" });
+        (0, child_process_1.execSync)(`scp \
+          -i ~/.ssh/ops.pem \
+          -o "UserKnownHostsFile=/dev/null" \
+          -o "StrictHostKeyChecking=no" \
+          ${path_1.default.resolve(__dirname, `../../ops/prod/image/authorized_keys`)} ec2-user@${ipAddress}:~`, { stdio: "inherit" });
         console.log("Executing build script.");
         (0, child_process_1.execSync)(`ssh \
           -i ~/.ssh/ops.pem \

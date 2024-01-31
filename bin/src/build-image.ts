@@ -35,7 +35,6 @@ const ec2 = new EC2Client({});
 
 const AMI_NAMES = {
   server: () => `parallel-server-${timestamp()}`,
-  ops: () => `parallel-ops-${timestamp()}`,
   builder: () => `parallel-builder-${timestamp()}`,
 };
 
@@ -112,7 +111,21 @@ async function main() {
           -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o "StrictHostKeyChecking=no" \
-          ${path.resolve(__dirname, `../../ops/prod/image/*`)} ec2-user@${ipAddress}:~`,
+          ${path.resolve(
+            __dirname,
+            `../../ops/prod/image/build-image-${image}.sh`,
+          )} ec2-user@${ipAddress}:~`,
+      { stdio: "inherit" },
+    );
+    execSync(
+      `scp \
+          -i ~/.ssh/ops.pem \
+          -o "UserKnownHostsFile=/dev/null" \
+          -o "StrictHostKeyChecking=no" \
+          ${path.resolve(
+            __dirname,
+            `../../ops/prod/image/authorized_keys`,
+          )} ec2-user@${ipAddress}:~`,
       { stdio: "inherit" },
     );
     console.log("Executing build script.");
