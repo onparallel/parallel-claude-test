@@ -70,13 +70,15 @@ export function PetitionFieldMathEditor({
     const defaultCondition = isReadOnly
       ? {}
       : field.type === "HEADING"
-        ? (referencedField && defaultFieldCondition(referencedField)) ?? petition.variables.length
-          ? {
-              variableName: petition.variables[0].name,
-              operator: "GREATER_THAN",
-              value: 0,
-            }
-          : {}
+        ? referencedField && defaultFieldCondition(referencedField)
+          ? defaultFieldCondition(referencedField)
+          : petition.variables.length
+            ? {
+                variableName: petition.variables[0].name,
+                operator: "GREATER_THAN",
+                value: 0,
+              }
+            : {}
         : defaultFieldCondition(field);
 
     return {
