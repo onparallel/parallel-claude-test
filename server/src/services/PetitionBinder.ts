@@ -17,7 +17,7 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
-import { ChildProcessNonSuccessError, spawn } from "../util/spawn";
+import { ChildProcessNonSuccessError, spawn as _spawn } from "../util/spawn";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { ILogger, LOGGER } from "./Logger";
@@ -57,6 +57,17 @@ export class PetitionBinder implements IPetitionBinder {
   ) {}
 
   private temporaryDirectory = "";
+  private petitionId = 0;
+
+  private info(message: string) {
+    this.logger.info(`[PetitionBinder:${this.petitionId}] - ${message}`);
+  }
+
+  private async spawn(...args: Parameters<typeof _spawn>) {
+    this.info(`Spawn: ${args[0]} ${args[1].join(" ")}`);
+    await _spawn(...args);
+  }
+
   async createBinder(
     userId: number,
     {
@@ -70,8 +81,12 @@ export class PetitionBinder implements IPetitionBinder {
     }: PetitionBinderOptions,
   ) {
     try {
+      this.petitionId = petitionId;
+      this.info("Creating binder");
       // first of all, create temporary directory to store all tmp files and delete it when finished
       this.temporaryDirectory = await this.buildTmpDir();
+
+      this.info(`Temporary directory created at ${this.temporaryDirectory}`);
 
       const [petition, fieldsWithFiles, attachments] = await Promise.all([
         this.petitions.loadPetition(petitionId),
@@ -92,13 +107,15 @@ export class PetitionBinder implements IPetitionBinder {
       }
 
       const mainDocPath = await this.writeTemporaryFile(
-        this.printer.petitionExport(userId, {
+        await this.printer.petitionExport(userId, {
           petitionId,
           documentTitle,
           showSignatureBoxes,
           includeNetDocumentsLinks,
         }),
+        "pdf",
       );
+      this.info(`Main document created at ${mainDocPath}`);
 
       const annexedDocumentPaths = includeAnnexedDocuments
         ? await pFlatMap(
@@ -114,6 +131,7 @@ export class PetitionBinder implements IPetitionBinder {
                   },
                   petition?.recipient_locale ?? "en",
                 ),
+                "pdf",
               );
 
               const filePaths = await this.downloadFileUpload(files, userId, documentTheme);
@@ -122,6 +140,12 @@ export class PetitionBinder implements IPetitionBinder {
             { concurrency: 2 },
           )
         : [];
+
+      this.info(
+        `${annexedDocumentPaths.length} annexed documents created: ${annexedDocumentPaths.join(
+          ", ",
+        )}`,
+      );
 
       const attachmentPaths = Object.fromEntries(
         await pMap(PetitionAttachmentTypeValues, async (type) => [
@@ -137,6 +161,8 @@ export class PetitionBinder implements IPetitionBinder {
           ),
         ]),
       ) as Record<PetitionAttachmentType, string[]>;
+
+      this.info(`Attachment documents created: ${JSON.stringify(attachmentPaths)}`);
 
       return await this.merge(
         [
@@ -162,17 +188,24 @@ export class PetitionBinder implements IPetitionBinder {
     filePaths: string[],
     opts?: { maxOutputSize?: number; outputFileName?: string },
   ) {
+    this.info(`Merging ${filePaths.length} files. opts: ${JSON.stringify(opts)}`);
     const DPIValues = [144, 110, 96, 72];
     let resultFilePath = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
 
     await this.mergeFiles(filePaths, resultFilePath);
 
+    this.info(`Merged file created at ${resultFilePath}`);
+
     let iteration = 0;
     let mergedFileSize = await this.getFileSize(resultFilePath);
 
+    this.info(`Merged file size: ${mergedFileSize}`);
+
     while (mergedFileSize > (opts?.maxOutputSize ?? Infinity) && DPIValues[iteration]) {
+      this.info(`Compressing file with DPI: ${DPIValues[iteration]}`);
       resultFilePath = await this.compressFile(resultFilePath, DPIValues[iteration++]);
       mergedFileSize = await this.getFileSize(resultFilePath);
+      this.info(`Merged file size: ${mergedFileSize}`);
     }
 
     if (mergedFileSize > (opts?.maxOutputSize ?? Infinity)) {
@@ -183,7 +216,9 @@ export class PetitionBinder implements IPetitionBinder {
     const path = resolve(tmpdir(), random(10));
     await mkdir(path, { recursive: true });
     const output = resolve(path, `${opts?.outputFileName ?? random(10)}.pdf`);
+    this.info(`Stripping metadata from file: ${resultFilePath}`);
     await this.stripMetadata(resultFilePath, output);
+    this.info(`Final file created at ${output}`);
     return output;
   }
 
@@ -194,7 +229,7 @@ export class PetitionBinder implements IPetitionBinder {
   private async compressFile(path: string, dpi: number) {
     // gs can't overwrite input with output, so we create a random output path on temporary directory
     const output = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
-    await spawn(
+    await this.spawn(
       "gs",
       [
         "-dNOPAUSE",
@@ -222,15 +257,18 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async stripMetadata(path: string, output: string) {
-    await spawn("exiftool", ["-all=", "-overwrite_original", path], {
+    await this.spawn("exiftool", ["-all=", "-overwrite_original", path], {
       timeout: 120_000,
       stdio: "inherit",
     });
     try {
-      await spawn("qpdf", ["--linearize", path, output], { timeout: 120_000, stdio: "inherit" });
+      await this.spawn("qpdf", ["--linearize", path, output], {
+        timeout: 120_000,
+        stdio: "inherit",
+      });
     } catch (e) {
       if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
-        this.logger.info("qpdf exited with warnings");
+        this.info("qpdf exited with warnings");
         return;
       } else {
         throw e;
@@ -240,13 +278,13 @@ export class PetitionBinder implements IPetitionBinder {
 
   private async mergeFiles(paths: string[], output: string) {
     try {
-      await spawn("qpdf", ["--empty", "--pages", ...paths, "--", output], {
+      await this.spawn("qpdf", ["--empty", "--pages", ...paths, "--", output], {
         timeout: 120_000,
         stdio: "inherit",
       });
     } catch (e) {
       if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
-        this.logger.info("qpdf exited with warnings");
+        this.info("qpdf exited with warnings");
         return;
       } else {
         throw e;
@@ -255,13 +293,14 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
+    const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
     const tmpPath = await this.writeTemporaryFile(
       await this.storage.fileUploads.downloadFile(fileS3Path),
+      outputFormat,
     );
 
-    const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
     const output = resolve(this.temporaryDirectory, `${random(10)}.${outputFormat}`);
-    await spawn(
+    await this.spawn(
       "convert",
       [
         // for GIF images, we only need the first frame
@@ -334,10 +373,12 @@ export class PetitionBinder implements IPetitionBinder {
 
             return await this.writeTemporaryFile(
               this.printer.imageToPdf(userId, { imageUrl, theme: theme.data }),
+              "pdf",
             );
           } else if (file.content_type === "application/pdf") {
             return await this.writeTemporaryFile(
               await this.storage.fileUploads.downloadFile(file.path),
+              "pdf",
             );
           } else {
             this.logger.warn(
@@ -351,8 +392,8 @@ export class PetitionBinder implements IPetitionBinder {
     ).filter(isDefined);
   }
 
-  private async writeTemporaryFile(stream: MaybePromise<NodeJS.ReadableStream>) {
-    const path = resolve(this.temporaryDirectory, random(10));
+  private async writeTemporaryFile(stream: MaybePromise<NodeJS.ReadableStream>, extension: string) {
+    const path = resolve(this.temporaryDirectory, `${random(10)}.${extension}`);
     await writeFile(path, await stream);
     return path;
   }
