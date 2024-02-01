@@ -1008,8 +1008,9 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                     <HStack as="li" key={index} alignItems="center">
                       <Center
                         height="20px"
-                        width="26px"
+                        minWidth="26px"
                         fontSize="xs"
+                        paddingX={1}
                         borderRadius="sm"
                         border="1px solid"
                         borderColor={color}
