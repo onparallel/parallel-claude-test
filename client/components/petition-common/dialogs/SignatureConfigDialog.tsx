@@ -92,26 +92,28 @@ export function SignatureConfigDialog({
 }: DialogProps<SignatureConfigDialogProps, SignatureConfigInput>) {
   const intl = useIntl();
 
+  const signatureConfig =
+    petition.signatureConfig ??
+    (petition.__typename === "Petition" ? petition.currentSignatureRequest?.signatureConfig : null);
+
   const [presetSigners, otherSigners] = partition(
-    (petition.signatureConfig?.signers ?? []).filter(isDefined),
+    (signatureConfig?.signers ?? []).filter(isDefined),
     (s) => s.isPreset,
   );
   const form = useForm<SignatureConfigFormData>({
     mode: "onSubmit",
     defaultValues: {
       integration:
-        petition.signatureConfig?.integration ??
-        integrations.find((i) => i.isDefault) ??
-        integrations[0],
-      review: petition.signatureConfig?.review ?? false,
-      title: petition.signatureConfig?.title ?? null,
-      allowAdditionalSigners: petition.signatureConfig?.allowAdditionalSigners ?? false,
+        signatureConfig?.integration ?? integrations.find((i) => i.isDefault) ?? integrations[0],
+      review: signatureConfig?.review ?? false,
+      title: signatureConfig?.title ?? null,
+      allowAdditionalSigners: signatureConfig?.allowAdditionalSigners ?? false,
       includePresetSigners: presetSigners.length > 0,
       presetSigners,
-      signingMode: petition.signatureConfig?.signingMode ?? "PARALLEL",
-      minSigners: petition.signatureConfig?.minSigners ?? 1,
-      instructions: petition.signatureConfig?.instructions ?? null,
-      showInstructions: isDefined(petition.signatureConfig?.instructions),
+      signingMode: signatureConfig?.signingMode ?? "PARALLEL",
+      minSigners: signatureConfig?.minSigners ?? 1,
+      instructions: signatureConfig?.instructions ?? null,
+      showInstructions: isDefined(signatureConfig?.instructions),
     },
   });
 
@@ -734,27 +736,37 @@ function SignatureConfigDialogBodyStep3({
 }
 
 SignatureConfigDialog.fragments = {
+  get SignatureConfig() {
+    return gql`
+      fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
+        integration {
+          ...SignatureConfigDialog_SignatureOrgIntegration
+        }
+        signers {
+          ...ConfirmPetitionSignersDialog_PetitionSigner
+          contactId
+          firstName
+          lastName
+          email
+          isPreset
+        }
+        title
+        review
+        allowAdditionalSigners
+        signingMode
+        minSigners
+        instructions
+      }
+      ${this.SignatureOrgIntegration}
+      ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+    `;
+  },
   get PetitionBase() {
     return gql`
       fragment SignatureConfigDialog_PetitionBase on PetitionBase {
         name
         signatureConfig {
-          integration {
-            ...SignatureConfigDialog_SignatureOrgIntegration
-          }
-          signers {
-            contactId
-            firstName
-            lastName
-            email
-            isPreset
-          }
-          title
-          review
-          allowAdditionalSigners
-          signingMode
-          minSigners
-          instructions
+          ...SignatureConfigDialog_SignatureConfig
         }
         ... on Petition {
           status
@@ -768,6 +780,11 @@ SignatureConfigDialog.fragments = {
               email
             }
           }
+          currentSignatureRequest {
+            signatureConfig {
+              ...SignatureConfigDialog_SignatureConfig
+            }
+          }
           signatureRequests {
             signatureConfig {
               signers {
@@ -777,7 +794,7 @@ SignatureConfigDialog.fragments = {
           }
         }
       }
-      ${this.SignatureOrgIntegration}
+      ${this.SignatureConfig}
       ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     `;
   },

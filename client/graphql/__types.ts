@@ -12435,6 +12435,31 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   petitionNamePattern?: string | null;
 };
 
+export type SignatureConfigDialog_SignatureConfigFragment = {
+  __typename?: "SignatureConfig";
+  title?: string | null;
+  review: boolean;
+  allowAdditionalSigners: boolean;
+  signingMode: SignatureConfigSigningMode;
+  minSigners: number;
+  instructions?: string | null;
+  integration?: {
+    __typename?: "SignatureOrgIntegration";
+    id: string;
+    name: string;
+    isDefault: boolean;
+    environment: SignatureOrgIntegrationEnvironment;
+  } | null;
+  signers: Array<{
+    __typename?: "PetitionSigner";
+    contactId?: string | null;
+    firstName: string;
+    lastName?: string | null;
+    email: string;
+    isPreset: boolean;
+  } | null>;
+};
+
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
@@ -12451,6 +12476,33 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
       email: string;
     } | null;
   }>;
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      title?: string | null;
+      review: boolean;
+      allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        name: string;
+        isDefault: boolean;
+        environment: SignatureOrgIntegrationEnvironment;
+      } | null;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        isPreset: boolean;
+      } | null>;
+    };
+  } | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     signatureConfig: {
@@ -14473,6 +14525,30 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      title?: string | null;
+      review: boolean;
+      allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        name: string;
+        isDefault: boolean;
+        environment: SignatureOrgIntegrationEnvironment;
+      } | null;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        isPreset: boolean;
+      } | null>;
+    };
   } | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
@@ -18970,23 +19046,44 @@ export type PetitionSignaturesCard_PetitionFragment = {
       email: string;
     } | null;
   }>;
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    environment: SignatureOrgIntegrationEnvironment;
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      title?: string | null;
+      review: boolean;
+      allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        name: string;
+        isDefault: boolean;
+        environment: SignatureOrgIntegrationEnvironment;
+      } | null;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        isPreset: boolean;
+      } | null>;
+    };
+  } | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title?: string | null;
     review: boolean;
+    timezone: string;
+    title?: string | null;
     allowAdditionalSigners: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
-    timezone: string;
-    integration?: {
-      __typename?: "SignatureOrgIntegration";
-      id: string;
-      name: string;
-      provider: SignatureOrgIntegrationProvider;
-      environment: SignatureOrgIntegrationEnvironment;
-      isDefault: boolean;
-    } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -18996,11 +19093,14 @@ export type PetitionSignaturesCard_PetitionFragment = {
       isPreset: boolean;
       fullName: string;
     } | null>;
-  } | null;
-  currentSignatureRequest?: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    environment: SignatureOrgIntegrationEnvironment;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      id: string;
+      name: string;
+      provider: SignatureOrgIntegrationProvider;
+      environment: SignatureOrgIntegrationEnvironment;
+      isDefault: boolean;
+    } | null;
   } | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -19181,23 +19281,44 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             email: string;
           } | null;
         }>;
+        currentSignatureRequest?: {
+          __typename?: "PetitionSignatureRequest";
+          id: string;
+          environment: SignatureOrgIntegrationEnvironment;
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            title?: string | null;
+            review: boolean;
+            allowAdditionalSigners: boolean;
+            signingMode: SignatureConfigSigningMode;
+            minSigners: number;
+            instructions?: string | null;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              name: string;
+              isDefault: boolean;
+              environment: SignatureOrgIntegrationEnvironment;
+            } | null;
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              firstName: string;
+              lastName?: string | null;
+              email: string;
+              isPreset: boolean;
+            } | null>;
+          };
+        } | null;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title?: string | null;
           review: boolean;
+          timezone: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
-          timezone: string;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            name: string;
-            provider: SignatureOrgIntegrationProvider;
-            environment: SignatureOrgIntegrationEnvironment;
-            isDefault: boolean;
-          } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -19207,11 +19328,14 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             isPreset: boolean;
             fullName: string;
           } | null>;
-        } | null;
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          environment: SignatureOrgIntegrationEnvironment;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            name: string;
+            provider: SignatureOrgIntegrationProvider;
+            environment: SignatureOrgIntegrationEnvironment;
+            isDefault: boolean;
+          } | null;
         } | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -19445,23 +19569,44 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         email: string;
       } | null;
     }>;
+    currentSignatureRequest?: {
+      __typename?: "PetitionSignatureRequest";
+      id: string;
+      environment: SignatureOrgIntegrationEnvironment;
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        title?: string | null;
+        review: boolean;
+        allowAdditionalSigners: boolean;
+        signingMode: SignatureConfigSigningMode;
+        minSigners: number;
+        instructions?: string | null;
+        integration?: {
+          __typename?: "SignatureOrgIntegration";
+          id: string;
+          name: string;
+          isDefault: boolean;
+          environment: SignatureOrgIntegrationEnvironment;
+        } | null;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null;
+          firstName: string;
+          lastName?: string | null;
+          email: string;
+          isPreset: boolean;
+        } | null>;
+      };
+    } | null;
     signatureConfig?: {
       __typename?: "SignatureConfig";
-      title?: string | null;
       review: boolean;
+      timezone: string;
+      title?: string | null;
       allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
-      timezone: string;
-      integration?: {
-        __typename?: "SignatureOrgIntegration";
-        id: string;
-        name: string;
-        provider: SignatureOrgIntegrationProvider;
-        environment: SignatureOrgIntegrationEnvironment;
-        isDefault: boolean;
-      } | null;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -19471,11 +19616,14 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         isPreset: boolean;
         fullName: string;
       } | null>;
-    } | null;
-    currentSignatureRequest?: {
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      environment: SignatureOrgIntegrationEnvironment;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        name: string;
+        provider: SignatureOrgIntegrationProvider;
+        environment: SignatureOrgIntegrationEnvironment;
+        isDefault: boolean;
+      } | null;
     } | null;
     fields: Array<{
       __typename?: "PetitionField";
@@ -19656,23 +19804,44 @@ export type PetitionSignaturesCard_petitionQuery = {
             email: string;
           } | null;
         }>;
+        currentSignatureRequest?: {
+          __typename?: "PetitionSignatureRequest";
+          id: string;
+          environment: SignatureOrgIntegrationEnvironment;
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            title?: string | null;
+            review: boolean;
+            allowAdditionalSigners: boolean;
+            signingMode: SignatureConfigSigningMode;
+            minSigners: number;
+            instructions?: string | null;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              name: string;
+              isDefault: boolean;
+              environment: SignatureOrgIntegrationEnvironment;
+            } | null;
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              firstName: string;
+              lastName?: string | null;
+              email: string;
+              isPreset: boolean;
+            } | null>;
+          };
+        } | null;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title?: string | null;
           review: boolean;
+          timezone: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
-          timezone: string;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            name: string;
-            provider: SignatureOrgIntegrationProvider;
-            environment: SignatureOrgIntegrationEnvironment;
-            isDefault: boolean;
-          } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -19682,11 +19851,14 @@ export type PetitionSignaturesCard_petitionQuery = {
             isPreset: boolean;
             fullName: string;
           } | null>;
-        } | null;
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          environment: SignatureOrgIntegrationEnvironment;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            name: string;
+            provider: SignatureOrgIntegrationProvider;
+            environment: SignatureOrgIntegrationEnvironment;
+            isDefault: boolean;
+          } | null;
         } | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -29290,11 +29462,11 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   signatureConfig?: {
     __typename?: "SignatureConfig";
     timezone: string;
-    title?: string | null;
     review: boolean;
+    title?: string | null;
     allowAdditionalSigners: boolean;
-    signingMode: SignatureConfigSigningMode;
     minSigners: number;
+    signingMode: SignatureConfigSigningMode;
     instructions?: string | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -29459,6 +29631,30 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      title?: string | null;
+      review: boolean;
+      allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        name: string;
+        isDefault: boolean;
+        environment: SignatureOrgIntegrationEnvironment;
+      } | null;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        isPreset: boolean;
+      } | null>;
+    };
   } | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
@@ -29982,6 +30178,30 @@ export type PetitionCompose_updatePetitionMutation = {
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            title?: string | null;
+            review: boolean;
+            allowAdditionalSigners: boolean;
+            signingMode: SignatureConfigSigningMode;
+            minSigners: number;
+            instructions?: string | null;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              name: string;
+              isDefault: boolean;
+              environment: SignatureOrgIntegrationEnvironment;
+            } | null;
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              firstName: string;
+              lastName?: string | null;
+              email: string;
+              isPreset: boolean;
+            } | null>;
+          };
         } | null;
         fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
@@ -30012,11 +30232,11 @@ export type PetitionCompose_updatePetitionMutation = {
         signatureConfig?: {
           __typename?: "SignatureConfig";
           timezone: string;
-          title?: string | null;
           review: boolean;
+          title?: string | null;
           allowAdditionalSigners: boolean;
-          signingMode: SignatureConfigSigningMode;
           minSigners: number;
+          signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -31331,11 +31551,11 @@ export type PetitionCompose_petitionQuery = {
         signatureConfig?: {
           __typename?: "SignatureConfig";
           timezone: string;
-          title?: string | null;
           review: boolean;
+          title?: string | null;
           allowAdditionalSigners: boolean;
-          signingMode: SignatureConfigSigningMode;
           minSigners: number;
+          signingMode: SignatureConfigSigningMode;
           instructions?: string | null;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -31500,6 +31720,30 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            title?: string | null;
+            review: boolean;
+            allowAdditionalSigners: boolean;
+            signingMode: SignatureConfigSigningMode;
+            minSigners: number;
+            instructions?: string | null;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              name: string;
+              isDefault: boolean;
+              environment: SignatureOrgIntegrationEnvironment;
+            } | null;
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              firstName: string;
+              lastName?: string | null;
+              email: string;
+              isPreset: boolean;
+            } | null>;
+          };
         } | null;
         fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
@@ -36045,6 +36289,30 @@ export type PetitionReplies_PetitionFragment = {
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      title?: string | null;
+      review: boolean;
+      allowAdditionalSigners: boolean;
+      signingMode: SignatureConfigSigningMode;
+      minSigners: number;
+      instructions?: string | null;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        name: string;
+        isDefault: boolean;
+        environment: SignatureOrgIntegrationEnvironment;
+      } | null;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        isPreset: boolean;
+      } | null>;
+    };
   } | null;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -36119,12 +36387,12 @@ export type PetitionReplies_PetitionFragment = {
   signatureConfig?: {
     __typename?: "SignatureConfig";
     review: boolean;
+    timezone: string;
     title?: string | null;
     allowAdditionalSigners: boolean;
     signingMode: SignatureConfigSigningMode;
     minSigners: number;
     instructions?: string | null;
-    timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -36825,6 +37093,30 @@ export type PetitionReplies_closePetitionMutation = {
       status: PetitionSignatureRequestStatus;
       cancelReason?: string | null;
       environment: SignatureOrgIntegrationEnvironment;
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        title?: string | null;
+        review: boolean;
+        allowAdditionalSigners: boolean;
+        signingMode: SignatureConfigSigningMode;
+        minSigners: number;
+        instructions?: string | null;
+        integration?: {
+          __typename?: "SignatureOrgIntegration";
+          id: string;
+          name: string;
+          isDefault: boolean;
+          environment: SignatureOrgIntegrationEnvironment;
+        } | null;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null;
+          firstName: string;
+          lastName?: string | null;
+          email: string;
+          isPreset: boolean;
+        } | null>;
+      };
     } | null;
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
@@ -36899,12 +37191,12 @@ export type PetitionReplies_closePetitionMutation = {
     signatureConfig?: {
       __typename?: "SignatureConfig";
       review: boolean;
+      timezone: string;
       title?: string | null;
       allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
-      timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -37267,6 +37559,30 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       status: PetitionSignatureRequestStatus;
       cancelReason?: string | null;
       environment: SignatureOrgIntegrationEnvironment;
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        title?: string | null;
+        review: boolean;
+        allowAdditionalSigners: boolean;
+        signingMode: SignatureConfigSigningMode;
+        minSigners: number;
+        instructions?: string | null;
+        integration?: {
+          __typename?: "SignatureOrgIntegration";
+          id: string;
+          name: string;
+          isDefault: boolean;
+          environment: SignatureOrgIntegrationEnvironment;
+        } | null;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null;
+          firstName: string;
+          lastName?: string | null;
+          email: string;
+          isPreset: boolean;
+        } | null>;
+      };
     } | null;
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
@@ -37341,12 +37657,12 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     signatureConfig?: {
       __typename?: "SignatureConfig";
       review: boolean;
+      timezone: string;
       title?: string | null;
       allowAdditionalSigners: boolean;
       signingMode: SignatureConfigSigningMode;
       minSigners: number;
       instructions?: string | null;
-      timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -37876,6 +38192,30 @@ export type PetitionReplies_petitionQuery = {
           status: PetitionSignatureRequestStatus;
           cancelReason?: string | null;
           environment: SignatureOrgIntegrationEnvironment;
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            title?: string | null;
+            review: boolean;
+            allowAdditionalSigners: boolean;
+            signingMode: SignatureConfigSigningMode;
+            minSigners: number;
+            instructions?: string | null;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              name: string;
+              isDefault: boolean;
+              environment: SignatureOrgIntegrationEnvironment;
+            } | null;
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              firstName: string;
+              lastName?: string | null;
+              email: string;
+              isPreset: boolean;
+            } | null>;
+          };
         } | null;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -37955,12 +38295,12 @@ export type PetitionReplies_petitionQuery = {
         signatureConfig?: {
           __typename?: "SignatureConfig";
           review: boolean;
+          timezone: string;
           title?: string | null;
           allowAdditionalSigners: boolean;
           signingMode: SignatureConfigSigningMode;
           minSigners: number;
           instructions?: string | null;
-          timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -48078,26 +48418,34 @@ export const SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc = gql`
     environment
   }
 ` as unknown as DocumentNode<SignatureConfigDialog_SignatureOrgIntegrationFragment, unknown>;
+export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
+  fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
+    integration {
+      ...SignatureConfigDialog_SignatureOrgIntegration
+    }
+    signers {
+      ...ConfirmPetitionSignersDialog_PetitionSigner
+      contactId
+      firstName
+      lastName
+      email
+      isPreset
+    }
+    title
+    review
+    allowAdditionalSigners
+    signingMode
+    minSigners
+    instructions
+  }
+  ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<SignatureConfigDialog_SignatureConfigFragment, unknown>;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
   fragment SignatureConfigDialog_PetitionBase on PetitionBase {
     name
     signatureConfig {
-      integration {
-        ...SignatureConfigDialog_SignatureOrgIntegration
-      }
-      signers {
-        contactId
-        firstName
-        lastName
-        email
-        isPreset
-      }
-      title
-      review
-      allowAdditionalSigners
-      signingMode
-      minSigners
-      instructions
+      ...SignatureConfigDialog_SignatureConfig
     }
     ... on Petition {
       status
@@ -48111,6 +48459,11 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
           email
         }
       }
+      currentSignatureRequest {
+        signatureConfig {
+          ...SignatureConfigDialog_SignatureConfig
+        }
+      }
       signatureRequests {
         signatureConfig {
           signers {
@@ -48120,7 +48473,7 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
       }
     }
   }
-  ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
+  ${SignatureConfigDialog_SignatureConfigFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<SignatureConfigDialog_PetitionBaseFragment, unknown>;
 export const CompliancePeriodDialog_PetitionBaseFragmentDoc = gql`
