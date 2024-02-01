@@ -211,14 +211,15 @@ export const PetitionComposeFieldList = Object.assign(
         onFieldVisibilityClick: () => {
           const { fields } = allFieldsDataRef.current!;
           const field = fields.find((f) => f.id === fieldId)!;
-
           if (field.visibility) {
             onFieldEdit(fieldId, { visibility: null });
           } else {
             const index = fields.findIndex((f) => f.id === field.id);
+
             const prevField = isDefined(field.parent)
               ? fields[index - 1]
-              : fields.slice(0, index).findLast((f) => !isDefined(f.parent) && !f.isReadOnly)!;
+              : fields.slice(0, index).findLast((f) => !isDefined(f.parent))!;
+
             // if the previous field has a visibility setting copy it
             if (prevField.visibility) {
               onFieldEdit(fieldId, { visibility: prevField.visibility });
