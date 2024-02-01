@@ -511,6 +511,39 @@ describe("GraphQL/Petition Fields", () => {
         replies: [{ id: expect.any(String) }],
       });
     });
+
+    it("creates the field as internal if parent is internal", async () => {
+      const [parent] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        is_internal: true,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $parentFieldId: GID!, $type: PetitionFieldType!) {
+            createPetitionField(
+              petitionId: $petitionId
+              parentFieldId: $parentFieldId
+              type: $type
+            ) {
+              type
+              isInternal
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          parentFieldId: toGlobalId("PetitionField", parent.id),
+          type: "TEXT",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionField).toEqual({
+        type: "TEXT",
+        isInternal: true,
+      });
+    });
   });
 
   describe("clonePetitionField", () => {

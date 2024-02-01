@@ -2031,6 +2031,7 @@ export class PetitionRepository extends BaseRepository {
     if (dataArr.length === 0) {
       return [];
     }
+    const parent = isDefined(parentFieldId) ? await this.loadField(parentFieldId) : null;
     const { fields, petition } = await this.withTransaction(async (t) => {
       const [{ max }] = await this.from("petition_field", t)
         .where({
@@ -2066,6 +2067,7 @@ export class PetitionRepository extends BaseRepository {
           "petition_field",
           dataArr.map((field) => ({
             ...omit(field, ["math"]),
+            is_internal: parent?.is_internal ? true : field.is_internal,
             math: field.math ? this.json(field.math) : null,
             parent_petition_field_id: parentFieldId,
             petition_id: petitionId,
