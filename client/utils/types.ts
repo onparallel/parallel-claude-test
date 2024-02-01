@@ -22,3 +22,5 @@ export type IsEmptyObject<T> = keyof T extends [never] ? true : false;
 export interface Focusable {
   focus(options?: FocusOptions): void;
 }
+
+export function assertType<T>(value: unknown): asserts value is T {}

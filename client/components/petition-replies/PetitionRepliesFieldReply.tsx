@@ -28,6 +28,8 @@ import { UserOrContactReference } from "../petition-activity/UserOrContactRefere
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
+import { isDefined } from "remeda";
+import { FieldOptions } from "@parallel/utils/petitionFields";
 
 export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
@@ -174,7 +176,27 @@ export function PetitionRepliesFieldReply({
                   </Stack>
                 ) : (
                   <HStack>
-                    <BreakLines>{content}</BreakLines>{" "}
+                    {["SELECT", "CHECKBOX"].includes(type) &&
+                    isDefined(
+                      (reply.field!.options as FieldOptions["SELECT" | "CHECKBOX"]).labels,
+                    ) ? (
+                      <Text as="span">
+                        {content}{" "}
+                        <Text as="span" textStyle="hint">
+                          {
+                            (reply.field!.options as FieldOptions["SELECT" | "CHECKBOX"]).values[
+                              (
+                                reply.field!.options as FieldOptions["SELECT" | "CHECKBOX"]
+                              ).values.indexOf(
+                                type === "SELECT" ? reply.content.value : reply.content.value[i],
+                              )
+                            ]
+                          }
+                        </Text>
+                      </Text>
+                    ) : (
+                      <BreakLines>{content}</BreakLines>
+                    )}{" "}
                     {reply.field?.type === "DATE_TIME" &&
                     currentTimezone !== reply.content.timezone ? (
                       <HelpPopover>
