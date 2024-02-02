@@ -1438,7 +1438,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates single replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(14);
+      expect(PetitionFieldTypeValues).toHaveLength(15);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1459,6 +1459,7 @@ describe("repositories/PetitionRepository", () => {
             datetime: "2023-03-03T03:00",
             timezone: "Europe/Madrid",
           },
+          BACKGROUND_CHECK: "this should be ignored",
         },
         user,
       );
@@ -1518,7 +1519,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates multiple replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(14);
+      expect(PetitionFieldTypeValues).toHaveLength(15);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1548,6 +1549,7 @@ describe("repositories/PetitionRepository", () => {
               timezone: "Europe/Madrid",
             },
           ],
+          BACKGROUND_CHECK: "this should be ignored",
         },
         user,
       );
@@ -1653,7 +1655,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("ignores a reply if it does not match with field options", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(14);
+      expect(PetitionFieldTypeValues).toHaveLength(15);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1668,6 +1670,7 @@ describe("repositories/PetitionRepository", () => {
             datetime: "2023-03-03T03:00",
             timezone: "Europe/Madrid",
           },
+          BACKGROUND_CHECK: "this should be ignored",
         },
         user,
       );

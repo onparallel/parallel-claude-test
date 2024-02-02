@@ -29,6 +29,7 @@ import { PdfDocumentGetProps } from "../../utils/pdf";
 import { LiquidPetitionVariableProvider } from "../../utils/liquid/LiquidPetitionVariableProvider";
 
 export interface PetitionExportInitialData {
+  assetsUrl: string;
   petitionId: string;
   documentTitle: string | null;
   showSignatureBoxes?: boolean;
@@ -40,6 +41,7 @@ export interface PetitionExportProps extends Omit<PetitionExportInitialData, "pe
 }
 
 export default function PetitionExport({
+  assetsUrl,
   documentTitle,
   showSignatureBoxes,
   includeNetDocumentsLinks,
@@ -153,10 +155,7 @@ export default function PetitionExport({
                   <View style={styles.header}>
                     {theme.showLogo ? (
                       <Image
-                        src={
-                          petition.organization.logoUrl ??
-                          "https://static.onparallel.com/static/emails/logo.png"
-                        }
+                        src={petition.organization.logoUrl ?? `${assetsUrl}/static/emails/logo.png`}
                         style={styles.documentLogo}
                       />
                     ) : null}
@@ -548,7 +547,7 @@ function groupFieldsByPages<T extends PetitionExport_PetitionBaseFragment>(
                 ([reply, childrenLogic]) => ({
                   ...reply,
                   children: zip(reply.children!, childrenLogic)
-                    .filter(([_, { isVisible }]) => isVisible)
+                    .filter(([child, { isVisible }]) => isVisible && child.field.showInPdf)
                     .map(([r]) => r),
                 }),
               ),

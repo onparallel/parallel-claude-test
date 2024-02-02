@@ -31,6 +31,7 @@ import { SettingsRowAlias } from "./rows/SettingsRowAlias";
 import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
+import { PetitionComposeBackgroundCheckSettings } from "./fields/PetitionComposeBackgroundCheckSettings";
 
 export interface PetitionComposeFieldSettingsProps {
   petitionId: string;
@@ -56,6 +57,7 @@ const COMPONENTS: Partial<
   FIELD_GROUP: PetitionComposeFieldGroupSettings,
   NUMBER: PetitionComposeNumberSettings,
   SHORT_TEXT: PetitionComposeShortTextSettings,
+  BACKGROUND_CHECK: PetitionComposeBackgroundCheckSettings,
 };
 
 export const PetitionComposeFieldSettings = Object.assign(
@@ -82,7 +84,7 @@ export const PetitionComposeFieldSettings = Object.assign(
 
       const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
 
-      const canOnlyBeInternal = ["DOW_JONES_KYC"].includes(field.type);
+      const canOnlyBeInternal = ["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(field.type);
 
       const isInternalFieldDisabled =
         isReadOnly ||
@@ -98,6 +100,7 @@ export const PetitionComposeFieldSettings = Object.assign(
         "CHECKBOX",
         "ES_TAX_DOCUMENTS",
         "DOW_JONES_KYC",
+        "BACKGROUND_CHECK",
         "FIELD_GROUP",
       ].includes(field.type);
 
@@ -140,7 +143,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                       if (type !== field.type) {
                         const isTypeChangeNotAllowed =
                           isFieldGroupChild &&
-                          type === "DOW_JONES_KYC" &&
+                          (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
                           field.position === 0 &&
                           !field.parent!.isInternal;
 
@@ -238,7 +241,9 @@ export const PetitionComposeFieldSettings = Object.assign(
               </SettingsRowGroup>
             ) : null}
 
-            {isFieldGroupChild || canOnlyBeInternal ? null : (
+            {isFieldGroupChild ||
+            field.type === "DOW_JONES_KYC" ||
+            field.type === "BACKGROUND_CHECK" ? null : (
               <SettingsRowGroup
                 label={
                   <FormattedMessage
@@ -318,8 +323,10 @@ export const PetitionComposeFieldSettings = Object.assign(
             }
           }
           ...SettingsRowAlias_PetitionField
+          ...PetitionComposeBackgroundCheckSettings_PetitionField
         }
         ${SettingsRowAlias.fragments.PetitionField}
+        ${PetitionComposeBackgroundCheckSettings.fragments.PetitionField}
       `,
     },
   },

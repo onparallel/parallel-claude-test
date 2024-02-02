@@ -309,6 +309,12 @@ export interface NexusGenInputs {
     firstName?: string | null; // String
     lastName?: string | null; // String
   };
+  UpdatePetitionFieldAutoSearchConfigInput: {
+    // input type
+    date?: NexusGenScalars["GID"] | null; // GID
+    name: NexusGenScalars["GID"][]; // [GID!]!
+    type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
+  };
   UpdatePetitionFieldInput: {
     // input type
     alias?: string | null; // String
@@ -411,6 +417,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   AiCompletionLogStatus: db.AiCompletionLogStatus;
+  BackgroundCheckEntitySearchType: "COMPANY" | "PERSON";
   BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult:
     | "INCORRECT_PASSWORD"
@@ -571,6 +578,113 @@ export interface NexusGenObjects {
     // root type
     type: string; // String!
     url: string; // String!
+  };
+  BackgroundCheckEntityDetailsCompany: {
+    // root type
+    createdAt?: NexusGenScalars["DateTime"] | null; // DateTime
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsCompanyProperties: {
+    // root type
+    address?: string[] | null; // [String!]
+    alias?: string[] | null; // [String!]
+    dateOfRegistration?: string[] | null; // [String!]
+    jurisdiction?: string[] | null; // [String!]
+    name?: string[] | null; // [String!]
+    relationships?: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
+    sanctions?: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    topics?: string[] | null; // [String!]
+  };
+  BackgroundCheckEntityDetailsPerson: {
+    // root type
+    createdAt?: NexusGenScalars["DateTime"] | null; // DateTime
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsPersonProperties: {
+    // root type
+    alias?: string[] | null; // [String!]
+    birthPlace?: string[] | null; // [String!]
+    country?: string[] | null; // [String!]
+    countryOfBirth?: string[] | null; // [String!]
+    dateOfBirth?: string[] | null; // [String!]
+    education?: string[] | null; // [String!]
+    ethnicity?: string[] | null; // [String!]
+    gender?: string[] | null; // [String!]
+    name?: string[] | null; // [String!]
+    nationality?: string[] | null; // [String!]
+    position?: string[] | null; // [String!]
+    relationships?: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
+    religion?: string[] | null; // [String!]
+    sanctions?: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    status?: string[] | null; // [String!]
+    topics?: string[] | null; // [String!]
+  };
+  BackgroundCheckEntityDetailsRelationship: {
+    // root type
+    id: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationshipProperties"]; // BackgroundCheckEntityDetailsRelationshipProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsRelationshipProperties: {
+    // root type
+    endDate?: string[] | null; // [String!]
+    entityA?: NexusGenRootTypes["BackgroundCheckEntityDetails"] | null; // BackgroundCheckEntityDetails
+    entityB?: NexusGenRootTypes["BackgroundCheckEntityDetails"] | null; // BackgroundCheckEntityDetails
+    relationship?: string[] | null; // [String!]
+    startDate?: string[] | null; // [String!]
+  };
+  BackgroundCheckEntityDetailsSanction: {
+    // root type
+    id: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionProperties"]; // BackgroundCheckEntityDetailsSanctionProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsSanctionProperties: {
+    // root type
+    authority?: string[] | null; // [String!]
+    endDate?: string[] | null; // [String!]
+    program?: string[] | null; // [String!]
+    sourceUrl?: string[] | null; // [String!]
+    startDate?: string[] | null; // [String!]
+  };
+  BackgroundCheckEntitySearch: {
+    // root type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    items: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][]; // [BackgroundCheckEntitySearchSchema!]!
+    totalCount: number; // Int!
+  };
+  BackgroundCheckEntitySearchCompany: {
+    // root type
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntitySearchCompanyProperties: {
+    // root type
+    incorporationDate?: string[] | null; // [String!]
+    jurisdiction?: string[] | null; // [String!]
+    topics?: string[] | null; // [String!]
+  };
+  BackgroundCheckEntitySearchPerson: {
+    // root type
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntitySearchPersonProperties: {
+    // root type
+    birthDate?: string[] | null; // [String!]
+    country?: string[] | null; // [String!]
+    gender?: string[] | null; // [String!]
+    topics?: string[] | null; // [String!]
   };
   BulkCreateContactsReturnType: {
     // root type
@@ -1134,6 +1248,12 @@ export interface NexusGenObjects {
 }
 
 export interface NexusGenInterfaces {
+  BackgroundCheckEntityDetails:
+    | NexusGenRootTypes["BackgroundCheckEntityDetailsCompany"]
+    | NexusGenRootTypes["BackgroundCheckEntityDetailsPerson"];
+  BackgroundCheckEntitySearchSchema:
+    | NexusGenRootTypes["BackgroundCheckEntitySearchCompany"]
+    | NexusGenRootTypes["BackgroundCheckEntitySearchPerson"];
   CreatedAt: {
     created_at: Date;
   };
@@ -1256,6 +1376,113 @@ export interface NexusGenFieldTypes {
     // field return type
     type: string; // String!
     url: string; // String!
+  };
+  BackgroundCheckEntityDetailsCompany: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"] | null; // DateTime
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsCompanyProperties: {
+    // field return type
+    address: string[] | null; // [String!]
+    alias: string[] | null; // [String!]
+    dateOfRegistration: string[] | null; // [String!]
+    jurisdiction: string[] | null; // [String!]
+    name: string[] | null; // [String!]
+    relationships: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
+    sanctions: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    topics: string[] | null; // [String!]
+  };
+  BackgroundCheckEntityDetailsPerson: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"] | null; // DateTime
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsPersonProperties: {
+    // field return type
+    alias: string[] | null; // [String!]
+    birthPlace: string[] | null; // [String!]
+    country: string[] | null; // [String!]
+    countryOfBirth: string[] | null; // [String!]
+    dateOfBirth: string[] | null; // [String!]
+    education: string[] | null; // [String!]
+    ethnicity: string[] | null; // [String!]
+    gender: string[] | null; // [String!]
+    name: string[] | null; // [String!]
+    nationality: string[] | null; // [String!]
+    position: string[] | null; // [String!]
+    relationships: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
+    religion: string[] | null; // [String!]
+    sanctions: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    status: string[] | null; // [String!]
+    topics: string[] | null; // [String!]
+  };
+  BackgroundCheckEntityDetailsRelationship: {
+    // field return type
+    id: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationshipProperties"]; // BackgroundCheckEntityDetailsRelationshipProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsRelationshipProperties: {
+    // field return type
+    endDate: string[] | null; // [String!]
+    entityA: NexusGenRootTypes["BackgroundCheckEntityDetails"] | null; // BackgroundCheckEntityDetails
+    entityB: NexusGenRootTypes["BackgroundCheckEntityDetails"] | null; // BackgroundCheckEntityDetails
+    relationship: string[] | null; // [String!]
+    startDate: string[] | null; // [String!]
+  };
+  BackgroundCheckEntityDetailsSanction: {
+    // field return type
+    id: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionProperties"]; // BackgroundCheckEntityDetailsSanctionProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntityDetailsSanctionProperties: {
+    // field return type
+    authority: string[] | null; // [String!]
+    endDate: string[] | null; // [String!]
+    program: string[] | null; // [String!]
+    sourceUrl: string[] | null; // [String!]
+    startDate: string[] | null; // [String!]
+  };
+  BackgroundCheckEntitySearch: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    items: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][]; // [BackgroundCheckEntitySearchSchema!]!
+    totalCount: number; // Int!
+  };
+  BackgroundCheckEntitySearchCompany: {
+    // field return type
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntitySearchCompanyProperties: {
+    // field return type
+    incorporationDate: string[] | null; // [String!]
+    jurisdiction: string[] | null; // [String!]
+    topics: string[] | null; // [String!]
+  };
+  BackgroundCheckEntitySearchPerson: {
+    // field return type
+    id: string; // String!
+    name: string; // String!
+    properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
+    type: string; // String!
+  };
+  BackgroundCheckEntitySearchPersonProperties: {
+    // field return type
+    birthDate: string[] | null; // [String!]
+    country: string[] | null; // [String!]
+    gender: string[] | null; // [String!]
+    topics: string[] | null; // [String!]
   };
   BulkCreateContactsReturnType: {
     // field return type
@@ -1576,6 +1803,7 @@ export interface NexusGenFieldTypes {
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
@@ -1719,6 +1947,7 @@ export interface NexusGenFieldTypes {
     unlinkPetitionFieldChildren: NexusGenRootTypes["PetitionField"]; // PetitionField!
     unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updateFeatureFlag: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1738,6 +1967,7 @@ export interface NexusGenFieldTypes {
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionAttachmentType: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    updatePetitionFieldAutoSearchConfig: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -2858,6 +3088,8 @@ export interface NexusGenFieldTypes {
     // field return type
     access: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     accesses: NexusGenRootTypes["PublicPetitionAccessPagination"]; // PublicPetitionAccessPagination!
+    backgroundCheckEntityDetails: NexusGenRootTypes["BackgroundCheckEntityDetails"]; // BackgroundCheckEntityDetails!
+    backgroundCheckEntitySearch: NexusGenRootTypes["BackgroundCheckEntitySearch"]; // BackgroundCheckEntitySearch!
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
@@ -3295,6 +3527,19 @@ export interface NexusGenFieldTypes {
     remainingAttempts: number; // Int!
     token: string; // ID!
   };
+  BackgroundCheckEntityDetails: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"] | null; // DateTime
+    id: string; // String!
+    name: string; // String!
+    type: string; // String!
+  };
+  BackgroundCheckEntitySearchSchema: {
+    // field return type
+    id: string; // String!
+    name: string; // String!
+    type: string; // String!
+  };
   CreatedAt: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -3506,6 +3751,113 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     type: "String";
     url: "String";
+  };
+  BackgroundCheckEntityDetailsCompany: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "String";
+    name: "String";
+    properties: "BackgroundCheckEntityDetailsCompanyProperties";
+    type: "String";
+  };
+  BackgroundCheckEntityDetailsCompanyProperties: {
+    // field return type name
+    address: "String";
+    alias: "String";
+    dateOfRegistration: "String";
+    jurisdiction: "String";
+    name: "String";
+    relationships: "BackgroundCheckEntityDetailsRelationship";
+    sanctions: "BackgroundCheckEntityDetailsSanction";
+    topics: "String";
+  };
+  BackgroundCheckEntityDetailsPerson: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "String";
+    name: "String";
+    properties: "BackgroundCheckEntityDetailsPersonProperties";
+    type: "String";
+  };
+  BackgroundCheckEntityDetailsPersonProperties: {
+    // field return type name
+    alias: "String";
+    birthPlace: "String";
+    country: "String";
+    countryOfBirth: "String";
+    dateOfBirth: "String";
+    education: "String";
+    ethnicity: "String";
+    gender: "String";
+    name: "String";
+    nationality: "String";
+    position: "String";
+    relationships: "BackgroundCheckEntityDetailsRelationship";
+    religion: "String";
+    sanctions: "BackgroundCheckEntityDetailsSanction";
+    status: "String";
+    topics: "String";
+  };
+  BackgroundCheckEntityDetailsRelationship: {
+    // field return type name
+    id: "String";
+    properties: "BackgroundCheckEntityDetailsRelationshipProperties";
+    type: "String";
+  };
+  BackgroundCheckEntityDetailsRelationshipProperties: {
+    // field return type name
+    endDate: "String";
+    entityA: "BackgroundCheckEntityDetails";
+    entityB: "BackgroundCheckEntityDetails";
+    relationship: "String";
+    startDate: "String";
+  };
+  BackgroundCheckEntityDetailsSanction: {
+    // field return type name
+    id: "String";
+    properties: "BackgroundCheckEntityDetailsSanctionProperties";
+    type: "String";
+  };
+  BackgroundCheckEntityDetailsSanctionProperties: {
+    // field return type name
+    authority: "String";
+    endDate: "String";
+    program: "String";
+    sourceUrl: "String";
+    startDate: "String";
+  };
+  BackgroundCheckEntitySearch: {
+    // field return type name
+    createdAt: "DateTime";
+    items: "BackgroundCheckEntitySearchSchema";
+    totalCount: "Int";
+  };
+  BackgroundCheckEntitySearchCompany: {
+    // field return type name
+    id: "String";
+    name: "String";
+    properties: "BackgroundCheckEntitySearchCompanyProperties";
+    type: "String";
+  };
+  BackgroundCheckEntitySearchCompanyProperties: {
+    // field return type name
+    incorporationDate: "String";
+    jurisdiction: "String";
+    topics: "String";
+  };
+  BackgroundCheckEntitySearchPerson: {
+    // field return type name
+    id: "String";
+    name: "String";
+    properties: "BackgroundCheckEntitySearchPersonProperties";
+    type: "String";
+  };
+  BackgroundCheckEntitySearchPersonProperties: {
+    // field return type name
+    birthDate: "String";
+    country: "String";
+    gender: "String";
+    topics: "String";
   };
   BulkCreateContactsReturnType: {
     // field return type name
@@ -3826,6 +4178,7 @@ export interface NexusGenFieldTypeNames {
     completePetition: "Petition";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
     createAzureOpenAiIntegration: "SupportMethodResponse";
+    createBackgroundCheckProfilePdfTask: "Task";
     createBulkPetitionSendTask: "Task";
     createContact: "Contact";
     createDowJonesKycIntegration: "OrgIntegration";
@@ -3969,6 +4322,7 @@ export interface NexusGenFieldTypeNames {
     unlinkPetitionFieldChildren: "PetitionField";
     unsubscribeFromProfile: "Profile";
     untagPetition: "PetitionBase";
+    updateBackgroundCheckEntity: "Success";
     updateContact: "Contact";
     updateEventSubscription: "PetitionEventSubscription";
     updateFeatureFlag: "SupportMethodResponse";
@@ -3988,6 +4342,7 @@ export interface NexusGenFieldTypeNames {
     updatePetition: "PetitionBase";
     updatePetitionAttachmentType: "PetitionAttachment";
     updatePetitionField: "PetitionField";
+    updatePetitionFieldAutoSearchConfig: "PetitionField";
     updatePetitionFieldComment: "PetitionFieldComment";
     updatePetitionFieldReplies: "PetitionFieldReply";
     updatePetitionFieldRepliesStatus: "PetitionField";
@@ -5108,6 +5463,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     access: "PublicPetitionAccess";
     accesses: "PublicPetitionAccessPagination";
+    backgroundCheckEntityDetails: "BackgroundCheckEntityDetails";
+    backgroundCheckEntitySearch: "BackgroundCheckEntitySearch";
     contact: "Contact";
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
@@ -5545,6 +5902,19 @@ export interface NexusGenFieldTypeNames {
     remainingAttempts: "Int";
     token: "ID";
   };
+  BackgroundCheckEntityDetails: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "String";
+    name: "String";
+    type: "String";
+  };
+  BackgroundCheckEntitySearchSchema: {
+    // field return type name
+    id: "String";
+    name: "String";
+    type: "String";
+  };
   CreatedAt: {
     // field return type name
     createdAt: "DateTime";
@@ -5824,6 +6194,11 @@ export interface NexusGenArgTypes {
       apiKey: string; // String!
       endpoint: string; // String!
       orgId: NexusGenScalars["GID"]; // GID!
+    };
+    createBackgroundCheckProfilePdfTask: {
+      // args
+      entityId: string; // String!
+      token: string; // String!
     };
     createBulkPetitionSendTask: {
       // args
@@ -6627,6 +7002,11 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       tagId: NexusGenScalars["GID"]; // GID!
     };
+    updateBackgroundCheckEntity: {
+      // args
+      entityId?: string | null; // String
+      token: string; // String!
+    };
     updateContact: {
       // args
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
@@ -6739,6 +7119,12 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["UpdatePetitionFieldInput"]; // UpdatePetitionFieldInput!
       fieldId: NexusGenScalars["GID"]; // GID!
       force?: boolean | null; // Boolean
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionFieldAutoSearchConfig: {
+      // args
+      config?: NexusGenInputs["UpdatePetitionFieldAutoSearchConfigInput"] | null; // UpdatePetitionFieldAutoSearchConfigInput
+      fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionFieldComment: {
@@ -7012,6 +7398,18 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     };
+    backgroundCheckEntityDetails: {
+      // args
+      entityId: string; // String!
+      token: string; // String!
+    };
+    backgroundCheckEntitySearch: {
+      // args
+      date?: NexusGenScalars["Date"] | null; // Date
+      name: string; // String!
+      token: string; // String!
+      type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
+    };
     contact: {
       // args
       id: NexusGenScalars["GID"]; // GID!
@@ -7271,6 +7669,12 @@ export interface NexusGenAbstractTypeMembers {
   PublicUserOrContact: "PublicContact" | "PublicUser";
   UserOrPetitionAccess: "PetitionAccess" | "User";
   UserOrUserGroup: "User" | "UserGroup";
+  BackgroundCheckEntityDetails:
+    | "BackgroundCheckEntityDetailsCompany"
+    | "BackgroundCheckEntityDetailsPerson";
+  BackgroundCheckEntitySearchSchema:
+    | "BackgroundCheckEntitySearchCompany"
+    | "BackgroundCheckEntitySearchPerson";
   CreatedAt:
     | "PetitionFieldAttachment"
     | "PetitionMessage"
@@ -7382,6 +7786,10 @@ export interface NexusGenTypeInterfaces {
   AccessDelegatedEvent: "PetitionEvent";
   AccessOpenedEvent: "PetitionEvent";
   AiCompletionLog: "Timestamps";
+  BackgroundCheckEntityDetailsCompany: "BackgroundCheckEntityDetails";
+  BackgroundCheckEntityDetailsPerson: "BackgroundCheckEntityDetails";
+  BackgroundCheckEntitySearchCompany: "BackgroundCheckEntitySearchSchema";
+  BackgroundCheckEntitySearchPerson: "BackgroundCheckEntitySearchSchema";
   CommentCreatedUserNotification: "PetitionUserNotification";
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";
@@ -7489,6 +7897,8 @@ export type NexusGenUnionNames = keyof NexusGenUnions;
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
 export type NexusGenAbstractsUsingStrategyResolveType =
+  | "BackgroundCheckEntityDetails"
+  | "BackgroundCheckEntitySearchSchema"
   | "CreatedAt"
   | "DowJonesKycEntityProfileResult"
   | "DowJonesKycEntitySearchResult"

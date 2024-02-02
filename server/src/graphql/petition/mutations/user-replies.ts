@@ -6,6 +6,7 @@ import {
   mutationField,
   nonNull,
   objectType,
+  stringArg,
 } from "nexus";
 import pMap from "p-map";
 import { isDefined, uniq } from "remeda";
@@ -15,13 +16,16 @@ import { fieldReplyContent } from "../../../util/fieldReplyContent";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
+import { SUCCESS } from "../../helpers/Success";
 import { authenticateAnd, chain } from "../../helpers/authorize";
-import { ApolloError } from "../../helpers/errors";
+import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
 import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
+import { authenticateBackgroundCheckToken } from "../../integrations/authorizers";
+import { parseBackgroundCheckToken } from "../../integrations/utils";
 import {
   fieldCanBeReplied,
   fieldHasType,
@@ -373,6 +377,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
 });
 
 export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
+  deprecation: "use BACKGROUND_CHECK field",
   description: "Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document",
   type: "PetitionFieldReply",
   args: {
@@ -641,5 +646,70 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
       })),
       ctx.user!,
     );
+  },
+});
+
+export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckEntity", {
+  type: "Success",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("BACKGROUND_CHECK"),
+    authenticateBackgroundCheckToken("token"),
+  ),
+  args: {
+    token: nonNull(stringArg()),
+    entityId: stringArg(),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const params = parseBackgroundCheckToken(args.token);
+
+      const replies = await ctx.petitions.loadRepliesForField(params.fieldId);
+      const reply = replies.find(
+        (r) =>
+          r.type === "BACKGROUND_CHECK" &&
+          isDefined(r.content.query) &&
+          r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
+      );
+
+      if (!isDefined(reply)) {
+        throw new ApolloError(`Can't find BACKGROUND_CHECK reply`, "REPLY_NOT_FOUND");
+      }
+
+      const updateCheck = await ctx.petitions.repliesCanBeUpdated([reply.id]);
+      if (updateCheck === "REPLY_ALREADY_APPROVED") {
+        throw new ApolloError(
+          `The reply has been approved and cannot be updated.`,
+          "REPLY_ALREADY_APPROVED_ERROR",
+        );
+      } else if (updateCheck === "REPLY_NOT_FOUND") {
+        throw new ForbiddenError("FORBIDDEN");
+      }
+
+      const entity = isDefined(args.entityId)
+        ? await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id)
+        : null;
+
+      await ctx.petitions.updatePetitionFieldRepliesContent(
+        params.petitionId,
+        [
+          {
+            id: reply.id,
+            content: JSON.stringify({ ...reply.content, entity }),
+          },
+        ],
+        ctx.user!,
+      );
+      return SUCCESS;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "PROFILE_NOT_FOUND") {
+          throw new ApolloError("Profile not found", "PROFILE_NOT_FOUND");
+        }
+        if (error.message === "INVALID_CREDENTIALS") {
+          throw new ForbiddenError("Invalid credentials");
+        }
+      }
+      throw error;
+    }
   },
 });

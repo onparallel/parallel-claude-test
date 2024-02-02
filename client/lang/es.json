@@ -415,6 +415,231 @@
     "context": "Profile"
   },
   {
+    "term": "component.background-check-entity-details-company-basic.date-of-registration",
+    "definition": "Fecha de registro",
+    "context": "Date of registration"
+  },
+  {
+    "term": "component.background-check-entity-details-company-basic.entity",
+    "definition": "Entidad",
+    "context": "Entity"
+  },
+  {
+    "term": "component.background-check-entity-details-company-basic.jurisdiction",
+    "definition": "Jurisdicción",
+    "context": "Jurisdiction"
+  },
+  {
+    "term": "component.background-check-entity-details-company-basic.preview-pdf",
+    "definition": "Previsualizar PDF",
+    "context": "Preview PDF"
+  },
+  {
+    "term": "component.background-check-entity-details-company-basic.type",
+    "definition": "Tipo",
+    "context": "Type"
+  },
+  {
+    "term": "component.background-check-entity-details-company-overview.address",
+    "definition": "Dirección",
+    "context": "Address"
+  },
+  {
+    "term": "component.background-check-entity-details-company-overview.alias",
+    "definition": "Alias",
+    "context": "Alias"
+  },
+  {
+    "term": "component.background-check-entity-details-company-overview.name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "component.background-check-entity-details-company-overview.overview",
+    "definition": "Resumen",
+    "context": "Overview"
+  },
+  {
+    "term": "component.background-check-entity-details-person-basic.country",
+    "definition": "País",
+    "context": "Country"
+  },
+  {
+    "term": "component.background-check-entity-details-person-basic.date-of-birth",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.background-check-entity-details-person-basic.gender",
+    "definition": "Género",
+    "context": "Gender"
+  },
+  {
+    "term": "component.background-check-entity-details-person-basic.nationality",
+    "definition": "Nacionalidad",
+    "context": "Nationality"
+  },
+  {
+    "term": "component.background-check-entity-details-person-basic.person",
+    "definition": "Persona",
+    "context": "Person"
+  },
+  {
+    "term": "component.background-check-entity-details-person-basic.preview-pdf",
+    "definition": "Previsualizar PDF",
+    "context": "Preview PDF"
+  },
+  {
+    "term": "component.background-check-entity-details-person-basic.type",
+    "definition": "Tipo",
+    "context": "Type"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.alias",
+    "definition": "Alias",
+    "context": "Alias"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.education",
+    "definition": "Educación",
+    "context": "Education"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.ethnicity",
+    "definition": "Origen étnico",
+    "context": "Ethnicity"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.full-name",
+    "definition": "Nombre y apellidos",
+    "context": "Full name"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.overview",
+    "definition": "Resumen",
+    "context": "Overview"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.place-of-birth",
+    "definition": "Lugar de nacimiento",
+    "context": "Place of birth"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.position",
+    "definition": "Cargo",
+    "context": "Position"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.regilion",
+    "definition": "Religión",
+    "context": "Religion"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.status",
+    "definition": "Estatus",
+    "context": "Status"
+  },
+  {
+    "term": "component.background-check-entity-details-relationships.no-relationships-found-message",
+    "definition": "No hemos encontrado relaciones relevantes de esta entidad",
+    "context": "We have not found any relevant relationships for this entity"
+  },
+  {
+    "term": "component.background-check-entity-details-relationships.relationships",
+    "definition": "Relaciones",
+    "context": "Relationships"
+  },
+  {
+    "term": "component.background-check-entity-details-sanctions.no-sanctions-found-message",
+    "definition": "No hemos encontrado esta entidad en ninguna lista de sanciones",
+    "context": "We have not found this entity on any sanctions list"
+  },
+  {
+    "term": "component.background-check-entity-details-sanctions.sanction-lists",
+    "definition": "Listas de sanciones",
+    "context": "Sanction lists"
+  },
+  {
+    "term": "component.background-check-entity-type-select.entity-type-any",
+    "definition": "Todos los resultados",
+    "context": "All results"
+  },
+  {
+    "term": "component.background-check-entity-type-select.entity-type-company",
+    "definition": "Compañías",
+    "context": "Companies"
+  },
+  {
+    "term": "component.background-check-entity-type-select.entity-type-person",
+    "definition": "Personas físicas",
+    "context": "Individuals"
+  },
+  {
+    "term": "component.background-check-search-result.country-territory",
+    "definition": "País/Territorio",
+    "context": "Country/Territory"
+  },
+  {
+    "term": "component.background-check-search-result.date-of-birth",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.background-check-search-result.gender",
+    "definition": "Género",
+    "context": "Gender"
+  },
+  {
+    "term": "component.background-check-search-result.incorporation-date",
+    "definition": "Fecha de incorporación",
+    "context": "Incorporation date"
+  },
+  {
+    "term": "component.background-check-search-result.modify-search",
+    "definition": "Modificar búsqueda",
+    "context": "Modify search"
+  },
+  {
+    "term": "component.background-check-search-result.name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "component.background-check-search-result.no-results-found",
+    "definition": "¡Parece que la entidad que buscas no aparece en ningún listado!",
+    "context": "It seems that the entity you are looking for is not listed anywhere!"
+  },
+  {
+    "term": "component.background-check-search-result.none-of-these-results",
+    "definition": "¿No es ninguno de estos resultados?",
+    "context": "None of these results?"
+  },
+  {
+    "term": "component.background-check-search-result.results-found",
+    "definition": "Resultados encontrados: {amount}",
+    "context": "Results found: {amount}"
+  },
+  {
+    "term": "component.background-check-search-result.results-obtained-on",
+    "definition": "Resultados del {date}",
+    "context": "Results from {date}"
+  },
+  {
+    "term": "component.background-check-search-result.risk-labels",
+    "definition": "Etiquetas de riesgo",
+    "context": "Risk labels"
+  },
+  {
+    "term": "component.background-check-search-result.save-search-text",
+    "definition": "Hemos guardado la búsqueda automáticamente para conservar la evidencia de cara a una futura auditoría.",
+    "context": "We have automatically saved the search to preserve the evidence for a future audit."
+  },
+  {
+    "term": "component.background-check-search-result.searching-for",
+    "definition": "Búsqueda de",
+    "context": "Searching for"
+  },
+  {
     "term": "component.branding-document-preview.document-title",
     "definition": "Título del documento",
     "context": "Document title"
@@ -648,6 +873,56 @@
     "term": "component.completing-message-dialog.pending-processes-count",
     "definition": "{tone, select, INFORMAL{Tienes} other{Tiene}} {count, plural, =1{# proceso pendiente} other{# procesos pendientes}}",
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.body",
+    "definition": "Selecciona los campos a utilizar para automatizar la búsqueda en listados.",
+    "context": "Select the fields to be used to automate the list search."
+  },
+  {
+    "term": "component.configure-automate-search-dialog.date-of-birth-helper-text",
+    "definition": "No hay campos de fecha en el formulario.",
+    "context": "There are no date fields in the form."
+  },
+  {
+    "term": "component.configure-automate-search-dialog.date-of-birth-label",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.date-of-registration-label",
+    "definition": "Fecha de inscripción",
+    "context": "Date of registration"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.header",
+    "definition": "Automatizar búsqueda",
+    "context": "Automate search"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.name-helper-text",
+    "definition": "No hay campos de respuesta corta en el formulario.",
+    "context": "There are no short replies fields in the form."
+  },
+  {
+    "term": "component.configure-automate-search-dialog.name-label",
+    "definition": "Nombre de la persona/entidad",
+    "context": "Name of person/entity"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.remove-setting",
+    "definition": "Quitar ajuste",
+    "context": "Remove setting"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.select-field-placeholder",
+    "definition": "Selecciona un campo",
+    "context": "Select a field"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.type-of-search-label",
+    "definition": "Tipo de búsqueda",
+    "context": "Type of search"
   },
   {
     "term": "component.configure-reminder-settings-dialog.header",
@@ -1303,6 +1578,16 @@
     "term": "component.copy-liquid-reference-button.reference-copied",
     "definition": "¡Copiada al portapapeles!",
     "context": "Copied to clipboard!"
+  },
+  {
+    "term": "component.copy-or-download-reply-button.view-details",
+    "definition": "Ver detalles",
+    "context": "View details"
+  },
+  {
+    "term": "component.copy-or-download-reply-button.view-results",
+    "definition": "Ver resultados",
+    "context": "View results"
   },
   {
     "term": "component.copy-signature-config-dialog.body",
@@ -2405,6 +2690,16 @@
     "context": "Compliance feature"
   },
   {
+    "term": "component.feature-flag-descriptions.background-check-description",
+    "definition": "Habilita el campo de Búsqueda en listados para la organización.",
+    "context": "Enables the Background check petition field on the organization."
+  },
+  {
+    "term": "component.feature-flag-descriptions.background-check-name",
+    "definition": "Búsqueda en listados",
+    "context": "Background check"
+  },
+  {
     "term": "component.feature-flag-descriptions.branding",
     "definition": "Marca",
     "context": "Branding"
@@ -2713,6 +3008,21 @@
     "term": "component.field-settings-number.range-minimum",
     "definition": "Mínimo:",
     "context": "Minimum:"
+  },
+  {
+    "term": "component.field-used-for-searches.body",
+    "definition": "Este campo se utiliza para automatizar la búsqueda en un campo de {fieldName}. Para continuar, por favor, primero cambia la configuración de ese campo.",
+    "context": "This field is used to automate the search in a {fieldName} field. To continue, please first update the field configuration."
+  },
+  {
+    "term": "component.field-used-for-searches.header",
+    "definition": "Campo utilizado para búsquedas",
+    "context": "Field used for searches"
+  },
+  {
+    "term": "component.field-used-for-searches.see-configuration",
+    "definition": "Ver configuración",
+    "context": "See configuration"
   },
   {
     "term": "component.file-icon.audio-file",
@@ -3980,6 +4290,26 @@
     "context": "Too many attachments"
   },
   {
+    "term": "component.petition-compose-background-check-settings.automate-search",
+    "definition": "Automatizar la búsqueda",
+    "context": "Automate the search"
+  },
+  {
+    "term": "component.petition-compose-background-check-settings.automate-search-help",
+    "definition": "Añade esta opción para automatizar la búsqueda utilizando respuestas de los campos.",
+    "context": "Add this option to automate the search using replies from the fields."
+  },
+  {
+    "term": "component.petition-compose-background-check-settings.provider",
+    "definition": "Proveedor",
+    "context": "Provider"
+  },
+  {
+    "term": "component.petition-compose-background-check-settings.provider-placeholder",
+    "definition": "Sin proveedor",
+    "context": "No provider"
+  },
+  {
     "term": "component.petition-compose-checkbox-settings.description",
     "definition": "Esta opción permite limitar el número de opciones que puede escoger el destinarario.",
     "context": "This option allows you to limit the number of options that the recipient can choose."
@@ -4330,6 +4660,16 @@
     "context": "Do you want to remove this field from the group?"
   },
   {
+    "term": "component.petition-compose-field.update-plan-to-use-field",
+    "definition": "Actualiza tu plan para utilizar este campo.",
+    "context": "Update your plan to use this field."
+  },
+  {
+    "term": "component.petition-compose-field.update-plan-to-use-field-contact-message",
+    "definition": "Hola, me gustaría obtener más información para actualizar mi plan y acceder al campo de {fieldLabel}.",
+    "context": "Hi, I would like more information about upgrade my plan to access the {fieldLabel} field."
+  },
+  {
     "term": "component.petition-compose-field.visibility-help",
     "definition": "Este campo sólo se mostrará u ocultará cuando se cumplan las condiciones.",
     "context": "This field will only be shown or hidden when the conditions are met."
@@ -4505,6 +4845,11 @@
     "context": "Select a field"
   },
   {
+    "term": "component.petition-field-type-select-dropdown.background-check-description",
+    "definition": "Realiza una búsqueda para comprobar los antecedentes de un individuo o entidad.",
+    "context": "Run a background check on an individual or a legal entity."
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.category-advanced-fields",
     "definition": "Campos avanzados",
     "context": "Advanced fields"
@@ -4568,6 +4913,11 @@
     "term": "component.petition-field-type-select-dropdown.number",
     "definition": "Permite al destinatario responder solo con números.",
     "context": "Allow the recipient to respond with numbers only."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.paid-badge",
+    "definition": "De pago",
+    "context": "Paid"
   },
   {
     "term": "component.petition-field-type-select-dropdown.phone",
@@ -5798,6 +6148,76 @@
     "term": "component.preview-dow-jones-permission-denied-dialog.title",
     "definition": "Permisos para realizar esta acción",
     "context": "Permissions needed"
+  },
+  {
+    "term": "component.preview-petition-background-check.check-lists",
+    "definition": "Buscar en listados",
+    "context": "Run background check"
+  },
+  {
+    "term": "component.preview-petition-background-check.do-another-search",
+    "definition": "Modificar búsqueda",
+    "context": "Modify search"
+  },
+  {
+    "term": "component.preview-petition-background-check.wait-perform-search",
+    "definition": "Por favor, espera mientras realizamos la búsqueda...",
+    "context": "Please wait while we run the background check..."
+  },
+  {
+    "term": "component.preview-petition-field-background-check-replace-reply-dialog.body",
+    "definition": "Este campo solo admite un elemento. Si guardas una nueva, se descartará la anterior.",
+    "context": "This field only admits one element. If you save a new one, the current one will be removed."
+  },
+  {
+    "term": "component.preview-petition-field-background-check-replace-reply-dialog.body-question",
+    "definition": "¿Estás seguro de querer <b>sobreescribir con esta entidad</b>?",
+    "context": "Are you sure you want to <b>overwrite with this entity</b>?"
+  },
+  {
+    "term": "component.preview-petition-field-background-check-replace-reply-dialog.header",
+    "definition": "Sobreescribir entidad",
+    "context": "Overwrite entity"
+  },
+  {
+    "term": "component.preview-petition-field-background-check-replace-reply-dialog.yes-overwrite",
+    "definition": "Sí, sobreescribir",
+    "context": "Yes, overwrite"
+  },
+  {
+    "term": "component.preview-petition-field-background-check-save-search-dialog.body",
+    "definition": "En ese caso, puedes cerrar esta página. Parallel ya ha guardado la búsqueda automáticamente para conservar la evidencia de cara a una futura auditoría.",
+    "context": "In that case, you can close this page. Parallel has already automatically saved the search to preserve the evidence for a future audit."
+  },
+  {
+    "term": "component.preview-petition-field-background-check-save-search-dialog.header",
+    "definition": "¿No es ninguno de estos resultados?",
+    "context": "None of these results?"
+  },
+  {
+    "term": "component.preview-petition-field-background-check.approved-profile",
+    "definition": "Este perfil ha sido aprobado",
+    "context": "This profile has been approved"
+  },
+  {
+    "term": "component.preview-petition-field-background-check.rejected-profile",
+    "definition": "Este perfil ha sido rechazado",
+    "context": "This profile has been rejected"
+  },
+  {
+    "term": "component.preview-petition-field-background-check.remove-reply-label",
+    "definition": "Eliminar respuesta",
+    "context": "Remove reply"
+  },
+  {
+    "term": "component.preview-petition-field-background-check.view-details",
+    "definition": "Ver detalles",
+    "context": "View details"
+  },
+  {
+    "term": "component.preview-petition-field-background-check.view-results",
+    "definition": "Ver resultados",
+    "context": "View results"
   },
   {
     "term": "component.preview-petition-field-group.review-reply",
@@ -8270,6 +8690,26 @@
     "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
   },
   {
+    "term": "component.timeline-reply-created-event.description-background-check-entity",
+    "definition": "{userIsYou, select, true {Guardaste} other {{createdBy} guardó}} una entidad en el campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description-background-check-entity-children-of-group",
+    "definition": "{userIsYou, select, true {Guardaste} other {{createdBy} guardó}} una entidad en el campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description-background-check-search",
+    "definition": "Se ha guardado una búsqueda en el campo {field} {timeAgo}",
+    "context": "A search was saved in the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-created-event.description-background-check-search-children-of-group",
+    "definition": "Se ha guardado una búsqueda en el campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "A search was saved in the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
     "term": "component.timeline-reply-created-event.description-children-of-group",
     "definition": "{userIsYou, select, true {Respondiste} other {{createdBy} respondió}} al campo {field} de un grupo de {parentField} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} from a group of {parentField} {timeAgo}"
@@ -8290,6 +8730,16 @@
     "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a group {field} and all its replies {timeAgo}"
   },
   {
+    "term": "component.timeline-reply-deleted-event.description-background-check",
+    "definition": "{userIsYou, select, true {Descartaste} other {{deletedBy} descartó}} una búsqueda/entidad guardada en el campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-deleted-event.description-background-check-children-of-group",
+    "definition": "{userIsYou, select, true {Descartaste} other {{deletedBy} descartó}} una búsqueda/entidad guardada en el campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} removed the search criteria/entity saved in the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
     "term": "component.timeline-reply-deleted-event.description-children-of-group",
     "definition": "{userIsYou, select, true {Eliminaste} other {{deletedBy} eliminó}} una respuesta al campo {field} de un grupo de {parentField} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} from a group of {parentField} {timeAgo}"
@@ -8298,6 +8748,26 @@
     "term": "component.timeline-reply-updated-event.description",
     "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una respuesta al campo {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description-background-check-entity",
+    "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una entidad en el campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description-background-check-entity-children-of-group",
+    "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una entidad en el campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} from a group of {parentField} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description-background-check-search",
+    "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una búsqueda en el campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-reply-updated-event.description-background-check-search-children-of-group",
+    "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una búsqueda en el campo {field} de un grupo de {parentField} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}"
   },
   {
     "term": "component.timeline-reply-updated-event.description-children-of-group",
@@ -9425,9 +9895,19 @@
     "context": "Export"
   },
   {
+    "term": "generic.female",
+    "definition": "Femenino",
+    "context": "Female"
+  },
+  {
     "term": "generic.field-required-error",
     "definition": "Este campo es requerido",
     "context": "This field is required"
+  },
+  {
+    "term": "generic.fields-not-available",
+    "definition": "Campos no disponibles",
+    "context": "Fields not available"
   },
   {
     "term": "generic.file-name",
@@ -9523,11 +10003,6 @@
     "term": "generic.forms.invalid-email-error",
     "definition": "Por favor, introduzca un correo electrónico válido",
     "context": "Please, enter a valid email"
-  },
-  {
-    "term": "generic.forms.invalid-first-name-error",
-    "definition": "Por favor, introduzca el nombre",
-    "context": "Please, enter the first name"
   },
   {
     "term": "generic.forms.invalid-group-name-error",
@@ -9675,6 +10150,11 @@
     "context": "You can only move fields so that visibility and calculations conditions refer only to previous fields."
   },
   {
+    "term": "generic.invalid-first-name-error",
+    "definition": "Por favor, introduzca el nombre",
+    "context": "Please, enter the first name"
+  },
+  {
     "term": "generic.invalid-password-policy-error",
     "definition": "Por favor, escoge una contraseña más robusta",
     "context": "Please choose a stronger password"
@@ -9755,6 +10235,11 @@
     "context": "reply"
   },
   {
+    "term": "generic.male",
+    "definition": "Masculino",
+    "context": "Male"
+  },
+  {
     "term": "generic.more-options",
     "definition": "Más opciones...",
     "context": "More options..."
@@ -9798,6 +10283,11 @@
     "term": "generic.n-profiles",
     "definition": "{count, plural, one {# perfil} other {# perfiles}}",
     "context": "{count, plural, one {# profile} other {# profiles}}"
+  },
+  {
+    "term": "generic.n-results",
+    "definition": "{count, plural,=0{Sin resultados} =1 {1 resultado} other {# resultados}}",
+    "context": "{count, plural,=0{No results} =1 {1 result} other {# results}}"
   },
   {
     "term": "generic.name",
@@ -9958,6 +10448,11 @@
     "term": "generic.petition-count",
     "definition": "{count, plural, =1 {# parallel} other {# parallels}}",
     "context": "{count, plural, =1 {# parallel} other {# parallels}}"
+  },
+  {
+    "term": "generic.petition-field-type-background-check",
+    "definition": "Búsqueda en listados",
+    "context": "Background check"
   },
   {
     "term": "generic.petition-field-type-checkbox",
@@ -10143,6 +10638,11 @@
     "term": "generic.saving-changes",
     "definition": "Guardando...",
     "context": "Saving..."
+  },
+  {
+    "term": "generic.search",
+    "definition": "Búsqueda",
+    "context": "Search"
   },
   {
     "term": "generic.select",
@@ -10765,76 +11265,6 @@
     "context": "Hi, I would like more information about setting a subdomain."
   },
   {
-    "term": "organization.integrations.alert-button",
-    "definition": "Sugerir integración",
-    "context": "Suggest integration"
-  },
-  {
-    "term": "organization.integrations.alert-description",
-    "definition": "¡Te escuchamos! Dinos las aplicaciones con la que te gustaría conectar Parallel para que podamos estudiarlo.",
-    "context": "Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
-  },
-  {
-    "term": "organization.integrations.alert-title",
-    "definition": "¿Echas en falta alguna integración?",
-    "context": "Can't find the integration you need?"
-  },
-  {
-    "term": "organization.integrations.docusign-description",
-    "definition": "Añade firma digital a tus parallels.",
-    "context": "Add digital signature to your parallels."
-  },
-  {
-    "term": "organization.integrations.dow-jones-contact-message",
-    "definition": "Hola, me gustaría recibir más información sobre la integración de Dow Jones.",
-    "context": "Hi, I would like more information about Dow Jones integration."
-  },
-  {
-    "term": "organization.integrations.dow-jones-description",
-    "definition": "Verifica la información de individuos y empresas a través de su base de datos.",
-    "context": "Run a background check of individuals and legal entities using its database."
-  },
-  {
-    "term": "organization.integrations.dow-jones-disabled-message",
-    "definition": "Esta es una funcionalidad enterprise. <a>Contacta</a> con nuestro equipo de soporte para más información.",
-    "context": "This is an Enterprise feature. <a>Contact</a> with our support team for more information."
-  },
-  {
-    "term": "organization.integrations.dow-jones-error",
-    "definition": "La integración no está funcionando correctamente. Por favor, vuelve a conectar con tu cuenta.",
-    "context": "The integration is not working properly. Please reconnect to your account."
-  },
-  {
-    "term": "organization.integrations.dow-jones-title",
-    "definition": "Dow Jones RiskCenter",
-    "context": "Dow Jones RiskCenter"
-  },
-  {
-    "term": "organization.integrations.parallel-api-description",
-    "definition": "Accede a nuestra API para automatizar todos tus flujos.",
-    "context": "Access our API to automate all your flows."
-  },
-  {
-    "term": "organization.integrations.parallel-api-title",
-    "definition": "API de Parallel",
-    "context": "Parallel API"
-  },
-  {
-    "term": "organization.integrations.signaturit-description",
-    "definition": "Añade firma digital a tus parallels.",
-    "context": "Add digital signature to your parallels."
-  },
-  {
-    "term": "organization.integrations.title",
-    "definition": "Integraciones",
-    "context": "Integrations"
-  },
-  {
-    "term": "organization.integrations.zapier-description",
-    "definition": "Automatiza tus flujos de trabajo utilizando sus +400 servicios.",
-    "context": "Automate your workflows using its +400 services."
-  },
-  {
     "term": "organization.organization-created-success.toast-description",
     "definition": "Hemos enviado un correo electrónico a {email} con instrucciones y la contraseña temporal.",
     "context": "We have sent an email to {email} with instructions and the temporal password."
@@ -11013,6 +11443,116 @@
     "term": "page.alerts.title",
     "definition": "Alertas",
     "context": "Alerts"
+  },
+  {
+    "term": "page.background-check-profile-details.authority",
+    "definition": "Autoridad",
+    "context": "Authority"
+  },
+  {
+    "term": "page.background-check-profile-details.end-date",
+    "definition": "Fecha de finalización",
+    "context": "End date"
+  },
+  {
+    "term": "page.background-check-profile-details.from",
+    "definition": "Desde",
+    "context": "From"
+  },
+  {
+    "term": "page.background-check-profile-details.name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "page.background-check-profile-details.overview",
+    "definition": "Resumen",
+    "context": "Overview"
+  },
+  {
+    "term": "page.background-check-profile-details.program",
+    "definition": "Programa",
+    "context": "Program"
+  },
+  {
+    "term": "page.background-check-profile-details.relation",
+    "definition": "Relación",
+    "context": "Relation"
+  },
+  {
+    "term": "page.background-check-profile-details.results-obtained-on",
+    "definition": "Resultados del {date}",
+    "context": "Results from {date}"
+  },
+  {
+    "term": "page.background-check-profile-details.sanction-lists",
+    "definition": "Listas de sanciones",
+    "context": "Sanction lists"
+  },
+  {
+    "term": "page.background-check-profile-details.see-other-results",
+    "definition": "Ver otros resultados",
+    "context": "See other results"
+  },
+  {
+    "term": "page.background-check-profile-details.sources",
+    "definition": "Fuentes",
+    "context": "Sources"
+  },
+  {
+    "term": "page.background-check-profile-details.start-date",
+    "definition": "Fecha de inicio",
+    "context": "Start date"
+  },
+  {
+    "term": "page.background-check-profile-details.to",
+    "definition": "Hasta",
+    "context": "To"
+  },
+  {
+    "term": "page.background-check.date-of-birth",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "page.background-check.date-of-registration",
+    "definition": "Fecha de registro",
+    "context": "Date of registration"
+  },
+  {
+    "term": "page.background-check.disabled-feature-alert-body",
+    "definition": "Tu organización no tiene acceso a esta funcionalidad. <Link>Contacta con nuestro equipo de soporte</Link> para más información.",
+    "context": "Your organization does not have access to this feature. <Link>Contact with our support team</Link> for more information."
+  },
+  {
+    "term": "page.background-check.disabled-feature-alert-message",
+    "definition": "Hola, estoy teniendo problemas con el campo de Búsqueda en listados.",
+    "context": "Hi, I am having issues with the Background check field."
+  },
+  {
+    "term": "page.background-check.disabled-feature-alert-title",
+    "definition": "Funcionalidad desactivada",
+    "context": "Disabled feature"
+  },
+  {
+    "term": "page.background-check.fill-in-data",
+    "definition": "Búsqueda en listados",
+    "context": "Run background check"
+  },
+  {
+    "term": "page.background-check.name-person-entity",
+    "definition": "Nombre de la persona/entidad *",
+    "context": "Name of the person/entity *"
+  },
+  {
+    "term": "page.background-check.search",
+    "definition": "Buscar",
+    "context": "Search"
+  },
+  {
+    "term": "page.background-check.type-of-search-label",
+    "definition": "Tipo de búsqueda",
+    "context": "Type of search"
   },
   {
     "term": "page.choose-org.header",
@@ -11293,6 +11833,96 @@
     "term": "page.opt-out.title",
     "definition": "Cancelar correos electrónicos",
     "context": "Opt out from emails"
+  },
+  {
+    "term": "page.organization-integrations.alert-button",
+    "definition": "Sugerir integración",
+    "context": "Suggest integration"
+  },
+  {
+    "term": "page.organization-integrations.alert-description",
+    "definition": "¡Te escuchamos! Dinos las aplicaciones con la que te gustaría conectar Parallel para que podamos estudiarlo.",
+    "context": "Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
+  },
+  {
+    "term": "page.organization-integrations.alert-title",
+    "definition": "¿Echas en falta alguna integración?",
+    "context": "Can't find the integration you need?"
+  },
+  {
+    "term": "page.organization-integrations.docusign-description",
+    "definition": "Añade firma digital a tus parallels.",
+    "context": "Add digital signature to your parallels."
+  },
+  {
+    "term": "page.organization-integrations.dow-jones-contact-message",
+    "definition": "Hola, me gustaría recibir más información sobre la integración de Dow Jones.",
+    "context": "Hi, I would like more information about Dow Jones integration."
+  },
+  {
+    "term": "page.organization-integrations.dow-jones-description",
+    "definition": "Verifica la información de individuos y empresas a través de su base de datos.",
+    "context": "Run a background check of individuals and legal entities using its database."
+  },
+  {
+    "term": "page.organization-integrations.dow-jones-disabled-message",
+    "definition": "Esta es una funcionalidad enterprise. <a>Contacta</a> con nuestro equipo de soporte para más información.",
+    "context": "This is an Enterprise feature. <a>Contact</a> with our support team for more information."
+  },
+  {
+    "term": "page.organization-integrations.dow-jones-error",
+    "definition": "La integración no está funcionando correctamente. Por favor, vuelve a conectar con tu cuenta.",
+    "context": "The integration is not working properly. Please reconnect to your account."
+  },
+  {
+    "term": "page.organization-integrations.dow-jones-title",
+    "definition": "Dow Jones RiskCenter",
+    "context": "Dow Jones RiskCenter"
+  },
+  {
+    "term": "page.organization-integrations.open-sanctions-contact-message",
+    "definition": "Hola, me gustaría recibir más información sobre la integración de OpenSanctions.",
+    "context": "Hi, I would like more information about OpenSanctions integration."
+  },
+  {
+    "term": "page.organization-integrations.open-sanctions-description",
+    "definition": "Verifica la información de individuos y empresas a través de su base de datos.",
+    "context": "Run a background check of individuals and legal entities using its database."
+  },
+  {
+    "term": "page.organization-integrations.open-sanctions-disabled-message",
+    "definition": "Contacta con nosotros para activar esta integración y cumplir con éxito los requisitos de PBC. <a>Contactar</a>",
+    "context": "Contact us to activate this integration and successfully meet the requirements of AML (Anti-Money Laundering). <a>Contact us</a>"
+  },
+  {
+    "term": "page.organization-integrations.open-sanctions-title",
+    "definition": "OpenSanctions",
+    "context": "OpenSanctions"
+  },
+  {
+    "term": "page.organization-integrations.parallel-api-description",
+    "definition": "Accede a nuestra API para automatizar todos tus flujos.",
+    "context": "Access our API to automate all your flows."
+  },
+  {
+    "term": "page.organization-integrations.parallel-api-title",
+    "definition": "API de Parallel",
+    "context": "Parallel API"
+  },
+  {
+    "term": "page.organization-integrations.signaturit-description",
+    "definition": "Añade firma digital a tus parallels.",
+    "context": "Add digital signature to your parallels."
+  },
+  {
+    "term": "page.organization-integrations.title",
+    "definition": "Integraciones",
+    "context": "Integrations"
+  },
+  {
+    "term": "page.organization-integrations.zapier-description",
+    "definition": "Automatiza tus flujos de trabajo utilizando sus +400 servicios.",
+    "context": "Automate your workflows using its +400 services."
   },
   {
     "term": "page.organization-profile-type.add-profile-type-field",
@@ -14240,6 +14870,186 @@
     "context": "This team contains all users from the organization."
   },
   {
+    "term": "util.get-open-sanctions-relationship.board-member",
+    "definition": "Miembro del consejo",
+    "context": "Board member"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.business",
+    "definition": "Relaciones comerciales",
+    "context": "Business relationships"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.ceo",
+    "definition": "CEO",
+    "context": "CEO"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.chairman-of-the-board",
+    "definition": "Presidente del consejo",
+    "context": "Chairman of the board"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.child",
+    "definition": "Hijo",
+    "context": "Child"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.daughter",
+    "definition": "Hija",
+    "context": "Daughter"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.deputy-general-director",
+    "definition": "Subdirector general",
+    "context": "Deputy general director"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.director",
+    "definition": "Director",
+    "context": "Director"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.family-member-of",
+    "definition": "Miembro de la familia",
+    "context": "Family member of"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.father",
+    "definition": "Padre",
+    "context": "Father"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.father-in-law",
+    "definition": "Suegro",
+    "context": "Father in law"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.financial-manager",
+    "definition": "Gerente financiero",
+    "context": "Financial manager"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.friend",
+    "definition": "Amigo",
+    "context": "Friend"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.grandfather",
+    "definition": "Abuelo",
+    "context": "Grandfather"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.grandmother",
+    "definition": "Abuela",
+    "context": "Grandmother"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.grandson",
+    "definition": "Nieto",
+    "context": "Grandson"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.head",
+    "definition": "Jefe",
+    "context": "Head"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.husband",
+    "definition": "Esposo",
+    "context": "Husband"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.leader-or-official-of",
+    "definition": "Líder u oficial",
+    "context": "Leader or official of"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.mother",
+    "definition": "Madre",
+    "context": "Mother"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.mother-in-law",
+    "definition": "Suegra",
+    "context": "Mother in law"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.niece",
+    "definition": "Sobrina",
+    "context": "Niece"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.personal",
+    "definition": "Relaciones personales",
+    "context": "Personal relationships"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.relative",
+    "definition": "Familiar",
+    "context": "Relative"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.secretary",
+    "definition": "Secretario",
+    "context": "Secretary"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.sibling",
+    "definition": "Hermano",
+    "context": "Sibling"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.significant-person",
+    "definition": "Persona significativa",
+    "context": "Significant person"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.son",
+    "definition": "Hijo",
+    "context": "Son"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.son-in-law",
+    "definition": "Yerno",
+    "context": "Son in law"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.spouse",
+    "definition": "Cónyuge",
+    "context": "Spouse"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.the-chairman",
+    "definition": "El presidente",
+    "context": "The chairman"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.the-president",
+    "definition": "El presidente",
+    "context": "The president"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.uncle",
+    "definition": "Tío",
+    "context": "Uncle"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.unmarried-partner",
+    "definition": "Pareja no casada",
+    "context": "Unmarried partner"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.wife",
+    "definition": "Esposa",
+    "context": "Wife"
+  },
+  {
+    "term": "util.get-open-sanctions-relationship.wife-father",
+    "definition": "Padre de la esposa",
+    "context": "Wife's father"
+  },
+  {
     "term": "util.use-petition-compose-field-reorder.move-referenced-field-error-math",
     "definition": "Sólo se pueden mover campos de manera que los cálculos hagan referencia únicamente a campos anteriores.",
     "context": "You can only move fields so that calculations refer only to previous fields."
@@ -14413,6 +15223,16 @@
     "term": "util.validate-petition-fields.number-field-with-invalid-limits-error",
     "definition": "Por favor arregle el límite de rango en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>número</em>. El máximo no puede ser inferior al mínimo.",
     "context": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum."
+  },
+  {
+    "term": "util.validate-petition-fields.paid-fields-footer",
+    "definition": "Contacta con nosotros para más información o dale a continuar para seguir con el envío.",
+    "context": "Contact us for more information or click continue to proceed with the shipment."
+  },
+  {
+    "term": "util.validate-petition-fields.paid-fields-message",
+    "definition": "Los siguientes campos están fuera del plan actual.",
+    "context": "The following fields are not included in your current plan."
   },
   {
     "term": "util.validate-petition-fields.select-fields-without-options-error",

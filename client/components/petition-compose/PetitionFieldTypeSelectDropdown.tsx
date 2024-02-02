@@ -1,7 +1,9 @@
 import { gql } from "@apollo/client";
 import {
   AspectRatio,
+  Badge,
   Box,
+  HStack,
   Heading,
   Image,
   MenuGroup,
@@ -113,6 +115,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
               defaultMessage: "Advanced fields",
             }),
             fields: [
+              "BACKGROUND_CHECK",
               "DYNAMIC_SELECT",
               ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
               ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
@@ -130,6 +133,8 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       }, [user.hasEsTaxDocumentsField, user.hasDowJonesField, isFieldGroupChild]);
 
       const { locale } = useIntl();
+
+      const showPaidBadge = activeType === "BACKGROUND_CHECK" && !user.hasBackgroundCheck;
       return (
         <MenuList
           ref={_ref}
@@ -219,9 +224,21 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${activeType}_${locale}.png`}
                 />
               </AspectRatio>
-              <Heading as="h2" size="sm" marginBottom={1}>
-                <PetitionFieldTypeText as={"span" as any} type={activeType} />
-              </Heading>
+
+              <HStack marginBottom={1} align="center">
+                <Heading as="h2" size="sm">
+                  <PetitionFieldTypeText as={"span" as any} type={activeType} />
+                </Heading>
+                {showPaidBadge ? (
+                  <Badge colorScheme="blue" textTransform="uppercase">
+                    <FormattedMessage
+                      id="component.petition-field-type-select-dropdown.paid-badge"
+                      defaultMessage="Paid"
+                    />
+                  </Badge>
+                ) : null}
+              </HStack>
+
               <Box fontSize="sm" id={`field-description-${activeType}`}>
                 {activeType === "HEADING" ? (
                   <FormattedMessage
@@ -309,6 +326,11 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                     id="component.petition-field-type-select-dropdown.dow-jones-kyc-research-description"
                     defaultMessage="Easily search in Dow Jones to run a background check of an individual or legal entity."
                   />
+                ) : activeType === "BACKGROUND_CHECK" ? (
+                  <FormattedMessage
+                    id="component.petition-field-type-select-dropdown.background-check-description"
+                    defaultMessage="Run a background check on an individual or a legal entity."
+                  />
                 ) : activeType === "FIELD_GROUP" ? (
                   <FormattedMessage
                     id="component.petition-field-type-select-dropdown.field-group-description"
@@ -328,6 +350,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
         fragment PetitionFieldTypeSelectDropdown_User on User {
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
           hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+          hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
         }
       `,
     },

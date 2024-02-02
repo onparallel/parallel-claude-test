@@ -832,6 +832,7 @@ export const schemaTypes: IntrospectionType[] = [
     interfaces: null,
     enumValues: [
       { name: "AUTO_ANONYMIZE", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "BACKGROUND_CHECK", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "BULK_PETITION_SEND_TASK",
         description: null,

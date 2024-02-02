@@ -13,6 +13,7 @@ import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { PetitionRepliesFieldAction } from "./PetitionRepliesFieldReply";
+import { isDefined } from "remeda";
 
 interface CopyOrDownloadReplyButtonProps {
   reply: CopyOrDownloadReplyButton_PetitionFieldReplyFragment;
@@ -37,6 +38,24 @@ export function CopyOrDownloadReplyButton({
             minimumFractionDigits: 0,
             maximumFractionDigits: 20,
           })}
+        />
+      ) : reply.field!.type === "BACKGROUND_CHECK" ? (
+        <IconButtonWithTooltip
+          isDisabled={reply.isAnonymized}
+          onClick={() => onAction(isDefined(content?.entity) ? "VIEW_DETAILS" : "VIEW_RESULTS")}
+          icon={<EyeIcon />}
+          size="xs"
+          label={
+            isDefined(content?.entity)
+              ? intl.formatMessage({
+                  id: "component.copy-or-download-reply-button.view-details",
+                  defaultMessage: "View details",
+                })
+              : intl.formatMessage({
+                  id: "component.copy-or-download-reply-button.view-results",
+                  defaultMessage: "View results",
+                })
+          }
         />
       ) : isFileTypeField(reply.field!.type) ? (
         <ReplyDownloadButton

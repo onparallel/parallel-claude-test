@@ -113,21 +113,25 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     const petitionFieldsScope = buildPetitionFieldsLiquidScope(
       {
         id: toGlobalId("Petition", petition.id),
-        fields: composedPetition.fields.map((f) => ({
-          ...f,
-          id: toGlobalId("PetitionField", f.id),
-          replies: f.replies.map((r) => ({
-            ...r,
-            children:
-              r.children?.map((c) => ({
-                ...c,
-                field: {
-                  ...c.field,
-                  id: toGlobalId("PetitionField", c.field.id),
-                },
-              })) ?? null,
+        fields: composedPetition.fields
+          .filter((f) => f.type !== "BACKGROUND_CHECK")
+          .map((f) => ({
+            ...f,
+            id: toGlobalId("PetitionField", f.id),
+            replies: f.replies.map((r) => ({
+              ...r,
+              children:
+                r.children
+                  ?.filter((c) => c.field.type !== "BACKGROUND_CHECK")
+                  .map((c) => ({
+                    ...c,
+                    field: {
+                      ...c.field,
+                      id: toGlobalId("PetitionField", c.field.id),
+                    },
+                  })) ?? null,
+            })),
           })),
-        })),
       },
       intl,
     );
@@ -145,7 +149,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     const liquid = createLiquid();
     const fieldLogic = evaluateFieldLogic(composedPetition);
     const fieldsInfoScope = zip(getFieldsWithIndices(composedPetition.fields), fieldLogic)
-      .filter(([, { isVisible }]) => isVisible)
+      .filter(([[field], { isVisible }]) => isVisible && field.type !== "BACKGROUND_CHECK") // don't include BACKGROUND_CHECK fields in summary scope
       .map(([[field, index, childrenFieldIndexes], logic]) => ({
         title: field.title,
         description: field.description
@@ -165,7 +169,9 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
             ? zip(field.replies, logic.groupChildrenLogic!).map(([reply, childLogic]) => ({
                 content: replyContent(field.type, reply.content),
                 children: zipX(reply.children!, childLogic, childrenFieldIndexes!)
-                  .filter(([_, logic]) => logic.isVisible)
+                  .filter(
+                    ([{ field }, logic]) => logic.isVisible && field.type !== "BACKGROUND_CHECK",
+                  )
                   .map(([{ field, replies }, logic, childIndex]) => ({
                     field: {
                       title: field.title,

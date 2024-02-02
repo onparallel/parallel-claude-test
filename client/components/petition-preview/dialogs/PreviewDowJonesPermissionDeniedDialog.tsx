@@ -29,7 +29,7 @@ export function PreviewDowJonesPermissionDeniedDialog({ ...props }: DialogProps<
                 <Link href={`/app/organization/integrations`}>
                   <Text as="span">
                     <FormattedMessage
-                      id="organization.integrations.title"
+                      id="page.organization-integrations.title"
                       defaultMessage="Integrations"
                     />
                   </Text>

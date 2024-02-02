@@ -11,48 +11,33 @@ const path_1 = require("path");
 const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const run_1 = require("./utils/run");
-const SELECTION = [
-    "IBM Plex Sans",
-    "Roboto Slab",
-    "Merriweather",
-    "Playfair Display",
-    "Lora",
-    "PT Serif",
-    ["Source Serif 4", "Source Serif Pro"],
-    "IBM Plex Serif",
-    "Cormorant Garamond",
-    "Alegreya",
-    "Tinos",
-    "Libre Baskerville",
-    "Noto Serif",
-    "Roboto",
-    "Open Sans",
-    "Lato",
-    "Montserrat",
-    "Poppins",
-    ["Source Sans 3", "Source Sans Pro"],
-    "Noto Sans",
-    "Raleway",
-    "Nunito",
-    "Rubik",
-    "Parisienne",
-    "Rubik Wet Paint",
-    "Inconsolata",
-];
 async function main() {
-    const { output } = await yargs_1.default.option("output", {
+    const { outputManifest, fonts, output } = await yargs_1.default
+        .option("fonts", {
+        required: true,
+        type: "string",
+        array: true,
+        description: "fonts to download",
+    })
+        .option("output", {
         required: true,
         type: "string",
         description: "Directory to place fonts",
+    })
+        .option("output-manifest", {
+        required: true,
+        type: "string",
+        array: true,
+        description: "where to put the manifest json file",
     }).argv;
     const res = await (0, node_fetch_1.default)(`https://webfonts.googleapis.com/v1/webfonts?${new URLSearchParams({
         fields: ["items.files", "items.family"].join(","),
         key: "AIzaSyBpQsEEScqktyrQeEGfm5R0UIMivXAlhw8",
     })}`);
-    const { items: fonts } = (await res.json());
+    const { items: availableFonts } = (await res.json());
     const results = [];
-    await (0, p_map_1.default)(SELECTION, async (family) => {
-        const [name, alias] = Array.isArray(family) ? family : [family, family];
+    await (0, p_map_1.default)(fonts, async (family) => {
+        const [name, alias] = family.includes("@") ? family.split("@") : [family, family];
         const familyDir = (0, path_1.join)(output, alias);
         const result = {
             family: alias,
@@ -65,7 +50,7 @@ async function main() {
         catch { }
         await (0, promises_1.mkdir)(familyDir);
         console.log(`Downloading ${name}`);
-        const { files } = fonts.find((f) => f.family === name);
+        const { files } = availableFonts.find((f) => f.family === name);
         for (const [descriptor, url] of Object.entries(files)) {
             const sourceUrl = `${descriptor}.ttf`;
             if (descriptor === "regular") {
@@ -92,9 +77,9 @@ async function main() {
             const dest = (0, path_1.join)(familyDir, `${descriptor}.ttf`);
             await new Promise((resolve, reject) => res.body.pipe((0, fs_1.createWriteStream)(dest)).on("error", reject).on("close", resolve));
         }
-    }, {
-        concurrency: 1,
-    });
-    await (0, json_1.writeJson)((0, path_1.join)(output, "fonts.json"), results);
+    }, { concurrency: 1 });
+    for (const path of outputManifest) {
+        await (0, json_1.writeJson)(path, results);
+    }
 }
 (0, run_1.run)(main);

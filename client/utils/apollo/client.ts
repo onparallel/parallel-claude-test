@@ -178,21 +178,6 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             },
             myEffectivePermission: { merge: true },
             effectivePermissions: { merge: mergeArraysBy(["user", "id"]) },
-          },
-        },
-        PetitionBaseMini: {
-          fields: {
-            myEffectivePermission: { merge: true },
-          },
-        },
-        PetitionTemplate: {
-          fields: {
-            defaultPermissions: { merge: false },
-            effectiveDefaultPermissions: { merge: mergeArraysBy(["user", "id"]) },
-          },
-        },
-        Petition: {
-          fields: {
             permissions: {
               merge: function merge(existing, incoming, { readField, mergeObjects }) {
                 const getKey = (value: any) => {
@@ -216,13 +201,32 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                     );
                   }
                 };
-                const existingByKey = indexBy(existing || [], getKey);
-                return incoming.map((value: any) => {
-                  const key = getKey(value);
-                  return existingByKey[key] ? mergeObjects(existingByKey[key], value) : value;
-                });
+                if (existing === undefined) {
+                  return incoming;
+                } else {
+                  const existingByKey = indexBy(existing, getKey);
+                  return incoming.map((value: any) => {
+                    const key = getKey(value);
+                    return existingByKey[key] ? mergeObjects(existingByKey[key], value) : value;
+                  });
+                }
               },
             },
+          },
+        },
+        PetitionBaseMini: {
+          fields: {
+            myEffectivePermission: { merge: true },
+          },
+        },
+        PetitionTemplate: {
+          fields: {
+            defaultPermissions: { merge: false },
+            effectiveDefaultPermissions: { merge: mergeArraysBy(["user", "id"]) },
+          },
+        },
+        Petition: {
+          fields: {
             accesses: { merge: mergeArraysBy(["id"]) },
             emailBody: { merge: false },
             signatureConfig: { merge: true },

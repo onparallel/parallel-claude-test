@@ -175,7 +175,7 @@ function Contact({ contactId }: ContactProps) {
                 </ToggleInput>
                 <FormErrorMessage>
                   <FormattedMessage
-                    id="generic.forms.invalid-first-name-error"
+                    id="generic.invalid-first-name-error"
                     defaultMessage="Please, enter the first name"
                   />
                 </FormErrorMessage>
@@ -426,6 +426,7 @@ Contact.fragments = {
         permissionType
         ... on PetitionUserPermission {
           user {
+            id
             ...UserAvatarList_User
           }
         }

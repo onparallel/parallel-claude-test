@@ -5,6 +5,14 @@ export interface PossibleTypesResultData {
 }
 const result: PossibleTypesResultData = {
   possibleTypes: {
+    BackgroundCheckEntityDetails: [
+      "BackgroundCheckEntityDetailsCompany",
+      "BackgroundCheckEntityDetailsPerson",
+    ],
+    BackgroundCheckEntitySearchSchema: [
+      "BackgroundCheckEntitySearchCompany",
+      "BackgroundCheckEntitySearchPerson",
+    ],
     CreatedAt: [
       "PetitionFieldAttachment",
       "PetitionMessage",

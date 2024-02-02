@@ -71,6 +71,10 @@ export type TaskInput<TName extends TaskName> = {
   PETITION_SUMMARY: {
     petition_id: number;
   };
+  BACKGROUND_CHECK_PROFILE_PDF: {
+    token: string;
+    entity_id: string;
+  };
 }[TName];
 
 export interface PetitionReportStatusCount {
@@ -164,6 +168,9 @@ export type TaskOutput<TName extends TaskName> = {
   };
   PETITION_SUMMARY: {
     ai_completion_log_id: number;
+  };
+  BACKGROUND_CHECK_PROFILE_PDF: {
+    temporary_file_id: number;
   };
 }[TName];
 

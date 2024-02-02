@@ -10,11 +10,15 @@ import PetitionExport, {
 } from "../pdf/documents/recipient/PetitionExport";
 import { toGlobalId } from "../util/globalId";
 import { AUTH, IAuth } from "./AuthService";
+import BackgroundCheckProfile, {
+  BackgroundCheckProfileProps,
+} from "../pdf/documents/BackgroundCheckProfile";
+import { CONFIG, Config } from "../config";
 
 export interface IPrinter {
   petitionExport(
     userId: number,
-    data: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number },
+    data: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & { petitionId: number },
   ): Promise<NodeJS.ReadableStream>;
   annexCoverPage(
     userId: number,
@@ -22,6 +26,10 @@ export interface IPrinter {
     locale: ContactLocale,
   ): Promise<NodeJS.ReadableStream>;
   imageToPdf(userId: number, props: ImageToPdfProps): Promise<NodeJS.ReadableStream>;
+  backgroundCheckProfile(
+    userId: number,
+    props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
+  ): Promise<NodeJS.ReadableStream>;
 }
 
 export const PRINTER = Symbol.for("PRINTER");
@@ -30,6 +38,7 @@ export const PRINTER = Symbol.for("PRINTER");
 export class Printer implements IPrinter {
   constructor(
     @inject(AUTH) protected auth: IAuth,
+    @inject(CONFIG) protected config: Config,
     private petitions: PetitionRepository,
   ) {}
 
@@ -51,7 +60,11 @@ export class Printer implements IPrinter {
     const client = await this.createClient(userId);
     return await buildPdf(
       PetitionExport,
-      { ...data, petitionId: toGlobalId("Petition", petitionId) },
+      {
+        ...data,
+        petitionId: toGlobalId("Petition", petitionId),
+        assetsUrl: this.config.misc.assetsUrl,
+      },
       { client, locale: petition.recipient_locale },
     );
   }
@@ -67,5 +80,17 @@ export class Printer implements IPrinter {
       client,
       locale: "es" /* locale doesn't matter here as this is an image-only document */,
     });
+  }
+
+  public async backgroundCheckProfile(userId: number, props: BackgroundCheckProfileProps) {
+    const client = await this.createClient(userId);
+    return await buildPdf(
+      BackgroundCheckProfile,
+      { ...props, assetsUrl: this.config.misc.assetsUrl },
+      {
+        client,
+        locale: "en",
+      },
+    );
   }
 }

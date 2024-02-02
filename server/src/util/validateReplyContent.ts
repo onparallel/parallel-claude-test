@@ -1,13 +1,13 @@
+import { isValid as validIban } from "iban";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { difference, isDefined } from "remeda";
+import { validCIF, validDNI, validNIE } from "spain-id";
 import { PetitionField } from "../db/__types";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
-import { Maybe } from "./types";
-import { isValidDate, isValidDatetime, isValidTimezone } from "./time";
-import { isGlobalId } from "./globalId";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
-import { validDNI, validNIE, validCIF } from "spain-id";
-import { isValid as validIban } from "iban";
+import { isGlobalId } from "./globalId";
+import { isValidDate, isValidDatetime, isValidTimezone } from "./time";
+import { Maybe } from "./types";
 
 export class ValidateReplyContentError extends Error {
   constructor(

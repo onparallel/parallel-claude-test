@@ -5,6 +5,7 @@ import {
   PreviewPetitionField_PetitionFieldDocument,
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
+  PreviewPetitionField_UserFragment,
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   PreviewPetitionField_retryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
@@ -14,6 +15,7 @@ import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useCallback, useEffect, useRef } from "react";
+import { pick } from "remeda";
 import { useTone } from "../common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
@@ -46,13 +48,14 @@ import {
 } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
-import { pick } from "remeda";
+import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
+  user: PreviewPetitionField_UserFragment;
   petition: PreviewPetitionField_PetitionBaseFragment;
   field: PreviewPetitionField_PetitionFieldFragment;
   isDisabled: boolean;
@@ -64,6 +67,7 @@ export interface PreviewPetitionFieldProps
 }
 
 export function PreviewPetitionField({
+  user,
   field,
   petition,
   isCacheOnly,
@@ -279,6 +283,7 @@ export function PreviewPetitionField({
       <PreviewPetitionFieldGroup
         {...props}
         {...commonProps}
+        user={user}
         onCreateFileReply={handleCreateFileUploadReply}
         onDownloadFileUploadReply={handleDownloadFileUploadReply}
         onRefreshField={handleRefreshAsyncField}
@@ -339,17 +344,37 @@ export function PreviewPetitionField({
           onRefreshField={handleRefreshAsyncField}
           isCacheOnly={isCacheOnly}
         />
+      ) : field.type === "BACKGROUND_CHECK" ? (
+        <PreviewPetitionFieldBackgroundCheck
+          {...props}
+          {...commonProps}
+          user={user}
+          petition={petition}
+          onRefreshField={handleRefreshAsyncField}
+          isCacheOnly={isCacheOnly}
+        />
       ) : null}
     </RecipientViewPetitionFieldCard>
   );
 }
 
 PreviewPetitionField.fragments = {
+  User: gql`
+    fragment PreviewPetitionField_User on User {
+      id
+      ...PreviewPetitionFieldBackgroundCheck_User
+      ...PreviewPetitionFieldGroup_User
+    }
+    ${PreviewPetitionFieldBackgroundCheck.fragments.User}
+    ${PreviewPetitionFieldGroup.fragments.User}
+  `,
   PetitionBase: gql`
     fragment PreviewPetitionField_PetitionBase on PetitionBase {
+      ...PreviewPetitionFieldBackgroundCheck_PetitionBase
       ...PreviewPetitionFieldKyc_PetitionBase
       ...PreviewPetitionFieldGroup_PetitionBase
     }
+    ${PreviewPetitionFieldBackgroundCheck.fragments.PetitionBase}
     ${PreviewPetitionFieldKyc.fragments.PetitionBase}
     ${PreviewPetitionFieldGroup.fragments.PetitionBase}
   `,
@@ -413,14 +438,14 @@ PreviewPetitionField.mutations = [
   `,
   gql`
     mutation PreviewPetitionField_retryAsyncFieldCompletion(
-      $petitionId: GID!
       $fieldId: GID!
+      $petitionId: GID!
       $parentReplyId: GID
     ) {
       retryAsyncFieldCompletion(
         petitionId: $petitionId
-        fieldId: $fieldId
         parentReplyId: $parentReplyId
+        fieldId: $fieldId
       ) {
         type
         url

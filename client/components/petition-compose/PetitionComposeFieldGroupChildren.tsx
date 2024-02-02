@@ -98,7 +98,11 @@ export function PetitionComposeFieldGroupChildren({
   const showErrorDialog = useErrorDialog();
   const handleAddNewField = async (type: PetitionFieldType) => {
     const childrenLength = field.children?.length ?? 0;
-    if (type === "DOW_JONES_KYC" && childrenLength === 0 && !field.isInternal) {
+    if (
+      (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
+      childrenLength === 0 &&
+      !field.isInternal
+    ) {
       try {
         await showErrorDialog({
           message: (
@@ -202,7 +206,7 @@ export function PetitionComposeFieldGroupChildren({
         if (isDefined(field.children)) {
           let position = field.children.findIndex((f) => f.id === fieldId);
           if (
-            type === "DOW_JONES_KYC" &&
+            (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
             field.children.length > 0 &&
             position === 0 &&
             !field.isInternal

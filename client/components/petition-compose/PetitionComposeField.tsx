@@ -89,6 +89,7 @@ import usePrevious from "@react-hook/previous";
 import { NativeTypes } from "react-dnd-html5-backend";
 import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
+import { RestrictedPetitionFieldAlert } from "../petition-common/RestrictedPetitionFieldAlert";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
@@ -765,6 +766,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 
   const letter = letters();
   const previousVisibility = usePrevious(field.visibility);
+  const showRestrictedPetitionFieldAlert =
+    field.type === "BACKGROUND_CHECK" && !user.hasBackgroundCheck;
 
   return (
     <Stack spacing={1} ref={elementRef} {...props}>
@@ -1036,6 +1039,10 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           </Box>
         ) : null}
       </Stack>
+
+      {showRestrictedPetitionFieldAlert ? (
+        <RestrictedPetitionFieldAlert fieldType={field.type} />
+      ) : null}
 
       {field.visibility ? (
         <Box paddingTop={1}>
@@ -1350,6 +1357,7 @@ const fragments = {
     return gql`
       fragment PetitionComposeField_User on User {
         id
+        hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
         ...PetitionComposeFieldGroupChildren_User
       }
       ${PetitionComposeFieldGroupChildren.fragments.User}

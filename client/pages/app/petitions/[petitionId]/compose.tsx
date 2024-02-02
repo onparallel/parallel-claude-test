@@ -4,8 +4,9 @@ import { CalculatorIcon, ListIcon, PaperPlaneIcon, SettingsIcon } from "@paralle
 import { Card } from "@parallel/components/common/Card";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { SupportButton } from "@parallel/components/common/SupportButton";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   FieldErrorDialog,
@@ -28,11 +29,16 @@ import { PetitionComposeVariables } from "@parallel/components/petition-compose/
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
+import {
+  ConfigureAutomateSearchDialog,
+  useConfigureAutomateSearchDialog,
+} from "@parallel/components/petition-compose/dialogs/ConfigureAutomateSearchDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
 import { useConfirmLinkFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmLinkFieldDialog";
 import { useConfirmUnlinkFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmUnlinkFieldDialog";
+import { useFieldUsedForSearchesDialog } from "@parallel/components/petition-compose/dialogs/FieldUsedForSearchesDialog";
 import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
 import {
@@ -71,6 +77,7 @@ import {
   PetitionFieldVisibility,
 } from "@parallel/utils/fieldLogic/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
@@ -175,7 +182,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       if (hash.includes("#field-settings-")) {
         handleFieldSettingsClick(hash.replace("#field-settings-", ""));
       } else {
-        const { error, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices);
+        const { error, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices, petition);
         if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
           setShowErrors(true);
           focusFieldTitle(fieldsWithIndices[0][0].id);
@@ -320,9 +327,59 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   };
 
+  const checkReferencedFieldInBackgroundCheck = async (fieldId: string) => {
+    const { allFieldsWithIndices } = fieldsRef.current;
+    const referencedInBackgroundCheck = allFieldsWithIndices.filter(([f]) => {
+      const options = f.options as FieldOptions["BACKGROUND_CHECK"];
+      return (
+        f.type === "BACKGROUND_CHECK" &&
+        options.autoSearchConfig &&
+        (options.autoSearchConfig.name.includes(fieldId) ||
+          options.autoSearchConfig.date === fieldId)
+      );
+    });
+
+    if (referencedInBackgroundCheck.length) {
+      const [backgroundCheckField] = referencedInBackgroundCheck[0];
+      try {
+        await showFieldUsedForSearchesDialog();
+        const autoSearchConfig = await showAutomateSearchDialog({
+          fields: allFieldsWithIndices.map(([f]) => f),
+          field: backgroundCheckField,
+        });
+
+        await _handleFieldEdit(backgroundCheckField.id, {
+          options: {
+            ...backgroundCheckField.options,
+            autoSearchConfig,
+          },
+        });
+
+        return true;
+      } catch (e) {
+        if (isDialogError(e) && e.reason === "DELETE_AUTO_SEARCH_CONFIG") {
+          try {
+            await _handleFieldEdit(backgroundCheckField.id, {
+              options: {
+                ...backgroundCheckField.options,
+                autoSearchConfig: null,
+              },
+            });
+          } catch {}
+        }
+      }
+      return true;
+    }
+    return false;
+  };
+
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
       setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : activeFieldId));
+
+      if (await checkReferencedFieldInBackgroundCheck(fieldId)) {
+        return;
+      }
       await deleteField(false);
 
       async function deleteField(force: boolean) {
@@ -424,7 +481,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         isDefined(field) &&
         field.type === "FIELD_GROUP" &&
         (field.children ?? []).length > 0 &&
-        field.children![0].type === "DOW_JONES_KYC"
+        (field.children![0].type === "DOW_JONES_KYC" ||
+          field.children![0].type === "BACKGROUND_CHECK")
       ) {
         await withError(
           showErrorDialog({
@@ -513,6 +571,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           variables: { petitionId, fieldId, data },
         });
       } catch (e) {
+        if (isApolloError(e, "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
+          await checkReferencedFieldInBackgroundCheck(fieldId);
+        }
         if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
           throw e;
         }
@@ -530,12 +591,19 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
   const handleFieldEdit = useCallback(wrapper(_handleFieldEdit), [petitionId, _handleFieldEdit]);
 
+  const showAutomateSearchDialog = useConfigureAutomateSearchDialog();
+  const showFieldUsedForSearchesDialog = useFieldUsedForSearchesDialog();
   const showReferencedFieldDialog = useReferencedFieldDialog();
   const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
   const [changePetitionFieldType] = useMutation(PetitionCompose_changePetitionFieldTypeDocument);
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
       const { allFieldsWithIndices } = fieldsRef.current!;
+
+      if (await checkReferencedFieldInBackgroundCheck(fieldId)) {
+        return;
+      }
+
       const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
       const referencingVisibility = allFieldsWithIndices.filter(
         ([f]) =>
@@ -668,14 +736,48 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showErrorDialog = useErrorDialog();
   const showFieldErrorDialog = useFieldErrorDialog();
   const validPetitionFields = async () => {
-    const { error, message, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices);
+    const { error, message, footer, fieldsWithIndices } = validatePetitionFields(
+      allFieldsWithIndices,
+      petition,
+    );
     if (error) {
       setShowErrors(true);
       if (fieldsWithIndices && fieldsWithIndices.length > 0) {
-        await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
-        const firstId = fieldsWithIndices[0][0].id;
-        const node = document.querySelector(`#field-${firstId}`);
-        await scrollIntoView(node!, { block: "center", behavior: "smooth" });
+        if (error === "PAID_FIELDS_BLOCKED") {
+          await withError(
+            showFieldErrorDialog({
+              header: (
+                <FormattedMessage
+                  id="generic.fields-not-available"
+                  defaultMessage="Fields not available"
+                />
+              ),
+              message,
+              footer,
+              fieldsWithIndices,
+              cancel: (
+                <SupportButton
+                  variant="outline"
+                  colorScheme="primary"
+                  message={intl.formatMessage({
+                    id: "generic.upgrade-plan-support-message",
+                    defaultMessage:
+                      "Hi, I would like to get more information about how to upgrade my plan.",
+                  })}
+                >
+                  <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+                </SupportButton>
+              ),
+              confirm: <FormattedMessage id="generic.continue" defaultMessage="Continue" />,
+            }),
+          );
+          return true;
+        } else {
+          await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
+          const firstId = fieldsWithIndices[0][0].id;
+          const node = document.querySelector(`#field-${firstId}`);
+          await scrollIntoView(node!, { block: "center", behavior: "smooth" });
+        }
       } else {
         await withError(showErrorDialog({ message }));
         if (error === "NO_REPLIABLE_FIELDS") {
@@ -725,7 +827,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           },
         });
       } catch (error) {
-        if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
+        if (isApolloError(error, "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
+          await checkReferencedFieldInBackgroundCheck(
+            (error.graphQLErrors[0]!.extensions?.fieldId ?? "") as string,
+          );
+        } else if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
           try {
             await showConfirmLinkDialog();
             await linkPetitionFieldChild({
@@ -1167,6 +1273,7 @@ const _fragments = {
         }
         isAnonymized
         ...PetitionComposeVariables_PetitionBase
+        ...validatePetitionFields_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionComposeFieldList.fragments.PetitionBase}
@@ -1175,6 +1282,7 @@ const _fragments = {
       ${useSendPetitionHandler.fragments.Petition}
       ${PetitionComposeVariables.fragments.PetitionBase}
       ${this.PetitionField}
+      ${validatePetitionFields.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -1186,6 +1294,7 @@ const _fragments = {
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         ...ReferencedFieldDialog_PetitionField
+        ...ConfigureAutomateSearchDialog_PetitionField
         parent {
           id
           position
@@ -1197,6 +1306,7 @@ const _fragments = {
           ...validatePetitionFields_PetitionField
           ...FieldErrorDialog_PetitionField
           ...ReferencedFieldDialog_PetitionField
+          ...ConfigureAutomateSearchDialog_PetitionField
           parent {
             id
             position
@@ -1212,6 +1322,7 @@ const _fragments = {
       ${validatePetitionFields.fragments.PetitionField}
       ${FieldErrorDialog.fragments.PetitionField}
       ${ReferencedFieldDialog.fragments.PetitionField}
+      ${ConfigureAutomateSearchDialog.fragments.PetitionField}
     `;
   },
   get Query() {

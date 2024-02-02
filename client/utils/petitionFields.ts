@@ -1,5 +1,5 @@
 import { useTheme } from "@chakra-ui/react";
-import { PetitionFieldType } from "@parallel/graphql/__types";
+import { BackgroundCheckEntitySearchType, PetitionFieldType } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { Maybe } from "./types";
@@ -21,6 +21,7 @@ export interface FieldOptions {
   };
   FILE_UPLOAD: {
     accepts: Maybe<FileUploadAccepts[]>;
+    attachToPdf: boolean;
   };
   SHORT_TEXT: {
     placeholder?: Maybe<string>;
@@ -70,8 +71,20 @@ export interface FieldOptions {
   };
   DATE: {};
   DOW_JONES_KYC: {};
+  BACKGROUND_CHECK: {
+    integrationId?: string | null;
+    autoSearchConfig?: {
+      // name and date are globalIds pointing to SHORT_TEXT and DATE fields on the petition
+      name: string[];
+      date: string | null;
+      type: BackgroundCheckEntitySearchType | null;
+    } | null;
+  };
   FIELD_GROUP: {
     groupName?: Maybe<string>;
+  };
+  ES_TAX_DOCUMENTS: {
+    attachToPdf: boolean;
   };
 }
 
@@ -144,6 +157,11 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "generic.petition-field-type-dow-jones-kyc-research",
           defaultMessage: "Search in Dow Jones",
         });
+      case "BACKGROUND_CHECK":
+        return intl.formatMessage({
+          id: "generic.petition-field-type-background-check",
+          defaultMessage: "Background check",
+        });
       case "FIELD_GROUP":
         return intl.formatMessage({
           id: "generic.petition-field-type-field-group",
@@ -172,6 +190,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       DATE_TIME: "#EB9753",
       ES_TAX_DOCUMENTS: theme.colors.teal[500],
       DOW_JONES_KYC: "#48A3D3",
+      BACKGROUND_CHECK: theme.colors.green[700],
       FIELD_GROUP: theme.colors.blue[600],
     } as Record<PetitionFieldType, string>
   )[type];

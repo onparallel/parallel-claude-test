@@ -20,6 +20,7 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
 
     const exportExcel = await getPetitionFiles(
       petitionId,
+      this.task.user_id,
       {
         locale: userData!.preferred_locale,
         xlsxOnly: true,

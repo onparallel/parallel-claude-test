@@ -11,13 +11,18 @@ import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
+  PetitionRepliesFieldReply_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { Fragment } from "react";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { useWindowEvent } from "@parallel/utils/useWindowEvent";
+import { Fragment, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
@@ -25,22 +30,28 @@ import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
+import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
+import { useBackgroundCheckEntityTypeSelectOptions } from "../petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
-import { isDefined } from "remeda";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 
 export interface PetitionRepliesFieldReplyProps {
+  petition: PetitionRepliesFieldReply_PetitionFragment;
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
   onAction: (action: PetitionRepliesFieldAction) => void;
   isDisabled?: boolean;
 }
 
-export type PetitionRepliesFieldAction = "DOWNLOAD_FILE" | "PREVIEW_FILE";
+export type PetitionRepliesFieldAction =
+  | "DOWNLOAD_FILE"
+  | "PREVIEW_FILE"
+  | "VIEW_DETAILS"
+  | "VIEW_RESULTS";
 
 export function PetitionRepliesFieldReply({
+  petition,
   reply,
   onUpdateStatus,
   onAction,
@@ -48,8 +59,18 @@ export function PetitionRepliesFieldReply({
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
   const type = reply.field!.type;
+  const parentReplyId = reply.parent?.id;
 
+  const browserTabRef = useRef<Window>();
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const tokenBase64 = btoa(
+    JSON.stringify({
+      fieldId: reply.field!.id,
+      petitionId: petition.id,
+      ...(parentReplyId ? { parentReplyId } : {}),
+    }),
+  );
 
   const buildUrlToSection = useBuildUrlToPetitionSection();
   const editReplyIconButton = (idSuffix = "") => {
@@ -78,6 +99,64 @@ export function PetitionRepliesFieldReply({
     );
   };
 
+  useWindowEvent(
+    "message",
+    async (e) => {
+      const browserTab = browserTabRef.current;
+      if (!isDefined(browserTab) || e.source !== browserTab) {
+        return;
+      }
+      if (e.data.event === "update-info") {
+        const token = e.data.token;
+        if (token !== tokenBase64) {
+          return;
+        }
+
+        browserTab.postMessage(
+          {
+            event: "info-updated",
+            entityIds: [reply.content?.entity?.id].filter(isDefined),
+          },
+          browserTab.origin,
+        );
+      }
+    },
+    [tokenBase64],
+  );
+
+  const handleAction = async (action: PetitionRepliesFieldAction) => {
+    if (action === "VIEW_DETAILS" || action === "VIEW_RESULTS") {
+      const { name, date, type } = reply.content?.query ?? {};
+
+      let url = `/${intl.locale}/app/background-check/`;
+
+      const petitionStatus = petition.__typename === "Petition" && petition.status;
+
+      const isReadOnly = isDisabled || reply.status === "APPROVED" || petitionStatus === "CLOSED";
+
+      if (action === "VIEW_RESULTS") {
+        url += `/results`;
+      } else {
+        url += `/${reply.content?.entity?.id}`;
+      }
+      const urlParams = new URLSearchParams({
+        token: tokenBase64,
+        ...(name ? { name } : {}),
+        ...(date ? { date } : {}),
+        ...(type ? { type } : {}),
+        ...(isReadOnly ? { readonly: "true" } : {}),
+      });
+      browserTabRef.current = await openNewWindow(`${url}?${urlParams.toString()}`);
+    } else {
+      onAction(action);
+    }
+  };
+
+  const entityTypeOptions = useBackgroundCheckEntityTypeSelectOptions();
+  const entityTypeLabel = entityTypeOptions.find(
+    (option) => option.value === reply.content?.query?.type,
+  )?.label;
+
   return (
     <HStack>
       <Grid
@@ -95,7 +174,7 @@ export function PetitionRepliesFieldReply({
         {getReplyContents({ intl, reply, petitionField: reply.field! }).map((content, i) => (
           <Fragment key={i}>
             <GridItem paddingBottom={1}>
-              <CopyOrDownloadReplyButton reply={reply} content={content} onAction={onAction} />
+              <CopyOrDownloadReplyButton reply={reply} content={content} onAction={handleAction} />
             </GridItem>
             <GridItem
               borderLeft="2px solid"
@@ -135,6 +214,57 @@ export function PetitionRepliesFieldReply({
                       </Box>
                     </Text>
                   </Flex>
+                ) : type === "BACKGROUND_CHECK" ? (
+                  <Stack spacing={1}>
+                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                      {content?.entity ? (
+                        <>
+                          <VisuallyHidden>
+                            {intl.formatMessage({
+                              id: "generic.name",
+                              defaultMessage: "Name",
+                            })}
+                          </VisuallyHidden>
+                          <HStack>
+                            {content.entity.type === "Person" ? <UserIcon /> : <BusinessIcon />}
+                            <Text as="span">{content.entity.name}</Text>
+                          </HStack>
+                          {(content.entity.properties.topics as string[] | undefined)?.map(
+                            (hint, i) => <BackgroundCheckRiskLabel key={i} risk={hint} />,
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <VisuallyHidden>
+                            {intl.formatMessage({
+                              id: "generic.search",
+                              defaultMessage: "Search",
+                            })}
+                          </VisuallyHidden>
+                          <Text as="span">
+                            {[entityTypeLabel, content?.query?.name, content?.query?.date]
+                              .filter(isDefined)
+                              .join(" | ")}
+                          </Text>
+                          <Text as="span" color="gray.500" fontSize="sm">
+                            {`(${intl.formatMessage(
+                              {
+                                id: "generic.n-results",
+                                defaultMessage:
+                                  "{count, plural,=0{No results} =1 {1 result} other {# results}}",
+                              },
+                              {
+                                count: content?.search?.totalCount ?? 0,
+                              },
+                            )})`}
+                          </Text>
+                        </>
+                      )}
+                      <Box display="inline-block" marginLeft={1}>
+                        {editReplyIconButton()}
+                      </Box>
+                    </Flex>
+                  </Stack>
                 ) : type === "DOW_JONES_KYC" ? (
                   <Stack spacing={1}>
                     <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
@@ -317,6 +447,14 @@ export function PetitionRepliesFieldReply({
 }
 
 PetitionRepliesFieldReply.fragments = {
+  Petition: gql`
+    fragment PetitionRepliesFieldReply_Petition on Petition {
+      id
+      ... on Petition {
+        status
+      }
+    }
+  `,
   PetitionFieldReply: gql`
     fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
       id

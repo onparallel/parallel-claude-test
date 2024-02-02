@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, partition, uniq, zip } from "remeda";
+import { isDefined, partition, uniq } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -197,39 +197,15 @@ export function fieldCanBeReplied<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const _fields = unMaybeArray(fieldsArg(args));
-
-    const [_fieldsNoParent, _fieldsWithParent] = partition(
-      _fields,
-      (f) => !isDefined(f.parentReplyId),
-    );
-
     const overwriteExisting = isDefined(overWriteArg)
       ? (args[overWriteArg] as boolean | null | undefined) ?? false
       : false;
 
-    const [fieldsNoParent, fieldsNoParentReplies, fieldsWithParent, fieldsChildReplies] =
-      await Promise.all([
-        ctx.petitions.loadField(_fieldsNoParent.map((f) => f.id)),
-        ctx.petitions.loadRepliesForField(_fieldsNoParent.map((f) => f.id)),
-        ctx.petitions.loadField(_fieldsWithParent.map((f) => f.id)),
-        ctx.petitions.loadPetitionFieldGroupChildReplies.raw(
-          _fieldsWithParent.map((f) => ({
-            petitionFieldId: f.id,
-            parentPetitionFieldReplyId: f.parentReplyId!,
-          })),
-        ),
-      ]);
-
-    for (const [field, replies] of [
-      ...zip(fieldsNoParent, fieldsNoParentReplies),
-      ...zip(fieldsWithParent, fieldsChildReplies),
-    ]) {
-      if (!field || (!field.multiple && replies.length > 0 && !overwriteExisting)) {
-        throw new ApolloError(
-          "The field is already replied and does not accept multiple replies",
-          "FIELD_ALREADY_REPLIED_ERROR",
-        );
-      }
+    if (!(await ctx.petitions.fieldsCanBeReplied(_fields, overwriteExisting))) {
+      throw new ApolloError(
+        "The field is already replied and does not accept multiple replies",
+        "FIELD_ALREADY_REPLIED_ERROR",
+      );
     }
 
     return true;
@@ -252,14 +228,11 @@ export function fieldHasType<
           : (args as any)[argFieldId]) as MaybeArray<number>,
       ),
     );
-    const fields = await ctx.petitions.loadField(fieldIds);
+
     const validFieldTypes = unMaybeArray(fieldType);
-
-    const invalidField = fields.find((field) => !validFieldTypes.includes(field!.type));
-
-    if (isDefined(invalidField)) {
+    if (!(await ctx.petitions.fieldHasType(fieldIds, validFieldTypes))) {
       throw new ApolloError(
-        `Expected ${validFieldTypes.join(" or ")}, got ${invalidField.type}`,
+        `Expected fields of type ${validFieldTypes.join(" or ")}`,
         "INVALID_FIELD_TYPE_ERROR",
       );
     }
@@ -285,19 +258,10 @@ export function replyIsForFieldOfType<
       ),
     );
 
-    const [fields, replies] = await Promise.all([
-      ctx.petitions.loadFieldForReply(replyIds),
-      ctx.petitions.loadFieldReply(replyIds),
-    ]);
-
     const validFieldTypes = unMaybeArray(fieldType);
-
-    const invalidField = fields.find((field) => !validFieldTypes.includes(field!.type));
-    const invalidReply = replies.find((reply) => !validFieldTypes.includes(reply!.type));
-
-    if (invalidField || invalidReply) {
+    if (!(await ctx.petitions.replyIsForFieldOfType(replyIds, validFieldTypes))) {
       throw new ApolloError(
-        `Expected ${validFieldTypes.join(" or ")}, got ${(invalidField || invalidReply)!.type}`,
+        `Expected replies to be of type ${validFieldTypes.join(" or ")}`,
         "INVALID_FIELD_TYPE_ERROR",
       );
     }
@@ -629,37 +593,14 @@ export function replyCanBeUpdated<
       ),
     );
 
-    const replies = await ctx.petitions.loadFieldReply(replyIds);
-    if (replies.some((r) => !isDefined(r))) {
+    const result = await ctx.petitions.repliesCanBeUpdated(replyIds);
+
+    if (result === "REPLY_NOT_FOUND") {
       // field or reply could be already deleted, throw FORBIDDEN error
       return false;
     }
 
-    const fieldGroupReplies = replies.filter(isDefined).filter((r) => r.type === "FIELD_GROUP");
-
-    const allReplies = replies;
-
-    if (fieldGroupReplies.length > 0) {
-      const childFields = await ctx.petitions.loadPetitionFieldChildren(
-        fieldGroupReplies.map((r) => r.petition_field_id),
-      );
-      if (childFields.length > 0) {
-        const fieldGroupChildReplies = (
-          await ctx.petitions.loadPetitionFieldGroupChildReplies.raw(
-            zip(fieldGroupReplies, childFields).flatMap(([reply, fields]) =>
-              fields.map((field) => ({
-                petitionFieldId: field.id,
-                parentPetitionFieldReplyId: reply.id,
-              })),
-            ),
-          )
-        ).flat();
-
-        allReplies.push(...fieldGroupChildReplies);
-      }
-    }
-
-    if (allReplies.some((r) => r!.status === "APPROVED" || r!.anonymized_at !== null)) {
+    if (result === "REPLY_ALREADY_APPROVED") {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR",
@@ -678,20 +619,18 @@ export function replyCanBeDeleted<
   return async (_, args, ctx) => {
     const replyId = args[argReplyId] as unknown as number;
 
-    const field = await ctx.petitions.loadFieldForReply(replyId);
-    if (!field) {
+    const result = await ctx.petitions.replyCanBeDeleted(replyId);
+    if (result === "REPLY_ALREADY_DELETED") {
       throw new ApolloError(`Reply is already deleted`, "REPLY_ALREADY_DELETED_ERROR");
     }
-    if (field.type === "FIELD_GROUP" && !field.optional) {
-      const replies = await ctx.petitions.loadRepliesForField(field.id);
-      if (replies.length === 1 && replies[0].id === replyId) {
-        throw new ApolloError(
-          `You can't delete the last reply of a required FIELD_GROUP field`,
-          "DELETE_FIELD_GROUP_REPLY_ERROR",
-        );
-      }
-      ctx.petitions.loadRepliesForField.dataloader.clear(field.id);
+
+    if (result === "CANT_DELETE_FIELD_GROUP_REPLY") {
+      throw new ApolloError(
+        `You can't delete the last reply of a required FIELD_GROUP field`,
+        "DELETE_FIELD_GROUP_REPLY_ERROR",
+      );
     }
+
     return true;
   };
 }
@@ -887,13 +826,17 @@ export function fieldHasParent<
       args[childrenFieldIdsArg] as unknown as MaybeArray<number>,
     );
 
-    const fields = await ctx.petitions.loadField(childrenFieldIds);
+    if (parentFieldId) {
+      const isFieldGroupField = await ctx.petitions.fieldHasType([parentFieldId], ["FIELD_GROUP"]);
+      if (!isFieldGroupField) {
+        throw new ApolloError(
+          `Expected parent field to be of type FIELD_GROUP`,
+          "INVALID_FIELD_TYPE_ERROR",
+        );
+      }
+    }
 
-    return fields.every(
-      (f) =>
-        isDefined(f?.parent_petition_field_id) &&
-        (!isDefined(parentFieldId) || f!.parent_petition_field_id === parentFieldId),
-    );
+    return await ctx.petitions.fieldHasParent(childrenFieldIds, parentFieldId);
   };
 }
 

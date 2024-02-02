@@ -185,7 +185,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
         description: field.description,
         optional: field.optional,
         multiple: field.multiple,
-        options: omit(field.options, ["file"]),
+        options: omit(field.options, ["file", "autoSearchConfig"]),
         visibility: isDefined(field.visibility)
           ? {
               ...field.visibility,

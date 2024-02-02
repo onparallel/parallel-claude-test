@@ -6,13 +6,13 @@ import {
   IntegrationCredentials,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
+import { AzureOpenAiIntegration } from "../integrations/AzureOpenAiIntegration";
 import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
 import {
   SignaturitEnvironment,
   SignaturitIntegration,
 } from "../integrations/SignaturitIntegration";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
-import { AzureOpenAiIntegration } from "../integrations/AzureOpenAiIntegration";
 
 export const INTEGRATIONS_SETUP_SERVICE = Symbol.for("INTEGRATIONS_SETUP_SERVICE");
 export interface IIntegrationsSetupService {

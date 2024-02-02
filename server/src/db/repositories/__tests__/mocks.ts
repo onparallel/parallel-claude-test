@@ -724,6 +724,23 @@ export class Mocks {
       .returning("*");
   }
 
+  async createPetitionFieldReply(
+    fieldId: number,
+    amount: number,
+    builder: (index: number) => Omit<CreatePetitionFieldReply, "petition_field_id">,
+  ) {
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: fieldId,
+            ...builder?.(index),
+          };
+        }),
+      )
+      .returning("*");
+  }
+
   async createRandomTags(
     orgId: number,
     amount?: number,

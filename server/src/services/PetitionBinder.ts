@@ -15,6 +15,7 @@ import {
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
+import { applyFieldVisibility } from "../util/fieldLogic";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { ChildProcessNonSuccessError, spawn as _spawn } from "../util/spawn";
@@ -23,11 +24,6 @@ import { MaybePromise } from "../util/types";
 import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
 import { IStorageService, STORAGE_SERVICE } from "./StorageService";
-import { applyFieldVisibility } from "../util/fieldLogic";
-
-function isPrintableContentType(contentType: string) {
-  return ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType);
-}
 
 interface PetitionBinderOptions {
   petitionId: number;
@@ -135,6 +131,7 @@ export class PetitionBinder implements IPetitionBinder {
               );
 
               const filePaths = await this.downloadFileUpload(files, userId, documentTheme);
+
               return [coverPagePath, ...filePaths];
             },
             { concurrency: 2 },
@@ -348,7 +345,7 @@ export class PetitionBinder implements IPetitionBinder {
           (file) =>
             fileUploadIds.includes(file.id) &&
             file.upload_complete &&
-            isPrintableContentType(file.content_type),
+            this.isPrintableContentType(file.content_type),
         );
 
       return printable.length > 0 ? [[field, printable] as const] : [];
@@ -402,5 +399,9 @@ export class PetitionBinder implements IPetitionBinder {
     const path = resolve(tmpdir(), random(10));
     await mkdir(path, { recursive: true });
     return path;
+  }
+
+  private isPrintableContentType(contentType: string) {
+    return ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType);
   }
 }

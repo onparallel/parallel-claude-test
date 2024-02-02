@@ -3,7 +3,7 @@ import pMap from "p-map";
 import { isDefined } from "remeda";
 import { WorkerContext } from "../context";
 import { ContactLocale, OrgIntegration } from "../db/__types";
-import { IntegrationSettings, SignatureProvider } from "../db/repositories/IntegrationRepository";
+import { IntegrationProvider, IntegrationSettings } from "../db/repositories/IntegrationRepository";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { InvalidCredentialsError } from "../integrations/GenericIntegration";
 import {
@@ -20,7 +20,7 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type SignatureOrgIntegration = Replace<
   OrgIntegration,
-  { settings: IntegrationSettings<"SIGNATURE">; provider: SignatureProvider }
+  { settings: IntegrationSettings<"SIGNATURE">; provider: IntegrationProvider<"SIGNATURE"> }
 >;
 
 /** starts a signature request on the petition */

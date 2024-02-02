@@ -193,6 +193,10 @@ export function buildConfig() {
         },
       },
     },
+    openSanctions: {
+      yenteUsername: process.env.OPEN_SANCTIONS_YENTE_USERNAME!,
+      yentePassword: process.env.OPEN_SANCTIONS_YENTE_PASSWORD!,
+    },
   });
 }
 

@@ -727,9 +727,15 @@ const _fragments = {
         path
         permissions {
           ... on PetitionUserPermission {
+            user {
+              id
+            }
             ...PetitionSharingModal_PetitionUserPermission
           }
           ... on PetitionUserGroupPermission {
+            group {
+              id
+            }
             ...PetitionSharingModal_PetitionUserGroupPermission
           }
         }

@@ -135,6 +135,8 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any): any {
       };
     case "FIELD_GROUP":
       return {};
+    case "BACKGROUND_CHECK":
+      return content;
     default:
       return content.value as string;
   }
@@ -148,7 +150,6 @@ function mapFieldReply(reply: PetitionFieldReplyFragment, type: PetitionFieldTyp
         "status",
         // show metadata info only on FILE fields
         ...(isFileTypeField(type) ? ["metadata" as keyof PetitionFieldReplyFragment] : []),
-        "content",
         "createdAt",
         "updatedAt",
       ]),
@@ -231,6 +232,8 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
         } else {
           return replies[0].content.value ?? null;
         }
+      case "BACKGROUND_CHECK":
+        return replies[0]?.content ?? null; // BACKGROUND_CHECK is always single-reply
       case "FILE_UPLOAD":
       case "ES_TAX_DOCUMENTS":
       case "DOW_JONES_KYC":

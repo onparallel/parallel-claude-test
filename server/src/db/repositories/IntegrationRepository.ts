@@ -8,13 +8,11 @@ import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 
-export interface IntegrationProviders {
+interface IntegrationProviders {
   SIGNATURE: "SIGNATURIT" | "DOCUSIGN";
   DOW_JONES_KYC: "DOW_JONES_KYC";
   AI_COMPLETION: "AZURE_OPEN_AI";
 }
-
-export type SignatureProvider = IntegrationProviders["SIGNATURE"];
 
 export type IntegrationProvider<TType extends IntegrationType> =
   TType extends keyof IntegrationProviders ? IntegrationProviders[TType] : string;

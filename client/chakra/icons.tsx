@@ -2723,3 +2723,20 @@ export const CalculatorIcon = createIcon({
     </g>
   ),
 });
+
+export const BackgroundCheckIcon = createIcon({
+  displayName: "BackgroundCheckIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m11 19c4.4183 0 8-3.5817 8-8 0-4.41828-3.5817-8-8-8-4.41828 0-8 3.58172-8 8 0 4.4183 3.58172 8 8 8z" />
+      <path d="m21 21-4.35-4.35" />
+    </g>
+  ),
+});

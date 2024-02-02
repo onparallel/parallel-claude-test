@@ -11,6 +11,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
+import { authenticateBackgroundCheckToken } from "../integrations/authorizers";
 import {
   petitionHasRepliableFields,
   petitionIsNotAnonymized,
@@ -244,6 +245,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       "TEMPLATE_REPLIES_REPORT",
       "DOW_JONES_PROFILE_DOWNLOAD",
       "TEMPLATE_REPLIES_CSV_EXPORT",
+      "BACKGROUND_CHECK_PROFILE_PDF",
     ]),
   ),
   args: {
@@ -257,7 +259,8 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       | Task<"EXPORT_EXCEL">
       | Task<"TEMPLATE_REPLIES_REPORT">
       | Task<"DOW_JONES_PROFILE_DOWNLOAD">
-      | Task<"TEMPLATE_REPLIES_CSV_EXPORT">;
+      | Task<"TEMPLATE_REPLIES_CSV_EXPORT">
+      | Task<"BACKGROUND_CHECK_PROFILE_PDF">;
 
     const file = isDefined(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
@@ -406,3 +409,31 @@ export const createPetitionSummaryTask = mutationField("createPetitionSummaryTas
     );
   },
 });
+
+export const createBackgroundCheckProfilePdfTask = mutationField(
+  "createBackgroundCheckProfilePdfTask",
+  {
+    type: "Task",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("BACKGROUND_CHECK"),
+      authenticateBackgroundCheckToken("token"),
+    ),
+    args: {
+      token: nonNull(stringArg()),
+      entityId: nonNull(stringArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      return await ctx.tasks.createTask(
+        {
+          name: "BACKGROUND_CHECK_PROFILE_PDF",
+          user_id: ctx.user!.id,
+          input: {
+            token: args.token,
+            entity_id: args.entityId,
+          },
+        },
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);

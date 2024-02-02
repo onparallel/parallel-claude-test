@@ -10,7 +10,7 @@ import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useConstant } from "@parallel/utils/useConstant";
-import { useLoadCountryNames } from "@parallel/utils/useCountryName";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import useMergedRef from "@react-hook/merged-ref";
 import { AsYouType } from "libphonenumber-js";

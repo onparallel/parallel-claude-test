@@ -1,11 +1,19 @@
-import { idArg, nonNull, queryField, stringArg } from "nexus";
+import { idArg, nonNull, nullable, queryField, stringArg } from "nexus";
+import { isDefined } from "remeda";
 import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
+import {
+  EntityDetailsResponse,
+  EntitySearchResponse,
+} from "../../services/background-check-clients/BackgroundCheckClient";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
-import { datetimeArg } from "../helpers/scalars/DateTime";
+import { ApolloError, ForbiddenError } from "../helpers/errors";
+import { dateArg, datetimeArg } from "../helpers/scalars/DateTime";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
+import { authenticateBackgroundCheckToken } from "./authorizers";
+import { parseBackgroundCheckToken } from "./utils";
 
+/** @deprecated */
 export const queries = queryField((t) => {
   t.paginationField("dowJonesKycEntitySearch", {
     type: "DowJonesKycEntitySearchResult",
@@ -167,4 +175,186 @@ export const queries = queryField((t) => {
       }
     },
   });
+});
+
+export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySearch", {
+  type: nonNull("BackgroundCheckEntitySearch"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("BACKGROUND_CHECK"),
+    authenticateBackgroundCheckToken("token"),
+  ),
+  args: {
+    token: nonNull(stringArg()),
+    type: nullable("BackgroundCheckEntitySearchType"),
+    name: nonNull(
+      stringArg({
+        description: "Name of the entity",
+      }),
+    ),
+    date: dateArg({
+      description:
+        "Date of birth if entity is a Person, or date of registration if entity is a Company",
+    }),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const params = parseBackgroundCheckToken(args.token);
+
+      const query = {
+        name: args.name,
+        date: args.date ?? null,
+        type: args.type ?? null,
+      };
+
+      const petition = await ctx.petitions.loadPetition(params.petitionId);
+      const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
+
+      // look for a reply in the field that matches the search criteria
+      const reply = fieldReplies.find(
+        (r) =>
+          r.type === "BACKGROUND_CHECK" &&
+          isDefined(r.content.search) &&
+          r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
+      );
+
+      if (
+        isDefined(reply) &&
+        reply.content.query.name === query.name &&
+        reply.content.query.date === query.date &&
+        reply.content.query.type === query.type
+      ) {
+        // i found a reply and it matches the search criteria, return it
+        return reply.content.search as EntitySearchResponse;
+      }
+
+      const canBeReplied = await ctx.petitions.fieldsCanBeReplied(
+        [{ id: params.fieldId, parentReplyId: params.parentReplyId ?? null }],
+        true,
+      );
+
+      if (!canBeReplied) {
+        throw new ApolloError(
+          "The field is already replied and does not accept multiple replies",
+          "FIELD_ALREADY_REPLIED_ERROR",
+        );
+      }
+
+      if (isDefined(reply)) {
+        const updateCheck = await ctx.petitions.repliesCanBeUpdated([reply.id]);
+        if (updateCheck === "REPLY_ALREADY_APPROVED") {
+          throw new ApolloError(
+            `The reply has been approved and cannot be updated.`,
+            "REPLY_ALREADY_APPROVED_ERROR",
+          );
+        } else if (updateCheck === "REPLY_NOT_FOUND") {
+          throw new ForbiddenError("FORBIDDEN");
+        }
+      }
+
+      const search = await ctx.backgroundCheck.entitySearch(query);
+      if (isDefined(reply)) {
+        // reply is defined but search criteria doesn't match, update it
+        await ctx.petitions.updatePetitionFieldRepliesContent(
+          params.petitionId,
+          [
+            {
+              id: reply.id,
+              content: JSON.stringify({
+                query,
+                search,
+                entity: null,
+              }),
+            },
+          ],
+          ctx.user!,
+        );
+      } else if (petition?.is_template === false) {
+        // reply does not exist, create a new one
+        await ctx.orgCredits.ensurePetitionHasConsumedCredit(
+          params.petitionId,
+          `User:${ctx.user!.id}`,
+        );
+
+        // create a new reply with the correct search criteria
+        await ctx.petitions.createPetitionFieldReply(
+          params.petitionId,
+          {
+            type: "BACKGROUND_CHECK",
+            content: { query, search, entity: null },
+            user_id: ctx.user!.id,
+            petition_field_id: params.fieldId,
+            parent_petition_field_reply_id: params.parentReplyId ?? null,
+            status: "PENDING",
+          },
+          `User:${ctx.user!.id}`,
+        );
+      }
+
+      return search;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+          throw new ApolloError(
+            "Can't submit a reply due to lack of credits",
+            "PETITION_SEND_LIMIT_REACHED",
+          );
+        }
+        if (error.message === "INVALID_CREDENTIALS") {
+          throw new ForbiddenError("Invalid credentials");
+        }
+      }
+      throw error;
+    }
+  },
+});
+
+export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDetails", {
+  type: nonNull("BackgroundCheckEntityDetails"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("BACKGROUND_CHECK"),
+    authenticateBackgroundCheckToken("token"),
+  ),
+  args: {
+    token: nonNull(stringArg()),
+    entityId: nonNull(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const params = parseBackgroundCheckToken(args.token);
+
+      const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
+
+      // look for a reply in the field that matches the provided entity
+      const reply = fieldReplies.find(
+        (r) =>
+          r.type === "BACKGROUND_CHECK" &&
+          r.content.entity?.id === args.entityId &&
+          r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
+      );
+
+      if (isDefined(reply)) {
+        // i found a reply and it matches the entity, return it
+        return reply.content.entity as EntityDetailsResponse;
+      }
+
+      return await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "PROFILE_NOT_FOUND") {
+          throw new ApolloError(
+            `Couldn't find entity with id ${args.entityId}`,
+            "PROFILE_NOT_FOUND",
+          );
+        } else if (error.message === "INVALID_ENTITY_SCHEMA") {
+          throw new ApolloError(
+            `Invalid entity schema for entity with id ${args.entityId}`,
+            "INVALID_ENTITY_SCHEMA",
+          );
+        } else if (error.message === "INVALID_CREDENTIALS") {
+          throw new ForbiddenError("Invalid credentials");
+        }
+      }
+      throw error;
+    }
+  },
 });

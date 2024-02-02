@@ -1,0 +1,105 @@
+import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import {
+  TaskProgressDialog,
+  useTaskProgressDialog,
+} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import {
+  useBackgroundCheckProfileDownloadTask_createBackgroundCheckProfilePdfTaskDocument,
+  useBackgroundCheckProfileDownloadTask_getTaskResultFileDocument,
+} from "@parallel/graphql/__types";
+import { useIntl } from "react-intl";
+import { isDefined } from "remeda";
+import { openNewWindow } from "../openNewWindow";
+import { withError } from "../promises/withError";
+
+export function useBackgroundCheckProfileDownloadTask() {
+  const apollo = useApolloClient();
+  const showError = useErrorDialog();
+  const [getTaskResultFile] = useMutation(
+    useBackgroundCheckProfileDownloadTask_getTaskResultFileDocument,
+  );
+
+  const showTaskProgressDialog = useTaskProgressDialog();
+  const intl = useIntl();
+
+  return async ({ token, entityId }: { token: string; entityId: string }) => {
+    const [taskError, finishedTask] = await withError(async () => {
+      return await showTaskProgressDialog({
+        initTask: async () => {
+          const { data } = await apollo.mutate({
+            mutation:
+              useBackgroundCheckProfileDownloadTask_createBackgroundCheckProfilePdfTaskDocument,
+            variables: { token, entityId },
+          });
+          if (!isDefined(data)) {
+            throw new Error();
+          }
+          return data.createBackgroundCheckProfilePdfTask;
+        },
+        dialogHeader: intl.formatMessage({
+          id: "component.dowjones-profile-download-task.header",
+          defaultMessage: "Generating PDF file...",
+        }),
+        confirmText: intl.formatMessage({
+          id: "generic.download",
+          defaultMessage: "Download",
+        }),
+      });
+    });
+
+    if (taskError?.message === "SERVER_ERROR") {
+      await withError(
+        showError({
+          message: intl.formatMessage({
+            id: "generic.unexpected-error-happened",
+            defaultMessage:
+              "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+          }),
+        }),
+      );
+    } else if (!taskError) {
+      const [error] = await withError(
+        openNewWindow(async () => {
+          const { data } = await getTaskResultFile({
+            variables: { taskId: finishedTask!.id },
+          });
+          return data!.getTaskResultFile.url;
+        }),
+      );
+
+      if (error) {
+        await withError(
+          showError({
+            message: intl.formatMessage({
+              id: "generic.unexpected-error-happened",
+              defaultMessage:
+                "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+            }),
+          }),
+        );
+      }
+    }
+  };
+}
+
+useBackgroundCheckProfileDownloadTask.mutations = [
+  gql`
+    mutation useBackgroundCheckProfileDownloadTask_createBackgroundCheckProfilePdfTask(
+      $token: String!
+      $entityId: String!
+    ) {
+      createBackgroundCheckProfilePdfTask(token: $token, entityId: $entityId) {
+        ...TaskProgressDialog_Task
+      }
+    }
+    ${TaskProgressDialog.fragments.Task}
+  `,
+  gql`
+    mutation useBackgroundCheckProfileDownloadTask_getTaskResultFile($taskId: GID!) {
+      getTaskResultFile(taskId: $taskId, preview: true) {
+        url
+      }
+    }
+  `,
+];

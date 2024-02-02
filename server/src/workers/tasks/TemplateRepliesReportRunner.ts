@@ -10,6 +10,7 @@ import {
   PetitionSignatureRequest,
   PetitionStatus,
 } from "../../db/__types";
+import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheckReplyUrl";
 import { FORMATS } from "../../util/dates";
 import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
@@ -95,6 +96,8 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     const headers = this.buildExcelHeaders(includePreviewUrl, templateFields, intl);
     let rows: Record<string, Maybe<string | Date>>[] = [];
+
+    const parallelUrl = this.ctx.config.misc.parallelUrl;
 
     if (petitions.length > 0) {
       const [
@@ -219,9 +222,10 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         };
 
         if (includePreviewUrl) {
-          row["preview-url"] = `${this.ctx.config.misc.parallelUrl}/${
-            intl.locale
-          }/app/petitions/${toGlobalId("Petition", petition.id)}/preview`;
+          row["preview-url"] = `${parallelUrl}/${intl.locale}/app/petitions/${toGlobalId(
+            "Petition",
+            petition.id,
+          )}/preview`;
         }
 
         for (const [name, value] of Object.entries(logic[0].finalVariables)) {
@@ -238,7 +242,10 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           row[columnId] = isFinite(value) ? value.toString() : "";
         }
 
-        function replyContent(r: Pick<PetitionFieldReply, "content" | "type">) {
+        function replyContent(
+          r: Pick<PetitionFieldReply, "content" | "type">,
+          field: Pick<PetitionField, "id" | "petition_id">,
+        ) {
           switch (r.type) {
             case "CHECKBOX":
               return (r.content.value as string[]).join(", ");
@@ -252,6 +259,8 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
                 ...FORMATS["L+LT"],
                 timeZone: "Etc/UTC",
               });
+            case "BACKGROUND_CHECK":
+              return backgroundCheckFieldReplyUrl(parallelUrl, intl.locale, field, r);
             default:
               return r.content.value as string;
           }
@@ -260,7 +269,12 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         function fillRow(
           field: Pick<
             PetitionField,
-            "id" | "from_petition_field_id" | "type" | "title" | "parent_petition_field_id"
+            | "id"
+            | "petition_id"
+            | "from_petition_field_id"
+            | "type"
+            | "title"
+            | "parent_petition_field_id"
           > & {
             reply_group_index?: number;
           },
@@ -311,7 +325,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           }
 
           row[columnId] = !isFileTypeField(field.type)
-            ? replies.map((r) => replyContent({ ...r, type: field.type })).join("; ")
+            ? replies.map((r) => replyContent({ ...r, type: field.type }, field)).join("; ")
             : replies.length > 0
               ? intl.formatMessage(
                   {

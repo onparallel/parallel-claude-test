@@ -80,7 +80,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         : []),
       {
         title: intl.formatMessage({
-          id: "organization.integrations.title",
+          id: "page.organization-integrations.title",
           defaultMessage: "Integrations",
         }),
         path: "/app/organization/integrations",

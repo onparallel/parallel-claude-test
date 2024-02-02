@@ -1,5 +1,8 @@
 import { gql } from "@apollo/client";
-import { validatePetitionFields_PetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  validatePetitionFields_PetitionBaseFragment,
+  validatePetitionFields_PetitionFieldFragment,
+} from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
@@ -16,9 +19,11 @@ interface ValidationResult<T extends PartialField> {
     | "CHECKBOX_WITHOUT_OPTIONS"
     | "NUMBER_INVALID_LIMITS"
     | "FIELD_GROUP_WITHOUT_CHILDREN"
+    | "PAID_FIELDS_BLOCKED"
     | null;
   fieldsWithIndices?: [field: T, fieldIndex: PetitionFieldIndex][];
   message?: ReactNode;
+  footer?: ReactNode;
 }
 
 /**
@@ -26,6 +31,7 @@ interface ValidationResult<T extends PartialField> {
  */
 export function validatePetitionFields<T extends PartialField>(
   fieldsWithIndices: [T, PetitionFieldIndex][],
+  petition: validatePetitionFields_PetitionBaseFragment,
 ): ValidationResult<T> {
   if (fieldsWithIndices.every(([field]) => field.isReadOnly)) {
     return {
@@ -171,6 +177,31 @@ export function validatePetitionFields<T extends PartialField>(
     };
   }
 
+  const features = petition.organization?.features ?? [];
+
+  const blockedPaidFields = fieldsWithIndices.filter(([field]) => {
+    return features.some((feature) => feature.name === field.type && !feature.value);
+  });
+
+  if (blockedPaidFields.length > 0) {
+    return {
+      error: "PAID_FIELDS_BLOCKED",
+      fieldsWithIndices: blockedPaidFields,
+      message: (
+        <FormattedMessage
+          id="util.validate-petition-fields.paid-fields-message"
+          defaultMessage="The following fields are not included in your current plan."
+        />
+      ),
+      footer: (
+        <FormattedMessage
+          id="util.validate-petition-fields.paid-fields-footer"
+          defaultMessage="Contact us for more information or click continue to proceed with the shipment."
+        />
+      ),
+    };
+  }
+
   return { error: null };
 }
 
@@ -184,6 +215,17 @@ validatePetitionFields.fragments = {
       options
       children {
         id
+      }
+    }
+  `,
+  PetitionBase: gql`
+    fragment validatePetitionFields_PetitionBase on PetitionBase {
+      id
+      organization {
+        features {
+          name
+          value
+        }
       }
     }
   `,

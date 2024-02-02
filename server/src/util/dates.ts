@@ -45,6 +45,21 @@ export const FORMATS = (() => {
       year: "numeric",
     },
     /**
+     * E.g. Mar 5, 2020
+     */
+    ll: {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    },
+    /**
+     * E.g. March 2020
+     */
+    YYYMM: {
+      month: "long",
+      year: "numeric",
+    },
+    /**
      * E.g. March 5
      */
     MMMdd: {

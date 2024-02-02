@@ -1,0 +1,577 @@
+import { gql } from "@apollo/client";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  HStack,
+  List,
+  Progress,
+  Stack,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react";
+import {
+  BackgroundCheckIcon,
+  BusinessIcon,
+  CheckIcon,
+  CloseIcon,
+  DeleteIcon,
+  EyeIcon,
+  QuestionIcon,
+  UserIcon,
+} from "@parallel/chakra/icons";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
+import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/RestrictedPetitionFieldAlert";
+import {
+  PreviewPetitionFieldBackgroundCheck_PetitionBaseFragment,
+  PreviewPetitionFieldBackgroundCheck_UserFragment,
+} from "@parallel/graphql/__types";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { FORMATS } from "@parallel/utils/dates";
+import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { useInterval } from "@parallel/utils/useInterval";
+import { useWindowEvent } from "@parallel/utils/useWindowEvent";
+import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined, zip } from "remeda";
+import {
+  RecipientViewPetitionFieldLayout,
+  RecipientViewPetitionFieldLayoutProps,
+  RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
+} from "../../../recipient-view/fields/RecipientViewPetitionFieldLayout";
+import { useBackgroundCheckEntityTypeSelectOptions } from "./BackgroundCheckEntityTypeSelect";
+
+export interface PreviewPetitionFieldBackgroundCheckProps
+  extends Omit<
+    RecipientViewPetitionFieldLayoutProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
+  user: PreviewPetitionFieldBackgroundCheck_UserFragment;
+  petition: PreviewPetitionFieldBackgroundCheck_PetitionBaseFragment;
+  isDisabled: boolean;
+  onDeleteReply: (replyId: string) => Promise<void>;
+  onRefreshField: () => void;
+  isInvalid?: boolean;
+  isCacheOnly?: boolean;
+  parentReplyId?: string;
+}
+
+export function PreviewPetitionFieldBackgroundCheck({
+  user,
+  field,
+  petition,
+  isDisabled,
+  isInvalid,
+  onDeleteReply,
+  onDownloadAttachment,
+  onCommentsButtonClick,
+  onRefreshField,
+  isCacheOnly,
+  parentReplyId,
+}: PreviewPetitionFieldBackgroundCheckProps) {
+  const intl = useIntl();
+  const router = useRouter();
+  const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
+  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
+
+  const fieldLogic = useFieldLogic(petition, isCacheOnly);
+
+  const visibleFields = zip(petition.fields, fieldLogic)
+    .filter(([_, { isVisible }]) => isVisible)
+    .map(([field, { groupChildrenLogic }]) => {
+      if (field.type === "FIELD_GROUP") {
+        return {
+          ...field,
+          replies: field.replies.map((r, groupIndex) => ({
+            ...r,
+            children: r.children?.filter(
+              (_, childReplyIndex) =>
+                groupChildrenLogic?.[groupIndex][childReplyIndex].isVisible ?? false,
+            ),
+          })),
+        };
+      } else {
+        return field;
+      }
+    });
+
+  const tokenBase64 = btoa(
+    JSON.stringify({
+      fieldId: field.id,
+      petitionId: petition.id,
+      ...(parentReplyId ? { parentReplyId } : {}),
+    }),
+  );
+
+  const handleDeletePetitionReply = useCallback(
+    async function handleDeletePetitionReply({ replyId }: { replyId: string }) {
+      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
+      await onDeleteReply(replyId);
+      setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
+    },
+    [onDeleteReply],
+  );
+
+  const browserTabRef = useRef<Window>();
+  useInterval(
+    async (done) => {
+      if (isDefined(browserTabRef.current) && browserTabRef.current.closed) {
+        setState("IDLE");
+        done();
+      } else if (state === "FETCHING") {
+        onRefreshField();
+      }
+    },
+    5000,
+    [onRefreshField, state, field.replies.length],
+  );
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      if (isDefined(browserTabRef.current)) {
+        browserTabRef.current.postMessage("close", browserTabRef.current.origin);
+      }
+    };
+
+    router.events.on("routeChangeStart", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+    };
+  }, [router]);
+
+  useWindowEvent(
+    "message",
+    async (e) => {
+      const browserTab = browserTabRef.current;
+      if (!isDefined(browserTab) || e.source !== browserTab) {
+        return;
+      }
+      if (e.data === "refresh") {
+        onRefreshField();
+      } else if (e.data.event === "update-info") {
+        const token = e.data.token;
+        if (token !== tokenBase64) {
+          return;
+        }
+
+        browserTab.postMessage(
+          {
+            event: "info-updated",
+            entityIds: field.replies.map((r) => r?.content?.entity?.id).filter(isDefined),
+          },
+          browserTab.origin,
+        );
+      }
+    },
+    [onRefreshField, tokenBase64, field.replies.map((r) => r?.content?.entity?.id).join(",")],
+  );
+
+  const handleViewReply = useCallback(
+    async (reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) => {
+      let url = `/${intl.locale}/app/background-check`;
+
+      const isReadOnly = reply.status === "APPROVED" || isDisabled;
+
+      const { name, date, type } = reply.content?.query ?? {};
+      const urlParams = new URLSearchParams({
+        token: tokenBase64,
+        ...(name ? { name } : {}),
+        ...(date ? { date } : {}),
+        ...(type ? { type } : {}),
+        ...(isReadOnly ? { readonly: "true" } : {}),
+      });
+
+      if (reply.content.entity) {
+        // Go to details
+        url += `/${reply.content.entity.id}?${urlParams}`;
+      } else if (reply.content.query) {
+        // Go to results because is a search
+        url += `/results?${urlParams}`;
+      }
+
+      browserTabRef.current = await openNewWindow(url);
+    },
+    [intl.locale, isDisabled],
+  );
+
+  const handleStart = async () => {
+    setState("FETCHING");
+
+    let url = `/${intl.locale}/app/background-check`;
+
+    const options = field.options as FieldOptions["BACKGROUND_CHECK"];
+
+    const searchParams = new URLSearchParams({
+      token: tokenBase64,
+      ...(isCacheOnly ? { template: "true" } : {}),
+    });
+
+    if (field.replies.length) {
+      const reply = field.replies[0];
+      const { name, date, type } = reply.content?.query ?? {};
+
+      if (name) {
+        searchParams.set("name", name);
+      }
+      if (date) {
+        searchParams.set("date", date);
+      }
+      if (type) {
+        searchParams.set("type", type);
+      }
+    } else if (isDefined(options.autoSearchConfig)) {
+      const fields = parentReplyId
+        ? visibleFields.flatMap((f) => [f, ...(f.children ?? [])])
+        : visibleFields;
+
+      const name = options
+        .autoSearchConfig!.name.map((id) => {
+          const field = fields.find((f) => f.id === id);
+          if (field) {
+            const replies = isCacheOnly ? field.previewReplies : field.replies;
+            return field.parent && parentReplyId
+              ? replies.find((r) => r?.parent?.id === parentReplyId)?.content.value
+              : replies[0]?.content.value;
+          }
+          return null;
+        })
+        .filter(isDefined)
+        .join(" ")
+        .trim();
+
+      const date =
+        petition.fields.find((f) => f.id === options.autoSearchConfig!.date)?.replies[0]?.content
+          .value ?? "";
+
+      if (name || date) {
+        if (name) {
+          searchParams.set("name", name);
+        }
+        if (date) {
+          searchParams.set("date", date);
+        }
+        if (options.autoSearchConfig.type) {
+          searchParams.set("type", options.autoSearchConfig.type);
+        }
+
+        url += `/results`;
+      }
+    }
+
+    url += `?${searchParams.toString()}`;
+
+    browserTabRef.current = await openNewWindow(url);
+
+    if (isCacheOnly) {
+      setState("IDLE");
+    }
+  };
+
+  const handleCancelClick = () => {
+    setState("IDLE");
+    browserTabRef.current?.close();
+  };
+
+  const fieldReplies = completedFieldReplies(field);
+
+  const showRestrictedPetitionFieldAlert = !user?.hasBackgroundCheck;
+
+  return (
+    <RecipientViewPetitionFieldLayout
+      field={field}
+      onCommentsButtonClick={onCommentsButtonClick}
+      onDownloadAttachment={onDownloadAttachment}
+    >
+      {fieldReplies.length ? (
+        <Text fontSize="sm" color="gray.600">
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.profiles-uploaded"
+            defaultMessage="{count, plural, =1 {1 profile uploaded} other {# profiles uploaded}}"
+            values={{ count: fieldReplies.length }}
+          />
+        </Text>
+      ) : null}
+
+      {field.replies.length ? (
+        <List as={Stack} marginTop={1}>
+          <AnimatePresence initial={false}>
+            {field.replies.map((reply) => (
+              <motion.li
+                key={reply.id}
+                layout
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0, transition: { ease: "easeOut" } }}
+                exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
+              >
+                <KYCResearchFieldReplyProfile
+                  id={`reply-${field.id}-${reply.id}`}
+                  reply={reply}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
+                  onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
+                  onViewReply={handleViewReply}
+                  isViewDisabled={isCacheOnly || reply.isAnonymized}
+                />
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </List>
+      ) : null}
+      <Button
+        variant="outline"
+        onClick={handleStart}
+        isDisabled={
+          isDisabled ||
+          state === "FETCHING" ||
+          showRestrictedPetitionFieldAlert ||
+          field.replies.some((reply) => reply.status === "APPROVED")
+        }
+        marginTop={3}
+        outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
+      >
+        {field.replies.length ? (
+          <FormattedMessage
+            id="component.preview-petition-background-check.do-another-search"
+            defaultMessage="Modify search"
+          />
+        ) : (
+          <FormattedMessage
+            id="component.preview-petition-background-check.check-lists"
+            defaultMessage="Run background check"
+          />
+        )}
+      </Button>
+      {state === "FETCHING" ? (
+        <Stack marginTop={4}>
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="component.preview-petition-background-check.wait-perform-search"
+              defaultMessage="Please wait while we run the background check..."
+            />
+          </Text>
+          <HStack>
+            <Progress
+              size="md"
+              isIndeterminate
+              colorScheme="green"
+              borderRadius="full"
+              width="100%"
+            />
+            <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
+              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+            </Button>
+          </HStack>
+        </Stack>
+      ) : null}
+      {showRestrictedPetitionFieldAlert ? (
+        <RestrictedPetitionFieldAlert fieldType="BACKGROUND_CHECK" marginTop={3} />
+      ) : null}
+    </RecipientViewPetitionFieldLayout>
+  );
+}
+
+interface KYCResearchFieldReplyProfileProps {
+  id: string;
+  reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection;
+  isDisabled: boolean;
+  onRemove?: () => void;
+  onViewReply?: (reply: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) => void;
+  isViewDisabled?: boolean;
+}
+
+export function KYCResearchFieldReplyProfile({
+  id,
+  reply,
+  isDisabled,
+  onRemove,
+  onViewReply,
+  isViewDisabled,
+}: KYCResearchFieldReplyProfileProps) {
+  const intl = useIntl();
+  const entityTypeOptions = useBackgroundCheckEntityTypeSelectOptions();
+  const entityTypeLabel = entityTypeOptions.find(
+    (option) => option.value === reply.content?.query?.type,
+  )?.label;
+
+  return (
+    <Stack direction="row" alignItems="center" backgroundColor="white" id={id}>
+      <Center
+        boxSize={10}
+        borderRadius="md"
+        border="1px solid"
+        borderColor="gray.300"
+        color="gray.600"
+        boxShadow="sm"
+        fontSize="xl"
+      >
+        {reply.isAnonymized ? (
+          <QuestionIcon color="gray.300" />
+        ) : reply.content?.entity?.type === "Company" ? (
+          <BusinessIcon />
+        ) : reply.content?.entity?.type === "Person" ? (
+          <UserIcon />
+        ) : (
+          <BackgroundCheckIcon />
+        )}
+      </Center>
+      <Box flex="1" overflow="hidden" paddingBottom="2px">
+        <Flex minWidth={0} alignItems="baseline">
+          {!reply.isAnonymized ? (
+            reply.content?.entity ? (
+              <Flex flexWrap="wrap" gap={2}>
+                <Text as="span" lineHeight={1.2}>
+                  {reply.content?.entity?.name}
+                </Text>
+                <Flex flexWrap="wrap" gap={2} alignItems="center">
+                  {(reply.content?.entity?.properties?.topics as string[] | undefined)?.map(
+                    (hint, i) => <BackgroundCheckRiskLabel key={i} risk={hint} />,
+                  )}
+                </Flex>
+              </Flex>
+            ) : (
+              <Flex flexWrap="wrap" gap={2} alignItems="center">
+                <Text as="span">
+                  {[entityTypeLabel, reply.content?.query?.name, reply.content?.query?.date]
+                    .filter(isDefined)
+                    .join(" | ")}
+                </Text>
+                <Text as="span" color="gray.500" fontSize="sm">
+                  {`(${intl.formatMessage(
+                    {
+                      id: "generic.n-results",
+                      defaultMessage:
+                        "{count, plural,=0{No results} =1 {1 result} other {# results}}",
+                    },
+                    {
+                      count: reply.content?.search?.totalCount ?? 0,
+                    },
+                  )})`}
+                </Text>
+              </Flex>
+            )
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage
+                id="generic.reply-not-available"
+                defaultMessage="Reply not available"
+              />
+            </Text>
+          )}
+        </Flex>
+        <Text fontSize="xs">
+          <DateTime value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
+        </Text>
+      </Box>
+      {reply.status !== "PENDING" ? (
+        <Center boxSize={10}>
+          {reply.status === "APPROVED" ? (
+            <Tooltip
+              label={intl.formatMessage({
+                id: "component.preview-petition-field-background-check.approved-profile",
+                defaultMessage: "This profile has been approved",
+              })}
+            >
+              <CheckIcon color="green.600" />
+            </Tooltip>
+          ) : (
+            <Tooltip
+              label={intl.formatMessage({
+                id: "component.preview-petition-field-background-check.rejected-profile",
+                defaultMessage: "This profile has been rejected",
+              })}
+            >
+              <CloseIcon fontSize="14px" color="red.500" />
+            </Tooltip>
+          )}
+        </Center>
+      ) : null}
+
+      <IconButtonWithTooltip
+        isDisabled={isViewDisabled}
+        onClick={() => {
+          onViewReply?.(reply);
+        }}
+        variant="ghost"
+        icon={<EyeIcon />}
+        size="md"
+        placement="bottom"
+        label={
+          isDefined(reply.content?.entity)
+            ? intl.formatMessage({
+                id: "component.preview-petition-field-background-check.view-details",
+                defaultMessage: "View details",
+              })
+            : intl.formatMessage({
+                id: "component.preview-petition-field-background-check.view-results",
+                defaultMessage: "View results",
+              })
+        }
+      />
+      {onRemove !== undefined ? (
+        <IconButtonWithTooltip
+          isDisabled={isDisabled || reply.status === "APPROVED"}
+          onClick={onRemove}
+          variant="ghost"
+          icon={<DeleteIcon />}
+          size="md"
+          placement="bottom"
+          label={intl.formatMessage({
+            id: "component.preview-petition-field-background-check.remove-reply-label",
+            defaultMessage: "Remove reply",
+          })}
+        />
+      ) : null}
+    </Stack>
+  );
+}
+
+PreviewPetitionFieldBackgroundCheck.fragments = {
+  User: gql`
+    fragment PreviewPetitionFieldBackgroundCheck_User on User {
+      id
+      hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+    }
+  `,
+  PetitionField: gql`
+    fragment PreviewPetitionFieldBackgroundCheck_PetitionField on PetitionField {
+      id
+      parent {
+        id
+      }
+      previewReplies @client {
+        id
+        content
+        parent {
+          id
+        }
+      }
+      replies {
+        id
+        content
+        parent {
+          id
+        }
+      }
+    }
+  `,
+  PetitionBase: gql`
+    fragment PreviewPetitionFieldBackgroundCheck_PetitionBase on PetitionBase {
+      id
+      fields {
+        ...PreviewPetitionFieldBackgroundCheck_PetitionField
+        children {
+          ...PreviewPetitionFieldBackgroundCheck_PetitionField
+        }
+      }
+      ...useFieldLogic_PetitionBase
+    }
+    ${useFieldLogic.fragments.PetitionBase}
+  `,
+};

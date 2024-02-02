@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
-import { findLast, isDefined, minBy } from "remeda";
+import { findLast, isDefined, minBy, pick } from "remeda";
 import {
   ContactLocaleValues,
   PetitionAttachment,
@@ -20,6 +20,7 @@ import {
   mapFieldLogicCondition,
   mapFieldMathOperation,
 } from "../../../util/fieldLogic";
+import { mapFieldOptions } from "../../../db/helpers/fieldOptions";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -409,7 +410,7 @@ export const PetitionFieldMini = objectType({
     });
     t.jsonObject("options", {
       description: "The options of the petition field.",
-      resolve: (o) => o.options,
+      resolve: (o) => mapFieldOptions(o.options),
     });
   },
 });
@@ -613,6 +614,7 @@ export const PetitionFieldType = enumType({
     { name: "ES_TAX_DOCUMENTS", description: "A tax documents/info field." },
     { name: "DOW_JONES_KYC", description: "A saerch in Dow Jones field." },
     { name: "FIELD_GROUP", description: "A group of fields" },
+    { name: "BACKGROUND_CHECK", description: "Run a background check of entities" },
   ],
 });
 
@@ -636,7 +638,7 @@ export const PetitionField = objectType({
     });
     t.jsonObject("options", {
       description: "The options of the petition field.",
-      resolve: (o) => o.options,
+      resolve: (o) => mapFieldOptions(o.options),
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
@@ -652,15 +654,17 @@ export const PetitionField = objectType({
     });
     t.boolean("isInternal", {
       description: "Determines if the field is visible by the recipients.",
-      resolve: (o) => o.is_internal,
+      resolve: (o) => ["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(o.type) || o.is_internal,
     });
     t.boolean("showInPdf", {
       description: "Determines if the field is visible in PDF export.",
-      resolve: (o) => o.type !== "DOW_JONES_KYC" && o.show_in_pdf,
+      resolve: (o) => !["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(o.type) && o.show_in_pdf,
     });
     t.boolean("showActivityInPdf", {
       description: "Determines if the field last activity is visible in PDF export.",
-      resolve: (o) => !["DOW_JONES_KYC", "FIELD_GROUP"].includes(o.type) && o.show_activity_in_pdf,
+      resolve: (o) =>
+        !["DOW_JONES_KYC", "BACKGROUND_CHECK", "FIELD_GROUP"].includes(o.type) &&
+        o.show_activity_in_pdf,
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
@@ -1074,6 +1078,21 @@ export const PetitionFieldReply = objectType({
                       { request: root.content.request, error: root.content.error }
                     : {}),
                 };
+        } else if (root.type === "BACKGROUND_CHECK") {
+          return {
+            query: isDefined(root.content.query)
+              ? pick(root.content.query, ["name", "date", "type"])
+              : null,
+            search: isDefined(root.content.search)
+              ? pick(root.content.search, ["totalCount"])
+              : null,
+            entity: isDefined(root.content.entity)
+              ? {
+                  ...pick(root.content.entity, ["id", "type", "name"]),
+                  properties: pick(root.content.entity.properties, ["topics"]),
+                }
+              : null,
+          };
         } else {
           return root.content ?? {};
         }

@@ -10,11 +10,18 @@
       },
       "args": {
         "fieldTitle": "Título del campo",
-        "fieldNumber": 1
+        "fieldNumber": 1,
+        "theme": {
+          "marginLeft": 25.4,
+          "marginRight": 25.4,
+          "marginTop": 25.4,
+          "marginBottom": 25.4
+        }
       },
       "argTypes": {
         "fieldTitle": { "control": { "type": "text" } },
-        "fieldNumber": { "control": { "type": "number" } }
+        "fieldNumber": { "control": { "type": "number" } },
+        "theme": { "control": { "type": "object" } }
       }
     }
   ]

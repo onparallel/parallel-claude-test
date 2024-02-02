@@ -3,13 +3,17 @@ import { IntlShape } from "react-intl";
 import { Readable } from "stream";
 import { ApiContext, WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
+import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheckReplyUrl";
 import { ZipFileInput } from "../../util/createZipFile";
 import { FORMATS } from "../../util/dates";
 import { Maybe, UnwrapArray } from "../../util/types";
 import { FieldCommentsExcelWorksheet } from "./FieldCommentsExcelWorksheet";
 import { TextRepliesExcelWorksheet } from "./TextRepliesExcelWorksheet";
 
-type ComposedPetitionField = Pick<PetitionField, "type" | "title" | "parent_petition_field_id"> & {
+type ComposedPetitionField = Pick<
+  PetitionField,
+  "id" | "petition_id" | "type" | "title" | "parent_petition_field_id"
+> & {
   replies: Pick<PetitionFieldReply, "content">[];
   group_name?: Maybe<string>;
   group_number?: number;
@@ -82,6 +86,12 @@ export class PetitionExcelExport {
     );
   }
 
+  private extractBackgroundCheckReply(field: ComposedPetitionField) {
+    return this.extractReplies(field, (r) =>
+      backgroundCheckFieldReplyUrl(this.context.config.misc.parallelUrl, this.locale, field, r),
+    );
+  }
+
   private extractReplies(
     field: ComposedPetitionField,
     contentMapper: (reply: UnwrapArray<ComposedPetitionField["replies"]>) => string,
@@ -132,6 +142,8 @@ export class PetitionExcelExport {
       return this.extractDateReply(field, FORMATS["L"]);
     } else if (field.type === "DATE_TIME") {
       return this.extractDateReply(field, FORMATS["L+LTS"]);
+    } else if (field.type === "BACKGROUND_CHECK") {
+      return this.extractBackgroundCheckReply(field);
     } else {
       throw new Error(`Can't extract replies on field type ${field.type}`);
     }

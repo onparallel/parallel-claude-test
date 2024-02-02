@@ -13,11 +13,23 @@ export interface IntegrationSwitchCardProps {
   isDisabled?: boolean;
   disabledMessage?: ReactNode;
   onChange?: (isChecked: boolean) => void;
+  switchButton?: ReactNode;
 }
 
 export const IntegrationSwitchCard = chakraForwardRef<"div", IntegrationSwitchCardProps>(
   function IntegrationSwitchCard(
-    { logo, title, body, badge, isDisabled, isChecked, disabledMessage, onChange, ...props },
+    {
+      logo,
+      title,
+      body,
+      badge,
+      isDisabled,
+      isChecked,
+      disabledMessage,
+      onChange,
+      switchButton,
+      ...props
+    },
     ref,
   ) {
     return (
@@ -41,11 +53,15 @@ export const IntegrationSwitchCard = chakraForwardRef<"div", IntegrationSwitchCa
               </Stack>
             </Stack>
             <Center>
-              <Switch
-                isChecked={isChecked}
-                isDisabled={isDisabled}
-                onChange={(event) => onChange?.(event.target.checked)}
-              />
+              {switchButton ? (
+                switchButton
+              ) : (
+                <Switch
+                  isChecked={isChecked}
+                  isDisabled={isDisabled}
+                  onChange={(event) => onChange?.(event.target.checked)}
+                />
+              )}
             </Center>
           </HStack>
         </Card>

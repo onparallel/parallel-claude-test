@@ -1,6 +1,10 @@
 import { createContainer } from "../src/container";
 import { ANALYTICS, IAnalyticsService } from "../src/services/AnalyticsService";
 import { AUTH, IAuth } from "../src/services/AuthService";
+import {
+  BACKGROUND_CHECK_SERVICE,
+  IBackgroundCheckService,
+} from "../src/services/BackgroundCheckService";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "../src/services/DowJonesClient";
 import { EMAILS, IEmailsService } from "../src/services/EmailsService";
 import { FETCH_SERVICE, IFetchService } from "../src/services/FetchService";
@@ -11,6 +15,7 @@ import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService
 import {
   MockAnalyticsService,
   MockAuth,
+  MockBackgroundCheckService,
   MockDowJonesClient,
   MockEmailsService,
   MockFetchService,
@@ -30,5 +35,9 @@ export function createTestContainer() {
   container.rebind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
   container.rebind<IStorageService>(STORAGE_SERVICE).to(MockStorage);
   container.rebind<IDowJonesClient>(DOW_JONES_CLIENT).to(MockDowJonesClient);
+  container
+    .rebind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
+    .to(MockBackgroundCheckService)
+    .inSingletonScope();
   return container;
 }

@@ -117,6 +117,128 @@ export type AsyncFieldCompletionResponse = {
   url: Scalars["String"]["output"];
 };
 
+export type BackgroundCheckEntityDetails = {
+  createdAt: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntityDetailsCompany = BackgroundCheckEntityDetails & {
+  createdAt: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  properties: BackgroundCheckEntityDetailsCompanyProperties;
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntityDetailsCompanyProperties = {
+  address: Maybe<Array<Scalars["String"]["output"]>>;
+  alias: Maybe<Array<Scalars["String"]["output"]>>;
+  dateOfRegistration: Maybe<Array<Scalars["String"]["output"]>>;
+  jurisdiction: Maybe<Array<Scalars["String"]["output"]>>;
+  name: Maybe<Array<Scalars["String"]["output"]>>;
+  relationships: Maybe<Array<BackgroundCheckEntityDetailsRelationship>>;
+  sanctions: Maybe<Array<BackgroundCheckEntityDetailsSanction>>;
+  topics: Maybe<Array<Scalars["String"]["output"]>>;
+};
+
+export type BackgroundCheckEntityDetailsPerson = BackgroundCheckEntityDetails & {
+  createdAt: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  properties: BackgroundCheckEntityDetailsPersonProperties;
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntityDetailsPersonProperties = {
+  alias: Maybe<Array<Scalars["String"]["output"]>>;
+  birthPlace: Maybe<Array<Scalars["String"]["output"]>>;
+  country: Maybe<Array<Scalars["String"]["output"]>>;
+  countryOfBirth: Maybe<Array<Scalars["String"]["output"]>>;
+  dateOfBirth: Maybe<Array<Scalars["String"]["output"]>>;
+  education: Maybe<Array<Scalars["String"]["output"]>>;
+  ethnicity: Maybe<Array<Scalars["String"]["output"]>>;
+  gender: Maybe<Array<Scalars["String"]["output"]>>;
+  name: Maybe<Array<Scalars["String"]["output"]>>;
+  nationality: Maybe<Array<Scalars["String"]["output"]>>;
+  position: Maybe<Array<Scalars["String"]["output"]>>;
+  relationships: Maybe<Array<BackgroundCheckEntityDetailsRelationship>>;
+  religion: Maybe<Array<Scalars["String"]["output"]>>;
+  sanctions: Maybe<Array<BackgroundCheckEntityDetailsSanction>>;
+  status: Maybe<Array<Scalars["String"]["output"]>>;
+  topics: Maybe<Array<Scalars["String"]["output"]>>;
+};
+
+export type BackgroundCheckEntityDetailsRelationship = {
+  id: Scalars["String"]["output"];
+  properties: BackgroundCheckEntityDetailsRelationshipProperties;
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntityDetailsRelationshipProperties = {
+  endDate: Maybe<Array<Scalars["String"]["output"]>>;
+  entityA: Maybe<BackgroundCheckEntityDetails>;
+  entityB: Maybe<BackgroundCheckEntityDetails>;
+  relationship: Maybe<Array<Scalars["String"]["output"]>>;
+  startDate: Maybe<Array<Scalars["String"]["output"]>>;
+};
+
+export type BackgroundCheckEntityDetailsSanction = {
+  id: Scalars["String"]["output"];
+  properties: BackgroundCheckEntityDetailsSanctionProperties;
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntityDetailsSanctionProperties = {
+  authority: Maybe<Array<Scalars["String"]["output"]>>;
+  endDate: Maybe<Array<Scalars["String"]["output"]>>;
+  program: Maybe<Array<Scalars["String"]["output"]>>;
+  sourceUrl: Maybe<Array<Scalars["String"]["output"]>>;
+  startDate: Maybe<Array<Scalars["String"]["output"]>>;
+};
+
+export type BackgroundCheckEntitySearch = {
+  createdAt: Scalars["DateTime"]["output"];
+  items: Array<BackgroundCheckEntitySearchSchema>;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type BackgroundCheckEntitySearchCompany = BackgroundCheckEntitySearchSchema & {
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  properties: BackgroundCheckEntitySearchCompanyProperties;
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntitySearchCompanyProperties = {
+  incorporationDate: Maybe<Array<Scalars["String"]["output"]>>;
+  jurisdiction: Maybe<Array<Scalars["String"]["output"]>>;
+  topics: Maybe<Array<Scalars["String"]["output"]>>;
+};
+
+export type BackgroundCheckEntitySearchPerson = BackgroundCheckEntitySearchSchema & {
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  properties: BackgroundCheckEntitySearchPersonProperties;
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntitySearchPersonProperties = {
+  birthDate: Maybe<Array<Scalars["String"]["output"]>>;
+  country: Maybe<Array<Scalars["String"]["output"]>>;
+  gender: Maybe<Array<Scalars["String"]["output"]>>;
+  topics: Maybe<Array<Scalars["String"]["output"]>>;
+};
+
+export type BackgroundCheckEntitySearchSchema = {
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntitySearchType = "COMPANY" | "PERSON";
+
 export type BulkCreateContactsReturnType = {
   contacts: Array<Contact>;
   errors: Maybe<Array<Scalars["JSON"]["output"]>>;
@@ -367,6 +489,7 @@ export type EventSubscriptionSignatureKey = {
 
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
+  | "BACKGROUND_CHECK"
   | "BULK_PETITION_SEND_TASK"
   | "CLIENT_PORTAL"
   | "CUSTOM_HOST_UI"
@@ -652,13 +775,17 @@ export type Mutation = {
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
+  createBackgroundCheckProfilePdfTask: Task;
   /** Creates a Task for creating, prefilling and sending petitions from a templateId */
   createBulkPetitionSendTask: Task;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
-  /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
+  /**
+   * Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document
+   * @deprecated use BACKGROUND_CHECK field
+   */
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
@@ -922,6 +1049,7 @@ export type Mutation = {
   unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
+  updateBackgroundCheckEntity: Success;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates an existing event subscription for the user's petitions */
@@ -960,6 +1088,8 @@ export type Mutation = {
   updatePetitionAttachmentType: PetitionAttachment;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
+  /** Updates the auto search config of a BACKGROUND_CHECK petition field. */
+  updatePetitionFieldAutoSearchConfig: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
   /** Updates multiple replies for a petition at once */
@@ -1139,6 +1269,11 @@ export type MutationcreateAzureOpenAiIntegrationArgs = {
   apiKey: Scalars["String"]["input"];
   endpoint: Scalars["String"]["input"];
   orgId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateBackgroundCheckProfilePdfTaskArgs = {
+  entityId: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
 };
 
 export type MutationcreateBulkPetitionSendTaskArgs = {
@@ -1943,6 +2078,11 @@ export type MutationuntagPetitionArgs = {
   tagId: Scalars["GID"]["input"];
 };
 
+export type MutationupdateBackgroundCheckEntityArgs = {
+  entityId?: InputMaybe<Scalars["String"]["input"]>;
+  token: Scalars["String"]["input"];
+};
+
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
   id: Scalars["GID"]["input"];
@@ -2054,6 +2194,12 @@ export type MutationupdatePetitionFieldArgs = {
   data: UpdatePetitionFieldInput;
   fieldId: Scalars["GID"]["input"];
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationupdatePetitionFieldAutoSearchConfigArgs = {
+  config?: InputMaybe<UpdatePetitionFieldAutoSearchConfigInput>;
+  fieldId: Scalars["GID"]["input"];
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -3088,6 +3234,8 @@ export type PetitionFieldReplyStatus =
 
 /** Type of a petition field */
 export type PetitionFieldType =
+  /** Run a background check of entities */
+  | "BACKGROUND_CHECK"
   /** A options list. */
   | "CHECKBOX"
   /** A datepicker field. */
@@ -4273,6 +4421,8 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 export type Query = {
   access: PublicPetitionAccess;
   accesses: PublicPetitionAccessPagination;
+  backgroundCheckEntityDetails: BackgroundCheckEntityDetails;
+  backgroundCheckEntitySearch: BackgroundCheckEntitySearch;
   contact: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
@@ -4353,6 +4503,18 @@ export type QueryaccessesArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   status?: InputMaybe<Array<PetitionStatus>>;
+};
+
+export type QuerybackgroundCheckEntityDetailsArgs = {
+  entityId: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+};
+
+export type QuerybackgroundCheckEntitySearchArgs = {
+  date?: InputMaybe<Scalars["Date"]["input"]>;
+  name: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+  type?: InputMaybe<BackgroundCheckEntitySearchType>;
 };
 
 export type QuerycontactArgs = {
@@ -4949,6 +5111,7 @@ export type Task = {
 };
 
 export type TaskName =
+  | "BACKGROUND_CHECK_PROFILE_PDF"
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
   | "DOW_JONES_PROFILE_DOWNLOAD"
@@ -5033,6 +5196,12 @@ export type Tone = "FORMAL" | "INFORMAL";
 export type UpdateContactInput = {
   firstName?: InputMaybe<Scalars["String"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UpdatePetitionFieldAutoSearchConfigInput = {
+  date?: InputMaybe<Scalars["GID"]["input"]>;
+  name: Array<Scalars["GID"]["input"]>;
+  type?: InputMaybe<BackgroundCheckEntitySearchType>;
 };
 
 export type UpdatePetitionFieldInput = {

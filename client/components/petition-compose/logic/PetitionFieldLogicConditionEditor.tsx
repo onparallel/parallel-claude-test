@@ -422,7 +422,8 @@ function ConditionPredicate({
         } else if (
           isDefined(referencedField) &&
           !isFileTypeField(referencedField.type) &&
-          referencedField.type !== "DYNAMIC_SELECT"
+          referencedField.type !== "DYNAMIC_SELECT" &&
+          referencedField.type !== "BACKGROUND_CHECK"
         ) {
           options.push(
             {

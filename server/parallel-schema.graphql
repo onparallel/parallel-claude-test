@@ -93,6 +93,131 @@ type AsyncFieldCompletionResponse {
   url: String!
 }
 
+interface BackgroundCheckEntityDetails {
+  createdAt: DateTime
+  id: String!
+  name: String!
+  type: String!
+}
+
+type BackgroundCheckEntityDetailsCompany implements BackgroundCheckEntityDetails {
+  createdAt: DateTime
+  id: String!
+  name: String!
+  properties: BackgroundCheckEntityDetailsCompanyProperties!
+  type: String!
+}
+
+type BackgroundCheckEntityDetailsCompanyProperties {
+  address: [String!]
+  alias: [String!]
+  dateOfRegistration: [String!]
+  jurisdiction: [String!]
+  name: [String!]
+  relationships: [BackgroundCheckEntityDetailsRelationship!]
+  sanctions: [BackgroundCheckEntityDetailsSanction!]
+  topics: [String!]
+}
+
+type BackgroundCheckEntityDetailsPerson implements BackgroundCheckEntityDetails {
+  createdAt: DateTime
+  id: String!
+  name: String!
+  properties: BackgroundCheckEntityDetailsPersonProperties!
+  type: String!
+}
+
+type BackgroundCheckEntityDetailsPersonProperties {
+  alias: [String!]
+  birthPlace: [String!]
+  country: [String!]
+  countryOfBirth: [String!]
+  dateOfBirth: [String!]
+  education: [String!]
+  ethnicity: [String!]
+  gender: [String!]
+  name: [String!]
+  nationality: [String!]
+  position: [String!]
+  relationships: [BackgroundCheckEntityDetailsRelationship!]
+  religion: [String!]
+  sanctions: [BackgroundCheckEntityDetailsSanction!]
+  status: [String!]
+  topics: [String!]
+}
+
+type BackgroundCheckEntityDetailsRelationship {
+  id: String!
+  properties: BackgroundCheckEntityDetailsRelationshipProperties!
+  type: String!
+}
+
+type BackgroundCheckEntityDetailsRelationshipProperties {
+  endDate: [String!]
+  entityA: BackgroundCheckEntityDetails
+  entityB: BackgroundCheckEntityDetails
+  relationship: [String!]
+  startDate: [String!]
+}
+
+type BackgroundCheckEntityDetailsSanction {
+  id: String!
+  properties: BackgroundCheckEntityDetailsSanctionProperties!
+  type: String!
+}
+
+type BackgroundCheckEntityDetailsSanctionProperties {
+  authority: [String!]
+  endDate: [String!]
+  program: [String!]
+  sourceUrl: [String!]
+  startDate: [String!]
+}
+
+type BackgroundCheckEntitySearch {
+  createdAt: DateTime!
+  items: [BackgroundCheckEntitySearchSchema!]!
+  totalCount: Int!
+}
+
+type BackgroundCheckEntitySearchCompany implements BackgroundCheckEntitySearchSchema {
+  id: String!
+  name: String!
+  properties: BackgroundCheckEntitySearchCompanyProperties!
+  type: String!
+}
+
+type BackgroundCheckEntitySearchCompanyProperties {
+  incorporationDate: [String!]
+  jurisdiction: [String!]
+  topics: [String!]
+}
+
+type BackgroundCheckEntitySearchPerson implements BackgroundCheckEntitySearchSchema {
+  id: String!
+  name: String!
+  properties: BackgroundCheckEntitySearchPersonProperties!
+  type: String!
+}
+
+type BackgroundCheckEntitySearchPersonProperties {
+  birthDate: [String!]
+  country: [String!]
+  gender: [String!]
+  topics: [String!]
+}
+
+interface BackgroundCheckEntitySearchSchema {
+  id: String!
+  name: String!
+  type: String!
+}
+
+enum BackgroundCheckEntitySearchType {
+  COMPANY
+  PERSON
+}
+
 type BulkCreateContactsReturnType {
   contacts: [Contact!]!
   errors: [JSON!]
@@ -418,6 +543,7 @@ type EventSubscriptionSignatureKey {
 
 enum FeatureFlag {
   AUTO_ANONYMIZE
+  BACKGROUND_CHECK
   BULK_PETITION_SEND_TASK
   CLIENT_PORTAL
   CUSTOM_HOST_UI
@@ -860,6 +986,7 @@ type Mutation {
     endpoint: String!
     orgId: GID!
   ): SupportMethodResponse!
+  createBackgroundCheckProfilePdfTask(entityId: String!, token: String!): Task!
 
   """
   Creates a Task for creating, prefilling and sending petitions from a templateId
@@ -895,7 +1022,7 @@ type Mutation {
     parentReplyId: GID
     petitionId: GID!
     profileId: ID!
-  ): PetitionFieldReply!
+  ): PetitionFieldReply! @deprecated(reason: "use BACKGROUND_CHECK field")
 
   """
   Creates a task for downloading a PDF file with the profile of an entity in DowJones
@@ -1986,6 +2113,7 @@ type Mutation {
   Removes the given tag from the given petition
   """
   untagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
+  updateBackgroundCheckEntity(entityId: String, token: String!): Success!
 
   """
   Updates a contact.
@@ -2178,6 +2306,15 @@ type Mutation {
     data: UpdatePetitionFieldInput!
     fieldId: GID!
     force: Boolean = false
+    petitionId: GID!
+  ): PetitionField!
+
+  """
+  Updates the auto search config of a BACKGROUND_CHECK petition field.
+  """
+  updatePetitionFieldAutoSearchConfig(
+    config: UpdatePetitionFieldAutoSearchConfigInput
+    fieldId: GID!
     petitionId: GID!
   ): PetitionField!
 
@@ -3825,6 +3962,11 @@ enum PetitionFieldReplyStatus {
 Type of a petition field
 """
 enum PetitionFieldType {
+  """
+  Run a background check of entities
+  """
+  BACKGROUND_CHECK
+
   """
   A options list.
   """
@@ -5741,6 +5883,20 @@ type Query {
     search: String
     status: [PetitionStatus!]
   ): PublicPetitionAccessPagination!
+  backgroundCheckEntityDetails(entityId: String!, token: String!): BackgroundCheckEntityDetails!
+  backgroundCheckEntitySearch(
+    """
+    Date of birth if entity is a Person, or date of registration if entity is a Company
+    """
+    date: Date
+
+    """
+    Name of the entity
+    """
+    name: String!
+    token: String!
+    type: BackgroundCheckEntitySearchType
+  ): BackgroundCheckEntitySearch!
   contact(id: GID!): Contact
 
   """
@@ -6637,6 +6793,7 @@ type Task {
 }
 
 enum TaskName {
+  BACKGROUND_CHECK_PROFILE_PDF
   BANKFLIP_SESSION_COMPLETED
   BULK_PETITION_SEND
   DOW_JONES_PROFILE_DOWNLOAD
@@ -6778,6 +6935,12 @@ enum Tone {
 input UpdateContactInput {
   firstName: String
   lastName: String
+}
+
+input UpdatePetitionFieldAutoSearchConfigInput {
+  date: GID
+  name: [GID!]!
+  type: BackgroundCheckEntitySearchType
 }
 
 input UpdatePetitionFieldInput {

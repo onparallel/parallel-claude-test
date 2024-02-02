@@ -291,3 +291,50 @@ export function fieldIsNotBeingUsedInMathOperation<
     return true;
   };
 }
+
+export function fieldIsNotBeingUsedInAutoSearchConfig<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  petitionIdArg: TArgPetitionId,
+  fieldIdArg: TArgFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const fieldIds = unMaybeArray(args[fieldIdArg] as unknown as MaybeArray<number>);
+
+    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
+
+    for (const fieldId of fieldIds) {
+      const field = petitionFields.find((f) => f.id === fieldId);
+      if (!field) {
+        continue;
+      }
+
+      if (field.type === "SHORT_TEXT" || field.type === "DATE") {
+        if (
+          petitionFields.some(
+            (f) =>
+              f.type === "BACKGROUND_CHECK" &&
+              isDefined(f.options.autoSearchConfig) &&
+              ((f.options.autoSearchConfig.name as number[]).includes(field.id) ||
+                (f.options.autoSearchConfig.date as number | null) === field.id),
+          )
+        ) {
+          throw new ApolloError(
+            `PetitionField ${toGlobalId(
+              "PetitionField",
+              fieldId,
+            )} is being referenced on an autoSearchConfig`,
+            "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+            { fieldId: toGlobalId("PetitionField", fieldId) },
+          );
+        }
+      }
+    }
+
+    return true;
+  };
+}

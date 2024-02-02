@@ -10,6 +10,7 @@ import { UserOrContactReference } from "../../UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
+import { isDefined } from "remeda";
 
 export interface TimelineReplyUpdatedEventProps {
   event: TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
@@ -22,42 +23,90 @@ export function TimelineReplyUpdatedEvent({
 }: TimelineReplyUpdatedEventProps) {
   const isChildren = field?.parent?.id !== undefined;
 
+  let message = isChildren ? (
+    <FormattedMessage
+      id="component.timeline-reply-updated-event.description-children-of-group"
+      defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
+      values={{
+        userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+        updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+        field: <PetitionFieldReference field={field} />,
+        parentField: <PetitionFieldReference field={field.parent!} />,
+        timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+      }}
+    />
+  ) : (
+    <FormattedMessage
+      id="component.timeline-reply-updated-event.description"
+      defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+      values={{
+        userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+        updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+        field: <PetitionFieldReference field={field} />,
+        timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+      }}
+    />
+  );
+
+  if (field?.type === "BACKGROUND_CHECK") {
+    message = isChildren ? (
+      isDefined(reply?.content?.entity) ? (
+        <FormattedMessage
+          id="component.timeline-reply-updated-event.description-background-check-entity-children-of-group"
+          defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} from a group of {parentField} {timeAgo}"
+          values={{
+            userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+            updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+            field: <PetitionFieldReference field={field} />,
+            parentField: <PetitionFieldReference field={field.parent!} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="component.timeline-reply-updated-event.description-background-check-search-children-of-group"
+          defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} from a group of {parentField} {timeAgo}"
+          values={{
+            userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+            updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+            field: <PetitionFieldReference field={field} />,
+            parentField: <PetitionFieldReference field={field.parent!} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      )
+    ) : isDefined(reply?.content?.entity) ? (
+      <FormattedMessage
+        id="component.timeline-reply-updated-event.description-background-check-entity"
+        defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated an entity in the field {field} {timeAgo}"
+        values={{
+          userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+          updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+          field: <PetitionFieldReference field={field} />,
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+        }}
+      />
+    ) : (
+      <FormattedMessage
+        id="component.timeline-reply-updated-event.description-background-check-search"
+        defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated the search criteria in the field {field} {timeAgo}"
+        values={{
+          userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+          updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+          field: <PetitionFieldReference field={field} />,
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+        }}
+      />
+    );
+  }
+
   return (
     <TimelineItem
       icon={<TimelineIcon icon={PlusCircleIcon} color="gray.600" size="18px" />}
       paddingY={2}
     >
       <HStack spacing={2}>
-        <Text>
-          {isChildren ? (
-            <FormattedMessage
-              id="component.timeline-reply-updated-event.description-children-of-group"
-              defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} from a group of {parentField} {timeAgo}"
-              values={{
-                userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-                updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
-                field: <PetitionFieldReference field={field} />,
-                parentField: <PetitionFieldReference field={field.parent!} />,
-                timeAgo: (
-                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-                ),
-              }}
-            />
-          ) : (
-            <FormattedMessage
-              id="component.timeline-reply-updated-event.description"
-              defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
-              values={{
-                userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
-                updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
-                field: <PetitionFieldReference field={field} />,
-                timeAgo: (
-                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-                ),
-              }}
-            />
-          )}
-        </Text>
+        <Text>{message}</Text>
         <TimelineSeeReplyButton field={field} replyId={reply?.id} />
       </HStack>
     </TimelineItem>
@@ -80,6 +129,7 @@ TimelineReplyUpdatedEvent.fragments = {
         ...UserOrContactReference_UserOrPetitionAccess
       }
       reply {
+        content
         ...TimelineSeeReplyButton_PetitionFieldReply
       }
       createdAt

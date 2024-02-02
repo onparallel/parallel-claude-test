@@ -2,6 +2,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { isDefined } from "remeda";
 import { CreatePetitionField, PetitionField, PetitionFieldType } from "../__types";
+import { toGlobalId } from "../../util/globalId";
 
 const SCHEMAS = {
   NUMBER: {
@@ -257,6 +258,35 @@ const SCHEMAS = {
     additionalProperties: false,
     properties: {},
   },
+  BACKGROUND_CHECK: {
+    type: "object",
+    additionalProperties: false,
+    required: [],
+    properties: {
+      integrationId: {
+        type: ["number", "null"],
+      },
+      autoSearchConfig: {
+        type: ["object", "null"],
+        additionalProperties: false,
+        required: ["type", "name", "date"],
+        properties: {
+          type: {
+            type: ["string", "null"],
+            enum: ["PERSON", "COMPANY", null],
+          },
+          name: {
+            type: ["array"],
+            items: {
+              type: "number",
+            },
+            minItems: 1,
+          },
+          date: { type: ["number", "null"] },
+        },
+      },
+    },
+  },
   FIELD_GROUP: {
     type: "object",
     additionalProperties: false,
@@ -300,13 +330,15 @@ export function defaultFieldProperties(
         ? false
         : type === "HEADING" // HEADING always false
           ? false
-          : type === "DOW_JONES_KYC" // DOW_JONES_KYC always true
-            ? true
-            : type === "FIELD_GROUP" // FIELD_GROUP always true
+          : type === "BACKGROUND_CHECK" // BACKGROUND_CHECK always false
+            ? false
+            : type === "DOW_JONES_KYC" // DOW_JONES_KYC always true
               ? true
-              : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
-                ? false
-                : field?.multiple ?? false;
+              : type === "FIELD_GROUP" // FIELD_GROUP always true
+                ? true
+                : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
+                  ? false
+                  : field?.multiple ?? false;
 
   const alias = type === "HEADING" ? null : field?.alias ?? null;
 
@@ -344,6 +376,12 @@ export function defaultFieldProperties(
               ? field.options.maxLength
               : null,
           format: null,
+        };
+      }
+      case "BACKGROUND_CHECK": {
+        return {
+          integrationId: null,
+          autoSearchConfig: null,
         };
       }
       case "DOW_JONES_KYC":
@@ -434,8 +472,10 @@ export function defaultFieldProperties(
   return {
     optional,
     multiple,
-    is_internal: type === "DOW_JONES_KYC" ? true : field?.is_internal ?? false,
-    show_in_pdf: type === "DOW_JONES_KYC" ? false : field?.show_in_pdf ?? true,
+    is_internal:
+      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK" ? true : field?.is_internal ?? false,
+    show_in_pdf:
+      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK" ? false : field?.show_in_pdf ?? true,
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,
     require_approval:
@@ -448,4 +488,23 @@ export function defaultFieldProperties(
 
 function hasPlaceholder(type: PetitionFieldType) {
   return ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "PHONE"].includes(type);
+}
+
+export function mapFieldOptions(options: any) {
+  return {
+    ...options,
+    ...(options.autoSearchConfig
+      ? {
+          autoSearchConfig: {
+            type: options.autoSearchConfig.type,
+            name: options.autoSearchConfig.name.map((id: number) =>
+              toGlobalId("PetitionField", id),
+            ),
+            date: isDefined(options.autoSearchConfig.date)
+              ? toGlobalId("PetitionField", options.autoSearchConfig.date)
+              : null,
+          },
+        }
+      : {}),
+  };
 }

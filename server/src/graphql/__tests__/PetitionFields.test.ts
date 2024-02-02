@@ -1091,6 +1091,77 @@ describe("GraphQL/Petition Fields", () => {
         ],
       });
     });
+
+    it("updates the ids of the autoSearch fields when cloning a FIELD_GROUP with BACKGROUND_CHECK child and autoSearchConfig", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+      }));
+      const [name, date, backgroundCheck] = await mocks.createRandomPetitionFields(
+        petition.id,
+        3,
+        (i) => ({
+          type: ["SHORT_TEXT", "DATE", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+          parent_petition_field_id: fieldGroup.id,
+        }),
+      );
+
+      await mocks.knex
+        .from("petition_field")
+        .where("id", backgroundCheck.id)
+        .update({
+          options: JSON.stringify({
+            autoSearchConfig: { name: [name.id], date: date.id, type: null },
+          }),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              type
+              children {
+                id
+                type
+                options
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", fieldGroup.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitionField).toEqual({
+        type: "FIELD_GROUP",
+        children: [
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            options: expect.any(Object),
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            options: expect.any(Object),
+          },
+          {
+            id: expect.any(String),
+            type: "BACKGROUND_CHECK",
+            options: {
+              autoSearchConfig: {
+                type: null,
+                name: [data.clonePetitionField.children[0].id],
+                date: data.clonePetitionField.children[1].id,
+              },
+            },
+          },
+        ],
+      });
+    });
   });
 
   describe("deletePetitionField", () => {
@@ -3997,6 +4068,38 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("ALIAS_ALREADY_EXISTS");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to update BACKGROUND_CHECK isInternal or showInPdf property", async () => {
+      const [backgroundCheck] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "BACKGROUND_CHECK",
+        is_internal: true,
+      }));
+
+      for (const inputData of [
+        { isInternal: true },
+        { isInternal: false },
+        { showInPdf: true },
+        { showInPdf: false },
+      ]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", userPetition.id),
+            fieldId: toGlobalId("PetitionField", backgroundCheck.id),
+            data: inputData,
+          },
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      }
+    });
   });
 
   describe("changePetitionFieldType", () => {
@@ -4839,7 +4942,7 @@ describe("GraphQL/Petition Fields", () => {
         )
         .select("*");
 
-      expect(field0UpdatedReplies).toMatchObject([
+      expect(field0UpdatedReplies.map(pick(["id", "status"]))).toIncludeSameMembers([
         { id: field0Replies[0].id, status: "APPROVED" },
         { id: field0Replies[1].id, status: "APPROVED" },
       ]);

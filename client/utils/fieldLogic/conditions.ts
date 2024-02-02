@@ -16,7 +16,8 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
   const isOnlyHasReplies =
     isFileTypeField(field.type) ||
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
-    field.type === "FIELD_GROUP";
+    field.type === "FIELD_GROUP" ||
+    field.type === "BACKGROUND_CHECK";
 
   return {
     fieldId: field.id,
@@ -39,7 +40,11 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
 export function defaultFieldConditionValue<
   T extends Pick<PetitionField, "id" | "type" | "options">,
 >(field: T, column?: number): number | string | null {
-  if (isFileTypeField(field.type) || (field.type === "DYNAMIC_SELECT" && column === undefined)) {
+  if (
+    isFileTypeField(field.type) ||
+    (field.type === "DYNAMIC_SELECT" && column === undefined) ||
+    field.type === "BACKGROUND_CHECK"
+  ) {
     return 0;
   } else if (field.type === "SELECT") {
     return (field.options as FieldOptions["SELECT"]).values[0] ?? null;

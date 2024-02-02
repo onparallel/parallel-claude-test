@@ -14,6 +14,7 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { renderSlateWithMentionsToHtml } from "../../util/slate/mentions";
 import { renderSlateWithPlaceholdersToHtml } from "../../util/slate/placeholders";
+import { mapFieldOptions } from "../../db/helpers/fieldOptions";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -361,7 +362,7 @@ export const PublicPetitionField = objectType({
     });
     t.jsonObject("options", {
       description: "The options of the petition field.",
-      resolve: (o) => o.options,
+      resolve: (o) => mapFieldOptions(o.options),
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
@@ -610,6 +611,9 @@ export const PublicPetitionFieldReply = objectType({
                       { request: root.content.request, error: root.content.error }
                     : {}),
                 };
+        } else if (root.type === "BACKGROUND_CHECK") {
+          // make sure to not expose this field in public context
+          return {};
         } else {
           return root.content ?? {};
         }

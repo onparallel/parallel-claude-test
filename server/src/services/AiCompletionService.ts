@@ -3,7 +3,7 @@ import { Container, inject, injectable } from "inversify";
 import { pick } from "remeda";
 import { AiCompletionLog, AiCompletionLogType } from "../db/__types";
 import {
-  IntegrationProviders,
+  IntegrationProvider,
   IntegrationRepository,
 } from "../db/repositories/IntegrationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
@@ -16,7 +16,7 @@ import {
 
 export const AI_COMPLETION_SERVICE = Symbol.for("AI_COMPLETION_SERVICE");
 
-type AiCompletionProvider = IntegrationProviders["AI_COMPLETION"];
+type AiCompletionProvider = IntegrationProvider<"AI_COMPLETION">;
 
 interface AiCompletionConfig {
   integration_id: number;
@@ -48,7 +48,7 @@ export class AiCompletionService implements IAiCompletionService {
 
   public async processAiCompletion(config: AiCompletionConfig, createdBy: string) {
     const integration = (await this.integrations.loadIntegration(config.integration_id))!;
-    const provider = integration.provider as IntegrationProviders["AI_COMPLETION"];
+    const provider = integration.provider as IntegrationProvider<"AI_COMPLETION">;
     const client = this.getClient({ id: integration.id, provider });
     const params = client.buildRequestParams(config.model, config.prompt);
 

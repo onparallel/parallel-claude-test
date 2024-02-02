@@ -27,6 +27,7 @@ import {
   PreviewPetitionFieldGroup_PetitionBaseFragment,
   PreviewPetitionFieldGroup_PetitionFieldDataFragment,
   PreviewPetitionFieldGroup_PetitionFieldFragment,
+  PreviewPetitionFieldGroup_UserFragment,
 } from "@parallel/graphql/__types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
@@ -35,12 +36,14 @@ import { zip } from "remeda";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
 
 export interface PreviewPetitionFieldGroupProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
     "children" | "showAddNewReply" | "onAddNewReply" | "field"
   > {
+  user: PreviewPetitionFieldGroup_UserFragment;
   field: PreviewPetitionFieldGroup_PetitionFieldFragment;
   isDisabled: boolean;
   isCacheOnly: boolean;
@@ -75,6 +78,7 @@ export interface PreviewPetitionFieldGroupProps
 }
 
 export function PreviewPetitionFieldGroup({
+  user,
   field,
   petition,
   isDisabled,
@@ -138,6 +142,7 @@ export function PreviewPetitionFieldGroup({
                 return (
                   <LiquidPetitionVariableProvider key={field.id} logic={logic}>
                     <PreviewPetitionFieldGroupField
+                      user={user}
                       parentReplyId={group.id}
                       field={{ ...field, replies }}
                       petition={petition}
@@ -205,6 +210,7 @@ export function PreviewPetitionFieldGroup({
 
 function PreviewPetitionFieldGroupField(props: {
   parentReplyId: string;
+  user: PreviewPetitionFieldGroup_UserFragment;
   field: PreviewPetitionFieldGroup_PetitionFieldDataFragment;
   petition: PreviewPetitionFieldGroup_PetitionBaseFragment;
   isInvalid: boolean;
@@ -240,6 +246,7 @@ function PreviewPetitionFieldGroupField(props: {
   const {
     parentReplyId,
     field,
+    user,
     onDownloadFileUploadReply,
     onCreateFileReply,
     onStartAsyncFieldCompletion,
@@ -318,17 +325,33 @@ function PreviewPetitionFieldGroupField(props: {
           onRefreshField={onRefreshField}
           isCacheOnly={isCacheOnly}
         />
+      ) : field.type === "BACKGROUND_CHECK" ? (
+        <PreviewPetitionFieldBackgroundCheck
+          {...commonProps}
+          user={user}
+          petition={petition}
+          onRefreshField={onRefreshField}
+          isCacheOnly={isCacheOnly}
+        />
       ) : null}
     </Box>
   );
 }
 
 PreviewPetitionFieldGroup.fragments = {
+  User: gql`
+    fragment PreviewPetitionFieldGroup_User on User {
+      ...PreviewPetitionFieldBackgroundCheck_User
+    }
+    ${PreviewPetitionFieldBackgroundCheck.fragments.User}
+  `,
   PetitionBase: gql`
     fragment PreviewPetitionFieldGroup_PetitionBase on PetitionBase {
+      ...PreviewPetitionFieldBackgroundCheck_PetitionBase
       ...PreviewPetitionFieldKyc_PetitionBase
       ...usePetitionCanFinalize_PetitionBase
     }
+    ${PreviewPetitionFieldBackgroundCheck.fragments.PetitionBase}
     ${PreviewPetitionFieldKyc.fragments.PetitionBase}
     ${usePetitionCanFinalize.fragments.PetitionBase}
   `,

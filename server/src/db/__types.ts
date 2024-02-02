@@ -53,7 +53,8 @@ export type FeatureFlagName =
   | "PETITION_SUMMARY"
   | "RECIPIENT_LANG_CA"
   | "RECIPIENT_LANG_IT"
-  | "RECIPIENT_LANG_PT";
+  | "RECIPIENT_LANG_PT"
+  | "BACKGROUND_CHECK";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -84,6 +85,7 @@ export const FeatureFlagNameValues = [
   "RECIPIENT_LANG_CA",
   "RECIPIENT_LANG_IT",
   "RECIPIENT_LANG_PT",
+  "BACKGROUND_CHECK",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -257,7 +259,8 @@ export type PetitionFieldType =
   | "ES_TAX_DOCUMENTS"
   | "DOW_JONES_KYC"
   | "DATE_TIME"
-  | "FIELD_GROUP";
+  | "FIELD_GROUP"
+  | "BACKGROUND_CHECK";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -274,6 +277,7 @@ export const PetitionFieldTypeValues = [
   "DOW_JONES_KYC",
   "DATE_TIME",
   "FIELD_GROUP",
+  "BACKGROUND_CHECK",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
@@ -444,7 +448,8 @@ export type TaskName =
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
   | "TEMPLATE_REPLIES_CSV_EXPORT"
-  | "PETITION_SUMMARY";
+  | "PETITION_SUMMARY"
+  | "BACKGROUND_CHECK_PROFILE_PDF";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -458,6 +463,7 @@ export const TaskNameValues = [
   "BULK_PETITION_SEND",
   "TEMPLATE_REPLIES_CSV_EXPORT",
   "PETITION_SUMMARY",
+  "BACKGROUND_CHECK_PROFILE_PDF",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

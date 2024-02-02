@@ -4,6 +4,7 @@ import { IntlConfig, IntlProvider } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
 import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
 import fonts from "./utils/fonts.json";
+import internationalFonts from "./utils/international_fonts.json";
 import { ContactLocale } from "../db/__types";
 import hyphen from "hyphen";
 import { isDefined } from "remeda";
@@ -11,17 +12,10 @@ import { isDefined } from "remeda";
 let hasInit = false;
 
 function init() {
-  const families = [
-    {
-      family: "Arial Unicode MS",
-      fonts: [
-        { src: "700.ttf", fontWeight: 700 },
-        { src: "regular.ttf" },
-        { src: "italic.ttf", fontStyle: "italic" },
-      ],
-    },
-    ...fonts,
-  ];
+  const families = [...internationalFonts, ...fonts] as {
+    family: string;
+    fonts: { src: string; fontStyle: "italic"; fontWeight: number }[];
+  }[];
   for (const f of families) {
     const fonts = f.fonts.map((font) => ({
       ...font,

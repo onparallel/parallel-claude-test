@@ -129,6 +129,7 @@ import {
 import { validatePublicPetitionLinkSlug } from "../validations";
 import { ApolloError, ArgValidationError } from "./../../helpers/errors";
 import {
+  fieldIsNotBeingUsedInAutoSearchConfig,
   fieldIsNotBeingUsedInMathOperation,
   userCanSendAs,
   userHasAccessToPublicPetitionLink,
@@ -1008,6 +1009,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldIsNotBeingReferencedByAnotherFieldLogic("petitionId", "fieldId"),
+    fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1080,9 +1082,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       not(
         chain(
           fieldHasType("fieldId", ["FIELD_GROUP"]),
-          firstChildHasType("fieldId", ["DOW_JONES_KYC"]),
+          firstChildHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK"]),
         ),
       ),
+    ),
+    ifArgEquals(
+      (args) => args.data.multiple,
+      true,
+      fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
     ),
     ifArgDefined(
       (args) => args.data.optional ?? args.data.isInternal,
@@ -1090,7 +1097,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgDefined(
       (args) => args.data.isInternal ?? args.data.showInPdf,
-      not(fieldHasType("fieldId", ["DOW_JONES_KYC"])),
+      not(fieldHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK"])),
     ),
     ifArgDefined((args) => args.data.hasCommentsEnabled, not(fieldHasType("fieldId", ["HEADING"]))),
     ifArgDefined((args) => args.data.multiple, not(fieldHasType("fieldId", ["FIELD_GROUP"]))),
@@ -1195,6 +1202,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
     if (isDefined(options)) {
       try {
+        if ("autoSearchConfig" in options && options.autoSearchConfig !== null) {
+          throw new ApolloError(
+            "use updatePetitionFieldAutoSearchConfig mutation to update autoSearchConfig",
+            "FORBIDDEN",
+          );
+        }
         const field = await ctx.petitions.validateFieldData(args.fieldId, {
           options,
         });
@@ -1333,6 +1346,81 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     }
   },
 });
+
+export const updatePetitionFieldAutoSearchConfig = mutationField(
+  "updatePetitionFieldAutoSearchConfig",
+  {
+    description: "Updates the auto search config of a BACKGROUND_CHECK petition field.",
+    type: "PetitionField",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      fieldsBelongsToPetition("petitionId", "fieldId"),
+      petitionsAreEditable("petitionId"),
+      petitionsAreNotPublicTemplates("petitionId"),
+      petitionIsNotAnonymized("petitionId"),
+      fieldHasType("fieldId", "BACKGROUND_CHECK"),
+      ifArgDefined("config", async (_, args, ctx) => {
+        const field = await ctx.petitions.loadField(args.fieldId);
+        const nameFields = await ctx.petitions.loadField(args.config!.name);
+        const dateField = isDefined(args.config!.date)
+          ? await ctx.petitions.loadField(args.config!.date)
+          : null;
+        return (
+          nameFields.length > 0 &&
+          nameFields.every(
+            (f) =>
+              isDefined(f) &&
+              f.petition_id === args.petitionId && // fields must belong all to the same petition
+              f.type === "SHORT_TEXT" && // must be of type SHORT_TEXT
+              !f.multiple && // must be "single reply"
+              (!isDefined(f.parent_petition_field_id) || // must not be a child of another field (children are multiple by default)
+                f.parent_petition_field_id === field!.parent_petition_field_id), // can be a sibling of the BACKGROUND_CHECK field
+          ) &&
+          (!isDefined(dateField) ||
+            (dateField.petition_id === args.petitionId &&
+              dateField.type === "DATE" &&
+              !dateField.multiple &&
+              (!isDefined(dateField.parent_petition_field_id) ||
+                dateField.parent_petition_field_id === field!.parent_petition_field_id)))
+        );
+      }),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      config: inputObjectType({
+        name: "UpdatePetitionFieldAutoSearchConfigInput",
+        definition(t) {
+          t.nullable.field("type", { type: "BackgroundCheckEntitySearchType" });
+          t.nonNull.list.nonNull.globalId("name", { prefixName: "PetitionField" });
+          t.nullable.globalId("date", { prefixName: "PetitionField" });
+        },
+      }),
+    },
+    resolve: async (_, args, ctx) => {
+      const autoSearchConfig = args.config
+        ? {
+            name: args.config.name,
+            date: args.config.date ?? null,
+            type: args.config.type ?? null,
+          }
+        : null;
+
+      const field = await ctx.petitions.validateFieldData(args.fieldId, {
+        options: { autoSearchConfig },
+      });
+
+      const [updated] = await ctx.petitions.updatePetitionField(
+        args.petitionId,
+        args.fieldId,
+        { options: { ...field.options, autoSearchConfig } },
+        `User:${ctx.user!.id}`,
+      );
+
+      return updated;
+    },
+  },
+);
 
 export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFile", {
   description:
@@ -1545,28 +1633,43 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   resolve: async (_, args, ctx) => {
     try {
       const reply = await ctx.petitions.loadFieldReply(args.replyId);
-      if (!isFileTypeField(reply!.type)) {
+
+      if (isFileTypeField(reply!.type)) {
+        const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
+        if (!file) {
+          throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
+        }
+        if (!file.upload_complete) {
+          await ctx.storage.fileUploads.getFileMetadata(file!.path);
+          await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
+        }
+        return {
+          result: RESULT.SUCCESS,
+          file: file.upload_complete
+            ? file
+            : await ctx.files.loadFileUpload(file.id, { refresh: true }),
+          url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
+            file!.path,
+            file!.filename,
+            args.preview ? "inline" : "attachment",
+          ),
+        };
+      } else if (reply!.type === "BACKGROUND_CHECK" && isDefined(reply?.content?.entity)) {
+        const { binary_stream: stream, mime_type: contentType } =
+          await ctx.backgroundCheck.entityProfileDetailsPdf(ctx.user!.id, reply!.content);
+        const key = random(16);
+        await ctx.storage.temporaryFiles.uploadFile(key, contentType, stream);
+        return {
+          result: RESULT.SUCCESS,
+          url: await ctx.storage.temporaryFiles.getSignedDownloadEndpoint(
+            key,
+            `${reply!.content.entity.type}-${reply!.content.entity.id}.pdf`,
+            args.preview ? "inline" : "attachment",
+          ),
+        };
+      } else {
         throw new ApolloError(`${reply!.type} replies can not be downloaded`, "INVALID_FIELD_TYPE");
       }
-      const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
-      if (!file) {
-        throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
-      }
-      if (!file.upload_complete) {
-        await ctx.storage.fileUploads.getFileMetadata(file!.path);
-        await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
-      }
-      return {
-        result: RESULT.SUCCESS,
-        file: file.upload_complete
-          ? file
-          : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-        url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
-          file!.path,
-          file!.filename,
-          args.preview ? "inline" : "attachment",
-        ),
-      };
     } catch (error: any) {
       if (error instanceof ApolloError) {
         throw error;
@@ -2051,9 +2154,21 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
         ),
       ),
     ),
+    ifArgEquals(
+      "type",
+      "BACKGROUND_CHECK",
+      and(
+        userHasFeatureFlag("BACKGROUND_CHECK"),
+        or(
+          fieldIsNotFirstChild("fieldId"),
+          chain(fieldHasParent("fieldId"), parentFieldIsInternal("fieldId")),
+        ),
+      ),
+    ),
     ifArgEquals("type", "FIELD_GROUP", not(fieldHasParent("fieldId"))),
     petitionIsNotAnonymized("petitionId"),
     fieldIsNotBeingUsedInMathOperation("petitionId", "fieldId"),
+    fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2633,6 +2748,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
         not(fieldHasParent("childrenFieldIds")),
       ),
     ),
+    fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "childrenFieldIds"),
   ),
   validateArgs: notEmptyArray((args) => args.childrenFieldIds, "childrenFieldIds"),
   resolve: async (_, { petitionId, parentFieldId, childrenFieldIds, force }, ctx) => {

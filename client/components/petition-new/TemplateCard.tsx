@@ -68,11 +68,13 @@ export const TemplateCard = Object.assign(
           permissions {
             ... on PetitionUserPermission {
               user {
+                id
                 ...UserAvatarList_User
               }
             }
             ... on PetitionUserGroupPermission {
               group {
+                id
                 ...UserAvatarList_UserGroup
               }
             }

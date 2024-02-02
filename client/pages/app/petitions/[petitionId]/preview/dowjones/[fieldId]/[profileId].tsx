@@ -43,7 +43,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useLoadCountryNames } from "@parallel/utils/useCountryName";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useDowJonesProfileDownloadTask } from "@parallel/utils/tasks/useDowJonesProfileDownloadTask";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import Head from "next/head";

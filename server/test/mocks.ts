@@ -2,12 +2,15 @@ import { faker } from "@faker-js/faker/locale/af_ZA";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
+import { Readable } from "stream";
 import { User } from "../src/db/__types";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
+import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfile";
 import { IAnalyticsService } from "../src/services/AnalyticsService";
 import { IAuth } from "../src/services/AuthService";
+import { IBackgroundCheckService } from "../src/services/BackgroundCheckService";
 import {
   IDowJonesClient,
   RiskEntityProfilePdfResult,
@@ -18,6 +21,11 @@ import { IFetchService } from "../src/services/FetchService";
 import { IQueuesService } from "../src/services/QueuesService";
 import { IRedis } from "../src/services/Redis";
 import { IStorageImpl, IStorageService } from "../src/services/StorageService";
+import {
+  EntityDetailsResponse,
+  EntitySearchRequest,
+  EntitySearchResponse,
+} from "../src/services/background-check-clients/BackgroundCheckClient";
 import { random } from "../src/util/token";
 
 export const USER_COGNITO_ID = "test-cognito-id";
@@ -193,5 +201,48 @@ export class MockDowJonesClient implements IDowJonesClient {
   }
   entityFullName() {
     return "Mocked FullName";
+  }
+}
+
+@injectable()
+export class MockBackgroundCheckService implements IBackgroundCheckService {
+  async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {
+    return {
+      totalCount: 2,
+      items: [
+        {
+          id: "Q7747",
+          type: "Person",
+          name: "Vladimir Vladimirovich PUTIN",
+          properties: {},
+        },
+        {
+          id: "rupep-company-718",
+          type: "Company",
+          name: "Putin Consulting LLC",
+          properties: {},
+        },
+      ],
+      createdAt: new Date(),
+    };
+  }
+  async entityProfileDetails(entityId: string, userId: number): Promise<EntityDetailsResponse> {
+    if (entityId !== "Q7747") {
+      throw new Error("PROFILE_NOT_FOUND");
+    }
+
+    return {
+      id: "Q7747",
+      name: "Vladimir Vladimirovich PUTIN",
+      type: "Person",
+      properties: {},
+      createdAt: new Date(),
+    };
+  }
+  async entityProfileDetailsPdf(userId: number, props: BackgroundCheckProfileProps) {
+    return {
+      mime_type: "application/pdf",
+      binary_stream: Readable.from(""),
+    };
   }
 }

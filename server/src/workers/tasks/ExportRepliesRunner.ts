@@ -25,6 +25,7 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
     const zipFile = createZipFile(
       getPetitionFiles(
         petitionId,
+        this.task.user_id,
         {
           pattern: pattern ?? undefined,
           locale: userData!.preferred_locale,

@@ -24,6 +24,10 @@ import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountS
 import { AI_COMPLETION_SERVICE, AiCompletionService } from "./services/AiCompletionService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { AUTH, IAuth } from "./services/AuthService";
+import {
+  BACKGROUND_CHECK_SERVICE,
+  BackgroundCheckService,
+} from "./services/BackgroundCheckService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/DowJonesClient";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
@@ -93,6 +97,7 @@ export class ApiContext {
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
     public readonly petitionMessageContext: PetitionMessageContextService,
     @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
+    @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: BackgroundCheckService,
 
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
@@ -149,6 +154,8 @@ export class WorkerContext {
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
+    @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: BackgroundCheckService,
+    @inject(REDIS) public readonly redis: IRedis,
 
     // Repositories
     public readonly contacts: ContactRepository,

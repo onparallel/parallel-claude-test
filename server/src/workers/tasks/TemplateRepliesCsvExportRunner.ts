@@ -2,12 +2,13 @@ import Excel from "exceljs";
 import { isDefined, partition, sortBy } from "remeda";
 import { Readable } from "stream";
 import { PetitionField, PetitionFieldReply, PetitionFieldType } from "../../db/__types";
+import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheckReplyUrl";
+import { applyFieldVisibility } from "../../util/fieldLogic";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
-import { applyFieldVisibility } from "../../util/fieldLogic";
-import { pMapChunk } from "../../util/promises/pMapChunk";
 
 interface AliasedPetitionField extends PetitionField {
   alias: string;
@@ -53,6 +54,8 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
 
     let rows: Record<string, Maybe<string | Date>>[] = [];
 
+    const parallelUrl = this.ctx.config.misc.parallelUrl;
+
     if (petitions.length > 0) {
       const petitionsComposedFields = await pMapChunk(
         petitions.map((p) => p.id),
@@ -77,7 +80,10 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           "signature-status": petition.latest_signature_status ?? "",
         };
 
-        function replyContent(r: { content: any; type: PetitionFieldType; escapeCommas: boolean }) {
+        function replyContent(
+          r: { content: any; type: PetitionFieldType; escapeCommas: boolean },
+          field: Pick<AliasedPetitionField, "id" | "petition_id">,
+        ) {
           function valueMap(value: any) {
             // escape commas on every reply to distinguish between multiple replies
             if (r.escapeCommas && typeof value === "string") {
@@ -95,6 +101,9 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
                 .filter(isDefined)
                 .map(valueMap)
                 .join(",");
+            case "BACKGROUND_CHECK":
+              // no need for "valueMap", as URL will never include commas
+              return backgroundCheckFieldReplyUrl(parallelUrl, "en", field, r);
             default:
               return valueMap(r.content.value);
           }
@@ -104,6 +113,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           field: Pick<
             AliasedPetitionField,
             | "id"
+            | "petition_id"
             | "from_petition_field_id"
             | "type"
             | "title"
@@ -146,14 +156,17 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           row[columnId] = !isFileTypeField(field.type)
             ? replies
                 .map((r) =>
-                  replyContent({
-                    content: r.content,
-                    type: field.type,
-                    escapeCommas:
-                      field.multiple ||
-                      field.type === "CHECKBOX" ||
-                      field.type === "DYNAMIC_SELECT",
-                  }),
+                  replyContent(
+                    {
+                      content: r.content,
+                      type: field.type,
+                      escapeCommas:
+                        field.multiple ||
+                        field.type === "CHECKBOX" ||
+                        field.type === "DYNAMIC_SELECT",
+                    },
+                    field,
+                  ),
                 )
                 .join(",")
             : replies.length > 0

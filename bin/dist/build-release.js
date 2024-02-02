@@ -143,6 +143,7 @@ async function main() {
         console.log("Uploading build script to the new instance.");
         await (0, ssh_1.copyToRemoteServer)(ipAddress, path_1.default.resolve(__dirname, `../../ops/prod/build-release.sh`), "~");
         console.log("Executing build script.");
+        // TODO check when build fails
         await (0, ssh_1.executeRemoteCommand)(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`);
     }
     finally {

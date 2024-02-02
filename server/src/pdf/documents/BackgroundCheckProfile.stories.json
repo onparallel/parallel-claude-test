@@ -1,0 +1,158 @@
+{
+  "title": "Documents",
+  "stories": [
+    {
+      "name": "Background Check Profile",
+      "parameters": {
+        "server": {
+          "id": "documents/BackgroundCheckProfile"
+        }
+      },
+      "args": {
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "entity": {
+          "id": "Q7747",
+          "name": "Vladimir Vladimirovich PUTIN",
+          "type": "Person",
+          "createdAt": "2024-01-19T13:08:12.752Z",
+          "properties": {
+            "name": [
+              "PUTIN, Vladimir Vladimirovich",
+              "ウラジーミル・プーチン",
+              "Vladimir Vladimirovich POUTINE",
+              "ПУТИН Владимир Владимирович",
+              "Vladimir Vladimirovich PUTIN"
+            ],
+            "alias": [
+              "ヴラジーミル・ヴラジーミロヴィッチ・プーチン",
+              "Putin Volodimir Volodimirovich",
+              "ولادیمیر پوٹن",
+              "普丁",
+              "Vladimir Vladimirovič Putin",
+              "ولادِیمِیر پُیوتِن"
+            ],
+            "gender": ["male"],
+            "status": ["Domestic Politically Exposed Person"],
+            "topics": ["role.pep", "role.spy", "sanction"],
+            "country": ["ru"],
+            "position": [
+              "Secretary of the Security Council of Russia (1999-1999)",
+              "Prime Minister of Russia (1999-2000)",
+              "party leader (1995-1997)",
+              "постоянный член Совета безопасности Российской Федерации"
+            ],
+            "religion": ["Eastern Orthodoxy"],
+            "education": [
+              "Candidate of Economic Sciences (1997)",
+              "FSB Academy",
+              "School 193 (1960-1968)",
+              "Faculty of Law, Saint Petersburg State University (1970-1975)",
+              "Saint Petersburg Mining University (-1997)"
+            ],
+            "ethnicity": ["Russians"],
+            "birthPlace": [
+              "レニングラード（現サンクトペテルブルク）（ロシア）",
+              "St. Petersburg",
+              "V.F. Snegiryov Maternity Hospital No.6",
+              "Saint-Petersburg, Russian Federation",
+              "Санкт-Петербург"
+            ],
+            "dateOfBirth": ["1952-10-07"],
+            "nationality": ["suhh", "ru"],
+            "sanctions": [
+              {
+                "id": "fr-ga-c5c13b2c0ae3a4d47e40d6d65634ce5f07a3cc8a",
+                "type": "Sanction",
+                "properties": {
+                  "program": [
+                    "(UE) 2022/332 du 25/02/2022 (UE Ukraine intégrité territoriale - R (UE) 269/2014)"
+                  ],
+                  "authority": ["Ministry of Economy, Finance, and Recovery"],
+                  "sourceUrl": ["https://gels-avoirs.dgtresor.gouv.fr/"]
+                }
+              }
+            ],
+            "relationships": [
+              {
+                "id": "rupep-q7747-family-p-17297",
+                "type": "Family",
+                "properties": {
+                  "entityA": {
+                    "id": "NK-ZFsQPP6DM5wCez8Cn9egFr",
+                    "name": "Lyubov Mikhailovna KABAEVA",
+                    "type": "Person",
+                    "properties": {}
+                  },
+                  "entityB": {
+                    "id": "Q7747",
+                    "name": "Vladimir Vladimirovich PUTIN",
+                    "type": "Person",
+                    "properties": {}
+                  },
+                  "relationship": ["mother in law"]
+                }
+              },
+              {
+                "id": "NK-SB32japaV9ZGnpDwpc3xus",
+                "type": "Family",
+                "properties": {
+                  "entityA": {
+                    "id": "Q22941823",
+                    "name": "Errit Eost Faassen",
+                    "type": "Person",
+                    "properties": {}
+                  },
+                  "entityB": {
+                    "id": "Q7747",
+                    "name": "Vladimir Vladimirovich PUTIN",
+                    "type": "Person",
+                    "properties": {}
+                  },
+                  "relationship": ["son-in-law", "father-in-law", "father in law", "relative"]
+                }
+              }
+            ]
+          }
+        },
+        "query": {
+          "name": "Vladimir Putin",
+          "date": "1952-10-07"
+        },
+        "search": {
+          "items": [
+            {
+              "id": "Q7747",
+              "name": "Vladimir Vladimirovich PUTIN",
+              "type": "Person",
+              "properties": {
+                "gender": ["male"],
+                "topics": ["role.pep", "role.spy", "sanction"],
+                "country": ["ru"],
+                "birthDate": ["1952-10-07"]
+              }
+            },
+            {
+              "id": "Q4361931",
+              "name": "Vladimir Alekseevich Pekhtin",
+              "type": "Person",
+              "properties": {
+                "gender": ["male"],
+                "topics": ["role.pep"],
+                "country": ["ru"],
+                "birthDate": ["1950-12-09"]
+              }
+            }
+          ],
+          "createdAt": "2023-12-19T19:57:40.271Z",
+          "totalCount": 2
+        }
+      },
+      "argTypes": {
+        "assetsUrl": { "control": { "type": "text" } },
+        "entity": { "control": { "type": "object" } },
+        "query": { "control": { "type": "object" } },
+        "search": { "control": { "type": "object" } }
+      }
+    }
+  ]
+}

@@ -41,7 +41,7 @@ export function SignatureBox({
       fontSize: 8,
       position: "absolute",
       fontFamily: "Times-Roman",
-      top: 0,
+      top: 2,
       left: 0,
     },
     signatureImage: {

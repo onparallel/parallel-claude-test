@@ -16,8 +16,9 @@ import { OverflownText } from "../OverflownText";
 
 export interface FieldErrorDialogProps
   extends Omit<ConfirmDialogProps<void>, "body" | "header" | "confirm">,
-    Partial<Pick<ConfirmDialogProps<void>, "header" | "confirm">> {
+    Partial<Pick<ConfirmDialogProps<void>, "header" | "confirm" | "cancel">> {
   message: ReactNode;
+  footer?: ReactNode;
   showCancel?: boolean;
   fieldsWithIndices: (
     | [field: FieldErrorDialog_PetitionFieldFragment, fieldIndex: PetitionFieldIndex]
@@ -27,10 +28,12 @@ export interface FieldErrorDialogProps
 
 export function FieldErrorDialog({
   message,
+  footer,
   fieldsWithIndices,
   header,
   confirm,
   showCancel,
+  cancel,
   ...props
 }: DialogProps<FieldErrorDialogProps>) {
   const focusRef = useRef<HTMLButtonElement>(null);
@@ -86,21 +89,20 @@ export function FieldErrorDialog({
               </ListItem>
             ) : null}
           </List>
+          <Box>{footer}</Box>
         </Stack>
       }
       confirm={
-        confirm ?? (
-          <Button
-            ref={focusRef}
-            colorScheme="primary"
-            minWidth={24}
-            onClick={() => props.onResolve()}
-          >
-            <FormattedMessage id="generic.ok" defaultMessage="OK" />
-          </Button>
-        )
+        <Button
+          ref={focusRef}
+          colorScheme="primary"
+          minWidth={24}
+          onClick={() => props.onResolve()}
+        >
+          {confirm ?? <FormattedMessage id="generic.ok" defaultMessage="OK" />}
+        </Button>
       }
-      cancel={showCancel ? undefined : <></>}
+      cancel={showCancel || cancel ? cancel : <></>}
       {...props}
     />
   );

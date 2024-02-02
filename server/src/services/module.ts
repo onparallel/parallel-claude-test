@@ -11,6 +11,11 @@ import {
 } from "./AiCompletionService";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./AnalyticsService";
 import { AUTH, Auth, IAuth } from "./AuthService";
+import {
+  BACKGROUND_CHECK_SERVICE,
+  BackgroundCheckService,
+  IBackgroundCheckService,
+} from "./BackgroundCheckService";
 import { BANKFLIP_SERVICE, BankflipService, IBankflipService } from "./BankflipService";
 import { DOW_JONES_CLIENT, DowJonesClient, IDowJonesClient } from "./DowJonesClient";
 import { EMAILS, EmailsService, IEmailsService } from "./EmailsService";
@@ -24,6 +29,7 @@ import {
   IntegrationsSetupService,
 } from "./IntegrationsSetupService";
 import { ILogger, LOGGER, createLogger } from "./Logger";
+import { IOrgLimitsService, ORG_LIMITS_SERVICE, OrgLimitsService } from "./OrgLimitsService";
 import {
   IOrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
@@ -56,7 +62,6 @@ import { IRedis, REDIS, Redis } from "./Redis";
 import { ISignatureService, SIGNATURE, SignatureService } from "./SignatureService";
 import { ISmtp, SMTP, Smtp } from "./Smtp";
 import { IStorageService, STORAGE_SERVICE, StorageService } from "./StorageService";
-import { IOrgLimitsService, ORG_LIMITS_SERVICE, OrgLimitsService } from "./OrgLimitsService";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
@@ -89,4 +94,5 @@ export const servicesModule = new ContainerModule((bind) => {
     PetitionMessageContextService,
   );
   bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
+  bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE).to(BackgroundCheckService);
 });

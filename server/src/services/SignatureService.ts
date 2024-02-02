@@ -8,7 +8,10 @@ import {
   PetitionSignatureRequest,
   User,
 } from "../db/__types";
-import { IntegrationRepository, SignatureProvider } from "../db/repositories/IntegrationRepository";
+import {
+  IntegrationProvider,
+  IntegrationRepository,
+} from "../db/repositories/IntegrationRepository";
 import {
   PetitionRepository,
   PetitionSignatureConfig,
@@ -28,7 +31,7 @@ interface UpdateBrandingOpts {
 export interface ISignatureService {
   getClient<TClient extends ISignatureClient>(integration: {
     id: number;
-    provider: SignatureProvider;
+    provider: IntegrationProvider<"SIGNATURE">;
   }): TClient;
   createSignatureRequest(
     petitionId: number,
@@ -76,7 +79,7 @@ export class SignatureService implements ISignatureService {
 
   public getClient<TClient extends ISignatureClient>(integration: {
     id: number;
-    provider: SignatureProvider;
+    provider: IntegrationProvider<"SIGNATURE">;
   }) {
     const client = this.container.getNamed<TClient>(SIGNATURE_CLIENT, integration.provider);
     client.configure(integration.id);

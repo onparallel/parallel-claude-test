@@ -15,6 +15,7 @@ import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
 import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
 import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
+import { BackgroundCheckProfilePdfRunner } from "./tasks/BackgroundCheckProfilePdfRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -28,6 +29,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   BULK_PETITION_SEND: BulkPetitionSendRunner,
   TEMPLATE_REPLIES_CSV_EXPORT: TemplateRepliesCsvExportRunner,
   PETITION_SUMMARY: PetitionSummaryRunner,
+  BACKGROUND_CHECK_PROFILE_PDF: BackgroundCheckProfilePdfRunner,
 };
 
 export interface TaskWorkerPayload {
@@ -37,6 +39,8 @@ export interface TaskWorkerPayload {
 createQueueWorker(
   "task-worker",
   async ({ taskId }, ctx) => {
+    await ctx.redis.connect();
+
     const task = await ctx.tasks.pickupTask(taskId, ctx.config.instanceName);
     if (!isDefined(task)) {
       return;

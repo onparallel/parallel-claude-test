@@ -187,6 +187,7 @@ async function main() {
       "~",
     );
     console.log("Executing build script.");
+    // TODO check when build fails
     await executeRemoteCommand(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`);
   } finally {
     await shutdown();

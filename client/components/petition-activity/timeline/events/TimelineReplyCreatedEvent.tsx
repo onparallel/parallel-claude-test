@@ -10,6 +10,7 @@ import { UserOrContactReference } from "../../UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
+import { isDefined } from "remeda";
 
 export interface TimelineReplyCreatedEventProps {
   event: TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
@@ -47,6 +48,54 @@ export function TimelineReplyCreatedEvent({
     />
   );
 
+  if (field?.type === "BACKGROUND_CHECK") {
+    message = isChildren ? (
+      isDefined(reply?.content?.entity) ? (
+        <FormattedMessage
+          id="component.timeline-reply-created-event.description-background-check-entity-children-of-group"
+          defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} from a group of {parentField} {timeAgo}"
+          values={{
+            userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
+            createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+            field: <PetitionFieldReference field={field} />,
+            parentField: <PetitionFieldReference field={field.parent!} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="component.timeline-reply-created-event.description-background-check-search-children-of-group"
+          defaultMessage="A search was saved in the field {field} from a group of {parentField} {timeAgo}"
+          values={{
+            field: <PetitionFieldReference field={field} />,
+            parentField: <PetitionFieldReference field={field.parent!} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      )
+    ) : isDefined(reply?.content?.entity) ? (
+      <FormattedMessage
+        id="component.timeline-reply-created-event.description-background-check-entity"
+        defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} saved an entity in the field {field} {timeAgo}"
+        values={{
+          userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
+          createdBy: <UserOrContactReference userOrAccess={createdBy} />,
+          field: <PetitionFieldReference field={field} />,
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+        }}
+      />
+    ) : (
+      <FormattedMessage
+        id="component.timeline-reply-created-event.description-background-check-search"
+        defaultMessage="A search was saved in the field {field} {timeAgo}"
+        values={{
+          field: <PetitionFieldReference field={field} />,
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+        }}
+      />
+    );
+  }
+
   if (field?.type === "FIELD_GROUP") {
     message = (
       <FormattedMessage
@@ -55,7 +104,6 @@ export function TimelineReplyCreatedEvent({
         values={{
           userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
           createdBy: <UserOrContactReference userOrAccess={createdBy} />,
-
           field: <PetitionFieldReference field={field} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
@@ -95,6 +143,7 @@ TimelineReplyCreatedEvent.fragments = {
       }
       reply {
         ...TimelineSeeReplyButton_PetitionFieldReply
+        content
       }
       createdAt
     }

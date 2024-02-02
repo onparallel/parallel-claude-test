@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isDefined, uniq } from "remeda";
 import { ibanDefinitions, ibanRegex } from "./iban";
-import { useLoadCountryNames } from "./useCountryName";
+import { useLoadCountryNames } from "./useLoadCountryNames";
 import { EMAIL_REGEX } from "./validation";
 
 export type ShortTextFormat = ShortTextFormatImplementation & {

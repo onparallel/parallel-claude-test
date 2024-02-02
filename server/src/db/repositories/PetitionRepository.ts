@@ -1924,6 +1924,60 @@ export class PetitionRepository extends BaseRepository {
             cloned,
           })),
         );
+
+        // if inside the cloned FIELD_GROUP exists a BACKGROUND_CHECK with autoSearchConfig
+        // and fields configured in autoSearch are also children of the FIELD_GROUP
+        // we need to update the ids of the autoSearchConfig to reference to the cloned children
+        const originalChildrenIds = children.map((c) => c.id);
+        const backgroundCheckChildrenForAutoSearchUpdate = clonedChildren
+          .filter(
+            (f) =>
+              f.type === "BACKGROUND_CHECK" &&
+              isDefined(f.options.autoSearchConfig) &&
+              (f.options.autoSearchConfig.name.some((id: number) =>
+                originalChildrenIds.includes(id),
+              ) ||
+                (isDefined(f.options.autoSearchConfig.date) &&
+                  originalChildrenIds.includes(f.options.autoSearchConfig.date))),
+          )
+          .map((field) => ({
+            id: field.id,
+            options: {
+              ...field.options,
+              autoSearchConfig: {
+                ...field.options.autoSearchConfig,
+                name: field.options.autoSearchConfig.name.map(
+                  (id: number) =>
+                    clonedFields.find((f) => f.originalFieldId === id)?.cloned.id ?? id,
+                ),
+                date: isDefined(field.options.autoSearchConfig.date)
+                  ? clonedFields.find(
+                      (f) => f.originalFieldId === field.options.autoSearchConfig.date,
+                    )?.cloned.id ?? field.options.autoSearchConfig.date
+                  : null,
+              },
+            },
+          }));
+
+        if (backgroundCheckChildrenForAutoSearchUpdate.length > 0) {
+          await this.raw(
+            /* sql */ `
+            update petition_field as pf set
+              options = t.options
+            from (?) as t (id, options)
+            where t.id = pf.id;
+          `,
+            [
+              this.sqlValues(
+                backgroundCheckChildrenForAutoSearchUpdate.map((field) => [
+                  field.id,
+                  this.json(field.options),
+                ]),
+                ["int", "jsonb"],
+              ),
+            ],
+          );
+        }
       }
     }
 
@@ -3120,8 +3174,10 @@ export class PetitionRepository extends BaseRepository {
         await this.clonePetitionReplyEvents(petitionId, cloned.id, newFieldIds, newReplyIds, t);
       }
 
-      const toUpdate = clonedFields.filter((f) => isDefined(f.visibility) || isDefined(f.math));
-      if (toUpdate.length > 0) {
+      const fieldLogicUpdate = clonedFields.filter(
+        (f) => isDefined(f.visibility) || isDefined(f.math),
+      );
+      if (fieldLogicUpdate.length > 0) {
         // update visibility conditions and math on cloned fields
         await this.raw<PetitionField>(
           /* sql */ `
@@ -3134,7 +3190,7 @@ export class PetitionRepository extends BaseRepository {
         `,
           [
             this.sqlValues(
-              toUpdate.map((field) => {
+              fieldLogicUpdate.map((field) => {
                 const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
                 const math = field.math as Maybe<PetitionFieldMath[]>;
 
@@ -3185,6 +3241,46 @@ export class PetitionRepository extends BaseRepository {
                 ];
               }),
               ["int", "jsonb", "jsonb"],
+            ),
+          ],
+          t,
+        );
+      }
+
+      const backgroundCheckFieldsUpdate = clonedFields.filter(
+        (f) => f.type === "BACKGROUND_CHECK" && isDefined(f.options.autoSearchConfig),
+      );
+
+      // update field references in autoSearchConfig to point to cloned fields
+      if (backgroundCheckFieldsUpdate.length > 0) {
+        await this.raw(
+          /* sql */ `
+          update petition_field as pf set
+            options = t.options
+          from (?) as t (id, options)
+          where t.id = pf.id
+          returning *;
+        `,
+          [
+            this.sqlValues(
+              backgroundCheckFieldsUpdate.map((field) => {
+                return [
+                  field.id,
+                  JSON.stringify({
+                    ...field.options,
+                    autoSearchConfig: {
+                      type: field.options.autoSearchConfig.type,
+                      name: field.options.autoSearchConfig.name.map(
+                        (id: number) => newFieldIds[id],
+                      ),
+                      date: isDefined(field.options.autoSearchConfig.date)
+                        ? newFieldIds[field.options.autoSearchConfig.date]
+                        : null,
+                    },
+                  }),
+                ];
+              }),
+              ["int", "jsonb"],
             ),
           ],
           t,
@@ -6277,6 +6373,8 @@ export class PetitionRepository extends BaseRepository {
               content || jsonb_build_object('file_upload_id', null, 'json_contents', null)
             when 'FIELD_GROUP' then 
               '{}'::jsonb
+            when 'BACKGROUND_CHECK' then 
+              content || jsonb_build_object('query', null, 'search', null, 'entity', null)
             else 
               content || jsonb_build_object('value', null)
             end
@@ -7020,7 +7118,11 @@ export class PetitionRepository extends BaseRepository {
 
     for (const [alias, value] of entries) {
       const field = rootFields.find((f) => f.alias === alias);
-      if (!field || isFileTypeField(field.type) || ["HEADING"].includes(field.type)) {
+      if (
+        !field ||
+        isFileTypeField(field.type) ||
+        ["HEADING", "BACKGROUND_CHECK"].includes(field.type)
+      ) {
         continue;
       }
 
@@ -7642,6 +7744,124 @@ export class PetitionRepository extends BaseRepository {
       and ("summary_config"->>'integration_id')::int = ?
     `,
       [updatedBy, integrationId],
+    );
+  }
+
+  async fieldsCanBeReplied(
+    fields: { id: number; parentReplyId?: number | null }[],
+    overwrite: boolean,
+  ) {
+    const [_fieldsNoParent, _fieldsWithParent] = partition(
+      fields,
+      (f) => !isDefined(f.parentReplyId),
+    );
+
+    const [fieldsNoParent, fieldsNoParentReplies, fieldsWithParent, fieldsChildReplies] =
+      await Promise.all([
+        this.loadField(_fieldsNoParent.map((f) => f.id)),
+        this.loadRepliesForField(_fieldsNoParent.map((f) => f.id)),
+        this.loadField(_fieldsWithParent.map((f) => f.id)),
+        this.loadPetitionFieldGroupChildReplies.raw(
+          _fieldsWithParent.map((f) => ({
+            petitionFieldId: f.id,
+            parentPetitionFieldReplyId: f.parentReplyId!,
+          })),
+        ),
+      ]);
+
+    for (const [field, replies] of [
+      ...zip(fieldsNoParent, fieldsNoParentReplies),
+      ...zip(fieldsWithParent, fieldsChildReplies),
+    ]) {
+      if (!field || (!field.multiple && replies.length > 0 && !overwrite)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  async replyIsForFieldOfType(replyIds: number[], types: PetitionFieldType[]) {
+    const [fields, replies] = await Promise.all([
+      this.loadFieldForReply(replyIds),
+      this.loadFieldReply(replyIds),
+    ]);
+
+    const invalidField = fields.find((field) => !types.includes(field!.type));
+    const invalidReply = replies.find((reply) => !types.includes(reply!.type));
+
+    if (invalidField || invalidReply) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async fieldHasType(fieldIds: number[], types: PetitionFieldType[]) {
+    const fields = await this.loadField(fieldIds);
+    return fields.every((field) => types.includes(field!.type));
+  }
+
+  async repliesCanBeUpdated(replyIds: number[]) {
+    const replies = await this.loadFieldReply(replyIds);
+    if (replies.some((r) => !isDefined(r))) {
+      // field or reply could be already deleted, throw FORBIDDEN error
+      return "REPLY_NOT_FOUND";
+    }
+
+    const fieldGroupReplies = replies.filter(isDefined).filter((r) => r.type === "FIELD_GROUP");
+
+    const allReplies = replies;
+
+    if (fieldGroupReplies.length > 0) {
+      const childFields = await this.loadPetitionFieldChildren(
+        fieldGroupReplies.map((r) => r.petition_field_id),
+      );
+      if (childFields.length > 0) {
+        const fieldGroupChildReplies = (
+          await this.loadPetitionFieldGroupChildReplies.raw(
+            zip(fieldGroupReplies, childFields).flatMap(([reply, fields]) =>
+              fields.map((field) => ({
+                petitionFieldId: field.id,
+                parentPetitionFieldReplyId: reply.id,
+              })),
+            ),
+          )
+        ).flat();
+
+        allReplies.push(...fieldGroupChildReplies);
+      }
+    }
+
+    if (allReplies.some((r) => r!.status === "APPROVED" || r!.anonymized_at !== null)) {
+      return "REPLY_ALREADY_APPROVED";
+    }
+
+    return true;
+  }
+
+  async replyCanBeDeleted(replyId: number) {
+    const field = await this.loadFieldForReply(replyId);
+    if (!field) {
+      return "REPLY_ALREADY_DELETED";
+    }
+    if (field.type === "FIELD_GROUP" && !field.optional) {
+      const replies = await this.loadRepliesForField(field.id);
+      if (replies.length === 1 && replies[0].id === replyId) {
+        return "CANT_DELETE_FIELD_GROUP_REPLY";
+      }
+      this.loadRepliesForField.dataloader.clear(field.id);
+    }
+    return true;
+  }
+
+  async fieldHasParent(childrenFieldIds: number[], parentFieldId: number | null) {
+    const fields = await this.loadField(childrenFieldIds);
+
+    return fields.every(
+      (f) =>
+        isDefined(f?.parent_petition_field_id) &&
+        (!isDefined(parentFieldId) || f!.parent_petition_field_id === parentFieldId),
     );
   }
 }

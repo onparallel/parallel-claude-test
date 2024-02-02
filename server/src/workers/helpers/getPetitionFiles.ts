@@ -1,7 +1,7 @@
 import { indexBy, isDefined } from "remeda";
 import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
 import { WorkerContext } from "../../context";
-import { UserLocale } from "../../db/__types";
+import { PetitionField, UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
 import { getAllFieldsWithIndices } from "../../util/fieldIndices";
 import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
@@ -9,6 +9,7 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
 import { Maybe, UnwrapArray } from "../../util/types";
+import { Readable } from "stream";
 
 interface GetPetitionFilesOptions {
   locale: UserLocale;
@@ -19,6 +20,7 @@ interface GetPetitionFilesOptions {
 
 export async function* getPetitionFiles(
   petitionId: number,
+  userId: number,
   options: GetPetitionFilesOptions,
   ctx: WorkerContext,
 ) {
@@ -46,6 +48,10 @@ export async function* getPetitionFiles(
       isFileTypeField(r.type) && isDefined(r.content.file_upload_id) && !isDefined(r.content.error),
   );
 
+  const backgroundCheckEntityReplies = allReplies.filter(
+    (r) => r.type === "BACKGROUND_CHECK" && isDefined(r.content.entity),
+  );
+
   const textReplies = allReplies.filter((r) => !isFileTypeField(r.type));
 
   const files = await ctx.files.loadFileUpload(
@@ -61,6 +67,7 @@ export async function* getPetitionFiles(
     : Math.max(
         (textReplies.length > 0 ? 1 : 0) + // text replies excel
           fileReplies.length +
+          backgroundCheckEntityReplies.length + // each reply is 1 pdf file
           Number(isDefined(latestPetitionSignature?.file_upload_id)) +
           Number(isDefined(latestPetitionSignature?.file_upload_audit_trail_id)),
         1,
@@ -70,6 +77,35 @@ export async function* getPetitionFiles(
   const excelWorkbook = new PetitionExcelExport(options.locale, ctx);
   await excelWorkbook.init();
   const seen = new Set<string>();
+
+  function resolveFileName(
+    field: Pick<PetitionField, "id" | "title">,
+    pattern: string | null | undefined,
+    originalFileName: string,
+  ) {
+    const extension = originalFileName.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
+    const name = renderTextWithPlaceholders(pattern ?? "{{file-name}}", (placeholder) => {
+      switch (placeholder) {
+        case "field-number":
+          return `${indices[field.id]}`;
+        case "field-title":
+          return field.title ?? "";
+        case "file-name":
+          // remove file extension since it's added back later
+          return originalFileName.replace(/\.[a-z0-9]+$/, "");
+        default:
+          return "";
+      }
+    });
+    let filename = sanitizeFilenameWithSuffix(name, extension.toLowerCase());
+    let counter = 1;
+    while (seen.has(filename)) {
+      filename = sanitizeFilenameWithSuffix(name, ` ${counter++}${extension.toLowerCase()}`);
+    }
+    seen.add(filename);
+
+    return filename;
+  }
 
   async function* processField(
     field: UnwrapArray<typeof visibleFields> & {
@@ -101,36 +137,30 @@ export async function* getPetitionFiles(
       for (const reply of field.replies) {
         const file = filesById[reply.content["file_upload_id"]];
         if (file?.upload_complete) {
-          const extension = file.filename.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
-          const name = renderTextWithPlaceholders(
-            options.pattern ?? "{{file-name}}",
-            (placeholder) => {
-              switch (placeholder) {
-                case "field-number":
-                  return `${indices[field.id]}`;
-                case "field-title":
-                  return field.title ?? "";
-                case "file-name":
-                  // remove file extension since it's added back later
-                  return file.filename.replace(/\.[a-z0-9]+$/, "");
-                default:
-                  return "";
-              }
-            },
-          );
-          let filename = sanitizeFilenameWithSuffix(name, extension.toLowerCase());
-          let counter = 1;
-          while (seen.has(filename)) {
-            filename = sanitizeFilenameWithSuffix(name, ` ${counter++}${extension.toLowerCase()}`);
-          }
-          seen.add(filename);
           yield {
-            filename,
+            filename: resolveFileName(field, options.pattern, file.filename),
             stream: await ctx.storage.fileUploads.downloadFile(file.path),
           } as ZipFileInput;
           await options.onProgress?.(++processedFiles / totalFiles);
         }
       }
+    } else if (field.type === "BACKGROUND_CHECK") {
+      // on BACKGROUND_CHECK fields, export the PDF if reply has set "entity"
+      if (!options.xlsxOnly) {
+        for (const reply of field.replies.filter((r) => isDefined(r.content.entity))) {
+          yield {
+            filename: resolveFileName(
+              field,
+              options.pattern,
+              `${reply.content.entity.type}-${reply.content.entity.id}.pdf`,
+            ),
+            stream: Readable.from(await ctx.printer.backgroundCheckProfile(userId, reply.content)),
+          } as ZipFileInput;
+          await options.onProgress?.(++processedFiles / totalFiles);
+        }
+      }
+      // also, add the reply (entity or search) to the excel file
+      excelWorkbook.addPetitionFieldReply(field);
     } else if (!isFileTypeField(field.type)) {
       excelWorkbook.addPetitionFieldReply(field);
     }

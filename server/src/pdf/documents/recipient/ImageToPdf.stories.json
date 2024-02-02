@@ -9,10 +9,17 @@
         }
       },
       "args": {
-        "imageUrl": "https://static.onparallel.com/static/emails/logo.png"
+        "imageUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "theme": {
+          "marginLeft": 25.4,
+          "marginRight": 25.4,
+          "marginTop": 25.4,
+          "marginBottom": 25.4
+        }
       },
       "argTypes": {
-        "imageUrl": { "control": { "type": "text" } }
+        "imageUrl": { "control": { "type": "text" } },
+        "theme": { "control": { "type": "object" } }
       }
     }
   ]

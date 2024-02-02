@@ -1225,11 +1225,6 @@
     "context": "Please, enter a valid email"
   },
   {
-    "term": "generic.forms.invalid-first-name-error",
-    "definition": "",
-    "context": "Please, enter the first name"
-  },
-  {
     "term": "generic.forms.invalid-last-name-error",
     "definition": "",
     "context": "Please, enter the last name"
@@ -1273,6 +1268,11 @@
     "term": "generic.help",
     "definition": "",
     "context": "Help"
+  },
+  {
+    "term": "generic.invalid-first-name-error",
+    "definition": "",
+    "context": "Please, enter the first name"
   },
   {
     "term": "generic.language-catalan",
@@ -1338,6 +1338,11 @@
     "term": "generic.options",
     "definition": "",
     "context": "Options..."
+  },
+  {
+    "term": "generic.petition-field-type-background-check",
+    "definition": "",
+    "context": "Background check"
   },
   {
     "term": "generic.petition-field-type-checkbox",

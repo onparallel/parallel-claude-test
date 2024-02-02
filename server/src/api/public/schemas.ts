@@ -481,6 +481,32 @@ const _PetitionFieldReplyInner = {
           description: "The reply group for fields of type `FIELD_GROUP`",
           example: {},
         },
+        {
+          title: "Background Check reply",
+          type: "object",
+          description: "The reply for fields of type `BACKGROUND_CHECK`",
+          required: ["query", "search"],
+          properties: {
+            query: {
+              type: "object",
+              example: {
+                name: "Jon Doe",
+                date: "2022-10-10",
+              },
+            },
+            search: {
+              type: "object",
+              example: {
+                totalCount: 3,
+                createdAt: "2022-10-10T09:30:21",
+                items: [{ id: "1", type: "Person", properties: {} }],
+              },
+            },
+            entity: {
+              type: ["object", "null"],
+            },
+          },
+        },
       ],
     },
     createdAt: {
@@ -2354,7 +2380,7 @@ export const SubmitPetitionReplies = schema({
 
     If no field is found with the provided alias or the reply is invalid given the field type and options, that entry will be ignored.
 
-    \`HEADING\`, \`FILE_UPLOAD\`, \`ES_TAX_DOCUMENTS\`, and \`DOW_JONES_KYC\` fields do not accept reply submission via this endpoint.
+    \`HEADING\`, \`FILE_UPLOAD\`, \`ES_TAX_DOCUMENTS\`, \`BACKGROUND_CHECK\` and \`DOW_JONES_KYC\` fields do not accept reply submission via this endpoint.
   `,
   example: {
     fullName: "Robert Baratheon",

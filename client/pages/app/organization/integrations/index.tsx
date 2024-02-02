@@ -11,6 +11,7 @@ import {
   Heading,
   Image,
   Stack,
+  Switch,
   Text,
 } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
@@ -39,6 +40,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
@@ -96,7 +98,7 @@ function OrganizationIntegrations() {
       ),
       title: "Signaturit",
       body: intl.formatMessage({
-        id: "organization.integrations.signaturit-description",
+        id: "page.organization-integrations.signaturit-description",
         defaultMessage: "Add digital signature to your parallels.",
       }),
       href: "/app/organization/integrations/signature",
@@ -117,7 +119,7 @@ function OrganizationIntegrations() {
       ) : null,
       title: "DocuSign",
       body: intl.formatMessage({
-        id: "organization.integrations.docusign-description",
+        id: "page.organization-integrations.docusign-description",
         defaultMessage: "Add digital signature to your parallels.",
       }),
       href: "/app/organization/integrations/signature",
@@ -133,18 +135,68 @@ function OrganizationIntegrations() {
       ),
       title: "Zapier",
       body: intl.formatMessage({
-        id: "organization.integrations.zapier-description",
+        id: "page.organization-integrations.zapier-description",
         defaultMessage: "Automate your workflows using its +400 services.",
       }),
       href: "https://zapier.com/apps/parallel/integrations",
       isExternal: true,
     },
     {
+      isDisabled: false,
+      logo: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/open-sanctions.png`}
+          alt="OpenSanctions"
+          maxWidth="124px"
+        />
+      ),
+      title: intl.formatMessage({
+        id: "page.organization-integrations.open-sanctions-title",
+        defaultMessage: "OpenSanctions",
+      }),
+      body: intl.formatMessage({
+        id: "page.organization-integrations.open-sanctions-description",
+        defaultMessage:
+          "Run a background check of individuals and legal entities using its database.",
+      }),
+      switchButton: (
+        <RestrictedFeaturePopover
+          isRestricted={!me.hasBackgroundCheck}
+          borderRadius="md"
+          content={
+            <Text>
+              <FormattedMessage
+                id="page.organization-integrations.open-sanctions-disabled-message"
+                defaultMessage="Contact us to activate this integration and successfully meet the requirements of AML (Anti-Money Laundering). <a>Contact us</a>"
+                values={{
+                  a: (chunks: any) => (
+                    <SupportButton
+                      variant="link"
+                      fontSize="sm"
+                      message={intl.formatMessage({
+                        id: "page.organization-integrations.open-sanctions-contact-message",
+                        defaultMessage:
+                          "Hi, I would like more information about OpenSanctions integration.",
+                      })}
+                    >
+                      {chunks}
+                    </SupportButton>
+                  ),
+                }}
+              />
+            </Text>
+          }
+        >
+          <Switch isChecked={me.hasBackgroundCheck} isDisabled={true} onChange={() => {}} />
+        </RestrictedFeaturePopover>
+      ),
+    },
+    {
       isDisabled: !userCanEditIntegrations || !me.hasDowJonesFeature,
       disabledMessage: (
         <Text>
           <FormattedMessage
-            id="organization.integrations.dow-jones-disabled-message"
+            id="page.organization-integrations.dow-jones-disabled-message"
             defaultMessage="This is an Enterprise feature. <a>Contact</a> with our support team for more information."
             values={{
               a: (chunks: any) => (
@@ -152,7 +204,7 @@ function OrganizationIntegrations() {
                   variant="link"
                   fontSize="sm"
                   message={intl.formatMessage({
-                    id: "organization.integrations.dow-jones-contact-message",
+                    id: "page.organization-integrations.dow-jones-contact-message",
                     defaultMessage:
                       "Hi, I would like more information about Dow Jones integration.",
                   })}
@@ -177,7 +229,7 @@ function OrganizationIntegrations() {
             content={
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="organization.integrations.dow-jones-error"
+                  id="page.organization-integrations.dow-jones-error"
                   defaultMessage="The integration is not working properly. Please reconnect to your account."
                 />
               </Text>
@@ -193,11 +245,11 @@ function OrganizationIntegrations() {
         )
       ) : null,
       title: intl.formatMessage({
-        id: "organization.integrations.dow-jones-title",
+        id: "page.organization-integrations.dow-jones-title",
         defaultMessage: "Dow Jones RiskCenter",
       }),
       body: intl.formatMessage({
-        id: "organization.integrations.dow-jones-description",
+        id: "page.organization-integrations.dow-jones-description",
         defaultMessage:
           "Run a background check of individuals and legal entities using its database.",
       }),
@@ -214,11 +266,11 @@ function OrganizationIntegrations() {
         />
       ),
       title: intl.formatMessage({
-        id: "organization.integrations.parallel-api-title",
+        id: "page.organization-integrations.parallel-api-title",
         defaultMessage: "Parallel API",
       }),
       body: intl.formatMessage({
-        id: "organization.integrations.parallel-api-description",
+        id: "page.organization-integrations.parallel-api-description",
         defaultMessage: "Access our API to automate all your flows.",
       }),
       href: "/app/settings/developers",
@@ -228,14 +280,17 @@ function OrganizationIntegrations() {
   return (
     <OrganizationSettingsLayout
       title={intl.formatMessage({
-        id: "organization.integrations.title",
+        id: "page.organization-integrations.title",
         defaultMessage: "Integrations",
       })}
       me={me}
       realMe={realMe}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="organization.integrations.title" defaultMessage="Integrations" />
+          <FormattedMessage
+            id="page.organization-integrations.title"
+            defaultMessage="Integrations"
+          />
         </Heading>
       }
     >
@@ -251,13 +306,13 @@ function OrganizationIntegrations() {
             <Box>
               <AlertTitle>
                 <FormattedMessage
-                  id="organization.integrations.alert-title"
+                  id="page.organization-integrations.alert-title"
                   defaultMessage="Can't find the integration you need?"
                 />
               </AlertTitle>
               <AlertDescription>
                 <FormattedMessage
-                  id="organization.integrations.alert-description"
+                  id="page.organization-integrations.alert-description"
                   defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
                 />
               </AlertDescription>
@@ -272,12 +327,12 @@ function OrganizationIntegrations() {
                 rel="noopener"
                 href="https://roadmap.onparallel.com/feature-requests?category=integrations&selectedCategory=integrations"
                 aria-label={intl.formatMessage({
-                  id: "organization.integrations.alert-button",
+                  id: "page.organization-integrations.alert-button",
                   defaultMessage: "Suggest integration",
                 })}
               >
                 <FormattedMessage
-                  id="organization.integrations.alert-button"
+                  id="page.organization-integrations.alert-button"
                   defaultMessage="Suggest integration"
                 />
               </Button>
@@ -287,7 +342,10 @@ function OrganizationIntegrations() {
       </Box>
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => {
-          if (isDefined((integration as IntegrationSwitchCardProps).onChange)) {
+          if (
+            isDefined((integration as IntegrationSwitchCardProps).onChange) ||
+            isDefined((integration as IntegrationSwitchCardProps).switchButton)
+          ) {
             return <IntegrationSwitchCard key={index} {...integration} />;
           }
 
@@ -311,6 +369,7 @@ OrganizationIntegrations.queries = [
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasDowJonesFeature: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+        hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
         organization {
           id
           hasDowJones: hasIntegration(integration: DOW_JONES_KYC)

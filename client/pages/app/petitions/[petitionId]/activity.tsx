@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, useToast } from "@chakra-ui/react";
 import { ShareButton } from "@parallel/components/common/ShareButton";
+import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
@@ -57,7 +58,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
 
 type PetitionActivityProps = UnwrapPromise<ReturnType<typeof PetitionActivity.getInitialProps>>;
@@ -97,16 +98,51 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const showFieldErrorDialog = useFieldErrorDialog();
   const allFieldsWithIndices = useAllFieldsWithIndices(petition.fields);
   const _validatePetitionFields = async () => {
-    const { error, message, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices);
+    const { error, message, footer, fieldsWithIndices } = validatePetitionFields(
+      allFieldsWithIndices,
+      petition,
+    );
     if (error) {
       if (fieldsWithIndices && fieldsWithIndices.length > 0) {
-        await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
-        const firstId = fieldsWithIndices[0][0].id;
-        router.push(`/app/petitions/${query.petitionId}/compose#field-${firstId}`);
+        if (error === "PAID_FIELDS_BLOCKED") {
+          await withError(
+            showFieldErrorDialog({
+              header: (
+                <FormattedMessage
+                  id="generic.fields-not-available"
+                  defaultMessage="Fields not available"
+                />
+              ),
+              message,
+              footer,
+              fieldsWithIndices,
+              cancel: (
+                <SupportButton
+                  variant="outline"
+                  colorScheme="primary"
+                  message={intl.formatMessage({
+                    id: "generic.upgrade-plan-support-message",
+                    defaultMessage:
+                      "Hi, I would like to get more information about how to upgrade my plan.",
+                  })}
+                >
+                  <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+                </SupportButton>
+              ),
+              confirm: <FormattedMessage id="generic.continue" defaultMessage="Continue" />,
+            }),
+          );
+          return true;
+        } else {
+          await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
+          const firstId = fieldsWithIndices[0][0].id;
+          router.push(`/app/petitions/${query.petitionId}/compose#field-${firstId}`);
+        }
       } else {
         await withError(showErrorDialog({ message }));
         router.push(`/app/petitions/${query.petitionId}/compose`);
       }
+
       return false;
     }
     return true;
@@ -445,6 +481,7 @@ const _fragments = {
       }
       ...useConfirmSendReminderDialog_Petition
       ...PetitionProfilesTable_Petition
+      ...validatePetitionFields_PetitionBase
     }
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
@@ -455,6 +492,7 @@ const _fragments = {
     ${useSendPetitionHandler.fragments.Petition}
     ${useAllFieldsWithIndices.fragments.PetitionField}
     ${validatePetitionFields.fragments.PetitionField}
+    ${validatePetitionFields.fragments.PetitionBase}
     ${FieldErrorDialog.fragments.PetitionField}
     ${ConfirmDeactivateAccessDialog.fragments.PetitionAccess}
     ${ConfirmReactivateAccessDialog.fragments.PetitionAccess}

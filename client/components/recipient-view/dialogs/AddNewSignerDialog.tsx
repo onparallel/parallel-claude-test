@@ -79,7 +79,7 @@ function AddNewSignerDialog({ tone, ...props }: DialogProps<{ tone: Tone }, NewS
               <Input {...register("firstName", { required: true })} />
               <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.invalid-first-name-error"
+                  id="generic.invalid-first-name-error"
                   defaultMessage="Please, enter the first name"
                 />
               </FormErrorMessage>

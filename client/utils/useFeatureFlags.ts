@@ -193,6 +193,17 @@ export function useFeatureFlags() {
                 "Enables the creation of an AI Summary on the organization petitions.",
             }),
           },
+          {
+            name: "BACKGROUND_CHECK",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.background-check-name",
+              defaultMessage: "Background check",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.background-check-description",
+              defaultMessage: "Enables the Background check petition field on the organization.",
+            }),
+          },
         ],
       },
       {

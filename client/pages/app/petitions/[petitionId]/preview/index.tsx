@@ -16,6 +16,7 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { SupportButton } from "@parallel/components/common/SupportButton";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
@@ -195,14 +196,48 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const showFieldErrorDialog = useFieldErrorDialog();
   const allFieldsWithIndices = useAllFieldsWithIndices(petition.fields);
   const _validatePetitionFields = async () => {
-    const { error, message, fieldsWithIndices } = validatePetitionFields(allFieldsWithIndices);
+    const { error, message, footer, fieldsWithIndices } = validatePetitionFields(
+      allFieldsWithIndices,
+      petition,
+    );
     if (error) {
       const petitionId = query.petitionId;
       if (fieldsWithIndices && fieldsWithIndices.length > 0) {
-        await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
-        const firstId = fieldsWithIndices[0][0].id;
-        if (isDefined(petitionId) && typeof petitionId === "string") {
-          goToPetition(petitionId, "compose", { query: { field: firstId } });
+        if (error === "PAID_FIELDS_BLOCKED") {
+          await withError(
+            showFieldErrorDialog({
+              header: (
+                <FormattedMessage
+                  id="generic.fields-not-available"
+                  defaultMessage="Fields not available"
+                />
+              ),
+              message,
+              footer,
+              fieldsWithIndices,
+              cancel: (
+                <SupportButton
+                  variant="outline"
+                  colorScheme="primary"
+                  message={intl.formatMessage({
+                    id: "generic.upgrade-plan-support-message",
+                    defaultMessage:
+                      "Hi, I would like to get more information about how to upgrade my plan.",
+                  })}
+                >
+                  <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+                </SupportButton>
+              ),
+              confirm: <FormattedMessage id="generic.continue" defaultMessage="Continue" />,
+            }),
+          );
+          return true;
+        } else {
+          await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
+          const firstId = fieldsWithIndices[0][0].id;
+          if (isDefined(petitionId) && typeof petitionId === "string") {
+            goToPetition(petitionId, "compose", { query: { field: firstId } });
+          }
         }
       } else {
         await withError(showErrorDialog({ message }));
@@ -526,6 +561,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                           >
                             <PreviewPetitionField
                               key={field.id}
+                              user={me}
                               petition={petition}
                               field={field}
                               isDisabled={
@@ -705,6 +741,7 @@ const _fragments = {
       ...PreviewPetitionField_PetitionBase
       ...usePetitionCanFinalize_PetitionBase
       ...HiddenFieldDialog_PetitionBase
+      ...validatePetitionFields_PetitionBase
     }
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
@@ -726,6 +763,7 @@ const _fragments = {
     ${HiddenFieldDialog.fragments.PetitionField}
     ${GeneratePrefilledPublicLinkDialog.fragments.PetitionTemplate}
     ${usePetitionCanFinalize.fragments.PetitionBase}
+    ${validatePetitionFields.fragments.PetitionBase}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {
@@ -745,9 +783,11 @@ const _fragments = {
         }
         ...useSendPetitionHandler_User
         ...ConfirmPetitionSignersDialog_User
+        ...PreviewPetitionField_User
       }
     }
     ${PetitionLayout.fragments.Query}
+    ${PreviewPetitionField.fragments.User}
     ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
     ${useSendPetitionHandler.fragments.User}
     ${ConfirmPetitionSignersDialog.fragments.User}

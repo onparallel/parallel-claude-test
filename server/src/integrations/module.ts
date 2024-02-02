@@ -1,8 +1,8 @@
 import { ContainerModule } from "inversify";
+import { AzureOpenAiIntegration } from "./AzureOpenAiIntegration";
 import { DocusignIntegration } from "./DocusignIntegration";
 import { DowJonesIntegration } from "./DowJonesIntegration";
 import { SignaturitIntegration } from "./SignaturitIntegration";
-import { AzureOpenAiIntegration } from "./AzureOpenAiIntegration";
 
 export const integrationsModule = new ContainerModule((bind) => {
   bind<DocusignIntegration>(DocusignIntegration).toSelf();

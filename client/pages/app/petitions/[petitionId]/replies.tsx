@@ -803,7 +803,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       id={`field-${x.field.id}`}
                       data-section="replies-field"
                       data-field-type={x.field.type}
-                      petitionId={petition.id}
+                      petition={petition}
                       field={x.field}
                       childrenFieldIndices={x.childrenFieldIndices}
                       fieldIndex={x.fieldIndex}
@@ -870,6 +870,7 @@ PetitionReplies.fragments = {
         variables {
           name
         }
+        ...PetitionRepliesField_Petition
         ...PetitionVariablesCard_PetitionBase
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
@@ -880,6 +881,7 @@ PetitionReplies.fragments = {
         ...PetitionRepliesSummary_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
+      ${PetitionRepliesField.fragments.Petition}
       ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
       ${getPetitionSignatureStatus.fragments.Petition}
@@ -908,31 +910,6 @@ PetitionReplies.fragments = {
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionRepliesContents.fragments.PetitionField}
-    `;
-  },
-  get Query() {
-    return gql`
-      fragment PetitionReplies_Query on Query {
-        ...PetitionLayout_Query
-        me {
-          organization {
-            name
-            isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
-            petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
-              limit
-            }
-          }
-          ...PetitionRepliesFieldComments_User
-          ...ExportRepliesDialog_User
-          ...PetitionSignaturesCard_User
-          ...useUpdateIsReadNotification_User
-        }
-      }
-      ${PetitionLayout.fragments.Query}
-      ${PetitionRepliesFieldComments.fragments.User}
-      ${ExportRepliesDialog.fragments.User}
-      ${PetitionSignaturesCard.fragments.User}
-      ${useUpdateIsReadNotification.fragments.User}
     `;
   },
 };
@@ -1110,17 +1087,32 @@ function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
 PetitionReplies.queries = [
   gql`
     query PetitionReplies_user {
-      ...PetitionReplies_Query
+      ...PetitionLayout_Query
+      me {
+        organization {
+          name
+          isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+          petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+            limit
+          }
+        }
+        hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+        ...PetitionRepliesFieldComments_User
+        ...ExportRepliesDialog_User
+        ...PetitionSignaturesCard_User
+        ...useUpdateIsReadNotification_User
+        ...PetitionRepliesSummary_User
+      }
       metadata {
         country
         browserName
       }
-      me {
-        hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-        ...PetitionRepliesSummary_User
-      }
     }
-    ${PetitionReplies.fragments.Query}
+    ${PetitionLayout.fragments.Query}
+    ${PetitionRepliesFieldComments.fragments.User}
+    ${ExportRepliesDialog.fragments.User}
+    ${PetitionSignaturesCard.fragments.User}
+    ${useUpdateIsReadNotification.fragments.User}
     ${PetitionRepliesSummary.fragments.User}
   `,
   gql`

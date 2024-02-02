@@ -32,6 +32,7 @@ import {
   PetitionFieldReplyStatus,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
+  PetitionRepliesField_PetitionFragment,
   PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -54,7 +55,7 @@ import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 
 export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
-  petitionId: string;
+  petition: PetitionRepliesField_PetitionFragment;
   field: PetitionRepliesField_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
   childrenFieldIndices: string[] | undefined;
@@ -73,7 +74,7 @@ export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
 export const PetitionRepliesField = Object.assign(
   forwardRef<HTMLElement, PetitionRepliesFieldProps>(function PetitionRepliesField(
     {
-      petitionId,
+      petition,
       field,
       fieldIndex,
       childrenFieldIndices,
@@ -96,7 +97,7 @@ export const PetitionRepliesField = Object.assign(
       await withError(
         openNewWindow(async () => {
           const { data } = await petitionFieldAttachmentDownloadLink({
-            variables: { petitionId, fieldId: field.id, attachmentId },
+            variables: { petitionId: petition.id, fieldId: field.id, attachmentId },
           });
           const { url } = data!.petitionFieldAttachmentDownloadLink;
           return url!;
@@ -413,6 +414,7 @@ export const PetitionRepliesField = Object.assign(
                                 {x.field.childReplies.length ? (
                                   x.field.childReplies.map((reply) => (
                                     <PetitionRepliesFieldReply
+                                      petition={petition}
                                       key={reply.id}
                                       reply={reply}
                                       onAction={(action) => onAction(action, reply)}
@@ -590,6 +592,7 @@ export const PetitionRepliesField = Object.assign(
               {field.replies.map((reply) => (
                 <PetitionRepliesFieldReply
                   key={reply.id}
+                  petition={petition}
                   reply={reply}
                   onAction={(action) => onAction(action, reply)}
                   onUpdateStatus={(status) => onUpdateReplyStatus(field.id, reply.id, status)}
@@ -613,6 +616,13 @@ export const PetitionRepliesField = Object.assign(
   }),
   {
     fragments: {
+      Petition: gql`
+        fragment PetitionRepliesField_Petition on Petition {
+          id
+          ...PetitionRepliesFieldReply_Petition
+        }
+        ${PetitionRepliesFieldReply.fragments.Petition}
+      `,
       PetitionField: gql`
         fragment PetitionRepliesField_PetitionField on PetitionField {
           id
@@ -672,25 +682,24 @@ export const PetitionRepliesField = Object.assign(
         ${filterPetitionFields.fragments.PetitionField}
       `,
     },
-    mutations: [
-      gql`
-        mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
-          $petitionId: GID!
-          $fieldId: GID!
-          $attachmentId: GID!
-        ) {
-          petitionFieldAttachmentDownloadLink(
-            petitionId: $petitionId
-            fieldId: $fieldId
-            attachmentId: $attachmentId
-          ) {
-            url
-          }
-        }
-      `,
-    ],
   },
 );
+
+const _mutations = gql`
+  mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
+    $petitionId: GID!
+    $fieldId: GID!
+    $attachmentId: GID!
+  ) {
+    petitionFieldAttachmentDownloadLink(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      attachmentId: $attachmentId
+    ) {
+      url
+    }
+  }
+`;
 
 function PetitionRepliesFieldAttachments({
   attachments,

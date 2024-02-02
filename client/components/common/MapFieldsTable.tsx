@@ -53,6 +53,7 @@ export const excludedFieldsTarget = [
   "ES_TAX_DOCUMENTS",
   "DYNAMIC_SELECT",
   "DOW_JONES_KYC",
+  "BACKGROUND_CHECK",
 ] as PetitionFieldType[];
 
 export const excludedFieldsOrigin = ["HEADING", "DYNAMIC_SELECT"] as PetitionFieldType[];
