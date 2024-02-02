@@ -21,7 +21,9 @@ export function getReplyContents({
   reply: getReplyContents_PetitionFieldReplyFragment;
 }): any[] {
   const { type, options } = petitionField;
-  if (isFileTypeField(type)) {
+  if (reply.isAnonymized) {
+    return [null];
+  } else if (isFileTypeField(type)) {
     return [reply.content];
   } else if (type === "NUMBER") {
     return [formatNumberWithPrefix(intl, reply.content.value, options as FieldOptions["NUMBER"])];
@@ -64,6 +66,7 @@ getReplyContents.fragments = {
     return gql`
       fragment getReplyContents_PetitionFieldReply on PetitionFieldReply {
         content
+        isAnonymized
       }
     `;
   },

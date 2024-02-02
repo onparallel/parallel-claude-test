@@ -42500,6 +42500,7 @@ export type getPetitionSignatureStatus_PetitionFragment = {
 export type getReplyContents_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   content: { [key: string]: any };
+  isAnonymized: boolean;
 };
 
 export type getReplyContents_PetitionFieldFragment = {
@@ -44695,6 +44696,7 @@ export const ContactSelect_ContactFragmentDoc = gql`
 export const getReplyContents_PetitionFieldReplyFragmentDoc = gql`
   fragment getReplyContents_PetitionFieldReply on PetitionFieldReply {
     content
+    isAnonymized
   }
 ` as unknown as DocumentNode<getReplyContents_PetitionFieldReplyFragment, unknown>;
 export const MapFieldsTable_PetitionFieldReplyFragmentDoc = gql`

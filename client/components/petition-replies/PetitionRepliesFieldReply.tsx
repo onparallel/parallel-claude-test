@@ -51,8 +51,6 @@ export function PetitionRepliesFieldReply({
 
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const contents = getReplyContents({ intl, reply, petitionField: reply.field! });
-
   const buildUrlToSection = useBuildUrlToPetitionSection();
   const editReplyIconButton = (idSuffix = "") => {
     return (
@@ -94,7 +92,7 @@ export function PetitionRepliesFieldReply({
           },
         }}
       >
-        {contents.map((content, i) => (
+        {getReplyContents({ intl, reply, petitionField: reply.field! }).map((content, i) => (
           <Fragment key={i}>
             <GridItem paddingBottom={1}>
               <CopyOrDownloadReplyButton reply={reply} content={content} onAction={onAction} />
