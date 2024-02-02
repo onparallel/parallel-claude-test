@@ -41,7 +41,7 @@ export function CopyOrDownloadReplyButton({
       ) : isFileTypeField(reply.field!.type) ? (
         <ReplyDownloadButton
           isDisabled={reply.isAnonymized || content.uploadComplete === false || content.error}
-          contentType={content.contentType}
+          contentType={reply.isAnonymized ? "" : content.contentType}
           onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
         />
       ) : (
