@@ -39,8 +39,6 @@ export interface TaskWorkerPayload {
 createQueueWorker(
   "task-worker",
   async ({ taskId }, ctx) => {
-    await ctx.redis.connect();
-
     const task = await ctx.tasks.pickupTask(taskId, ctx.config.instanceName);
     if (!isDefined(task)) {
       return;

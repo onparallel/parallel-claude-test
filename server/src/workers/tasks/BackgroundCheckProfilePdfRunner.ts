@@ -4,6 +4,7 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class BackgroundCheckProfilePdfRunner extends TaskRunner<"BACKGROUND_CHECK_PROFILE_PDF"> {
   async run() {
+    await using _ = await this.ctx.redis.withConnection();
     if (!this.task.user_id) {
       throw new Error(`Task ${this.task.id} is missing user_id`);
     }

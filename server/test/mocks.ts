@@ -80,6 +80,11 @@ export class MockRedis implements IRedis {
   async connect() {
     return;
   }
+  async withConnection() {
+    return {
+      async [Symbol.asyncDispose]() {},
+    };
+  }
   async get(): Promise<string | null> {
     return null;
   }

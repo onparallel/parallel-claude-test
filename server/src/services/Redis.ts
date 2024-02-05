@@ -9,6 +9,8 @@ export interface IRedis {
    */
   connect(): Promise<void>;
 
+  withConnection(): Promise<AsyncDisposable>;
+
   /**
    * Get the value with the speicified key.
    * @param key The key to use
@@ -39,9 +41,20 @@ export class Redis implements IRedis {
   constructor(@inject(CONFIG) config: Config) {
     this.client = redis.createClient({ socket: { ...config.redis } });
   }
+
   async connect() {
     await this.client.connect();
   }
+
+  async withConnection(): Promise<AsyncDisposable> {
+    await this.client.connect();
+    return {
+      [Symbol.asyncDispose]: async () => {
+        await this.client.disconnect();
+      },
+    };
+  }
+
   async get(key: string) {
     return await this.client.get(key);
   }
