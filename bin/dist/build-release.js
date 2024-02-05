@@ -14,6 +14,7 @@ const run_1 = require("./utils/run");
 const ssh_1 = require("./utils/ssh");
 const timestamp_1 = require("./utils/timestamp");
 const wait_1 = require("./utils/wait");
+const stopwatch_1 = require("./utils/stopwatch");
 const WORK_DIR = "/home/ec2-user";
 const BUILDER_IMAGE_ID = "ami-0292d5deba2afa9fc";
 const INSTANCE_TYPE = "c6i.2xlarge";
@@ -57,6 +58,7 @@ async function main() {
     if (!force) {
         try {
             (0, child_process_1.execSync)(`aws s3 ls ${artifactPath}`, { cwd: WORK_DIR, encoding: "utf-8" });
+            console.log(chalk_1.default.green `Build already exists. Skipping. To force build run build-release with --force or full-release with --force-build`);
             return;
         }
         catch { }
@@ -132,7 +134,7 @@ async function main() {
         await ec2.send(new client_ec2_1.AttachVolumeCommand({
             InstanceId: instanceId,
             VolumeId: YARN_CACHE_VOLUME,
-            Device: "/dev/sdy",
+            Device: "/dev/xvdy",
         }));
         await (0, wait_1.waitFor)(async () => {
             var _a, _b, _c;
@@ -143,8 +145,10 @@ async function main() {
         console.log("Uploading build script to the new instance.");
         await (0, ssh_1.copyToRemoteServer)(ipAddress, path_1.default.resolve(__dirname, `../../ops/prod/build-release.sh`), "~");
         console.log("Executing build script.");
-        // TODO check when build fails
-        await (0, ssh_1.executeRemoteCommand)(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`);
+        const { time } = await (0, stopwatch_1.withStopwatch)(async () => {
+            await (0, ssh_1.executeRemoteCommand)(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`);
+        });
+        console.log(chalk_1.default.green `Build sucessful after ${Math.round(time / 1000)} seconds.`);
     }
     finally {
         await shutdown();

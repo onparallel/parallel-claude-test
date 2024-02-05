@@ -23,6 +23,7 @@ import { run } from "./utils/run";
 import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
 import { timestamp } from "./utils/timestamp";
 import { wait, waitFor } from "./utils/wait";
+import { withStopwatch } from "./utils/stopwatch";
 
 const WORK_DIR = "/home/ec2-user";
 
@@ -79,6 +80,9 @@ async function main() {
   if (!force) {
     try {
       execSync(`aws s3 ls ${artifactPath}`, { cwd: WORK_DIR, encoding: "utf-8" });
+      console.log(
+        chalk.green`Build already exists. Skipping. To force build run build-release with --force or full-release with --force-build`,
+      );
       return;
     } catch {}
   }
@@ -164,7 +168,7 @@ async function main() {
       new AttachVolumeCommand({
         InstanceId: instanceId,
         VolumeId: YARN_CACHE_VOLUME,
-        Device: "/dev/sdy",
+        Device: "/dev/xvdy",
       }),
     );
     await waitFor(
@@ -187,8 +191,10 @@ async function main() {
       "~",
     );
     console.log("Executing build script.");
-    // TODO check when build fails
-    await executeRemoteCommand(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`);
+    const { time } = await withStopwatch(async () => {
+      await executeRemoteCommand(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`);
+    });
+    console.log(chalk.green`Build sucessful after ${Math.round(time / 1000)} seconds.`);
   } finally {
     await shutdown();
   }

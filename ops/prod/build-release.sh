@@ -8,6 +8,8 @@ ARTIFACT_PATH="${BUCKET_NAME}/${ARTIFACT_NAME}"
 WORK_DIR="/home/ec2-user"
 BUILD_DIR="${WORK_DIR}/${BUILD_ID}"
 
+set -e
+
 # mount yarn cache
 # sudo mkfs -t ext4 /dev/xvdy # format newly created volume
 sudo mkdir -p /mnt/yarn-cache
@@ -34,7 +36,7 @@ rm .env.production_ .env.staging_
 export SENTRY_AUTH_TOKEN=$(aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:eu-central-1:749273139513:secret:ops/sentry-auth-token-609sGa | jq --raw-output .SecretString)
 export ENV
 export BUILD_ID
-yarn build
+NODE_OPTIONS='--max-old-space-size=12288' yarn build
 # remove useless big files to make artifact smaller
 rm -rf .next/cache/webpack
 aws s3 sync .next/static "s3://parallel-static-${ENV}/_next/static" --cache-control max-age=31536000 --quiet
@@ -47,7 +49,10 @@ popd
 
 # prune dev dependencies to make artifact smaller
 yarn install --production --ignore-scripts --prefer-offline --frozen-lockfile --ignore-optional
+# patch-package will fail because missing dev packages but it's ok
+set +e
 yarn patch-package
+set -e
 popd
 
 tar -zcf $ARTIFACT_NAME $BUILD_ID
