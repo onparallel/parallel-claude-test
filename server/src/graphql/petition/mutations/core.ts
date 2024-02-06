@@ -1635,6 +1635,9 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
       const reply = await ctx.petitions.loadFieldReply(args.replyId);
 
       if (isFileTypeField(reply!.type)) {
+        if (!isDefined(reply?.content["file_upload_id"])) {
+          throw new ApolloError("File not found", "FILE_NOT_FOUND");
+        }
         const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
         if (!file) {
           throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
