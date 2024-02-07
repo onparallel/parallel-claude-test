@@ -29,7 +29,10 @@ const server = new ApolloServer({
   plugins: [
     ...(process.env.NODE_ENV === "production" ? [ApolloServerPluginLandingPageDisabled()] : []),
     {
-      async requestDidStart() {
+      async requestDidStart({ request: { operationName, variables }, contextValue }) {
+        contextValue.logger.debug(`Start GraphQL operation "${operationName}"`, {
+          operation: { name: operationName, variables },
+        });
         const time = process.hrtime();
         return {
           async willSendResponse({

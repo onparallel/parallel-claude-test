@@ -29,6 +29,12 @@ export function api(container: Container) {
         skip: (req, res) => res.statusCode >= 500,
       }) as any,
     )
+    .use(
+      morgan("short", {
+        immediate: true,
+        stream: { write: (message: string) => logger.debug(message) },
+      }) as any,
+    )
     .use("/auth", auth)
     .use("/webhooks", webhooks)
     .use("/lambda", lambdas)
