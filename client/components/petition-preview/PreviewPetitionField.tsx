@@ -2,7 +2,7 @@ import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
   PetitionPermissionType,
   PreviewPetitionField_PetitionBaseFragment,
-  PreviewPetitionField_PetitionFieldDocument,
+  PreviewPetitionField_queryDocument,
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
   PreviewPetitionField_UserFragment,
@@ -251,7 +251,7 @@ export function PreviewPetitionField({
     return pick(data!.retryAsyncFieldCompletion, ["type", "url"]);
   };
 
-  const { refetch } = useQuery(PreviewPetitionField_PetitionFieldDocument, {
+  const { refetch } = useQuery(PreviewPetitionField_queryDocument, {
     skip: true,
   });
   const handleRefreshAsyncField = useCallback(async () => {
@@ -411,7 +411,7 @@ PreviewPetitionField.fragments = {
 
 const _queries = [
   gql`
-    query PreviewPetitionField_PetitionField($petitionId: GID!, $fieldId: GID!) {
+    query PreviewPetitionField_query($petitionId: GID!, $fieldId: GID!) {
       petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
         ...PreviewPetitionField_PetitionField
       }

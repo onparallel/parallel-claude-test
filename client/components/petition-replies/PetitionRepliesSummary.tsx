@@ -233,17 +233,6 @@ const _mutations = [
   `,
 ];
 
-const _queries = [
-  gql`
-    query PetitionRepliesSummary_Petition($petitionId: GID!) {
-      petition(id: $petitionId) {
-        ...PetitionRepliesSummary_Petition
-      }
-    }
-    ${PetitionRepliesSummary.fragments.Petition}
-  `,
-];
-
 function ErrorAlert() {
   const intl = useIntl();
   return (

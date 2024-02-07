@@ -5,7 +5,7 @@ import {
   PreviewPetitionField_publicretryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionAccessFragment,
-  RecipientViewPetitionField_PublicPetitionFieldDocument,
+  RecipientViewPetitionField_queryDocument,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
   RecipientViewPetitionField_publicCreatePetitionFieldRepliesDocument,
@@ -246,7 +246,7 @@ export function RecipientViewPetitionField({
     return pick(data!.publicRetryAsyncFieldCompletion, ["type", "url"]);
   };
 
-  const { refetch } = useQuery(RecipientViewPetitionField_PublicPetitionFieldDocument, {
+  const { refetch } = useQuery(RecipientViewPetitionField_queryDocument, {
     skip: true,
   });
   const handleRefreshAsyncField = useCallback(
@@ -360,7 +360,7 @@ RecipientViewPetitionField.fragments = {
 
 const _queries = [
   gql`
-    query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
+    query RecipientViewPetitionField_query($keycode: ID!, $fieldId: GID!) {
       publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
         ...RecipientViewPetitionFieldLayout_PublicPetitionField
       }

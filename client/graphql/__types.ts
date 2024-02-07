@@ -17126,12 +17126,12 @@ export type PreviewPetitionField_PetitionFieldReplyFragment = {
   content: { [key: string]: any };
 };
 
-export type PreviewPetitionField_PetitionFieldQueryVariables = Exact<{
+export type PreviewPetitionField_queryQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
 }>;
 
-export type PreviewPetitionField_PetitionFieldQuery = {
+export type PreviewPetitionField_queryQuery = {
   petitionField: {
     __typename?: "PetitionField";
     id: string;
@@ -19632,28 +19632,6 @@ export type PetitionRepliesSummary_createPetitionSummaryTaskMutationVariables = 
 
 export type PetitionRepliesSummary_createPetitionSummaryTaskMutation = {
   createPetitionSummaryTask: { __typename?: "Task"; id: string };
-};
-
-export type PetitionRepliesSummary_PetitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-}>;
-
-export type PetitionRepliesSummary_PetitionQuery = {
-  petition?:
-    | {
-        __typename?: "Petition";
-        id: string;
-        summaryConfig?: { [key: string]: any } | null;
-        fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
-        latestSummaryRequest?: {
-          __typename?: "AiCompletionLog";
-          id: string;
-          status: AiCompletionLogStatus;
-          completion?: string | null;
-        } | null;
-      }
-    | { __typename?: "PetitionTemplate" }
-    | null;
 };
 
 export type DatesList_SignerStatusFragment = {
@@ -22815,12 +22793,12 @@ export type RecipientViewPetitionField_PublicPetitionFieldReplyFragment = {
   content: { [key: string]: any };
 };
 
-export type RecipientViewPetitionField_PublicPetitionFieldQueryVariables = Exact<{
+export type RecipientViewPetitionField_queryQueryVariables = Exact<{
   keycode: Scalars["ID"]["input"];
   fieldId: Scalars["GID"]["input"];
 }>;
 
-export type RecipientViewPetitionField_PublicPetitionFieldQuery = {
+export type RecipientViewPetitionField_queryQuery = {
   publicPetitionField: {
     __typename?: "PublicPetitionField";
     id: string;
@@ -56147,16 +56125,16 @@ export const ViewTabs_markPetitionListViewAsDefaultDocument = gql`
   ViewTabs_markPetitionListViewAsDefaultMutation,
   ViewTabs_markPetitionListViewAsDefaultMutationVariables
 >;
-export const PreviewPetitionField_PetitionFieldDocument = gql`
-  query PreviewPetitionField_PetitionField($petitionId: GID!, $fieldId: GID!) {
+export const PreviewPetitionField_queryDocument = gql`
+  query PreviewPetitionField_query($petitionId: GID!, $fieldId: GID!) {
     petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
       ...PreviewPetitionField_PetitionField
     }
   }
   ${PreviewPetitionField_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  PreviewPetitionField_PetitionFieldQuery,
-  PreviewPetitionField_PetitionFieldQueryVariables
+  PreviewPetitionField_queryQuery,
+  PreviewPetitionField_queryQueryVariables
 >;
 export const PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PreviewPetitionField_petitionFieldAttachmentDownloadLink(
@@ -56446,17 +56424,6 @@ export const PetitionRepliesSummary_createPetitionSummaryTaskDocument = gql`
 ` as unknown as DocumentNode<
   PetitionRepliesSummary_createPetitionSummaryTaskMutation,
   PetitionRepliesSummary_createPetitionSummaryTaskMutationVariables
->;
-export const PetitionRepliesSummary_PetitionDocument = gql`
-  query PetitionRepliesSummary_Petition($petitionId: GID!) {
-    petition(id: $petitionId) {
-      ...PetitionRepliesSummary_Petition
-    }
-  }
-  ${PetitionRepliesSummary_PetitionFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionRepliesSummary_PetitionQuery,
-  PetitionRepliesSummary_PetitionQueryVariables
 >;
 export const PetitionSignaturesCard_updatePetitionSignatureConfigDocument = gql`
   mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
@@ -56992,16 +56959,16 @@ export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation,
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables
 >;
-export const RecipientViewPetitionField_PublicPetitionFieldDocument = gql`
-  query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
+export const RecipientViewPetitionField_queryDocument = gql`
+  query RecipientViewPetitionField_query($keycode: ID!, $fieldId: GID!) {
     publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
       ...RecipientViewPetitionFieldLayout_PublicPetitionField
     }
   }
   ${RecipientViewPetitionFieldLayout_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  RecipientViewPetitionField_PublicPetitionFieldQuery,
-  RecipientViewPetitionField_PublicPetitionFieldQueryVariables
+  RecipientViewPetitionField_queryQuery,
+  RecipientViewPetitionField_queryQueryVariables
 >;
 export const RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument = gql`
   mutation RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink(
