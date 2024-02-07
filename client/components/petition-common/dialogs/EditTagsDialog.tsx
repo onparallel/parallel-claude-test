@@ -93,10 +93,11 @@ useEditTagsDialog.fragments = {
       id
       tags {
         id
-        ...useEditTagsDialog_Tag
+        ...TagSelect_Tag
       }
       lastChangeAt
     }
+    ${TagSelect.fragments.Tag}
   `,
 };
 
