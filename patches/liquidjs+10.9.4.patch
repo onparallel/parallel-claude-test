@@ -1,0 +1,28 @@
+diff --git a/node_modules/liquidjs/dist/liquid.browser.esm.js b/node_modules/liquidjs/dist/liquid.browser.esm.js
+index b69a940..dd76c5c 100644
+--- a/node_modules/liquidjs/dist/liquid.browser.esm.js
++++ b/node_modules/liquidjs/dist/liquid.browser.esm.js
+@@ -1299,8 +1299,7 @@ const defaultOperators = {
+     },
+     'contains': (l, r) => {
+         l = toValue(l);
+-        r = toValue(r);
+-        return l && isFunction(l.indexOf) ? l.indexOf(r) > -1 : false;
++        return l && isFunction(l.some) ? l.some(i => equal(i, r)) : false;
+     },
+     'not': (v, ctx) => isFalsy(toValue(v), ctx),
+     'and': (l, r, ctx) => isTruthy(toValue(l), ctx) && isTruthy(toValue(r), ctx),
+diff --git a/node_modules/liquidjs/dist/liquid.node.cjs.js b/node_modules/liquidjs/dist/liquid.node.cjs.js
+index 95e7262..7b9abe4 100644
+--- a/node_modules/liquidjs/dist/liquid.node.cjs.js
++++ b/node_modules/liquidjs/dist/liquid.node.cjs.js
+@@ -1286,8 +1286,7 @@ const defaultOperators = {
+     },
+     'contains': (l, r) => {
+         l = toValue(l);
+-        r = toValue(r);
+-        return l && isFunction(l.indexOf) ? l.indexOf(r) > -1 : false;
++        return l && isFunction(l.some) ? l.some(i => equal(i, r)) : false;
+     },
+     'not': (v, ctx) => isFalsy(toValue(v), ctx),
+     'and': (l, r, ctx) => isTruthy(toValue(l), ctx) && isTruthy(toValue(r), ctx),
