@@ -106,7 +106,7 @@ export function PreviewPetitionFieldBackgroundCheck({
     JSON.stringify({
       fieldId: field.id,
       petitionId: petition.id,
-      ...(parentReplyId ? { parentReplyId } : {}),
+      ...(!isCacheOnly && parentReplyId ? { parentReplyId } : {}),
     }),
   );
 
