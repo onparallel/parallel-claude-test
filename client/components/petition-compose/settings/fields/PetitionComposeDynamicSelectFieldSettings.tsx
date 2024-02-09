@@ -24,10 +24,11 @@ import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettin
 import { SettingsRow } from "../rows/SettingsRow";
 
 export function PetitionComposeDynamicSelectFieldSettings({
+  petitionId,
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
+}: Pick<PetitionComposeFieldSettingsProps, "petitionId" | "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
@@ -43,7 +44,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
     await withError(
       openNewWindow(async () => {
         const { data } = await downloadLink({
-          variables: { petitionId: field.petition.id, fieldId: field.id },
+          variables: { petitionId, fieldId: field.id },
         });
         const { url, result } = data!.dynamicSelectFieldFileDownloadLink;
         if (result !== "SUCCESS") {
@@ -88,7 +89,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
             />
           ) : (
             <DynamicSelectOptionsDropzone
-              petitionId={field.petition.id}
+              petitionId={petitionId}
               fieldId={field.id}
               isReadOnly={isReadOnly}
             />

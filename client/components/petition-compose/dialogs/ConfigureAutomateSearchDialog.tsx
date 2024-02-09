@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { Button, FormControl, FormHelperText, FormLabel, Stack, Text } from "@chakra-ui/react";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -6,7 +6,9 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
 import {
   BackgroundCheckEntitySearchType,
-  ConfigureAutomateSearchDialog_PetitionFieldFragment,
+  ConfigureAutomateSearchDialog_InnerPetitionFieldFragment,
+  ConfigureAutomateSearchDialog_petitionDocument,
+  PetitionComposeFieldSettings_PetitionFieldFragment,
   UpdatePetitionFieldAutoSearchConfigInput,
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
@@ -16,29 +18,35 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
 interface ConfigureAutomateSearchDialogInput {
-  fields: ConfigureAutomateSearchDialog_PetitionFieldFragment[];
-  field: ConfigureAutomateSearchDialog_PetitionFieldFragment;
+  petitionId: string;
+  field: PetitionComposeFieldSettings_PetitionFieldFragment;
 }
 
 export function ConfigureAutomateSearchDialog({
-  fields,
+  petitionId,
   field,
   ...props
 }: DialogProps<ConfigureAutomateSearchDialogInput, UpdatePetitionFieldAutoSearchConfigInput>) {
   const intl = useIntl();
 
+  const { data, loading } = useQuery(ConfigureAutomateSearchDialog_petitionDocument, {
+    variables: { id: petitionId },
+  });
+
   const { autoSearchConfig } = field.options as FieldOptions["BACKGROUND_CHECK"];
 
   const fieldIsChild = field.parent !== null;
 
-  const allFields = useMemo(
+  const fields = data?.petition?.fields ?? [];
+
+  const allFields: ConfigureAutomateSearchDialog_InnerPetitionFieldFragment[] = useMemo(
     () => fields.flatMap((f) => [f, ...(fieldIsChild ? f.children ?? [] : [])]),
     [fields],
   );
 
   const { handleSubmit, control, watch } = useForm<{
-    name: ConfigureAutomateSearchDialog_PetitionFieldFragment[];
-    date: ConfigureAutomateSearchDialog_PetitionFieldFragment | null;
+    name: ConfigureAutomateSearchDialog_InnerPetitionFieldFragment[];
+    date: ConfigureAutomateSearchDialog_InnerPetitionFieldFragment | null;
     type: BackgroundCheckEntitySearchType | null;
   }>({
     mode: "onSubmit",
@@ -113,6 +121,7 @@ export function ConfigureAutomateSearchDialog({
               render={({ field: { onChange, value }, fieldState }) => (
                 <PetitionFieldSelect
                   isMulti
+                  isLoading={loading}
                   expandFieldGroups={fieldIsChild}
                   isInvalid={fieldState.invalid}
                   value={value}
@@ -120,7 +129,7 @@ export function ConfigureAutomateSearchDialog({
                   onChange={onChange}
                   filterFields={(f) =>
                     f.type === "SHORT_TEXT" &&
-                    !(f as ConfigureAutomateSearchDialog_PetitionFieldFragment).multiple &&
+                    !f.multiple &&
                     (!f.parent || f.parent.id === field.parent?.id)
                   }
                   placeholder={intl.formatMessage({
@@ -159,13 +168,14 @@ export function ConfigureAutomateSearchDialog({
               render={({ field: { onChange, value } }) => (
                 <PetitionFieldSelect
                   isClearable
+                  isLoading={loading}
                   expandFieldGroups={fieldIsChild}
                   value={value}
                   fields={fields}
                   onChange={onChange}
                   filterFields={(f) =>
                     f.type === "DATE" &&
-                    !(f as ConfigureAutomateSearchDialog_PetitionFieldFragment).multiple &&
+                    !f.multiple &&
                     (!f.parent || f.parent.id === field.parent?.id)
                   }
                   placeholder={intl.formatMessage({
@@ -216,17 +226,40 @@ export function useConfigureAutomateSearchDialog() {
 }
 
 ConfigureAutomateSearchDialog.fragments = {
-  PetitionField: gql`
-    fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
-      id
-      type
-      options
-      multiple
-      parent {
-        id
+  get PetitionField() {
+    return gql`
+      fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
+        ...ConfigureAutomateSearchDialog_InnerPetitionField
+        children {
+          ...ConfigureAutomateSearchDialog_InnerPetitionField
+        }
+        ...PetitionFieldSelect_PetitionField
       }
-      ...PetitionFieldSelect_PetitionField
-    }
-    ${PetitionFieldSelect.fragments.PetitionField}
-  `,
+
+      fragment ConfigureAutomateSearchDialog_InnerPetitionField on PetitionField {
+        id
+        type
+        options
+        multiple
+        parent {
+          id
+        }
+      }
+      ${PetitionFieldSelect.fragments.PetitionField}
+    `;
+  },
 };
+
+const _queries = [
+  gql`
+    query ConfigureAutomateSearchDialog_petition($id: GID!) {
+      petition(id: $id) {
+        id
+        fields {
+          ...ConfigureAutomateSearchDialog_PetitionField
+        }
+      }
+    }
+    ${ConfigureAutomateSearchDialog.fragments.PetitionField}
+  `,
+];

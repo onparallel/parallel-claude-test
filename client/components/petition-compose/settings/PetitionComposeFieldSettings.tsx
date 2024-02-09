@@ -15,6 +15,7 @@ import { ComponentType, PropsWithChildren, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
+import { PetitionComposeBackgroundCheckSettings } from "./fields/PetitionComposeBackgroundCheckSettings";
 import { PetitionComposeCheckboxSettings } from "./fields/PetitionComposeCheckboxSettings";
 import { PetitionComposeDynamicSelectFieldSettings } from "./fields/PetitionComposeDynamicSelectFieldSettings";
 import { PetitionComposeFieldGroupSettings } from "./fields/PetitionComposeFieldGroupSettings";
@@ -31,7 +32,6 @@ import { SettingsRowAlias } from "./rows/SettingsRowAlias";
 import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
-import { PetitionComposeBackgroundCheckSettings } from "./fields/PetitionComposeBackgroundCheckSettings";
 
 export interface PetitionComposeFieldSettingsProps {
   petitionId: string;
@@ -48,7 +48,9 @@ export interface PetitionComposeFieldSettingsProps {
 const COMPONENTS: Partial<
   Record<
     PetitionFieldType,
-    ComponentType<Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">>
+    ComponentType<
+      Pick<PetitionComposeFieldSettingsProps, "petitionId" | "field" | "onFieldEdit" | "isReadOnly">
+    >
   >
 > = {
   HEADING: PetitionComposeHeadingSettings,
@@ -169,7 +171,12 @@ export const PetitionComposeFieldSettings = Object.assign(
                   />
                 </Box>
               ) : null}
-              <SettingsComponent field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+              <SettingsComponent
+                petitionId={petitionId}
+                field={field}
+                onFieldEdit={onFieldEdit}
+                isReadOnly={isReadOnly}
+              />
               {canChangeMultiple ? (
                 field.type === "FILE_UPLOAD" ? (
                   <AllowMultipleFilesSettingsRow
@@ -316,17 +323,9 @@ export const PetitionComposeFieldSettings = Object.assign(
               type
             }
           }
-          petition {
-            id
-            fields {
-              id
-            }
-          }
           ...SettingsRowAlias_PetitionField
-          ...PetitionComposeBackgroundCheckSettings_PetitionField
         }
         ${SettingsRowAlias.fragments.PetitionField}
-        ${PetitionComposeBackgroundCheckSettings.fragments.PetitionField}
       `,
     },
   },

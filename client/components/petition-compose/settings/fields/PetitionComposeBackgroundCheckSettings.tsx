@@ -2,23 +2,21 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, HStack, Text } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
+import { PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigDocument } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import {
-  ConfigureAutomateSearchDialog,
-  useConfigureAutomateSearchDialog,
-} from "../../dialogs/ConfigureAutomateSearchDialog";
+import { useConfigureAutomateSearchDialog } from "../../dialogs/ConfigureAutomateSearchDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowButton } from "../rows/SettingsRowButton";
-import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigDocument } from "@parallel/graphql/__types";
 
 export function PetitionComposeBackgroundCheckSettings({
+  petitionId,
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
+}: Pick<PetitionComposeFieldSettingsProps, "petitionId" | "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const options = field.options as FieldOptions["BACKGROUND_CHECK"];
   const isDisabled = field.visibility !== null || isReadOnly || field.isFixed;
@@ -45,14 +43,14 @@ export function PetitionComposeBackgroundCheckSettings({
         });
       } else {
         const config = await showAutomateSearchDialog({
-          fields: field.petition.fields,
+          petitionId,
           field,
         });
 
         await updatePetitionFieldAutoSearchConfig({
           variables: {
             fieldId: field.id,
-            petitionId: field.petition.id,
+            petitionId,
             config,
           },
         });
@@ -132,30 +130,6 @@ export function PetitionComposeBackgroundCheckSettings({
     </>
   );
 }
-
-PetitionComposeBackgroundCheckSettings.fragments = {
-  PetitionField: gql`
-    fragment PetitionComposeBackgroundCheckSettings_PetitionField on PetitionField {
-      id
-      petition {
-        id
-        organization {
-          id
-        }
-        fields {
-          id
-          ...ConfigureAutomateSearchDialog_PetitionField
-          children {
-            id
-            ...ConfigureAutomateSearchDialog_PetitionField
-          }
-        }
-      }
-      ...ConfigureAutomateSearchDialog_PetitionField
-    }
-    ${ConfigureAutomateSearchDialog.fragments.PetitionField}
-  `,
-};
 
 const _mutations = [
   gql`

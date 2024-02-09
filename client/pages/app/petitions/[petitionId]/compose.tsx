@@ -29,10 +29,7 @@ import { PetitionComposeVariables } from "@parallel/components/petition-compose/
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
-import {
-  ConfigureAutomateSearchDialog,
-  useConfigureAutomateSearchDialog,
-} from "@parallel/components/petition-compose/dialogs/ConfigureAutomateSearchDialog";
+import { useConfigureAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureAutomateSearchDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
@@ -344,7 +341,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       try {
         await showFieldUsedForSearchesDialog();
         const autoSearchConfig = await showAutomateSearchDialog({
-          fields: allFieldsWithIndices.map(([f]) => f),
+          petitionId,
           field: backgroundCheckField,
         });
 
@@ -1294,7 +1291,6 @@ const _fragments = {
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         ...ReferencedFieldDialog_PetitionField
-        ...ConfigureAutomateSearchDialog_PetitionField
         parent {
           id
           position
@@ -1306,7 +1302,6 @@ const _fragments = {
           ...validatePetitionFields_PetitionField
           ...FieldErrorDialog_PetitionField
           ...ReferencedFieldDialog_PetitionField
-          ...ConfigureAutomateSearchDialog_PetitionField
           parent {
             id
             position
@@ -1322,7 +1317,6 @@ const _fragments = {
       ${validatePetitionFields.fragments.PetitionField}
       ${FieldErrorDialog.fragments.PetitionField}
       ${ReferencedFieldDialog.fragments.PetitionField}
-      ${ConfigureAutomateSearchDialog.fragments.PetitionField}
     `;
   },
   get Query() {

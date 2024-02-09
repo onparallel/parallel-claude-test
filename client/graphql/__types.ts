@@ -15066,15 +15066,78 @@ export type ConfigureAutomateSearchDialog_PetitionFieldFragment = {
   options: { [key: string]: any };
   multiple: boolean;
   title?: string | null;
-  parent?: { __typename?: "PetitionField"; id: string } | null;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: string | null;
     options: { [key: string]: any };
+    multiple: boolean;
+    title?: string | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }> | null;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+};
+
+export type ConfigureAutomateSearchDialog_InnerPetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  multiple: boolean;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+};
+
+export type ConfigureAutomateSearchDialog_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type ConfigureAutomateSearchDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          multiple: boolean;
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            multiple: boolean;
+            title?: string | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+          }> | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          multiple: boolean;
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            multiple: boolean;
+            title?: string | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+          }> | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        }>;
+      }
+    | null;
 };
 
 export type useConfirmDiscardDraftDialog_PetitionBase_Petition_Fragment = {
@@ -15569,69 +15632,6 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
     isInternal: boolean;
     children?: Array<{ __typename?: "PetitionField"; id: string; type: PetitionFieldType }> | null;
   } | null;
-  petition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          multiple: boolean;
-          title?: string | null;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              title?: string | null;
-              options: { [key: string]: any };
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }> | null;
-          }> | null;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        }>;
-        organization: { __typename?: "Organization"; id: string };
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          multiple: boolean;
-          title?: string | null;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              title?: string | null;
-              options: { [key: string]: any };
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }> | null;
-          }> | null;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        }>;
-        organization: { __typename?: "Organization"; id: string };
-      };
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -15640,88 +15640,6 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
     multiple: boolean;
     alias?: string | null;
     options: { [key: string]: any };
-    parent?: { __typename?: "PetitionField"; id: string } | null;
-  }> | null;
-};
-
-export type PetitionComposeBackgroundCheckSettings_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  multiple: boolean;
-  title?: string | null;
-  petition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        organization: { __typename?: "Organization"; id: string };
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          multiple: boolean;
-          title?: string | null;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              title?: string | null;
-              options: { [key: string]: any };
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }> | null;
-          }> | null;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        organization: { __typename?: "Organization"; id: string };
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          multiple: boolean;
-          title?: string | null;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              title?: string | null;
-              options: { [key: string]: any };
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }> | null;
-          }> | null;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        }>;
-      };
-  parent?: { __typename?: "PetitionField"; id: string } | null;
-  children?: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-    options: { [key: string]: any };
-    parent?: { __typename?: "PetitionField"; id: string } | null;
   }> | null;
 };
 
@@ -30719,7 +30637,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -30733,69 +30651,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     parent?: {
       __typename?: "PetitionField";
@@ -30810,69 +30665,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       }> | null;
     } | null;
     replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-    petition:
-      | {
-          __typename?: "Petition";
-          id: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        };
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -31073,7 +30865,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -31087,69 +30879,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     parent?: {
       __typename?: "PetitionField";
@@ -31163,69 +30892,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         type: PetitionFieldType;
       }> | null;
     } | null;
-    petition:
-      | {
-          __typename?: "Petition";
-          id: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        };
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -31396,7 +31062,7 @@ export type PetitionCompose_PetitionFieldFragment = {
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
       isInternal: boolean;
-      parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+      parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -31410,133 +31076,7 @@ export type PetitionCompose_PetitionFieldFragment = {
         isComplete: boolean;
       };
     }>;
-    petition:
-      | {
-          __typename?: "Petition";
-          id: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        };
   }> | null;
-  petition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          multiple: boolean;
-          title?: string | null;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              title?: string | null;
-              options: { [key: string]: any };
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }> | null;
-          }> | null;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        }>;
-        organization: { __typename?: "Organization"; id: string };
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          multiple: boolean;
-          title?: string | null;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              title?: string | null;
-              options: { [key: string]: any };
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }> | null;
-          }> | null;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        }>;
-        organization: { __typename?: "Organization"; id: string };
-      };
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
     id: string;
@@ -31964,30 +31504,9 @@ export type PetitionCompose_createPetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
+            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
-          organization: { __typename?: "Organization"; id: string };
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
           myEffectivePermission?: {
@@ -32008,30 +31527,9 @@ export type PetitionCompose_createPetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
+            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
-          organization: { __typename?: "Organization"; id: string };
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -32093,7 +31591,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -32107,69 +31605,6 @@ export type PetitionCompose_createPetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
@@ -32265,30 +31700,9 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
+            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
-          organization: { __typename?: "Organization"; id: string };
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
           myEffectivePermission?: {
@@ -32309,30 +31723,9 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
+            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }>;
-          organization: { __typename?: "Organization"; id: string };
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -32394,7 +31787,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -32408,69 +31801,6 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -32570,71 +31900,8 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     requireApproval: boolean;
     description?: string | null;
     petition:
-      | {
-          __typename?: "Petition";
-          status: PetitionStatus;
-          id: string;
-          lastChangeAt: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          lastChangeAt: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        };
+      | { __typename?: "Petition"; status: PetitionStatus; id: string; lastChangeAt: string }
+      | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
     parent?: {
       __typename?: "PetitionField";
       id: string;
@@ -32690,7 +31957,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -32704,69 +31971,6 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -32812,71 +32016,8 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     requireApproval: boolean;
     description?: string | null;
     petition:
-      | {
-          __typename?: "Petition";
-          status: PetitionStatus;
-          id: string;
-          lastChangeAt: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          lastChangeAt: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
-        };
+      | { __typename?: "Petition"; status: PetitionStatus; id: string; lastChangeAt: string }
+      | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
     parent?: {
       __typename?: "PetitionField";
       id: string;
@@ -32932,7 +32073,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -32946,69 +32087,6 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -33058,65 +32136,13 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
           __typename?: "Petition";
           id: string;
           lastChangeAt: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
         }
       | {
           __typename?: "PetitionTemplate";
           id: string;
           lastChangeAt: string;
-          fields: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
-            parent?: { __typename?: "PetitionField"; id: string } | null;
-          }>;
-          organization: { __typename?: "Organization"; id: string };
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
     parent?: {
       __typename?: "PetitionField";
@@ -33173,7 +32199,7 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -33187,69 +32213,6 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -33302,30 +32265,8 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
           }>;
-          organization: { __typename?: "Organization"; id: string };
         }
       | {
           __typename?: "PetitionTemplate";
@@ -33334,30 +32275,8 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
           fields: Array<{
             __typename?: "PetitionField";
             id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            multiple: boolean;
-            title?: string | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                title?: string | null;
-                options: { [key: string]: any };
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              }> | null;
-            }> | null;
           }>;
-          organization: { __typename?: "Organization"; id: string };
         };
     parent?: {
       __typename?: "PetitionField";
@@ -33414,7 +32333,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
         visibility?: { [key: string]: any } | null;
         math?: Array<{ [key: string]: any }> | null;
         isInternal: boolean;
-        parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+        parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
       }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -33428,69 +32347,6 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
           isComplete: boolean;
         };
       }>;
-      petition:
-        | {
-            __typename?: "Petition";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          }
-        | {
-            __typename?: "PetitionTemplate";
-            id: string;
-            fields: Array<{
-              __typename?: "PetitionField";
-              id: string;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              multiple: boolean;
-              title?: string | null;
-              children?: Array<{
-                __typename?: "PetitionField";
-                id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                multiple: boolean;
-                title?: string | null;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-                children?: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  title?: string | null;
-                  options: { [key: string]: any };
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }> | null;
-              }> | null;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            }>;
-            organization: { __typename?: "Organization"; id: string };
-          };
     }> | null;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -33724,7 +32580,7 @@ export type PetitionCompose_petitionQuery = {
               visibility?: { [key: string]: any } | null;
               math?: Array<{ [key: string]: any }> | null;
               isInternal: boolean;
-              parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+              parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
             }> | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
@@ -33738,69 +32594,6 @@ export type PetitionCompose_petitionQuery = {
                 isComplete: boolean;
               };
             }>;
-            petition:
-              | {
-                  __typename?: "Petition";
-                  id: string;
-                  fields: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      options: { [key: string]: any };
-                      multiple: boolean;
-                      title?: string | null;
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                      children?: Array<{
-                        __typename?: "PetitionField";
-                        id: string;
-                        type: PetitionFieldType;
-                        title?: string | null;
-                        options: { [key: string]: any };
-                        parent?: { __typename?: "PetitionField"; id: string } | null;
-                      }> | null;
-                    }> | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                  }>;
-                  organization: { __typename?: "Organization"; id: string };
-                }
-              | {
-                  __typename?: "PetitionTemplate";
-                  id: string;
-                  fields: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      options: { [key: string]: any };
-                      multiple: boolean;
-                      title?: string | null;
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                      children?: Array<{
-                        __typename?: "PetitionField";
-                        id: string;
-                        type: PetitionFieldType;
-                        title?: string | null;
-                        options: { [key: string]: any };
-                        parent?: { __typename?: "PetitionField"; id: string } | null;
-                      }> | null;
-                    }> | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                  }>;
-                  organization: { __typename?: "Organization"; id: string };
-                };
           }> | null;
           parent?: {
             __typename?: "PetitionField";
@@ -33815,69 +32608,6 @@ export type PetitionCompose_petitionQuery = {
             }> | null;
           } | null;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-          petition:
-            | {
-                __typename?: "Petition";
-                id: string;
-                fields: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  options: { [key: string]: any };
-                  multiple: boolean;
-                  title?: string | null;
-                  children?: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      title?: string | null;
-                      options: { [key: string]: any };
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                    }> | null;
-                  }> | null;
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }>;
-                organization: { __typename?: "Organization"; id: string };
-              }
-            | {
-                __typename?: "PetitionTemplate";
-                id: string;
-                fields: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  options: { [key: string]: any };
-                  multiple: boolean;
-                  title?: string | null;
-                  children?: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      title?: string | null;
-                      options: { [key: string]: any };
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                    }> | null;
-                  }> | null;
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }>;
-                organization: { __typename?: "Organization"; id: string };
-              };
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -34100,7 +32830,7 @@ export type PetitionCompose_petitionQuery = {
               visibility?: { [key: string]: any } | null;
               math?: Array<{ [key: string]: any }> | null;
               isInternal: boolean;
-              parent?: { __typename?: "PetitionField"; isInternal: boolean; id: string } | null;
+              parent?: { __typename?: "PetitionField"; isInternal: boolean } | null;
             }> | null;
             attachments: Array<{
               __typename?: "PetitionFieldAttachment";
@@ -34114,69 +32844,6 @@ export type PetitionCompose_petitionQuery = {
                 isComplete: boolean;
               };
             }>;
-            petition:
-              | {
-                  __typename?: "Petition";
-                  id: string;
-                  fields: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      options: { [key: string]: any };
-                      multiple: boolean;
-                      title?: string | null;
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                      children?: Array<{
-                        __typename?: "PetitionField";
-                        id: string;
-                        type: PetitionFieldType;
-                        title?: string | null;
-                        options: { [key: string]: any };
-                        parent?: { __typename?: "PetitionField"; id: string } | null;
-                      }> | null;
-                    }> | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                  }>;
-                  organization: { __typename?: "Organization"; id: string };
-                }
-              | {
-                  __typename?: "PetitionTemplate";
-                  id: string;
-                  fields: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      options: { [key: string]: any };
-                      multiple: boolean;
-                      title?: string | null;
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                      children?: Array<{
-                        __typename?: "PetitionField";
-                        id: string;
-                        type: PetitionFieldType;
-                        title?: string | null;
-                        options: { [key: string]: any };
-                        parent?: { __typename?: "PetitionField"; id: string } | null;
-                      }> | null;
-                    }> | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                  }>;
-                  organization: { __typename?: "Organization"; id: string };
-                };
           }> | null;
           parent?: {
             __typename?: "PetitionField";
@@ -34190,69 +32857,6 @@ export type PetitionCompose_petitionQuery = {
               type: PetitionFieldType;
             }> | null;
           } | null;
-          petition:
-            | {
-                __typename?: "Petition";
-                id: string;
-                fields: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  options: { [key: string]: any };
-                  multiple: boolean;
-                  title?: string | null;
-                  children?: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      title?: string | null;
-                      options: { [key: string]: any };
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                    }> | null;
-                  }> | null;
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }>;
-                organization: { __typename?: "Organization"; id: string };
-              }
-            | {
-                __typename?: "PetitionTemplate";
-                id: string;
-                fields: Array<{
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  options: { [key: string]: any };
-                  multiple: boolean;
-                  title?: string | null;
-                  children?: Array<{
-                    __typename?: "PetitionField";
-                    id: string;
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    multiple: boolean;
-                    title?: string | null;
-                    parent?: { __typename?: "PetitionField"; id: string } | null;
-                    children?: Array<{
-                      __typename?: "PetitionField";
-                      id: string;
-                      type: PetitionFieldType;
-                      title?: string | null;
-                      options: { [key: string]: any };
-                      parent?: { __typename?: "PetitionField"; id: string } | null;
-                    }> | null;
-                  }> | null;
-                  parent?: { __typename?: "PetitionField"; id: string } | null;
-                }>;
-                organization: { __typename?: "Organization"; id: string };
-              };
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -47662,6 +46266,26 @@ export const CreateFolderDialog_PetitionBaseFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<CreateFolderDialog_PetitionBaseFragment, unknown>;
+export const Tag_TagFragmentDoc = gql`
+  fragment Tag_Tag on Tag {
+    name
+    color
+  }
+` as unknown as DocumentNode<Tag_TagFragment, unknown>;
+export const TagSelect_TagFragmentDoc = gql`
+  fragment TagSelect_Tag on Tag {
+    id
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
+` as unknown as DocumentNode<TagSelect_TagFragment, unknown>;
+export const useEditTagsDialog_TagFragmentDoc = gql`
+  fragment useEditTagsDialog_Tag on Tag {
+    id
+    ...TagSelect_Tag
+  }
+  ${TagSelect_TagFragmentDoc}
+` as unknown as DocumentNode<useEditTagsDialog_TagFragment, unknown>;
 export const ImportRepliesDialog_PetitionFieldFragmentDoc = gql`
   fragment ImportRepliesDialog_PetitionField on PetitionField {
     id
@@ -48059,6 +46683,28 @@ export const PetitionComposeVariables_PetitionFieldFragmentDoc = gql`
   }
   ${ReferencedCalculationsDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeVariables_PetitionFieldFragment, unknown>;
+export const ConfigureAutomateSearchDialog_InnerPetitionFieldFragmentDoc = gql`
+  fragment ConfigureAutomateSearchDialog_InnerPetitionField on PetitionField {
+    id
+    type
+    options
+    multiple
+    parent {
+      id
+    }
+  }
+` as unknown as DocumentNode<ConfigureAutomateSearchDialog_InnerPetitionFieldFragment, unknown>;
+export const ConfigureAutomateSearchDialog_PetitionFieldFragmentDoc = gql`
+  fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
+    ...ConfigureAutomateSearchDialog_InnerPetitionField
+    children {
+      ...ConfigureAutomateSearchDialog_InnerPetitionField
+    }
+    ...PetitionFieldSelect_PetitionField
+  }
+  ${ConfigureAutomateSearchDialog_InnerPetitionFieldFragmentDoc}
+  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<ConfigureAutomateSearchDialog_PetitionFieldFragment, unknown>;
 export const CreateOrUpdatePetitionVariableDialog_PetitionBaseFragmentDoc = gql`
   fragment CreateOrUpdatePetitionVariableDialog_PetitionBase on PetitionBase {
     id
@@ -48166,12 +46812,6 @@ export const ViewTabs_UserFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<ViewTabs_UserFragment, unknown>;
-export const Tag_TagFragmentDoc = gql`
-  fragment Tag_Tag on Tag {
-    name
-    color
-  }
-` as unknown as DocumentNode<Tag_TagFragment, unknown>;
 export const PetitionListTagFilter_TagFragmentDoc = gql`
   fragment PetitionListTagFilter_Tag on Tag {
     id
@@ -49511,30 +48151,16 @@ export const PetitionHeader_PetitionTemplateFragmentDoc = gql`
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
   ${useDeletePetitions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionHeader_PetitionTemplateFragment, unknown>;
-export const TagSelect_TagFragmentDoc = gql`
-  fragment TagSelect_Tag on Tag {
-    id
-    ...Tag_Tag
-  }
-  ${Tag_TagFragmentDoc}
-` as unknown as DocumentNode<TagSelect_TagFragment, unknown>;
-export const useEditTagsDialog_TagFragmentDoc = gql`
-  fragment useEditTagsDialog_Tag on Tag {
-    id
-    ...TagSelect_Tag
-  }
-  ${TagSelect_TagFragmentDoc}
-` as unknown as DocumentNode<useEditTagsDialog_TagFragment, unknown>;
 export const useEditTagsDialog_PetitionBaseFragmentDoc = gql`
   fragment useEditTagsDialog_PetitionBase on PetitionBase {
     id
     tags {
       id
-      ...useEditTagsDialog_Tag
+      ...TagSelect_Tag
     }
     lastChangeAt
   }
-  ${useEditTagsDialog_TagFragmentDoc}
+  ${TagSelect_TagFragmentDoc}
 ` as unknown as DocumentNode<useEditTagsDialog_PetitionBaseFragment, unknown>;
 export const PetitionHeader_PetitionBaseFragmentDoc = gql`
   fragment PetitionHeader_PetitionBase on PetitionBase {
@@ -51428,40 +50054,6 @@ export const SettingsRowAlias_PetitionFieldFragmentDoc = gql`
   ${CopyLiquidReferenceButton_PetitionFieldFragmentDoc}
   ${MoreLiquidReferencesButton_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<SettingsRowAlias_PetitionFieldFragment, unknown>;
-export const ConfigureAutomateSearchDialog_PetitionFieldFragmentDoc = gql`
-  fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
-    id
-    type
-    options
-    multiple
-    parent {
-      id
-    }
-    ...PetitionFieldSelect_PetitionField
-  }
-  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<ConfigureAutomateSearchDialog_PetitionFieldFragment, unknown>;
-export const PetitionComposeBackgroundCheckSettings_PetitionFieldFragmentDoc = gql`
-  fragment PetitionComposeBackgroundCheckSettings_PetitionField on PetitionField {
-    id
-    petition {
-      id
-      organization {
-        id
-      }
-      fields {
-        id
-        ...ConfigureAutomateSearchDialog_PetitionField
-        children {
-          id
-          ...ConfigureAutomateSearchDialog_PetitionField
-        }
-      }
-    }
-    ...ConfigureAutomateSearchDialog_PetitionField
-  }
-  ${ConfigureAutomateSearchDialog_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionComposeBackgroundCheckSettings_PetitionFieldFragment, unknown>;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
     id
@@ -51489,17 +50081,9 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
         type
       }
     }
-    petition {
-      id
-      fields {
-        id
-      }
-    }
     ...SettingsRowAlias_PetitionField
-    ...PetitionComposeBackgroundCheckSettings_PetitionField
   }
   ${SettingsRowAlias_PetitionFieldFragmentDoc}
-  ${PetitionComposeBackgroundCheckSettings_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldSettings_PetitionFieldFragment, unknown>;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   fragment PetitionCompose_PetitionField on PetitionField {
@@ -51509,7 +50093,6 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
     ...validatePetitionFields_PetitionField
     ...FieldErrorDialog_PetitionField
     ...ReferencedFieldDialog_PetitionField
-    ...ConfigureAutomateSearchDialog_PetitionField
     parent {
       id
       position
@@ -51521,7 +50104,6 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
       ...validatePetitionFields_PetitionField
       ...FieldErrorDialog_PetitionField
       ...ReferencedFieldDialog_PetitionField
-      ...ConfigureAutomateSearchDialog_PetitionField
       parent {
         id
         position
@@ -51537,7 +50119,6 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   ${validatePetitionFields_PetitionFieldFragmentDoc}
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
   ${ReferencedFieldDialog_PetitionFieldFragmentDoc}
-  ${ConfigureAutomateSearchDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_PetitionFieldFragment, unknown>;
 export const PetitionComposeVariables_PetitionBaseFragmentDoc = gql`
   fragment PetitionComposeVariables_PetitionBase on PetitionBase {
@@ -55927,6 +54508,20 @@ export const PetitionSettings_updateTemplateDefaultPermissionsDocument = gql`
 ` as unknown as DocumentNode<
   PetitionSettings_updateTemplateDefaultPermissionsMutation,
   PetitionSettings_updateTemplateDefaultPermissionsMutationVariables
+>;
+export const ConfigureAutomateSearchDialog_petitionDocument = gql`
+  query ConfigureAutomateSearchDialog_petition($id: GID!) {
+    petition(id: $id) {
+      id
+      fields {
+        ...ConfigureAutomateSearchDialog_PetitionField
+      }
+    }
+  }
+  ${ConfigureAutomateSearchDialog_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  ConfigureAutomateSearchDialog_petitionQuery,
+  ConfigureAutomateSearchDialog_petitionQueryVariables
 >;
 export const CreateOrUpdatePetitionVariableDialog_createPetitionVariableDocument = gql`
   mutation CreateOrUpdatePetitionVariableDialog_createPetitionVariable(
