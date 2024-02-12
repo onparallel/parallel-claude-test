@@ -152,7 +152,15 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
                                 "https://static.onparallel.com/static/images/signatures/juan-francisco-sahuquillo-cebrian-tiko.png",
                             },
                           ]
-                        : []
+                        : ["zas25KHxAByKXaxCQoK"].includes(templateId)
+                          ? [
+                              {
+                                fullName: "Manuel Holstein",
+                                signatureImageUrl:
+                                  "https://static.onparallel.com/static/images/signatures/manuel-holstein-tiko.png",
+                              },
+                            ]
+                          : []
       : []),
     ...signatureConfig.signers!.map((signer, i) => ({
       wordAnchor: `3cb39pzCQA9wJ${i}`,
