@@ -453,7 +453,7 @@ export function defaultFieldProperties(
               ? field.options.values
               : [],
           limit: {
-            type: "UNLIMITED",
+            type: "RADIO",
             min: optional ?? false ? 0 : 1,
             max: 1,
           },
