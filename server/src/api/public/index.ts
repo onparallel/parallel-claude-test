@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import stringify from "fast-safe-stringify";
 import { unlink } from "fs/promises";
 import { GraphQLClient, gql } from "graphql-request";
@@ -333,9 +334,10 @@ export const api = new RestApi({
     if (!authorization) {
       throw new UnauthorizedError("API token is missing");
     }
+    req.requestId = randomUUID();
     return {
       client: new GraphQLClient("http://localhost/graphql", {
-        headers: { authorization },
+        headers: { authorization, "api-request-id": req.requestId },
       }),
     };
   },

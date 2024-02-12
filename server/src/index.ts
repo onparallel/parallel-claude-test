@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { json } from "express";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
+import onFinished from "on-finished";
 import { api } from "./api";
 import { createContainer } from "./container";
 import { ApiContext } from "./context";
@@ -33,7 +34,6 @@ const server = new ApolloServer({
         contextValue.logger.debug(`Start GraphQL operation "${operationName}"`, {
           operation: { name: operationName, variables },
         });
-        const time = process.hrtime();
         return {
           async willSendResponse({
             request: { operationName, variables },
@@ -60,10 +60,10 @@ const server = new ApolloServer({
                 }
               });
             }
-            const duration = stopwatchEnd(time);
-            contextValue.logger.info(`GraphQL operation "${operationName}" - ${duration}ms`, {
-              operation: { name: operationName, variables },
-              duration,
+            contextValue.req.graphQLOperations ??= [];
+            contextValue.req.graphQLOperations!.push({
+              name: operationName!,
+              variables: variables!,
             });
           },
         };
@@ -83,6 +83,7 @@ if (process.env.TS_NODE_DEV) {
   await loadEnv();
   const container = createContainer();
   const redis = container.get<IRedis>(REDIS);
+  const logger = container.get<ILogger>(LOGGER);
   await Promise.all([redis.connect(), server.start()]);
 
   const port = process.env.PORT || 4000;
@@ -91,6 +92,32 @@ if (process.env.TS_NODE_DEV) {
     .get("/ping", (req, res, next) =>
       res.set("content-type", "text/plain").status(200).send("pong"),
     )
+    .use((req, res, next) => {
+      const context = container.get<ApiContext>(ApiContext);
+      context.req = req;
+      req.context = context;
+      const time = process.hrtime();
+      const url = req.originalUrl ?? req.url;
+      const ip = req.header("x-forwarded-for") ?? req.ip ?? req.socket.remoteAddress;
+      const method = req.method;
+      logger.debug(`${method} ${url}`);
+      onFinished(res, () => {
+        const statusCode = res.statusCode;
+        const duration = stopwatchEnd(time);
+        const length = res.getHeader("content-length");
+        logger[statusCode >= 500 ? "error" : "info"](
+          `${ip} ${method} ${url} ${statusCode} ${length}B ${duration}ms`,
+          {
+            userId: req.context?.trails.userId,
+            accessId: req.context?.trails.accessId,
+            orgId: req.context?.trails.orgId,
+            graphQL: req.graphQLOperations,
+            requestId: req.header("api-request-id") ?? req.requestId,
+          },
+        );
+      });
+      next();
+    })
     .use("/api", cors(), cookieParser(), api(container))
     .use(
       "/graphql",
@@ -98,11 +125,7 @@ if (process.env.TS_NODE_DEV) {
       json({ limit: "2mb" }),
       graphqlUploadExpress(),
       expressMiddleware(server, {
-        context: async ({ req }) => {
-          const context = container.get<ApiContext>(ApiContext);
-          context.req = req;
-          return context;
-        },
+        context: async ({ req }) => req.context,
       }),
     )
     .listen(port, () => {

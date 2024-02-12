@@ -29,7 +29,9 @@ export const scim = Router().use(
       if (!integration) {
         throw new Error("Invalid authentication");
       }
-      req.context.organization = await req.context.organizations.loadOrg(integration.org_id);
+      const organization = await req.context.organizations.loadOrg(integration.org_id);
+      req.context.organization = organization;
+      req.context.trails["orgId"] = organization?.id;
       next();
     } catch (error) {
       return res.sendStatus(401);

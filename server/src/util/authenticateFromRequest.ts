@@ -13,6 +13,7 @@ export async function authenticateFromRequest(req: IncomingMessage, ctx: ApiCont
   } else {
     ctx.user = user;
     ctx.realUser = realUser ?? user;
+    ctx.trails["userId"] = user.id;
     return true;
   }
 }

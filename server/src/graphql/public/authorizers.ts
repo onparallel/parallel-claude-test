@@ -70,6 +70,7 @@ export function fetchPetitionAccess<
       );
     } else {
       ctx.access = access;
+      ctx.trails["accessId"] = access?.id;
       const [contact, petition] = await Promise.all([
         access.contact_id ? ctx.contacts.loadContact(access.contact_id) : null,
         ctx.petitions.loadPetition(access.petition_id),

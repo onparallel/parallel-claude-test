@@ -73,6 +73,10 @@ export class ApiContext {
   contact: Contact | null = null;
   access: PetitionAccess | null = null;
   organization: Organization | null = null;
+  // @apollo server shallowly clones the context so we need a place to put this
+  // so express can access this later for loggin
+  readonly trails: Record<string, any> = {};
+
   req!: express.Request;
   constructor(
     @inject(CONFIG) public config: Config,
