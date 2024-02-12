@@ -70,6 +70,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
 
   const { data: petitionData } = useQuery(ImportRepliesDialog_petitionDocument, {
     variables: { petitionId },
+    fetchPolicy: "cache-and-network",
   });
 
   const petitionSelectorRef = useRef<PetitionSelectInstance<false>>(null);
@@ -183,6 +184,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                 variables: {
                   petitionId: data.sourcePetitionId,
                 },
+                fetchPolicy: "cache-and-network",
               });
 
               setInitialMapping(res.data);
