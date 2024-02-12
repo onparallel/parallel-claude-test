@@ -163,7 +163,7 @@ function MdInline({ token }: { token: InlineToken }) {
   ) : token.type === "del" ? (
     <chakra.del>{content}</chakra.del>
   ) : token.type === "link" ? (
-    <NormalLink href={token.href} isExternal>
+    <NormalLink href={token.href} isExternal textDecoration="underline">
       {content}
     </NormalLink>
   ) : token.type === "text" ? (
