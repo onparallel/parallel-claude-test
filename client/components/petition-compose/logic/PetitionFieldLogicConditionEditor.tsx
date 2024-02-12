@@ -1015,7 +1015,14 @@ function ConditionPredicateValueSelect({
       })}
       components={options.length > 100 ? { MenuList: OptimizedMenuList as any } : {}}
       singleLineOptions={options.length > 100}
-      styles={{ valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }) }}
+      styles={{
+        valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }),
+        option: (styles) => ({
+          ...styles,
+          "-webkit-line-clamp": "3",
+          padding: "4px 8px",
+        }),
+      }}
     />
   );
 }
