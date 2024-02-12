@@ -19529,6 +19529,7 @@ export type PetitionRepliesSummary_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   summaryConfig?: { [key: string]: any } | null;
+  isAnonymized: boolean;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string } | null;
   latestSummaryRequest?: {
     __typename?: "AiCompletionLog";
@@ -51583,6 +51584,7 @@ export const PetitionRepliesSummary_PetitionFragmentDoc = gql`
       status
       completion
     }
+    isAnonymized
   }
 ` as unknown as DocumentNode<PetitionRepliesSummary_PetitionFragment, unknown>;
 export const PetitionReplies_PetitionFragmentDoc = gql`

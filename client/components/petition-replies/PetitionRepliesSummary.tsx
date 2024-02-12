@@ -155,7 +155,12 @@ export const PetitionRepliesSummary = Object.assign(
               background="white"
             >
               <HStack>
-                <CopyToClipboardButton size="sm" text={summary} onClick={handleCopySummary} />
+                <CopyToClipboardButton
+                  size="sm"
+                  text={summary}
+                  onClick={handleCopySummary}
+                  isDisabled={petition.isAnonymized}
+                />
                 <IconButtonWithTooltip
                   size="sm"
                   label={intl.formatMessage({
@@ -164,7 +169,11 @@ export const PetitionRepliesSummary = Object.assign(
                   })}
                   onClick={handleRegenerateSummary}
                   icon={<RepeatIcon />}
-                  isDisabled={!user.hasSummaryAccess || !isDefined(petition.summaryConfig)}
+                  isDisabled={
+                    petition.isAnonymized ||
+                    !user.hasSummaryAccess ||
+                    !isDefined(petition.summaryConfig)
+                  }
                 />
               </HStack>
               {hasError && <ErrorAlert />}
@@ -183,7 +192,11 @@ export const PetitionRepliesSummary = Object.assign(
                 leftIcon={<SparklesIcon />}
                 colorScheme="primary"
                 onClick={handleGenerateSummary}
-                isDisabled={!user.hasSummaryAccess || !isDefined(petition.summaryConfig)}
+                isDisabled={
+                  petition.isAnonymized ||
+                  !user.hasSummaryAccess ||
+                  !isDefined(petition.summaryConfig)
+                }
               >
                 <FormattedMessage
                   id="component.petition-replies-summary.generate-summary"
@@ -211,6 +224,7 @@ export const PetitionRepliesSummary = Object.assign(
             status
             completion
           }
+          isAnonymized
         }
       `,
       User: gql`

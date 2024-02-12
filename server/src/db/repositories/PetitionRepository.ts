@@ -6290,12 +6290,16 @@ export class PetitionRepository extends BaseRepository {
     );
 
     await this.withTransaction(async (t) => {
-      await this.updatePetition(
+      const [petition] = await this.updatePetition(
         petitionId,
         { signature_config: null, anonymized_at: this.now() },
         "AnonymizerWorker",
         t,
       );
+
+      if (isDefined(petition.summary_ai_completion_log_id)) {
+        await this.updatePetitionSummaryAiCompletionLogId(petition, null, "AnonymizerWorker", t);
+      }
 
       const [messages, reminders] = await Promise.all([
         this.anonymizePetitionMessages(petitionId, t),
@@ -7705,11 +7709,12 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionSummaryAiCompletionLogId(
     petition: Pick<Petition, "id" | "summary_ai_completion_log_id">,
-    summaryId: number,
+    summaryId: number | null,
     updatedBy: string,
+    t?: Knex.Transaction,
   ) {
     if (isDefined(petition.summary_ai_completion_log_id)) {
-      await this.from("ai_completion_log")
+      await this.from("ai_completion_log", t)
         .where({
           id: petition.summary_ai_completion_log_id,
           deprecated_at: null,
@@ -7719,7 +7724,7 @@ export class PetitionRepository extends BaseRepository {
         });
     }
 
-    await this.from("petition")
+    await this.from("petition", t)
       .where({
         id: petition.id,
         deleted_at: null,
