@@ -115,6 +115,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
             borderBottomColor: "transparent",
           }}
           fontWeight="semibold"
+          alignItems="center"
         >
           <FormattedMessage
             id="component.petition-comments-and-notes-editor.notes"
