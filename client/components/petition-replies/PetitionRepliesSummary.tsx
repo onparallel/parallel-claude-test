@@ -124,7 +124,7 @@ export const PetitionRepliesSummary = Object.assign(
                 message={intl.formatMessage({
                   id: "component.petition-replies-summary.activate-petition-summary-support-message",
                   defaultMessage:
-                    "Hi, I would like to get more information about how to generate a summary of my parallel with AI.",
+                    "Hi, I would like to use Mike AI to analyze the replies from a parallel.",
                 })}
               >
                 <FormattedMessage id="generic.contact" defaultMessage="Contact" />

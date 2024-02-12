@@ -5546,8 +5546,8 @@
   },
   {
     "term": "component.petition-replies-summary.activate-petition-summary-support-message",
-    "definition": "Hi, I would like to get more information about how to generate a summary of my parallel with AI.",
-    "context": "Hi, I would like to get more information about how to generate a summary of my parallel with AI."
+    "definition": "Hi, I would like to use Mike AI to analyze the replies from a parallel.",
+    "context": "Hi, I would like to use Mike AI to analyze the replies from a parallel."
   },
   {
     "term": "component.petition-replies-summary.error",
