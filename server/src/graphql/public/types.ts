@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
-import { isDefined, minBy } from "remeda";
+import { isDefined, minBy, pick } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import {
   PetitionFieldMath,
@@ -602,13 +602,14 @@ export const PublicPetitionFieldReply = objectType({
                 contentType: file.content_type,
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
+                ...(root.type === "ES_TAX_DOCUMENTS" ? { warning: root.content.warning } : {}),
               }
             : root.anonymized_at
               ? {}
               : {
                   ...(root.type === "ES_TAX_DOCUMENTS"
                     ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
-                      { request: root.content.request, error: root.content.error }
+                      pick(root.content, ["type", "request", "error"])
                     : {}),
                 };
         } else if (root.type === "BACKGROUND_CHECK") {

@@ -2545,6 +2545,16 @@
     "context": "The Public Administration has blocked the user access for security reasons."
   },
   {
+    "term": "component.es-tax-documents-content-error-message.user-blocked-identity-verification-document-expired",
+    "definition": "It seems the provided documentation is expired and could not be verified. Please, try again with a valid document.",
+    "context": "It seems the provided documentation is expired and could not be verified. Please, try again with a valid document."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-blocked-identity-verification-underage",
+    "definition": "It seems the provided documentation belongs to an underage person. Please, try again with a valid document.",
+    "context": "It seems the provided documentation belongs to an underage person. Please, try again with a valid document."
+  },
+  {
     "term": "component.es-tax-documents-content-error-message.user-not-registered",
     "definition": "The user is not registered in the Public Administration.",
     "context": "The user is not registered in the Public Administration."
@@ -5470,9 +5480,19 @@
     "context": "Approve"
   },
   {
+    "term": "component.petition-replies-field-reply.es-tax-documents-identity-verification-error-header",
+    "definition": "Identity Verification",
+    "context": "Identity Verification"
+  },
+  {
     "term": "component.petition-replies-field-reply.file-incomplete",
     "definition": "There was an error uploading the file. Please request a new upload.",
     "context": "There was an error uploading the file. Please request a new upload."
+  },
+  {
+    "term": "component.petition-replies-field-reply.manual-review-required",
+    "definition": "We could not verify automatically that this is a valid document.",
+    "context": "We could not verify automatically that this is a valid document."
   },
   {
     "term": "component.petition-replies-field-reply.reject",
@@ -7270,9 +7290,19 @@
     "context": "Download file"
   },
   {
+    "term": "component.recipient-view-petition-field-reply.es-tax-documents-identity-verification-error-header",
+    "definition": "Identity Verification",
+    "context": "Identity Verification"
+  },
+  {
     "term": "component.recipient-view-petition-field-reply.file-incomplete",
     "definition": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}.",
     "context": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.manual-review-required",
+    "definition": "We could not verify automatically that this is a valid document.",
+    "context": "We could not verify automatically that this is a valid document."
   },
   {
     "term": "component.recipient-view-petition-field-reply.rejected-file",

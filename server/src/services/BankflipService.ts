@@ -8,14 +8,9 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../util/globalId";
+import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
 import { IImageService, IMAGE_SERVICE } from "./ImageService";
-import {
-  ORGANIZATION_CREDITS_SERVICE,
-  OrganizationCreditsService,
-} from "./OrganizationCreditsService";
-import { STORAGE_SERVICE, StorageService } from "./StorageService";
-import { Maybe } from "../util/types";
 
 export type SessionMetadata = {
   petitionId: string;
@@ -66,8 +61,49 @@ export interface ModelRequestOutcome {
   modelRequest: { model: ModelRequest };
   noDocumentReasons: Maybe<NoDocumentReason[]>;
 }
-interface SessionSummaryResponse {
+
+interface IdentityVerificationDocumentInfo {
+  id: string;
+  sessionId: string;
+  extension: string;
+  name: string;
+  contentType: string;
+  createdAt: string;
+}
+
+interface IdentityVerificationDocument {
+  type: "id_card" | "passport" | "residence_permit" | "driver_license";
+  country: string;
+  frontPictureDocument: Maybe<IdentityVerificationDocumentInfo>;
+  backPictureDocument: Maybe<IdentityVerificationDocumentInfo>;
+  dataDocument: Maybe<IdentityVerificationDocumentInfo>;
+  imagesDocument: Maybe<IdentityVerificationDocumentInfo>;
+}
+
+export interface IdentityVerification {
+  id: Maybe<string>;
+  createdAt: Maybe<string>;
+  state: "ok" | "ko";
+  koReason:
+    | "generic"
+    | "user_aborted"
+    | "manually_rejected"
+    | "attempts_exceeded"
+    | "user_blocked"
+    | null;
+  koSubreason:
+    | "user_aborted_before_start"
+    | "user_aborted_during_process"
+    | "user_aborted_after_error"
+    | "user_blocked_expired_document"
+    | "user_blocked_underage"
+    | null;
+  documents: IdentityVerificationDocument[];
+}
+
+export interface SessionSummaryResponse {
   modelRequestOutcomes: ModelRequestOutcome[];
+  identityVerification: Maybe<IdentityVerification>;
 }
 
 interface SessionResponse {
@@ -86,7 +122,7 @@ export interface IBankflipService {
   webhookSecret(orgId: string): string;
   fetchSessionMetadata(orgId: string, sessionId: string): Promise<SessionMetadata>;
   fetchSessionSummary(orgId: string, sessionId: string): Promise<SessionSummaryResponse>;
-  fetchPdfDocumentContents(orgId: string, documentId: string): Promise<Buffer>;
+  fetchBinaryDocumentContents(orgId: string, documentId: string): Promise<Buffer>;
   fetchJsonDocumentContents(orgId: string, documentId: string): Promise<any>;
 }
 
@@ -98,8 +134,6 @@ export class BankflipService implements IBankflipService {
     @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(IMAGE_SERVICE) private images: IImageService,
-    @inject(STORAGE_SERVICE) private storage: StorageService,
-    @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: OrganizationCreditsService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(CONFIG) private config: Config,
   ) {}
@@ -160,9 +194,6 @@ export class BankflipService implements IBankflipService {
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const field = await this.petitions.loadField(fieldId);
-    if (!field?.options.requests) {
-      throw new Error(`Expected to have models configured in PetitionField:${fieldId}`);
-    }
 
     const orgId = fromGlobalId(metadata.orgId, "Organization").id;
     const customization = await this.buildBankflipCustomization(orgId);
@@ -170,10 +201,11 @@ export class BankflipService implements IBankflipService {
     return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
       method: "POST",
       body: JSON.stringify({
-        requests: field.options.requests,
+        requests: field?.options.requests ?? [],
         webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}`,
         customization,
         metadata,
+        identityVerification: field?.options.identityVerification ?? null,
       }),
     });
   }
@@ -191,15 +223,21 @@ export class BankflipService implements IBankflipService {
         (r) =>
           isDefined(r.content.error) &&
           Array.isArray(r.content.error) &&
+          (!isDefined(r.content.type) || r.content.type === "model-request") &&
           r.content.error[0]?.reason !== "document_not_found" &&
           r.parent_petition_field_reply_id === parentReplyId &&
           r.status !== "APPROVED",
       )
       .map((r) => r.content.request);
 
-    if (requests.length === 0) {
-      throw new Error("NOTHING_TO_RETRY_ERROR");
-    }
+    const identityVerification =
+      fieldReplies.find(
+        (r) =>
+          (isDefined(r.content.error) || isDefined(r.content.warning)) &&
+          r.content.type === "identity-verification" &&
+          r.parent_petition_field_reply_id === parentReplyId &&
+          r.status !== "APPROVED",
+      )?.content.request ?? null;
 
     const orgId = fromGlobalId(metadata.orgId, "Organization").id;
     const customization = await this.buildBankflipCustomization(orgId);
@@ -208,9 +246,10 @@ export class BankflipService implements IBankflipService {
       method: "POST",
       body: JSON.stringify({
         requests,
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}/retry`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}?retry=true`,
         customization,
         metadata,
+        identityVerification,
       }),
     });
   }
@@ -224,7 +263,7 @@ export class BankflipService implements IBankflipService {
     return await this.apiRequest<SessionSummaryResponse>(orgId, `/session/${sessionId}/summary`);
   }
 
-  async fetchPdfDocumentContents(orgId: string, documentId: string) {
+  async fetchBinaryDocumentContents(orgId: string, documentId: string) {
     return await this.apiRequest<Buffer>(orgId, `/document/${documentId}/content`, {}, "buffer");
   }
 

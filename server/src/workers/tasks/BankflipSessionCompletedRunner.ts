@@ -1,11 +1,14 @@
 import stringify from "fast-safe-stringify";
 import pMap from "p-map";
 import { groupBy, isDefined, pick, zip } from "remeda";
+import { CreatePetitionFieldReply, PetitionFieldReply } from "../../db/__types";
 import {
+  IdentityVerification,
   ModelRequest,
   ModelRequestDocument,
   ModelRequestOutcome,
   SessionMetadata,
+  SessionSummaryResponse,
 } from "../../services/BankflipService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { pFlatMap } from "../../util/promises/pFlatMap";
@@ -17,121 +20,42 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     const {
       bankflip_session_id: sessionId,
       org_id: orgId,
-      retry_errors: retryErrors,
+      update_errors: updateErrors,
     } = this.task.input;
     const metadata = await this.ctx.bankflip.fetchSessionMetadata(
       toGlobalId("Organization", orgId),
       sessionId,
     );
-    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
-    const parentReplyId = isDefined(metadata.parentReplyId)
-      ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
-      : null;
-
     const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
-    const petitionAccessId =
-      "accessId" in metadata ? fromGlobalId(metadata.accessId, "PetitionAccess").id : null;
-
-    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
 
     const summary = await this.ctx.bankflip.fetchSessionSummary(metadata.orgId, sessionId);
+
     try {
       if (isDefined(userId)) {
         await this.ctx.orgCredits.ensurePetitionHasConsumedCredit(petitionId, `User:${userId}`);
       }
 
-      const replyContents = await pFlatMap(
-        summary.modelRequestOutcomes.filter((o) => o.completed),
-        async (model) => await this.extractAndUploadModelDocuments(metadata, model, createdBy),
-        { concurrency: 2 },
-      );
-
-      if (!retryErrors) {
-        await this.ctx.petitions.createPetitionFieldReply(
-          petitionId,
-          replyContents.map((content) => ({
-            petition_field_id: fieldId,
-            type: "ES_TAX_DOCUMENTS",
-            parent_petition_field_reply_id: parentReplyId,
-            content: { ...content, bankflip_session_id: sessionId },
-            user_id: userId,
-            petition_access_id: petitionAccessId,
-          })),
-          createdBy,
-        );
+      if (updateErrors) {
+        await this.updateEsTaxDocumentsErrorReplies(summary, metadata, sessionId);
       } else {
-        // fetch replies with request that have previously errored
-        // and try to update their content with the new data
-        const errorReplies = (await this.ctx.petitions.loadRepliesForField(fieldId)).filter(
-          (r) =>
-            isDefined(r.content.error) &&
-            Array.isArray(r.content.error) &&
-            r.content.error[0]?.reason !== "document_not_found" &&
-            r.parent_petition_field_reply_id === parentReplyId &&
-            r.status !== "APPROVED",
-        );
-
-        const updateData = errorReplies
-          .map((r) => ({
-            id: r.id,
-            content: replyContents.filter(
-              (c) => JSON.stringify(c.request.model) === JSON.stringify(r.content.request.model),
-            ),
-          }))
-          .filter((d) => d.content.length > 0);
-
-        const updater = isDefined(userId)
-          ? await this.ctx.users.loadUser(userId)
-          : await this.ctx.petitions.loadAccess(petitionAccessId!);
-
-        for (const data of updateData) {
-          const [updateReplyContent, ...newRepliesContent] = data.content;
-          await this.ctx.petitions.updatePetitionFieldRepliesContent(
-            petitionId,
-            [{ id: data.id, content: updateReplyContent }],
-            updater!,
-          );
-
-          if (newRepliesContent.length > 0) {
-            await this.ctx.petitions.createPetitionFieldReply(
-              petitionId,
-              newRepliesContent.map((content) => ({
-                petition_field_id: fieldId,
-                type: "ES_TAX_DOCUMENTS",
-                parent_petition_field_reply_id: parentReplyId,
-                content: { ...content, bankflip_session_id: sessionId },
-                user_id: userId,
-                petition_access_id: petitionAccessId,
-              })),
-              createdBy,
-            );
-          }
-        }
+        await this.createEsTaxDocumentsReplies(summary, metadata, sessionId);
       }
 
       return {
         success: true,
       };
     } catch (error) {
-      if (error instanceof Error && error.message === "PETITION_SEND_LIMIT_REACHED") {
-        // create an "error" reply so frontend knows there was an error
-        await this.ctx.petitions.createPetitionFieldReply(
-          petitionId,
-          {
-            petition_field_id: fieldId,
-            type: "ES_TAX_DOCUMENTS",
-            parent_petition_field_reply_id: parentReplyId,
-            content: {
-              file_upload_id: null,
-              request: summary.modelRequestOutcomes[0].modelRequest,
-              error: [{ reason: "parallel_send_limit_reached" }],
-            },
-            user_id: userId,
-            petition_access_id: petitionAccessId,
-          },
-          createdBy,
-        );
+      if (
+        error instanceof Error &&
+        error.message === "PETITION_SEND_LIMIT_REACHED" &&
+        !updateErrors
+      ) {
+        // create an "error" reply on every requested model so frontend knows there was an error
+        // and we later know which requests we need to retry
+        await this.createEsTaxDocumentsErrorReplies(summary, metadata, [
+          { reason: "parallel_send_limit_reached" },
+        ]);
       }
 
       return {
@@ -141,20 +65,248 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     }
   }
 
+  private async createEsTaxDocumentsErrorReplies(
+    summary: SessionSummaryResponse,
+    metadata: SessionMetadata,
+    error: { reason: string; subreason?: string | null }[],
+  ) {
+    const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
+    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
+    const parentReplyId = isDefined(metadata.parentReplyId)
+      ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
+      : null;
+    const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
+    const petitionAccessId =
+      "accessId" in metadata ? fromGlobalId(metadata.accessId, "PetitionAccess").id : null;
+    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+
+    const errorContents: any[] = [];
+    if (isDefined(summary.identityVerification)) {
+      const field = await this.ctx.petitions.loadField(fieldId);
+      if (isDefined(field?.options.identityVerification)) {
+        errorContents.push({
+          file_upload_id: null,
+          type: "identity-verification",
+          request: field!.options.identityVerification,
+          error,
+        });
+      }
+    }
+
+    errorContents.push(
+      ...summary.modelRequestOutcomes.map((outcome) => ({
+        file_upload_id: null,
+        type: "model-request",
+        request: outcome.modelRequest,
+        error,
+      })),
+    );
+
+    if (errorContents.length > 0) {
+      await this.ctx.petitions.createPetitionFieldReply(
+        petitionId,
+        errorContents.map((content) => ({
+          petition_field_id: fieldId,
+          type: "ES_TAX_DOCUMENTS",
+          parent_petition_field_reply_id: parentReplyId,
+          content,
+          user_id: userId,
+          petition_access_id: petitionAccessId,
+        })),
+        createdBy,
+      );
+    }
+  }
+
+  private async updateEsTaxDocumentsErrorReplies(
+    summary: SessionSummaryResponse,
+    metadata: SessionMetadata,
+    sessionId: string,
+  ) {
+    const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
+    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
+    const parentReplyId = isDefined(metadata.parentReplyId)
+      ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
+      : null;
+    const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
+    const petitionAccessId =
+      "accessId" in metadata ? fromGlobalId(metadata.accessId, "PetitionAccess").id : null;
+    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+
+    // fetch replies with request that have previously errored
+    // and try to update their content with the new data
+    const fieldReplies = (await this.ctx.petitions.loadRepliesForField(fieldId)).filter(
+      (r) => r.parent_petition_field_reply_id === parentReplyId && r.status !== "APPROVED",
+    );
+
+    // in this array we will store the data for updating the existing "errored" replies
+    const updateRepliesData: Pick<PetitionFieldReply, "id" | "content" | "metadata">[] = [];
+    // in case the new request has generated new replies, we will store the data for creating them
+    const newRepliesData: Pick<CreatePetitionFieldReply, "content" | "metadata">[] = [];
+    /**
+     * push every item in errorReplies into updatedRepliesData with its corresponding updatedDocument
+     * the rest of 'updatedDocument' will be pushed into newRepliesData as it doesn't have a corresponding errorReply
+     */
+    function fillRepliesArrays(
+      errorReplies: PetitionFieldReply[],
+      updatedDocuments: Pick<CreatePetitionFieldReply, "content" | "metadata">[],
+    ) {
+      for (const reply of errorReplies) {
+        // we need to find the correct document to update as there can be multiple documents with the same request
+        const documents = updatedDocuments.filter(
+          (r) => JSON.stringify(r.content.request) === JSON.stringify(reply.content.request),
+        );
+        // the first document will be the one to update, the rest will be new documents
+        const [updateReply, ...newReplies] = documents;
+        if (isDefined(updateReply)) {
+          updateRepliesData.push({
+            id: reply.id,
+            content: updateReply.content,
+            metadata: updateReply.metadata,
+          });
+
+          // remove updateReply from array to be sure that we don't create duplicates
+          updatedDocuments.splice(updatedDocuments.indexOf(updateReply), 1);
+        }
+        for (const newReply of newReplies) {
+          newRepliesData.push(newReply);
+          updatedDocuments.splice(updatedDocuments.indexOf(newReply), 1);
+        }
+      }
+
+      // the remaining documents are new documents that need to be created
+      newRepliesData.push(...updatedDocuments);
+    }
+
+    const idVerificationErrorReplies = fieldReplies.filter(
+      (r) =>
+        r.content.type === "identity-verification" &&
+        (isDefined(r.content.error) || isDefined(r.content.warning)),
+    );
+
+    const idVerificationNewDocuments = isDefined(summary.identityVerification)
+      ? await this.extractAndUploadIdentityVerificationDocuments(
+          metadata,
+          summary.identityVerification,
+          sessionId,
+          createdBy,
+        )
+      : [];
+
+    fillRepliesArrays(idVerificationErrorReplies, idVerificationNewDocuments);
+
+    const modelRequestErrorReplies = fieldReplies.filter(
+      (r) =>
+        (!isDefined(r.content.type) || r.content.type === "model-request") &&
+        isDefined(r.content.error) &&
+        Array.isArray(r.content.error) &&
+        r.content.error[0]?.reason !== "document_not_found",
+    );
+
+    const modelRequestNewDocuments = await pFlatMap(
+      summary.modelRequestOutcomes.filter((o) => o.completed),
+      async (model) =>
+        await this.extractAndUploadModelRequestDocuments(metadata, model, sessionId, createdBy),
+      { concurrency: 2 },
+    );
+
+    fillRepliesArrays(modelRequestErrorReplies, modelRequestNewDocuments);
+
+    if (updateRepliesData.length > 0) {
+      const updater = isDefined(userId)
+        ? await this.ctx.users.loadUser(userId)
+        : await this.ctx.petitions.loadAccess(petitionAccessId!);
+      await this.ctx.petitions.updatePetitionFieldRepliesContent(
+        petitionId,
+        updateRepliesData,
+        updater!,
+      );
+    }
+
+    if (newRepliesData.length > 0) {
+      await this.ctx.petitions.createPetitionFieldReply(
+        petitionId,
+        newRepliesData.map((data) => ({
+          petition_field_id: fieldId,
+          type: "ES_TAX_DOCUMENTS",
+          parent_petition_field_reply_id: parentReplyId,
+          user_id: userId,
+          petition_access_id: petitionAccessId,
+          ...data,
+        })),
+        createdBy,
+      );
+    }
+  }
+
+  private async createEsTaxDocumentsReplies(
+    summary: SessionSummaryResponse,
+    metadata: SessionMetadata,
+    sessionId: string,
+  ) {
+    const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
+    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
+    const parentReplyId = isDefined(metadata.parentReplyId)
+      ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
+      : null;
+    const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
+    const petitionAccessId =
+      "accessId" in metadata ? fromGlobalId(metadata.accessId, "PetitionAccess").id : null;
+    const createdBy = isDefined(userId) ? `User:${userId}` : `PetitionAccess:${petitionAccessId!}`;
+
+    const idVerificationReplies = isDefined(summary.identityVerification)
+      ? await this.extractAndUploadIdentityVerificationDocuments(
+          metadata,
+          summary.identityVerification,
+          sessionId,
+          createdBy,
+        )
+      : [];
+
+    const modelRequestReplies = await pFlatMap(
+      summary.modelRequestOutcomes.filter((o) => o.completed),
+      async (model) =>
+        await this.extractAndUploadModelRequestDocuments(metadata, model, sessionId, createdBy),
+      { concurrency: 2 },
+    );
+
+    const replies = [...idVerificationReplies, ...modelRequestReplies];
+
+    if (replies.length > 0) {
+      await this.ctx.petitions.createPetitionFieldReply(
+        petitionId,
+        replies.map((data) => ({
+          petition_field_id: fieldId,
+          type: "ES_TAX_DOCUMENTS",
+          parent_petition_field_reply_id: parentReplyId,
+          user_id: userId,
+          petition_access_id: petitionAccessId,
+          ...data,
+        })),
+        createdBy,
+      );
+    }
+  }
+
   /**
    * extracts the contents of the documents on a given model outcome, uploads the files to S3 and returns the data for creating an ES_TAX_DOCUMENTS reply.
    */
-  private async extractAndUploadModelDocuments(
+  private async extractAndUploadModelRequestDocuments(
     metadata: SessionMetadata,
     modelRequestOutcome: ModelRequestOutcome,
+    sessionId: string,
     createdBy: string,
-  ): Promise<any[]> {
+  ): Promise<Pick<CreatePetitionFieldReply, "content" | "metadata">[]> {
     if (isDefined(modelRequestOutcome.noDocumentReasons)) {
       return [
         {
-          file_upload_id: null,
-          request: modelRequestOutcome.modelRequest,
-          error: modelRequestOutcome.noDocumentReasons,
+          content: {
+            file_upload_id: null,
+            type: "model-request",
+            request: modelRequestOutcome.modelRequest,
+            error: modelRequestOutcome.noDocumentReasons,
+            bankflip_session_id: sessionId,
+          },
         },
       ];
     }
@@ -167,67 +319,193 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         .map((key) => d.model[key as keyof ModelRequest])
         .join("_"),
     );
-    return await pFlatMap(Object.values(groupedByRequestModel), async (docs) => {
-      const documents: Record<string, ModelRequestDocument[]> = {};
-      ["pdf", "json"].forEach((extension) => {
-        documents[extension] = docs.filter((d) => d.extension === extension);
-      });
+    return await pFlatMap(
+      Object.values(groupedByRequestModel),
+      async (docs) => {
+        const documents: Record<string, ModelRequestDocument[]> = {};
+        ["pdf", "json"].forEach((extension) => {
+          documents[extension] = docs.filter((d) => d.extension === extension);
+        });
 
-      if (documents.pdf.length === 0) {
-        return [
-          {
+        if (documents.pdf.length === 0) {
+          return [
+            {
+              content: {
+                file_upload_id: null,
+                type: "model-request",
+                request: modelRequestOutcome.modelRequest,
+                error: modelRequestOutcome.noDocumentReasons,
+                bankflip_session_id: sessionId,
+              },
+            },
+          ];
+        }
+
+        const pdfBuffers = await pMap(
+          documents.pdf,
+          async ({ id }) => await this.ctx.bankflip.fetchBinaryDocumentContents(metadata.orgId, id),
+          { concurrency: 1 },
+        );
+
+        const results: Pick<CreatePetitionFieldReply, "content">[] = [];
+        for (const [request, pdfBuffer] of zip(documents.pdf, pdfBuffers)) {
+          const path = random(16);
+          const res = await this.ctx.storage.fileUploads.uploadFile(
+            path,
+            "application/pdf",
+            pdfBuffer,
+          );
+          const [file] = await this.ctx.files.createFileUpload(
+            {
+              path,
+              content_type: "application/pdf",
+              filename: `${request.name}.pdf`,
+              size: res["ContentLength"]!.toString(),
+              upload_complete: true,
+            },
+            createdBy,
+          );
+
+          results.push({
+            content: {
+              file_upload_id: file.id,
+              type: "model-request",
+              request,
+              json_contents:
+                // TODO: el modelo CARP_CIUD_CERT_CATASTRO devuelve multiples pdfs y jsons con el mismo "request".
+                // actualmente no se puede identificar cuál json corresponde a cada pdf.
+                // hablé con Gabriel para implementar algo que permita identificarlos, pero por ahora
+                // ignoramos los json de este modelo. De todas formas aún no lo están parseando.
+                // Cuando esté implementada la solución en Bankflip, hay que cambiar la manera de agrupar documentos (comentado más arriba)
+                request.model.type === "CARP_CIUD_CERT_CATASTRO"
+                  ? null
+                  : documents.json.length === 1
+                    ? await this.ctx.bankflip.fetchJsonDocumentContents(
+                        metadata.orgId,
+                        documents.json[0].id,
+                      )
+                    : null,
+              bankflip_session_id: sessionId,
+            },
+          });
+        }
+        return results;
+      },
+      { concurrency: 1 },
+    );
+  }
+
+  private async extractAndUploadIdentityVerificationDocuments(
+    metadata: SessionMetadata,
+    idVerification: IdentityVerification,
+    sessionId: string,
+    createdBy: string,
+  ): Promise<Pick<CreatePetitionFieldReply, "content" | "metadata">[]> {
+    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
+    const field = await this.ctx.petitions.loadField(fieldId);
+    if (!field) {
+      return [];
+    }
+
+    if (idVerification.state === "ko" && idVerification.documents.length === 0) {
+      return [
+        {
+          content: {
             file_upload_id: null,
-            request: modelRequestOutcome.modelRequest,
-            error: modelRequestOutcome.noDocumentReasons,
+            type: "identity-verification",
+            request: field.options.identityVerification,
+            error: [{ reason: idVerification.koReason, subreason: idVerification.koSubreason }],
+            bankflip_session_id: sessionId,
           },
-        ];
-      }
+        },
+      ];
+    }
 
-      const pdfBuffers = await pMap(
-        documents.pdf,
-        async ({ id }) => await this.ctx.bankflip.fetchPdfDocumentContents(metadata.orgId, id),
-        { concurrency: 1 },
-      );
+    return await pMap(
+      idVerification.documents,
+      async (doc) => {
+        if (!isDefined(doc.imagesDocument)) {
+          return {
+            content: {
+              file_upload_id: null,
+              type: "identity-verification",
+              request: field.options.identityVerification,
+              error: [{ reason: "generic", subreason: "no_images_document" }],
+              bankflip_session_id: sessionId,
+            },
+          };
+        }
 
-      const results: any[] = [];
-      for (const [request, pdfBuffer] of zip(documents.pdf, pdfBuffers)) {
+        const documentBuffer = await this.ctx.bankflip.fetchBinaryDocumentContents(
+          metadata.orgId,
+          doc.imagesDocument.id,
+        );
+
+        let jsonContents: any = null;
+        if (isDefined(doc.dataDocument) && doc.dataDocument.extension === "json") {
+          jsonContents = await this.ctx.bankflip.fetchJsonDocumentContents(
+            metadata.orgId,
+            doc.dataDocument.id,
+          );
+        }
+
         const path = random(16);
         const res = await this.ctx.storage.fileUploads.uploadFile(
           path,
-          "application/pdf",
-          pdfBuffer,
+          doc.imagesDocument.contentType,
+          documentBuffer,
         );
+
+        const filename = jsonContents
+          ? `${[
+              jsonContents.type,
+              jsonContents.issuingCountry,
+              jsonContents.surname,
+              jsonContents.firstName,
+            ]
+              .filter(isDefined)
+              .join("_")
+              .replace(/\s/g, "_")}`
+          : doc.imagesDocument.name;
+
         const [file] = await this.ctx.files.createFileUpload(
           {
             path,
-            content_type: "application/pdf",
-            filename: `${request.name}.pdf`,
+            content_type: doc.imagesDocument.contentType,
+            filename: `${filename}.${doc.imagesDocument.extension}`,
             size: res["ContentLength"]!.toString(),
             upload_complete: true,
           },
           createdBy,
         );
 
-        results.push({
-          file_upload_id: file.id,
-          request: request,
-          json_contents:
-            // TODO: el modelo CARP_CIUD_CERT_CATASTRO devuelve multiples pdfs y jsons con el mismo "request".
-            // actualmente no se puede identificar cuál json corresponde a cada pdf.
-            // hablé con Gabriel para implementar algo que permita identificarlos, pero por ahora
-            // ignoramos los json de este modelo. De todas formas aún no lo están parseando.
-            // Cuando esté implementada la solución en Bankflip, hay que cambiar la manera de agrupar documentos (comentado más arriba)
-            request.model.type === "CARP_CIUD_CERT_CATASTRO"
-              ? null
-              : documents.json.length === 1
-                ? await this.ctx.bankflip.fetchJsonDocumentContents(
-                    metadata.orgId,
-                    documents.json[0].id,
-                  )
-                : null,
-        });
-      }
-      return results;
-    });
+        return {
+          content: {
+            file_upload_id: file.id,
+            type: "identity-verification",
+            request: field.options.identityVerification,
+            // "attempts_exceeded" occur when identityVerification cannot be done automatically
+            //this will not be treated as an error, because documents are still correctly generated on this case
+            error:
+              idVerification.state === "ko" && idVerification.koReason !== "attempts_exceeded"
+                ? [{ reason: idVerification.koReason, subreason: idVerification.koSubreason }]
+                : undefined,
+            // instead, we will use a warning to indicate the user that a manual review is needed
+            warning:
+              idVerification.state === "ko" && idVerification.koReason === "attempts_exceeded"
+                ? "manual_review_required"
+                : undefined,
+            bankflip_session_id: sessionId,
+          },
+          metadata: isDefined(jsonContents?.type)
+            ? {
+                inferred_type: jsonContents.type,
+                inferred_data: jsonContents,
+              }
+            : null,
+        };
+      },
+      { concurrency: 1 },
+    );
   }
 }

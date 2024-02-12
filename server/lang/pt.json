@@ -95,6 +95,11 @@
     "context": "(Pending review)"
   },
   {
+    "term": "document.petition-export.identity-verification-header",
+    "definition": "Verificação de identidade",
+    "context": "Identity Verification"
+  },
+  {
     "term": "document.petition-export.no-files",
     "definition": "Nenhum ficheiro foi carregado.",
     "context": "No files have been submitted."

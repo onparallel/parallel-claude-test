@@ -1069,13 +1069,14 @@ export const PetitionFieldReply = objectType({
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
                 ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
+                ...(root.type === "ES_TAX_DOCUMENTS" ? { warning: root.content.warning } : {}),
               }
             : root.anonymized_at
               ? {}
               : {
                   ...(root.type === "ES_TAX_DOCUMENTS"
                     ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
-                      { request: root.content.request, error: root.content.error }
+                      pick(root.content, ["type", "request", "error"])
                     : {}),
                 };
         } else if (root.type === "BACKGROUND_CHECK") {

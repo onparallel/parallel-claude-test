@@ -2377,7 +2377,7 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionFieldRepliesContent(
     petitionId: number,
-    data: { id: number; content?: any }[],
+    data: { id: number; content: any; metadata?: any }[],
     updater: User | PetitionAccess,
     t?: Knex.Transaction,
   ) {
@@ -2394,11 +2394,12 @@ export class PetitionRepository extends BaseRepository {
     const replies = await this.raw<PetitionFieldReply>(
       /* sql */ `
       with input_data as (
-        select * from (?) as t(reply_id, content)
+        select * from (?) as t(reply_id, content, metadata)
       )
       update petition_field_reply pfr
       set
         content = id.content,
+        metadata = pfr.metadata || id.metadata,
         status = 'PENDING',
         updated_at = NOW(),
         updated_by = ?,
@@ -2411,8 +2412,8 @@ export class PetitionRepository extends BaseRepository {
   `,
       [
         this.sqlValues(
-          data.map((d) => [d.id, d.content]),
-          ["int", "jsonb"],
+          data.map((d) => [d.id, JSON.stringify(d.content), JSON.stringify(d.metadata ?? {})]),
+          ["int", "jsonb", "jsonb"],
         ),
         updatedBy,
         isContact ? null : updater.id,
@@ -6367,6 +6368,7 @@ export class PetitionRepository extends BaseRepository {
           .whereNull("anonymized_at")
           .update({
             anonymized_at: this.now(),
+            metadata: this.knex.raw(/* sql */ `metadata - 'inferred_data' - 'inferred_type'`),
             content: this.knex.raw(/* sql */ `
           case "type"
             when 'FILE_UPLOAD' then

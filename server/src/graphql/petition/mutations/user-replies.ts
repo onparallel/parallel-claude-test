@@ -323,28 +323,20 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
     petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
-    try {
-      const session = await ctx.bankflip.createRetrySession({
-        petitionId: toGlobalId("Petition", petitionId),
-        orgId: toGlobalId("Organization", ctx.user!.org_id),
-        fieldId: toGlobalId("PetitionField", fieldId),
-        userId: toGlobalId("User", ctx.user!.id),
-        parentReplyId: isDefined(parentReplyId)
-          ? toGlobalId("PetitionFieldReply", parentReplyId)
-          : null,
-      });
+    const session = await ctx.bankflip.createRetrySession({
+      petitionId: toGlobalId("Petition", petitionId),
+      orgId: toGlobalId("Organization", ctx.user!.org_id),
+      fieldId: toGlobalId("PetitionField", fieldId),
+      userId: toGlobalId("User", ctx.user!.id),
+      parentReplyId: isDefined(parentReplyId)
+        ? toGlobalId("PetitionFieldReply", parentReplyId)
+        : null,
+    });
 
-      return {
-        type: "WINDOW",
-        url: session.widgetLink,
-      };
-    } catch (error) {
-      if (error instanceof Error && error.message === "NOTHING_TO_RETRY_ERROR") {
-        throw new ApolloError("Nothing to retry", "NOTHING_TO_RETRY_ERROR");
-      }
-
-      throw error;
-    }
+    return {
+      type: "WINDOW",
+      url: session.widgetLink,
+    };
   },
 });
 
@@ -694,7 +686,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         [
           {
             id: reply.id,
-            content: JSON.stringify({ ...reply.content, entity }),
+            content: { ...reply.content, entity },
           },
         ],
         ctx.user!,

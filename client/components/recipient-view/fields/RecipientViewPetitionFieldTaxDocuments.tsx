@@ -1,6 +1,5 @@
 import { Box, Button, Flex, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
-import { NormalLink } from "@parallel/components/common/Link";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
@@ -188,9 +187,11 @@ export function RecipientViewPetitionFieldTaxDocuments({
 
   const hasErrorDocuments = field.replies.some(
     (r) =>
-      isDefined(r.content.error) &&
-      Array.isArray(r.content.error) &&
-      r.content.error[0]?.reason !== "document_not_found",
+      ((isDefined(r.content.error) &&
+        Array.isArray(r.content.error) &&
+        r.content.error[0]?.reason !== "document_not_found") ||
+        isDefined(r.content.warning)) &&
+      r.status !== "APPROVED",
   );
 
   const showChangePersonDialog = useEsTaxDocumentsChangePersonDialog();
@@ -269,11 +270,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
             variant="outline"
             width="min-content"
             onClick={handleRetryRequest}
-            isDisabled={
-              isDisabled ||
-              state === "FETCHING" ||
-              field.replies.some((r) => r.status === "APPROVED")
-            }
+            isDisabled={isDisabled || state === "FETCHING"}
           >
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.retry-button"
@@ -297,12 +294,12 @@ export function RecipientViewPetitionFieldTaxDocuments({
           <Box />
         )}
         {field.replies.length > 0 && state === "IDLE" ? (
-          <NormalLink role="button" onClick={handleChangePerson}>
+          <Button variant="link" onClick={handleChangePerson}>
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.change-person-button"
               defaultMessage="Change person"
             />
-          </NormalLink>
+          </Button>
         ) : null}
       </Flex>
       {state === "ERROR" ? (

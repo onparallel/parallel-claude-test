@@ -20,20 +20,21 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { EsTaxDocumentsContentErrorMessage } from "@parallel/components/petition-common/EsTaxDocumentsContentErrorMessage";
 import { PetitionFieldType } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
 import { MaybePromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
@@ -195,7 +196,18 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
           {!reply.isAnonymized ? (
             reply.content.error ? (
-              <Text>{reply.content.request.model.type}</Text>
+              <Text>
+                {reply.content.type === "identity-verification" ? (
+                  <FormattedMessage
+                    id="component.recipient-view-petition-field-reply.es-tax-documents-identity-verification-error-header"
+                    defaultMessage="Identity Verification"
+                  />
+                ) : (
+                  [reply.content.request.model.type, reply.content.request.model.year]
+                    .filter(isDefined)
+                    .join("_")
+                )}
+              </Text>
             ) : (
               <>
                 <FileName value={reply.content?.filename} />
@@ -241,7 +253,19 @@ export function RecipientViewPetitionFieldReplyFileUpload({
                 />
               </Text>
             ) : type === "ES_TAX_DOCUMENTS" && reply.content.error ? (
-              <EsTaxDocumentsContentErrorMessage error={reply.content.error} />
+              <EsTaxDocumentsContentErrorMessage
+                type={reply.content.type}
+                error={reply.content.error}
+              />
+            ) : type === "ES_TAX_DOCUMENTS" &&
+              reply.content.warning === "manual_review_required" &&
+              reply.status === "PENDING" ? (
+              <Text fontSize="xs" color="yellow.500">
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-reply.manual-review-required"
+                  defaultMessage="We could not verify automatically that this is a valid document."
+                />
+              </Text>
             ) : (
               <DateTime
                 fontSize="xs"

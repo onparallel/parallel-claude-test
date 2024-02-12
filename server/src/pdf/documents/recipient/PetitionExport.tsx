@@ -23,10 +23,10 @@ import { SignaturesBlock } from "../../components/SignaturesBlock";
 import { ThemeProvider } from "../../utils/ThemeProvider";
 import { cleanupText } from "../../utils/cleanupText";
 import { LiquidProvider } from "../../utils/liquid/LiquidContext";
+import { LiquidPetitionVariableProvider } from "../../utils/liquid/LiquidPetitionVariableProvider";
 import { LiquidScopeProvider } from "../../utils/liquid/LiquidScopeProvider";
 import { useLiquidRender } from "../../utils/liquid/useLiquid";
 import { PdfDocumentGetProps } from "../../utils/pdf";
-import { LiquidPetitionVariableProvider } from "../../utils/liquid/LiquidPetitionVariableProvider";
 
 export interface PetitionExportInitialData {
   assetsUrl: string;
@@ -372,7 +372,16 @@ function PetitionExportField({
                   ) : field.type === "ES_TAX_DOCUMENTS" ? (
                     <View>
                       <Text style={[styles.text]}>
-                        {reply.content.request.model.type}{" "}
+                        {reply.content.type === "identity-verification" ? (
+                          <FormattedMessage
+                            id="document.petition-export.identity-verification-header"
+                            defaultMessage="Identity Verification"
+                          />
+                        ) : (
+                          [reply.content.request.model.type, reply.content.request.model.year]
+                            .filter(isDefined)
+                            .join("_")
+                        )}{" "}
                         <FormattedMessage
                           id="document.petition-export.file-not-found"
                           defaultMessage="(Not found)"

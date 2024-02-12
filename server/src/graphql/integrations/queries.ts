@@ -259,11 +259,11 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
           [
             {
               id: reply.id,
-              content: JSON.stringify({
+              content: {
                 query,
                 search,
                 entity: null,
-              }),
+              },
             },
           ],
           ctx.user!,

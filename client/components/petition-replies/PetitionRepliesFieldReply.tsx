@@ -186,7 +186,18 @@ export function PetitionRepliesFieldReply({
                 {reply.isAnonymized ? (
                   <ReplyNotAvailable type={type} />
                 ) : type === "ES_TAX_DOCUMENTS" && content.error ? (
-                  <Text>{content.request.model.type}</Text>
+                  <Text>
+                    {content.type === "identity-verification" ? (
+                      <FormattedMessage
+                        id="component.petition-replies-field-reply.es-tax-documents-identity-verification-error-header"
+                        defaultMessage="Identity Verification"
+                      />
+                    ) : (
+                      [content.request.model.type, content.request.model.year]
+                        .filter(isDefined)
+                        .join("_")
+                    )}
+                  </Text>
                 ) : isFileTypeField(type) && type !== "DOW_JONES_KYC" ? (
                   <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
                     <VisuallyHidden>
@@ -361,9 +372,21 @@ export function PetitionRepliesFieldReply({
                   defaultMessage="There was an error uploading the file. Please request a new upload."
                 />
               </Text>
-            ) : type === "ES_TAX_DOCUMENTS" ? (
-              <EsTaxDocumentsContentErrorMessage error={reply.content.error} />
+            ) : type === "ES_TAX_DOCUMENTS" && reply.content.error ? (
+              <EsTaxDocumentsContentErrorMessage
+                type={reply.content.type}
+                error={reply.content.error}
+              />
             ) : null
+          ) : type === "ES_TAX_DOCUMENTS" &&
+            reply.content.warning === "manual_review_required" &&
+            reply.status === "PENDING" ? (
+            <Text fontSize="xs" color="yellow.500">
+              <FormattedMessage
+                id="component.petition-replies-field-reply.manual-review-required"
+                defaultMessage="We could not verify automatically that this is a valid document."
+              />
+            </Text>
           ) : (
             <HStack
               wrap={"wrap"}
