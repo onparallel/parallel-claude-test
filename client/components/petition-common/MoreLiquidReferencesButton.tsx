@@ -116,9 +116,7 @@ export const MoreLiquidReferencesButton = Object.assign(
           type
           multiple
           options
-          parent {
-            id
-          }
+          isChild
           children {
             id
             type
@@ -146,8 +144,7 @@ function useLiquidReferences({
 }): LiquidReference[] {
   const intl = useIntl();
   return useMemo(() => {
-    const buildAlias = (alias: string) =>
-      field.multiple || isDefined(field.parent) ? alias + "[0]" : alias;
+    const buildAlias = (alias: string) => (field.multiple || field.isChild ? alias + "[0]" : alias);
 
     const conditionalReference = (() => {
       switch (field.type) {
@@ -255,7 +252,7 @@ function useLiquidReferences({
     // If checkbox max is 1 we trate it like a radio button, if is unlimited we ignore the max
     const multipleFieldReferences =
       field.multiple ||
-      isDefined(field.parent) ||
+      field.isChild ||
       (field.type === "CHECKBOX" &&
         (field.options.limit.type === "UNLIMITED" || field.options.limit.max > 1))
         ? [
@@ -471,7 +468,7 @@ function useLiquidReferences({
     field.type,
     field.options,
     field.multiple,
-    isDefined(field.parent),
+    field.isChild,
     field.children?.map((f) => f.alias).join(","),
   ]);
 }

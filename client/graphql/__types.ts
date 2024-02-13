@@ -3166,6 +3166,7 @@ export interface PetitionField {
   hasCommentsEnabled: Scalars["Boolean"]["output"];
   /** The ID of the petition field. */
   id: Scalars["GID"]["output"];
+  isChild: Scalars["Boolean"]["output"];
   /** Determines if the field can be moved or deleted. */
   isFixed: Scalars["Boolean"]["output"];
   /** Determines if the field is visible by the recipients. */
@@ -5855,6 +5856,7 @@ export type MapFieldsTable_PetitionFieldFragment = {
   isReadOnly: boolean;
   alias?: string | null;
   fromPetitionFieldId?: string | null;
+  isChild: boolean;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -5867,6 +5869,7 @@ export type MapFieldsTable_PetitionFieldFragment = {
     isReadOnly: boolean;
     alias?: string | null;
     fromPetitionFieldId?: string | null;
+    isChild: boolean;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -5910,6 +5913,7 @@ export type MapFieldsTable_PetitionFieldDataFragment = {
   isReadOnly: boolean;
   alias?: string | null;
   fromPetitionFieldId?: string | null;
+  isChild: boolean;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -11303,7 +11307,7 @@ export type CopyLiquidReferenceButton_PetitionFieldFragment = {
   type: PetitionFieldType;
   multiple: boolean;
   options: { [key: string]: any };
-  parent?: { __typename?: "PetitionField"; id: string } | null;
+  isChild: boolean;
 };
 
 export type MessageClosingEmailEditor_PetitionBase_Petition_Fragment = {
@@ -11415,7 +11419,7 @@ export type MoreLiquidReferencesButton_PetitionFieldFragment = {
   type: PetitionFieldType;
   multiple: boolean;
   options: { [key: string]: any };
-  parent?: { __typename?: "PetitionField"; id: string } | null;
+  isChild: boolean;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -11751,6 +11755,7 @@ export type ImportRepliesDialog_petitionQuery = {
           isReadOnly: boolean;
           alias?: string | null;
           fromPetitionFieldId?: string | null;
+          isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -11763,6 +11768,7 @@ export type ImportRepliesDialog_petitionQuery = {
             isReadOnly: boolean;
             alias?: string | null;
             fromPetitionFieldId?: string | null;
+            isChild: boolean;
             replies: Array<{
               __typename?: "PetitionFieldReply";
               id: string;
@@ -11827,6 +11833,7 @@ export type ImportRepliesDialog_petitionQuery = {
           isReadOnly: boolean;
           alias?: string | null;
           fromPetitionFieldId?: string | null;
+          isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
@@ -11839,6 +11846,7 @@ export type ImportRepliesDialog_petitionQuery = {
             isReadOnly: boolean;
             alias?: string | null;
             fromPetitionFieldId?: string | null;
+            isChild: boolean;
             replies: Array<{
               __typename?: "PetitionFieldReply";
               id: string;
@@ -14039,8 +14047,8 @@ export type PetitionComposeContents_PetitionFieldFragment = {
   options: { [key: string]: any };
   isInternal: boolean;
   alias?: string | null;
+  isChild: boolean;
   multiple: boolean;
-  parent?: { __typename?: "PetitionField"; id: string } | null;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -15625,6 +15633,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   alias?: string | null;
   hasCommentsEnabled: boolean;
   requireApproval: boolean;
+  isChild: boolean;
   parent?: {
     __typename?: "PetitionField";
     id: string;
@@ -15692,7 +15701,7 @@ export type SettingsRowAlias_PetitionFieldFragment = {
   alias?: string | null;
   multiple: boolean;
   options: { [key: string]: any };
-  parent?: { __typename?: "PetitionField"; id: string } | null;
+  isChild: boolean;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -30588,6 +30597,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     title?: string | null;
     multiple: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -30610,6 +30620,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -30816,6 +30827,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     multiple: boolean;
     isInternal: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -30838,6 +30850,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -31004,6 +31017,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   title?: string | null;
   isInternal: boolean;
   alias?: string | null;
+  isChild: boolean;
   optional: boolean;
   multiple: boolean;
   showInPdf: boolean;
@@ -31035,6 +31049,7 @@ export type PetitionCompose_PetitionFieldFragment = {
     isInternal: boolean;
     isReadOnly: boolean;
     math?: Array<{ [key: string]: any }> | null;
+    isChild: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
@@ -31482,6 +31497,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
     title?: string | null;
     isInternal: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     multiple: boolean;
     showInPdf: boolean;
@@ -31564,6 +31580,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -31678,6 +31695,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
     title?: string | null;
     isInternal: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     multiple: boolean;
     showInPdf: boolean;
@@ -31760,6 +31778,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -31892,6 +31911,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     title?: string | null;
     isInternal: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     multiple: boolean;
     showInPdf: boolean;
@@ -31930,6 +31950,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -32008,6 +32029,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     title?: string | null;
     isInternal: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     multiple: boolean;
     showInPdf: boolean;
@@ -32046,6 +32068,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -32124,6 +32147,7 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
     title?: string | null;
     isInternal: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     multiple: boolean;
     showInPdf: boolean;
@@ -32172,6 +32196,7 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -32250,6 +32275,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
     title?: string | null;
     isInternal: boolean;
     alias?: string | null;
+    isChild: boolean;
     optional: boolean;
     multiple: boolean;
     showInPdf: boolean;
@@ -32306,6 +32332,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
       isInternal: boolean;
       isReadOnly: boolean;
       math?: Array<{ [key: string]: any }> | null;
+      isChild: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       position: number;
@@ -32531,6 +32558,7 @@ export type PetitionCompose_petitionQuery = {
           title?: string | null;
           multiple: boolean;
           alias?: string | null;
+          isChild: boolean;
           optional: boolean;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -32553,6 +32581,7 @@ export type PetitionCompose_petitionQuery = {
             isInternal: boolean;
             isReadOnly: boolean;
             math?: Array<{ [key: string]: any }> | null;
+            isChild: boolean;
             showInPdf: boolean;
             showActivityInPdf: boolean;
             position: number;
@@ -32781,6 +32810,7 @@ export type PetitionCompose_petitionQuery = {
           multiple: boolean;
           isInternal: boolean;
           alias?: string | null;
+          isChild: boolean;
           optional: boolean;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -32803,6 +32833,7 @@ export type PetitionCompose_petitionQuery = {
             isInternal: boolean;
             isReadOnly: boolean;
             math?: Array<{ [key: string]: any }> | null;
+            isChild: boolean;
             showInPdf: boolean;
             showActivityInPdf: boolean;
             position: number;
@@ -44121,6 +44152,7 @@ export type isReplyContentCompatible_PetitionFieldFragment = {
   type: PetitionFieldType;
   options: { [key: string]: any };
   multiple: boolean;
+  isChild: boolean;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -45640,6 +45672,7 @@ export const isReplyContentCompatible_PetitionFieldFragmentDoc = gql`
       id
       content
     }
+    isChild
   }
 ` as unknown as DocumentNode<isReplyContentCompatible_PetitionFieldFragment, unknown>;
 export const getReplyContents_PetitionFieldFragmentDoc = gql`
@@ -49991,9 +50024,7 @@ export const MoreLiquidReferencesButton_PetitionFieldFragmentDoc = gql`
     type
     multiple
     options
-    parent {
-      id
-    }
+    isChild
     children {
       id
       type
@@ -50011,9 +50042,7 @@ export const CopyLiquidReferenceButton_PetitionFieldFragmentDoc = gql`
     type
     multiple
     options
-    parent {
-      id
-    }
+    isChild
   }
 ` as unknown as DocumentNode<CopyLiquidReferenceButton_PetitionFieldFragment, unknown>;
 export const AddAliasToFieldDialog_PetitionFieldFragmentDoc = gql`
@@ -50033,9 +50062,7 @@ export const PetitionComposeContents_PetitionFieldFragmentDoc = gql`
     options
     isInternal
     alias
-    parent {
-      id
-    }
+    isChild
     ...MoreLiquidReferencesButton_PetitionField
     ...CopyLiquidReferenceButton_PetitionField
     ...AddAliasToFieldDialog_PetitionField

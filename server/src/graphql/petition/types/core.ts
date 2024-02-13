@@ -783,6 +783,9 @@ export const PetitionField = objectType({
         return null;
       },
     });
+    t.nonNull.boolean("isChild", {
+      resolve: (o) => o.parent_petition_field_id !== null,
+    });
   },
   sourceType: "db.PetitionField",
 });

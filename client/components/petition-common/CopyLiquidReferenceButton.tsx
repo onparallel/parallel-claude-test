@@ -6,7 +6,6 @@ import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { MouseEvent } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
-import { isDefined } from "remeda";
 
 export interface CopyLiquidReferenceButtonProps extends Omit<IconButtonWithTooltipProps, "label"> {
   field: CopyLiquidReferenceButton_PetitionFieldFragment;
@@ -49,7 +48,7 @@ export const CopyLiquidReferenceButton = Object.assign(
                 : (field.type === "CHECKBOX" &&
                       (field.options.limit.type === "UNLIMITED" || field.options.limit.max > 1)) ||
                     field.multiple ||
-                    isDefined(field.parent)
+                    field.isChild
                   ? [
                       `{% for ${loopVariable} in ${alias} -%}`,
                       `- {{ ${loopVariable}${defaultFilter} }}`,
@@ -79,9 +78,7 @@ export const CopyLiquidReferenceButton = Object.assign(
           type
           multiple
           options
-          parent {
-            id
-          }
+          isChild
         }
       `,
     },

@@ -3648,6 +3648,7 @@ type PetitionField {
   The ID of the petition field.
   """
   id: GID!
+  isChild: Boolean!
 
   """
   Determines if the field can be moved or deleted.

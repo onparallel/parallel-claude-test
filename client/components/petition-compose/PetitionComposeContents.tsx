@@ -10,7 +10,6 @@ import { memoWithFragments } from "@parallel/utils/memoWithFragments";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
 import { Divider } from "../common/Divider";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { CopyLiquidReferenceButton } from "../petition-common/CopyLiquidReferenceButton";
@@ -44,7 +43,7 @@ export function PetitionComposeContents<T extends PetitionComposeContents_Petiti
       {fieldsWithIndices.map(([field, fieldIndex]) => {
         return (
           <PetitionComposeContentsItem
-            isChildField={isDefined(field.parent)}
+            isChildField={field.isChild}
             key={field.id}
             field={field}
             fieldIndex={fieldIndex}
@@ -74,9 +73,7 @@ PetitionComposeContents.fragments = {
       options
       isInternal
       alias
-      parent {
-        id
-      }
+      isChild
       ...MoreLiquidReferencesButton_PetitionField
       ...CopyLiquidReferenceButton_PetitionField
       ...AddAliasToFieldDialog_PetitionField

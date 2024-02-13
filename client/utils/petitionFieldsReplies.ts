@@ -189,7 +189,9 @@ export const isReplyContentCompatible = (
   origin: isReplyContentCompatible_PetitionFieldFragment,
 ) => {
   let isCompatible = false;
-  const replies = target.multiple ? origin.replies : [origin.replies[0]];
+
+  // if is a child field we need to treat like if it was multiple, we asume that origin is also child
+  const replies = target.multiple || target.isChild ? origin.replies : [origin.replies[0]];
 
   switch (target.type) {
     case "FIELD_GROUP": {
@@ -365,6 +367,7 @@ isReplyContentCompatible.fragments = {
           id
           content
         }
+        isChild
       }
     `;
   },
