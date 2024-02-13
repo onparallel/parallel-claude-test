@@ -176,6 +176,11 @@ export function buildConfig() {
       debifyHost: process.env.BANKFLIP_DEBIFY_HOST!,
       debifyApiKey: process.env.BANKFLIP_DEBIFY_API_KEY!,
       debifyWebhookSecret: process.env.BANKFLIP_DEBIFY_WEBHOOK_SECRET!,
+      // mundimoto
+      mundimotoOrgId: process.env.BANKFLIP_MUNDIMOTO_ORG_GID,
+      mundimotoHost: process.env.BANKFLIP_MUNDIMOTO_HOST!,
+      mundimotoApiKey: process.env.BANKFLIP_MUNDIMOTO_API_KEY!,
+      mundimotoWebhookSecret: process.env.BANKFLIP_MUNDIMOTO_WEBHOOK_SECRET!,
     },
     oauth: {
       docusign: {

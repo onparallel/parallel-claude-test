@@ -144,6 +144,8 @@ export class BankflipService implements IBankflipService {
         return this.config.bankflip.saldadosWebhookSecret;
       case this.config.bankflip.debifyOrgId:
         return this.config.bankflip.debifyWebhookSecret;
+      case this.config.bankflip.mundimotoOrgId:
+        return this.config.bankflip.mundimotoWebhookSecret;
       default:
         return this.config.bankflip.webhookSecret;
     }
@@ -155,6 +157,8 @@ export class BankflipService implements IBankflipService {
         return this.config.bankflip.saldadosHost;
       case this.config.bankflip.debifyOrgId:
         return this.config.bankflip.debifyHost;
+      case this.config.bankflip.mundimotoOrgId:
+        return this.config.bankflip.mundimotoHost;
       default:
         return this.config.bankflip.host;
     }
@@ -166,6 +170,8 @@ export class BankflipService implements IBankflipService {
         return this.config.bankflip.saldadosApiKey;
       case this.config.bankflip.debifyOrgId:
         return this.config.bankflip.debifyApiKey;
+      case this.config.bankflip.mundimotoOrgId:
+        return this.config.bankflip.mundimotoApiKey;
       default:
         return this.config.bankflip.apiKey;
     }
