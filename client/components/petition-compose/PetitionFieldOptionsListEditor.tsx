@@ -10,8 +10,8 @@ import { SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { isSelectionExpanded } from "@udecode/plate-common";
 import {
-  forwardRef,
   KeyboardEvent,
+  forwardRef,
   useCallback,
   useImperativeHandle,
   useMemo,
@@ -20,7 +20,7 @@ import {
 import { FormattedMessage } from "react-intl";
 import { pipe } from "remeda";
 import { shallowEqualArrays } from "shallow-equal";
-import { createEditor, Editor, Point, Transforms } from "slate";
+import { Editor, Point, Transforms, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import {
   Editable,
@@ -139,6 +139,10 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         }
       }, [field.options.values, value, onFieldEdit, onChange]);
 
+      const validOptions = value.filter((v) => !isEmptyParagraph(v));
+      const isInvalid =
+        field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
+
       return isReadOnly ? (
         <Box textStyle="muted">
           {field.options.values.map((value: string, index: number) => {
@@ -164,6 +168,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
               {...props}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              aria-invalid={(showError && isInvalid) || undefined}
             />
           </Box>
         </Slate>
@@ -186,12 +191,15 @@ export const PetitionFieldOptionsListEditor = Object.assign(
 );
 
 function renderElement({ attributes, children, element }: RenderElementProps) {
-  const isEmpty = isEmptyParagraph(element as PetitionFieldOptionsListEditorBlock);
   return (
     <Text
       as="div"
       _before={{ content: "'-'", marginRight: 1 }}
-      color={isEmpty ? "gray.400" : undefined}
+      sx={{
+        "[aria-invalid] &": {
+          color: "red.500",
+        },
+      }}
       wordBreak="break-word"
       {...attributes}
     >
@@ -212,6 +220,7 @@ function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
           userSelect="none"
           pointerEvents="none"
           contentEditable={false}
+          opacity={0.3}
           width={0}
         >
           <FormattedMessage id="generic.choice" defaultMessage="Choice" />
