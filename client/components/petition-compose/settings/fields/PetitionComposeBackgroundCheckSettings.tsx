@@ -19,7 +19,7 @@ export function PetitionComposeBackgroundCheckSettings({
 }: Pick<PetitionComposeFieldSettingsProps, "petitionId" | "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const options = field.options as FieldOptions["BACKGROUND_CHECK"];
-  const isDisabled = field.visibility !== null || isReadOnly || field.isFixed;
+  const isDisabled = isReadOnly || field.isFixed;
 
   const providers = [] as {
     value: string;
