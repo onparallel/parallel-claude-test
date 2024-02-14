@@ -497,6 +497,12 @@ export const PetitionClosedNotifiedEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(data.petition_access_id))!;
       },
     });
+    t.nullable.string("emailBody", {
+      description: "The email message on HTML format.",
+      resolve: (o) => {
+        return o.data.email_body ?? null;
+      },
+    });
   },
 );
 

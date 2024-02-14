@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { ThumbUpIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -6,6 +7,7 @@ import { TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../../UserReference";
+import { useSentPetitionMessageDialog } from "../../dialogs/SentPetitionMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
@@ -18,39 +20,70 @@ export function TimelinePetitionClosedNotifiedEvent({
   event,
   userId,
 }: TimelinePetitionClosedNotifiedEventProps) {
+  const showSendPetitionMessage = useSentPetitionMessageDialog();
+  async function handleSeeMessageClick() {
+    try {
+      await showSendPetitionMessage({
+        message: {
+          access: event.access,
+          emailBody: event.emailBody!,
+          sentAt: event.createdAt,
+        },
+      });
+    } catch {}
+  }
+
   return (
     <TimelineItem
       icon={<TimelineIcon icon={ThumbUpIcon} color="white" backgroundColor="blue.500" />}
     >
-      {event.access.delegateGranter ? (
-        <FormattedMessage
-          id="timeline.petition-correct-notified-description-delegated"
-          defaultMessage="{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
-          values={{
-            userIsYou: userId === event.user?.id,
-            user: <UserReference user={event.user} />,
-            senderIsYou: userId === event.access.granter?.id,
-            sender: <UserReference user={event.access.granter} />,
-            contact: <ContactReference contact={event.access.contact} />,
-            timeAgo: (
-              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-            ),
-          }}
-        />
-      ) : (
-        <FormattedMessage
-          id="timeline.petition-correct-notified-description"
-          defaultMessage="{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
-          values={{
-            userIsYou: userId === event.user?.id,
-            user: <UserReference user={event.user} />,
-            contact: <ContactReference contact={event.access.contact} />,
-            timeAgo: (
-              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-            ),
-          }}
-        />
-      )}
+      <Flex align="center">
+        <Box>
+          {event.access.delegateGranter ? (
+            <FormattedMessage
+              id="component.timeline-petition-closed-notified-delegated.description"
+              defaultMessage="{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
+              values={{
+                userIsYou: userId === event.user?.id,
+                user: <UserReference user={event.user} />,
+                senderIsYou: userId === event.access.granter?.id,
+                sender: <UserReference user={event.access.granter} />,
+                contact: <ContactReference contact={event.access.contact} />,
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="component.timeline-petition-closed-notified.description"
+              defaultMessage="{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
+              values={{
+                userIsYou: userId === event.user?.id,
+                user: <UserReference user={event.user} />,
+                contact: <ContactReference contact={event.access.contact} />,
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
+        </Box>
+        {event.emailBody ? (
+          <Button
+            onClick={handleSeeMessageClick}
+            size="sm"
+            variant="outline"
+            marginLeft={2}
+            background="white"
+          >
+            <FormattedMessage
+              id="generic.timeline-see-message-button"
+              defaultMessage="See message"
+            />
+          </Button>
+        ) : null}
+      </Flex>
     </TimelineItem>
   );
 }
@@ -72,6 +105,7 @@ TimelinePetitionClosedNotifiedEvent.fragments = {
           ...ContactReference_Contact
         }
       }
+      emailBody
       createdAt
     }
     ${UserReference.fragments.User}

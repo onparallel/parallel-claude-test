@@ -3662,6 +3662,8 @@ export class PetitionRepository extends BaseRepository {
     return true;
   }
 
+  readonly loadPetitionEvent = this.buildLoadBy("petition_event", "id");
+
   async createEvent(events: MaybeArray<CreatePetitionEvent>, t?: Knex.Transaction) {
     if (Array.isArray(events) && events.length === 0) {
       return [];
@@ -3749,6 +3751,15 @@ export class PetitionRepository extends BaseRepository {
     await this.queues.enqueueEvents(event, "petition_event", notifyAfter, t);
 
     return event;
+  }
+
+  async mergePetitionEventData(eventId: number, data: any) {
+    await this.raw(
+      /* sql */ `
+      update petition_event set "data" = "data" || ? where id = ?;
+    `,
+      [this.json(data), eventId],
+    );
   }
 
   readonly loadPetitionFieldCommentsForField = this.buildLoader<
@@ -6302,12 +6313,13 @@ export class PetitionRepository extends BaseRepository {
         await this.updatePetitionSummaryAiCompletionLogId(petition, null, "AnonymizerWorker", t);
       }
 
-      const [messages, reminders] = await Promise.all([
+      const [messages, reminders, events] = await Promise.all([
         this.anonymizePetitionMessages(petitionId, t),
         this.anonymizePetitionReminders(
           accesses.map((a) => a.id),
           t,
         ),
+        this.anonymizePetitionEvents(petitionId, t),
         this.anonymizePetitionFieldReplies(replies, t),
         this.anonymizePetitionFieldComments(
           comments.map((c) => c.id),
@@ -6325,6 +6337,9 @@ export class PetitionRepository extends BaseRepository {
         [
           ...messages.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
           ...reminders.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
+          ...events
+            .filter((e) => isDefined((e.data as any).email_log_id))
+            .map((e) => (e.data as any).email_log_id!),
         ],
         t,
       );
@@ -6342,6 +6357,24 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
     });
+  }
+
+  async anonymizePetitionEvents(petitionId: number, t?: Knex.Transaction) {
+    return await this.from("petition_event", t)
+      .where("petition_id", petitionId)
+      .update(
+        {
+          data: this.knex.raw(/* sql */ `
+        case "type"
+          when 'PETITION_CLOSED_NOTIFIED' then
+            "data" || jsonb_build_object('email_body', null)
+          else 
+            "data"
+          end
+      `),
+        },
+        "*",
+      );
   }
 
   async anonymizePetitionFieldReplies(

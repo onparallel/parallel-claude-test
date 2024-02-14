@@ -2930,6 +2930,8 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
+  /** The email message on HTML format. */
+  emailBody: Maybe<Scalars["String"]["output"]>;
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
@@ -3075,6 +3077,7 @@ export type PetitionField = {
   hasCommentsEnabled: Scalars["Boolean"]["output"];
   /** The ID of the petition field. */
   id: Scalars["GID"]["output"];
+  isChild: Scalars["Boolean"]["output"];
   /** Determines if the field can be moved or deleted. */
   isFixed: Scalars["Boolean"]["output"];
   /** Determines if the field is visible by the recipients. */

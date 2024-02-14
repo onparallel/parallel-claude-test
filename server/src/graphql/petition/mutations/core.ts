@@ -2242,26 +2242,25 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
 
     const activeAccesses = accesses.filter((a) => a.status === "ACTIVE" && isDefined(a.contact_id));
 
-    await Promise.all([
-      ctx.emails.sendPetitionClosedEmail(
-        args.petitionId,
-        ctx.user!.id,
-        activeAccesses.map((a) => a.id),
-        args.emailBody,
-        args.attachPdfExport,
-        args.pdfExportTitle ?? null,
-      ),
-      ctx.petitions.createEvent(
-        activeAccesses.map((access) => ({
-          type: "PETITION_CLOSED_NOTIFIED",
-          petition_id: args.petitionId,
-          data: {
-            user_id: ctx.user!.id,
-            petition_access_id: access.id,
-          },
-        })),
-      ),
-    ]);
+    const events = await ctx.petitions.createEvent(
+      activeAccesses.map((access) => ({
+        type: "PETITION_CLOSED_NOTIFIED",
+        petition_id: args.petitionId,
+        data: {
+          user_id: ctx.user!.id,
+          petition_access_id: access.id,
+        },
+      })),
+    );
+
+    await ctx.emails.sendPetitionClosedEmail(
+      args.petitionId,
+      ctx.user!.id,
+      args.emailBody,
+      args.attachPdfExport,
+      args.pdfExportTitle ?? null,
+      events.map((e) => e.id),
+    );
 
     return (await ctx.petitions.loadPetition(args.petitionId))!;
   },

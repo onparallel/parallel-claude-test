@@ -45,10 +45,10 @@ export interface IEmailsService {
   sendPetitionClosedEmail(
     petitionId: number,
     userId: number,
-    petitionAccessIds: MaybeArray<number>,
     emailBody: any,
     attachPdfExport: boolean,
     pdfExportTitle: Maybe<string>,
+    petitionEventIds: MaybeArray<number>,
   ): Promise<void>;
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(
@@ -209,14 +209,14 @@ export class EmailsService implements IEmailsService {
   async sendPetitionClosedEmail(
     petitionId: number,
     userId: number,
-    petitionAccessIds: MaybeArray<number>,
     emailBody: any,
     attachPdfExport: boolean,
     pdfExportTitle: Maybe<string>,
+    petitionEventIds: MaybeArray<number>,
   ) {
     return await this.enqueueEmail("petition-closed-notification", {
-      id: this.buildQueueId("PetitionClosedNotification", petitionAccessIds),
-      petition_access_ids: unMaybeArray(petitionAccessIds),
+      id: this.buildQueueId("PetitionClosedNotification", petitionEventIds),
+      petition_event_ids: unMaybeArray(petitionEventIds),
       petition_id: petitionId,
       user_id: userId,
       message: emailBody,

@@ -14760,12 +14760,12 @@
     "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
   },
   {
-    "term": "timeline.petition-correct-notified-description",
+    "term": "component.timeline-petition-closed-notified.description",
     "definition": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
   },
   {
-    "term": "timeline.petition-correct-notified-description-delegated",
+    "term": "component.timeline-petition-closed-notified-delegated.description",
     "definition": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
   },

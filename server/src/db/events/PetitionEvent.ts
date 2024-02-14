@@ -98,6 +98,8 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CLOSED_NOTIFIED: {
     user_id: number;
     petition_access_id: number;
+    email_body?: any;
+    email_log_id?: number;
   };
   PETITION_REOPENED: {
     user_id: number;

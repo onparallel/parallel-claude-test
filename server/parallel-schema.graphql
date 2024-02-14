@@ -3475,6 +3475,11 @@ type PetitionClosedNotifiedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   data: JSONObject!
+
+  """
+  The email message on HTML format.
+  """
+  emailBody: String
   id: GID!
   petition: Petition
   type: PetitionEventType!

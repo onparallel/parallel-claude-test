@@ -3012,6 +3012,8 @@ export interface PetitionClosedNotifiedEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
+  /** The email message on HTML format. */
+  emailBody?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["GID"]["output"];
   petition?: Maybe<Petition>;
   type: PetitionEventType;
@@ -9062,6 +9064,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "PetitionClosedNotifiedEvent";
           id: string;
+          emailBody?: string | null;
           createdAt: string;
           user?: {
             __typename?: "User";
@@ -9811,6 +9814,7 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
   __typename?: "PetitionClosedNotifiedEvent";
   id: string;
+  emailBody?: string | null;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
@@ -10950,6 +10954,7 @@ export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
 
 export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment = {
   __typename?: "PetitionClosedNotifiedEvent";
+  emailBody?: string | null;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
@@ -27574,6 +27579,7 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "PetitionClosedNotifiedEvent";
           id: string;
+          emailBody?: string | null;
           createdAt: string;
           user?: {
             __typename?: "User";
@@ -28658,6 +28664,7 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "PetitionClosedNotifiedEvent";
                 id: string;
+                emailBody?: string | null;
                 createdAt: string;
                 user?: {
                   __typename?: "User";
@@ -29826,6 +29833,7 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "PetitionClosedNotifiedEvent";
                 id: string;
+                emailBody?: string | null;
                 createdAt: string;
                 user?: {
                   __typename?: "User";
@@ -48722,6 +48730,7 @@ export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFrag
         ...ContactReference_Contact
       }
     }
+    emailBody
     createdAt
   }
   ${UserReference_UserFragmentDoc}
