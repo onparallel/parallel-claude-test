@@ -335,6 +335,7 @@ export function PreviewPetitionFieldBackgroundCheck({
         }
         marginTop={3}
         outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
+        id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
       >
         {field.replies.length ? (
           <FormattedMessage

@@ -48,6 +48,7 @@ export interface RecipientViewPetitionFieldFileUploadProps
   onError: (error: any) => void;
   isInvalid?: boolean;
   isCacheOnly?: boolean;
+  parentReplyId?: string;
 }
 
 export function RecipientViewPetitionFieldFileUpload({
@@ -61,6 +62,7 @@ export function RecipientViewPetitionFieldFileUpload({
   onError,
   isCacheOnly,
   isInvalid,
+  parentReplyId,
 }: RecipientViewPetitionFieldFileUploadProps) {
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
@@ -140,6 +142,7 @@ export function RecipientViewPetitionFieldFileUpload({
           onCreateReply={onCreateReply}
           onError={handleError}
           isInvalid={isInvalid || hasAlreadyRepliedError}
+          parentReplyId={parentReplyId}
         />
       </Box>
     </RecipientViewPetitionFieldLayout>
@@ -340,6 +343,7 @@ interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   onCreateReply: (files: File[]) => MaybePromise<void>;
   onError: (error: any) => void;
   isInvalid?: boolean;
+  parentReplyId?: string;
 }
 
 function PetitionFieldFileUploadDropzone({
@@ -348,6 +352,7 @@ function PetitionFieldFileUploadDropzone({
   onCreateReply,
   onError,
   isInvalid,
+  parentReplyId,
   ...props
 }: PetitionFieldFileUploadDropzoneProps) {
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
@@ -380,6 +385,7 @@ function PetitionFieldFileUploadDropzone({
         disabled={_isDisabled}
         maxSize={MAX_FILE_SIZE}
         isInvalid={isInvalid}
+        id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
       >
         {({ isDragActive, isDragReject }) => (
           <Box pointerEvents="none">

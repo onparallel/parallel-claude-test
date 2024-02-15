@@ -5500,6 +5500,11 @@
     "context": "Reject"
   },
   {
+    "term": "component.petition-replies-field.add-field-reply",
+    "definition": "Añadir respuesta",
+    "context": "Add reply"
+  },
+  {
     "term": "component.petition-replies-field.attachments",
     "definition": "{count, plural, =1 {1 archivo adjunto} other {# archivo adjuntos}}",
     "context": "{count, plural, =1 {1 file attached} other {# files attached}}"

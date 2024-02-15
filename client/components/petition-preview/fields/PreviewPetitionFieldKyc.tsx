@@ -53,6 +53,7 @@ export interface PreviewPetitionFieldKycProps
   onRefreshField: () => void;
   isInvalid?: boolean;
   isCacheOnly?: boolean;
+  parentReplyId?: string;
 }
 
 export function PreviewPetitionFieldKyc({
@@ -66,6 +67,7 @@ export function PreviewPetitionFieldKyc({
   onCommentsButtonClick,
   onRefreshField,
   isCacheOnly,
+  parentReplyId,
 }: PreviewPetitionFieldKycProps) {
   const intl = useIntl();
   const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
@@ -172,6 +174,7 @@ export function PreviewPetitionFieldKyc({
         isDisabled={isDisabled || state === "FETCHING"}
         marginTop={3}
         outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
+        id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
       >
         {field.replies.length ? (
           <FormattedMessage

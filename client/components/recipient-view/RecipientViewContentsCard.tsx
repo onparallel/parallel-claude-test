@@ -18,7 +18,6 @@ import {
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult, useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
-import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { ArrayUnionToUnion, Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
@@ -89,8 +88,7 @@ export const RecipientViewContentsCard = Object.assign(
           ? field.previewReplies.filter((r) => r.parent?.id === parentReplyId)
           : field.replies.filter((r) => r.parent?.id === parentReplyId);
 
-      const focusFieldContainer =
-        ["HEADING", "FIELD_GROUP"].includes(field.type) || isFileTypeField(field.type);
+      const focusFieldContainer = ["HEADING", "FIELD_GROUP"].includes(field.type);
       let id = "";
       if (focusFieldContainer || field.type === "CHECKBOX") {
         id = `field-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}`;

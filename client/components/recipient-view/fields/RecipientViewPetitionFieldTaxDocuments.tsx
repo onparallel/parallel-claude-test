@@ -33,6 +33,7 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
   onError: (error: any) => void;
   isInvalid?: boolean;
   hideDeleteReplyButton?: boolean;
+  parentReplyId?: string;
 }
 
 export function RecipientViewPetitionFieldTaxDocuments({
@@ -49,6 +50,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
   isInvalid,
   isCacheOnly,
   hideDeleteReplyButton,
+  parentReplyId,
 }: RecipientViewPetitionFieldTaxDocumentsProps) {
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
@@ -284,6 +286,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
             onClick={handleStart}
             isDisabled={state === "FETCHING" || isDisabled}
             outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
+            id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
           >
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.start-button"

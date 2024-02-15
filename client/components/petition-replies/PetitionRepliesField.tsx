@@ -15,6 +15,7 @@ import {
   Heading,
   IconButton,
   Stack,
+  StackProps,
   Text,
   ThemingProps,
   Tooltip,
@@ -425,14 +426,14 @@ export const PetitionRepliesField = Object.assign(
                                     />
                                   ))
                                 ) : (
-                                  <Box paddingTop={3} paddingBottom={3}>
-                                    <Text textStyle="hint" textAlign="center">
-                                      <FormattedMessage
-                                        id="component.petition-replies-field.no-replies"
-                                        defaultMessage="There are no replies to this field yet"
-                                      />
-                                    </Text>
-                                  </Box>
+                                  <NoRepliesHintWithButton
+                                    paddingTop={3}
+                                    paddingBottom={3}
+                                    href={buildUrlToSection("preview", {
+                                      field: x.field.id,
+                                      parentReply: reply.id,
+                                    })}
+                                  />
                                 )}
                               </Stack>
                             )}
@@ -447,14 +448,12 @@ export const PetitionRepliesField = Object.assign(
               );
             })
           ) : (
-            <Box paddingY={4}>
-              <Text textStyle="hint" textAlign="center">
-                <FormattedMessage
-                  id="component.petition-replies-field.no-replies"
-                  defaultMessage="There are no replies to this field yet"
-                />
-              </Text>
-            </Box>
+            <NoRepliesHintWithButton
+              paddingY={4}
+              href={buildUrlToSection("preview", {
+                field: field.id,
+              })}
+            />
           )}
         </Stack>
       </Box>
@@ -602,14 +601,12 @@ export const PetitionRepliesField = Object.assign(
             </Stack>
           </Box>
         ) : (
-          <Box paddingY={4}>
-            <Text textStyle="hint" textAlign="center">
-              <FormattedMessage
-                id="component.petition-replies-field.no-replies"
-                defaultMessage="There are no replies to this field yet"
-              />
-            </Text>
-          </Box>
+          <NoRepliesHintWithButton
+            paddingY={4}
+            href={buildUrlToSection("preview", {
+              field: field.id,
+            })}
+          />
         )}
       </Card>
     );
@@ -816,3 +813,43 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
     />
   );
 });
+
+const NoRepliesHintWithButton = chakraForwardRef<"div", StackProps & { href: string }>(
+  function NoRepliesHintWithButton({ href, ...rest }, ref) {
+    const intl = useIntl();
+    return (
+      <HStack
+        ref={ref}
+        {...rest}
+        sx={{
+          "&:focus-within, &:hover": {
+            ".edit-field-reply-button": {
+              opacity: 1,
+            },
+          },
+        }}
+      >
+        <Text textStyle="hint">
+          <FormattedMessage
+            id="component.petition-replies-field.no-replies"
+            defaultMessage="There are no replies to this field yet"
+          />
+        </Text>
+        <NakedLink href={href}>
+          <IconButtonWithTooltip
+            as="a"
+            opacity={0}
+            className="edit-field-reply-button"
+            variant="ghost"
+            size="xs"
+            icon={<EditSimpleIcon />}
+            label={intl.formatMessage({
+              id: "component.petition-replies-field.add-field-reply",
+              defaultMessage: "Add reply",
+            })}
+          />
+        </NakedLink>
+      </HStack>
+    );
+  },
+);
