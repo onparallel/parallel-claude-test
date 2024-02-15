@@ -305,16 +305,6 @@
     "context": "Zip file"
   },
   {
-    "term": "component.internal-field-badge.popover",
-    "definition": "",
-    "context": "The internal fields will not be visible to the recipient."
-  },
-  {
-    "term": "component.internal-field-badge.text",
-    "definition": "",
-    "context": "Int"
-  },
-  {
     "term": "component.message-email-body-form-control.required-error",
     "definition": "",
     "context": "Customizing the initial message improves the response time of the recipients"
@@ -1055,36 +1045,6 @@
     "context": "Do you still want to create the contact?"
   },
   {
-    "term": "component.user-dropdown-empty.invite-button",
-    "definition": "",
-    "context": "Invite people"
-  },
-  {
-    "term": "component.user-dropdown-empty.no-options",
-    "definition": "",
-    "context": "Can't find someone?"
-  },
-  {
-    "term": "component.user-dropdown-empty.no-options-contact-admin",
-    "definition": "",
-    "context": "Contact with <a>the owner</a> of your organization to create them an account."
-  },
-  {
-    "term": "component.user-dropdown-empty.search-hint",
-    "definition": "",
-    "context": "Search for existing users"
-  },
-  {
-    "term": "component.user-dropdown-empty.search-hint-include-groups",
-    "definition": "",
-    "context": "Search for existing users and teams"
-  },
-  {
-    "term": "component.user-select.user-group-icon-alt",
-    "definition": "",
-    "context": "Team"
-  },
-  {
     "term": "contacts.create-new-contact.header",
     "definition": "",
     "context": "Enter the contact details"
@@ -1163,11 +1123,6 @@
     "term": "generic.deleted-field",
     "definition": "",
     "context": "Deleted field"
-  },
-  {
-    "term": "generic.deleted-user-group",
-    "definition": "",
-    "context": "Deleted team"
   },
   {
     "term": "generic.document-not-available",
@@ -1295,39 +1250,9 @@
     "context": "Please, enter the first name"
   },
   {
-    "term": "generic.language-catalan",
-    "definition": "",
-    "context": "Catalan"
-  },
-  {
-    "term": "generic.language-english",
-    "definition": "",
-    "context": "English"
-  },
-  {
-    "term": "generic.language-italian",
-    "definition": "",
-    "context": "Italian"
-  },
-  {
-    "term": "generic.language-portuguese",
-    "definition": "",
-    "context": "Portuguese"
-  },
-  {
-    "term": "generic.language-spanish",
-    "definition": "",
-    "context": "Spanish"
-  },
-  {
     "term": "generic.more-options",
     "definition": "",
     "context": "More options..."
-  },
-  {
-    "term": "generic.n-group-members",
-    "definition": "",
-    "context": "{count, plural, =1 {1 member} other {# members}}"
   },
   {
     "term": "generic.n-more",
@@ -2098,11 +2023,6 @@
     "term": "recipient-view.verify-title",
     "definition": "",
     "context": "Enter verification code"
-  },
-  {
-    "term": "user-group.all-members.description",
-    "definition": "",
-    "context": "This team contains all users from the organization."
   },
   {
     "term": "util.use-short-text-formats.email",

@@ -12,7 +12,7 @@
     "postbuild": "yarn _strip-js --input ../client/.next/server/pages/es/update.html && yarn _strip-js --input ../client/.next/server/pages/en/update.html",
     "generate-graphql-types": "graphql-codegen",
     "extract-i18n-terms": "yarn concurrently \"yarn:extract-i18n-terms:* start\"",
-    "extract-i18n-terms:recipient": "yarn workspace @parallel/bin extract-i18n-terms --cwd '../client' --locales en es ca it pt --input './pages/{pp,petition}/**/*.{ts,tsx}' './pages/{maintenance,thanks,update,404}.tsx' --output './lang/recipient'",
+    "extract-i18n-terms:recipient": "yarn workspace @parallel/bin extract-i18n-terms --cwd '../client' --locales en es ca it pt --input './pages/{pp,petition}/**/*.{ts,tsx}' './pages/{maintenance,thanks,update,404}.tsx' --output './lang/recipient' --exclude-pragma no-recipient",
     "extract-i18n-terms:app": "yarn workspace @parallel/bin extract-i18n-terms --cwd '../client' --locales en es --input './pages/**/*.{ts,tsx}' --output './lang'",
     "generate-i18n-files": "yarn concurrently \"yarn:generate-i18n-files:* start\"",
     "generate-i18n-files:recipient": "yarn workspace @parallel/bin generate-i18n-files --locales en es ca it pt --input '../client/lang/recipient' --pick-missing-from '../client/lang' --output-raw '../client/public/static/lang/recipient' --output-compiled '../client/public/static/lang/recipient/compiled'",

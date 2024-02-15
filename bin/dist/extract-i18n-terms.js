@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** no-recipient */
 const cli_lib_1 = require("@formatjs/cli-lib");
 const chalk_1 = __importDefault(require("chalk"));
 const detective_typescript_1 = __importDefault(require("detective-typescript"));
@@ -13,16 +14,22 @@ const json_1 = require("./utils/json");
 const run_1 = require("./utils/run");
 const yargs_1 = __importDefault(require("yargs"));
 const remeda_1 = require("remeda");
-async function extractTerms(cwd, glob) {
+async function extractTerms(cwd, glob, excludePragma) {
     const queue = (0, fast_glob_1.sync)(glob, {
         cwd,
         ignore: ["../**/*.d.ts"],
     }).map((file) => path_1.default.resolve(cwd, file));
     const files = new Set();
     let file;
+    const excludeRegex = excludePragma
+        ? new RegExp("(^\\/\\/\\s*" + excludePragma + "$|^\\/\\*\\*\\s*" + excludePragma + "\\s*\\*\\/$)", "m")
+        : undefined;
     while ((file = queue.pop())) {
-        files.add(file);
         const source = await (0, promises_1.readFile)(file, { encoding: "utf-8" });
+        if ((0, remeda_1.isDefined)(excludeRegex) && source.match(excludeRegex)) {
+            continue;
+        }
+        files.add(file);
         const dependencies = (0, detective_typescript_1.default)(source, { jsx: true, skipTypeImports: true });
         for (const dependecy of dependencies) {
             if (dependecy.startsWith("@parallel/")) {
@@ -96,7 +103,7 @@ function logStats(terms, data) {
     }
 }
 async function main() {
-    const { cwd, locales, input, output } = await yargs_1.default
+    const { cwd, locales, input, output, excludePragma } = await yargs_1.default
         .option("cwd", {
         required: true,
         type: "string",
@@ -114,12 +121,16 @@ async function main() {
         array: true,
         description: "Files to extract terms from",
     })
+        .option("exclude-pragma", {
+        type: "string",
+        description: "Pragma to exclude files",
+    })
         .option("output", {
         required: true,
         type: "string",
         description: "Directory to place the extracted terms",
     }).argv;
-    const terms = await extractTerms(path_1.default.resolve(cwd), input);
+    const terms = await extractTerms(path_1.default.resolve(cwd), input, excludePragma);
     let first = true;
     const outputDir = path_1.default.join(process.cwd(), cwd, output);
     for (const locale of locales) {

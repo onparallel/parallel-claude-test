@@ -8710,6 +8710,16 @@
     "context": "Test signature"
   },
   {
+    "term": "component.timeline-petition-closed-notified-delegated.description",
+    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} como {senderIsYou, select, true {tú} other {{sender}}} que el parallel está correcto {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-closed-notified.description",
+    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} que el parallel está correcto {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
+  },
+  {
     "term": "component.timeline-petition-tagged-event.description",
     "definition": "{userIsYou, select, true {Etiquetaste} other {{user} etiquetó}} este parallel con {tagList} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} tagged this parallel with {tagList} {timeAgo}"
@@ -14763,16 +14773,6 @@
     "term": "timeline.petition-completed-description",
     "definition": "{userIsYou, select, true {Completaste} other {{name} completó}} el parallel {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
-  },
-  {
-    "term": "component.timeline-petition-closed-notified.description",
-    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} que el parallel está correcto {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
-  },
-  {
-    "term": "component.timeline-petition-closed-notified-delegated.description",
-    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} como {senderIsYou, select, true {tú} other {{sender}}} que el parallel está correcto {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
   },
   {
     "term": "timeline.petition-created-description",

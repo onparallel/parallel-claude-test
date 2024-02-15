@@ -1,3 +1,4 @@
+/** no-recipient */
 import { extract } from "@formatjs/cli-lib";
 import chalk from "chalk";
 import detective from "detective-typescript";
@@ -25,16 +26,25 @@ interface MessageDescriptor {
   col: number;
 }
 
-async function extractTerms(cwd: string, glob: string | string[]) {
+async function extractTerms(cwd: string, glob: string | string[], excludePragma?: string) {
   const queue = globSync(glob, {
     cwd,
     ignore: ["../**/*.d.ts"],
   }).map((file) => path.resolve(cwd, file));
   const files = new Set<string>();
   let file: string | undefined;
+  const excludeRegex = excludePragma
+    ? new RegExp(
+        "(^\\/\\/\\s*" + excludePragma + "$|^\\/\\*\\*\\s*" + excludePragma + "\\s*\\*\\/$)",
+        "m",
+      )
+    : undefined;
   while ((file = queue.pop())) {
-    files.add(file);
     const source = await readFile(file, { encoding: "utf-8" });
+    if (isDefined(excludeRegex) && source.match(excludeRegex)) {
+      continue;
+    }
+    files.add(file);
     const dependencies = detective(source, { jsx: true, skipTypeImports: true });
     for (const dependecy of dependencies) {
       if (dependecy.startsWith("@parallel/")) {
@@ -115,7 +125,7 @@ function logStats(terms: Record<string, MessageDescriptor>, data: Map<string, Te
 }
 
 async function main() {
-  const { cwd, locales, input, output } = await yargs
+  const { cwd, locales, input, output, excludePragma } = await yargs
     .option("cwd", {
       required: true,
       type: "string",
@@ -133,13 +143,17 @@ async function main() {
       array: true,
       description: "Files to extract terms from",
     })
+    .option("exclude-pragma", {
+      type: "string",
+      description: "Pragma to exclude files",
+    })
     .option("output", {
       required: true,
       type: "string",
       description: "Directory to place the extracted terms",
     }).argv;
 
-  const terms = await extractTerms(path.resolve(cwd), input);
+  const terms = await extractTerms(path.resolve(cwd), input, excludePragma);
   let first = true;
   const outputDir = path.join(process.cwd(), cwd, output);
   for (const locale of locales) {

@@ -1,3 +1,4 @@
+/** no-recipient */
 import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
 import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty";

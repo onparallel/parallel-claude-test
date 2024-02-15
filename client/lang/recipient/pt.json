@@ -305,16 +305,6 @@
     "context": "Zip file"
   },
   {
-    "term": "component.internal-field-badge.popover",
-    "definition": "Os campos internos não serão visíveis para o destinatário.",
-    "context": "The internal fields will not be visible to the recipient."
-  },
-  {
-    "term": "component.internal-field-badge.text",
-    "definition": "Int",
-    "context": "Int"
-  },
-  {
     "term": "component.message-email-body-form-control.required-error",
     "definition": "Personalizar a mensagem inicial melhora o tempo de resposta dos destinatários",
     "context": "Customizing the initial message improves the response time of the recipients"
@@ -1055,36 +1045,6 @@
     "context": "Do you still want to create the contact?"
   },
   {
-    "term": "component.user-dropdown-empty.invite-button",
-    "definition": "Convidar pessoas",
-    "context": "Invite people"
-  },
-  {
-    "term": "component.user-dropdown-empty.no-options",
-    "definition": "Não encontras alguém?",
-    "context": "Can't find someone?"
-  },
-  {
-    "term": "component.user-dropdown-empty.no-options-contact-admin",
-    "definition": "Contacta com <a>o proprietário</a> da tua organização para criar uma conta.",
-    "context": "Contact with <a>the owner</a> of your organization to create them an account."
-  },
-  {
-    "term": "component.user-dropdown-empty.search-hint",
-    "definition": "Procura por utilizadores existentes",
-    "context": "Search for existing users"
-  },
-  {
-    "term": "component.user-dropdown-empty.search-hint-include-groups",
-    "definition": "Procura por utilizadores e equipas existentes",
-    "context": "Search for existing users and teams"
-  },
-  {
-    "term": "component.user-select.user-group-icon-alt",
-    "definition": "Equipa",
-    "context": "Team"
-  },
-  {
     "term": "contacts.create-new-contact.header",
     "definition": "Introduz os dados do contacto",
     "context": "Enter the contact details"
@@ -1163,11 +1123,6 @@
     "term": "generic.deleted-field",
     "definition": "Campo eliminado",
     "context": "Deleted field"
-  },
-  {
-    "term": "generic.deleted-user-group",
-    "definition": "Equipa eliminada",
-    "context": "Deleted team"
   },
   {
     "term": "generic.document-not-available",
@@ -1295,39 +1250,9 @@
     "context": "Please, enter the first name"
   },
   {
-    "term": "generic.language-catalan",
-    "definition": "Catalão",
-    "context": "Catalan"
-  },
-  {
-    "term": "generic.language-english",
-    "definition": "Inglês",
-    "context": "English"
-  },
-  {
-    "term": "generic.language-italian",
-    "definition": "Italiano",
-    "context": "Italian"
-  },
-  {
-    "term": "generic.language-portuguese",
-    "definition": "Português",
-    "context": "Portuguese"
-  },
-  {
-    "term": "generic.language-spanish",
-    "definition": "Espanhol",
-    "context": "Spanish"
-  },
-  {
     "term": "generic.more-options",
     "definition": "Mais opções...",
     "context": "More options..."
-  },
-  {
-    "term": "generic.n-group-members",
-    "definition": "{count, plural, =1 {1 membro} other {# membros}}",
-    "context": "{count, plural, =1 {1 member} other {# members}}"
   },
   {
     "term": "generic.n-more",
@@ -2098,11 +2023,6 @@
     "term": "recipient-view.verify-title",
     "definition": "{tone, select, INFORMAL{Introduce} other{Introduza}} o código de verificação",
     "context": "Enter verification code"
-  },
-  {
-    "term": "user-group.all-members.description",
-    "definition": "Este grupo contém todos os utilizadores da organização.",
-    "context": "This team contains all users from the organization."
   },
   {
     "term": "util.use-short-text-formats.email",

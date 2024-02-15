@@ -1,3 +1,4 @@
+/** no-recipient */
 import { Badge, BoxProps, Placement, Text, TextProps, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
