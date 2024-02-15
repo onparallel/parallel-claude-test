@@ -40,7 +40,7 @@ async function logPath(cwd, from, to) {
             }
         }
     }
-    let current = to;
+    let current = path_1.default.resolve(cwd, to);
     while (current) {
         console.log(current);
         current = parent[current];

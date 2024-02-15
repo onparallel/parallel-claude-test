@@ -40,81 +40,6 @@
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
-    "definition": "Se esta opção estiver desativada, apenas as pessoas indicadas poderão assinar o documento.",
-    "context": "If this option is disabled, only the indicated people will be able to sign the document."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-label",
-    "definition": "Permitir que os destinatários adicionem mais signatários",
-    "context": "Allow recipients to add additional signers"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.contact-select-placeholder",
-    "definition": "Adicione um contacto para assinar",
-    "context": "Add a contact to sign"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.edit-signers-header",
-    "definition": "Editar signatários",
-    "context": "Edit signers"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.include-message",
-    "definition": "Incluir mensagem",
-    "context": "Include message"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.message-placeholder",
-    "definition": "Escreva aqui uma mensagem para os signatários...",
-    "context": "Write here a message for the signers..."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.min-signers",
-    "definition": "Adicione pelo menos {count, plural, =1{# signatário} other{# signatários}}",
-    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.no-signers-added",
-    "definition": "Ainda não adicionou signatários",
-    "context": "You have not added any signers"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.no-signers-set",
-    "definition": "Enviaremos o documento aos seguintes contactos:",
-    "context": "We will send the document to the following contacts:"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.no-signers-set-sequential",
-    "definition": "Ao iniciar a assinatura, cada contacto receberá o documento após o anterior assinar:",
-    "context": "We will send the document to sign to each contact after the one before has signed:"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.preset-signers",
-    "definition": "{names} {count, plural, =1{assinará} other {assinarão}} juntamente com os signatários que adicionares.",
-    "context": "{names} will sign together with the signers you add."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.preset-signers-sequential",
-    "definition": "{names} {count, plural, =1{assinará} other {assinarão}} após os signatários que adicionares.",
-    "context": "{names} will sign after the other signers."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.signer-added-by-recipient",
-    "definition": "Signatários adicionados pelo destinatário",
-    "context": "Signers added by the recipient"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.start-signature-button",
-    "definition": "Iniciar assinatura",
-    "context": "Start signature"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.start-signature-header",
-    "definition": "Iniciar a assinatura",
-    "context": "Start signature"
-  },
-  {
     "term": "component.confirm-signer-info-dialog.header",
     "definition": "Já adicionaste este email para {signersList}. Podes modificar o nome e adicioná-lo novamente.",
     "context": "You already added this email for {signersList}. You can modify the name and add it again."
@@ -123,31 +48,6 @@
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Confirme os dados do signatário",
     "context": "Confirm the signer's information"
-  },
-  {
-    "term": "component.contact-select.bounced-email-tooltip",
-    "definition": "Email anteriormente devolvido",
-    "context": "Previously bounced email"
-  },
-  {
-    "term": "component.contact-select.create-new-contact",
-    "definition": "Criar novo contacto para: <b>{email}</b>",
-    "context": "Create new contact for: <b>{email}</b>"
-  },
-  {
-    "term": "component.contact-select.enter-email",
-    "definition": "Também podes introduzir um email válido.",
-    "context": "You can also enter a valid email."
-  },
-  {
-    "term": "component.contact-select.no-options",
-    "definition": "Não conseguimos encontrar nenhum contacto com <em>{search}</em>",
-    "context": "We could not find any existing contacts for <em>{search}</em>"
-  },
-  {
-    "term": "component.contact-select.search-hint",
-    "definition": "Procura contactos existentes ou insere um email válido",
-    "context": "Search for existing contacts or enter a valid email."
   },
   {
     "term": "component.date-time.a-moment-ago",
@@ -795,156 +695,6 @@
     "context": "Search..."
   },
   {
-    "term": "component.signature-config-dialog.add-instructions-help",
-    "definition": "As instruções ajudarão os demais utilizadores e destinatários a saber quem tem de assinar este documento.",
-    "context": "Instructions help other users and recipients understand who has to sign the document."
-  },
-  {
-    "term": "component.signature-config-dialog.add-instructions-label",
-    "definition": "Adicionar instruções",
-    "context": "Add instructions"
-  },
-  {
-    "term": "component.signature-config-dialog.allow-additional-signers-help",
-    "definition": "Se esta opção estiver desativada, apenas as pessoas indicadas poderão assinar o documento.",
-    "context": "If this option is disabled, only the indicated people will be able to sign the document."
-  },
-  {
-    "term": "component.signature-config-dialog.allow-additional-signers-label",
-    "definition": "Permitir que os destinatários adicionem mais signatários",
-    "context": "Allow recipients to add additional signers"
-  },
-  {
-    "term": "component.signature-config-dialog.contact-select-add-contact-to-sign-placeholder",
-    "definition": "Adiciona um contacto para assinar",
-    "context": "Add a contact to sign"
-  },
-  {
-    "term": "component.signature-config-dialog.header-help-link",
-    "definition": "Mais sobre a assinatura",
-    "context": "More about eSignature"
-  },
-  {
-    "term": "component.signature-config-dialog.header-subtitle",
-    "definition": "Assine um documento PDF com todas as respostas usando um dos nossos fornecedores de assinatura digital integrados.",
-    "context": "Sign a PDF document with all the replies using one of our integrated eSignature providers."
-  },
-  {
-    "term": "component.signature-config-dialog.include-fixed-signers-template-label",
-    "definition": "Incluir contactos que assinem sempre o documento",
-    "context": "Include contacts who always sign the document"
-  },
-  {
-    "term": "component.signature-config-dialog.instructions-label",
-    "definition": "Instruções",
-    "context": "Instructions"
-  },
-  {
-    "term": "component.signature-config-dialog.instructions-placeholder",
-    "definition": "Ex: Adiciona como signatários os representantes legais da tua empresa",
-    "context": "e.g. Add your company's legal representatives as signers"
-  },
-  {
-    "term": "component.signature-config-dialog.min-signers-label",
-    "definition": "Este documento terá pelo menos {input} {count, plural, =1{assinante} other{assinantes}}",
-    "context": "This document will have at least {input} {count, plural, =1{signer} other{signers}}"
-  },
-  {
-    "term": "component.signature-config-dialog.no-signers-added",
-    "definition": "Ainda não adicionaste nenhum assinante",
-    "context": "You haven't added any signers yet"
-  },
-  {
-    "term": "component.signature-config-dialog.provider-label",
-    "definition": "Fornecedor de assinatura digital",
-    "context": "eSignature provider"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-label",
-    "definition": "Quando desejas que comece a assinatura?",
-    "context": "When do you want the eSignature to start?"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-no",
-    "definition": "Após concluir o parallel",
-    "context": "After the parallel is completed"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-no-explainer",
-    "definition": "O processo de assinatura começará quando toda a informação estiver completa.",
-    "context": "The signature process will start when all the information has been completed."
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-yes",
-    "definition": "Após rever a informação",
-    "context": "After reviewing the information"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-yes-explainer",
-    "definition": "Após rever a informação, terás de iniciar a assinatura manualmente.",
-    "context": "After reviewing the information you will have to start the signature manually."
-  },
-  {
-    "term": "component.signature-config-dialog.sending-same-time-help",
-    "definition": "Os signatários receberão o documento para assinar ao mesmo tempo.",
-    "context": "All the signers will receive the document at the same time."
-  },
-  {
-    "term": "component.signature-config-dialog.sending-same-time-label",
-    "definition": "Ao mesmo tempo",
-    "context": "All at the same time"
-  },
-  {
-    "term": "component.signature-config-dialog.sending-sequential-help",
-    "definition": "Cada signatário receberá o documento após o anterior ter assinado.",
-    "context": "Each signer will receive the document after the one before has signed."
-  },
-  {
-    "term": "component.signature-config-dialog.sending-sequential-label",
-    "definition": "Sequencial, um a um",
-    "context": "In order, signing one by one"
-  },
-  {
-    "term": "component.signature-config-dialog.sending-type-label",
-    "definition": "Como desejas que as assinaturas sejam enviadas?",
-    "context": "How do you want Parallel to send the signatures?"
-  },
-  {
-    "term": "component.signature-config-dialog.step-1-header",
-    "definition": "Configurações de assinatura digital",
-    "context": "eSignature configuration"
-  },
-  {
-    "term": "component.signature-config-dialog.step-2-header",
-    "definition": "Configura as assinaturas do documento",
-    "context": "Set up document signatures"
-  },
-  {
-    "term": "component.signature-config-dialog.step-3-header",
-    "definition": "Editar assinantes",
-    "context": "Add signers"
-  },
-  {
-    "term": "component.signature-config-dialog.template-alert",
-    "definition": "Estes signatários serão atribuídos a todos os parallels criados a partir desta modelo.",
-    "context": "These signers will be assigned to all parallels created from this template."
-  },
-  {
-    "term": "component.signature-config-dialog.title-help",
-    "definition": "Inclui um título no documento a ser assinado. Também será usado como nome do arquivo uma vez assinado.",
-    "context": "Include a title on the signing document. It will also be used as the name of the file once signed."
-  },
-  {
-    "term": "component.signature-config-dialog.title-label",
-    "definition": "Título do documento",
-    "context": "Title of the document"
-  },
-  {
-    "term": "component.signature-config-dialog.title-placeholder",
-    "definition": "Escreve um título...",
-    "context": "Enter a title..."
-  },
-  {
     "term": "component.signature-sent-alert.petition-completed-alert-2",
     "definition": "{tone, select, INFORMAL{Se realizares alguma alteração} other{Se realizar alguma alteração}}, não {tone, select, INFORMAL{esqueças} other{esqueça}} de clicar novamente no botão <b>Finalizar</b>.",
     "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
@@ -1025,31 +775,6 @@
     "context": "Other"
   },
   {
-    "term": "component.use-create-contact.create-contact",
-    "definition": "Criar contacto",
-    "context": "Create contact"
-  },
-  {
-    "term": "component.use-create-contact.force-contact-body",
-    "definition": "O domínio do email não pôde ser verificado. Se for criado, pode não ser possível enviar emails para este endereço.",
-    "context": "We could not verify this email address. You may not be able to send emails to this address."
-  },
-  {
-    "term": "component.use-create-contact.force-contact-header",
-    "definition": "Não foi possível verificar o email",
-    "context": "Failed to verify email"
-  },
-  {
-    "term": "component.use-create-contact.force-contact-question",
-    "definition": "Ainda queres criar o contacto?",
-    "context": "Do you still want to create the contact?"
-  },
-  {
-    "term": "contacts.create-new-contact.header",
-    "definition": "Introduz os dados do contacto",
-    "context": "Enter the contact details"
-  },
-  {
     "term": "error.404.header",
     "definition": "Não conseguimos encontrar a página que procuras.",
     "context": "We can't seem to find the page you're looking for."
@@ -1113,11 +838,6 @@
     "term": "generic.delete",
     "definition": "Eliminar",
     "context": "Delete"
-  },
-  {
-    "term": "generic.deleted-contact",
-    "definition": "Contacto eliminado",
-    "context": "Deleted contact"
   },
   {
     "term": "generic.deleted-field",
@@ -1275,11 +995,6 @@
     "context": "OK"
   },
   {
-    "term": "generic.optional",
-    "definition": "Opcional",
-    "context": "Optional"
-  },
-  {
     "term": "generic.options",
     "definition": "Opções...",
     "context": "Options..."
@@ -1418,11 +1133,6 @@
     "term": "generic.show-more-less",
     "definition": "Mostrar {more, select, true {mais} other {menos}}",
     "context": "Show {more, select, true {more} other {less}}"
-  },
-  {
-    "term": "generic.signature-demo-environment-long",
-    "definition": "Ambiente de teste",
-    "context": "Test environment"
   },
   {
     "term": "generic.something-went-wrong",

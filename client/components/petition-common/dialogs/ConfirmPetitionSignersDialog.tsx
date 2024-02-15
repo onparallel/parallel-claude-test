@@ -44,7 +44,6 @@ import { isDefined, partition, pick, uniqBy } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
-import { MAX_SIGNERS_ALLOWED } from "./SignatureConfigDialog";
 
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
@@ -64,6 +63,8 @@ export type SignerSelectSelection = Omit<
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   "__typename" | "isPreset"
 >;
+
+const MAX_SIGNERS_ALLOWED = 40;
 
 export function ConfirmPetitionSignersDialog(
   props: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>,

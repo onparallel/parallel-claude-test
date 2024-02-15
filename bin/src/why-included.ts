@@ -37,7 +37,7 @@ async function logPath(cwd: string, from: string | string[], to: string) {
       }
     }
   }
-  let current = to;
+  let current = path.resolve(cwd, to);
   while (current) {
     console.log(current);
     current = parent[current];

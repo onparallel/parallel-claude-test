@@ -15,7 +15,7 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
+import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 
 interface ConfirmSignerInfoDialogProps {
   selection: SignerSelectSelection;

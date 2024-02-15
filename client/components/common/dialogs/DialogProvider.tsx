@@ -8,6 +8,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react";
 
@@ -30,6 +31,11 @@ interface UseDialogReturn<TProps = {}, TResult = void> {
       ? []
       : [props: Prettify<Omit<TProps, keyof DialogCallbacks>>]
   ): Promise<TResult>;
+  ignoringDialogErrors: (
+    ...args: [keyof Omit<TProps, keyof DialogCallbacks>] extends [never]
+      ? []
+      : [props: Prettify<Omit<TProps, keyof DialogCallbacks>>]
+  ) => Promise<void>;
 }
 
 export function useDialog<TProps = {}, TResult = void>(
@@ -37,11 +43,29 @@ export function useDialog<TProps = {}, TResult = void>(
   Dialog: ComponentType<DialogProps<TProps, TResult>>,
 ): UseDialogReturn<TProps, TResult> {
   const opener = useContext(DialogOpenerContext)!;
-  return useCallback(
-    (props?: Omit<TProps, keyof DialogCallbacks>) =>
-      opener((callbacks: DialogCallbacks<TResult>) => (
-        <Dialog {...callbacks} {...((props as any) ?? {})} />
-      )),
+  return useMemo(
+    () =>
+      Object.assign(
+        async (props?: Omit<TProps, keyof DialogCallbacks>) =>
+          await opener((callbacks: DialogCallbacks<TResult>) => (
+            <Dialog {...callbacks} {...((props as any) ?? {})} />
+          )),
+        {
+          ignoringDialogErrors: async (props?: Omit<TProps, keyof DialogCallbacks>) => {
+            try {
+              await opener((callbacks: DialogCallbacks<TResult>) => (
+                <Dialog {...callbacks} {...((props as any) ?? {})} />
+              ));
+            } catch (e) {
+              if (e instanceof DialogError) {
+                return;
+              } else {
+                throw e;
+              }
+            }
+          },
+        },
+      ),
     [Dialog],
   );
 }

@@ -40,81 +40,6 @@
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
-    "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
-    "context": "If this option is disabled, only the indicated people will be able to sign the document."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.allow-additional-signers-label",
-    "definition": "Allow recipients to add additional signers",
-    "context": "Allow recipients to add additional signers"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.contact-select-placeholder",
-    "definition": "Add a contact to sign",
-    "context": "Add a contact to sign"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.edit-signers-header",
-    "definition": "Edit signers",
-    "context": "Edit signers"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.include-message",
-    "definition": "Include message",
-    "context": "Include message"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.message-placeholder",
-    "definition": "Write here a message for the signers...",
-    "context": "Write here a message for the signers..."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.min-signers",
-    "definition": "Add at least {count, plural, =1{# signer} other{# signers}}",
-    "context": "Add at least {count, plural, =1{# signer} other{# signers}}"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.no-signers-added",
-    "definition": "You have not added any signers",
-    "context": "You have not added any signers"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.no-signers-set",
-    "definition": "We will send the document to the following contacts:",
-    "context": "We will send the document to the following contacts:"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.no-signers-set-sequential",
-    "definition": "We will send the document to sign to each contact after the one before has signed:",
-    "context": "We will send the document to sign to each contact after the one before has signed:"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.preset-signers",
-    "definition": "{names} will sign together with the signers you add.",
-    "context": "{names} will sign together with the signers you add."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.preset-signers-sequential",
-    "definition": "{names} will sign after the other signers.",
-    "context": "{names} will sign after the other signers."
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.signer-added-by-recipient",
-    "definition": "Signers added by the recipient",
-    "context": "Signers added by the recipient"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.start-signature-button",
-    "definition": "Start signature",
-    "context": "Start signature"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.start-signature-header",
-    "definition": "Start signature",
-    "context": "Start signature"
-  },
-  {
     "term": "component.confirm-signer-info-dialog.header",
     "definition": "You already added this email for {signersList}. You can modify the name and add it again.",
     "context": "You already added this email for {signersList}. You can modify the name and add it again."
@@ -123,31 +48,6 @@
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Confirm the signer's information",
     "context": "Confirm the signer's information"
-  },
-  {
-    "term": "component.contact-select.bounced-email-tooltip",
-    "definition": "Previously bounced email",
-    "context": "Previously bounced email"
-  },
-  {
-    "term": "component.contact-select.create-new-contact",
-    "definition": "Create new contact for: <b>{email}</b>",
-    "context": "Create new contact for: <b>{email}</b>"
-  },
-  {
-    "term": "component.contact-select.enter-email",
-    "definition": "You can also enter a valid email.",
-    "context": "You can also enter a valid email."
-  },
-  {
-    "term": "component.contact-select.no-options",
-    "definition": "We could not find any existing contacts for <em>{search}</em>",
-    "context": "We could not find any existing contacts for <em>{search}</em>"
-  },
-  {
-    "term": "component.contact-select.search-hint",
-    "definition": "Search for existing contacts or enter a valid email.",
-    "context": "Search for existing contacts or enter a valid email."
   },
   {
     "term": "component.date-time.a-moment-ago",
@@ -795,156 +695,6 @@
     "context": "Search..."
   },
   {
-    "term": "component.signature-config-dialog.add-instructions-help",
-    "definition": "Instructions help other users and recipients understand who has to sign the document.",
-    "context": "Instructions help other users and recipients understand who has to sign the document."
-  },
-  {
-    "term": "component.signature-config-dialog.add-instructions-label",
-    "definition": "Add instructions",
-    "context": "Add instructions"
-  },
-  {
-    "term": "component.signature-config-dialog.allow-additional-signers-help",
-    "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
-    "context": "If this option is disabled, only the indicated people will be able to sign the document."
-  },
-  {
-    "term": "component.signature-config-dialog.allow-additional-signers-label",
-    "definition": "Allow recipients to add additional signers",
-    "context": "Allow recipients to add additional signers"
-  },
-  {
-    "term": "component.signature-config-dialog.contact-select-add-contact-to-sign-placeholder",
-    "definition": "Add a contact to sign",
-    "context": "Add a contact to sign"
-  },
-  {
-    "term": "component.signature-config-dialog.header-help-link",
-    "definition": "More about eSignature",
-    "context": "More about eSignature"
-  },
-  {
-    "term": "component.signature-config-dialog.header-subtitle",
-    "definition": "Sign a PDF document with all the replies using one of our integrated eSignature providers.",
-    "context": "Sign a PDF document with all the replies using one of our integrated eSignature providers."
-  },
-  {
-    "term": "component.signature-config-dialog.include-fixed-signers-template-label",
-    "definition": "Include contacts who always sign the document",
-    "context": "Include contacts who always sign the document"
-  },
-  {
-    "term": "component.signature-config-dialog.instructions-label",
-    "definition": "Instructions",
-    "context": "Instructions"
-  },
-  {
-    "term": "component.signature-config-dialog.instructions-placeholder",
-    "definition": "e.g. Add your company's legal representatives as signers",
-    "context": "e.g. Add your company's legal representatives as signers"
-  },
-  {
-    "term": "component.signature-config-dialog.min-signers-label",
-    "definition": "This document will have at least {input} {count, plural, =1{signer} other{signers}}",
-    "context": "This document will have at least {input} {count, plural, =1{signer} other{signers}}"
-  },
-  {
-    "term": "component.signature-config-dialog.no-signers-added",
-    "definition": "You haven't added any signers yet",
-    "context": "You haven't added any signers yet"
-  },
-  {
-    "term": "component.signature-config-dialog.provider-label",
-    "definition": "eSignature provider",
-    "context": "eSignature provider"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-label",
-    "definition": "When do you want the eSignature to start?",
-    "context": "When do you want the eSignature to start?"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-no",
-    "definition": "After the parallel is completed",
-    "context": "After the parallel is completed"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-no-explainer",
-    "definition": "The signature process will start when all the information has been completed.",
-    "context": "The signature process will start when all the information has been completed."
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-yes",
-    "definition": "After reviewing the information",
-    "context": "After reviewing the information"
-  },
-  {
-    "term": "component.signature-config-dialog.review-before-send-option-yes-explainer",
-    "definition": "After reviewing the information you will have to start the signature manually.",
-    "context": "After reviewing the information you will have to start the signature manually."
-  },
-  {
-    "term": "component.signature-config-dialog.sending-same-time-help",
-    "definition": "All the signers will receive the document at the same time.",
-    "context": "All the signers will receive the document at the same time."
-  },
-  {
-    "term": "component.signature-config-dialog.sending-same-time-label",
-    "definition": "All at the same time",
-    "context": "All at the same time"
-  },
-  {
-    "term": "component.signature-config-dialog.sending-sequential-help",
-    "definition": "Each signer will receive the document after the one before has signed.",
-    "context": "Each signer will receive the document after the one before has signed."
-  },
-  {
-    "term": "component.signature-config-dialog.sending-sequential-label",
-    "definition": "In order, signing one by one",
-    "context": "In order, signing one by one"
-  },
-  {
-    "term": "component.signature-config-dialog.sending-type-label",
-    "definition": "How do you want Parallel to send the signatures?",
-    "context": "How do you want Parallel to send the signatures?"
-  },
-  {
-    "term": "component.signature-config-dialog.step-1-header",
-    "definition": "eSignature configuration",
-    "context": "eSignature configuration"
-  },
-  {
-    "term": "component.signature-config-dialog.step-2-header",
-    "definition": "Set up document signatures",
-    "context": "Set up document signatures"
-  },
-  {
-    "term": "component.signature-config-dialog.step-3-header",
-    "definition": "Add signers",
-    "context": "Add signers"
-  },
-  {
-    "term": "component.signature-config-dialog.template-alert",
-    "definition": "These signers will be assigned to all parallels created from this template.",
-    "context": "These signers will be assigned to all parallels created from this template."
-  },
-  {
-    "term": "component.signature-config-dialog.title-help",
-    "definition": "Include a title on the signing document. It will also be used as the name of the file once signed.",
-    "context": "Include a title on the signing document. It will also be used as the name of the file once signed."
-  },
-  {
-    "term": "component.signature-config-dialog.title-label",
-    "definition": "Title of the document",
-    "context": "Title of the document"
-  },
-  {
-    "term": "component.signature-config-dialog.title-placeholder",
-    "definition": "Enter a title...",
-    "context": "Enter a title..."
-  },
-  {
     "term": "component.signature-sent-alert.petition-completed-alert-2",
     "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
     "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
@@ -1025,31 +775,6 @@
     "context": "Other"
   },
   {
-    "term": "component.use-create-contact.create-contact",
-    "definition": "Create contact",
-    "context": "Create contact"
-  },
-  {
-    "term": "component.use-create-contact.force-contact-body",
-    "definition": "We could not verify this email address. You may not be able to send emails to this address.",
-    "context": "We could not verify this email address. You may not be able to send emails to this address."
-  },
-  {
-    "term": "component.use-create-contact.force-contact-header",
-    "definition": "Failed to verify email",
-    "context": "Failed to verify email"
-  },
-  {
-    "term": "component.use-create-contact.force-contact-question",
-    "definition": "Do you still want to create the contact?",
-    "context": "Do you still want to create the contact?"
-  },
-  {
-    "term": "contacts.create-new-contact.header",
-    "definition": "Enter the contact details",
-    "context": "Enter the contact details"
-  },
-  {
     "term": "error.404.header",
     "definition": "We can't seem to find the page you're looking for.",
     "context": "We can't seem to find the page you're looking for."
@@ -1113,11 +838,6 @@
     "term": "generic.delete",
     "definition": "Delete",
     "context": "Delete"
-  },
-  {
-    "term": "generic.deleted-contact",
-    "definition": "Deleted contact",
-    "context": "Deleted contact"
   },
   {
     "term": "generic.deleted-field",
@@ -1275,11 +995,6 @@
     "context": "OK"
   },
   {
-    "term": "generic.optional",
-    "definition": "Optional",
-    "context": "Optional"
-  },
-  {
     "term": "generic.options",
     "definition": "Options...",
     "context": "Options..."
@@ -1418,11 +1133,6 @@
     "term": "generic.show-more-less",
     "definition": "Show {more, select, true {more} other {less}}",
     "context": "Show {more, select, true {more} other {less}}"
-  },
-  {
-    "term": "generic.signature-demo-environment-long",
-    "definition": "Test environment",
-    "context": "Test environment"
   },
   {
     "term": "generic.something-went-wrong",

@@ -19,7 +19,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
-import { withError } from "@parallel/utils/promises/withError";
+import { untranslated } from "@parallel/utils/untranslated";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -32,12 +32,11 @@ import {
   ContactSelectProps,
   ContactSelectSelection,
 } from "./ContactSelect";
-import { ConfirmDialog } from "./dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "./dialogs/DialogProvider";
-import { useErrorDialog } from "./dialogs/ErrorDialog";
 import { HelpPopover } from "./HelpPopover";
 import { Link } from "./Link";
-import { untranslated } from "@parallel/utils/untranslated";
+import { ConfirmDialog } from "./dialogs/ConfirmDialog";
+import { DialogProps, isDialogError, useDialog } from "./dialogs/DialogProvider";
+import { useErrorDialog } from "./dialogs/ErrorDialog";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
@@ -74,18 +73,18 @@ export function RecipientSelectGroups({
 
   const showErrorDialog = useErrorDialog();
   const showMultipleEmailsDialog = useDialog(MultipleEmailsPastedDialog);
-  async function handlePasteEmails(groupNumber: number, emails: string[]) {
-    const contacts = await onSearchContactsByEmail(emails);
+  async function handlePasteEmails(groupNumber: number, emails: string[][]) {
+    const allEmails = emails.flat();
+    const contacts = await onSearchContactsByEmail(allEmails);
 
     const unknownEmails = uniq(
-      zip(contacts, emails)
+      zip(contacts, allEmails)
         .map(([contact, email]) => (!contact ? email : null))
         .filter(isDefined),
     );
-
-    if (unknownEmails.length > 0) {
-      await withError(
-        showErrorDialog({
+    try {
+      if (unknownEmails.length > 0) {
+        return await showErrorDialog({
           header: (
             <FormattedMessage
               id="component.recipient-select-groups.unknown-contacts-header"
@@ -97,17 +96,25 @@ export function RecipientSelectGroups({
               <Text>
                 <FormattedMessage
                   id="component.recipient-select-groups.unknown-contacts-message-1"
-                  defaultMessage="We couldn't find the following {count, plural, =1{contact} other{contacts}}:"
+                  defaultMessage="We couldn't find the following {count, plural, =1{contact} other{# contacts}}:"
                   values={{ count: unknownEmails.length }}
                 />
               </Text>
-
               <Stack as="ul" paddingX={6} spacing={0}>
-                {unknownEmails.map((email, i) => (
+                {unknownEmails.slice(0, 10).map((email, i) => (
                   <Text as="li" key={i}>
                     {email}
                   </Text>
                 ))}
+                {unknownEmails.length > 10 ? (
+                  <Text as="li" fontStyle="italic">
+                    <FormattedMessage
+                      id="generic.n-more"
+                      defaultMessage="{count} more"
+                      values={{ count: unknownEmails.length - 3 }}
+                    />
+                  </Text>
+                ) : null}
               </Stack>
 
               <Text>
@@ -126,31 +133,40 @@ export function RecipientSelectGroups({
               </Text>
             </Stack>
           ),
-        }),
+        });
+      }
+      const contactByEmail = Object.fromEntries(
+        zip(contacts, allEmails).map(([c, email]) => [email, c!]),
       );
-      return;
-    }
-    const [, result] = await withError(showMultipleEmailsDialog());
-    if (result === "SEPARATE_GROUPS") {
-      onChangeRecipientGroups([
-        ...recipientGroups.slice(0, groupNumber),
-        ...recipientGroups.slice(groupNumber, groupNumber + contacts.length).map((group, index) => {
-          const contact = contacts[index]!;
-          return group.some((c) => c.id === contact.id) ? group : [...group, contact];
-        }),
-        ...(recipientGroups.length > groupNumber + contacts.length
-          ? recipientGroups.slice(groupNumber + contacts.length)
-          : contacts.slice(recipientGroups.length - groupNumber).map((contact) => [contact!])),
-      ]);
+      const result =
+        emails.length === 1 || emails.every((row) => row.length === 1)
+          ? await showMultipleEmailsDialog()
+          : "SEPARATE_GROUPS";
+      if (result === "SEPARATE_GROUPS") {
+        // if all emails in one row, make one email per row
+        emails = emails.length === 1 ? emails[0].map((e) => [e]) : emails;
+      } else if (result === "SAME_GROUP") {
+        // if one email per row, make all emails in a single row
+        emails = [emails.flat()];
+      }
+      const newRecipientGroups = [...recipientGroups];
+      for (let i = 0; i < emails.length; ++i) {
+        newRecipientGroups[i + groupNumber] = uniqBy(
+          [
+            ...(newRecipientGroups[i + groupNumber] ?? []),
+            ...emails[i].map((e) => contactByEmail[e]),
+          ],
+          (c) => c.id,
+        );
+      }
+      onChangeRecipientGroups(newRecipientGroups);
       focusRecipientGroup(groupNumber + contacts.length - 1);
-    } else if (result === "SAME_GROUP") {
-      onChangeRecipientGroups(
-        recipientGroups.map((group, index) =>
-          index === groupNumber
-            ? uniqBy([...group, ...(contacts as ContactSelectSelection[])], (c) => c.id)
-            : group,
-        ),
-      );
+    } catch (e) {
+      if (isDialogError(e)) {
+        return;
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -255,7 +271,7 @@ export function RecipientSelectGroups({
                   onSearchContacts={onSearchContacts}
                   onPasteEmails={
                     canAddRecipientGroups
-                      ? (emails: string[]) => handlePasteEmails(index, emails)
+                      ? (emails: string[][]) => handlePasteEmails(index, emails)
                       : undefined
                   }
                 />

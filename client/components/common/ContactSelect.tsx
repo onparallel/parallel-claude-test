@@ -2,24 +2,23 @@ import { gql } from "@apollo/client";
 import { Box, Text, Tooltip } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
-import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
-import { Maybe, unMaybeArray } from "@parallel/utils/types";
+import { Maybe, MaybePromise, unMaybeArray } from "@parallel/utils/types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import {
   ClipboardEvent,
   ForwardedRef,
-  forwardRef,
   KeyboardEvent,
   ReactElement,
   RefAttributes,
+  forwardRef,
   useRef,
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  components,
   InputActionMeta,
   InputProps,
   MultiValueProps,
@@ -27,10 +26,12 @@ import {
   OptionProps,
   SelectInstance,
   SingleValueProps,
+  components,
 } from "react-select";
 import AsyncCreatableSelect, { AsyncCreatableProps } from "react-select/async-creatable";
-import { isDefined, pick } from "remeda";
+import { isDefined, pick, range, zip } from "remeda";
 import { DeletedContact } from "./DeletedContact";
+import { useErrorDialog } from "./dialogs/ErrorDialog";
 
 export type ContactSelectSelection = ContactSelect_ContactFragment & {
   isInvalid?: boolean;
@@ -41,7 +42,7 @@ export interface ContactSelectProps<IsMulti extends boolean = false>
   extends CustomAsyncCreatableSelectProps<ContactSelectSelection, IsMulti, never> {
   onCreateContact: (data: { defaultEmail?: string }) => Promise<Maybe<ContactSelectSelection>>;
   onSearchContacts: (search: string, exclude: string[]) => Promise<ContactSelectSelection[]>;
-  onPasteEmails?: (emails: string[]) => void;
+  onPasteEmails?: (emails: string[][]) => MaybePromise<void>;
   onFocus?: () => void;
 }
 
@@ -395,23 +396,83 @@ function Option({ children, ...props }: OptionProps<ContactSelectSelection>) {
 function Input(
   props: InputProps & {
     selectProps: {
-      onPasteEmails?: (emails: string[]) => void;
+      onPasteEmails?: (emails: string[][]) => MaybePromise<void>;
     };
   },
 ) {
+  const showErrorDialog = useErrorDialog();
+  const intl = useIntl();
   return (
     <components.Input
       {...props}
       {...{
         onPaste:
           props.selectProps.onPasteEmails &&
-          ((e: ClipboardEvent<HTMLInputElement>) => {
+          (async (e: ClipboardEvent<HTMLInputElement>) => {
             if (e.clipboardData.types.includes("text/plain")) {
               const text = e.clipboardData.getData("text/plain");
-              const emails = text.split(/\s+/g).filter((part) => part.match(EMAIL_REGEX));
-              if (emails.length > 1) {
+              const lines = text
+                .trim()
+                .split(/\n/g)
+                .map((line) => line.trim());
+              if (lines.length === 1) {
+                const emails = text
+                  .split(/(?:\s*[;,]\s*|\s+)/g)
+                  .filter((part) => part.match(EMAIL_REGEX));
+                if (emails.length > 1) {
+                  e.preventDefault();
+                  props.selectProps.onPasteEmails?.([emails]);
+                }
+              } else if (lines.length > 1) {
+                const emails: string[][] = [];
+                try {
+                  for (const [line, row] of zip(lines, range(0, lines.length))) {
+                    const current = [];
+                    for (const word of line.split(/(?:\s*[;,]\s*|\s+)/g)) {
+                      if (word.match(EMAIL_REGEX)) {
+                        current.push(word);
+                      } else {
+                        e.preventDefault();
+                        await showErrorDialog.ignoringDialogErrors({
+                          header: intl.formatMessage({
+                            id: "component.contact-select.invalid-email-pasted-dialog-title",
+                            defaultMessage: "Invalid email pasted",
+                          }),
+                          message: intl.formatMessage(
+                            {
+                              id: "component.contact-select.invalid-email-pasted-dialog-description",
+                              defaultMessage:
+                                'An invalid email was pasted on line {lineNumber} "{email}". Please check and try again.',
+                            },
+                            { lineNumber: row + 1, email: word },
+                          ),
+                        });
+                        throw new Error();
+                      }
+                    }
+                    if (current.length === 0) {
+                      e.preventDefault();
+                      await showErrorDialog.ignoringDialogErrors({
+                        header: intl.formatMessage({
+                          id: "component.contact-select.no-emails-pasted-dialog-title",
+                          defaultMessage: "No emails pasted",
+                        }),
+                        message: intl.formatMessage(
+                          {
+                            id: "component.contact-select.no-emails-pasted-dialog-description",
+                            defaultMessage:
+                              "No emails pasted on line {lineNumber}. Please check and try again.",
+                          },
+                          { lineNumber: row + 1 },
+                        ),
+                      });
+                      throw new Error();
+                    }
+                    emails.push(current);
+                  }
+                  props.selectProps.onPasteEmails?.(emails);
+                } catch {}
                 e.preventDefault();
-                props.selectProps.onPasteEmails?.(emails);
               }
             }
           }),

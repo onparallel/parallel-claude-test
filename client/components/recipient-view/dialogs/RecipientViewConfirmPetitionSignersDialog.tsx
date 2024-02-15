@@ -20,9 +20,8 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { SelectedSignerRow } from "@parallel/components/petition-common/SelectedSignerRow";
 import { SuggestedSigners } from "@parallel/components/petition-common/SuggestedSigners";
-import { SignerSelectSelection } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
+import type { SignerSelectSelection } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "@parallel/components/petition-common/dialogs/ConfirmSignerInfoDialog";
-import { MAX_SIGNERS_ALLOWED } from "@parallel/components/petition-common/dialogs/SignatureConfigDialog";
 import {
   PublicPetitionSignerDataInput,
   Tone,
@@ -50,6 +49,8 @@ export interface RecipientViewConfirmPetitionSignersDialogResult {
   additionalSigners: PublicPetitionSignerDataInput[];
   message: Maybe<string>;
 }
+
+const MAX_SIGNERS_ALLOWED = 40;
 
 function RecipientViewConfirmPetitionSignersDialog({
   keycode,

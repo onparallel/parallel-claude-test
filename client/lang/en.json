@@ -1560,6 +1560,26 @@
     "context": "You can also enter a valid email."
   },
   {
+    "term": "component.contact-select.invalid-email-pasted-dialog-description",
+    "definition": "An invalid email was pasted on line {lineNumber} \"{email}\". Please check and try again.",
+    "context": "An invalid email was pasted on line {lineNumber} \"{email}\". Please check and try again."
+  },
+  {
+    "term": "component.contact-select.invalid-email-pasted-dialog-title",
+    "definition": "Invalid email pasted",
+    "context": "Invalid email pasted"
+  },
+  {
+    "term": "component.contact-select.no-emails-pasted-dialog-description",
+    "definition": "No emails pasted on line {lineNumber}. Please check and try again.",
+    "context": "No emails pasted on line {lineNumber}. Please check and try again."
+  },
+  {
+    "term": "component.contact-select.no-emails-pasted-dialog-title",
+    "definition": "No emails pasted",
+    "context": "No emails pasted"
+  },
+  {
     "term": "component.contact-select.no-options",
     "definition": "We could not find any existing contacts for <em>{search}</em>",
     "context": "We could not find any existing contacts for <em>{search}</em>"
@@ -7026,8 +7046,8 @@
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-message-1",
-    "definition": "We couldn't find the following {count, plural, =1{contact} other{contacts}}:",
-    "context": "We couldn't find the following {count, plural, =1{contact} other{contacts}}:"
+    "definition": "We couldn't find the following {count, plural, =1{contact} other{# contacts}}:",
+    "context": "We couldn't find the following {count, plural, =1{contact} other{# contacts}}:"
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-message-2",
