@@ -93,6 +93,8 @@ export function AddPetitionAccessDialog({
 }: DialogProps<AddPetitionAccessDialogProps, AddPetitionAccessDialogResult>) {
   const sendAsOptions = useMemo(() => [user, ...user.delegateOf], [user]);
 
+  const userCanSendOnBehalfOfAnyone = useHasPermission("PETITIONS:SEND_ON_BEHALF");
+
   const { watch, control, handleSubmit, register, setError, clearErrors } = useForm<{
     signatureConfig: AddPetitionAccessDialog_SignatureConfigFragment | null;
     recipientGroups: ContactSelectSelection[][];
@@ -114,7 +116,8 @@ export function AddPetitionAccessDialog({
         // make sure the "send as" is one of the available delegated users
         // it may not be an allowed user when setting default from the template's Messages tab.
         isDefined(petition.defaultOnBehalf) &&
-        sendAsOptions.some((o) => o.id === petition.defaultOnBehalf!.id)
+        (userCanSendOnBehalfOfAnyone ||
+          sendAsOptions.some((o) => o.id === petition.defaultOnBehalf!.id))
           ? petition.defaultOnBehalf
           : user,
       subscribeSender: false,
@@ -133,9 +136,8 @@ export function AddPetitionAccessDialog({
 
   const [accesses, setAccesses] = useState(petition.accesses);
 
-  const userCanSendOnBehalf = useHasPermission("PETITIONS:SEND_ON_BEHALF");
-
-  const showSendAs = user.hasOnBehalfOf && (userCanSendOnBehalf || user.delegateOf.length > 0);
+  const showSendAs =
+    user.hasOnBehalfOf && (userCanSendOnBehalfOfAnyone || user.delegateOf.length > 0);
   const senderHasPermission = petition.effectivePermissions.some(
     (p) => p.user.id === sendAsUser.id,
   );
@@ -373,7 +375,7 @@ export function AddPetitionAccessDialog({
                   name="sendAsUser"
                   control={control}
                   render={({ field: { value, onChange } }) =>
-                    userCanSendOnBehalf ? (
+                    userCanSendOnBehalfOfAnyone ? (
                       <UserSelect
                         onSearch={handleSearchUsers}
                         isSearchable
