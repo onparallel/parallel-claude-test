@@ -114,7 +114,11 @@ export function PreviewPetitionFieldGroup({
         field={field}
         onCommentsButtonClick={onCommentsButtonClick}
         onDownloadAttachment={onDownloadAttachment}
-        onAddNewGroup={handleAddReply}
+        onAddNewGroup={
+          isDisabled || (petition.__typename === "Petition" ? petition.status === "CLOSED" : false)
+            ? undefined
+            : handleAddReply
+        }
         composeUrl={buildUrlToSection("compose", { field: field.id })}
       >
         {zip(replies, fieldLogic.groupChildrenLogic!).map(([group, groupLogic], index) => {
@@ -347,6 +351,9 @@ PreviewPetitionFieldGroup.fragments = {
   `,
   PetitionBase: gql`
     fragment PreviewPetitionFieldGroup_PetitionBase on PetitionBase {
+      ... on Petition {
+        status
+      }
       ...PreviewPetitionFieldBackgroundCheck_PetitionBase
       ...PreviewPetitionFieldKyc_PetitionBase
       ...usePetitionCanFinalize_PetitionBase

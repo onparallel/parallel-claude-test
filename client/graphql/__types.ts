@@ -16469,6 +16469,7 @@ export type PreviewPetitionField_UserFragment = {
 export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  status: PetitionStatus;
   fields: Array<{
     __typename?: "PetitionField";
     type: PetitionFieldType;
@@ -17838,6 +17839,7 @@ export type PreviewPetitionFieldGroup_UserFragment = {
 
 export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  status: PetitionStatus;
   id: string;
   fields: Array<{
     __typename?: "PetitionField";
@@ -22548,6 +22550,7 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
   petition: {
     __typename?: "PublicPetition";
+    status: PetitionStatus;
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -23132,6 +23135,7 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment = {
 
 export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
   __typename?: "PublicPetition";
+  status: PetitionStatus;
   fields: Array<{
     __typename?: "PublicPetitionField";
     type: PetitionFieldType;
@@ -51021,6 +51025,9 @@ export const usePetitionCanFinalize_PetitionBaseFragmentDoc = gql`
 ` as unknown as DocumentNode<usePetitionCanFinalize_PetitionBaseFragment, unknown>;
 export const PreviewPetitionFieldGroup_PetitionBaseFragmentDoc = gql`
   fragment PreviewPetitionFieldGroup_PetitionBase on PetitionBase {
+    ... on Petition {
+      status
+    }
     ...PreviewPetitionFieldBackgroundCheck_PetitionBase
     ...PreviewPetitionFieldKyc_PetitionBase
     ...usePetitionCanFinalize_PetitionBase
@@ -52836,6 +52843,7 @@ export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragme
 >;
 export const RecipientViewPetitionFieldGroup_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewPetitionFieldGroup_PublicPetition on PublicPetition {
+    status
     ...usePetitionCanFinalize_PublicPetition
   }
   ${usePetitionCanFinalize_PublicPetitionFragmentDoc}

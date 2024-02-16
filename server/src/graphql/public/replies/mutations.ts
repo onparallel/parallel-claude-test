@@ -26,6 +26,7 @@ import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
   fieldIsExternal,
+  publicPetitionIsNotClosed,
   replyBelongsToAccess,
   replyBelongsToExternalField,
 } from "../authorizers";
@@ -39,29 +40,30 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(
-      fieldBelongsToAccess((args) => args.fields.map((f) => f.id)),
-      fieldIsExternal((args) => args.fields.map((f) => f.id)),
-      fieldHasType(
-        (args) => args.fields.map((f) => f.id),
-        [
-          "TEXT",
-          "SHORT_TEXT",
-          "SELECT",
-          "PHONE",
-          "NUMBER",
-          "DYNAMIC_SELECT",
-          "DATE",
-          "DATE_TIME",
-          "CHECKBOX",
-          "FIELD_GROUP",
-        ],
-      ),
-      fieldCanBeReplied((args) => args.fields),
-      replyIsForFieldOfType(
-        (args) => args.fields.map((f) => f.parentReplyId).filter(isDefined),
+    fieldHasType(
+      (args) => args.fields.map((f) => f.id),
+      [
+        "TEXT",
+        "SHORT_TEXT",
+        "SELECT",
+        "PHONE",
+        "NUMBER",
+        "DYNAMIC_SELECT",
+        "DATE",
+        "DATE_TIME",
+        "CHECKBOX",
         "FIELD_GROUP",
-      ),
+      ],
+    ),
+    fieldCanBeReplied((args) => args.fields),
+    fieldIsExternal((args) => args.fields.map((f) => f.id)),
+    replyIsForFieldOfType(
+      (args) => args.fields.map((f) => f.parentReplyId).filter(isDefined),
+      "FIELD_GROUP",
+    ),
+    and(
+      publicPetitionIsNotClosed(),
+      fieldBelongsToAccess((args) => args.fields.map((f) => f.id)),
       replyBelongsToAccess((args) => args.fields.map((f) => f.parentReplyId).filter(isDefined)),
     ),
   ),
@@ -100,24 +102,25 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    replyBelongsToExternalField((args) => args.replies.map((r) => r.id)),
+    replyIsForFieldOfType(
+      (args) => args.replies.map((r) => r.id),
+      [
+        "TEXT",
+        "SHORT_TEXT",
+        "SELECT",
+        "PHONE",
+        "NUMBER",
+        "DYNAMIC_SELECT",
+        "DATE",
+        "DATE_TIME",
+        "CHECKBOX",
+      ],
+    ),
+    replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
     and(
+      publicPetitionIsNotClosed(),
       replyBelongsToAccess((args) => args.replies.map((r) => r.id)),
-      replyBelongsToExternalField((args) => args.replies.map((r) => r.id)),
-      replyIsForFieldOfType(
-        (args) => args.replies.map((r) => r.id),
-        [
-          "TEXT",
-          "SHORT_TEXT",
-          "SELECT",
-          "PHONE",
-          "NUMBER",
-          "DYNAMIC_SELECT",
-          "DATE",
-          "DATE_TIME",
-          "CHECKBOX",
-        ],
-      ),
-      replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
     ),
   ),
   validateArgs: validateAnd(
@@ -153,9 +156,9 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
   authorize: chain(
     authenticatePublicAccess("keycode"),
     replyCanBeDeleted("replyId"),
-    replyBelongsToAccess("replyId"),
     replyBelongsToExternalField("replyId"),
     replyCanBeUpdated("replyId"),
+    and(publicPetitionIsNotClosed(), replyBelongsToAccess("replyId")),
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -175,9 +178,9 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    replyBelongsToAccess("replyId"),
     replyBelongsToExternalField("replyId"),
     replyIsForFieldOfType("replyId", "FILE_UPLOAD"),
+    and(publicPetitionIsNotClosed(), replyBelongsToAccess("replyId")),
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -209,12 +212,10 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(
-      fieldBelongsToAccess("fieldId"),
-      fieldIsExternal("fieldId"),
-      fieldHasType("fieldId", "FILE_UPLOAD"),
-      fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
-    ),
+    fieldIsExternal("fieldId"),
+    fieldHasType("fieldId", "FILE_UPLOAD"),
+    fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
+    and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
   validateArgs: validateAnd(
     validFileUploadInput((args) => args.data, { maxSizeBytes: 300 * 1024 * 1024 }, "data"),
@@ -260,11 +261,9 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     type: "FileUploadDownloadLinkResult",
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      and(
-        replyBelongsToAccess("replyId"),
-        replyBelongsToExternalField("replyId"),
-        replyIsForFieldOfType("replyId", ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"]),
-      ),
+      replyBelongsToExternalField("replyId"),
+      replyIsForFieldOfType("replyId", ["FILE_UPLOAD", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"]),
+      and(publicPetitionIsNotClosed(), replyBelongsToAccess("replyId")),
     ),
     args: {
       keycode: nonNull(idArg()),
@@ -320,12 +319,10 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(
-      fieldBelongsToAccess("fieldId"),
-      fieldIsExternal("fieldId"),
-      fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-      fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
-    ),
+    fieldIsExternal("fieldId"),
+    fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
+    fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
+    and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
   resolve: async (_, { fieldId, parentReplyId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
@@ -356,11 +353,9 @@ export const publicRetryAsyncFieldCompletion = mutationField("publicRetryAsyncFi
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(
-      fieldBelongsToAccess("fieldId"),
-      fieldIsExternal("fieldId"),
-      fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
-    ),
+    fieldIsExternal("fieldId"),
+    fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
+    and(publicPetitionIsNotClosed(), fieldBelongsToAccess("fieldId")),
   ),
   resolve: async (_, { fieldId, parentReplyId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);

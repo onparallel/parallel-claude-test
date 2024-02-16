@@ -17,7 +17,7 @@ import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
 import { SUCCESS } from "../../helpers/Success";
-import { authenticateAnd, chain } from "../../helpers/authorize";
+import { authenticateAnd, chain, not } from "../../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
@@ -30,6 +30,7 @@ import {
   fieldCanBeReplied,
   fieldHasType,
   fieldsBelongsToPetition,
+  petitionHasStatus,
   petitionIsNotAnonymized,
   repliesBelongsToPetition,
   replyCanBeDeleted,
@@ -70,6 +71,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateAnd(
     validFileUploadInput((args) => args.file, { maxSizeBytes: 300 * 1024 * 1024 }, "file"),
@@ -135,6 +137,7 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -162,6 +165,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     replyCanBeUpdated("replyId"),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validFileUploadInput(
     (args) => args.file,
@@ -219,6 +223,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -260,6 +265,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
     chain(
       replyCanBeDeleted("replyId"),
       replyCanBeUpdated("replyId"),
@@ -285,6 +291,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateCreateFileReplyInput(
     (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
@@ -321,6 +328,7 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
     const session = await ctx.bankflip.createRetrySession({
@@ -351,6 +359,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -386,6 +395,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     fieldHasType("fieldId", ["DOW_JONES_KYC"]),
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateCreateFileReplyInput(
     (args) => [{ id: args.fieldId, parentReplyId: args.parentReplyId }],
@@ -478,6 +488,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
       args.fields.map((field) => field.parentReplyId).filter(isDefined),
     ),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.fields, "fields"),
@@ -597,6 +608,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
     ),
     replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
     petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -654,6 +666,12 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
   resolve: async (_, args, ctx) => {
     try {
       const params = parseBackgroundCheckToken(args.token);
+
+      const petition = await ctx.petitions.loadPetition(params.petitionId);
+
+      if (petition?.status === "CLOSED") {
+        throw new ForbiddenError("The petition is closed and does not accept new replies");
+      }
 
       const replies = await ctx.petitions.loadRepliesForField(params.fieldId);
       const reply = replies.find(

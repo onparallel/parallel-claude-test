@@ -41,6 +41,19 @@ export function authenticatePublicAccess<
   });
 }
 
+export function publicPetitionIsNotClosed<
+  TypeName extends string,
+  FieldName extends string,
+>(): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async function (_, args, ctx) {
+    const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
+    if (petition.status !== "CLOSED") {
+      return true;
+    }
+    return false;
+  };
+}
+
 export function getContactAuthCookieValue(
   req: IncomingMessage,
   contactId: number,

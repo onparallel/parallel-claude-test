@@ -104,7 +104,7 @@ export function RecipientViewPetitionFieldGroup({
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
-      onAddNewGroup={handleAddReply}
+      onAddNewGroup={isDisabled || petition.status === "CLOSED" ? undefined : handleAddReply}
     >
       {zip(field.replies, fieldLogic.groupChildrenLogic!).map(([group, groupLogic], index) => {
         return (
@@ -383,7 +383,7 @@ export function RecipientViewPetitionFieldGroupLayout({
         ) : null}
       </Stack>
       {children}
-      {field.replies.length > 0 && !field.multiple ? null : (
+      {(field.replies.length > 0 && !field.multiple) || !isDefined(onAddNewGroup) ? null : (
         <Box paddingX={4}>
           <Button onClick={onAddNewGroup} leftIcon={<AddIcon />}>
             <Text>
@@ -599,6 +599,7 @@ RecipientViewPetitionFieldGroup.fragments = {
   `,
   PublicPetition: gql`
     fragment RecipientViewPetitionFieldGroup_PublicPetition on PublicPetition {
+      status
       ...usePetitionCanFinalize_PublicPetition
     }
     ${usePetitionCanFinalize.fragments.PublicPetition}

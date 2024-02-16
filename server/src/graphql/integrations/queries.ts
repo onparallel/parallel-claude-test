@@ -227,6 +227,10 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         return reply.content.search as EntitySearchResponse;
       }
 
+      if (petition?.status === "CLOSED") {
+        throw new ForbiddenError("The petition is closed and does not accept new replies");
+      }
+
       const canBeReplied = await ctx.petitions.fieldsCanBeReplied(
         [{ id: params.fieldId, parentReplyId: params.parentReplyId ?? null }],
         true,
