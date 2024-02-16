@@ -343,8 +343,8 @@ export class UserGroupRepository extends BaseRepository {
           with 
             ug as (select * from (?) as t(user_group_id)),
             u as (select * from (?) as t(user_id))
-          insert into petition_permission(type, user_id, petition_id, from_user_group_id, created_by, updated_by)
-            select pp.type, u.user_id, pp.petition_id, pp.user_group_id, ?, ?
+          insert into petition_permission(type, user_id, petition_id, from_user_group_id, is_subscribed, created_by, updated_by)
+            select pp.type, u.user_id, pp.petition_id, pp.user_group_id, pp.is_subscribed, ?, ?
             from u cross join ug
             join petition_permission pp on pp.user_group_id = ug.user_group_id and pp.deleted_at is null
           on conflict do nothing;

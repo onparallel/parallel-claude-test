@@ -3,10 +3,11 @@ import { Knex } from "knex";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import { KNEX } from "../../knex";
-import { Organization, User, UserGroup } from "../../__types";
+import { Organization, Petition, User, UserGroup } from "../../__types";
 import { PetitionRepository } from "../PetitionRepository";
 import { UserGroupRepository } from "../UserGroupRepository";
 import { Mocks } from "./mocks";
+import { pick } from "remeda";
 
 describe("repositories/UserGroupRepository", () => {
   let container: Container;
@@ -18,6 +19,7 @@ describe("repositories/UserGroupRepository", () => {
   let organization: Organization;
   let users: User[];
   let userGroups: UserGroup[];
+  let petition: Petition;
 
   beforeAll(async () => {
     container = createTestContainer();
@@ -29,6 +31,7 @@ describe("repositories/UserGroupRepository", () => {
 
     users = await mocks.createRandomUsers(organization.id, 6);
     userGroups = await mocks.createUserGroups(2, organization.id);
+    [petition] = await mocks.createRandomPetitions(organization.id, users[0].id, 1);
   });
 
   afterAll(async () => {
@@ -53,7 +56,121 @@ describe("repositories/UserGroupRepository", () => {
 
   afterEach(async () => {
     await mocks.knex.from("user_group_member").delete();
+    await mocks.knex
+      .from("petition_permission")
+      .where("petition_id", petition.id)
+      .whereNot("type", "OWNER")
+      .delete();
     userGroupsRepo.loadUserGroupMembers.dataloader.clearAll();
+  });
+
+  describe("addUserGroupMemberPermissions", () => {
+    it("should create petition_permission when adding a member to a group that has a petition_permission", async () => {
+      await petitionsRepo.addPetitionPermissions(
+        [petition.id],
+        [
+          {
+            type: "UserGroup",
+            id: userGroups[1].id,
+            permissionType: "READ",
+            isSubscribed: true,
+          },
+        ],
+        "User",
+        users[0].id,
+      );
+      expect(
+        (await petitionsRepo.loadUserPermissionsByPetitionId.raw(petition.id)).map(
+          pick(["user_id", "type", "user_group_id", "from_user_group_id", "is_subscribed"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          user_id: users[0].id,
+          type: "OWNER",
+          user_group_id: null,
+          from_user_group_id: null,
+          is_subscribed: true,
+        },
+        ...[users[2].id, users[3].id, users[4].id, users[5].id].map((id) => ({
+          user_id: id,
+          type: "READ",
+          from_user_group_id: userGroups[1].id,
+          user_group_id: null,
+          is_subscribed: true,
+        })),
+      ]);
+      await userGroupsRepo.addUsersToGroups(userGroups[1].id, [users[1].id], `User:${users[0].id}`);
+      expect(
+        (await petitionsRepo.loadUserPermissionsByPetitionId.raw(petition.id)).map(
+          pick(["user_id", "type", "user_group_id", "from_user_group_id", "is_subscribed"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          user_id: users[0].id,
+          type: "OWNER",
+          user_group_id: null,
+          from_user_group_id: null,
+          is_subscribed: true,
+        },
+        ...[users[1].id, users[2].id, users[3].id, users[4].id, users[5].id].map((id) => ({
+          user_id: id,
+          type: "READ",
+          from_user_group_id: userGroups[1].id,
+          user_group_id: null,
+          is_subscribed: true,
+        })),
+      ]);
+    });
+
+    it("should respect group subscription when adding a new member permission", async () => {
+      expect(
+        (await petitionsRepo.loadUserPermissionsByPetitionId.raw(petition.id)).map(
+          pick(["user_id", "type", "user_group_id", "from_user_group_id", "is_subscribed"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          user_id: users[0].id,
+          type: "OWNER",
+          user_group_id: null,
+          from_user_group_id: null,
+          is_subscribed: true,
+        },
+      ]);
+      await petitionsRepo.addPetitionPermissions(
+        [petition.id],
+        [
+          {
+            type: "UserGroup",
+            id: userGroups[1].id,
+            permissionType: "READ",
+            isSubscribed: false,
+          },
+        ],
+        "User",
+        users[0].id,
+      );
+      await userGroupsRepo.addUsersToGroups(userGroups[1].id, [users[1].id], `User:${users[0].id}`);
+      expect(
+        (await petitionsRepo.loadUserPermissionsByPetitionId.raw(petition.id)).map(
+          pick(["user_id", "type", "user_group_id", "from_user_group_id", "is_subscribed"]),
+        ),
+      ).toIncludeSameMembers([
+        {
+          user_id: users[0].id,
+          type: "OWNER",
+          user_group_id: null,
+          from_user_group_id: null,
+          is_subscribed: true,
+        },
+        ...[users[1].id, users[2].id, users[3].id, users[4].id, users[5].id].map((id) => ({
+          user_id: id,
+          type: "READ",
+          from_user_group_id: userGroups[1].id,
+          user_group_id: null,
+          is_subscribed: false,
+        })),
+      ]);
+    });
   });
 
   describe("removeUsersFromGroups", () => {
