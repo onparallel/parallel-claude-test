@@ -18,6 +18,7 @@ import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { applyFieldVisibility } from "../util/fieldLogic";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
+import { retry } from "../util/retry";
 import { ChildProcessNonSuccessError, spawn as _spawn } from "../util/spawn";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
@@ -145,18 +146,22 @@ export class PetitionBinder implements IPetitionBinder {
       );
 
       const attachmentPaths = Object.fromEntries(
-        await pMap(PetitionAttachmentTypeValues, async (type) => [
-          type,
-          await this.downloadFileUpload(
-            (
-              await this.files.loadFileUpload(
-                attachments.filter((a) => a.type === type).map((a) => a.file_upload_id),
-              )
-            ).filter(isDefined),
-            userId,
-            documentTheme,
-          ),
-        ]),
+        await pMap(
+          PetitionAttachmentTypeValues,
+          async (type) => [
+            type,
+            await this.downloadFileUpload(
+              (
+                await this.files.loadFileUpload(
+                  attachments.filter((a) => a.type === type).map((a) => a.file_upload_id),
+                )
+              ).filter(isDefined),
+              userId,
+              documentTheme,
+            ),
+          ],
+          { concurrency: 5 },
+        ),
       ) as Record<PetitionAttachmentType, string[]>;
 
       this.info(`Attachment documents created: ${JSON.stringify(attachmentPaths)}`);
@@ -274,18 +279,71 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async mergeFiles(paths: string[], output: string) {
+    let filePaths = paths;
+
+    await retry(
+      async (i) => {
+        try {
+          await this.spawn("qpdf", ["--empty", "--pages", ...filePaths, "--", output], {
+            timeout: 120_000,
+            stdio: "pipe",
+          });
+        } catch (e) {
+          if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
+            this.info("qpdf exited with warnings");
+            return;
+          }
+
+          if (i === 0 && e instanceof ChildProcessNonSuccessError) {
+            const damagedFilePaths = e.data.stderr
+              .split("\n")
+              .map((l) => {
+                const match = l.match(/^WARNING: (.*): file is damaged$/);
+                if (match) {
+                  return match[1];
+                } else {
+                  return null;
+                }
+              })
+              .filter(isDefined);
+            if (damagedFilePaths.length > 0) {
+              this.info(`Found ${damagedFilePaths.length} damaged files. Attempting to repair...`);
+              filePaths = await pMap(
+                paths,
+                async (path) => {
+                  if (damagedFilePaths.includes(path)) {
+                    return await this.repairDocument(path);
+                  } else {
+                    return path;
+                  }
+                },
+                { concurrency: 1 },
+              );
+            }
+          }
+
+          throw e;
+        }
+      },
+      { maxRetries: 1 },
+    );
+  }
+
+  private async repairDocument(filePath: string) {
+    const output = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
     try {
-      await this.spawn("qpdf", ["--empty", "--pages", ...paths, "--", output], {
-        timeout: 120_000,
-        stdio: "inherit",
-      });
-    } catch (e) {
-      if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
-        this.info("qpdf exited with warnings");
-        return;
-      } else {
-        throw e;
-      }
+      await this.spawn(
+        "gs",
+        ["-o", output, "-sDEVICE=pdfwrite", "-dPDFSETTINGS=/default", filePath],
+        {
+          timeout: 120_000,
+          stdio: "inherit",
+        },
+      );
+      return output;
+    } catch (error) {
+      this.info("Error repairing document");
+      return filePath;
     }
   }
 
