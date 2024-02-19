@@ -9,6 +9,7 @@ import {
 import { getFieldsWithIndices } from "./fieldIndices";
 import { FieldLogicResult } from "./fieldLogic";
 import { isFileTypeField } from "./isFileTypeField";
+import { Drop } from "liquidjs";
 
 interface InnerPetitionFieldLiquidScope
   extends Pick<PetitionField, "type" | "multiple" | "alias" | "options"> {
@@ -113,17 +114,29 @@ export function buildPetitionFieldsLiquidScope(petition: PetitionLiquidScope, in
   return scope;
 }
 
+class PetitionVariableDrop extends Drop {
+  constructor(
+    public final: number,
+    public after: number,
+    public before: number,
+  ) {
+    super();
+  }
+
+  public override valueOf() {
+    return this.final;
+  }
+}
+
 export function buildPetitionVariablesLiquidScope(logic: FieldLogicResult) {
   return Object.fromEntries(
     Object.keys(logic.finalVariables).map((key) => [
       key,
-      {
-        after: logic.currentVariables[key],
-        before: logic.previousVariables[key],
-        toString() {
-          return logic.finalVariables[key];
-        },
-      },
+      new PetitionVariableDrop(
+        logic.finalVariables[key],
+        logic.currentVariables[key],
+        logic.previousVariables[key],
+      ),
     ]),
   );
 }

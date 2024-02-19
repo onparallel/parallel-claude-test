@@ -2,6 +2,7 @@ import { PropsWithChildren, useContext, useMemo } from "react";
 import { isDefined } from "remeda";
 import { FieldLogic } from "../fieldLogic/useFieldLogic";
 import { LiquidScopeContext } from "./LiquidScopeProvider";
+import { Drop } from "liquidjs";
 
 export function LiquidPetitionVariableProvider({
   logic,
@@ -23,17 +24,29 @@ export function LiquidPetitionVariableProvider({
         Object.fromEntries(
           Object.keys(logic.finalVariables).map((key) => [
             key,
-            {
-              after: logic.currentVariables[key],
-              before: logic.previousVariables[key],
-              toString() {
-                return logic.finalVariables[key];
-              },
-            },
+            new PetitionVariableDrop(
+              logic.finalVariables[key],
+              logic.currentVariables[key],
+              logic.previousVariables[key],
+            ),
           ]),
         ),
       ),
     [parent, logic],
   );
   return <LiquidScopeContext.Provider value={scope}>{children}</LiquidScopeContext.Provider>;
+}
+
+class PetitionVariableDrop extends Drop {
+  constructor(
+    public final: number,
+    public after: number,
+    public before: number,
+  ) {
+    super();
+  }
+
+  public override valueOf() {
+    return this.final;
+  }
 }
