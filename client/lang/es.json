@@ -6095,6 +6095,11 @@
     "context": "Create variable: <b>{name}</b>"
   },
   {
+    "term": "component.petition-variable-select.create-new-variable-empty",
+    "definition": "Crear variable nueva",
+    "context": "Create new variable"
+  },
+  {
     "term": "component.petition-variable-select.placeholder",
     "definition": "Selecciona una variable",
     "context": "Select a variable"

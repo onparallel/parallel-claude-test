@@ -43,7 +43,7 @@ export function PetitionVariableSelect({
 }
 
 const isValidNewOption = (value: string, _: any, options: readonly any[]) => {
-  return REFERENCE_REGEX.test(value);
+  return value === "" || REFERENCE_REGEX.test(value);
 };
 
 function PetitionVariableSelectItem({
@@ -85,26 +85,33 @@ function SingleValue(props: SingleValueProps<SimpleOption>) {
 const formatCreateLabel = (label: string) => {
   return (
     <Text as="span">
-      <FormattedMessage
-        id="component.petition-variable-select.create-new-variable"
-        defaultMessage="Create variable: <b>{name}</b>"
-        values={{
-          name: label,
-          b: (chunks: any) => (
-            <Badge
-              colorScheme="blue"
-              fontSize="sm"
-              textTransform="none"
-              whiteSpace="nowrap"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              verticalAlign="bottom"
-            >
-              {chunks}
-            </Badge>
-          ),
-        }}
-      />
+      {label ? (
+        <FormattedMessage
+          id="component.petition-variable-select.create-new-variable"
+          defaultMessage="Create variable: <b>{name}</b>"
+          values={{
+            name: label,
+            b: (chunks: any) => (
+              <Badge
+                colorScheme="blue"
+                fontSize="sm"
+                textTransform="none"
+                whiteSpace="nowrap"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                verticalAlign="bottom"
+              >
+                {chunks}
+              </Badge>
+            ),
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="component.petition-variable-select.create-new-variable-empty"
+          defaultMessage="Create new variable"
+        />
+      )}
     </Text>
   );
 };
