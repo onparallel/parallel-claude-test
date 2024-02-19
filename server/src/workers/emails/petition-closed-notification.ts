@@ -1,5 +1,4 @@
 import { createReadStream } from "fs";
-import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { PetitionClosedNotifiedEvent } from "../../db/events/PetitionEvent";
@@ -18,9 +17,7 @@ export async function petitionClosedNotification(
   payload: {
     user_id: number;
     petition_id: number;
-    /** @deprecated replaced by petition_event_ids */
-    petition_access_ids?: number[];
-    petition_event_ids?: number[]; // TODO '?' is temporary, remove when petition_access_ids is removed
+    petition_event_ids: number[];
     message: any;
     attach_pdf_export: boolean;
     pdf_export_title: string | null;
@@ -47,183 +44,100 @@ export async function petitionClosedNotification(
 
   const emails: EmailLog[] = [];
 
-  if (isDefined(payload.petition_event_ids)) {
-    for (const eventId of payload.petition_event_ids) {
-      const event = (await context.petitions.loadPetitionEvent(
-        eventId,
-      )) as PetitionClosedNotifiedEvent | null;
-      if (!event) {
-        context.logger.error(`Expected PetitionEvent to be defined on PetitionEvent:${eventId}`);
-        continue;
-      }
-      const access = await context.petitions.loadAccess(event.data.petition_access_id);
-      const granterData = await context.users.loadUserDataByUserId(access!.granter_id);
-      const contact = access!.contact_id
-        ? await context.contacts.loadContact(access!.contact_id)
-        : null;
-      if (!contact) {
-        context.logger.error(`Expected Contact to be defined on PetitionAccess:${access!.id}`);
-        continue;
-      }
-
-      if (!granterData) {
-        context.logger.error(`Expected granter data to be defined on PetitionAccess:${access!.id}`);
-        continue;
-      }
-
-      const getValues = await context.petitionMessageContext.fetchPlaceholderValues(
-        {
-          contactId: contact.id,
-          petitionId: payload.petition_id,
-          userId: payload.user_id,
-          petitionAccessId: access!.id,
-        },
-        { publicContext: true },
-      );
-
-      const bodyHtml = renderSlateWithPlaceholdersToHtml(payload.message, getValues);
-
-      const { html, text, subject, from } = await buildEmail(
-        PetitionClosedNotification,
-        {
-          contactFullName: fullName(contact.first_name, contact.last_name)!,
-          senderName: fullName(granterData.first_name, granterData.last_name)!,
-          senderEmail: granterData.email,
-          bodyHtml,
-          bodyPlainText: renderSlateWithPlaceholdersToText(payload.message, getValues),
-          ...layoutProps,
-        },
-        { locale: petition.recipient_locale },
-      );
-      const email = await context.emailLogs.createEmail({
-        from: buildFrom(from, emailFrom),
-        to: contact.email,
-        subject,
-        text,
-        html,
-        reply_to: senderData.email,
-        track_opens: true,
-        created_from: `PetitionClosedNotification:${access!.id}`,
-      });
-
-      if (payload.attach_pdf_export) {
-        const filename = sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf");
-        const owner = await context.petitions.loadPetitionOwner(petition.id);
-        const binderPath = await context.petitionBinder.createBinder(owner!.id, {
-          petitionId: petition.id,
-          documentTitle: payload.pdf_export_title ?? "",
-          maxOutputSize: 18 * 1024 * 1024,
-          outputFileName: filename,
-        });
-        const path = random(16);
-
-        const res = await context.storage.temporaryFiles.uploadFile(
-          path,
-          "application/pdf",
-          createReadStream(binderPath),
-        );
-        const attachment = await context.files.createTemporaryFile(
-          {
-            path,
-            content_type: "application/pdf",
-            filename,
-            size: res["ContentLength"]!.toString(),
-          },
-          `User:${sender.id}`,
-        );
-
-        await context.emailLogs.addEmailAttachments(email.id, attachment.id);
-      }
-
-      await context.petitions.mergePetitionEventData(event.id, {
-        email_log_id: email.id,
-        email_body: bodyHtml,
-      });
-
-      emails.push(email);
+  for (const eventId of payload.petition_event_ids) {
+    const event = (await context.petitions.loadPetitionEvent(
+      eventId,
+    )) as PetitionClosedNotifiedEvent | null;
+    if (!event) {
+      context.logger.error(`Expected PetitionEvent to be defined on PetitionEvent:${eventId}`);
+      continue;
     }
-  } else {
-    // TODO this whole for loop is deprecated
-    for (const accessId of payload.petition_access_ids!) {
-      const access = await context.petitions.loadAccess(accessId);
-      const granterData = await context.users.loadUserDataByUserId(access!.granter_id);
-      const contact = access!.contact_id
-        ? await context.contacts.loadContact(access!.contact_id)
-        : null;
-      if (!contact) {
-        context.logger.error(`Expected Contact to be defined on PetitionAccess:${access!.id}`);
-        continue;
-      }
-
-      if (!granterData) {
-        context.logger.error(`Expected granter data to be defined on PetitionAccess:${access!.id}`);
-        continue;
-      }
-
-      const getValues = await context.petitionMessageContext.fetchPlaceholderValues(
-        {
-          contactId: contact.id,
-          petitionId: payload.petition_id,
-          userId: payload.user_id,
-          petitionAccessId: accessId,
-        },
-        { publicContext: true },
-      );
-
-      const { html, text, subject, from } = await buildEmail(
-        PetitionClosedNotification,
-        {
-          contactFullName: fullName(contact.first_name, contact.last_name)!,
-          senderName: fullName(granterData.first_name, granterData.last_name)!,
-          senderEmail: granterData.email,
-          bodyHtml: renderSlateWithPlaceholdersToHtml(payload.message, getValues),
-          bodyPlainText: renderSlateWithPlaceholdersToText(payload.message, getValues),
-          ...layoutProps,
-        },
-        { locale: petition.recipient_locale },
-      );
-      const email = await context.emailLogs.createEmail({
-        from: buildFrom(from, emailFrom),
-        to: contact.email,
-        subject,
-        text,
-        html,
-        reply_to: senderData.email,
-        track_opens: true,
-        created_from: `PetitionClosedNotification:${accessId}`,
-      });
-
-      if (payload.attach_pdf_export) {
-        const filename = sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf");
-        const owner = await context.petitions.loadPetitionOwner(petition.id);
-        const binderPath = await context.petitionBinder.createBinder(owner!.id, {
-          petitionId: petition.id,
-          documentTitle: payload.pdf_export_title ?? "",
-          maxOutputSize: 18 * 1024 * 1024,
-          outputFileName: filename,
-        });
-        const path = random(16);
-
-        const res = await context.storage.temporaryFiles.uploadFile(
-          path,
-          "application/pdf",
-          createReadStream(binderPath),
-        );
-        const attachment = await context.files.createTemporaryFile(
-          {
-            path,
-            content_type: "application/pdf",
-            filename,
-            size: res["ContentLength"]!.toString(),
-          },
-          `User:${sender.id}`,
-        );
-
-        await context.emailLogs.addEmailAttachments(email.id, attachment.id);
-      }
-
-      emails.push(email);
+    const access = await context.petitions.loadAccess(event.data.petition_access_id);
+    const granterData = await context.users.loadUserDataByUserId(access!.granter_id);
+    const contact = access!.contact_id
+      ? await context.contacts.loadContact(access!.contact_id)
+      : null;
+    if (!contact) {
+      context.logger.error(`Expected Contact to be defined on PetitionAccess:${access!.id}`);
+      continue;
     }
+
+    if (!granterData) {
+      context.logger.error(`Expected granter data to be defined on PetitionAccess:${access!.id}`);
+      continue;
+    }
+
+    const getValues = await context.petitionMessageContext.fetchPlaceholderValues(
+      {
+        contactId: contact.id,
+        petitionId: payload.petition_id,
+        userId: payload.user_id,
+        petitionAccessId: access!.id,
+      },
+      { publicContext: true },
+    );
+
+    const bodyHtml = renderSlateWithPlaceholdersToHtml(payload.message, getValues);
+
+    const { html, text, subject, from } = await buildEmail(
+      PetitionClosedNotification,
+      {
+        contactFullName: fullName(contact.first_name, contact.last_name)!,
+        senderName: fullName(granterData.first_name, granterData.last_name)!,
+        senderEmail: granterData.email,
+        bodyHtml,
+        bodyPlainText: renderSlateWithPlaceholdersToText(payload.message, getValues),
+        ...layoutProps,
+      },
+      { locale: petition.recipient_locale },
+    );
+
+    const email = await context.emailLogs.createEmail({
+      from: buildFrom(from, emailFrom),
+      to: contact.email,
+      subject,
+      text,
+      html,
+      reply_to: senderData.email,
+      track_opens: true,
+      created_from: `PetitionClosedNotification:${access!.id}`,
+    });
+
+    if (payload.attach_pdf_export) {
+      const filename = sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf");
+      const owner = await context.petitions.loadPetitionOwner(petition.id);
+      const binderPath = await context.petitionBinder.createBinder(owner!.id, {
+        petitionId: petition.id,
+        documentTitle: payload.pdf_export_title ?? "",
+        maxOutputSize: 18 * 1024 * 1024,
+        outputFileName: filename,
+      });
+      const path = random(16);
+
+      const res = await context.storage.temporaryFiles.uploadFile(
+        path,
+        "application/pdf",
+        createReadStream(binderPath),
+      );
+      const attachment = await context.files.createTemporaryFile(
+        {
+          path,
+          content_type: "application/pdf",
+          filename,
+          size: res["ContentLength"]!.toString(),
+        },
+        `User:${sender.id}`,
+      );
+
+      await context.emailLogs.addEmailAttachments(email.id, attachment.id);
+    }
+
+    await context.petitions.mergePetitionEventData(event.id, {
+      email_log_id: email.id,
+      email_body: bodyHtml,
+    });
+
+    emails.push(email);
   }
 
   return emails;
