@@ -18,10 +18,11 @@ import {
   PetitionFieldTypeSelectDropdown_UserFragment,
 } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
-import useMergedRef from "@react-hook/merged-ref";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { difference } from "remeda";
+import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
 
@@ -51,25 +52,9 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       ref,
     ) {
       const intl = useIntl();
-      const innerRef = useRef<HTMLDivElement>(null);
-      const _ref = useMergedRef(ref, innerRef);
+      const typesRefs = useMultipleRefs<HTMLButtonElement>();
       const [activeType, setActiveType] = useState<PetitionFieldType>("HEADING");
       const activeTypeLabel = usePetitionFieldTypeLabel(activeType);
-
-      // Until we can set the roles via props
-      useEffect(() => {
-        const menu = innerRef.current!;
-        menu.setAttribute("role", role);
-        const itemRole = (
-          {
-            menu: "menuitem",
-            listbox: "option",
-          } as Record<string, string>
-        )[role];
-        for (const item of Array.from(menu.querySelectorAll("[role='menuitem']"))) {
-          item.setAttribute("role", itemRole);
-        }
-      }, []);
 
       const { isOpen, menuRef, buttonRef, forceUpdate } = useMenuContext();
 
@@ -135,9 +120,17 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       const { locale } = useIntl();
 
       const showPaidBadge = activeType === "BACKGROUND_CHECK" && !user.hasBackgroundCheck;
+
+      const itemRole = (
+        {
+          menu: "menuitem",
+          listbox: "option",
+        } as Record<string, string>
+      )[role];
+
       return (
         <MenuList
-          ref={_ref}
+          ref={ref}
           display="flex"
           paddingY={0}
           minWidth={{
@@ -146,6 +139,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
           }}
           overflow="auto"
           maxHeight="240px"
+          role={role}
           {...props}
         >
           <Box flex="1" position="relative" height="fit-content">
@@ -180,6 +174,8 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                         {fields.map((type) => (
                           <MenuItem
                             key={type}
+                            ref={typesRefs[type]}
+                            role={itemRole}
                             paddingY={2}
                             aria-describedby={
                               activeType === type ? `field-description-${type}` : undefined
@@ -187,6 +183,11 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                             data-field-type={type}
                             onClick={() => onSelectFieldType(type)}
                             onFocus={() => setActiveType(type)}
+                            onKeyDownCapture={() => {
+                              smoothScrollIntoView(typesRefs[type].current!, {
+                                block: "center",
+                              });
+                            }}
                           >
                             <PetitionFieldTypeLabel type={type} />
                           </MenuItem>
