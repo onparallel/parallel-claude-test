@@ -12210,6 +12210,16 @@
     "context": "Grants users in this team permissions to send parallels on behalf of any other user in their organization without explicit delegation."
   },
   {
+    "term": "page.permissions-group.petitions-view-public-templates",
+    "definition": "View public templates",
+    "context": "View public templates"
+  },
+  {
+    "term": "page.permissions-group.petitions-view-public-templates-description",
+    "definition": "Grant users in this team permission to browse public templates.",
+    "context": "Grant users in this team permission to browse public templates."
+  },
+  {
     "term": "page.permissions-group.profile-alerts-list",
     "definition": "View alerts",
     "context": "View alerts"

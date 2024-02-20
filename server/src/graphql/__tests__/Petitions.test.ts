@@ -116,6 +116,7 @@ describe("GraphQL/Petitions", () => {
       organization.id,
       [
         "PETITIONS:CREATE_PETITIONS",
+        "PETITIONS:LIST_PUBLIC_TEMPLATES",
         "PROFILES:CREATE_PROFILES",
         "PROFILES:CLOSE_PROFILES",
         "PROFILES:LIST_PROFILES",

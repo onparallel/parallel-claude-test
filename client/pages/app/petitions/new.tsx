@@ -132,10 +132,11 @@ function NewPetition() {
     [refetch],
   );
 
+  const userCanViewPublicTemplates = useHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES");
   const canCreateTemplate = useHasPermission("PETITIONS:CREATE_TEMPLATES");
 
   useEffect(() => {
-    if (!canCreateTemplate && state.public) {
+    if (!userCanViewPublicTemplates && state.public) {
       setQueryState((current) => ({ ...current, public: false }));
     }
   }, [me, state.public]);
@@ -198,7 +199,7 @@ function NewPetition() {
   }, [goToPetition, createPetition, state.path]);
 
   useEffect(() => {
-    if (!hasTemplates && !state.public && canCreateTemplate) {
+    if (!hasTemplates && !state.public && userCanViewPublicTemplates) {
       handleTabChange(1);
     }
   }, []);
@@ -282,7 +283,10 @@ function NewPetition() {
               >
                 <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
               </Tab>
-              <RestrictedFeaturePopover isRestricted={!canCreateTemplate} borderBottomRadius={0}>
+              <RestrictedFeaturePopover
+                isRestricted={!userCanViewPublicTemplates}
+                borderBottomRadius={0}
+              >
                 <Tab
                   data-testid="new-petition-public-templates-tab"
                   data-link="public-templates"
@@ -290,7 +294,7 @@ function NewPetition() {
                   _selected={selectTabStyles}
                   whiteSpace="nowrap"
                   paddingX={3}
-                  isDisabled={!canCreateTemplate}
+                  isDisabled={!userCanViewPublicTemplates}
                 >
                   <FormattedMessage
                     id="new-petition.public-templates"

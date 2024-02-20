@@ -75,6 +75,7 @@ export function TemplateDetailsModal({
   const myId = useGetMyId();
   const userCanClone = useHasPermission("PETITIONS:CREATE_TEMPLATES");
   const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
+  const userCanViewPublicTemplates = useHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES");
 
   const onCopyPublicLink = useClipboardWithToast({
     text: intl.formatMessage({
@@ -193,13 +194,16 @@ export function TemplateDetailsModal({
             <Flex marginY={6} flexDirection={{ base: "column-reverse", md: "row" }} gridGap={3}>
               <Box flex="1">
                 {template.isPublic ? (
-                  <RestrictedFeaturePopover width="100%" isRestricted={!userCanCreatePetition}>
+                  <RestrictedFeaturePopover
+                    width="100%"
+                    isRestricted={!userCanCreatePetition || !userCanViewPublicTemplates}
+                  >
                     <Button
                       width="100%"
                       data-testid="create-parallel-button"
                       data-action="use-template"
                       leftIcon={<PaperPlaneIcon />}
-                      isDisabled={!userCanCreatePetition}
+                      isDisabled={!userCanCreatePetition || !userCanViewPublicTemplates}
                       onClick={handleCreatePetition}
                     >
                       <FormattedMessage
@@ -219,11 +223,14 @@ export function TemplateDetailsModal({
               </Box>
               <HStack flex="1" spacing={3}>
                 {template.isPublic ? (
-                  <RestrictedFeaturePopover width="100%" isRestricted={!userCanClone}>
+                  <RestrictedFeaturePopover
+                    width="100%"
+                    isRestricted={!userCanClone || !userCanViewPublicTemplates}
+                  >
                     <Button
                       width="100%"
                       colorScheme="primary"
-                      isDisabled={!userCanClone}
+                      isDisabled={!userCanClone || !userCanViewPublicTemplates}
                       onClick={handleCloneTemplate}
                       leftIcon={<CopyIcon />}
                     >

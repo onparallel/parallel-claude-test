@@ -1103,7 +1103,7 @@ type Mutation {
   createOrganizationPdfDocumentTheme(isDefault: Boolean!, name: String!): Organization!
 
   """
-  Create parallel.
+  Create parallel
   """
   createPetition(
     locale: PetitionLocale

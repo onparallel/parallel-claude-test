@@ -134,6 +134,17 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             }),
           },
           {
+            name: "PETITIONS:LIST_PUBLIC_TEMPLATES",
+            title: intl.formatMessage({
+              id: "page.permissions-group.petitions-view-public-templates",
+              defaultMessage: "View public templates",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.petitions-view-public-templates-description",
+              defaultMessage: "Grant users in this team permission to browse public templates.",
+            }),
+          },
+          {
             name: "PETITIONS:CREATE_PETITIONS",
             title: intl.formatMessage({
               id: "page.permissions-group.petitions-create",

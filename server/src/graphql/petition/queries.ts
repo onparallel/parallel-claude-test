@@ -12,7 +12,14 @@ import {
 import { isDefined, sort, uniq } from "remeda";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { authenticate, authenticateAnd, ifArgDefined, or } from "../helpers/authorize";
+import {
+  and,
+  authenticate,
+  authenticateAnd,
+  ifArgDefined,
+  ifArgEquals,
+  or,
+} from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -20,6 +27,7 @@ import { validateAnd } from "../helpers/validateArgs";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validPath } from "../helpers/validators/validPath";
+import { contextUserHasPermission } from "../users/authorizers";
 import {
   fieldsBelongsToPetition,
   petitionsArePublicTemplates,
@@ -109,7 +117,15 @@ export const petitionQuery = queryField("petition", {
   args: {
     id: nonNull(globalIdArg("Petition")),
   },
-  authorize: authenticateAnd(or(userHasAccessToPetitions("id"), petitionsArePublicTemplates("id"))),
+  authorize: authenticateAnd(
+    or(
+      userHasAccessToPetitions("id"),
+      and(
+        petitionsArePublicTemplates("id" as never),
+        contextUserHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES"),
+      ),
+    ),
+  ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.loadPetition(args.id);
   },
@@ -124,7 +140,13 @@ export const petitionsByIdQuery = queryField("petitionsById", {
   authorize: authenticateAnd(
     ifArgDefined(
       (args) => args.ids,
-      or(userHasAccessToPetitions("ids" as never), petitionsArePublicTemplates("ids" as never)),
+      or(
+        userHasAccessToPetitions("ids" as never),
+        and(
+          petitionsArePublicTemplates("ids" as never),
+          contextUserHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES"),
+        ),
+      ),
     ),
   ),
   validateArgs: validateAnd(
@@ -168,7 +190,9 @@ export const templatesQuery = queryField((t) => {
   t.paginationField("templates", {
     type: "PetitionBaseOrFolder",
     description: "The available templates",
-    authorize: authenticate(),
+    authorize: authenticateAnd(
+      ifArgEquals("isPublic", true, contextUserHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES")),
+    ),
     extendArgs: {
       path: stringArg(),
       locale: arg({ type: "PetitionLocale" }),

@@ -138,7 +138,7 @@ import {
 import { FIELD_REFERENCE_REGEX } from "./variables";
 
 export const createPetition = mutationField("createPetition", {
-  description: "Create parallel.",
+  description: "Create parallel",
   type: "PetitionBase",
   authorize: authenticateAnd(
     ifArgEquals(
@@ -152,7 +152,10 @@ export const createPetition = mutationField("createPetition", {
             petitionIsNotAnonymized("petitionId" as never),
             or(
               userHasAccessToPetitions("petitionId" as never),
-              petitionsArePublicTemplates("petitionId" as never),
+              and(
+                petitionsArePublicTemplates("petitionId" as never),
+                contextUserHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES"),
+              ),
             ),
           ),
           argIsDefined("locale"),
@@ -166,7 +169,10 @@ export const createPetition = mutationField("createPetition", {
             petitionIsNotAnonymized("petitionId" as never),
             or(
               userHasAccessToPetitions("petitionId" as never),
-              petitionsArePublicTemplates("petitionId" as never),
+              and(
+                petitionsArePublicTemplates("petitionId" as never),
+                contextUserHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES"),
+              ),
             ),
           ),
           argIsDefined("locale"),
@@ -254,7 +260,13 @@ export const clonePetitions = mutationField("clonePetitions", {
   description: "Clone petition.",
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
-    or(userHasAccessToPetitions("petitionIds"), petitionsArePublicTemplates("petitionIds")),
+    or(
+      userHasAccessToPetitions("petitionIds"),
+      and(
+        petitionsArePublicTemplates("petitionIds"),
+        contextUserHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES"),
+      ),
+    ),
     contextUserCanClonePetitions("petitionIds"),
   ),
   args: {

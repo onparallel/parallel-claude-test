@@ -193,6 +193,7 @@ export class AccountSetupService implements IAccountSetupService {
           "PETITIONS:SEND_ON_BEHALF",
           "PETITIONS:CHANGE_PATH",
           "PETITIONS:CREATE_TEMPLATES",
+          "PETITIONS:LIST_PUBLIC_TEMPLATES",
           "INTEGRATIONS:CRUD_API",
           "PROFILES:SUBSCRIBE_PROFILES",
           "PETITIONS:CREATE_PETITIONS",
