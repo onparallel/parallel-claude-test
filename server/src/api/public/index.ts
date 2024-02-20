@@ -585,7 +585,10 @@ api
         }),
         ...petitionIncludeParam(),
       },
-      responses: { 200: SuccessResponse(PaginatedPetitions) },
+      responses: {
+        200: SuccessResponse(PaginatedPetitions),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+      },
       tags: ["Parallels"],
     },
     async ({ client, query }) => {
@@ -637,14 +640,23 @@ api
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(GetPetitions_petitionsDocument, {
-        ...pick(query, ["offset", "limit", "status", "fromTemplateId", "sortBy"]),
-        tags,
-        ...getPetitionIncludesFromQuery(query),
-      });
-      const { items, totalCount } = result.petitions;
-      assertType<PetitionFragmentType[]>(items);
-      return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
+      try {
+        const result = await client.request(GetPetitions_petitionsDocument, {
+          ...pick(query, ["offset", "limit", "status", "fromTemplateId", "sortBy"]),
+          tags,
+          ...getPetitionIncludesFromQuery(query),
+        });
+        const { items, totalCount } = result.petitions;
+        assertType<PetitionFragmentType[]>(items);
+        return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
+      } catch (error) {
+        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          if (error.response.errors?.[0].extensions.argName === "filters.fromTemplateId") {
+            throw new ForbiddenError("Invalid fromTemplateId");
+          }
+        }
+        throw error;
+      }
     },
   )
   .post(
