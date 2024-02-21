@@ -7,7 +7,7 @@ import { onError } from "@apollo/client/link/error";
 import { getOperationName } from "@apollo/client/utilities";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
 import { Login_currentUserDocument } from "@parallel/graphql/__types";
-import { createUploadLink } from "apollo-upload-client";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { DefinitionNode, Kind, OperationDefinitionNode, OperationTypeNode } from "graphql";
 import { IncomingMessage } from "http";

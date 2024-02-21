@@ -81,7 +81,7 @@ export const Duration = scalarType({
     extensions: {
       jsonSchema: DURATION_SCHEMA,
     },
-  } satisfies GraphQLScalarTypeConfig<Duration, Duration>),
+  } satisfies GraphQLScalarTypeConfig<_Duration, _Duration>),
 });
 
 export function durationArg(opts?: Omit<core.NexusArgConfig<"Duration">, "type">) {

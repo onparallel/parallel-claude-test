@@ -22,7 +22,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { FORMATS } from "@parallel/utils/dates";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useMetadata } from "@parallel/utils/withMetadata";
-import { isPast, sub } from "date-fns";
+import { Duration, isPast, sub } from "date-fns";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";

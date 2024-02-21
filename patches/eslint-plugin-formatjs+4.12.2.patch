@@ -1,8 +1,8 @@
 diff --git a/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js b/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js
-index 9d5c5c7..7a4f90b 100644
+index c257693..b95124e 100644
 --- a/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js
 +++ b/node_modules/eslint-plugin-formatjs/rules/no-literal-string-in-jsx.js
-@@ -15,6 +15,7 @@ const defaultPropIncludePattern = [
+@@ -16,6 +16,7 @@ const defaultPropIncludePattern = [
      ['[a-z]*([a-z0-9])', '(placeholder|title)'],
      ['img', 'alt'],
  ];
@@ -10,7 +10,7 @@ index 9d5c5c7..7a4f90b 100644
  const defaultPropExcludePattern = [];
  function stringifyJsxTagName(tagName) {
      switch (tagName.type) {
-@@ -102,11 +103,16 @@ const rule = {
+@@ -106,11 +107,16 @@ exports.rule = {
          const checkJSXExpression = (node) => {
              // Check if this is either a string literal / template literal, or the concat of them.
              // It also ignores the empty string.
@@ -23,15 +23,15 @@ index 9d5c5c7..7a4f90b 100644
 +                !IGNORE_REGEXES.some(re => re.test(node.value))) {
 +                context.report({
 +                    node: node,
-+                    message: 'Cannot have untranslated text in JSX',
++                    messageId: 'noLiteralStringInJsx',
 +                });
 +            }
 +            else if (node.type === 'TemplateLiteral' &&
-+                     node.quasis.some(q => !IGNORE_REGEXES.some(re => re.test(q.value.raw)))) {
++                     node.quasis.some(q => !IGNORE_REGEXES.some(re => re.test(q.value.raw)))) { 
                  context.report({
                      node: node,
-                     message: 'Cannot have untranslated text in JSX',
-@@ -147,7 +153,7 @@ const rule = {
+                     messageId: 'noLiteralStringInJsx',
+@@ -151,7 +157,7 @@ exports.rule = {
                  }
                  if (node.value.type === 'Literal' &&
                      typeof node.value.value === 'string' &&
@@ -39,15 +39,4 @@ index 9d5c5c7..7a4f90b 100644
 +                    !IGNORE_REGEXES.some(re => re.test(node.value.value))) {
                      context.report({
                          node: node,
-                         message: 'Cannot have untranslated text in JSX',
-@@ -163,6 +169,10 @@ const rule = {
-                 if (!node.value.replace(/\s*/gm, '')) {
-                     return;
-                 }
-+                // Ignore symbols
-+                if (IGNORE_REGEXES.some(re => re.test(node.value))) {
-+                    return;
-+                }
-                 context.report({
-                     node: node,
-                     message: 'Cannot have untranslated text in JSX',
+                         messageId: 'noLiteralStringInJsx',

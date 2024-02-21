@@ -1,6 +1,6 @@
 import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
-import { FromSchema, JSONSchema as _JSONSchema, JSONSchema7 } from "json-schema-to-ts";
+import { FromSchema, JSONSchema as _JSONSchema } from "json-schema-to-ts";
 import { isValidTime, isValidTimezone } from "../../util/time";
 
 export type JsonSchema = Exclude<_JSONSchema, boolean>;
@@ -9,7 +9,7 @@ export type JsonSchemaFor<T> = JsonSchema & {
   __type?: T;
 };
 
-export function schema<T extends JSONSchema7>(value: T): JsonSchemaFor<FromSchema<T>> {
+export function schema<T extends _JSONSchema>(value: T): JsonSchemaFor<FromSchema<T>> {
   return value as any;
 }
 

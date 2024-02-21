@@ -87,7 +87,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
     async (done) => {
       const someChange =
         field.replies.length !== repliesBefore.length ||
-        zip(repliesBefore, field.replies.map(pick(["id", "updatedAt"]))).some(([before, after]) => {
+        zip(
+          repliesBefore,
+          field.replies.map((r) => pick(r, ["id", "updatedAt"])),
+        ).some(([before, after]) => {
           return before.updatedAt !== after.updatedAt;
         });
 

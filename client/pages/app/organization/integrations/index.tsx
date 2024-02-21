@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -40,7 +41,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
-import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 
 function OrganizationIntegrations() {
   const intl = useIntl();

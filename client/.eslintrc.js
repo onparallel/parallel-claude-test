@@ -14,7 +14,9 @@ module.exports = {
     "formatjs/no-literal-string-in-jsx": [
       "error",
       {
-        include: [["AppLayout", "title"]],
+        props: {
+          include: [["*", "title"]],
+        },
       },
     ],
   },

@@ -20,7 +20,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { unMaybeArray } from "@parallel/utils/types";
 import usePrevious from "@react-hook/previous";
-import { isPast, sub } from "date-fns";
+import { Duration, isPast, sub } from "date-fns";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   Control,
