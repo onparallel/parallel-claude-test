@@ -29,7 +29,7 @@ async function main() {
         description: "The duration of the session",
         default: 30 * 60,
     }).argv;
-    const sts = new client_sts_1.STSClient((0, credential_provider_ini_1.fromIni)({ profile }));
+    const sts = new client_sts_1.STSClient({ credentials: (0, credential_provider_ini_1.fromIni)({ profile }) });
     const userArn = await sts.send(new client_sts_1.GetCallerIdentityCommand({})).then((r) => r.Arn);
     const iam = new client_iam_1.IAMClient((0, credential_provider_ini_1.fromIni)({ profile }));
     const mfaSerialNumber = await iam
