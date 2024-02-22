@@ -3911,8 +3911,8 @@
   },
   {
     "term": "component.notification-petition-shared-group.body",
-    "definition": "{name} ha compartido {isTemplate, select, true {la plantilla} other {el parallel}} con el equipo \"{group}\" al que perteneces.",
-    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the team \"{group}\" to which you belong."
+    "definition": "{name} ha compartido {isTemplate, select, true {la plantilla} other {el parallel}} con el equipo {group} al que perteneces.",
+    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the team {group} to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",

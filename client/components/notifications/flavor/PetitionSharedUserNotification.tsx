@@ -7,6 +7,7 @@ import { PetitionSharedUserNotification_PetitionSharedUserNotificationFragment }
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
+import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 
 export interface PetitionSharedUserNotificationProps {
   isFirst?: boolean;
@@ -36,11 +37,11 @@ export const PetitionSharedUserNotification = Object.assign(
           {sharedWith?.__typename === "UserGroup" ? (
             <FormattedMessage
               id="component.notification-petition-shared-group.body"
-              defaultMessage='{name} has shared the {isTemplate, select, true {template} other {petition}} with the team "{group}" to which you belong.'
+              defaultMessage="{name} has shared the {isTemplate, select, true {template} other {petition}} with the team {group} to which you belong."
               values={{
                 isTemplate: petition.__typename === "PetitionTemplate",
                 name: <UserReference user={notification.owner} />,
-                group: sharedWith.name,
+                group: <UserGroupReference fontWeight="bold" userGroup={sharedWith} />,
               }}
             />
           ) : sharedWith?.__typename === "User" ? (
@@ -79,14 +80,14 @@ export const PetitionSharedUserNotification = Object.assign(
               ...UserReference_User
             }
             ... on UserGroup {
-              id
-              name
+              ...UserGroupReference_UserGroup
             }
           }
           permissionType
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
         ${UserReference.fragments.User}
+        ${UserGroupReference.fragments.UserGroup}
       `,
     },
   },

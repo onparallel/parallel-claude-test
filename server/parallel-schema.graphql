@@ -3801,7 +3801,7 @@ type PetitionFieldComment {
 }
 
 union PetitionFieldCommentMention =
-    PetitionFieldCommentUserGroupMention
+  | PetitionFieldCommentUserGroupMention
   | PetitionFieldCommentUserMention
 
 """
