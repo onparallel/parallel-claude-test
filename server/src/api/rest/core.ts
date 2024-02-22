@@ -384,12 +384,10 @@ export class RestApi<TContext = {}> {
   }
 }
 
-type PathArguments<
-  TPath extends string,
-  TParams extends PathParameters<TPath>,
-> = {} extends PathParameters<TPath>
-  ? [path: TPath] | [path: TPath, pathOptions: RestPathOptions]
-  : [path: TPath, pathOptions: RestPathOptionsWithParams<TPath, TParams>];
+type PathArguments<TPath extends string, TParams extends PathParameters<TPath>> =
+  {} extends PathParameters<TPath>
+    ? [path: TPath] | [path: TPath, pathOptions: RestPathOptions]
+    : [path: TPath, pathOptions: RestPathOptionsWithParams<TPath, TParams>];
 
 type _RestPathOptions<
   TPath extends string,

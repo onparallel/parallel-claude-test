@@ -235,8 +235,8 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                     )[0]?.field ?? petitionFields.find((f) => f.id === targetFieldId);
 
                   const replies =
-                    field?.replies.filter(
-                      (reply) => reply.children?.every((child) => child.replies.length === 0),
+                    field?.replies.filter((reply) =>
+                      reply.children?.every((child) => child.replies.length === 0),
                     ) ?? [];
 
                   childrenFields = childrenFields.concat(

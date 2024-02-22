@@ -279,8 +279,8 @@ export function CreateOrUpdateEventSubscriptionDialog({
         !initialFieldsSetRef.current
       ) {
         resetField("fromTemplateFields", {
-          defaultValue: fields.filter(
-            (field) => eventSubscription.fromTemplateFields?.some((f) => field.id === f.id),
+          defaultValue: fields.filter((field) =>
+            eventSubscription.fromTemplateFields?.some((f) => field.id === f.id),
           ),
         });
         initialFieldsSetRef.current = true;

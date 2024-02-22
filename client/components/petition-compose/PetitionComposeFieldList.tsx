@@ -130,9 +130,20 @@ export const PetitionComposeFieldList = Object.assign(
             // ensure no field has a condition on a missing value
             const values = field.options.values as any[];
             const newValues = data.options.values as any[];
-            const referencingVisibility = fields.filter(
-              (f) =>
-                (f.visibility as PetitionFieldVisibility)?.conditions.some(
+            const referencingVisibility = fields.filter((f) =>
+              (f.visibility as PetitionFieldVisibility)?.conditions.some(
+                (c) =>
+                  "fieldId" in c &&
+                  c.fieldId === fieldId &&
+                  c.modifier !== "NUMBER_OF_REPLIES" &&
+                  c.value !== null &&
+                  !newValues.includes(c.value),
+              ),
+            );
+
+            const referencingMath = fields.filter((f) =>
+              (f.math as PetitionFieldMath[])?.some((calc) =>
+                calc.conditions.some(
                   (c) =>
                     "fieldId" in c &&
                     c.fieldId === fieldId &&
@@ -140,20 +151,7 @@ export const PetitionComposeFieldList = Object.assign(
                     c.value !== null &&
                     !newValues.includes(c.value),
                 ),
-            );
-
-            const referencingMath = fields.filter(
-              (f) =>
-                (f.math as PetitionFieldMath[])?.some((calc) =>
-                  calc.conditions.some(
-                    (c) =>
-                      "fieldId" in c &&
-                      c.fieldId === fieldId &&
-                      c.modifier !== "NUMBER_OF_REPLIES" &&
-                      c.value !== null &&
-                      !newValues.includes(c.value),
-                  ),
-                ),
+              ),
             );
 
             const updatePetitionFieldLogicCondition = (c: PetitionFieldLogicCondition) => {

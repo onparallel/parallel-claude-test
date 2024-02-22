@@ -188,11 +188,8 @@ export interface QueryStateOptions {
 }
 
 export type QueryStateOf<T extends {}> = { [P in keyof T]: QueryItem<T[P]> };
-export type QueryStateFrom<T extends Record<string, QueryItem<any>>> = T extends QueryStateOf<
-  infer U
->
-  ? U
-  : never;
+export type QueryStateFrom<T extends Record<string, QueryItem<any>>> =
+  T extends QueryStateOf<infer U> ? U : never;
 
 type NextQueryState<T> = T | ((prevState: T) => T);
 export type SetQueryState<T> = (state: NextQueryState<T>, options?: SetQueryStateOptions) => void;

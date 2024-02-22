@@ -14,9 +14,10 @@ export class PetitionsList extends AppLayout {
   async changePetitionType(type: "PETITION" | "TEMPLATE") {
     const button = this.getPetitionTypeButton();
     const menu = await openMenu(this.page, button);
-    await (type === "PETITION"
-      ? menu.getByTestId("petition-type-petition")
-      : menu.getByTestId("petition-type-template")
+    await (
+      type === "PETITION"
+        ? menu.getByTestId("petition-type-petition")
+        : menu.getByTestId("petition-type-template")
     ).click();
   }
 }

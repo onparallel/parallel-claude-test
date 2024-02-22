@@ -1984,15 +1984,14 @@ export class PetitionRepository extends BaseRepository {
     // when cloning, we need to check if the fields have math conditions or operations that references to themselves.
     // if so, we need to update the cloned field math to reference to the cloned field id instead of the original field id
     const clonedFieldsForMathUpdate = clonedFields
-      .filter(
-        ({ originalFieldId, cloned }) =>
-          (cloned.math as PetitionFieldMath[] | null)?.some(
-            (m) =>
-              m.conditions.some((c) => "fieldId" in c && c.fieldId === originalFieldId) ||
-              m.operations.some(
-                (op) => op.operand.type === "FIELD" && op.operand.fieldId === originalFieldId,
-              ),
-          ),
+      .filter(({ originalFieldId, cloned }) =>
+        (cloned.math as PetitionFieldMath[] | null)?.some(
+          (m) =>
+            m.conditions.some((c) => "fieldId" in c && c.fieldId === originalFieldId) ||
+            m.operations.some(
+              (op) => op.operand.type === "FIELD" && op.operand.fieldId === originalFieldId,
+            ),
+        ),
       )
       .map(({ originalFieldId, cloned }) => ({
         id: cloned.id,

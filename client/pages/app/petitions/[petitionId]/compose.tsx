@@ -232,26 +232,22 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     // if they want to remove the conflicting conditions
 
     const fieldToCheck = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
-    const referencingVisibility = allFieldsWithIndices.filter(
-      ([f]) =>
-        (f.visibility as PetitionFieldVisibility)?.conditions.some(
-          (c) =>
-            "fieldId" in c &&
-            (fieldToCheck.type === "FIELD_GROUP"
-              ? c.fieldId === fieldId || fieldToCheck.children?.some((f) => c.fieldId === f.id)
-              : c.fieldId === fieldId),
-        ),
+    const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
+      (f.visibility as PetitionFieldVisibility)?.conditions.some(
+        (c) =>
+          "fieldId" in c &&
+          (fieldToCheck.type === "FIELD_GROUP"
+            ? c.fieldId === fieldId || fieldToCheck.children?.some((f) => c.fieldId === f.id)
+            : c.fieldId === fieldId),
+      ),
     );
 
-    const referencingMath = allFieldsWithIndices.filter(
-      ([f]) =>
-        (f.math as PetitionFieldMath[])?.some(
-          (calc) =>
-            calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
-            calc.operations.some(
-              (o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId,
-            ),
-        ),
+    const referencingMath = allFieldsWithIndices.filter(([f]) =>
+      (f.math as PetitionFieldMath[])?.some(
+        (calc) =>
+          calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
+          calc.operations.some((o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId),
+      ),
     );
 
     if (referencingVisibility.length > 0 || referencingMath.length > 0) {
@@ -505,16 +501,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           }
           return true;
         };
-        const referencingVisibility = allFieldsWithIndices.filter(
-          ([f]) =>
-            (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => !validCondition(c)),
+        const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
+          (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => !validCondition(c)),
         );
 
-        const referencingMath = allFieldsWithIndices.filter(
-          ([f]) =>
-            (f.math as PetitionFieldMath[])?.some((calc) =>
-              calc.conditions.some((c) => !validCondition(c)),
-            ),
+        const referencingMath = allFieldsWithIndices.filter(([f]) =>
+          (f.math as PetitionFieldMath[])?.some((calc) =>
+            calc.conditions.some((c) => !validCondition(c)),
+          ),
         );
 
         if (referencingVisibility.length || referencingMath.length) {
@@ -602,22 +596,20 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       }
 
       const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
-      const referencingVisibility = allFieldsWithIndices.filter(
-        ([f]) =>
-          (f.visibility as PetitionFieldVisibility)?.conditions.some(
-            (c) => "fieldId" in c && c.fieldId === fieldId,
-          ),
+      const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
+        (f.visibility as PetitionFieldVisibility)?.conditions.some(
+          (c) => "fieldId" in c && c.fieldId === fieldId,
+        ),
       );
 
-      const referencingMath = allFieldsWithIndices.filter(
-        ([f]) =>
-          (f.math as PetitionFieldMath[])?.some(
-            (calc) =>
-              calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
-              calc.operations.some(
-                (o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId,
-              ),
-          ),
+      const referencingMath = allFieldsWithIndices.filter(([f]) =>
+        (f.math as PetitionFieldMath[])?.some(
+          (calc) =>
+            calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
+            calc.operations.some(
+              (o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId,
+            ),
+        ),
       );
 
       if (referencingVisibility.length || referencingMath.length) {

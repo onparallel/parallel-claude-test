@@ -1269,11 +1269,9 @@ export class ProfileRepository extends BaseRepository {
         .whereIn("petition_profile.petition_id", petitionIds)
         .whereNull("profile.deleted_at")
         .whereIn("profile.status", ["OPEN", "CLOSED"])
-        .select<Array<Profile & { petition_id: number; pp_created_at: Date }>>(
-          "profile.*",
-          "petition_profile.petition_id",
-          "petition_profile.created_at as pp_created_at",
-        );
+        .select<
+          Array<Profile & { petition_id: number; pp_created_at: Date }>
+        >("profile.*", "petition_profile.petition_id", "petition_profile.created_at as pp_created_at");
 
       const byPetitionId = groupBy(results, (r) => r.petition_id);
       return petitionIds.map((id) =>

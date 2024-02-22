@@ -24,11 +24,9 @@ export class TagRepository extends BaseRepository {
       .join("petition_tag", "tag.id", "petition_tag.tag_id")
       .whereIn("petition_tag.petition_id", petitionIds)
       .whereNull("tag.deleted_at")
-      .select<Array<Tag & { petition_id: number; pt_created_at: Date }>>(
-        "tag.*",
-        "petition_tag.petition_id",
-        "petition_tag.created_at as pt_created_at",
-      );
+      .select<
+        Array<Tag & { petition_id: number; pt_created_at: Date }>
+      >("tag.*", "petition_tag.petition_id", "petition_tag.created_at as pt_created_at");
     const byPetitionId = groupBy(results, (r) => r.petition_id);
     return petitionIds.map((id) =>
       byPetitionId[id]

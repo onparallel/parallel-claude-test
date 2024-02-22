@@ -86,24 +86,22 @@ export function PetitionComposeVariables({
     PetitionComposeVariables_deletePetitionVariableDocument,
   );
   const handleDeleteVariable = async (name: string) => {
-    const referencingMath = allFieldsWithIndices.filter(
-      ([f]) =>
-        (f.math as PetitionFieldMath[])?.some(
-          (calc) =>
-            calc.conditions.some((c) => "variableName" in c && c.variableName === name) ||
-            calc.operations.some(
-              (o) =>
-                ("variable" in o && o.variable === name) ||
-                (o.operand.type === "VARIABLE" && o.operand.name === name),
-            ),
-        ),
+    const referencingMath = allFieldsWithIndices.filter(([f]) =>
+      (f.math as PetitionFieldMath[])?.some(
+        (calc) =>
+          calc.conditions.some((c) => "variableName" in c && c.variableName === name) ||
+          calc.operations.some(
+            (o) =>
+              ("variable" in o && o.variable === name) ||
+              (o.operand.type === "VARIABLE" && o.operand.name === name),
+          ),
+      ),
     );
 
-    const referencingVisibility = allFieldsWithIndices.filter(
-      ([f]) =>
-        (f.visibility as PetitionFieldVisibility)?.conditions.some(
-          (c) => "variableName" in c && c.variableName === name,
-        ),
+    const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
+      (f.visibility as PetitionFieldVisibility)?.conditions.some(
+        (c) => "variableName" in c && c.variableName === name,
+      ),
     );
 
     if (referencingMath.length || referencingVisibility.length) {

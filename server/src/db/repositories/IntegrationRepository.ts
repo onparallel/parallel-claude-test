@@ -65,9 +65,10 @@ export type IntegrationSettings<
 export type IntegrationCredentials<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-> = EnhancedIntegrationSettings<TType, TProvider, false> extends { CREDENTIALS: any }
-  ? EnhancedIntegrationSettings<TType, TProvider, false>["CREDENTIALS"]
-  : never;
+> =
+  EnhancedIntegrationSettings<TType, TProvider, false> extends { CREDENTIALS: any }
+    ? EnhancedIntegrationSettings<TType, TProvider, false>["CREDENTIALS"]
+    : never;
 
 export type EnhancedIntegrationSettings<
   TType extends IntegrationType,
