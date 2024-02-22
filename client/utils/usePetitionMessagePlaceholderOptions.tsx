@@ -87,7 +87,8 @@ export function usePetitionMessagePlaceholderOptions({
             field.isInternal &&
             !field.isReadOnly &&
             !isFileTypeField(field.type) &&
-            field.type !== "FIELD_GROUP", // don't include FIELD_GROUP nor any of its children
+            field.type !== "FIELD_GROUP" &&
+            field.type !== "BACKGROUND_CHECK", // don't include BACKGROUND_CHECK, FIELD_GROUP nor any of its children
         )
         .map(([field, fieldIndex]) => ({
           key: field.id,
