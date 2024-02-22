@@ -74,17 +74,17 @@ scim
   })
   .post(async (req, res, next) => {
     try {
-      const {
-        externalId,
-        active,
-        name: { familyName, givenName },
-        emails,
-      } = req.body as {
+      const { externalId, active, name, emails } = req.body as {
         externalId: string;
         active: boolean;
-        name: { givenName: string; familyName: string };
+        name?: { givenName: string; familyName: string };
         emails?: { type: string; value: string }[];
       };
+
+      if (!isDefined(name) || !isDefined(emails)) {
+        return res.status(401).send("'emails' and 'name' are required fields");
+      }
+
       let user = await req.context.users.loadUserByExternalId({
         externalId,
         orgId: req.context.organization!.id,
@@ -120,12 +120,12 @@ scim
             );
           }
         }
-        if (userData.first_name !== givenName || userData.last_name !== familyName) {
+        if (userData.first_name !== name.givenName || userData.last_name !== name.familyName) {
           [userData] = await req.context.users.updateUserData(
             userData.id,
             {
-              first_name: givenName,
-              last_name: familyName,
+              first_name: name.givenName,
+              last_name: name.familyName,
             },
             `Provisioning:${req.context.organization!.id}`,
           );
@@ -145,8 +145,12 @@ scim
           orgId,
           "SSO",
         );
-        const email = emails?.find((e) => e.type === "work")?.value;
-        if (ssoIntegrations.length > 0 && email) {
+        const email = emails.find((e) => e.type === "work")?.value;
+        if (!email) {
+          return res.status(401).send("work email is required");
+        }
+
+        if (ssoIntegrations.length > 0) {
           const user = await req.context.accountSetup.createUser(
             {
               org_id: orgId,
@@ -157,8 +161,8 @@ scim
               // fake unique cognitoId, should update when user logs in
               cognito_id: `${req.context.organization!.id}_${externalId}`,
               email: email.toLowerCase(),
-              first_name: givenName,
-              last_name: familyName,
+              first_name: name.givenName,
+              last_name: name.familyName,
               details: {
                 source: "SCIM",
               },
