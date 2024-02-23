@@ -8,7 +8,7 @@ import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { isDefined } from "@udecode/plate-common";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { pick, zip } from "remeda";
 import { useEsTaxDocumentsChangePersonDialog } from "../dialogs/EsTaxDocumentsChangePersonDialog";
@@ -77,9 +77,8 @@ export function RecipientViewPetitionFieldTaxDocuments({
   // ready means bankflip exported all requested docs and sent event to our webhook to start uploading replies
   const [bankflipSessionReady, setBankflipSessionReady] = useState(false);
 
-  const repliesBefore = useMemo(
-    () => field.replies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
-    [field.replies.length],
+  const [repliesBefore, setRepliesBefore] = useState(
+    field.replies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
   );
 
   const popupRef = useRef<Window>();
@@ -105,6 +104,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
           setState("IDLE");
           done();
         } else {
+          setRepliesBefore(field.replies.map(pick(["id", "updatedAt"])));
           onRefreshField();
         }
       } else {
@@ -115,7 +115,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
     [
       onRefreshField,
       state,
-      field.replies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
+      field.replies.map((r) => r.id + "-" + r.updatedAt).join(","),
       bankflipSessionReady,
     ],
   );

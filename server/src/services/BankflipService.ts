@@ -222,28 +222,39 @@ export class BankflipService implements IBankflipService {
     const parentReplyId = metadata.parentReplyId
       ? fromGlobalId(metadata.parentReplyId, "PetitionFieldReply").id
       : null;
-    const fieldReplies = await this.petitions.loadRepliesForField(fieldId);
+    const field = await this.petitions.loadField(fieldId);
 
-    const requests = fieldReplies
+    const fieldReplies = (await this.petitions.loadRepliesForField(fieldId)).filter(
+      (r) => r.parent_petition_field_reply_id === parentReplyId && r.status !== "APPROVED",
+    );
+
+    // filter model-request replies that have been successful or have document_not_found error
+    const successfulModelRequestReplies = fieldReplies
+      .filter((r) => !isDefined(r.content.type) || r.content.type === "model-request")
       .filter(
         (r) =>
-          isDefined(r.content.error) &&
-          Array.isArray(r.content.error) &&
-          (!isDefined(r.content.type) || r.content.type === "model-request") &&
-          r.content.error[0]?.reason !== "document_not_found" &&
-          r.parent_petition_field_reply_id === parentReplyId &&
-          r.status !== "APPROVED",
-      )
-      .map((r) => r.content.request);
+          !isDefined(r.content.error) ||
+          (Array.isArray(r.content.error) && r.content.error[0]?.reason === "document_not_found"),
+      );
 
+    // on original configured model requests, get only those that don't have a successful reply with the same request
+    const requests = (field?.options.requests ?? []).filter(
+      (request: any) =>
+        !successfulModelRequestReplies
+          .map((r) => JSON.stringify(r.content.request.model))
+          .includes(JSON.stringify(request.model)),
+    );
+
+    const successfulIdentityVerificationReply = fieldReplies.find(
+      (r) => r.content.type === "identity-verification" && !isDefined(r.content.error),
+    );
+
+    // if identity-verification was configured and there's no successful reply, retry with the same configuration
     const identityVerification =
-      fieldReplies.find(
-        (r) =>
-          (isDefined(r.content.error) || isDefined(r.content.warning)) &&
-          r.content.type === "identity-verification" &&
-          r.parent_petition_field_reply_id === parentReplyId &&
-          r.status !== "APPROVED",
-      )?.content.request ?? null;
+      isDefined(field?.options.identityVerification) &&
+      !isDefined(successfulIdentityVerificationReply)
+        ? field!.options.identityVerification
+        : null;
 
     const orgId = fromGlobalId(metadata.orgId, "Organization").id;
     const customization = await this.buildBankflipCustomization(orgId);
