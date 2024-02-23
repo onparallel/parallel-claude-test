@@ -32,7 +32,7 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
         name: "CreatePetitionVariableInput",
         definition(t) {
           t.nonNull.string("name");
-          t.nonNull.int("defaultValue");
+          t.nonNull.float("defaultValue");
         },
       }),
     ),

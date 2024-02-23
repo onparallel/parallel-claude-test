@@ -1368,7 +1368,7 @@ export const PetitionVariable = objectType({
   name: "PetitionVariable",
   definition(t) {
     t.nonNull.string("name");
-    t.nonNull.int("defaultValue", { resolve: (o) => o.default_value });
+    t.nonNull.float("defaultValue", { resolve: (o) => o.default_value });
   },
   sourceType: /* ts */ `{
     name: string;
@@ -1380,7 +1380,7 @@ export const PetitionVariableResult = objectType({
   name: "PetitionVariableResult",
   definition(t) {
     t.nonNull.string("name");
-    t.nullable.int("value", { resolve: (o) => o.value });
+    t.nullable.float("value", { resolve: (o) => o.value });
   },
   sourceType: /* ts */ `{
     name: string;

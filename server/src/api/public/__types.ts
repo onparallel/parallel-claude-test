@@ -345,7 +345,7 @@ export type CreatePetitionFieldReplyInput = {
 };
 
 export type CreatePetitionVariableInput = {
-  defaultValue: Scalars["Int"]["input"];
+  defaultValue: Scalars["Float"]["input"];
   name: Scalars["String"]["input"];
 };
 
@@ -805,7 +805,7 @@ export type Mutation = {
   createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
-  /** Create parallel. */
+  /** Create parallel */
   createPetition: PetitionBase;
   /** Creates a contactless petition access */
   createPetitionAccess: PetitionAccess;

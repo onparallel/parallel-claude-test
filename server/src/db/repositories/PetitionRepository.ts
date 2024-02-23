@@ -7614,7 +7614,7 @@ export class PetitionRepository extends BaseRepository {
       /* sql */ `
         update petition
         set 
-          variables = coalesce(variables, '[]') || jsonb_build_object('name', ?::text, 'default_value', ?::int),
+          variables = coalesce(variables, '[]') || jsonb_build_object('name', ?::text, 'default_value', ?::float),
           last_change_at = now(),
           updated_at = now(),
           updated_by = ?

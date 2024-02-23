@@ -130,7 +130,7 @@ export interface NexusGenInputs {
   };
   CreatePetitionVariableInput: {
     // input type
-    defaultValue: number; // Int!
+    defaultValue: number; // Float!
     name: string; // String!
   };
   CreateProfileTypeFieldInput: {
@@ -2673,13 +2673,13 @@ export interface NexusGenFieldTypes {
   };
   PetitionVariable: {
     // field return type
-    defaultValue: number; // Int!
+    defaultValue: number; // Float!
     name: string; // String!
   };
   PetitionVariableResult: {
     // field return type
     name: string; // String!
-    value: number | null; // Int
+    value: number | null; // Float
   };
   Profile: {
     // field return type
@@ -5050,13 +5050,13 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionVariable: {
     // field return type name
-    defaultValue: "Int";
+    defaultValue: "Float";
     name: "String";
   };
   PetitionVariableResult: {
     // field return type name
     name: "String";
-    value: "Int";
+    value: "Float";
   };
   Profile: {
     // field return type name

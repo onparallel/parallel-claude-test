@@ -345,7 +345,7 @@ export type CreatePetitionFieldReplyInput = {
 };
 
 export type CreatePetitionVariableInput = {
-  defaultValue: Scalars["Int"]["input"];
+  defaultValue: Scalars["Float"]["input"];
   name: Scalars["String"]["input"];
 };
 
@@ -805,7 +805,7 @@ export type Mutation = {
   createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
-  /** Create parallel. */
+  /** Create parallel */
   createPetition: PetitionBase;
   /** Creates a contactless petition access */
   createPetitionAccess: PetitionAccess;
@@ -5597,9 +5597,9 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
           }> | null;
         };
         replies: Array<{
-          content: { [key: string]: any };
           id: string;
           status: PetitionFieldReplyStatus;
+          content: { [key: string]: any };
           metadata: { [key: string]: any };
           isAnonymized: boolean;
           repliedAt: string | null;
@@ -5719,9 +5719,9 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
           }> | null;
         };
         replies: Array<{
-          content: { [key: string]: any };
           id: string;
           status: PetitionFieldReplyStatus;
+          content: { [key: string]: any };
           metadata: { [key: string]: any };
           isAnonymized: boolean;
           repliedAt: string | null;
@@ -5999,9 +5999,9 @@ export type PetitionExport_petitionQuery = {
                 }> | null;
               };
               replies: Array<{
-                content: { [key: string]: any };
                 id: string;
                 status: PetitionFieldReplyStatus;
+                content: { [key: string]: any };
                 metadata: { [key: string]: any };
                 isAnonymized: boolean;
                 repliedAt: string | null;
@@ -6126,9 +6126,9 @@ export type PetitionExport_petitionQuery = {
                 }> | null;
               };
               replies: Array<{
-                content: { [key: string]: any };
                 id: string;
                 status: PetitionFieldReplyStatus;
+                content: { [key: string]: any };
                 metadata: { [key: string]: any };
                 isAnonymized: boolean;
                 repliedAt: string | null;
