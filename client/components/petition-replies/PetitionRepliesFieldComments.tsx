@@ -4,6 +4,7 @@ import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
 import {
+  PetitionRepliesFieldComments_PetitionBaseFragment,
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PetitionRepliesFieldComments_petitionFieldQueryDocument,
 } from "@parallel/graphql/__types";
@@ -24,7 +25,7 @@ import {
 } from "../petition-common/PetitionCommentsAndNotesEditor";
 
 export interface PetitionRepliesFieldCommentsProps {
-  petitionId: string;
+  petition: PetitionRepliesFieldComments_PetitionBaseFragment;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
   onAddComment: (content: any, isNote: boolean) => Promise<void>;
   onDeleteComment: (petitionFieldCommentId: string) => void;
@@ -39,7 +40,7 @@ export const PetitionRepliesFieldComments = Object.assign(
   chakraForwardRef<"section", PetitionRepliesFieldCommentsProps>(
     function PetitionRepliesFieldComments(
       {
-        petitionId,
+        petition,
         field,
         onAddComment,
         onDeleteComment,
@@ -54,8 +55,11 @@ export const PetitionRepliesFieldComments = Object.assign(
     ) {
       const intl = useIntl();
 
-      const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
+      const hasCommentsEnabled = field.isInternal
+        ? false
+        : field.hasCommentsEnabled && petition.isInteractionWithRecipientsEnabled;
 
+      const petitionId = petition.id;
       const commentsRef = useRef<HTMLDivElement>(null);
       const editorRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
       const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
@@ -152,29 +156,31 @@ export const PetitionRepliesFieldComments = Object.assign(
                       <>
                         <Text color="gray.400">
                           <FormattedMessage
-                            id="petition-replies.field-comments.only-notes"
+                            id="component.petition-replies-field-comments.only-notes"
                             defaultMessage="This field only accepts notes"
                           />
                         </Text>
-                        <Text color="gray.400">
-                          <FormattedMessage
-                            id="petition-replies.field-comments.disabled-comments-2"
-                            defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                            values={{
-                              composeTab: intl.formatMessage({
-                                id: "petition.header.compose-tab",
-                                defaultMessage: "Compose",
-                              }),
-                              a: (chunks: any) => (
-                                <Link
-                                  href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                                >
-                                  {chunks}
-                                </Link>
-                              ),
-                            }}
-                          />
-                        </Text>
+                        {petition.isInteractionWithRecipientsEnabled ? (
+                          <Text color="gray.400">
+                            <FormattedMessage
+                              id="component.petition-replies-field-comments.enable-comments-settings"
+                              defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                              values={{
+                                composeTab: intl.formatMessage({
+                                  id: "petition.header.compose-tab",
+                                  defaultMessage: "Compose",
+                                }),
+                                a: (chunks: any) => (
+                                  <Link
+                                    href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                                  >
+                                    {chunks}
+                                  </Link>
+                                ),
+                              }}
+                            />
+                          </Text>
+                        ) : null}
                       </>
                     )}
                   </Stack>
@@ -225,6 +231,12 @@ export const PetitionRepliesFieldComments = Object.assign(
       User: gql`
         fragment PetitionRepliesFieldComments_User on User {
           id
+        }
+      `,
+      PetitionBase: gql`
+        fragment PetitionRepliesFieldComments_PetitionBase on PetitionBase {
+          id
+          isInteractionWithRecipientsEnabled
         }
       `,
       get PetitionField() {

@@ -26,8 +26,7 @@ import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  ConfirmPetitionSignersDialog_PetitionAccessFragment,
-  ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment,
+  ConfirmPetitionSignersDialog_PetitionFragment,
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_SignatureConfigFragment,
   ConfirmPetitionSignersDialog_UserFragment,
@@ -47,10 +46,9 @@ import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
-  accesses: ConfirmPetitionSignersDialog_PetitionAccessFragment[];
   signatureConfig: ConfirmPetitionSignersDialog_SignatureConfigFragment;
   isUpdate?: boolean;
-  previousSignatures?: ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment[];
+  petition: ConfirmPetitionSignersDialog_PetitionFragment;
 }
 
 export interface ConfirmPetitionSignersDialogResult {
@@ -92,7 +90,9 @@ export function ConfirmPetitionSignersDialog(
     defaultValues: {
       signers: otherSigners,
       message: null,
-      allowAdditionalSigners: props.signatureConfig.allowAdditionalSigners,
+      allowAdditionalSigners: props.petition.isInteractionWithRecipientsEnabled
+        ? props.signatureConfig.allowAdditionalSigners
+        : false,
     },
   });
 
@@ -105,7 +105,7 @@ export function ConfirmPetitionSignersDialog(
 
   const suggestions = uniqBy(
     [
-      ...(props.previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? [])
+      ...(props.petition.signatureRequests.flatMap((s) => s.signatureConfig.signers) ?? [])
         .filter(isDefined)
         .map((signer) => pick(signer, ["firstName", "lastName", "email"])),
       {
@@ -113,7 +113,7 @@ export function ConfirmPetitionSignersDialog(
         firstName: props.user.firstName ?? "",
         lastName: props.user.lastName,
       },
-      ...props.accesses
+      ...props.petition.accesses
         .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
         .map((a) => ({
           contactId: a.contact!.id,
@@ -203,7 +203,9 @@ export function ConfirmPetitionSignersDialog(
                 isPreset: true,
               })),
             ],
-            allowAdditionalSigners: !isMaxSignersReached && allowAdditionalSigners,
+            allowAdditionalSigners: props.petition.isInteractionWithRecipientsEnabled
+              ? !isMaxSignersReached && allowAdditionalSigners
+              : false,
           });
         }),
       }}
@@ -360,7 +362,8 @@ export function ConfirmPetitionSignersDialog(
             />
           </FormControl>
           {props.isUpdate ? (
-            !isMaxSignersReached && (
+            !isMaxSignersReached &&
+            props.petition.isInteractionWithRecipientsEnabled && (
               <Checkbox marginTop={4} colorScheme="primary" {...register("allowAdditionalSigners")}>
                 <HStack alignContent="center">
                   <FormattedMessage
@@ -431,59 +434,71 @@ export function ConfirmPetitionSignersDialog(
 }
 
 ConfirmPetitionSignersDialog.fragments = {
-  User: gql`
-    fragment ConfirmPetitionSignersDialog_User on User {
-      id
-      email
-      firstName
-      lastName
-    }
-  `,
-  PetitionAccess: gql`
-    fragment ConfirmPetitionSignersDialog_PetitionAccess on PetitionAccess {
-      id
-      status
-      contact {
+  get User() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_User on User {
         id
         email
         firstName
         lastName
       }
-    }
-  `,
-  PetitionSigner: gql`
-    fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-      contactId
-      email
-      firstName
-      lastName
-      isPreset
-      ...SelectedSignerRow_PetitionSigner
-      ...SuggestedSigners_PetitionSigner
-    }
-    ${SelectedSignerRow.fragments.PetitionSigner}
-    ${SuggestedSigners.fragments.PetitionSigner}
-  `,
-  PetitionSignatureRequest: gql`
-    fragment ConfirmPetitionSignersDialog_PetitionSignatureRequest on PetitionSignatureRequest {
-      signatureConfig {
+    `;
+  },
+  get PetitionSigner() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+        contactId
+        email
+        firstName
+        lastName
+        isPreset
+        ...SelectedSignerRow_PetitionSigner
+        ...SuggestedSigners_PetitionSigner
+      }
+      ${SelectedSignerRow.fragments.PetitionSigner}
+      ${SuggestedSigners.fragments.PetitionSigner}
+    `;
+  },
+  get SignatureConfig() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
+        signingMode
+        minSigners
+        instructions
+        allowAdditionalSigners
         signers {
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
       }
-    }
-  `,
-  SignatureConfig: gql`
-    fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
-      signingMode
-      minSigners
-      instructions
-      allowAdditionalSigners
-      signers {
-        ...ConfirmPetitionSignersDialog_PetitionSigner
+      ${this.PetitionSigner}
+    `;
+  },
+  get Petition() {
+    return gql`
+      fragment ConfirmPetitionSignersDialog_Petition on Petition {
+        id
+        isInteractionWithRecipientsEnabled
+        accesses {
+          id
+          status
+          contact {
+            id
+            email
+            firstName
+            lastName
+          }
+        }
+        signatureRequests {
+          signatureConfig {
+            signers {
+              ...ConfirmPetitionSignersDialog_PetitionSigner
+            }
+          }
+        }
       }
-    }
-  `,
+      ${this.PetitionSigner}
+    `;
+  },
 };
 
 export function useConfirmPetitionSignersDialog() {

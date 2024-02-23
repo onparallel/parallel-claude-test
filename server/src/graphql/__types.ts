@@ -351,7 +351,10 @@ export interface NexusGenInputs {
     emailSubject?: string | null; // String
     isCompletingMessageEnabled?: boolean | null; // Boolean
     isDelegateAccessEnabled?: boolean | null; // Boolean
+    isDocumentGenerationEnabled?: boolean | null; // Boolean
+    isInteractionWithRecipientsEnabled?: boolean | null; // Boolean
     isRecipientViewContentsHidden?: boolean | null; // Boolean
+    isReviewFlowEnabled?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
     remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
@@ -2110,9 +2113,12 @@ export interface NexusGenFieldTypes {
     isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
     isDelegateAccessEnabled: boolean; // Boolean!
+    isDocumentGenerationEnabled: boolean; // Boolean!
+    isInteractionWithRecipientsEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
+    isReviewFlowEnabled: boolean; // Boolean!
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastChangeAt: NexusGenScalars["DateTime"]; // DateTime!
     lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -2617,10 +2623,13 @@ export interface NexusGenFieldTypes {
     isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
     isDelegateAccessEnabled: boolean; // Boolean!
+    isDocumentGenerationEnabled: boolean; // Boolean!
+    isInteractionWithRecipientsEnabled: boolean; // Boolean!
     isPublic: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
+    isReviewFlowEnabled: boolean; // Boolean!
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastChangeAt: NexusGenScalars["DateTime"]; // DateTime!
     lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -3597,9 +3606,12 @@ export interface NexusGenFieldTypes {
     isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
     isDelegateAccessEnabled: boolean; // Boolean!
+    isDocumentGenerationEnabled: boolean; // Boolean!
+    isInteractionWithRecipientsEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
+    isReviewFlowEnabled: boolean; // Boolean!
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastChangeAt: NexusGenScalars["DateTime"]; // DateTime!
     lastRecipientActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -4487,9 +4499,12 @@ export interface NexusGenFieldTypeNames {
     isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
     isDelegateAccessEnabled: "Boolean";
+    isDocumentGenerationEnabled: "Boolean";
+    isInteractionWithRecipientsEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
+    isReviewFlowEnabled: "Boolean";
     lastActivityAt: "DateTime";
     lastChangeAt: "DateTime";
     lastRecipientActivityAt: "DateTime";
@@ -4994,10 +5009,13 @@ export interface NexusGenFieldTypeNames {
     isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
     isDelegateAccessEnabled: "Boolean";
+    isDocumentGenerationEnabled: "Boolean";
+    isInteractionWithRecipientsEnabled: "Boolean";
     isPublic: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
+    isReviewFlowEnabled: "Boolean";
     lastActivityAt: "DateTime";
     lastChangeAt: "DateTime";
     lastRecipientActivityAt: "DateTime";
@@ -5974,9 +5992,12 @@ export interface NexusGenFieldTypeNames {
     isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
     isDelegateAccessEnabled: "Boolean";
+    isDocumentGenerationEnabled: "Boolean";
+    isInteractionWithRecipientsEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
+    isReviewFlowEnabled: "Boolean";
     lastActivityAt: "DateTime";
     lastChangeAt: "DateTime";
     lastRecipientActivityAt: "DateTime";

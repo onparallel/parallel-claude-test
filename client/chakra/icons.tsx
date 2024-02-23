@@ -2724,8 +2724,8 @@ export const CalculatorIcon = createIcon({
   ),
 });
 
-export const BackgroundCheckIcon = createIcon({
-  displayName: "BackgroundCheckIcon",
+export const ShortSearchIcon = createIcon({
+  displayName: "ShortSearchIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

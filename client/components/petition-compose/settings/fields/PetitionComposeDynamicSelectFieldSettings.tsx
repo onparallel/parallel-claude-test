@@ -24,13 +24,14 @@ import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettin
 import { SettingsRow } from "../rows/SettingsRow";
 
 export function PetitionComposeDynamicSelectFieldSettings({
-  petitionId,
+  petition,
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "petitionId" | "field" | "onFieldEdit" | "isReadOnly">) {
+}: Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
+  const petitionId = petition.id;
 
   function handleRemoveOptions() {
     onFieldEdit(field.id, { options: { labels: [], values: [], file: null } });

@@ -24,6 +24,7 @@ import {
   PetitionCommentsAndNotesEditorInstance,
 } from "@parallel/components/petition-common/PetitionCommentsAndNotesEditor";
 import {
+  PreviewPetitionFieldCommentsDialog_PetitionBaseFragment,
   PreviewPetitionFieldCommentsDialog_PetitionFieldFragment,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
   Tone,
@@ -43,7 +44,7 @@ import {
 import { Divider } from "../../common/Divider";
 
 interface PreviewPetitionFieldCommentsDialogProps {
-  petitionId: string;
+  petition: PreviewPetitionFieldCommentsDialog_PetitionBaseFragment;
   field: PreviewPetitionFieldCommentsDialog_PetitionFieldFragment;
   isTemplate?: boolean;
   tone: Tone;
@@ -52,7 +53,7 @@ interface PreviewPetitionFieldCommentsDialogProps {
 }
 
 export function PreviewPetitionFieldCommentsDialog({
-  petitionId,
+  petition,
   field,
   isTemplate,
   tone,
@@ -61,7 +62,7 @@ export function PreviewPetitionFieldCommentsDialog({
   ...props
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
-
+  const petitionId = petition.id;
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
     {
@@ -74,7 +75,9 @@ export function PreviewPetitionFieldCommentsDialog({
   const defaultMentionables = useGetDefaultMentionables(petitionId);
 
   const comments = data?.petitionField.comments ?? [];
-  const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
+  const hasCommentsEnabled = field.isInternal
+    ? false
+    : field.hasCommentsEnabled && petition.isInteractionWithRecipientsEnabled;
   const closeRef = useRef<HTMLButtonElement>(null);
   const editorRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
   const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
@@ -215,29 +218,31 @@ export function PreviewPetitionFieldCommentsDialog({
                     <>
                       <Text color="gray.400">
                         <FormattedMessage
-                          id="petition-replies.field-comments.only-notes"
+                          id="component.preview-petition-field-comments-dialog.only-notes"
                           defaultMessage="This field only accepts notes"
                         />
                       </Text>
-                      <Text color="gray.400">
-                        <FormattedMessage
-                          id="petition-replies.field-comments.disabled-comments-2"
-                          defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                          values={{
-                            composeTab: intl.formatMessage({
-                              id: "petition.header.compose-tab",
-                              defaultMessage: "Compose",
-                            }),
-                            a: (chunks: any) => (
-                              <Link
-                                href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                              >
-                                {chunks}
-                              </Link>
-                            ),
-                          }}
-                        />
-                      </Text>
+                      {petition.isInteractionWithRecipientsEnabled ? (
+                        <Text color="gray.400">
+                          <FormattedMessage
+                            id="component.preview-petition-field-comments-dialog.enable-comments-settings"
+                            defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                            values={{
+                              composeTab: intl.formatMessage({
+                                id: "petition.header.compose-tab",
+                                defaultMessage: "Compose",
+                              }),
+                              a: (chunks: any) => (
+                                <Link
+                                  href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                                >
+                                  {chunks}
+                                </Link>
+                              ),
+                            }}
+                          />
+                        </Text>
+                      ) : null}
                     </>
                   )}
                 </Stack>
@@ -304,6 +309,12 @@ export function usePreviewPetitionFieldCommentsDialog() {
 }
 
 PreviewPetitionFieldCommentsDialog.fragments = {
+  PetitionBase: gql`
+    fragment PreviewPetitionFieldCommentsDialog_PetitionBase on PetitionBase {
+      id
+      isInteractionWithRecipientsEnabled
+    }
+  `,
   PetitionField: gql`
     fragment PreviewPetitionFieldCommentsDialog_PetitionField on PetitionField {
       id

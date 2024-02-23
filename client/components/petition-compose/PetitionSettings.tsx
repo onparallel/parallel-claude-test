@@ -29,6 +29,7 @@ import {
   LockClosedIcon,
   LockOpenIcon,
   ShieldIcon,
+  ShortSearchIcon,
   SignatureIcon,
   TimeIcon,
   UserPlusIcon,
@@ -347,30 +348,6 @@ function _PetitionSettings({
     } catch {}
   };
 
-  const restrictEditingSwitch = (
-    <SettingsRowSwitch
-      isDisabled={isPublicTemplate || petition.isAnonymized || myEffectivePermission === "READ"}
-      icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
-      label={
-        <FormattedMessage
-          id="component.petition-settings.restrict-editing"
-          defaultMessage="Restrict editing"
-        />
-      }
-      description={
-        <FormattedMessage
-          id="component.petition-settings.restrict-editing-description"
-          defaultMessage="Enable this option to prevent users from accidentally making changes to this {isTemplate, select, true{template} other{parallel}}."
-          values={{ isTemplate: petition.__typename === "PetitionTemplate" }}
-        />
-      }
-      isChecked={petition.isRestricted}
-      onChange={handleRestrictPetition}
-      controlId="restrict-editing"
-      data-section="restrict-editing"
-    />
-  );
-
   const toast = useToast();
   const showConfigCompliancePeriodDialog = useCompliancePeriodDialog();
   const handleConfigCompliancePeriod = async (showDialog: boolean) => {
@@ -438,157 +415,465 @@ function _PetitionSettings({
 
   return (
     <Stack padding={4} spacing={2}>
+      <Heading as="h5" size="sm" marginY={1.5}>
+        <FormattedMessage
+          id="component.petition-settings.process-settings"
+          defaultMessage="Process settings"
+        />
+      </Heading>
+      <SettingsRowSwitch
+        isDisabled={isPublicTemplate || petition.isAnonymized || myEffectivePermission === "READ"}
+        icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
+        label={
+          <FormattedMessage
+            id="component.petition-settings.restrict-editing"
+            defaultMessage="Restrict editing"
+          />
+        }
+        description={
+          <FormattedMessage
+            id="component.petition-settings.restrict-editing-description"
+            defaultMessage="Enable this option to prevent users from accidentally making changes to this {isTemplate, select, true{template} other{parallel}}."
+            values={{ isTemplate: petition.__typename === "PetitionTemplate" }}
+          />
+        }
+        isChecked={petition.isRestricted}
+        onChange={handleRestrictPetition}
+        controlId="restrict-editing"
+        data-section="restrict-editing"
+      />
       {petition.__typename === "PetitionTemplate" ? (
-        <>
-          <Heading as="h5" size="sm" marginY={1.5}>
+        <SettingsRowSwitch
+          isDisabled={settingIsDisabled}
+          icon={<ShortSearchIcon />}
+          label={
             <FormattedMessage
-              id="component.petition-settings.adjustments-template"
-              defaultMessage="Template settings"
+              id="component.petition-settings.review-flow"
+              defaultMessage="Review flow"
+            />
+          }
+          description={
+            <>
+              <Text fontSize="sm" marginBottom={2}>
+                <FormattedMessage
+                  id="component.petition-settings.review-flow-description"
+                  defaultMessage="Enable this option if the process requires someone to review the answers."
+                />
+              </Text>
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-settings.help-us-tailor-options"
+                  defaultMessage="Disabling it will help us tailor the options your process needs."
+                />
+              </Text>
+            </>
+          }
+          isChecked={petition.isReviewFlowEnabled}
+          onChange={(value) => withError(onUpdatePetition({ isReviewFlowEnabled: value }))}
+          controlId="review-flow"
+        />
+      ) : null}
+
+      {petition.__typename === "PetitionTemplate" ? (
+        <SettingsRowButton
+          data-section="share-automatically"
+          isDisabled={settingIsDisabled}
+          icon={<ArrowShortRightIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.share-automatically"
+              defaultMessage="Assign automatically to"
+            />
+          }
+          description={
+            <FormattedMessage
+              id="component.petition-settings.share-automatically-description"
+              defaultMessage="Specify which users or teams the parallels created from this template are shared with."
+            />
+          }
+          controlId="share-automatically"
+          isActive={hasDefaultPermissions}
+          onAdd={() => handleUpdateTemplateDefaultPermissions(true)}
+          onRemove={() => handleUpdateTemplateDefaultPermissions(false)}
+          onConfig={() => handleUpdateTemplateDefaultPermissions(true)}
+        />
+      ) : null}
+
+      {petition.__typename === "PetitionTemplate" ? (
+        <SettingsRow
+          controlId="default-path"
+          isDisabled={settingIsDisabled}
+          icon={<FolderIcon />}
+          label={
+            <>
+              <FormattedMessage
+                id="component.petition-settings.default-path"
+                defaultMessage="Folder for created parallels:"
+              />{" "}
+              <PathName as="strong" type="PETITION" path={petition.defaultPath} />
+            </>
+          }
+        >
+          <Button
+            size="sm"
+            fontSize="md"
+            fontWeight={400}
+            id="default-path"
+            onClick={handleChangeDefaultPath}
+            isDisabled={
+              petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"
+            }
+          >
+            <FormattedMessage id="generic.change" defaultMessage="Change" />
+          </Button>
+        </SettingsRow>
+      ) : null}
+      {!petition.isDocumentGenerationEnabled &&
+      !petition.isInteractionWithRecipientsEnabled ? null : (
+        <SettingsRow
+          controlId="petition-locale"
+          isDisabled={settingIsDisabled}
+          icon={<EmailIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.locale-label"
+              defaultMessage="Communications language"
+            />
+          }
+        >
+          <Box>
+            <Select
+              size="sm"
+              borderRadius="md"
+              name="petition-locale"
+              minWidth="120px"
+              value={petition.locale}
+              onChange={(e) => withError(() => onUpdatePetition({ locale: e.target.value as any }))}
+            >
+              {locales.map((locale) => (
+                <option key={locale.key} value={locale.key}>
+                  {locale.localizedLabel}
+                </option>
+              ))}
+            </Select>
+          </Box>
+        </SettingsRow>
+      )}
+      <Divider />
+      <SettingsRowSwitch
+        isDisabled={settingIsDisabled || petition.__typename === "Petition"}
+        label={
+          <Heading as="h5" size="sm">
+            <FormattedMessage
+              id="component.petition-settings.interaction-with-recipients"
+              defaultMessage="Interaction with recipients"
             />
           </Heading>
-          {restrictEditingSwitch}
-          <SettingsRowButton
-            data-section="share-by-link"
-            isDisabled={
-              isPublicTemplate || petition.isRestricted || myEffectivePermission === "READ"
-            }
-            icon={<LinkIcon />}
-            label={<FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />}
-            description={
-              <FormattedMessage
-                id="component.petition-settings.share-by-link-description"
-                defaultMessage="Share an open link that allows your clients create parallels by themselves. They will be managed by the owner."
-              />
-            }
-            isActive={hasActivePublicLink}
-            onAdd={handleToggleShareByLink}
-            onRemove={handleToggleShareByLink}
-            onConfig={handleEditPublicPetitionLink}
-            controlId="share-by-link"
-          >
-            <InputGroup size="sm">
-              <Input
-                size="sm"
-                borderRadius="md"
-                type="text"
-                value={petition.publicLink?.url}
-                onChange={noop}
-              />
-              <InputRightAddon borderRadius="md" padding={0}>
-                <CopyToClipboardButton
-                  size="sm"
-                  border={"1px solid"}
-                  borderColor="inherit"
-                  borderLeftRadius={0}
-                  text={petition.publicLink?.url as string}
+        }
+        description={
+          petition.__typename === "Petition" ? (
+            <FormattedMessage
+              id="component.petition-settings.setting-determined-by-template"
+              defaultMessage="This setting is determined by the template and cannot be changed."
+            />
+          ) : (
+            <>
+              <Text fontSize="sm" marginBottom={2}>
+                <FormattedMessage
+                  id="component.petition-settings.interaction-with-recipients-description"
+                  defaultMessage="Enable this option if the process requires recipients to reply the form."
                 />
-              </InputRightAddon>
-            </InputGroup>
-          </SettingsRowButton>
-          <SettingsRow
-            controlId="template-document-theme"
-            isDisabled={
-              petition.isRestricted ||
-              petition.isAnonymized ||
-              isPublicTemplate ||
-              myEffectivePermission === "READ"
-            }
-            icon={<DocumentIcon />}
-            label={
-              <FormattedMessage
-                id="component.petition-settings.document-theme-label"
-                defaultMessage="Document theme"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="component.petition-settings.document-theme-popover"
-                defaultMessage="Select the theme to be used in the document. You can design your themes in the <Link>Document Branding</Link>"
-                values={{
-                  Link: (chunks: any[]) => (
-                    <NormalLink
-                      role="a"
-                      href={`/${intl.locale}/app/organization/branding?style=document`}
-                      target="_blank"
-                    >
-                      {chunks}
-                    </NormalLink>
-                  ),
-                }}
-              />
-            }
-          >
-            <Box>
-              <Select
-                size="sm"
-                borderRadius="md"
-                minWidth="120px"
-                value={petition.selectedDocumentTheme.id}
-                onChange={(event) => handleUpdateTemplateDocumentTheme(event.target.value)}
+              </Text>
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-settings.help-us-tailor-options"
+                  defaultMessage="Disabling it will help us tailor the options your process needs."
+                />
+              </Text>
+            </>
+          )
+        }
+        isChecked={petition.isInteractionWithRecipientsEnabled}
+        onChange={(value) => {
+          withError(
+            onUpdatePetition({
+              isInteractionWithRecipientsEnabled: value,
+              remindersConfig: null,
+            }),
+          );
+        }}
+        controlId="interaction-with-recipients"
+      />
+
+      {petition.isInteractionWithRecipientsEnabled ? (
+        <>
+          {petition.__typename === "PetitionTemplate" ? (
+            <>
+              <SettingsRowButton
+                data-section="share-by-link"
+                isDisabled={settingIsDisabled}
+                icon={<LinkIcon />}
+                label={
+                  <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
+                }
+                description={
+                  <FormattedMessage
+                    id="component.petition-settings.share-by-link-description"
+                    defaultMessage="Share an open link that allows your clients create parallels by themselves. They will be managed by the owner."
+                  />
+                }
+                isActive={hasActivePublicLink}
+                onAdd={handleToggleShareByLink}
+                onRemove={handleToggleShareByLink}
+                onConfig={handleEditPublicPetitionLink}
+                controlId="share-by-link"
               >
-                {user.organization.pdfDocumentThemes.map((theme) => (
-                  <option key={theme.id} value={theme.id}>
-                    {theme.name}
-                  </option>
-                ))}
-              </Select>
-            </Box>
-          </SettingsRow>
-          <Divider paddingTop={2} />
+                <InputGroup size="sm">
+                  <Input
+                    size="sm"
+                    borderRadius="md"
+                    type="text"
+                    value={petition.publicLink?.url}
+                    onChange={noop}
+                  />
+                  <InputRightAddon borderRadius="md" padding={0}>
+                    <CopyToClipboardButton
+                      size="sm"
+                      border={"1px solid"}
+                      borderColor="inherit"
+                      borderLeftRadius={0}
+                      text={petition.publicLink?.url as string}
+                    />
+                  </InputRightAddon>
+                </InputGroup>
+              </SettingsRowButton>
+              <SettingsRowButton
+                isDisabled={settingIsDisabled}
+                icon={<BellSettingsIcon />}
+                label={
+                  <FormattedMessage
+                    id="component.petition-settings.automatic-reminders"
+                    defaultMessage="Automatic reminders"
+                  />
+                }
+                isActive={Boolean(petition.remindersConfig)}
+                onAdd={() => handleAutomaticReminders(true)}
+                onRemove={() => handleAutomaticReminders(false)}
+                onConfig={() => handleConfigureAutomaticReminders()}
+                controlId="automatic-reminders"
+              />
+            </>
+          ) : null}
+          {user.hasSkipForwardSecurity ? (
+            <SettingsRowSwitch
+              isDisabled={settingIsDisabled}
+              icon={<ShieldIcon />}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.skip-forward-security"
+                  defaultMessage="Disable Forward Security"
+                />
+              }
+              description={
+                <FormattedMessage
+                  id="component.petition-settings.forward-security-description"
+                  defaultMessage="Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
+                />
+              }
+              isChecked={petition.skipForwardSecurity}
+              onChange={handleSkipForwardSecurityChange}
+              controlId="disable-forward-security"
+            />
+          ) : null}
+          {user.hasHideRecipientViewContents ? (
+            <SettingsRowSwitch
+              isDisabled={settingIsDisabled}
+              icon={<ListIcon />}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.hide-recipient-view-contents"
+                  defaultMessage="Hide recipient view contents"
+                />
+              }
+              description={
+                <FormattedMessage
+                  id="component.petition-settings.hide-recipient-view-contents-description"
+                  defaultMessage="By enabling this, the contents card in the recipient view will be hidden."
+                />
+              }
+              isChecked={petition.isRecipientViewContentsHidden}
+              onChange={(value) =>
+                withError(onUpdatePetition({ isRecipientViewContentsHidden: value }))
+              }
+              controlId="hide-recipient-view-contents"
+            />
+          ) : null}
+          {user.hasSettingDelegateAccess ? (
+            <SettingsRowSwitch
+              isDisabled={settingIsDisabled}
+              icon={<UserPlusIcon />}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.delegate-access"
+                  defaultMessage="Allow inviting collaborators"
+                />
+              }
+              description={
+                <FormattedMessage
+                  id="component.petition-settings.delegate-access-description"
+                  defaultMessage="By enabling this, the recipient can invite a collaborator to help them respond."
+                />
+              }
+              isChecked={petition.isDelegateAccessEnabled}
+              onChange={(value) => withError(onUpdatePetition({ isDelegateAccessEnabled: value }))}
+              controlId="delegate-access"
+            />
+          ) : null}
+        </>
+      ) : null}
+      <Divider />
+      <SettingsRowSwitch
+        isDisabled={settingIsDisabled || petition.__typename === "Petition"}
+        label={
+          <Heading as="h5" size="sm">
+            <FormattedMessage
+              id="component.petition-settings.document-generation"
+              defaultMessage="Document generation"
+            />
+          </Heading>
+        }
+        description={
+          petition.__typename === "Petition" ? (
+            <FormattedMessage
+              id="component.petition-settings.setting-determined-by-template"
+              defaultMessage="This setting is determined by the template and cannot be changed."
+            />
+          ) : (
+            <>
+              <Text fontSize="sm" marginBottom={2}>
+                <FormattedMessage
+                  id="component.petition-settings.document-generation-description"
+                  defaultMessage="Enable this option if the process requires the generation of a document."
+                />
+              </Text>
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-settings.help-us-tailor-options"
+                  defaultMessage="Disabling it will help us tailor the options your process needs."
+                />
+              </Text>
+            </>
+          )
+        }
+        isChecked={petition.isDocumentGenerationEnabled}
+        onChange={(value) =>
+          withError(onUpdatePetition({ isDocumentGenerationEnabled: value, signatureConfig: null }))
+        }
+        controlId="interaction-with-recipients"
+      />
+      {petition.isDocumentGenerationEnabled ? (
+        <>
+          {petition.__typename === "PetitionTemplate" ? (
+            <SettingsRow
+              controlId="template-document-theme"
+              isDisabled={settingIsDisabled}
+              icon={<DocumentIcon />}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.document-theme-label"
+                  defaultMessage="Document theme"
+                />
+              }
+              description={
+                <FormattedMessage
+                  id="component.petition-settings.document-theme-popover"
+                  defaultMessage="Select the theme to be used in the document. You can design your themes in the <Link>Document Branding</Link>"
+                  values={{
+                    Link: (chunks: any[]) => (
+                      <NormalLink
+                        role="a"
+                        href={`/${intl.locale}/app/organization/branding?style=document`}
+                        target="_blank"
+                      >
+                        {chunks}
+                      </NormalLink>
+                    ),
+                  }}
+                />
+              }
+            >
+              <Box>
+                <Select
+                  size="sm"
+                  borderRadius="md"
+                  minWidth="120px"
+                  value={petition.selectedDocumentTheme.id}
+                  onChange={(event) => handleUpdateTemplateDocumentTheme(event.target.value)}
+                >
+                  {user.organization.pdfDocumentThemes.map((theme) => (
+                    <option key={theme.id} value={theme.id}>
+                      {theme.name}
+                    </option>
+                  ))}
+                </Select>
+              </Box>
+            </SettingsRow>
+          ) : null}
+
+          {petition.signatureConfig || hasSignature ? (
+            <SettingsRowButton
+              data-section="esignature-settings"
+              isDisabled={!hasSignature || settingIsDisabled}
+              icon={<SignatureIcon />}
+              label={
+                <HStack>
+                  <Text as="span">
+                    <FormattedMessage
+                      id="component.petition-settings.petition-signature-enable"
+                      defaultMessage="eSignature process"
+                    />
+                  </Text>
+                  <HelpPopover popoverWidth="2xs">
+                    <FormattedMessage
+                      id="component.petition-settings.signature-description"
+                      defaultMessage="Generates a document and initiates an eSignature process upon completion of the parallel, through one of our integrated providers."
+                    />
+                  </HelpPopover>
+                  {petition.signatureConfig?.integration?.environment === "DEMO" ||
+                  hasDemoSignature ? (
+                    <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
+                  ) : null}
+                </HStack>
+              }
+              isActive={Boolean(petition.signatureConfig)}
+              onAdd={() => handleSignatureChange(true)}
+              onRemove={() => handleSignatureChange(false)}
+              onConfig={() => handleConfigureSignatureClick()}
+              controlId="enable-esignature"
+            />
+          ) : null}
+        </>
+      ) : null}
+      {petition.__typename === "Petition" || user.hasAutoAnonymize ? (
+        <>
+          <Divider />
           <Heading as="h5" size="sm" paddingTop={2.5} paddingBottom={1.5}>
             <FormattedMessage
-              id="component.petition-settings.adjustments-for-parallels"
-              defaultMessage="Settings for parallels"
+              id="component.petition-settings.closing-settings"
+              defaultMessage="Closing settings"
             />
           </Heading>
         </>
-      ) : (
-        <Heading as="h5" size="sm" marginY={1.5}>
-          <FormattedMessage
-            id="component.petition-settings.adjustments-parallels"
-            defaultMessage="Parallel settings"
-          />
-        </Heading>
-      )}
-      <SettingsRow
-        controlId="petition-locale"
-        isDisabled={
-          petition.isRestricted ||
-          isPublicTemplate ||
-          petition.isAnonymized ||
-          myEffectivePermission === "READ"
-        }
-        icon={<EmailIcon />}
-        label={
-          <FormattedMessage
-            id="component.petition-settings.locale-label"
-            defaultMessage="Communications language"
-          />
-        }
-      >
-        <Box>
-          <Select
-            size="sm"
-            borderRadius="md"
-            name="petition-locale"
-            minWidth="120px"
-            value={petition.locale}
-            onChange={(e) => withError(() => onUpdatePetition({ locale: e.target.value as any }))}
-          >
-            {locales.map((locale) => (
-              <option key={locale.key} value={locale.key}>
-                {locale.localizedLabel}
-              </option>
-            ))}
-          </Select>
-        </Box>
-      </SettingsRow>
+      ) : null}
+
       {petition.__typename === "Petition" ? (
         <SettingsRow
           controlId="petition-deadline"
           isActive={Boolean(petition.deadline)}
           icon={<FieldDateIcon />}
-          isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+          isDisabled={
+            petition.isAnonymized || petition.isAnonymized || myEffectivePermission === "READ"
+          }
           label={
             <FormattedMessage
               id="component.petition-settings.deadline-label"
@@ -610,80 +895,7 @@ function _PetitionSettings({
           />
         </SettingsRow>
       ) : null}
-      {petition.__typename === "PetitionTemplate" ? (
-        <SettingsRowButton
-          data-section="share-automatically"
-          isDisabled={isPublicTemplate || petition.isRestricted || myEffectivePermission === "READ"}
-          icon={<ArrowShortRightIcon />}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.share-automatically"
-              defaultMessage="Assign automatically to"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="component.petition-settings.share-automatically-description"
-              defaultMessage="Specify which users or teams the parallels created from this template are shared with."
-            />
-          }
-          controlId="share-automatically"
-          isActive={hasDefaultPermissions}
-          onAdd={() => handleUpdateTemplateDefaultPermissions(true)}
-          onRemove={() => handleUpdateTemplateDefaultPermissions(false)}
-          onConfig={() => handleUpdateTemplateDefaultPermissions(true)}
-        />
-      ) : (
-        restrictEditingSwitch
-      )}
-      {petition.signatureConfig || hasSignature ? (
-        <SettingsRowButton
-          data-section="esignature-settings"
-          isDisabled={!hasSignature || settingIsDisabled}
-          icon={<SignatureIcon />}
-          label={
-            <HStack>
-              <Text as="span">
-                <FormattedMessage
-                  id="component.petition-settings.petition-signature-enable"
-                  defaultMessage="eSignature process"
-                />
-              </Text>
-              <HelpPopover popoverWidth="2xs">
-                <FormattedMessage
-                  id="component.petition-settings.signature-description"
-                  defaultMessage="Generates a document and initiates an eSignature process upon completion of the parallel, through one of our integrated providers."
-                />
-              </HelpPopover>
-              {petition.signatureConfig?.integration?.environment === "DEMO" || hasDemoSignature ? (
-                <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
-              ) : null}
-            </HStack>
-          }
-          isActive={Boolean(petition.signatureConfig)}
-          onAdd={() => handleSignatureChange(true)}
-          onRemove={() => handleSignatureChange(false)}
-          onConfig={() => handleConfigureSignatureClick()}
-          controlId="enable-esignature"
-        />
-      ) : null}
-      {petition.__typename === "PetitionTemplate" ? (
-        <SettingsRowButton
-          isDisabled={settingIsDisabled}
-          icon={<BellSettingsIcon />}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.automatic-reminders"
-              defaultMessage="Automatic reminders"
-            />
-          }
-          isActive={Boolean(petition.remindersConfig)}
-          onAdd={() => handleAutomaticReminders(true)}
-          onRemove={() => handleAutomaticReminders(false)}
-          onConfig={() => handleConfigureAutomaticReminders()}
-          controlId="automatic-reminders"
-        />
-      ) : null}
+
       {user.hasAutoAnonymize ? (
         <SettingsRowButton
           isDisabled={
@@ -713,119 +925,31 @@ function _PetitionSettings({
           onRemove={() => handleConfigCompliancePeriod(false)}
         />
       ) : null}
-      {user.hasSkipForwardSecurity ? (
-        <SettingsRowSwitch
-          isDisabled={settingIsDisabled}
-          icon={<ShieldIcon />}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.skip-forward-security"
-              defaultMessage="Disable Forward Security"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="component.petition-settings.forward-security-description"
-              defaultMessage="Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
-            />
-          }
-          isChecked={petition.skipForwardSecurity}
-          onChange={handleSkipForwardSecurityChange}
-          controlId="disable-forward-security"
-        />
-      ) : null}
-      {user.hasHideRecipientViewContents ? (
-        <SettingsRowSwitch
-          isDisabled={settingIsDisabled}
-          icon={<ListIcon />}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.hide-recipient-view-contents"
-              defaultMessage="Hide recipient view contents"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="component.petition-settings.hide-recipient-view-contents-description"
-              defaultMessage="By enabling this, the contents card in the recipient view will be hidden."
-            />
-          }
-          isChecked={petition.isRecipientViewContentsHidden}
-          onChange={(value) =>
-            withError(onUpdatePetition({ isRecipientViewContentsHidden: value }))
-          }
-          controlId="hide-recipient-view-contents"
-        />
-      ) : null}
-      {user.hasSettingDelegateAccess ? (
-        <SettingsRowSwitch
-          isDisabled={settingIsDisabled}
-          icon={<UserPlusIcon />}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.delegate-access"
-              defaultMessage="Allow inviting collaborators"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="component.petition-settings.delegate-access-description"
-              defaultMessage="By enabling this, the recipient can invite a collaborator to help them respond."
-            />
-          }
-          isChecked={petition.isDelegateAccessEnabled}
-          onChange={(value) => withError(onUpdatePetition({ isDelegateAccessEnabled: value }))}
-          controlId="delegate-access"
-        />
-      ) : null}
+
       {petition.__typename === "Petition" && petition.fromTemplate ? (
-        <Alert status="info" background="transparent" padding={0}>
-          <AlertIcon />
-          <AlertDescription fontStyle="italic">
-            <FormattedMessage
-              id="component.petition-settings.from-template-information"
-              defaultMessage="Parallel created from the {name}."
-              values={{
-                name: (
-                  <Text textStyle={petition.fromTemplate.name ? undefined : "hint"} as="span">
-                    {petition.fromTemplate.name ??
-                      intl.formatMessage({
-                        id: "generic.unnamed-template",
-                        defaultMessage: "Unnamed template",
-                      })}
-                  </Text>
-                ),
-              }}
-            />
-          </AlertDescription>
-        </Alert>
-      ) : null}
-      {petition.__typename === "PetitionTemplate" ? (
-        <SettingsRow
-          controlId="default-path"
-          isDisabled={petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"}
-          icon={<FolderIcon />}
-          label={
-            <>
+        <>
+          <Divider />
+          <Alert status="info" background="transparent" padding={0}>
+            <AlertIcon />
+            <AlertDescription fontStyle="italic">
               <FormattedMessage
-                id="component.petition-settings.default-path"
-                defaultMessage="Folder for created parallels:"
-              />{" "}
-              <PathName as="strong" type="PETITION" path={petition.defaultPath} />
-            </>
-          }
-        >
-          <Button
-            size="sm"
-            id="default-path"
-            onClick={handleChangeDefaultPath}
-            isDisabled={
-              petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"
-            }
-          >
-            <FormattedMessage id="generic.change" defaultMessage="Change" />
-          </Button>
-        </SettingsRow>
+                id="component.petition-settings.from-template-information"
+                defaultMessage="Parallel created from the {name}."
+                values={{
+                  name: (
+                    <Text textStyle={petition.fromTemplate.name ? undefined : "hint"} as="span">
+                      {petition.fromTemplate.name ??
+                        intl.formatMessage({
+                          id: "generic.unnamed-template",
+                          defaultMessage: "Unnamed template",
+                        })}
+                    </Text>
+                  ),
+                }}
+              />
+            </AlertDescription>
+          </Alert>
+        </>
       ) : null}
     </Stack>
   );
@@ -870,6 +994,9 @@ const fragments = {
       locale
       skipForwardSecurity
       isDelegateAccessEnabled
+      isInteractionWithRecipientsEnabled
+      isReviewFlowEnabled
+      isDocumentGenerationEnabled
       isRecipientViewContentsHidden
       isRestricted
       isRestrictedWithPassword

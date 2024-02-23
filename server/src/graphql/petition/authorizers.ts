@@ -113,6 +113,9 @@ export const petitionsArePublicTemplates = createPetitionAuthorizer(
 export const petitionsAreNotPublicTemplates = createPetitionAuthorizer((p) => !p.template_public);
 
 export const petitionsAreOfTypePetition = createPetitionAuthorizer((p) => !p.is_template);
+export const petitionsHaveEnabledInteractionWithRecipients = createPetitionAuthorizer(
+  (p) => p.enable_interaction_with_recipients,
+);
 export const petitionsAreOfTypeTemplate = createPetitionAuthorizer((p) => p.is_template);
 
 export function fieldIsNotFixed<

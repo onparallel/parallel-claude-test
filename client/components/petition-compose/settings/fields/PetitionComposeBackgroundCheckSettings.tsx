@@ -12,15 +12,15 @@ import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettin
 import { SettingsRowButton } from "../rows/SettingsRowButton";
 
 export function PetitionComposeBackgroundCheckSettings({
-  petitionId,
+  petition,
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "petitionId" | "field" | "onFieldEdit" | "isReadOnly">) {
+}: Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
   const options = field.options as FieldOptions["BACKGROUND_CHECK"];
   const isDisabled = isReadOnly || field.isFixed;
-
+  const petitionId = petition.id;
   const providers = [] as {
     value: string;
     label: string;

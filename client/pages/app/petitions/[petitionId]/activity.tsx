@@ -421,17 +421,20 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         ) : null
       }
     >
-      <PetitionAccessesTable
-        id="petition-accesses"
-        margin={4}
-        petition={petition}
-        onSendReminders={handleSendReminders}
-        onAddPetitionAccess={handleNextClick({ redirect: false })}
-        onReactivateAccess={handleReactivateAccess}
-        onDeactivateAccess={handleDeactivateAccess}
-        onConfigureReminders={handleConfigureReminders}
-        onPetitionSend={handleNextClick({ redirect: true })}
-      />
+      {petition.isInteractionWithRecipientsEnabled ? (
+        <PetitionAccessesTable
+          id="petition-accesses"
+          margin={4}
+          petition={petition}
+          onSendReminders={handleSendReminders}
+          onAddPetitionAccess={handleNextClick({ redirect: false })}
+          onReactivateAccess={handleReactivateAccess}
+          onDeactivateAccess={handleDeactivateAccess}
+          onConfigureReminders={handleConfigureReminders}
+          onPetitionSend={handleNextClick({ redirect: true })}
+        />
+      ) : null}
+
       {me.hasProfilesAccess ? (
         <Box margin={4}>
           <PetitionProfilesTable
@@ -456,6 +459,7 @@ const _fragments = {
   Petition: gql`
     fragment PetitionActivity_Petition on Petition {
       id
+      isInteractionWithRecipientsEnabled
       accesses {
         id
         status

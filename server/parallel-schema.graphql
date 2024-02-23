@@ -2997,11 +2997,26 @@ type Petition implements PetitionBase {
   isDelegateAccessEnabled: Boolean!
 
   """
+  TODO: add description
+  """
+  isDocumentGenerationEnabled: Boolean!
+
+  """
+  TODO: add description
+  """
+  isInteractionWithRecipientsEnabled: Boolean!
+
+  """
   Whether the contents card is hidden in the recipient view.
   """
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
+
+  """
+  TODO: add description
+  """
+  isReviewFlowEnabled: Boolean!
   lastActivityAt: DateTime
 
   """
@@ -3337,11 +3352,26 @@ interface PetitionBase {
   isDelegateAccessEnabled: Boolean!
 
   """
+  TODO: add description
+  """
+  isDocumentGenerationEnabled: Boolean!
+
+  """
+  TODO: add description
+  """
+  isInteractionWithRecipientsEnabled: Boolean!
+
+  """
   Whether the contents card is hidden in the recipient view.
   """
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
+
+  """
+  TODO: add description
+  """
+  isReviewFlowEnabled: Boolean!
   lastActivityAt: DateTime @deprecated(reason: "")
 
   """
@@ -4732,6 +4762,16 @@ type PetitionTemplate implements PetitionBase {
   isDelegateAccessEnabled: Boolean!
 
   """
+  TODO: add description
+  """
+  isDocumentGenerationEnabled: Boolean!
+
+  """
+  TODO: add description
+  """
+  isInteractionWithRecipientsEnabled: Boolean!
+
+  """
   Whether the template is publicly available or not
   """
   isPublic: Boolean!
@@ -4742,6 +4782,11 @@ type PetitionTemplate implements PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
+
+  """
+  TODO: add description
+  """
+  isReviewFlowEnabled: Boolean!
   lastActivityAt: DateTime @deprecated(reason: "")
 
   """
@@ -6984,7 +7029,10 @@ input UpdatePetitionInput {
   emailSubject: String
   isCompletingMessageEnabled: Boolean
   isDelegateAccessEnabled: Boolean
+  isDocumentGenerationEnabled: Boolean
+  isInteractionWithRecipientsEnabled: Boolean
   isRecipientViewContentsHidden: Boolean
+  isReviewFlowEnabled: Boolean
   locale: PetitionLocale
   name: String
   remindersConfig: RemindersConfigInput

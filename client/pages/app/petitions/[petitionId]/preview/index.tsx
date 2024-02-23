@@ -78,6 +78,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
+import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { withMetadata } from "@parallel/utils/withMetadata";
@@ -270,10 +271,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
-              accesses: petition.accesses,
               user: me,
               signatureConfig: petition.signatureConfig,
-              previousSignatures: petition.signatureRequests,
+              petition,
             });
           }
 
@@ -410,6 +410,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
   }, []);
 
+  const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
+    user: me,
+    petition: petition.__typename === "Petition" ? petition : (null as never),
+    onRefetch: refetch,
+  });
+
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
@@ -422,7 +428,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         section="preview"
         headerActions={
           isPetition &&
-          !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) ? (
+          !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) &&
+          petition.isInteractionWithRecipientsEnabled ? (
             <ResponsiveButtonIcon
               data-action="preview-next"
               id="petition-next"
@@ -435,6 +442,19 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               })}
               onClick={handleNextClick}
             />
+          ) : isPetition &&
+            petition.signatureConfig &&
+            !petition.isInteractionWithRecipientsEnabled &&
+            petition.isDocumentGenerationEnabled ? (
+            <Button
+              data-action="preview-start-signature"
+              id="petition-start-signature"
+              colorScheme="primary"
+              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+              onClick={handleStartSignature}
+            >
+              {buttonLabel}
+            </Button>
           ) : null
         }
         subHeader={
@@ -667,6 +687,8 @@ const _fragments = {
   PetitionBase: gql`
     fragment PetitionPreview_PetitionBase on PetitionBase {
       id
+      isInteractionWithRecipientsEnabled
+      isDocumentGenerationEnabled
       organization {
         id
         brandTheme {
@@ -679,17 +701,15 @@ const _fragments = {
         permissionType
       }
       ... on Petition {
+        ...useStartSignatureRequest_Petition
+        ...ConfirmPetitionSignersDialog_Petition
         accesses {
           id
           status
           isContactless
-          ...ConfirmPetitionSignersDialog_PetitionAccess
         }
         ...RecipientViewProgressFooter_Petition
         ...useSendPetitionHandler_Petition
-        signatureRequests {
-          ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
-        }
       }
       ... on PetitionTemplate {
         ...GeneratePrefilledPublicLinkDialog_PetitionTemplate
@@ -729,9 +749,6 @@ const _fragments = {
       signatureConfig {
         review
         timezone
-        signers {
-          ...ConfirmPetitionSignersDialog_PetitionSigner
-        }
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
       ...useGetPetitionPages_PetitionBase
@@ -743,10 +760,9 @@ const _fragments = {
       ...HiddenFieldDialog_PetitionBase
       ...validatePetitionFields_PetitionBase
     }
-    ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
-    ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+    ${useStartSignatureRequest.fragments.Petition}
+    ${ConfirmPetitionSignersDialog.fragments.Petition}
     ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
-    ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
     ${RecipientViewProgressFooter.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
     ${useGetPetitionPages.fragments.PetitionBase}
@@ -784,6 +800,7 @@ const _fragments = {
         ...useSendPetitionHandler_User
         ...ConfirmPetitionSignersDialog_User
         ...PreviewPetitionField_User
+        ...useStartSignatureRequest_User
       }
     }
     ${PetitionLayout.fragments.Query}
@@ -791,6 +808,7 @@ const _fragments = {
     ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
     ${useSendPetitionHandler.fragments.User}
     ${ConfirmPetitionSignersDialog.fragments.User}
+    ${useStartSignatureRequest.fragments.User}
   `,
 };
 

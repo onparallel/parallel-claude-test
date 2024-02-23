@@ -1,0 +1,202 @@
+import { gql, useMutation } from "@apollo/client";
+import { useToast } from "@chakra-ui/react";
+import {
+  ConfirmPetitionSignersDialog,
+  useConfirmPetitionSignersDialog,
+} from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
+import {
+  useStartSignatureRequest_PetitionFragment,
+  useStartSignatureRequest_UserFragment,
+  useStartSignatureRequest_completePetitionDocument,
+  useStartSignatureRequest_startSignatureRequestDocument,
+  useStartSignatureRequest_updateSignatureConfigDocument,
+} from "@parallel/graphql/__types";
+
+import { useCallback } from "react";
+import { useIntl } from "react-intl";
+import { omit } from "remeda";
+import { isApolloError } from "./apollo/isApolloError";
+import { withError } from "./promises/withError";
+import { Maybe } from "./types";
+import { usePetitionCanFinalize } from "./usePetitionCanFinalize";
+import { usePetitionLimitReachedErrorDialog } from "./usePetitionLimitReachedErrorDialog";
+
+interface UseStartSignatureRequestProps {
+  user: useStartSignatureRequest_UserFragment;
+  petition: useStartSignatureRequest_PetitionFragment;
+  onRefetch?: () => void;
+}
+
+export function useStartSignatureRequest({
+  user,
+  petition,
+  onRefetch,
+}: UseStartSignatureRequestProps) {
+  const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
+  const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
+
+  const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
+  const startSignature = reviewBeforeSigning || petition.status === "COMPLETED";
+  const { canFinalize } = usePetitionCanFinalize(petition);
+
+  const [updateSignatureConfig] = useMutation(
+    useStartSignatureRequest_updateSignatureConfigDocument,
+  );
+
+  const [startSignatureRequest] = useMutation(
+    useStartSignatureRequest_startSignatureRequestDocument,
+  );
+
+  const [completePetition] = useMutation(useStartSignatureRequest_completePetitionDocument);
+
+  const toast = useToast();
+  const intl = useIntl();
+
+  const handleStartSignatureProcess = useCallback(
+    async (message?: Maybe<string>, complete?: boolean) => {
+      try {
+        if (complete) {
+          await completePetition({
+            variables: {
+              petitionId: petition.id,
+              message,
+            },
+          });
+        } else {
+          await startSignatureRequest({
+            variables: { petitionId: petition.id, message },
+          });
+        }
+
+        toast({
+          isClosable: true,
+          duration: 5000,
+          title: intl.formatMessage({
+            id: "component.use-start-signature-request.signature-sent-toast-title",
+            defaultMessage: "eSignature sent",
+          }),
+          description: intl.formatMessage({
+            id: "component.use-start-signature-request.signature-sent-toast-description",
+            defaultMessage: "Your signature is on its way.",
+          }),
+          status: "success",
+        });
+        onRefetch?.();
+      } catch (error: any) {
+        if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
+          await withError(showPetitionLimitReachedErrorDialog());
+        }
+      }
+    },
+    [completePetition, startSignatureRequest, petition],
+  );
+
+  return {
+    handleStartSignature: async () => {
+      try {
+        const {
+          signers: signersInfo,
+          message,
+          allowAdditionalSigners: allowMoreSigners,
+        } = await showConfirmPetitionSignersDialog({
+          user,
+          signatureConfig: petition.signatureConfig!,
+          isUpdate: !startSignature && !canFinalize,
+          petition,
+        });
+
+        await updateSignatureConfig({
+          variables: {
+            petitionId: petition.id,
+            signatureConfig: {
+              ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+              timezone: petition.signatureConfig!.timezone,
+              orgIntegrationId: petition.signatureConfig!.integration!.id,
+              allowAdditionalSigners: allowMoreSigners,
+              signersInfo,
+            },
+          },
+        });
+
+        const completePetition = !reviewBeforeSigning && canFinalize;
+
+        if (startSignature || completePetition) {
+          handleStartSignatureProcess(message, completePetition);
+        }
+      } catch {}
+    },
+    buttonLabel: startSignature
+      ? intl.formatMessage({
+          id: "component.use-start-signature-request.start",
+          defaultMessage: "Start...",
+        })
+      : canFinalize
+        ? intl.formatMessage({
+            id: "component.use-start-signature-request.finalize-and-sign",
+            defaultMessage: "Finalize and sign",
+          })
+        : intl.formatMessage({
+            id: "component.use-start-signature-request.edit-signers",
+            defaultMessage: "Edit signers",
+          }),
+  };
+}
+
+useStartSignatureRequest.fragments = {
+  User: gql`
+    fragment useStartSignatureRequest_User on User {
+      id
+      ...ConfirmPetitionSignersDialog_User
+    }
+    ${ConfirmPetitionSignersDialog.fragments.User}
+  `,
+  Petition: gql`
+    fragment useStartSignatureRequest_Petition on Petition {
+      id
+      ...ConfirmPetitionSignersDialog_Petition
+      status
+      signatureConfig {
+        timezone
+        integration {
+          id
+        }
+        ...ConfirmPetitionSignersDialog_SignatureConfig
+        review
+      }
+      ...usePetitionCanFinalize_PetitionBase
+    }
+    ${ConfirmPetitionSignersDialog.fragments.Petition}
+    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
+    ${usePetitionCanFinalize.fragments.PetitionBase}
+  `,
+};
+
+const _mutations = [
+  gql`
+    mutation useStartSignatureRequest_updateSignatureConfig(
+      $petitionId: GID!
+      $signatureConfig: SignatureConfigInput
+    ) {
+      updatePetition(petitionId: $petitionId, data: { signatureConfig: $signatureConfig }) {
+        ...useStartSignatureRequest_Petition
+      }
+    }
+    ${useStartSignatureRequest.fragments.Petition}
+  `,
+  gql`
+    mutation useStartSignatureRequest_completePetition($petitionId: GID!, $message: String) {
+      completePetition(petitionId: $petitionId, message: $message) {
+        ...useStartSignatureRequest_Petition
+      }
+    }
+    ${useStartSignatureRequest.fragments.Petition}
+  `,
+  gql`
+    mutation useStartSignatureRequest_startSignatureRequest($petitionId: GID!, $message: String) {
+      startSignatureRequest(petitionId: $petitionId, message: $message) {
+        id
+        status
+      }
+    }
+  `,
+];

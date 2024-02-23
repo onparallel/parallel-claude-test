@@ -1,6 +1,6 @@
 import { Icon } from "@chakra-ui/react";
 import {
-  BackgroundCheckIcon,
+  ShortSearchIcon,
   DowJonesIcon,
   FieldCheckboxIcon,
   FieldDateIcon,
@@ -41,7 +41,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIc
         PHONE: FieldPhoneIcon,
         ES_TAX_DOCUMENTS: FieldTaxDocumentsIcon,
         DOW_JONES_KYC: DowJonesIcon,
-        BACKGROUND_CHECK: BackgroundCheckIcon,
+        BACKGROUND_CHECK: ShortSearchIcon,
         FIELD_GROUP: FieldGroupIcon,
       } as Record<PetitionFieldType, ElementType>
     )[type];

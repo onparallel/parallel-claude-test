@@ -357,6 +357,18 @@ export const PetitionBase = interfaceType({
       description: "Indicates whether delegate access is enabled for the recipient",
       resolve: (o) => o.enable_delegate_access,
     });
+    t.nonNull.boolean("isInteractionWithRecipientsEnabled", {
+      description: "TODO: add description",
+      resolve: (o) => o.enable_interaction_with_recipients,
+    });
+    t.nonNull.boolean("isReviewFlowEnabled", {
+      description: "TODO: add description",
+      resolve: (o) => o.enable_review_flow,
+    });
+    t.nonNull.boolean("isDocumentGenerationEnabled", {
+      description: "TODO: add description",
+      resolve: (o) => o.enable_document_generation,
+    });
     t.datetime("lastChangeAt", {
       description: "Time when the petition or any of its relations were last updated.",
       resolve: (o) => o.last_change_at,

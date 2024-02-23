@@ -4,6 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
+  PetitionComposeFieldSettings_PetitionBaseFragment,
   PetitionComposeFieldSettings_PetitionFieldFragment,
   PetitionComposeFieldSettings_UserFragment,
   PetitionFieldType,
@@ -34,7 +35,7 @@ import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
 
 export interface PetitionComposeFieldSettingsProps {
-  petitionId: string;
+  petition: PetitionComposeFieldSettings_PetitionBaseFragment;
   user: PetitionComposeFieldSettings_UserFragment;
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
@@ -49,7 +50,7 @@ const COMPONENTS: Partial<
   Record<
     PetitionFieldType,
     ComponentType<
-      Pick<PetitionComposeFieldSettingsProps, "petitionId" | "field" | "onFieldEdit" | "isReadOnly">
+      Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">
     >
   >
 > = {
@@ -66,7 +67,7 @@ export const PetitionComposeFieldSettings = Object.assign(
   chakraForwardRef<"section", PetitionComposeFieldSettingsProps>(
     function PetitionComposeFieldSettings(
       {
-        petitionId,
+        petition,
         user,
         field,
         fieldIndex,
@@ -172,7 +173,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                 </Box>
               ) : null}
               <SettingsComponent
-                petitionId={petitionId}
+                petition={petition}
                 field={field}
                 onFieldEdit={onFieldEdit}
                 isReadOnly={isReadOnly}
@@ -206,31 +207,33 @@ export const PetitionComposeFieldSettings = Object.assign(
               ) : null}
             </Stack>
 
-            <SettingsRowGroup
-              isReadOnly={isReadOnly}
-              label={
-                <FormattedMessage
-                  id="component.petition-compose-field-settings.interaction-with-recipients"
-                  defaultMessage="Interaction with recipients"
-                />
-              }
-            >
-              <InternalFieldSettingsRow
-                isChecked={field.isInternal}
-                isDisabled={isInternalFieldDisabled}
-                isRestricted={canOnlyBeInternal}
-                onChange={handleFieldEdit}
-              />
-              {isFieldGroupChild || canOnlyBeInternal ? null : (
-                <AllowCommentSettingsRow
-                  isDisabled={isReadOnly || field.isInternal}
-                  isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+            {petition.isInteractionWithRecipientsEnabled ? (
+              <SettingsRowGroup
+                isReadOnly={isReadOnly}
+                label={
+                  <FormattedMessage
+                    id="component.petition-compose-field-settings.interaction-with-recipients"
+                    defaultMessage="Interaction with recipients"
+                  />
+                }
+              >
+                <InternalFieldSettingsRow
+                  isChecked={field.isInternal}
+                  isDisabled={isInternalFieldDisabled}
+                  isRestricted={canOnlyBeInternal}
                   onChange={handleFieldEdit}
                 />
-              )}
-            </SettingsRowGroup>
+                {isFieldGroupChild || canOnlyBeInternal ? null : (
+                  <AllowCommentSettingsRow
+                    isDisabled={isReadOnly || field.isInternal}
+                    isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+                    onChange={handleFieldEdit}
+                  />
+                )}
+              </SettingsRowGroup>
+            ) : null}
 
-            {isReplyable ? (
+            {isReplyable && petition.isReviewFlowEnabled ? (
               <SettingsRowGroup
                 label={
                   <FormattedMessage
@@ -250,7 +253,8 @@ export const PetitionComposeFieldSettings = Object.assign(
 
             {isFieldGroupChild ||
             field.type === "DOW_JONES_KYC" ||
-            field.type === "BACKGROUND_CHECK" ? null : (
+            field.type === "BACKGROUND_CHECK" ||
+            !petition.isDocumentGenerationEnabled ? null : (
               <SettingsRowGroup
                 label={
                   <FormattedMessage
@@ -295,6 +299,14 @@ export const PetitionComposeFieldSettings = Object.assign(
           ...PetitionFieldTypeSelect_User
         }
         ${PetitionFieldTypeSelect.fragments.User}
+      `,
+      PetitionBase: gql`
+        fragment PetitionComposeFieldSettings_PetitionBase on PetitionBase {
+          id
+          isInteractionWithRecipientsEnabled
+          isReviewFlowEnabled
+          isDocumentGenerationEnabled
+        }
       `,
       PetitionField: gql`
         fragment PetitionComposeFieldSettings_PetitionField on PetitionField {

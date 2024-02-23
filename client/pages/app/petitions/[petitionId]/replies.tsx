@@ -620,28 +620,39 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               </Button>
             ) : null}
             {showDownloadAll && !petition.isAnonymized ? (
-              <ButtonWithMoreOptions
-                leftIcon={<DownloadIcon fontSize="lg" display="block" />}
-                onClick={handleDownloadAllClick}
-                options={
-                  <MenuList>
-                    <MenuItem
-                      icon={<FilePdfIcon boxSize={5} />}
-                      onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
-                      maxWidth={"260px"}
-                    >
-                      <Text>
-                        <FormattedMessage
-                          id="page.petition-replies.export-pdf"
-                          defaultMessage="Export to PDF"
-                        />
-                      </Text>
-                    </MenuItem>
-                  </MenuList>
-                }
-              >
-                <FormattedMessage id="page.replies.export-replies" defaultMessage="Export" />
-              </ButtonWithMoreOptions>
+              petition.isDocumentGenerationEnabled ? (
+                <ButtonWithMoreOptions
+                  leftIcon={<FilePdfIcon boxSize={5} />}
+                  onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
+                  options={
+                    <MenuList minWidth="0">
+                      <MenuItem onClick={handleDownloadAllClick}>
+                        <Text>
+                          <FormattedMessage
+                            id="page.replies.export-replies"
+                            defaultMessage="Export replies"
+                          />
+                        </Text>
+                      </MenuItem>
+                    </MenuList>
+                  }
+                >
+                  <FormattedMessage
+                    id="page.petition-replies.export-pdf"
+                    defaultMessage="Export to PDF"
+                  />
+                </ButtonWithMoreOptions>
+              ) : (
+                <Button
+                  leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+                  onClick={handleDownloadAllClick}
+                >
+                  <FormattedMessage
+                    id="page.replies.export-replies"
+                    defaultMessage="Export replies"
+                  />
+                </Button>
+              )
             ) : null}
           </Stack>
           <Divider />
@@ -686,7 +697,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 {activeFieldId && !!activeField ? (
                   <PetitionRepliesFieldComments
                     key={activeFieldId}
-                    petitionId={petition.id}
+                    petition={petition}
                     field={activeField}
                     isDisabled={petition.isAnonymized}
                     onClose={() => setActiveFieldId(null)}
@@ -742,7 +753,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                             filter={filter}
                             fieldLogic={fieldLogic}
                             onFieldClick={handlePetitionContentsFieldClick}
-                            signatureStatus={petitionSignatureStatus}
+                            signatureStatus={
+                              petition.isDocumentGenerationEnabled
+                                ? petitionSignatureStatus
+                                : undefined
+                            }
                             signatureEnvironment={petitionSignatureEnvironment}
                             onSignatureStatusClick={handlePetitionContentsSignatureClick}
                             onVariablesClick={
@@ -774,16 +789,18 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         }
       >
         <Box padding={4}>
-          <PetitionSignaturesCard
-            ref={signaturesRef as any}
-            id="signatures"
-            petition={petition}
-            user={me}
-            layerStyle="highlightable"
-            marginBottom={4}
-            onRefetchPetition={refetch}
-            isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-          />
+          {petition.isDocumentGenerationEnabled ? (
+            <PetitionSignaturesCard
+              ref={signaturesRef as any}
+              id="signatures"
+              petition={petition}
+              user={me}
+              layerStyle="highlightable"
+              marginBottom={4}
+              onRefetchPetition={refetch}
+              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+            />
+          ) : null}
           {petition.variables.length ? (
             <PetitionVariablesCard
               ref={variablesRef as any}
@@ -840,6 +857,7 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_Petition on Petition {
         id
+        isDocumentGenerationEnabled
         accesses {
           id
           status
@@ -879,6 +897,7 @@ PetitionReplies.fragments = {
         ...useFieldLogic_PetitionBase
         ...LiquidScopeProvider_PetitionBase
         ...PetitionRepliesSummary_Petition
+        ...PetitionRepliesFieldComments_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionRepliesField.fragments.Petition}
@@ -893,6 +912,7 @@ PetitionReplies.fragments = {
       ${ProfileDrawer.fragments.PetitionField}
       ${PetitionVariablesCard.fragments.PetitionBase}
       ${PetitionRepliesSummary.fragments.Petition}
+      ${PetitionRepliesFieldComments.fragments.PetitionBase}
     `;
   },
   get PetitionField() {

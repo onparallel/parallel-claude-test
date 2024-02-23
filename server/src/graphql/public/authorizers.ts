@@ -19,9 +19,10 @@ export function authenticatePublicAccess<
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return chain(fetchPetitionAccess(argKeycode), async function (_, args, ctx) {
     const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
-    if (petition.anonymized_at !== null) {
+    if (petition.anonymized_at !== null || petition.enable_interaction_with_recipients === false) {
       return false;
     }
+
     if (petition.skip_forward_security) {
       return true;
     }
@@ -223,7 +224,12 @@ export function validPublicPetitionLinkSlug<
       return false;
     }
     const template = await ctx.petitions.loadPetition(publicPetitionLink.template_id);
-    return isDefined(template) && template.is_template && template.anonymized_at === null;
+    return (
+      isDefined(template) &&
+      template.is_template &&
+      template.anonymized_at === null &&
+      template.enable_interaction_with_recipients
+    );
   };
 }
 

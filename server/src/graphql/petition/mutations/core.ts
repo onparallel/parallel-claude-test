@@ -118,6 +118,7 @@ import {
   petitionsAreOfTypePetition,
   petitionsAreOfTypeTemplate,
   petitionsArePublicTemplates,
+  petitionsHaveEnabledInteractionWithRecipients,
   repliesBelongsToField,
   repliesBelongsToPetition,
   replyStatusCanBeUpdated,
@@ -757,6 +758,14 @@ export const updatePetition = mutationField("updatePetition", {
       (args) => [args.data.defaultOnBehalfId],
       defaultOnBehalfUserBelongsToContextOrganization("data"),
     ),
+    ifSomeDefined(
+      (args) => [
+        args.data.isReviewFlowEnabled,
+        args.data.isDocumentGenerationEnabled,
+        args.data.isInteractionWithRecipientsEnabled,
+      ],
+      petitionsAreOfTypeTemplate("petitionId"),
+    ),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -776,6 +785,9 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.boolean("skipForwardSecurity");
           t.nullable.boolean("isRecipientViewContentsHidden");
           t.nullable.boolean("isDelegateAccessEnabled");
+          t.nullable.boolean("isInteractionWithRecipientsEnabled");
+          t.nullable.boolean("isReviewFlowEnabled");
+          t.nullable.boolean("isDocumentGenerationEnabled");
           t.nullable.field("signatureConfig", { type: "SignatureConfigInput" });
           t.nullable.json("description");
           t.nullable.boolean("isCompletingMessageEnabled");
@@ -837,6 +849,9 @@ export const updatePetition = mutationField("updatePetition", {
       skipForwardSecurity,
       isRecipientViewContentsHidden,
       isDelegateAccessEnabled,
+      isInteractionWithRecipientsEnabled,
+      isReviewFlowEnabled,
+      isDocumentGenerationEnabled,
       signatureConfig,
       description,
       isCompletingMessageEnabled,
@@ -877,6 +892,15 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (isDefined(isDelegateAccessEnabled)) {
       data.enable_delegate_access = isDelegateAccessEnabled;
+    }
+    if (isDefined(isInteractionWithRecipientsEnabled)) {
+      data.enable_interaction_with_recipients = isInteractionWithRecipientsEnabled;
+    }
+    if (isDefined(isReviewFlowEnabled)) {
+      data.enable_review_flow = isReviewFlowEnabled;
+    }
+    if (isDefined(isDocumentGenerationEnabled)) {
+      data.enable_document_generation = isDocumentGenerationEnabled;
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig;
@@ -1703,6 +1727,7 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionHasRepliableFields("petitionId"),
     petitionIsNotAnonymized("petitionId"),
+    petitionsHaveEnabledInteractionWithRecipients("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1746,6 +1771,7 @@ export const sendPetition = mutationField("sendPetition", {
     petitionIsNotAnonymized("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
     organizationHasEnoughPetitionSendCredits("petitionId", (args) => args.contactIdGroups.length),
+    petitionsHaveEnabledInteractionWithRecipients("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1995,6 +2021,7 @@ export const sendReminders = mutationField("sendReminders", {
     accessesHaveRemindersLeft("accessIds"),
     petitionIsNotAnonymized("petitionId"),
     petitionHasStatus("petitionId", ["PENDING", "COMPLETED"]),
+    petitionsHaveEnabledInteractionWithRecipients("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2235,6 +2262,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
+    petitionsHaveEnabledInteractionWithRecipients("petitionId"),
   ),
   validateArgs: validRichTextContent(
     (args) => args.emailBody,
@@ -2386,6 +2414,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
     petitionsAreOfTypeTemplate("templateId"),
     templateDoesNotHavePublicPetitionLink("templateId"),
+    petitionsHaveEnabledInteractionWithRecipients("templateId"),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),

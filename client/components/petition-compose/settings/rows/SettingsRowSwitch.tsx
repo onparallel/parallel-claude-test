@@ -22,7 +22,7 @@ export function SettingsRowSwitch({
 }: SettingsRowSwitchProps) {
   return (
     <Stack spacing={0}>
-      <SettingsRow isActive={isChecked} {...props}>
+      <SettingsRow isActive={isChecked} isDisabled={isDisabled} {...props}>
         <SmallPopover isDisabled={!isDisabled || !disabledReadon} content={disabledReadon}>
           <Box>
             <Switch

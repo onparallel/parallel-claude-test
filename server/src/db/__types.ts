@@ -1142,6 +1142,9 @@ export interface Petition {
   summary_config: Maybe<any>; // jsonb
   summary_ai_completion_log_id: Maybe<number>; // int4
   custom_lists: Maybe<any>; // jsonb
+  enable_interaction_with_recipients: boolean; // bool
+  enable_review_flow: boolean; // bool
+  enable_document_generation: boolean; // bool
 }
 
 export type CreatePetition = PartialProps<
@@ -1195,6 +1198,9 @@ export type CreatePetition = PartialProps<
   | "summary_config"
   | "summary_ai_completion_log_id"
   | "custom_lists"
+  | "enable_interaction_with_recipients"
+  | "enable_review_flow"
+  | "enable_document_generation"
 >;
 
 export interface PetitionAccess {

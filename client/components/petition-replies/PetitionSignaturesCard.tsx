@@ -3,39 +3,34 @@ import { Box, Center, Grid, Text, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  PetitionSignaturesCard_cancelSignatureRequestDocument,
-  PetitionSignaturesCard_completePetitionDocument,
-  PetitionSignaturesCard_petitionDocument,
   PetitionSignaturesCard_PetitionFragment,
+  PetitionSignaturesCard_UserFragment,
+  PetitionSignaturesCard_cancelSignatureRequestDocument,
+  PetitionSignaturesCard_petitionDocument,
   PetitionSignaturesCard_sendSignatureRequestRemindersDocument,
   PetitionSignaturesCard_signedPetitionDownloadLinkDocument,
-  PetitionSignaturesCard_startSignatureRequestDocument,
   PetitionSignaturesCard_updatePetitionSignatureConfigDocument,
-  PetitionSignaturesCard_UserFragment,
-  SignatureConfigInput,
 } from "@parallel/graphql/__types";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
-import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { useCallback, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
 } from "../petition-common/dialogs/SignatureConfigDialog";
-import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
 import { CurrentSignatureRequestRow } from "./CurrentSignatureRequestRow";
-import { useConfirmRestartSignatureRequestDialog } from "./dialogs/ConfirmRestartSignatureRequestDialog";
 import { NewSignatureRequestRow } from "./NewSignatureRequestRow";
 import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
+import { useConfirmRestartSignatureRequestDialog } from "./dialogs/ConfirmRestartSignatureRequestDialog";
 
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
@@ -105,14 +100,6 @@ const _mutations = [
         id
         status
         cancelReason
-      }
-    }
-  `,
-  gql`
-    mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!, $message: String) {
-      startSignatureRequest(petitionId: $petitionId, message: $message) {
-        id
-        status
       }
     }
   `,
@@ -192,9 +179,6 @@ export const PetitionSignaturesCard = Object.assign(
     const [cancelSignatureRequest] = useMutation(
       PetitionSignaturesCard_cancelSignatureRequestDocument,
     );
-    const [startSignatureRequest] = useMutation(
-      PetitionSignaturesCard_startSignatureRequestDocument,
-    );
     const [updateSignatureConfig] = useMutation(
       PetitionSignaturesCard_updatePetitionSignatureConfigDocument,
     );
@@ -213,49 +197,6 @@ export const PetitionSignaturesCard = Object.assign(
         } catch {}
       },
       [cancelSignatureRequest],
-    );
-
-    const [completePetition] = useMutation(PetitionSignaturesCard_completePetitionDocument);
-
-    const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
-
-    const handleStartSignatureProcess = useCallback(
-      async (message?: Maybe<string>, complete?: boolean) => {
-        try {
-          if (complete) {
-            await completePetition({
-              variables: {
-                petitionId: petition.id,
-                message,
-              },
-            });
-          } else {
-            await startSignatureRequest({
-              variables: { petitionId: petition.id, message },
-            });
-          }
-
-          toast({
-            isClosable: true,
-            duration: 5000,
-            title: intl.formatMessage({
-              id: "component.petition-signatures-card.signature-sent-toast-title",
-              defaultMessage: "eSignature sent",
-            }),
-            description: intl.formatMessage({
-              id: "component.petition-signatures-card.signature-sent-toast-description",
-              defaultMessage: "Your signature is on its way.",
-            }),
-            status: "success",
-          });
-          await onRefetchPetition();
-        } catch (error: any) {
-          if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
-            await withError(showPetitionLimitReachedErrorDialog());
-          }
-        }
-      },
-      [completePetition, startSignatureRequest, petition],
     );
 
     const handleDownloadSignedDoc = useCallback(
@@ -293,12 +234,6 @@ export const PetitionSignaturesCard = Object.assign(
           variables: { petitionId: petition.id, signatureConfig },
         });
       } catch {}
-    }
-
-    async function handleUpdateSignatureConfig(signatureConfig: SignatureConfigInput | null) {
-      await updateSignatureConfig({
-        variables: { petitionId: petition.id, signatureConfig },
-      });
     }
 
     const handleSendSignatureReminder = useCallback(
@@ -363,8 +298,7 @@ export const PetitionSignaturesCard = Object.assign(
               <NewSignatureRequestRow
                 user={user}
                 petition={petition}
-                onStart={handleStartSignatureProcess}
-                onUpdateConfig={handleUpdateSignatureConfig}
+                onRefetch={onRefetchPetition}
                 isDisabled={isDisabled}
               />
             ) : current ? (

@@ -4,70 +4,32 @@ import { TimeIcon } from "@parallel/chakra/icons";
 import {
   NewSignatureRequestRow_PetitionFragment,
   NewSignatureRequestRow_UserFragment,
-  SignatureConfigInput,
 } from "@parallel/graphql/__types";
-import { Maybe } from "@parallel/utils/types";
+import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { isDefined } from "remeda";
 import { SignerReference } from "../common/SignerReference";
-import {
-  ConfirmPetitionSignersDialog,
-  useConfirmPetitionSignersDialog,
-} from "../petition-common/dialogs/ConfirmPetitionSignersDialog";
-import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 
 interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;
   user: NewSignatureRequestRow_UserFragment;
-  onUpdateConfig: (data: SignatureConfigInput | null) => Promise<void>;
-  onStart: (message: Maybe<string>, completePetition: boolean) => void;
+  onRefetch?: () => void;
   isDisabled?: boolean;
 }
 
 export function NewSignatureRequestRow({
   petition,
   user,
-  onUpdateConfig,
-  onStart,
+  onRefetch,
   isDisabled,
 }: NewSignatureRequestRowProps) {
   const signers = petition.signatureConfig?.signers.filter(isDefined) ?? [];
-  const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
-  const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
 
-  const startSignature = reviewBeforeSigning || petition.status === "COMPLETED";
-
-  const { canFinalize } = usePetitionCanFinalize(petition);
-
-  const handleStartSignature = async () => {
-    try {
-      const {
-        signers: signersInfo,
-        message,
-        allowAdditionalSigners: allowMoreSigners,
-      } = await showConfirmPetitionSignersDialog({
-        user,
-        accesses: petition.accesses,
-        signatureConfig: petition.signatureConfig!,
-        isUpdate: !startSignature && !canFinalize,
-        previousSignatures: petition.signatureRequests,
-      });
-
-      await onUpdateConfig({
-        ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
-        timezone: petition.signatureConfig!.timezone,
-        orgIntegrationId: petition.signatureConfig!.integration!.id,
-        allowAdditionalSigners: allowMoreSigners,
-        signersInfo,
-      });
-
-      const completePetition = !reviewBeforeSigning && canFinalize;
-
-      if (startSignature || completePetition) {
-        onStart(message, completePetition);
-      }
-    } catch {}
-  };
+  const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
+    user,
+    petition,
+    onRefetch,
+  });
 
   return (
     <>
@@ -114,22 +76,7 @@ export function NewSignatureRequestRow({
           onClick={handleStartSignature}
           isDisabled={isDisabled}
         >
-          {startSignature ? (
-            <FormattedMessage
-              id="component.petition-signatures-card.start"
-              defaultMessage="Start..."
-            />
-          ) : canFinalize ? (
-            <FormattedMessage
-              id="component.petition-signatures-card.finalize-and-sign"
-              defaultMessage="Finalize and sign"
-            />
-          ) : (
-            <FormattedMessage
-              id="component.petition-signatures-card.edit-signers"
-              defaultMessage="Edit signers"
-            />
-          )}
+          {buttonLabel}
         </Button>
       </GridItem>
     </>
@@ -139,41 +86,20 @@ export function NewSignatureRequestRow({
 NewSignatureRequestRow.fragments = {
   User: gql`
     fragment NewSignatureRequestRow_User on User {
-      ...ConfirmPetitionSignersDialog_User
+      ...useStartSignatureRequest_User
     }
-    ${ConfirmPetitionSignersDialog.fragments.User}
+    ${useStartSignatureRequest.fragments.User}
   `,
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
-      status
+      ...useStartSignatureRequest_Petition
       signatureConfig {
         signers {
           ...SignerReference_PetitionSigner
-          ...ConfirmPetitionSignersDialog_PetitionSigner
         }
-        integration {
-          id
-          name
-          provider
-        }
-        review
-        timezone
-        title
-        ...ConfirmPetitionSignersDialog_SignatureConfig
       }
-      accesses {
-        ...ConfirmPetitionSignersDialog_PetitionAccess
-      }
-      signatureRequests {
-        ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
-      }
-      ...usePetitionCanFinalize_PetitionBase
     }
+    ${useStartSignatureRequest.fragments.Petition}
     ${SignerReference.fragments.PetitionSigner}
-    ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
-    ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
-    ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
-    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
-    ${usePetitionCanFinalize.fragments.PetitionBase}
   `,
 };

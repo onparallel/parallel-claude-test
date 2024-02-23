@@ -209,10 +209,9 @@ export function AddPetitionAccessDialog({
     try {
       const { signers, allowAdditionalSigners } = await showConfirmPetitionSignersDialog({
         user,
-        accesses: petition.accesses,
         signatureConfig: signatureConfig,
         isUpdate: true,
-        previousSignatures: petition.signatureRequests,
+        petition,
       });
 
       updateSignatureConfig({
@@ -578,12 +577,10 @@ AddPetitionAccessDialog.fragments = {
         }
         signers {
           ...CopySignatureConfigDialog_PetitionSigner
-          ...ConfirmPetitionSignersDialog_PetitionSigner
         }
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
       ${CopySignatureConfigDialog.fragments.PetitionSigner}
-      ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
       ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     `;
   },
@@ -603,9 +600,7 @@ AddPetitionAccessDialog.fragments = {
             id
           }
         }
-        signatureRequests {
-          ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
-        }
+        ...ConfirmPetitionSignersDialog_Petition
         signatureConfig {
           timezone
           ...AddPetitionAccessDialog_SignatureConfig
@@ -626,18 +621,16 @@ AddPetitionAccessDialog.fragments = {
           id
           isContactless
           recipientUrl
-          ...ConfirmPetitionSignersDialog_PetitionAccess
         }
         defaultOnBehalf {
           ...AddPetitionAccessDialog_DelegateUser
         }
         ...MessageEmailSubjectFormControl_PetitionBase
       }
-      ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
+      ${ConfirmPetitionSignersDialog.fragments.Petition}
       ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
       ${this.SignatureConfig}
       ${PetitionRemindersConfig.fragments.RemindersConfig}
-      ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
       ${this.DelegateUser}
       ${MessageEmailSubjectFormControl.fragments.PetitionBase}
     `;

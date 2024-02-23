@@ -58,10 +58,7 @@ import Select from "react-select";
 import { isDefined, noop, omit, partition, pick, uniqBy } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
-import {
-  ConfirmPetitionSignersDialog,
-  SignerSelectSelection,
-} from "./ConfirmPetitionSignersDialog";
+import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 export interface SignatureConfigDialogProps {
   petition: SignatureConfigDialog_PetitionBaseFragment;
@@ -105,9 +102,11 @@ export function SignatureConfigDialog({
     defaultValues: {
       integration:
         signatureConfig?.integration ?? integrations.find((i) => i.isDefault) ?? integrations[0],
-      review: signatureConfig?.review ?? false,
+      review: petition.isReviewFlowEnabled ? signatureConfig?.review ?? false : false,
       title: signatureConfig?.title ?? null,
-      allowAdditionalSigners: signatureConfig?.allowAdditionalSigners ?? false,
+      allowAdditionalSigners: petition.isInteractionWithRecipientsEnabled
+        ? signatureConfig?.allowAdditionalSigners ?? false
+        : false,
       includePresetSigners: presetSigners.length > 0,
       presetSigners,
       signingMode: signatureConfig?.signingMode ?? "PARALLEL",
@@ -357,7 +356,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
           })}
         />
       </FormControl>
-      <FormControl isDisabled={petitionIsCompleted}>
+      <FormControl isDisabled={petitionIsCompleted || !petition.isReviewFlowEnabled}>
         <FormLabel>
           <FormattedMessage
             id="component.signature-config-dialog.review-before-send-label"
@@ -374,7 +373,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<
                 value={reviewBeforeSendOptions[review ? 1 : 0]}
                 options={reviewBeforeSendOptions}
                 onChange={(v: any) => onChange(v.value === "YES")}
-                isDisabled={petitionIsCompleted}
+                isDisabled={petitionIsCompleted || !petition.isReviewFlowEnabled}
               />
               <Text marginTop={2} color="gray.500" fontSize="sm">
                 {review ? (
@@ -495,7 +494,7 @@ function SignatureConfigDialogBodyStep2({
           )}
         />
       </FormControl>
-      {!review && !petitionIsCompleted ? (
+      {!review && !petitionIsCompleted && petition.isInteractionWithRecipientsEnabled ? (
         <FormControl id="allowAdditionalSigners">
           <FormLabel margin={0}>
             <Checkbox colorScheme="primary" {...register("allowAdditionalSigners")}>
@@ -743,7 +742,7 @@ SignatureConfigDialog.fragments = {
           ...SignatureConfigDialog_SignatureOrgIntegration
         }
         signers {
-          ...ConfirmPetitionSignersDialog_PetitionSigner
+          ...SuggestedSigners_PetitionSigner
           contactId
           firstName
           lastName
@@ -758,13 +757,15 @@ SignatureConfigDialog.fragments = {
         instructions
       }
       ${this.SignatureOrgIntegration}
-      ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+      ${SuggestedSigners.fragments.PetitionSigner}
     `;
   },
   get PetitionBase() {
     return gql`
       fragment SignatureConfigDialog_PetitionBase on PetitionBase {
         name
+        isReviewFlowEnabled
+        isInteractionWithRecipientsEnabled
         signatureConfig {
           ...SignatureConfigDialog_SignatureConfig
         }
@@ -788,14 +789,14 @@ SignatureConfigDialog.fragments = {
           signatureRequests {
             signatureConfig {
               signers {
-                ...ConfirmPetitionSignersDialog_PetitionSigner
+                ...SuggestedSigners_PetitionSigner
               }
             }
           }
         }
       }
       ${this.SignatureConfig}
-      ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+      ${SuggestedSigners.fragments.PetitionSigner}
     `;
   },
   get SignatureOrgIntegration() {

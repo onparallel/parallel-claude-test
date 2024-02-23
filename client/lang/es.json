@@ -5495,6 +5495,16 @@
     "context": "Calculation results"
   },
   {
+    "term": "component.petition-replies-field-comments.enable-comments-settings",
+    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
+    "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+  },
+  {
+    "term": "component.petition-replies-field-comments.only-notes",
+    "definition": "Este campo solo admite notas",
+    "context": "This field only accepts notes"
+  },
+  {
     "term": "component.petition-replies-field-reply.approve",
     "definition": "Aprobar",
     "context": "Approve"
@@ -5635,24 +5645,14 @@
     "context": "Select {isMulti, select, true{templates} other {a template}}"
   },
   {
-    "term": "component.petition-settings.adjustments-for-parallels",
-    "definition": "Ajustes para los parallels",
-    "context": "Settings for parallels"
-  },
-  {
-    "term": "component.petition-settings.adjustments-parallels",
-    "definition": "Ajustes del parallel",
-    "context": "Parallel settings"
-  },
-  {
-    "term": "component.petition-settings.adjustments-template",
-    "definition": "Ajustes de la plantilla",
-    "context": "Template settings"
-  },
-  {
     "term": "component.petition-settings.automatic-reminders",
     "definition": "Recordatorios automáticos",
     "context": "Automatic reminders"
+  },
+  {
+    "term": "component.petition-settings.closing-settings",
+    "definition": "Ajustes de cierre",
+    "context": "Closing settings"
   },
   {
     "term": "component.petition-settings.compliance-period",
@@ -5700,6 +5700,16 @@
     "context": "By enabling this, the recipient can invite a collaborator to help them respond."
   },
   {
+    "term": "component.petition-settings.document-generation",
+    "definition": "Generación de documentos",
+    "context": "Document generation"
+  },
+  {
+    "term": "component.petition-settings.document-generation-description",
+    "definition": "Activa esta opción si el proceso requiere la generación de un documento.",
+    "context": "Enable this option if the process requires the generation of a document."
+  },
+  {
     "term": "component.petition-settings.document-theme-label",
     "definition": "Tema del documento",
     "context": "Document theme"
@@ -5720,6 +5730,11 @@
     "context": "Parallel created from the {name}."
   },
   {
+    "term": "component.petition-settings.help-us-tailor-options",
+    "definition": "Si lo desactivas, nos ayudará a adaptar las opciones que necesita tu proceso.",
+    "context": "Disabling it will help us tailor the options your process needs."
+  },
+  {
     "term": "component.petition-settings.hide-recipient-view-contents",
     "definition": "Ocultar contenidos",
     "context": "Hide recipient view contents"
@@ -5728,6 +5743,16 @@
     "term": "component.petition-settings.hide-recipient-view-contents-description",
     "definition": "Al habilitar esta opción, se ocultará la tarjeta de contenidos en la vista de destinatario.",
     "context": "By enabling this, the contents card in the recipient view will be hidden."
+  },
+  {
+    "term": "component.petition-settings.interaction-with-recipients",
+    "definition": "Interacción con destinatarios",
+    "context": "Interaction with recipients"
+  },
+  {
+    "term": "component.petition-settings.interaction-with-recipients-description",
+    "definition": "Activa esta opción si el proceso requiere destinatarios que completen parte del formulario.",
+    "context": "Enable this option if the process requires recipients to reply the form."
   },
   {
     "term": "component.petition-settings.link-copied-toast",
@@ -5745,6 +5770,11 @@
     "context": "eSignature process"
   },
   {
+    "term": "component.petition-settings.process-settings",
+    "definition": "Ajustes del proceso",
+    "context": "Process settings"
+  },
+  {
     "term": "component.petition-settings.restrict-editing",
     "definition": "Restringir la edición",
     "context": "Restrict editing"
@@ -5753,6 +5783,21 @@
     "term": "component.petition-settings.restrict-editing-description",
     "definition": "Activa esta opción para prevenir que otros usuarios hagan cambios accidentalmente en {isTemplate, select, true{esta plantilla} other{este parallel}}.",
     "context": "Enable this option to prevent users from accidentally making changes to this {isTemplate, select, true{template} other{parallel}}."
+  },
+  {
+    "term": "component.petition-settings.review-flow",
+    "definition": "Flujo de revisión",
+    "context": "Review flow"
+  },
+  {
+    "term": "component.petition-settings.review-flow-description",
+    "definition": "Activa esta opción si el proceso requiere que alguien revise las respuestas.",
+    "context": "Enable this option if the process requires someone to review the answers."
+  },
+  {
+    "term": "component.petition-settings.setting-determined-by-template",
+    "definition": "Este ajuste viene determinado por la plantilla y no se puede modificar.",
+    "context": "This setting is determined by the template and cannot be changed."
   },
   {
     "term": "component.petition-settings.share-automatically",
@@ -5920,16 +5965,6 @@
     "context": "Cancelling"
   },
   {
-    "term": "component.petition-signatures-card.edit-signers",
-    "definition": "Editar firmantes",
-    "context": "Edit signers"
-  },
-  {
-    "term": "component.petition-signatures-card.finalize-and-sign",
-    "definition": "Finalizar y firmar",
-    "context": "Finalize and sign"
-  },
-  {
     "term": "component.petition-signatures-card.more-info-button",
     "definition": "Más información",
     "context": "More information"
@@ -5965,16 +6000,6 @@
     "context": "Generates a document and initiates an eSignature process, through one of our integrated providers."
   },
   {
-    "term": "component.petition-signatures-card.signature-sent-toast-description",
-    "definition": "Tu firma está en camino.",
-    "context": "Your signature is on its way."
-  },
-  {
-    "term": "component.petition-signatures-card.signature-sent-toast-title",
-    "definition": "Firma enviada",
-    "context": "eSignature sent"
-  },
-  {
     "term": "component.petition-signatures-card.signed-document",
     "definition": "Documento firmado",
     "context": "Signed document"
@@ -5983,11 +6008,6 @@
     "term": "component.petition-signatures-card.signers",
     "definition": "Firmantes",
     "context": "Signers"
-  },
-  {
-    "term": "component.petition-signatures-card.start",
-    "definition": "Iniciar...",
-    "context": "Start..."
   },
   {
     "term": "component.petition-signatures-card.status",
@@ -6268,6 +6288,16 @@
     "term": "component.preview-petition-field-background-check.view-results",
     "definition": "Ver resultados",
     "context": "View results"
+  },
+  {
+    "term": "component.preview-petition-field-comments-dialog.enable-comments-settings",
+    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
+    "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+  },
+  {
+    "term": "component.preview-petition-field-comments-dialog.only-notes",
+    "definition": "Este campo solo admite notas",
+    "context": "This field only accepts notes"
   },
   {
     "term": "component.preview-petition-field-group.review-reply",
@@ -9183,6 +9213,31 @@
     "term": "component.use-expiration-options.do-not-remember",
     "definition": "No recordar",
     "context": "Do not remember"
+  },
+  {
+    "term": "component.use-start-signature-request.edit-signers",
+    "definition": "Editar firmantes",
+    "context": "Edit signers"
+  },
+  {
+    "term": "component.use-start-signature-request.finalize-and-sign",
+    "definition": "Finalizar y firmar",
+    "context": "Finalize and sign"
+  },
+  {
+    "term": "component.use-start-signature-request.signature-sent-toast-description",
+    "definition": "Tu firma está en camino.",
+    "context": "Your signature is on its way."
+  },
+  {
+    "term": "component.use-start-signature-request.signature-sent-toast-title",
+    "definition": "Firma enviada",
+    "context": "eSignature sent"
+  },
+  {
+    "term": "component.use-start-signature-request.start",
+    "definition": "Iniciar...",
+    "context": "Start..."
   },
   {
     "term": "component.user-dropdown-empty.invite-button",
@@ -12656,8 +12711,8 @@
   },
   {
     "term": "page.replies.export-replies",
-    "definition": "Exportar",
-    "context": "Export"
+    "definition": "Exportar respuestas",
+    "context": "Export replies"
   },
   {
     "term": "page.replies.finalize-petition-button",
@@ -13488,16 +13543,6 @@
     "term": "petition-permission-type.write",
     "definition": "Editor",
     "context": "Editor"
-  },
-  {
-    "term": "petition-replies.field-comments.disabled-comments-2",
-    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
-    "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-  },
-  {
-    "term": "petition-replies.field-comments.only-notes",
-    "definition": "Este campo solo admite notas",
-    "context": "This field only accepts notes"
   },
   {
     "term": "petition-replies.note-popover",

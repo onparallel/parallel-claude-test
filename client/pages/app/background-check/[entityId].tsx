@@ -1,6 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Box, Center, HStack, Skeleton, Spinner, Stack, Text } from "@chakra-ui/react";
-import { BackgroundCheckIcon } from "@parallel/chakra/icons";
+import { ShortSearchIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -198,7 +198,7 @@ function BackgroundCheckProfileDetails({
         <HStack justifyContent="space-between">
           <HStack spacing={4}>
             <IconButtonWithTooltip
-              icon={<BackgroundCheckIcon />}
+              icon={<ShortSearchIcon />}
               label={intl.formatMessage({
                 id: "page.background-check-profile-details.see-other-results",
                 defaultMessage: "See other results",

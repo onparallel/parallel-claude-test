@@ -426,7 +426,7 @@ export function PetitionRepliesFieldReply({
           )}
         </GridItem>
       </Grid>
-      {reply.field?.requireApproval ? (
+      {reply.field?.requireApproval && petition.isReviewFlowEnabled ? (
         <Stack
           direction="row"
           spacing={1}
@@ -476,6 +476,7 @@ PetitionRepliesFieldReply.fragments = {
       ... on Petition {
         status
       }
+      isReviewFlowEnabled
     }
   `,
   PetitionFieldReply: gql`

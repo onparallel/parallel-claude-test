@@ -283,18 +283,20 @@ export const PetitionHeader = Object.assign(
                   "data-testid": "petition-section-compose",
                 },
               },
-              {
-                rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
-                section: "messages",
-                label: intl.formatMessage({
-                  id: "petition.header.messages-tab",
-                  defaultMessage: "Messages",
-                }),
-                attributes: {
-                  "data-action": "template-messages",
-                  "data-testid": "petition-section-messages",
-                },
-              },
+              petition.isInteractionWithRecipientsEnabled
+                ? {
+                    rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
+                    section: "messages",
+                    label: intl.formatMessage({
+                      id: "petition.header.messages-tab",
+                      defaultMessage: "Messages",
+                    }),
+                    attributes: {
+                      "data-action": "template-messages",
+                      "data-testid": "petition-section-messages",
+                    },
+                  }
+                : null,
               {
                 section: "preview",
                 label: intl.formatMessage({
@@ -306,8 +308,8 @@ export const PetitionHeader = Object.assign(
                   "data-testid": "petition-section-preview",
                 },
               },
-            ],
-      [status, petition.isRestricted, intl.locale],
+            ].filter(isDefined),
+      [status, petition.isRestricted, petition.isInteractionWithRecipientsEnabled, intl.locale],
     );
 
     const [reopenPetition] = useMutation(PetitionHeader_reopenPetitionDocument);
@@ -633,16 +635,18 @@ export const PetitionHeader = Object.assign(
                       />
                     </MenuItem>
                   ) : null}
-                  <MenuItem
-                    onClick={() => handlePrintPdfTask(petition.id)}
-                    isDisabled={isAnonymized}
-                    icon={<DownloadIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="component.petition-header.export-pdf"
-                      defaultMessage="Export to PDF"
-                    />
-                  </MenuItem>
+                  {petition.isDocumentGenerationEnabled ? (
+                    <MenuItem
+                      onClick={() => handlePrintPdfTask(petition.id)}
+                      isDisabled={isAnonymized}
+                      icon={<DownloadIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.export-pdf"
+                        defaultMessage="Export to PDF"
+                      />
+                    </MenuItem>
+                  ) : null}
                   {me.hasProfilesAccess &&
                   petition.__typename === "Petition" &&
                   !petition.isAnonymized &&
@@ -843,6 +847,8 @@ export const PetitionHeader = Object.assign(
         return gql`
           fragment PetitionHeader_PetitionBase on PetitionBase {
             id
+            isDocumentGenerationEnabled
+            isInteractionWithRecipientsEnabled
             path
             ... on Petition {
               ...PetitionHeader_Petition

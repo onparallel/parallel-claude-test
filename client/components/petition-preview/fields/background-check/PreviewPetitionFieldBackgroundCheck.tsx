@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import {
-  BackgroundCheckIcon,
+  ShortSearchIcon,
   BusinessIcon,
   CheckIcon,
   CloseIcon,
@@ -419,7 +419,7 @@ export function KYCResearchFieldReplyProfile({
         ) : reply.content?.entity?.type === "Person" ? (
           <UserIcon />
         ) : (
-          <BackgroundCheckIcon />
+          <ShortSearchIcon />
         )}
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">

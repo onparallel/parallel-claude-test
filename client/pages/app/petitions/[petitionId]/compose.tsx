@@ -1027,7 +1027,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         section="compose"
         headerActions={
           petition?.__typename === "Petition" &&
-          !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) ? (
+          !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) &&
+          petition.isInteractionWithRecipientsEnabled ? (
             <ResponsiveButtonIcon
               data-testid="compose-send-petition-button"
               data-action="compose-next"
@@ -1077,7 +1078,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   id={`compose-petition-field-settings-${activeField.id}`}
                   data-testid="compose-petition-field-settings"
                   data-field-id={activeField.id}
-                  petitionId={petition.id}
+                  petition={petition}
                   key={activeField.id}
                   field={activeField}
                   fieldIndex={activeFieldWithIndex![1]}
@@ -1177,8 +1178,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onUnlinkField={handleUnlinkField}
               isReadOnly={isReadOnly}
             />
-
-            <PetitionComposeAttachments petition={petition} isReadOnly={isReadOnly} marginTop="4" />
+            {petition.isDocumentGenerationEnabled ? (
+              <PetitionComposeAttachments
+                petition={petition}
+                isReadOnly={isReadOnly}
+                marginTop="4"
+              />
+            ) : null}
 
             {petition.__typename === "PetitionTemplate" ? (
               <PetitionTemplateDescriptionEdit
@@ -1223,6 +1229,8 @@ const _fragments = {
     return gql`
       fragment PetitionCompose_PetitionBase on PetitionBase {
         id
+        isInteractionWithRecipientsEnabled
+        isDocumentGenerationEnabled
         ...PetitionLayout_PetitionBase
         ...PetitionSettings_PetitionBase
         ...PetitionComposeFieldList_PetitionBase
@@ -1263,6 +1271,7 @@ const _fragments = {
         isAnonymized
         ...PetitionComposeVariables_PetitionBase
         ...validatePetitionFields_PetitionBase
+        ...PetitionComposeFieldSettings_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionComposeFieldList.fragments.PetitionBase}
@@ -1272,6 +1281,7 @@ const _fragments = {
       ${PetitionComposeVariables.fragments.PetitionBase}
       ${this.PetitionField}
       ${validatePetitionFields.fragments.PetitionBase}
+      ${PetitionComposeFieldSettings.fragments.PetitionBase}
     `;
   },
   get PetitionField() {

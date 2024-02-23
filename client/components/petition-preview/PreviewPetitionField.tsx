@@ -118,7 +118,7 @@ export function PreviewPetitionField({
   async function handleCommentsButtonClick() {
     try {
       await showFieldComments({
-        petitionId,
+        petition,
         field,
         isTemplate: isCacheOnly,
         isDisabled,
@@ -373,10 +373,12 @@ PreviewPetitionField.fragments = {
       ...PreviewPetitionFieldBackgroundCheck_PetitionBase
       ...PreviewPetitionFieldKyc_PetitionBase
       ...PreviewPetitionFieldGroup_PetitionBase
+      ...PreviewPetitionFieldCommentsDialog_PetitionBase
     }
     ${PreviewPetitionFieldBackgroundCheck.fragments.PetitionBase}
     ${PreviewPetitionFieldKyc.fragments.PetitionBase}
     ${PreviewPetitionFieldGroup.fragments.PetitionBase}
+    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {

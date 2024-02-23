@@ -17,6 +17,7 @@ import {
   petitionIsNotAnonymized,
   petitionsAreOfTypePetition,
   petitionsAreOfTypeTemplate,
+  petitionsHaveEnabledInteractionWithRecipients,
   userHasAccessToPetitions,
   userHasEnabledIntegration,
   userHasFeatureFlag,
@@ -335,6 +336,7 @@ export const createBulkPetitionSendTask = mutationField("createBulkPetitionSendT
     petitionIsNotAnonymized("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
     petitionHasRepliableFields("templateId"),
+    petitionsHaveEnabledInteractionWithRecipients("templateId"),
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
