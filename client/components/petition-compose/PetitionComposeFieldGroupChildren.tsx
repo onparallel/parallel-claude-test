@@ -1,18 +1,18 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, HTMLChakraProps, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Stack, Text } from "@chakra-ui/react";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
 import {
   PetitionComposeFieldGroupChildren_PetitionFieldFragment,
   PetitionComposeFieldGroupChildren_UserFragment,
   PetitionFieldType,
 } from "@parallel/graphql/__types";
-import { assignRef } from "@parallel/utils/assignRef";
-import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
-import { Fragment, useCallback, useRef, useState } from "react";
+import { useState } from "react";
 import { useDrop } from "react-dnd";
 import { FormattedMessage } from "react-intl";
 import { isDefined, zip } from "remeda";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { AddFieldButton } from "../petition-common/AddFieldButton";
 import { AddFieldPopover } from "./AddFieldPopover";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
@@ -25,8 +25,6 @@ import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment
 import { PetitionFieldOptionsListEditor } from "./PetitionFieldOptionsListEditor";
 import { ReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
-import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
-import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 
 interface PetitionComposeFieldGroupChildrenProps
   extends Pick<
@@ -96,8 +94,9 @@ export function PetitionComposeFieldGroupChildren({
     [],
   );
   const showErrorDialog = useErrorDialog();
-  const handleAddNewField = async (type: PetitionFieldType) => {
+  const handleAddNewField = async (type: PetitionFieldType, position?: number) => {
     const childrenLength = field.children?.length ?? 0;
+    let _position = position ?? childrenLength + 1;
     if (
       (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
       childrenLength === 0 &&
@@ -114,121 +113,18 @@ export function PetitionComposeFieldGroupChildren({
         });
       } catch {}
     } else {
-      onAddField(type, childrenLength + 1, field.id);
+      // If the grouop has fields and they try to add to first position, we add it to the second position
+      if (
+        (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
+        childrenLength > 0 &&
+        position === 0 &&
+        !field.isInternal
+      ) {
+        _position = 1;
+      }
+      onAddField(type, _position, field.id);
     }
   };
-
-  const [hoveredFieldId, _setHoveredFieldId] = useState<string | null>(null);
-  const hoveredFieldIdRef = useRef<string>(null);
-  const hoveredFieldIdWhileMenuOpenedRef = useRef<string>(null);
-  const setHoveredFieldId = useCallback(
-    (fieldId: string | null) => {
-      _setHoveredFieldId(fieldId);
-      assignRef(hoveredFieldIdRef, fieldId);
-    },
-    [_setHoveredFieldId],
-  );
-  const [focusedFieldId, _setFocusedFieldId] = useState<string | null>(null);
-  const focusedFieldIdRef = useRef<string>(null);
-  const setFocusedFieldId = useCallback(
-    (fieldId: string | null) => {
-      _setFocusedFieldId(fieldId);
-      assignRef(focusedFieldIdRef, fieldId);
-    },
-    [_setFocusedFieldId],
-  );
-  const isMenuOpenedRef = useRef(false);
-  const timeoutRef = useRef<number>();
-  const fieldMouseHandlers = useMemoFactory(
-    (fieldId) =>
-      ({
-        onFocus(e) {
-          e.stopPropagation();
-          // see comment for onBlur below
-          clearTimeout(timeoutRef.current);
-          if (fieldId !== focusedFieldIdRef.current) {
-            setFocusedFieldId(fieldId);
-          }
-        },
-        onBlur() {
-          /**
-           * When moving from a field to another the following happens synchronously:
-           * - old active field -> blur event
-           * - new active field -> focus event
-           * To prevent hiding and showing the settings which would cause a bit of flickering
-           * we deactivate with a setTimeout that is cancelled on the focus event.
-           * This way instead of oldActiveId -> null -> newActiveId we oldActiveId -> newActiveId
-           * directly
-           */
-          timeoutRef.current = window.setTimeout(() => setFocusedFieldId(null));
-        },
-        onMouseMove() {
-          if (!isMenuOpenedRef.current) {
-            if (fieldId !== hoveredFieldIdRef.current) {
-              setHoveredFieldId(fieldId);
-            }
-          } else {
-            if (fieldId !== hoveredFieldIdWhileMenuOpenedRef.current) {
-              assignRef(hoveredFieldIdWhileMenuOpenedRef, fieldId);
-            }
-          }
-        },
-        onMouseEnter() {
-          clearTimeout(timeoutRef.current);
-          if (!isMenuOpenedRef.current) {
-            setHoveredFieldId(fieldId);
-          } else {
-            assignRef(hoveredFieldIdWhileMenuOpenedRef, fieldId);
-          }
-        },
-        onMouseLeave() {
-          // Something very similar to the focus/blur situation happens here, see comment
-          // for the onBlur handler above.
-          if (!isMenuOpenedRef.current) {
-            timeoutRef.current = window.setTimeout(() => setHoveredFieldId(null));
-          } else {
-            assignRef(hoveredFieldIdWhileMenuOpenedRef, null);
-          }
-        },
-      }) as HTMLChakraProps<"div">,
-    [setHoveredFieldId, setFocusedFieldId],
-  );
-
-  const addButtonMouseHandlers = useMemoFactory(
-    (fieldId) => ({
-      onMouseEnter() {
-        clearTimeout(timeoutRef.current);
-      },
-      onFocus() {
-        clearTimeout(timeoutRef.current);
-      },
-      onSelectFieldType(type: PetitionFieldType) {
-        if (isDefined(field.children)) {
-          let position = field.children.findIndex((f) => f.id === fieldId);
-          if (
-            (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
-            field.children.length > 0 &&
-            position === 0 &&
-            !field.isInternal
-          ) {
-            position = 1;
-          }
-          onAddField(type, position, field.id);
-        }
-      },
-      onOpen() {
-        assignRef(isMenuOpenedRef, true);
-      },
-      onClose() {
-        assignRef(isMenuOpenedRef, false);
-        if (hoveredFieldIdRef.current !== hoveredFieldIdWhileMenuOpenedRef.current) {
-          setHoveredFieldId(hoveredFieldIdWhileMenuOpenedRef.current);
-        }
-      },
-      user,
-    }),
-    [field.children?.length],
-  );
 
   const hasChildren = isDefined(field.children) && field.children.length > 0;
   const hasDropErrors = FIELD_GROUP_EXCLUDED_FIELD_TYPES.includes(draggedFieldType) && isOver;
@@ -271,38 +167,18 @@ export function PetitionComposeFieldGroupChildren({
 
         {hasChildren ? (
           zip(children, childrenFieldIndices).map(([field, fieldIndex], i) => {
-            const prevFieldId = children[i - 1]?.id ?? undefined;
-            const showAddFieldButton = [field.id, prevFieldId].some(
-              (id) => id === hoveredFieldId || id === focusedFieldId,
-            );
             const isActive = field.id === activeChildFieldId;
             const { onSettingsClick, ...restFieldProps } = fieldProps!(field.id);
-            const { onFocus, ...restMouseHandlers } = fieldMouseHandlers(field.id);
 
             return (
-              <Fragment key={field.id}>
-                {!isReadOnly && !isOver ? (
-                  <Box
-                    className="add-field-button-wrapper"
-                    position="relative"
-                    zIndex="1"
-                    display={showAddFieldButton ? "block" : "none"}
-                  >
-                    <AddFieldButton
-                      position="absolute"
-                      bottom={0}
-                      left="calc(50% - 14px)"
-                      transform="translate(-50%, 50%)"
-                      className="add-field-after-button"
-                      data-testid="small-add-field-button"
-                      colorScheme={
-                        petition.__typename === "PetitionTemplate" ? "primary" : undefined
-                      }
-                      isFieldGroupChild
-                      {...addButtonMouseHandlers(field.id)}
-                    />
-                  </Box>
-                ) : null}
+              <PetitionComposeFieldWrapper
+                key={field.id}
+                index={i}
+                isTemplate={petition.__typename === "PetitionTemplate"}
+                hideAddButtons={isReadOnly || isOver}
+                onAddNewField={handleAddNewField}
+                user={user}
+              >
                 <PetitionComposeField
                   ref={fieldRefs?.[field.id]}
                   borderTopRadius={i === 0 ? "md" : undefined}
@@ -317,8 +193,7 @@ export function PetitionComposeFieldGroupChildren({
                   petition={petition}
                   fieldIndex={fieldIndex}
                   index={i}
-                  onFocus={(e) => {
-                    onFocus?.(e);
+                  onFocus={() => {
                     if (!isActive && activeChildFieldId) {
                       onSettingsClick();
                     }
@@ -352,32 +227,8 @@ export function PetitionComposeFieldGroupChildren({
                     },
                   }}
                   {...restFieldProps}
-                  {...restMouseHandlers}
                 />
-                {i === children.length - 1 && !isReadOnly && !isOver ? (
-                  <Box
-                    className="add-field-button-wrapper"
-                    position="relative"
-                    zIndex="1"
-                    display={showAddFieldButton ? "block" : "none"}
-                  >
-                    <AddFieldButton
-                      position="absolute"
-                      bottom={0}
-                      left="calc(50% - 14px)"
-                      transform="translate(-50%, 50%)"
-                      className="add-field-after-button"
-                      data-testid="small-add-field-button"
-                      colorScheme={
-                        petition.__typename === "PetitionTemplate" ? "primary" : undefined
-                      }
-                      isFieldGroupChild
-                      {...addButtonMouseHandlers(field.id)}
-                      onSelectFieldType={handleAddNewField}
-                    />
-                  </Box>
-                ) : null}
-              </Fragment>
+              </PetitionComposeFieldWrapper>
             );
           })
         ) : (
@@ -413,6 +264,108 @@ export function PetitionComposeFieldGroupChildren({
         </AddFieldPopover>
       ) : null}
     </Stack>
+  );
+}
+
+function PetitionComposeFieldWrapper({
+  user,
+  isTemplate,
+  index,
+  onAddNewField,
+  hideAddButtons,
+  children,
+  ...props
+}: {
+  user: PetitionComposeFieldGroupChildren_UserFragment;
+  isTemplate: boolean;
+  index: number;
+  onAddNewField: (type: PetitionFieldType, position?: number) => void;
+  hideAddButtons?: boolean;
+  children: React.ReactNode;
+}) {
+  const [showAddFieldButton, setShowAddFieldButton] = useState(false);
+
+  return (
+    <Box
+      {...props}
+      sx={{
+        "&:hover, &:focus-within": {
+          ".add-field-button-wrapper": {
+            visibility: "visible",
+          },
+          ".field-actions-children": {
+            display: "flex",
+          },
+        },
+      }}
+      onFocus={(e) => {
+        e.stopPropagation();
+        setShowAddFieldButton(true);
+      }}
+      onBlur={() => {
+        setShowAddFieldButton(false);
+      }}
+    >
+      {!hideAddButtons ? (
+        <Box
+          className="add-field-button-wrapper"
+          position="relative"
+          zIndex="1"
+          sx={{
+            visibility: showAddFieldButton ? "visible" : "hidden",
+            "& :hover, & :focus-within": {
+              visibility: "visible",
+            },
+          }}
+        >
+          <AddFieldButton
+            position="absolute"
+            bottom={0}
+            left="calc(50% - 14px)"
+            transform="translate(-50%, 50%)"
+            className="add-field-after-button"
+            data-testid="small-add-field-button"
+            colorScheme={isTemplate ? "primary" : undefined}
+            isFieldGroupChild
+            onSelectFieldType={(type) => onAddNewField(type, index)}
+            user={user}
+            onOpen={() => {
+              setShowAddFieldButton(true);
+            }}
+          />
+        </Box>
+      ) : null}
+      {children}
+      {!hideAddButtons ? (
+        <Box
+          className="add-field-button-wrapper"
+          position="relative"
+          zIndex="1"
+          sx={{
+            visibility: showAddFieldButton ? "visible" : "hidden",
+            "& :hover, & :focus-within": {
+              visibility: "visible",
+            },
+          }}
+        >
+          <AddFieldButton
+            position="absolute"
+            bottom={0}
+            left="calc(50% - 14px)"
+            transform="translate(-50%, 50%)"
+            className="add-field-after-button"
+            data-testid="small-add-field-button"
+            colorScheme={isTemplate ? "primary" : undefined}
+            isFieldGroupChild
+            onSelectFieldType={(type) => onAddNewField(type, index + 1)}
+            user={user}
+            onOpen={() => {
+              setShowAddFieldButton(true);
+            }}
+          />
+        </Box>
+      ) : null}
+    </Box>
   );
 }
 

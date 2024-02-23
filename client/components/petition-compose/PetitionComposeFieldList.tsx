@@ -472,7 +472,12 @@ export const PetitionComposeFieldList = Object.assign(
                     className="add-field-button-wrapper"
                     position="relative"
                     zIndex="1"
-                    display={showAddFieldButton ? "block" : "none"}
+                    sx={{
+                      visibility: showAddFieldButton ? "visible" : "hidden",
+                      "& :hover, & :focus-within": {
+                        visibility: "visible",
+                      },
+                    }}
                   >
                     <AddFieldButton
                       position="absolute"
