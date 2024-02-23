@@ -1,5 +1,4 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs, useSafeLayoutEffect } from "@chakra-ui/react";
-import { useRouter } from "next/router";
 import { Fragment, ReactNode, useRef } from "react";
 import { NakedLink } from "../common/Link";
 
@@ -22,7 +21,6 @@ export function SettingsTabsInnerLayout<T extends string>({
   tabs,
   children,
 }: SettingsTabsInnerLayoutProps<T>) {
-  const router = useRouter();
   const currentTabRef = useRef<HTMLAnchorElement>(null);
   useSafeLayoutEffect(() => {
     // trigger :focus-visible
@@ -30,15 +28,11 @@ export function SettingsTabsInnerLayout<T extends string>({
     currentTabRef.current!.focus();
     currentTabRef.current!.contentEditable = "false";
   }, [currentTabKey]);
+
   return (
     <Tabs
       variant="enclosed"
       index={tabs.findIndex((t) => t.key === currentTabKey)!}
-      onChange={(index) => {
-        if (index >= 0 && !tabs[index].isDisabled) {
-          router.push(tabs[index].href!);
-        }
-      }}
       flex={1}
       display="flex"
       flexDirection="column"
