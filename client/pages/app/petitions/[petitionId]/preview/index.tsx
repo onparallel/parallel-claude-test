@@ -44,6 +44,7 @@ import {
   useHiddenFieldDialog,
 } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
+import { PetitionPreviewStartSignatureButton } from "@parallel/components/petition-preview/PetitionPreviewStartSignatureButton";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import {
   GeneratePrefilledPublicLinkDialog,
@@ -78,7 +79,6 @@ import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
-import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { withMetadata } from "@parallel/utils/withMetadata";
@@ -410,12 +410,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
   }, []);
 
-  const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
-    user: me,
-    petition: petition.__typename === "Petition" ? petition : (null as never),
-    onRefetch: refetch,
-  });
-
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
@@ -445,16 +439,21 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           ) : isPetition &&
             petition.signatureConfig &&
             !petition.isInteractionWithRecipientsEnabled &&
-            petition.isDocumentGenerationEnabled ? (
-            <Button
+            !petition.isReviewFlowEnabled &&
+            petition.isDocumentGenerationEnabled &&
+            (petition.signatureRequests.length === 0 ||
+              ["COMPLETED", "CANCELLING", "CANCELLED"].includes(
+                petition.signatureRequests[0].status,
+              )) ? (
+            <PetitionPreviewStartSignatureButton
               data-action="preview-start-signature"
               id="petition-start-signature"
               colorScheme="primary"
+              user={me}
+              petition={petition}
               isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-              onClick={handleStartSignature}
-            >
-              {buttonLabel}
-            </Button>
+              onRefetch={() => refetch()}
+            />
           ) : null
         }
         subHeader={
@@ -689,6 +688,7 @@ const _fragments = {
       id
       isInteractionWithRecipientsEnabled
       isDocumentGenerationEnabled
+      isReviewFlowEnabled
       organization {
         id
         brandTheme {
@@ -701,12 +701,15 @@ const _fragments = {
         permissionType
       }
       ... on Petition {
-        ...useStartSignatureRequest_Petition
+        ...PetitionPreviewStartSignatureButton_Petition
         ...ConfirmPetitionSignersDialog_Petition
         accesses {
           id
           status
           isContactless
+        }
+        signatureRequests {
+          status
         }
         ...RecipientViewProgressFooter_Petition
         ...useSendPetitionHandler_Petition
@@ -760,7 +763,7 @@ const _fragments = {
       ...HiddenFieldDialog_PetitionBase
       ...validatePetitionFields_PetitionBase
     }
-    ${useStartSignatureRequest.fragments.Petition}
+    ${PetitionPreviewStartSignatureButton.fragments.Petition}
     ${ConfirmPetitionSignersDialog.fragments.Petition}
     ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     ${RecipientViewProgressFooter.fragments.Petition}
@@ -800,7 +803,7 @@ const _fragments = {
         ...useSendPetitionHandler_User
         ...ConfirmPetitionSignersDialog_User
         ...PreviewPetitionField_User
-        ...useStartSignatureRequest_User
+        ...PetitionPreviewStartSignatureButton_User
       }
     }
     ${PetitionLayout.fragments.Query}
@@ -808,7 +811,7 @@ const _fragments = {
     ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
     ${useSendPetitionHandler.fragments.User}
     ${ConfirmPetitionSignersDialog.fragments.User}
-    ${useStartSignatureRequest.fragments.User}
+    ${PetitionPreviewStartSignatureButton.fragments.User}
   `,
 };
 

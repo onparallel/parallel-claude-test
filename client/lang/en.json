@@ -9236,8 +9236,8 @@
   },
   {
     "term": "component.use-start-signature-request.start",
-    "definition": "Start...",
-    "context": "Start..."
+    "definition": "Start signature",
+    "context": "Start signature"
   },
   {
     "term": "component.user-dropdown-empty.invite-button",
