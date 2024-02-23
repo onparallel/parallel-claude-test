@@ -435,6 +435,11 @@
     "context": "You are using the time zone {timezone}."
   },
   {
+    "term": "component.recipient-view-petition-field-file-upload.dropzone-placeholder",
+    "definition": "{tone, select, INFORMAL{Arrasta ficheiros para aqui ou clica para os selecionar} other {Arraste os arquivos aqui ou clique para selecionar}}",
+    "context": "Drag files here, or click to select them"
+  },
+  {
     "term": "component.recipient-view-petition-field-group.add-button",
     "definition": "Adicionar {groupName}",
     "context": "Add {groupName}"
@@ -853,11 +858,6 @@
     "term": "generic.done",
     "definition": "Pronto",
     "context": "Done"
-  },
-  {
-    "term": "generic.dropzone-default",
-    "definition": "Arrasta ficheiros para aqui ou clica para os selecionar",
-    "context": "Drag files here, or click to select them"
   },
   {
     "term": "generic.dropzone-error-file-too-large",

@@ -435,6 +435,11 @@
     "context": "You are using the time zone {timezone}."
   },
   {
+    "term": "component.recipient-view-petition-field-file-upload.dropzone-placeholder",
+    "definition": "",
+    "context": "Drag files here, or click to select them"
+  },
+  {
     "term": "component.recipient-view-petition-field-group.add-button",
     "definition": "",
     "context": "Add {groupName}"
@@ -853,11 +858,6 @@
     "term": "generic.done",
     "definition": "",
     "context": "Done"
-  },
-  {
-    "term": "generic.dropzone-default",
-    "definition": "",
-    "context": "Drag files here, or click to select them"
   },
   {
     "term": "generic.dropzone-error-file-too-large",

@@ -355,6 +355,8 @@ function PetitionFieldFileUploadDropzone({
   parentReplyId,
   ...props
 }: PetitionFieldFileUploadDropzoneProps) {
+  const tone = useTone();
+
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
 
   const MAX_FILE_SIZE = 300 * 1024 * 1024;
@@ -390,8 +392,9 @@ function PetitionFieldFileUploadDropzone({
         {({ isDragActive, isDragReject }) => (
           <Box pointerEvents="none">
             <FormattedMessage
-              id="generic.dropzone-default"
+              id="component.recipient-view-petition-field-file-upload.dropzone-placeholder"
               defaultMessage="Drag files here, or click to select them"
+              values={{ tone }}
             />
           </Box>
         )}

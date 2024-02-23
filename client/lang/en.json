@@ -7260,6 +7260,11 @@
     "context": "You are using the time zone {timezone}."
   },
   {
+    "term": "component.recipient-view-petition-field-file-upload.dropzone-placeholder",
+    "definition": "Drag files here, or click to select them",
+    "context": "Drag files here, or click to select them"
+  },
+  {
     "term": "component.recipient-view-petition-field-group.add-button",
     "definition": "Add {groupName}",
     "context": "Add {groupName}"
@@ -9868,11 +9873,6 @@
     "term": "generic.drag-to-sort",
     "definition": "Drag to sort",
     "context": "Drag to sort"
-  },
-  {
-    "term": "generic.dropzone-default",
-    "definition": "Drag files here, or click to select them",
-    "context": "Drag files here, or click to select them"
   },
   {
     "term": "generic.dropzone-error-file-invalid-type",
