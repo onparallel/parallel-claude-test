@@ -416,16 +416,7 @@ export class PetitionBinder implements IPetitionBinder {
         files,
         async (file) => {
           if (file.content_type.startsWith("image/")) {
-            // jpeg can be used directly, other types need processing
-            const imageUrl =
-              file.content_type === "image/jpeg"
-                ? await this.storage.fileUploads.getSignedDownloadEndpoint(
-                    file.path,
-                    file.filename,
-                    "inline",
-                  )
-                : await this.convertImage(file.path, file.content_type);
-
+            const imageUrl = await this.convertImage(file.path, file.content_type);
             return await this.writeTemporaryFile(
               this.printer.imageToPdf(userId, { imageUrl, theme: theme.data }),
               "pdf",
