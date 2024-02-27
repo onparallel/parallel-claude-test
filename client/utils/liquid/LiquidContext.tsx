@@ -13,8 +13,8 @@ function useCreateLiquid() {
     engine.registerFilter("number", function (value: any, digits?: number) {
       if (typeof value === "string") {
         value = parseFloat(value);
-      } else if (typeof value === "object" && "toString" in value) {
-        value = parseFloat(value.toString());
+      } else if (typeof value === "object" && "valueOf" in value) {
+        value = parseFloat(value.valueOf());
       }
       if (typeof value !== "number") {
         return undefined;
@@ -29,8 +29,8 @@ function useCreateLiquid() {
     engine.registerFilter("currency", function (value: any, currency: string) {
       if (typeof value === "string") {
         value = parseFloat(value);
-      } else if (typeof value === "object" && "toString" in value) {
-        value = parseFloat(value.toString());
+      } else if (typeof value === "object" && "valueOf" in value) {
+        value = parseFloat(value.valueOf());
       }
       if (typeof value !== "number") {
         return undefined;
@@ -42,8 +42,8 @@ function useCreateLiquid() {
     engine.registerFilter("percent", function (value: any, digits?: number) {
       if (typeof value === "string") {
         value = parseFloat(value);
-      } else if (typeof value === "object" && "toString" in value) {
-        value = parseFloat(value.toString());
+      } else if (typeof value === "object" && "valueOf" in value) {
+        value = parseFloat(value.valueOf());
       }
       if (typeof value !== "number") {
         return undefined;
