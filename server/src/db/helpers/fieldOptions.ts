@@ -1,8 +1,8 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { isDefined } from "remeda";
-import { CreatePetitionField, PetitionField, PetitionFieldType } from "../__types";
 import { toGlobalId } from "../../util/globalId";
+import { CreatePetitionField, PetitionField, PetitionFieldType } from "../__types";
 
 const SCHEMAS = {
   NUMBER: {
@@ -125,14 +125,18 @@ const SCHEMAS = {
     properties: {
       labels: {
         type: ["array", "null"],
+        maxItems: 1000,
         items: {
           type: "string",
+          maxLength: 2000,
         },
       },
       values: {
-        type: ["array", "null"],
+        type: "array",
+        maxItems: 1000,
         items: {
           type: "string",
+          maxLength: 2000,
         },
       },
       placeholder: {
@@ -193,14 +197,18 @@ const SCHEMAS = {
     properties: {
       labels: {
         type: ["array", "null"],
+        maxItems: 1000,
         items: {
           type: "string",
+          maxLength: 2000,
         },
       },
       values: {
-        type: ["array", "null"],
+        type: "array",
+        maxItems: 1000,
         items: {
           type: "string",
+          maxLength: 2000,
         },
       },
       limit: {

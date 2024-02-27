@@ -3821,13 +3821,13 @@ export type PetitionUserPermission = PetitionPermission &
   };
 
 export type PetitionVariable = {
-  defaultValue: Scalars["Int"]["output"];
+  defaultValue: Scalars["Float"]["output"];
   name: Scalars["String"]["output"];
 };
 
 export type PetitionVariableResult = {
   name: Scalars["String"]["output"];
-  value: Maybe<Scalars["Int"]["output"]>;
+  value: Maybe<Scalars["Float"]["output"]>;
 };
 
 export type Profile = Timestamps & {

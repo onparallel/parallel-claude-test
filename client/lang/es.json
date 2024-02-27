@@ -3205,14 +3205,19 @@
     "context": "Field not visible"
   },
   {
+    "term": "component.import-options-settings-row.description-1",
+    "definition": "Sube un <b>archivo .xlsx</b> para cargar el listado de opciones",
+    "context": "Upload an <b>.xlsx file</b> to load the list of options."
+  },
+  {
+    "term": "component.import-options-settings-row.label",
+    "definition": "Importar opciones de Excel",
+    "context": "Import options from Excel"
+  },
+  {
     "term": "component.import-replies-dialog.checkbox-overwrite-replies",
     "definition": "Sobreescribir respuestas existentes",
     "context": "Overwrite existing replies"
-  },
-  {
-    "term": "component.import-replies-dialog.limport-button",
-    "definition": "Importar",
-    "context": "Import"
   },
   {
     "term": "component.import-replies-dialog.mapping-despcription",
@@ -3248,6 +3253,46 @@
     "term": "component.import-replies-dialog.title",
     "definition": "Importar respuestas",
     "context": "Import replies"
+  },
+  {
+    "term": "component.import-select-options-dialog.attach-xlsx",
+    "definition": "Sube un archivo .xlsx como el modelo. Si quieres conservar las opciones existentes, descárgalas para incluirlas en la importación.",
+    "context": "Upload a .xlsx file like the provided model. If you want to keep the existing options, download them to include them in the import."
+  },
+  {
+    "term": "component.import-select-options-dialog.default-file-name",
+    "definition": "opciones",
+    "context": "options"
+  },
+  {
+    "term": "component.import-select-options-dialog.download-empty-model",
+    "definition": "Descargar modelo vacío",
+    "context": "Download empty model"
+  },
+  {
+    "term": "component.import-select-options-dialog.download-existing-options",
+    "definition": "Descargar opciones actuales",
+    "context": "Download existing options"
+  },
+  {
+    "term": "component.import-select-options-dialog.header",
+    "definition": "Importar opciones de Excel",
+    "context": "Import options from Excel"
+  },
+  {
+    "term": "component.import-select-options-dialog.import-from-excel-error-dialog-body",
+    "definition": "Por favor, revisa tu archivo y asegúrate de que no hay casillas vacías en el listado.",
+    "context": "Please, review your file and make sure there are no empty values."
+  },
+  {
+    "term": "component.import-select-options-dialog.import-from-excel-error-dialog-body-2",
+    "definition": "Si desea añadir etiquetas a los valores, todos los valores deben tener una etiqueta.",
+    "context": "If you want to add labels to the values, all values must have a label."
+  },
+  {
+    "term": "component.import-select-options-dialog.import-from-excel-error-dialog-header",
+    "definition": "Error de importación",
+    "context": "Import error"
   },
   {
     "term": "component.internal-field-badge.popover",
@@ -4868,6 +4913,11 @@
     "term": "component.petition-field-math-operator-select.substraction",
     "definition": "Resta",
     "context": "Substract"
+  },
+  {
+    "term": "component.petition-field-options-list-editor.settings-imported-options-description",
+    "definition": "Opciones importadas con valores internos. Para editarlas, importa un archivo Excel desde los ajustes de campo.",
+    "context": "Options imported with internal values. To edit, import an Excel file from field settings."
   },
   {
     "term": "component.petition-field-select.placeholder",
@@ -10245,6 +10295,11 @@
     "context": "I understand"
   },
   {
+    "term": "generic.import",
+    "definition": "Importar",
+    "context": "Import"
+  },
+  {
     "term": "generic.import-error",
     "definition": "Error de importación",
     "context": "Import error"
@@ -14983,6 +15038,16 @@
     "term": "user-group.all-members.description",
     "definition": "Este equipo contiene a todos los usuarios de la organización.",
     "context": "This team contains all users from the organization."
+  },
+  {
+    "term": "util.generate-value-label-excel.label",
+    "definition": "Descripción",
+    "context": "Label"
+  },
+  {
+    "term": "util.generate-value-label-excel.value",
+    "definition": "Valor interno",
+    "context": "Internal value"
   },
   {
     "term": "util.get-open-sanctions-relationship.board-member",

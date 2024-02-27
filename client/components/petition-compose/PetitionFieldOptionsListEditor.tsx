@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
+import { SettingsIcon } from "@parallel/chakra/icons";
 import {
   PetitionFieldOptionsListEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -13,12 +14,14 @@ import {
   KeyboardEvent,
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { FormattedMessage } from "react-intl";
-import { pipe } from "remeda";
+import { isDefined, pipe } from "remeda";
 import { shallowEqualArrays } from "shallow-equal";
 import { Editor, Point, Transforms, createEditor } from "slate";
 import { withHistory } from "slate-history";
@@ -65,6 +68,38 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
       const editorRef = useUpdatingRef(editor);
       const [value, onChange] = useState(valuesToSlateNodes(field.options.values ?? []));
+      const currentValues = useRef(field.options.values);
+
+      const hasLabels =
+        ["SELECT", "CHECKBOX"].includes(field.type) &&
+        isDefined(field.options.labels) &&
+        field.options.values.length === field.options.labels.length;
+
+      useEffect(() => {
+        if (!hasLabels && !shallowEqualArrays(field.options.values, currentValues.current)) {
+          const newSlateValue = valuesToSlateNodes(field.options.values);
+          onChange(newSlateValue);
+
+          const currentEditor = editorRef.current;
+
+          Editor.withoutNormalizing(currentEditor, () => {
+            // Select all the nodes
+            Transforms.select(currentEditor, {
+              anchor: Editor.start(currentEditor, []),
+              focus: Editor.end(currentEditor, []),
+            });
+            // Deletes all the selection and the empty node that creates by default
+            Transforms.delete(currentEditor);
+            Transforms.removeNodes(currentEditor, { at: [0] });
+
+            // Insert new values as nodes
+            Transforms.insertNodes(currentEditor, newSlateValue, { at: [0] });
+          });
+
+          currentValues.current = field.options.values;
+        }
+      }, [field.options.values.join(","), hasLabels]);
+
       useImperativeHandle(
         ref,
         () =>
@@ -136,6 +171,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
           } else {
             onFieldEdit({ options: { ...field.options, values } });
           }
+          currentValues.current = values;
         }
       }, [field.options.values, value, onFieldEdit, onChange]);
 
@@ -143,21 +179,37 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       const isInvalid =
         field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
 
-      return isReadOnly ? (
-        <Box textStyle="muted">
-          {field.options.values.map((value: string, index: number) => {
-            return (
-              <Text
-                key={index}
-                fontSize="sm"
-                marginY={0}
-                _before={{ content: "'-'", marginRight: 1 }}
-              >
-                {value}
+      return isReadOnly || hasLabels ? (
+        <>
+          {hasLabels ? (
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="component.petition-field-options-list-editor.settings-imported-options-description"
+                defaultMessage="Options imported with internal values. To edit, import an Excel file from field settings."
+              />
+              <Text as="span" marginLeft={1} position="relative" top="-1px">
+                (<SettingsIcon />)
               </Text>
-            );
-          })}
-        </Box>
+            </Text>
+          ) : null}
+
+          <Box textStyle="muted">
+            {field.options.values.map((value: string, index: number) => {
+              const label = field.options.labels?.[index];
+              return (
+                <Text
+                  key={index}
+                  fontSize="sm"
+                  marginY={0}
+                  _before={{ content: "'-'", marginRight: 1 }}
+                >
+                  {value}
+                  {isDefined(label) ? `: ${label}` : null}
+                </Text>
+              );
+            })}
+          </Box>
+        </>
       ) : (
         <Slate editor={editor} initialValue={value} onChange={onChange as any}>
           <Box maxHeight="200px" overflow="auto" fontSize="sm">

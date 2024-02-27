@@ -102,6 +102,7 @@
     "react-number-format": "^5.3.1",
     "react-select": "^5.8.0",
     "react-window": "^1.8.10",
+    "read-excel-file": "^5.7.1",
     "remeda": "^1.43.0",
     "request-ip": "^3.3.0",
     "sanitize-filename": "^1.6.3",
@@ -116,7 +117,8 @@
     "truncate-utf8-bytes": "^1.0.2",
     "ts-essentials": "^9.4.1",
     "ua-parser-js": "^1.0.37",
-    "userflow.js": "^2.12.0"
+    "userflow.js": "^2.12.0",
+    "write-excel-file": "^1.4.29"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",

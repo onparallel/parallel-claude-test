@@ -15782,6 +15782,13 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
   };
 };
 
+export type ImportOptionsSettingsRow_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  options: { [key: string]: any };
+};
+
 export type SettingsRowAlias_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -47766,6 +47773,13 @@ export const useEditPetitionFieldCalculationsDialog_PetitionBaseFragmentDoc = gq
   }
   ${PetitionFieldMathEditor_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<useEditPetitionFieldCalculationsDialog_PetitionBaseFragment, unknown>;
+export const ImportOptionsSettingsRow_PetitionFieldFragmentDoc = gql`
+  fragment ImportOptionsSettingsRow_PetitionField on PetitionField {
+    id
+    title
+    options
+  }
+` as unknown as DocumentNode<ImportOptionsSettingsRow_PetitionFieldFragment, unknown>;
 export const ViewTabs_UserFragmentDoc = gql`
   fragment ViewTabs_User on User {
     id

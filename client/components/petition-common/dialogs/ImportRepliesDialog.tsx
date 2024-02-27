@@ -408,10 +408,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
               defaultMessage="Next"
             />
           ) : (
-            <FormattedMessage
-              id="component.import-replies-dialog.limport-button"
-              defaultMessage="Import"
-            />
+            <FormattedMessage id="generic.import" defaultMessage="Import" />
           )}
         </Button>
       }

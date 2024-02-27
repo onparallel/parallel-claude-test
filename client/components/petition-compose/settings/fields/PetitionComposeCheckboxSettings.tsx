@@ -15,6 +15,8 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
+import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
+import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 
 type CheckboxLimitType = "UNLIMITED" | "EXACT" | "RANGE" | "RADIO";
 
@@ -122,9 +124,12 @@ export function PetitionComposeCheckboxSettings({
       },
     });
   };
-
+  const handleFieldEdit = (data: UpdatePetitionFieldInput) => {
+    onFieldEdit(field.id, data);
+  };
   return (
     <>
+      <ImportOptionsSettingsRow field={field} onChange={handleFieldEdit} isDisabled={isReadOnly} />
       <SettingsRowSwitch
         isDisabled={isReadOnly}
         isChecked={limitType !== "RADIO"}

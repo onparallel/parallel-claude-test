@@ -33,6 +33,7 @@ import { SettingsRowAlias } from "./rows/SettingsRowAlias";
 import { SettingsRowPlaceholder } from "./rows/SettingsRowPlaceholder";
 import { ShowPdfSettingsRow } from "./rows/ShowPdfSettingsRow";
 import { ShowReplyActivitySettingsRow } from "./rows/ShowReplyActivitySettingsRow";
+import { PetitionComposeSelectSettings } from "./fields/PetitionComposeSelectSettings";
 
 export interface PetitionComposeFieldSettingsProps {
   petition: PetitionComposeFieldSettings_PetitionBaseFragment;
@@ -57,6 +58,7 @@ const COMPONENTS: Partial<
   HEADING: PetitionComposeHeadingSettings,
   CHECKBOX: PetitionComposeCheckboxSettings,
   DYNAMIC_SELECT: PetitionComposeDynamicSelectFieldSettings,
+  SELECT: PetitionComposeSelectSettings,
   FIELD_GROUP: PetitionComposeFieldGroupSettings,
   NUMBER: PetitionComposeNumberSettings,
   SHORT_TEXT: PetitionComposeShortTextSettings,

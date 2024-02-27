@@ -1249,6 +1249,20 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         });
         data.options = { ...field.options, ...options };
 
+        if (["SELECT", "CHECKBOX"].includes(field.type)) {
+          const { values, labels } = data.options as {
+            labels?: string[] | null;
+            values?: string[] | null;
+          };
+          if (!isDefined(values) && isDefined(labels)) {
+            throw new Error("Values are required when labels are defined");
+          }
+          // make sure every or none of the values have a label
+          if (isDefined(values) && isDefined(labels) && values.length !== labels.length) {
+            throw new Error("The number of values and labels should match");
+          }
+        }
+
         if (
           field.type === "SHORT_TEXT" &&
           isDefined(data.options.format) &&

@@ -47,7 +47,7 @@ export interface FieldOptions {
   };
   SELECT: {
     values: string[];
-    labels?: string[];
+    labels?: Maybe<string[]>;
     placeholder?: Maybe<string>;
   };
   DYNAMIC_SELECT: {
