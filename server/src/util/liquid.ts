@@ -3,6 +3,7 @@ import { IntlShape } from "react-intl";
 import { isDefined } from "remeda";
 import { DateLiquidValue, DateTimeLiquidValue } from "../pdf/utils/liquid/LiquidValue";
 import { FORMATS, prettifyTimezone } from "./dates";
+import { startOfToday } from "date-fns";
 
 export function createLiquid() {
   const engine = new Liquid({ cache: true });
@@ -62,7 +63,14 @@ export function createLiquid() {
       if (!isDefined(format) || !["LL", "L"].includes(format)) {
         format = "LL";
       }
-      const _value = value instanceof DateLiquidValue ? value.content.value : value;
+      let _value: string | number | Date | undefined;
+      if (value instanceof DateLiquidValue) {
+        _value = value.content.value;
+      } else if (value === "now" || value === "today") {
+        _value = startOfToday();
+      } else {
+        _value = value;
+      }
       const intl = (this.context.globals as any)["intl"] as IntlShape;
       return intl.formatDate(_value, {
         timeZone: "UTC",
@@ -80,7 +88,16 @@ export function createLiquid() {
       if (!isDefined(format) || !["LLL", "L+LT", "L+LTS"].includes(format)) {
         format = "LLL";
       }
-      const _value = value instanceof DateTimeLiquidValue ? value.content.value : value;
+      let _value: string | number | Date | undefined;
+      if (value instanceof DateTimeLiquidValue) {
+        _value = value.content.value;
+      } else if (value === "now") {
+        _value = Date.now();
+      } else if (value === "today") {
+        _value = startOfToday();
+      } else {
+        _value = value;
+      }
       const timezone = value instanceof DateTimeLiquidValue ? value.content.timezone : "UTC";
       const intl = (this.context.globals as any)["intl"] as IntlShape;
 
