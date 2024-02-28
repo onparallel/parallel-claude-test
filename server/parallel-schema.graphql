@@ -2995,15 +2995,7 @@ type Petition implements PetitionBase {
   Indicates whether delegate access is enabled for the recipient
   """
   isDelegateAccessEnabled: Boolean!
-
-  """
-  TODO: add description
-  """
   isDocumentGenerationEnabled: Boolean!
-
-  """
-  TODO: add description
-  """
   isInteractionWithRecipientsEnabled: Boolean!
 
   """
@@ -3012,10 +3004,6 @@ type Petition implements PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
-
-  """
-  TODO: add description
-  """
   isReviewFlowEnabled: Boolean!
   lastActivityAt: DateTime
 
@@ -3350,15 +3338,7 @@ interface PetitionBase {
   Indicates whether delegate access is enabled for the recipient
   """
   isDelegateAccessEnabled: Boolean!
-
-  """
-  TODO: add description
-  """
   isDocumentGenerationEnabled: Boolean!
-
-  """
-  TODO: add description
-  """
   isInteractionWithRecipientsEnabled: Boolean!
 
   """
@@ -3367,10 +3347,6 @@ interface PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
-
-  """
-  TODO: add description
-  """
   isReviewFlowEnabled: Boolean!
   lastActivityAt: DateTime @deprecated(reason: "")
 
@@ -4760,15 +4736,7 @@ type PetitionTemplate implements PetitionBase {
   Indicates whether delegate access is enabled for the recipient
   """
   isDelegateAccessEnabled: Boolean!
-
-  """
-  TODO: add description
-  """
   isDocumentGenerationEnabled: Boolean!
-
-  """
-  TODO: add description
-  """
   isInteractionWithRecipientsEnabled: Boolean!
 
   """
@@ -4782,10 +4750,6 @@ type PetitionTemplate implements PetitionBase {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
   isRestricted: Boolean!
   isRestrictedWithPassword: Boolean!
-
-  """
-  TODO: add description
-  """
   isReviewFlowEnabled: Boolean!
   lastActivityAt: DateTime @deprecated(reason: "")
 

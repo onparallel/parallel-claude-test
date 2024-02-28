@@ -358,15 +358,12 @@ export const PetitionBase = interfaceType({
       resolve: (o) => o.enable_delegate_access,
     });
     t.nonNull.boolean("isInteractionWithRecipientsEnabled", {
-      description: "TODO: add description",
       resolve: (o) => o.enable_interaction_with_recipients,
     });
     t.nonNull.boolean("isReviewFlowEnabled", {
-      description: "TODO: add description",
       resolve: (o) => o.enable_review_flow,
     });
     t.nonNull.boolean("isDocumentGenerationEnabled", {
-      description: "TODO: add description",
       resolve: (o) => o.enable_document_generation,
     });
     t.datetime("lastChangeAt", {

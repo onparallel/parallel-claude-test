@@ -2661,9 +2661,7 @@ export type Petition = PetitionBase & {
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
   /** Indicates whether delegate access is enabled for the recipient */
   isDelegateAccessEnabled: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isDocumentGenerationEnabled: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isInteractionWithRecipientsEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
@@ -2672,7 +2670,6 @@ export type Petition = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isReviewFlowEnabled: Scalars["Boolean"]["output"];
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the petition or any of its relations were last updated. */
@@ -2849,9 +2846,7 @@ export type PetitionBase = {
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
   /** Indicates whether delegate access is enabled for the recipient */
   isDelegateAccessEnabled: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isDocumentGenerationEnabled: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isInteractionWithRecipientsEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
@@ -2860,7 +2855,6 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isReviewFlowEnabled: Scalars["Boolean"]["output"];
   /** @deprecated  */
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
@@ -3702,9 +3696,7 @@ export type PetitionTemplate = PetitionBase & {
   isCompletingMessageEnabled: Scalars["Boolean"]["output"];
   /** Indicates whether delegate access is enabled for the recipient */
   isDelegateAccessEnabled: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isDocumentGenerationEnabled: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isInteractionWithRecipientsEnabled: Scalars["Boolean"]["output"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"]["output"];
@@ -3715,7 +3707,6 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   isRestricted: Scalars["Boolean"]["output"];
   isRestrictedWithPassword: Scalars["Boolean"]["output"];
-  /** TODO: add description */
   isReviewFlowEnabled: Scalars["Boolean"]["output"];
   /** @deprecated  */
   lastActivityAt: Maybe<Scalars["DateTime"]["output"]>;
