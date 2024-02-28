@@ -74,8 +74,6 @@ Testing uses the [jest](https://jestjs.io/) testing framework. In order to run t
 yarn test
 ```
 
-This command will create the testing stack using `docker-compose` (look inside `./test/setup.ts` and `./test/teardown.ts`).
-
 # Naming conventions
 
 ## Repository methods
