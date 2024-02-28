@@ -27,7 +27,7 @@ export async function generateValueLabelExcel(
         {
           value: intl.formatMessage({
             id: "util.generate-value-label-excel.label",
-            defaultMessage: "Label",
+            defaultMessage: "Label (optional)",
           }),
           fontWeight: "bold",
         },

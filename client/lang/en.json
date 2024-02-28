@@ -15041,8 +15041,8 @@
   },
   {
     "term": "util.generate-value-label-excel.label",
-    "definition": "Label",
-    "context": "Label"
+    "definition": "Label (optional)",
+    "context": "Label (optional)"
   },
   {
     "term": "util.generate-value-label-excel.value",

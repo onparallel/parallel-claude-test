@@ -3286,7 +3286,7 @@
   },
   {
     "term": "component.import-select-options-dialog.import-from-excel-error-dialog-body-2",
-    "definition": "Si desea añadir etiquetas a los valores, todos los valores deben tener una etiqueta.",
+    "definition": "Si deseas añadir descripciones a los valores, todos los valores deben tener una descripción.",
     "context": "If you want to add labels to the values, all values must have a label."
   },
   {
@@ -15041,8 +15041,8 @@
   },
   {
     "term": "util.generate-value-label-excel.label",
-    "definition": "Descripción",
-    "context": "Label"
+    "definition": "Descripción (opcional)",
+    "context": "Label (optional)"
   },
   {
     "term": "util.generate-value-label-excel.value",
