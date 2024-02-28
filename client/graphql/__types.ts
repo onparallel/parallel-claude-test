@@ -16563,7 +16563,12 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
     minSigners: number;
     instructions?: string | null;
     allowAdditionalSigners: boolean;
-    integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      id: string;
+      environment: SignatureOrgIntegrationEnvironment;
+      name: string;
+    } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -19159,7 +19164,12 @@ export type NewSignatureRequestRow_PetitionFragment = {
       lastName?: string | null;
       isPreset: boolean;
     } | null>;
-    integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      id: string;
+      environment: SignatureOrgIntegrationEnvironment;
+      name: string;
+    } | null;
   } | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
@@ -34101,7 +34111,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   id: string;
   isInteractionWithRecipientsEnabled: boolean;
   isDocumentGenerationEnabled: boolean;
-  isReviewFlowEnabled: boolean;
   tone: Tone;
   isAnonymized: boolean;
   status: PetitionStatus;
@@ -34563,7 +34572,6 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   isInteractionWithRecipientsEnabled: boolean;
   isDocumentGenerationEnabled: boolean;
-  isReviewFlowEnabled: boolean;
   tone: Tone;
   isAnonymized: boolean;
   defaultPath: string;
@@ -35020,7 +35028,6 @@ export type PetitionPreview_updatePetitionMutation = {
         id: string;
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
-        isReviewFlowEnabled: boolean;
         tone: Tone;
         isAnonymized: boolean;
         status: PetitionStatus;
@@ -35489,7 +35496,6 @@ export type PetitionPreview_updatePetitionMutation = {
         id: string;
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
-        isReviewFlowEnabled: boolean;
         tone: Tone;
         isAnonymized: boolean;
         defaultPath: string;
@@ -35901,7 +35907,6 @@ export type PetitionPreview_completePetitionMutation = {
     id: string;
     isInteractionWithRecipientsEnabled: boolean;
     isDocumentGenerationEnabled: boolean;
-    isReviewFlowEnabled: boolean;
     tone: Tone;
     isAnonymized: boolean;
     status: PetitionStatus;
@@ -36370,7 +36375,6 @@ export type PetitionPreview_petitionQuery = {
         id: string;
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
-        isReviewFlowEnabled: boolean;
         tone: Tone;
         isAnonymized: boolean;
         status: PetitionStatus;
@@ -36839,7 +36843,6 @@ export type PetitionPreview_petitionQuery = {
         id: string;
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
-        isReviewFlowEnabled: boolean;
         tone: Tone;
         isAnonymized: boolean;
         defaultPath: string;
@@ -45862,7 +45865,12 @@ export type useStartSignatureRequest_PetitionFragment = {
     minSigners: number;
     instructions?: string | null;
     allowAdditionalSigners: boolean;
-    integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      id: string;
+      environment: SignatureOrgIntegrationEnvironment;
+      name: string;
+    } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -46037,7 +46045,12 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
           minSigners: number;
           instructions?: string | null;
           allowAdditionalSigners: boolean;
-          integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            environment: SignatureOrgIntegrationEnvironment;
+            name: string;
+          } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -46217,7 +46230,12 @@ export type useStartSignatureRequest_completePetitionMutation = {
       minSigners: number;
       instructions?: string | null;
       allowAdditionalSigners: boolean;
-      integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        environment: SignatureOrgIntegrationEnvironment;
+        name: string;
+      } | null;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -51612,6 +51630,8 @@ export const useStartSignatureRequest_PetitionFragmentDoc = gql`
       timezone
       integration {
         id
+        environment
+        name
       }
       ...ConfirmPetitionSignersDialog_SignatureConfig
       review
@@ -52041,7 +52061,6 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
     id
     isInteractionWithRecipientsEnabled
     isDocumentGenerationEnabled
-    isReviewFlowEnabled
     organization {
       id
       brandTheme {

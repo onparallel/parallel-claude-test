@@ -16,21 +16,25 @@ import { useCallback } from "react";
 import { useIntl } from "react-intl";
 import { omit } from "remeda";
 import { isApolloError } from "./apollo/isApolloError";
+import { useGoToPetitionSection } from "./goToPetition";
 import { withError } from "./promises/withError";
-import { Maybe } from "./types";
+import { Maybe, MaybePromise } from "./types";
 import { usePetitionCanFinalize } from "./usePetitionCanFinalize";
 import { usePetitionLimitReachedErrorDialog } from "./usePetitionLimitReachedErrorDialog";
+import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 
 interface UseStartSignatureRequestProps {
   user: useStartSignatureRequest_UserFragment;
   petition: useStartSignatureRequest_PetitionFragment;
-  onRefetch?: () => void;
+  onRefetch?: () => MaybePromise<void>;
+  options?: { redirect: boolean };
 }
 
 export function useStartSignatureRequest({
   user,
   petition,
   onRefetch,
+  options = { redirect: true },
 }: UseStartSignatureRequestProps) {
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
@@ -51,6 +55,8 @@ export function useStartSignatureRequest({
 
   const toast = useToast();
   const intl = useIntl();
+  const goToSection = useGoToPetitionSection();
+  const showTestSignatureDialog = useHandledTestSignatureDialog();
 
   const handleStartSignatureProcess = useCallback(
     async (message?: Maybe<string>, complete?: boolean) => {
@@ -67,21 +73,6 @@ export function useStartSignatureRequest({
             variables: { petitionId: petition.id, message },
           });
         }
-
-        toast({
-          isClosable: true,
-          duration: 5000,
-          title: intl.formatMessage({
-            id: "component.use-start-signature-request.signature-sent-toast-title",
-            defaultMessage: "eSignature sent",
-          }),
-          description: intl.formatMessage({
-            id: "component.use-start-signature-request.signature-sent-toast-description",
-            defaultMessage: "Your signature is on its way.",
-          }),
-          status: "success",
-        });
-        onRefetch?.();
       } catch (error: any) {
         if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
           await withError(showPetitionLimitReachedErrorDialog());
@@ -121,7 +112,32 @@ export function useStartSignatureRequest({
         const completePetition = !reviewBeforeSigning && canFinalize;
 
         if (startSignature || completePetition) {
-          handleStartSignatureProcess(message, completePetition);
+          await showTestSignatureDialog(
+            petition.signatureConfig?.integration?.environment,
+            petition.signatureConfig?.integration?.name,
+          );
+
+          await handleStartSignatureProcess(message, completePetition);
+
+          toast({
+            isClosable: true,
+            status: "success",
+            title: intl.formatMessage({
+              id: "component.use-start-signature-request.signature-sent-toast-title",
+              defaultMessage: "eSignature sent",
+            }),
+            description: intl.formatMessage({
+              id: "component.use-start-signature-request.signature-sent-toast-description",
+              defaultMessage: "Your signature is on its way.",
+            }),
+          });
+
+          await onRefetch?.();
+          if (options.redirect) {
+            setTimeout(() => {
+              goToSection("replies");
+            }, 500);
+          }
         }
       } catch {}
     },
@@ -159,6 +175,8 @@ useStartSignatureRequest.fragments = {
         timezone
         integration {
           id
+          environment
+          name
         }
         ...ConfirmPetitionSignersDialog_SignatureConfig
         review

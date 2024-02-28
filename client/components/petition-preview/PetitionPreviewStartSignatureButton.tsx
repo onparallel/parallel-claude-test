@@ -10,20 +10,15 @@ import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureReque
 interface PetitionPreviewStartSignatureButtonProps extends ButtonOptions, ThemingProps<"Button"> {
   user: PetitionPreviewStartSignatureButton_UserFragment;
   petition: PetitionPreviewStartSignatureButton_PetitionFragment;
-  onRefetch?: () => void;
   isDisabled?: boolean;
 }
 
 export const PetitionPreviewStartSignatureButton = Object.assign(
   chakraForwardRef<"button", PetitionPreviewStartSignatureButtonProps>(
-    function PetitionPreviewStartSignatureButton(
-      { user, petition, onRefetch, isDisabled, ...props },
-      ref,
-    ) {
+    function PetitionPreviewStartSignatureButton({ user, petition, isDisabled, ...props }, ref) {
       const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
         user,
         petition,
-        onRefetch,
       });
 
       return (

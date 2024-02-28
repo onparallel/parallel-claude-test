@@ -29,6 +29,7 @@ export function NewSignatureRequestRow({
     user,
     petition,
     onRefetch,
+    options: { redirect: false },
   });
 
   return (

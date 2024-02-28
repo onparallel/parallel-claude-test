@@ -381,16 +381,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     ],
   );
 
-  const displayPetitionLimitReachedAlert =
-    me.organization.isPetitionUsageLimitReached && isPetition && petition.status === "DRAFT";
-
-  const showGeneratePrefilledPublicLinkButton =
-    me.hasPublicLinkPrefill &&
-    petition.__typename === "PetitionTemplate" &&
-    petition.publicLink?.isActive &&
-    petition.fields.some(
-      (f) => !isFileTypeField(f.type) && isDefined(f.alias) && f.previewReplies.length > 0,
-    );
   const showGeneratePrefilledPublicLinkDialog = useGeneratePrefilledPublicLinkDialog();
   async function handleGeneratePrefilledPublicLinkClick() {
     try {
@@ -410,6 +400,38 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
   }, []);
 
+  const displayPetitionLimitReachedAlert =
+    me.organization.isPetitionUsageLimitReached && isPetition && petition.status === "DRAFT";
+
+  const showGeneratePrefilledPublicLinkButton =
+    me.hasPublicLinkPrefill &&
+    petition.__typename === "PetitionTemplate" &&
+    petition.publicLink?.isActive &&
+    petition.fields.some(
+      (f) => !isFileTypeField(f.type) && isDefined(f.alias) && f.previewReplies.length > 0,
+    );
+
+  const showSendToButton =
+    isPetition &&
+    !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) &&
+    petition.isInteractionWithRecipientsEnabled;
+
+  const showStartSignatureButton =
+    isPetition &&
+    petition.signatureConfig &&
+    petition.signatureConfig.review === false &&
+    !petition.isInteractionWithRecipientsEnabled &&
+    petition.isDocumentGenerationEnabled &&
+    (petition.signatureRequests.length === 0 ||
+      ["COMPLETED", "CANCELLING", "CANCELLED"].includes(petition.signatureRequests[0].status) ||
+      petition.status !== "COMPLETED");
+
+  const showPetitionCompletedAlert =
+    isPetition &&
+    !petition.signatureConfig?.review &&
+    ["COMPLETED", "CLOSED"].includes(petition.status) &&
+    !petition.isAnonymized;
+
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
@@ -421,9 +443,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         onRefetch={() => refetch()}
         section="preview"
         headerActions={
-          isPetition &&
-          !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) &&
-          petition.isInteractionWithRecipientsEnabled ? (
+          showSendToButton ? (
             <ResponsiveButtonIcon
               data-action="preview-next"
               id="petition-next"
@@ -436,15 +456,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               })}
               onClick={handleNextClick}
             />
-          ) : isPetition &&
-            petition.signatureConfig &&
-            !petition.isInteractionWithRecipientsEnabled &&
-            !petition.isReviewFlowEnabled &&
-            petition.isDocumentGenerationEnabled &&
-            (petition.signatureRequests.length === 0 ||
-              ["COMPLETED", "CANCELLING", "CANCELLED"].includes(
-                petition.signatureRequests[0].status,
-              )) ? (
+          ) : showStartSignatureButton ? (
             <PetitionPreviewStartSignatureButton
               data-action="preview-start-signature"
               id="petition-start-signature"
@@ -452,7 +464,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               user={me}
               petition={petition}
               isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-              onRefetch={() => refetch()}
             />
           ) : null
         }
@@ -496,12 +507,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             {displayPetitionLimitReachedAlert ? (
               <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
             ) : null}
-            {isPetition &&
-            !petition.signatureConfig?.review &&
-            ["COMPLETED", "CLOSED"].includes(petition.status) &&
-            !petition.isAnonymized ? (
-              <PetitionCompletedAlert />
-            ) : null}
+            {showPetitionCompletedAlert ? <PetitionCompletedAlert /> : null}
             {showRefreshRepliesAlert ? (
               <RecipientViewRefreshRepliesAlert
                 onRefetch={async () => {
@@ -688,7 +694,6 @@ const _fragments = {
       id
       isInteractionWithRecipientsEnabled
       isDocumentGenerationEnabled
-      isReviewFlowEnabled
       organization {
         id
         brandTheme {
