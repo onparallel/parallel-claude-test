@@ -3256,7 +3256,7 @@
   },
   {
     "term": "component.import-select-options-dialog.attach-xlsx",
-    "definition": "Sube un archivo .xlsx como el modelo. Si quieres conservar las opciones existentes, descárgalas para incluirlas en la importación.",
+    "definition": "Sube un archivo .xlsx como el del modelo. Si quieres conservar las opciones existentes, descárgalas para incluirlas en la importación.",
     "context": "Upload a .xlsx file like the provided model. If you want to keep the existing options, download them to include them in the import."
   },
   {
