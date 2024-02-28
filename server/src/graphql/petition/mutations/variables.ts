@@ -68,7 +68,7 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
       inputObjectType({
         name: "UpdatePetitionVariableInput",
         definition(t) {
-          t.nonNull.int("defaultValue");
+          t.nonNull.float("defaultValue");
         },
       }),
     ),

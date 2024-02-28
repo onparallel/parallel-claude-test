@@ -7640,7 +7640,7 @@ export class PetitionRepository extends BaseRepository {
         variables = (
         select jsonb_agg(
           case
-            when element->>'name' = ? then jsonb_build_object('name', ?::text, 'default_value', ?::int)
+            when element->>'name' = ? then jsonb_build_object('name', ?::text, 'default_value', ?::float)
             else element
           end
         )

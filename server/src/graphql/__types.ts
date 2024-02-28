@@ -363,7 +363,7 @@ export interface NexusGenInputs {
   };
   UpdatePetitionVariableInput: {
     // input type
-    defaultValue: number; // Int!
+    defaultValue: number; // Float!
   };
   UpdateProfileFieldValueInput: {
     // input type

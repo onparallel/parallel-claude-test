@@ -7005,7 +7005,7 @@ input UpdatePetitionInput {
 }
 
 input UpdatePetitionVariableInput {
-  defaultValue: Int!
+  defaultValue: Float!
 }
 
 input UpdateProfileFieldValueInput {
