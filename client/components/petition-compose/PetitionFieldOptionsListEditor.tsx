@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, List, ListItem, Text } from "@chakra-ui/react";
 import { SettingsIcon } from "@parallel/chakra/icons";
 import {
   PetitionFieldOptionsListEditor_PetitionFieldFragment,
@@ -193,22 +193,17 @@ export const PetitionFieldOptionsListEditor = Object.assign(
             </Text>
           ) : null}
 
-          <Box textStyle="muted">
+          <List textStyle="muted" maxHeight="200px" overflow="auto" fontSize="sm">
             {field.options.values.map((value: string, index: number) => {
               const label = field.options.labels?.[index];
               return (
-                <Text
-                  key={index}
-                  fontSize="sm"
-                  marginY={0}
-                  _before={{ content: "'-'", marginRight: 1 }}
-                >
+                <ListItem key={index} _before={{ content: "'-'", marginRight: 1 }}>
                   {value}
                   {isDefined(label) ? `: ${label}` : null}
-                </Text>
+                </ListItem>
               );
             })}
-          </Box>
+          </List>
         </>
       ) : (
         <Slate editor={editor} initialValue={value} onChange={onChange as any}>
@@ -220,6 +215,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
               {...props}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              as="ul"
               aria-invalid={(showError && isInvalid) || undefined}
             />
           </Box>
@@ -245,7 +241,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
 function renderElement({ attributes, children, element }: RenderElementProps) {
   return (
     <Text
-      as="div"
+      as="li"
       _before={{ content: "'-'", marginRight: 1 }}
       sx={{
         "[aria-invalid] &": {
