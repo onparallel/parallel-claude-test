@@ -23,8 +23,8 @@ import { wait, waitFor } from "./utils/wait";
 type Environment = "staging" | "production";
 
 const INSTANCE_TYPES = {
-  production: "t2.large",
-  staging: "t2.medium",
+  production: "t3.large",
+  staging: "t3.medium",
 } satisfies Record<Environment, _InstanceType>;
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-006ccce39b6f04158";

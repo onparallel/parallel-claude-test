@@ -12,8 +12,8 @@ const run_1 = require("./utils/run");
 const ssh_1 = require("./utils/ssh");
 const wait_1 = require("./utils/wait");
 const INSTANCE_TYPES = {
-    production: "t2.large",
-    staging: "t2.medium",
+    production: "t3.large",
+    staging: "t3.medium",
 };
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-006ccce39b6f04158";
