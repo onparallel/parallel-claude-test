@@ -53,6 +53,7 @@ export async function petitionClosedNotification(
       continue;
     }
     const access = await context.petitions.loadAccess(event.data.petition_access_id);
+    const [message] = await context.petitions.loadMessagesByPetitionAccessId(access!.id);
     const granterData = await context.users.loadUserDataByUserId(access!.granter_id);
     const contact = access!.contact_id
       ? await context.contacts.loadContact(access!.contact_id)
@@ -85,6 +86,7 @@ export async function petitionClosedNotification(
         contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granterData.first_name, granterData.last_name)!,
         senderEmail: granterData.email,
+        subject: message?.email_subject ?? null,
         bodyHtml,
         bodyPlainText: renderSlateWithPlaceholdersToText(payload.message, getValues),
         ...layoutProps,

@@ -11,6 +11,7 @@ export type PetitionClosedNotificationProps = {
   contactFullName: string;
   senderName: string;
   senderEmail: string;
+  subject: string | null;
   bodyHtml: string;
   bodyPlainText: string;
 } & LayoutProps;
@@ -25,13 +26,16 @@ const email: Email<PetitionClosedNotificationProps> = {
       { senderName },
     );
   },
-  subject({ senderName }, intl) {
-    return intl.formatMessage(
-      {
-        id: "petition-closed-notification.subject",
-        defaultMessage: "{senderName} confirmed receipt of the information.",
-      },
-      { senderName },
+  subject({ senderName, subject }, intl) {
+    return (
+      subject ??
+      intl.formatMessage(
+        {
+          id: "petition-closed-notification.subject",
+          defaultMessage: "{senderName} confirmed receipt of the information.",
+        },
+        { senderName },
+      )
     );
   },
   text({ senderName, senderEmail, bodyPlainText }, intl) {
