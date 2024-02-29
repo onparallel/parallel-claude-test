@@ -5,7 +5,7 @@ import { isDefined } from "remeda";
 import { FORMATS, prettifyTimezone } from "../dates";
 import { useConstant } from "../useConstant";
 import { DateLiquidValue, DateTimeLiquidValue } from "./LiquidValue";
-import { startOfToday } from "date-fns";
+import { startOfToday, format as formatDate } from "date-fns";
 
 function useCreateLiquid() {
   return useConstant(() => {
@@ -63,16 +63,19 @@ function useCreateLiquid() {
         if (value === undefined) {
           return "";
         }
-        if (!isDefined(format) || !["LL", "L"].includes(format)) {
+        if (!isDefined(format) || !["LL", "L", "ISO"].includes(format)) {
           format = "LL";
         }
         let _value: string | number | Date | undefined;
         if (value instanceof DateLiquidValue) {
           _value = value.content.value;
         } else if (value === "now" || value === "today") {
-          _value = startOfToday();
+          _value = formatDate(startOfToday(), "yyyy-MM-dd");
         } else {
           _value = value;
+        }
+        if (format === "ISO") {
+          return formatDate(new Date(_value), "yyyy-MM-dd");
         }
         const intl = (this.context.globals as any)["intl"] as IntlShape;
         return intl.formatDate(_value, {
@@ -96,8 +99,6 @@ function useCreateLiquid() {
           _value = value.content.value;
         } else if (value === "now") {
           _value = Date.now();
-        } else if (value === "today") {
-          _value = startOfToday();
         } else {
           _value = value;
         }
