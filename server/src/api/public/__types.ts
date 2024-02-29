@@ -7357,6 +7357,7 @@ export type UpdatePetitionField_updatePetitionFieldMutationVariables = Exact<{
   fieldId: Scalars["GID"]["input"];
   title?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
+  options?: InputMaybe<Scalars["JSONObject"]["input"]>;
 }>;
 
 export type UpdatePetitionField_updatePetitionFieldMutation = {
@@ -10363,11 +10364,12 @@ export const UpdatePetitionField_updatePetitionFieldDocument = gql`
     $fieldId: GID!
     $title: String
     $description: String
+    $options: JSONObject
   ) {
     updatePetitionField(
       petitionId: $petitionId
       fieldId: $fieldId
-      data: { title: $title, description: $description }
+      data: { title: $title, description: $description, options: $options }
     ) {
       ...PetitionField
     }

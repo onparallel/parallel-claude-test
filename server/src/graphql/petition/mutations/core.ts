@@ -1261,6 +1261,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           if (isDefined(values) && isDefined(labels) && values.length !== labels.length) {
             throw new Error("The number of values and labels should match");
           }
+          if (isDefined(labels) && labels.some((l) => l.trim() === "")) {
+            throw new Error("Labels cannot be empty");
+          }
+          if (isDefined(options.values) && !isDefined(options.labels)) {
+            data.options.labels = null;
+          }
         }
 
         if (

@@ -323,10 +323,34 @@ const _PetitionFieldInner = {
       example: "firstName",
     },
     options: {
-      type: ["array"],
       description:
-        "For fields of type `SELECT`, `DYNAMIC_SELECT` and `CHECKBOX`. An array with valid options for the reply.",
-      items: { type: "string" },
+        "For fields of type `SELECT` and `CHECKBOX`. An array with valid options for the reply.",
+      anyOf: [
+        {
+          type: "array",
+          items: {
+            type: "string",
+          },
+        },
+        {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["value", "label"],
+            properties: {
+              value: {
+                type: "string",
+                description: "The value of the option",
+              },
+              label: {
+                type: "string",
+                description: "The label of the option",
+              },
+            },
+          },
+        },
+      ],
       example: [],
     },
     optional: {
@@ -980,6 +1004,44 @@ export const UpdatePetitionField = schema({
       description: "The description of the parallel field",
       type: ["string", "null"],
       example: "Please, write your ID number",
+    },
+    options: {
+      description:
+        "For fields of type `SELECT` and `CHECKBOX`. An array with valid options. Items in the array can be strings or objects with `value` and `label` properties.",
+      anyOf: [
+        {
+          type: "array",
+          maxItems: 1000,
+          items: {
+            type: "string",
+            minLength: 1,
+            maxLength: 2000,
+          },
+        },
+        {
+          type: "array",
+          maxItems: 1000,
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["value", "label"],
+            properties: {
+              value: {
+                type: "string",
+                description: "The value of the option",
+                minLength: 1,
+                maxLength: 2000,
+              },
+              label: {
+                type: "string",
+                description: "The label of the option",
+                minLength: 1,
+                maxLength: 2000,
+              },
+            },
+          },
+        },
+      ],
     },
   },
 } as const);

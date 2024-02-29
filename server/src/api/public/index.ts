@@ -1626,10 +1626,13 @@ api
       operationId: "UpdatePetitionField",
       summary: "Update parallel field",
       description: outdent`
-      Update the title and/or description of the specified field on a parallel.
+      Update the title, description and/or options of the specified field on a parallel.
     `,
       body: JsonBody(UpdatePetitionField),
-      responses: { 200: SuccessResponse(PetitionField) },
+      responses: {
+        200: SuccessResponse(PetitionField),
+        400: ErrorResponse({ description: "Invalid request body" }),
+      },
       tags: ["Parallels"],
     },
     async ({ client, params, body }) => {
@@ -1639,25 +1642,51 @@ api
           $fieldId: GID!
           $title: String
           $description: String
+          $options: JSONObject
         ) {
           updatePetitionField(
             petitionId: $petitionId
             fieldId: $fieldId
-            data: { title: $title, description: $description }
+            data: { title: $title, description: $description, options: $options }
           ) {
             ...PetitionField
           }
         }
         ${PetitionFieldFragment}
       `;
-      const result = await client.request(UpdatePetitionField_updatePetitionFieldDocument, {
-        petitionId: params.petitionId,
-        fieldId: params.fieldId,
-        description: body.description,
-        title: body.title,
-      });
-      assert("id" in result.updatePetitionField!);
-      return Ok(mapPetitionField(result.updatePetitionField));
+
+      let options;
+      if (isDefined(body.options)) {
+        options =
+          typeof body.options[0] === "string"
+            ? { values: body.options, labels: null }
+            : {
+                values: body.options.map((x) => (x as any).value),
+                labels: body.options.map((x) => (x as any).label),
+              };
+
+        if (options.labels?.length === 0) {
+          options.labels = null;
+        }
+      }
+
+      try {
+        const result = await client.request(UpdatePetitionField_updatePetitionFieldDocument, {
+          petitionId: params.petitionId,
+          fieldId: params.fieldId,
+          description: body.description,
+          title: body.title,
+          options,
+        });
+        assert("id" in result.updatePetitionField!);
+        return Ok(mapPetitionField(result.updatePetitionField));
+      } catch (error) {
+        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          throw new BadRequestError("Invalid request body");
+        }
+
+        throw error;
+      }
     },
   );
 

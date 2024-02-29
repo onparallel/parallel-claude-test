@@ -3,7 +3,7 @@ import { createReadStream } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import { performance } from "perf_hooks";
-import { isDefined, omit, pick, pipe, uniq } from "remeda";
+import { isDefined, omit, pick, pipe, uniq, zip } from "remeda";
 import { promisify } from "util";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -200,7 +200,15 @@ export function mapPetitionField<T extends PetitionFieldFragment>(field: T) {
         "multiple",
         "optional",
       ]),
-      options: (field.options.values ?? []) as any[],
+      options:
+        ["CHECKBOX", "SELECT"].includes(field.type) && isDefined(field.options.labels)
+          ? zip(field.options.values, field.options.labels).map(([value, label]) => ({
+              value,
+              label,
+            }))
+          : field.type === "DYNAMIC_SELECT"
+            ? []
+            : field.options.values ?? [],
     };
   }
   return {
