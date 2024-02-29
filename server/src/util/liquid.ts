@@ -96,8 +96,6 @@ export function createLiquid() {
         _value = value.content.value;
       } else if (value === "now") {
         _value = Date.now();
-      } else if (value === "today") {
-        _value = startOfToday();
       } else {
         _value = value;
       }
