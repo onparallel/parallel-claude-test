@@ -41,8 +41,10 @@ jobs:
           yarn workspace @parallel/server extract-i18n-terms
           yarn workspace @parallel/server generate-i18n-files
           echo "Checking client translations..."
-          yarn workspace @parallel/client extract-i18n-terms
-          yarn workspace @parallel/client generate-i18n-files
+          yarn workspace @parallel/client extract-i18n-terms:recipient
+          yarn workspace @parallel/client generate-i18n-files:recipient
+          yarn workspace @parallel/client extract-i18n-terms:app
+          yarn workspace @parallel/client generate-i18n-files:app
 
 concurrency:
   group: ${{ github.ref }}-main
