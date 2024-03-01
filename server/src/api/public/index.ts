@@ -337,7 +337,11 @@ export const api = new RestApi({
     req.requestId = randomUUID();
     return {
       client: new GraphQLClient("http://localhost/graphql", {
-        headers: { authorization, "api-request-id": req.requestId },
+        headers: {
+          authorization,
+          "api-request-id": req.requestId,
+          "User-Agent": "parallel-api",
+        },
       }),
     };
   },
