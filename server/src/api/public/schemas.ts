@@ -2278,6 +2278,10 @@ export const CreateSubscription = schema({
       description: "Optional name to identify the subscription",
       example: "My subscription",
     },
+    type: {
+      type: "string",
+      enum: ["PETITION"],
+    },
     eventsUrl: {
       description: "The URL where you will receive POST requests with real time parallel events",
       type: "string",
