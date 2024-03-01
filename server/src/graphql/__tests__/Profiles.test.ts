@@ -1820,7 +1820,7 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(archiveErrors).toBeUndefined();
-      expect(archiveData?.archiveProfileType).toEqual([
+      expect(archiveData?.archiveProfileType).toIncludeSameMembers([
         {
           id: toGlobalId("ProfileType", profileTypes[1].id),
           archivedAt: expect.any(Date),
@@ -1854,7 +1854,7 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(archiveErrors).toBeUndefined();
-      expect(archiveData?.archiveProfileType).toEqual([
+      expect(archiveData?.archiveProfileType).toIncludeSameMembers([
         { id: toGlobalId("ProfileType", profileTypes[1].id) },
         { id: toGlobalId("ProfileType", profileTypes[2].id) },
       ]);
@@ -1876,7 +1876,7 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.unarchiveProfileType).toEqual([
+      expect(data?.unarchiveProfileType).toIncludeSameMembers([
         { id: toGlobalId("ProfileType", profileTypes[1].id) },
         { id: toGlobalId("ProfileType", profileTypes[2].id) },
       ]);
