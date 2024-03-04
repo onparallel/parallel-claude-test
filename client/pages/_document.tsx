@@ -97,7 +97,7 @@ class MyDocument extends Document<MyDocumentProps> {
 
   override render() {
     const { locale, messages, isRecipientPage: isRecipient } = this.props;
-    const polyfillsUrl = `https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
+    const polyfillsUrl = `https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=${encodeURIComponent(
       [
         ...POLYFILLS,
         ...POLYFILLS_INTL.flatMap((polyfill) => [polyfill, `${polyfill}.~locale.${locale}`]),
