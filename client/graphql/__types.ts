@@ -5463,7 +5463,7 @@ export interface UpdatePetitionInput {
 }
 
 export interface UpdatePetitionVariableInput {
-  defaultValue: Scalars["Int"]["input"];
+  defaultValue: Scalars["Float"]["input"];
 }
 
 export interface UpdateProfileFieldValueInput {
@@ -46492,6 +46492,9 @@ export const AppLayout_QueryFragmentDoc = gql`
         name
         petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
       }
+    }
+    realMe {
+      id
     }
     ...AppLayoutNavbar_Query
   }

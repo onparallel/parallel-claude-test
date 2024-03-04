@@ -28,6 +28,8 @@ import { Canny } from "../scripts/Canny";
 import { Segment } from "../scripts/Segment";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
+const HIDE_INTERCOM_PATHS = ["/app/petitions/[petitionId]/preview"];
+
 export interface AppLayoutProps extends AppLayout_QueryFragment {
   title: string;
 }
@@ -49,11 +51,12 @@ export const AppLayout = Object.assign(
       useCallback((matches) => {
         if (!matches) {
           window.intercomSettings = { hide_default_launcher: true };
-          window.Intercom?.("update");
         } else {
-          window.intercomSettings = { hide_default_launcher: false };
-          window.Intercom?.("update");
+          window.intercomSettings = {
+            hide_default_launcher: HIDE_INTERCOM_PATHS.includes(router.pathname) ? true : false,
+          };
         }
+        window.Intercom?.("update");
       }, []),
     );
 
@@ -111,29 +114,35 @@ export const AppLayout = Object.assign(
 
     // Load Segment analytics and identify user
     useEffect(() => {
-      if (window.analytics && !(window.analytics as any).initialized) {
-        window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY);
+      if (me.id === realMe.id) {
+        if (window.analytics && !(window.analytics as any).initialized) {
+          window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY);
+        }
+        window.analytics?.identify(me.id, {
+          email: me.email,
+          locale: router.locale,
+          firstName: me.firstName,
+          lastName: me.lastName,
+          createdAt: me.createdAt,
+          isOrgOwner: me.isOrgOwner,
+          name: me.fullName!,
+          lastActiveAt: me.lastActiveAt,
+          company: {
+            id: me.organization.id,
+            name: me.organization.name,
+            petitionsSubscriptionEndDate: me.organization.petitionsSubscriptionEndDate,
+          },
+        });
       }
-      window.analytics?.identify(me.id, {
-        email: me.email,
-        locale: router.locale,
-        firstName: me.firstName,
-        lastName: me.lastName,
-        createdAt: me.createdAt,
-        isOrgOwner: me.isOrgOwner,
-        name: me.fullName!,
-        lastActiveAt: me.lastActiveAt,
-        company: {
-          id: me.organization.id,
-          name: me.organization.name,
-          petitionsSubscriptionEndDate: me.organization.petitionsSubscriptionEndDate,
-        },
-      });
-    }, [me.id]);
+    }, [me.id, realMe.id]);
 
     // Initialize userflow
     useEffect(() => {
-      if (!userflow.isIdentified() && process.env.NODE_ENV === "production") {
+      if (
+        !userflow.isIdentified() &&
+        process.env.NODE_ENV === "production" &&
+        me.id === realMe.id
+      ) {
         // don't show userflow to certain users for better e2e testing purposes
         const userflowOmitEmails = (process.env.NEXT_PUBLIC_USERFLOW_OMIT ?? "").split(",");
         if (
@@ -154,7 +163,7 @@ export const AppLayout = Object.assign(
           device_type: window.innerWidth < 480 ? "mobile" : "desktop",
         });
       }
-    }, [me.id]);
+    }, [me.id, realMe.id]);
 
     // Identify user in Sentry
     useEffect(() => {
@@ -318,6 +327,9 @@ export const AppLayout = Object.assign(
               name
               petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
             }
+          }
+          realMe {
+            id
           }
           ...AppLayoutNavbar_Query
         }
