@@ -16,8 +16,9 @@ export async function parseValueLabelFromExcel(file: File) {
   if (options.some((x) => x.label) && !options.every((x) => x.label)) {
     throw new Error("Either no labels or all options must have a label");
   }
-
-  if (options.some((x) => x.label.length > 2000 || x.value.length > 2000)) {
+  if (
+    options.some((x) => (x.label && x.label.length > 2000) || (x.value && x.value.length > 2000))
+  ) {
     throw new Error("Values and labels must be less than 2000 characters");
   }
   return {
