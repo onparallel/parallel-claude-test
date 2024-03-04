@@ -5263,7 +5263,7 @@ export type UpdatePetitionInput = {
 };
 
 export type UpdatePetitionVariableInput = {
-  defaultValue: Scalars["Int"]["input"];
+  defaultValue: Scalars["Float"]["input"];
 };
 
 export type UpdateProfileFieldValueInput = {

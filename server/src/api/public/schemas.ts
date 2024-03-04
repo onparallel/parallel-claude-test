@@ -2349,7 +2349,7 @@ export const FileUpload = schema({
 const _SignatureRequest = {
   type: "object",
   additionalProperties: false,
-  required: ["id", "environment", "createdAt", "updatedAt", "status"],
+  required: ["id", "environment", "createdAt", "updatedAt", "status", "signers"],
   properties: {
     id: {
       type: "string",
@@ -2363,6 +2363,17 @@ const _SignatureRequest = {
       enum: ["DEMO", "PRODUCTION"],
       example: "PRODUCTION",
     },
+    status: {
+      type: "string",
+      enum: ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLING", "CANCELLED", "COMPLETED"],
+      description: "Current status of the signature request",
+      example: "COMPLETED",
+    },
+    signers: {
+      type: "array",
+      items: _PetitionSigner,
+      description: "The list of signers",
+    },
     createdAt: {
       description: "Creation date of the signature request",
       type: "string",
@@ -2374,12 +2385,6 @@ const _SignatureRequest = {
       type: "string",
       format: "date-time",
       example: new Date(2021, 2, 15).toISOString(),
-    },
-    status: {
-      type: "string",
-      enum: ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLING", "CANCELLED", "COMPLETED"],
-      description: "Current status of the signature request",
-      example: "COMPLETED",
     },
   },
 } as const;

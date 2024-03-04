@@ -5263,7 +5263,7 @@ export type UpdatePetitionInput = {
 };
 
 export type UpdatePetitionVariableInput = {
-  defaultValue: Scalars["Int"]["input"];
+  defaultValue: Scalars["Float"]["input"];
 };
 
 export type UpdateProfileFieldValueInput = {
@@ -5943,6 +5943,9 @@ export type PetitionSignatureRequestFragment = {
   environment: SignatureOrgIntegrationEnvironment;
   createdAt: string;
   updatedAt: string;
+  signatureConfig: {
+    signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+  };
 };
 
 export type getTags_tagsQueryVariables = Exact<{
@@ -7632,6 +7635,9 @@ export type GetSignatures_petitionSignaturesQuery = {
           environment: SignatureOrgIntegrationEnvironment;
           createdAt: string;
           updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
         }>;
       }
     | { __typename: "PetitionTemplate" }
@@ -7650,6 +7656,9 @@ export type StartSignature_startSignatureRequestMutation = {
     environment: SignatureOrgIntegrationEnvironment;
     createdAt: string;
     updatedAt: string;
+    signatureConfig: {
+      signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+    };
   };
 };
 
@@ -9882,6 +9891,13 @@ export const PetitionSignatureRequestFragmentDoc = gql`
     id
     status
     environment
+    signatureConfig {
+      signers {
+        email
+        firstName
+        lastName
+      }
+    }
     createdAt
     updatedAt
   }

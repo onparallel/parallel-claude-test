@@ -348,6 +348,13 @@ export const PetitionSignatureRequestFragment = gql`
     id
     status
     environment
+    signatureConfig {
+      signers {
+        email
+        firstName
+        lastName
+      }
+    }
     createdAt
     updatedAt
   }

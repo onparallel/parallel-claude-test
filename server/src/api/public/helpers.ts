@@ -32,6 +32,7 @@ import {
   PetitionFieldReplyFragment,
   PetitionFieldType,
   PetitionFragment,
+  PetitionSignatureRequestFragment,
   PetitionTagFilter,
   ProfileFragment,
   SubscriptionFragment,
@@ -354,6 +355,13 @@ export function mapPetition<
 
 export function mapTemplate<T extends Pick<TemplateFragment, "tags" | "fields">>(petition: T) {
   return pipe(petition, mapTemplateFields, mapPetitionTags);
+}
+
+export function mapSignatureRequest<T extends PetitionSignatureRequestFragment>(signature: T) {
+  return {
+    ...pick(signature, ["id", "status", "environment", "createdAt", "updatedAt"]),
+    signers: signature.signatureConfig.signers.filter(isDefined),
+  };
 }
 
 export async function getTags(client: GraphQLClient) {

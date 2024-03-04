@@ -157,6 +157,7 @@ import {
   mapPetitionFieldRepliesContent,
   mapProfile,
   mapReplyResponse,
+  mapSignatureRequest,
   mapSubscription,
   mapTemplate,
   paginationParams,
@@ -370,7 +371,7 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
         - \`tags\`: List of the tags the parallel has.
         - \`replies\`: An object with the replies by alias. Only fields with an alias defined will be shown.
         - \`progress\`: An object describing the progress of the parallel.
-        - \`signers\`: List of the signers, if any, of the parallel.
+        - \`signers\`: List of the signers configured to sign this parallel, if any.
         ${
           includeRecipientUrl
             ? `- \`recipients.recipientUrl\`: Include the recipient URL in when using \`recipients\`. **A special permission is required as there are security implications**.`
@@ -2565,7 +2566,7 @@ api
       if (data.petition?.__typename === "PetitionTemplate") {
         return Ok([]);
       } else {
-        return Ok(data.petition?.signatureRequests ?? []);
+        return Ok((data.petition?.signatureRequests ?? []).map(mapSignatureRequest));
       }
     },
   )
@@ -2605,7 +2606,7 @@ api
         });
 
         assert("id" in response.startSignatureRequest);
-        return Created(response.startSignatureRequest);
+        return Created(mapSignatureRequest(response.startSignatureRequest));
       } catch (error) {
         if (containsGraphQLError(error, "MISSING_SIGNATURE_CONFIG_ERROR")) {
           throw new ConflictError("The parallel does not have a signature configuration");
