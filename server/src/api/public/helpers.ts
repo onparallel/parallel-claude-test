@@ -42,6 +42,7 @@ import {
 } from "./__types";
 import { TaskFragment } from "./fragments";
 import pMap from "p-map";
+import { isAfter } from "date-fns";
 
 export function paginationParams() {
   return {
@@ -53,9 +54,12 @@ export function paginationParams() {
       example: 5,
     }),
     limit: intParam({
-      description: "How many items to return at most",
+      description:
+        "How many items to return at most. A hard limit of 100 will be set on June 1st, please use pagination with the `offset` parameter.",
       required: true,
       minimum: 0,
+      // TODO: remove after 2024-06-01
+      maximum: isAfter(new Date(), new Date("2024-06-01")) ? 100 : undefined,
       example: 10,
     }),
   };
