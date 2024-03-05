@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
-import { list, nonNull, queryField } from "nexus";
-import { authenticateAnd } from "../helpers/authorize";
+import { list, nonNull, queryField, stringArg } from "nexus";
+import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToTags } from "./authorizers";
 
@@ -24,6 +24,27 @@ export const tagsQuery = queryField((t) => {
         });
         items = fuse.search(args.search).map((r) => r.item);
       }
+
+      const offset = args.offset ?? 0;
+      const limit = args.limit ?? items.length;
+
+      return {
+        items: items.slice(offset, offset + limit),
+        totalCount: items.length,
+      };
+    },
+  });
+
+  t.paginationField("tagsByName", {
+    description:
+      "Paginated list of tags in the organization where tag name is included in the search argument.",
+    type: "Tag",
+    authorize: authenticate(),
+    extendArgs: {
+      search: nonNull(list(nonNull(stringArg()))),
+    },
+    resolve: async (_, args, ctx) => {
+      const items = await ctx.tags.getOrganizationTagsFilteredByName(ctx.user!.org_id, args.search);
 
       const offset = args.offset ?? 0;
       const limit = args.limit ?? items.length;

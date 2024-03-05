@@ -2047,6 +2047,7 @@ export interface NexusGenFieldTypes {
     usageDetails: NexusGenScalars["JSONObject"]; // JSONObject!
     usagePeriods: NexusGenRootTypes["OrganizationUsageLimitPagination"]; // OrganizationUsageLimitPagination!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
+    usersByEmail: NexusGenRootTypes["UserPagination"]; // UserPagination!
   };
   OrganizationBrandThemeData: {
     // field return type
@@ -3175,6 +3176,7 @@ export interface NexusGenFieldTypes {
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["EventSubscription"][]; // [EventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
+    tagsByName: NexusGenRootTypes["TagPagination"]; // TagPagination!
     task: NexusGenRootTypes["Task"]; // Task!
     templates: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
@@ -4471,6 +4473,7 @@ export interface NexusGenFieldTypeNames {
     usageDetails: "JSONObject";
     usagePeriods: "OrganizationUsageLimitPagination";
     users: "UserPagination";
+    usersByEmail: "UserPagination";
   };
   OrganizationBrandThemeData: {
     // field return type name
@@ -5599,6 +5602,7 @@ export interface NexusGenFieldTypeNames {
     searchUsers: "UserOrUserGroup";
     subscriptions: "EventSubscription";
     tags: "TagPagination";
+    tagsByName: "TagPagination";
     task: "Task";
     templates: "PetitionBaseOrFolderPagination";
     userGroup: "UserGroup";
@@ -7492,6 +7496,12 @@ export interface NexusGenArgTypes {
       searchByEmailOnly?: boolean | null; // Boolean
       sortBy?: NexusGenEnums["OrganizationUsers_OrderBy"][] | null; // [OrganizationUsers_OrderBy!]
     };
+    usersByEmail: {
+      // args
+      emails: string[]; // [String!]!
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+    };
   };
   Petition: {
     events: {
@@ -7759,6 +7769,12 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       search?: string | null; // String
       tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
+    tagsByName: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search: string[]; // [String!]!
     };
     task: {
       // args

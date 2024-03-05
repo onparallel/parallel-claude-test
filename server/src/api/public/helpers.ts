@@ -30,7 +30,7 @@ import {
   CreatePetitionRecipients_createContactDocument,
   CreatePetitionRecipients_updateContactDocument,
   EventSubscriptionFragment,
-  getTags_tagsDocument,
+  getTags_tagsByNameDocument,
   getTaskResultFileUrl_getTaskResultFileDocument,
   PetitionFieldFragment,
   PetitionFieldReplyFragment,
@@ -375,22 +375,6 @@ export function mapSignatureRequest<T extends PetitionSignatureRequestFragment>(
   };
 }
 
-export async function getTags(client: GraphQLClient) {
-  const _query = gql`
-    query getTags_tags($offset: Int!, $limit: Int!) {
-      tags(offset: $offset, limit: $limit) {
-        items {
-          ...Tag
-        }
-        totalCount
-      }
-    }
-    ${TagFragmentDoc}
-  `;
-  const result = await client.request(getTags_tagsDocument, { offset: 0, limit: 1000 });
-  return result.tags.items;
-}
-
 export async function waitForTask(client: GraphQLClient, task: TaskType) {
   const _query = gql`
     query waitForTask_Task($id: GID!) {
@@ -478,12 +462,37 @@ export function mapSubscription(subscription: EventSubscriptionFragment) {
   }
 }
 
-export function buildTagsFilter(
-  allTags: { id: string; name: string }[],
+async function getTags(client: GraphQLClient, search: string[]) {
+  const _query = gql`
+    query getTags_tagsByName($offset: Int!, $limit: Int!, $search: [String!]!) {
+      tagsByName(offset: $offset, limit: $limit, search: $search) {
+        items {
+          ...Tag
+        }
+        totalCount
+      }
+    }
+    ${TagFragmentDoc}
+  `;
+  try {
+    const result = await client.request(getTags_tagsByNameDocument, {
+      offset: 0,
+      limit: 100,
+      search,
+    });
+    return result.tagsByName.items;
+  } catch {
+    return [];
+  }
+}
+
+export async function buildTagsFilter(
+  client: GraphQLClient,
   tags: string[],
-): PetitionTagFilter {
+): Promise<PetitionTagFilter> {
   if (tags.length > 0) {
-    const _tags = tags.map((tagName) => allTags.find((t) => t.name === tagName));
+    const items = await getTags(client, tags);
+    const _tags = tags.map((tagName) => items.find((t) => t.name === tagName));
     if (_tags.some((t) => !isDefined(t))) {
       throw new Error("UNKNOWN_TAG_NAME");
     }

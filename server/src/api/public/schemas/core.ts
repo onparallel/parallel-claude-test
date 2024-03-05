@@ -1227,6 +1227,7 @@ export const SharePetition = schema({
     emails: {
       description: "List with emails of the users you want to share the parallel with",
       type: "array",
+      maxItems: 100,
       items: {
         type: "string",
         example: "user@domain.com",

@@ -3,9 +3,9 @@ import { Knex } from "knex";
 import { groupBy, omit, sortBy } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
+import { CreateTag, PetitionTag, Tag, User } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateTag, PetitionTag, Tag, User } from "../__types";
 
 @injectable()
 export class TagRepository extends BaseRepository {
@@ -18,6 +18,13 @@ export class TagRepository extends BaseRepository {
   readonly loadTagsByOrganizationId = this.buildLoadMultipleBy("tag", "organization_id", (q) =>
     q.whereNull("deleted_at").orderBy("name", "asc"),
   );
+
+  async getOrganizationTagsFilteredByName(orgId: number, search: string[]) {
+    return await this.from("tag")
+      .where({ organization_id: orgId, deleted_at: null })
+      .whereIn("name", search)
+      .select("*");
+  }
 
   readonly loadTagsByPetitionId = this.buildLoader<number, Tag[]>(async (petitionIds, t) => {
     const results = await this.from("tag", t)

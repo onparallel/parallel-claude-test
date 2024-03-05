@@ -145,6 +145,25 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
+  getOrganizationUsersFilteredByEmail(
+    orgId: number,
+    opts: {
+      emails: string[];
+    } & PageOpts,
+  ) {
+    return this.getPagination<User>(
+      this.from("user")
+        .join("user_data", "user.user_data_id", "user_data.id")
+        .where({ org_id: orgId })
+        .whereNull("user.deleted_at")
+        .whereNull("user_data.deleted_at")
+        .whereIn("user_data.email", opts.emails)
+        .orderBy("user.id")
+        .select("user.*"),
+      opts,
+    );
+  }
+
   readonly loadActiveUserCount = this.buildLoadCountBy("user", "org_id", (q) =>
     q.whereNull("deleted_at").andWhere("status", "ACTIVE"),
   );

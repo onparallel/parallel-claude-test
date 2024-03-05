@@ -2498,6 +2498,8 @@ export type Organization = Timestamps & {
   usagePeriods: OrganizationUsageLimitPagination;
   /** The users in the organization. */
   users: UserPagination;
+  /** The users in the organization filtered by a list of emails. */
+  usersByEmail: UserPagination;
 };
 
 /** An organization in the system. */
@@ -2554,6 +2556,13 @@ export type OrganizationusersArgs = {
   search?: InputMaybe<Scalars["String"]["input"]>;
   searchByEmailOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
+};
+
+/** An organization in the system. */
+export type OrganizationusersByEmailArgs = {
+  emails: Array<Scalars["String"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type OrganizationBrandThemeData = {
@@ -4581,6 +4590,8 @@ export type Query = {
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
+  /** Paginated list of tags in the organization where tag name is included in the search argument. */
+  tagsByName: TagPagination;
   task: Task;
   /** The available templates */
   templates: PetitionBaseOrFolderPagination;
@@ -4822,6 +4833,12 @@ export type QuerytagsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
+export type QuerytagsByNameArgs = {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search: Array<Scalars["String"]["input"]>;
 };
 
 export type QuerytaskArgs = {
@@ -6082,15 +6099,6 @@ export type ProfileFragment = {
   }>;
 };
 
-export type getTags_tagsQueryVariables = Exact<{
-  offset: Scalars["Int"]["input"];
-  limit: Scalars["Int"]["input"];
-}>;
-
-export type getTags_tagsQuery = {
-  tags: { totalCount: number; items: Array<{ id: string; name: string }> };
-};
-
 export type waitForTask_TaskQueryVariables = Exact<{
   id: Scalars["GID"]["input"];
 }>;
@@ -6104,6 +6112,16 @@ export type getTaskResultFileUrl_getTaskResultFileMutationVariables = Exact<{
 }>;
 
 export type getTaskResultFileUrl_getTaskResultFileMutation = { getTaskResultFile: { url: string } };
+
+export type getTags_tagsByNameQueryVariables = Exact<{
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
+  search: Array<Scalars["String"]["input"]> | Scalars["String"]["input"];
+}>;
+
+export type getTags_tagsByNameQuery = {
+  tagsByName: { totalCount: number; items: Array<{ id: string; name: string }> };
+};
 
 export type CreatePetitionRecipients_contactQueryVariables = Exact<{
   email: Scalars["String"]["input"];
@@ -6990,11 +7008,13 @@ export type ReopenPetition_reopenPetitionMutation = {
   };
 };
 
-export type TagPetition_tagsQueryVariables = Exact<{
-  search?: InputMaybe<Scalars["String"]["input"]>;
+export type TagPetition_tagsByNameQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
 }>;
 
-export type TagPetition_tagsQuery = { tags: { items: Array<{ id: string; name: string }> } };
+export type TagPetition_tagsByNameQuery = {
+  tagsByName: { items: Array<{ id: string; name: string }> };
+};
 
 export type TagPetition_createTagMutationVariables = Exact<{
   name: Scalars["String"]["input"];
@@ -7136,11 +7156,13 @@ export type TagPetition_tagPetitionMutation = {
     | {};
 };
 
-export type UntagPetition_tagsQueryVariables = Exact<{
-  search?: InputMaybe<Scalars["String"]["input"]>;
+export type UntagPetition_tagsByNameQueryVariables = Exact<{
+  search: Scalars["String"]["input"];
 }>;
 
-export type UntagPetition_tagsQuery = { tags: { items: Array<{ id: string; name: string }> } };
+export type UntagPetition_tagsByNameQuery = {
+  tagsByName: { items: Array<{ id: string; name: string }> };
+};
 
 export type UntagPetition_untagPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
@@ -7703,10 +7725,12 @@ export type GetPermissions_permissionsQuery = {
     | null;
 };
 
-export type SharePetition_usersQueryVariables = Exact<{ [key: string]: never }>;
+export type SharePetition_usersByEmailQueryVariables = Exact<{
+  emails: Array<Scalars["String"]["input"]> | Scalars["String"]["input"];
+}>;
 
-export type SharePetition_usersQuery = {
-  me: { organization: { users: { items: Array<{ id: string; email: string }> } } };
+export type SharePetition_usersByEmailQuery = {
+  me: { organization: { usersByEmail: { items: Array<{ id: string; email: string }> } } };
 };
 
 export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
@@ -10286,17 +10310,6 @@ export const ProfileFragmentDoc = gql`
   ${ProfileFieldPropertyFragmentDoc}
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<ProfileFragment, unknown>;
-export const getTags_tagsDocument = gql`
-  query getTags_tags($offset: Int!, $limit: Int!) {
-    tags(offset: $offset, limit: $limit) {
-      items {
-        ...Tag
-      }
-      totalCount
-    }
-  }
-  ${TagFragmentDoc}
-` as unknown as DocumentNode<getTags_tagsQuery, getTags_tagsQueryVariables>;
 export const waitForTask_TaskDocument = gql`
   query waitForTask_Task($id: GID!) {
     task(id: $id) {
@@ -10315,6 +10328,17 @@ export const getTaskResultFileUrl_getTaskResultFileDocument = gql`
   getTaskResultFileUrl_getTaskResultFileMutation,
   getTaskResultFileUrl_getTaskResultFileMutationVariables
 >;
+export const getTags_tagsByNameDocument = gql`
+  query getTags_tagsByName($offset: Int!, $limit: Int!, $search: [String!]!) {
+    tagsByName(offset: $offset, limit: $limit, search: $search) {
+      items {
+        ...Tag
+      }
+      totalCount
+    }
+  }
+  ${TagFragmentDoc}
+` as unknown as DocumentNode<getTags_tagsByNameQuery, getTags_tagsByNameQueryVariables>;
 export const CreatePetitionRecipients_contactDocument = gql`
   query CreatePetitionRecipients_contact($email: String!) {
     contacts: contactsByEmail(emails: [$email]) {
@@ -10539,16 +10563,16 @@ export const ReopenPetition_reopenPetitionDocument = gql`
   ReopenPetition_reopenPetitionMutation,
   ReopenPetition_reopenPetitionMutationVariables
 >;
-export const TagPetition_tagsDocument = gql`
-  query TagPetition_tags($search: String) {
-    tags(offset: 0, limit: 1000, search: $search) {
+export const TagPetition_tagsByNameDocument = gql`
+  query TagPetition_tagsByName($search: String!) {
+    tagsByName(offset: 0, limit: 1, search: [$search]) {
       items {
         ...Tag
       }
     }
   }
   ${TagFragmentDoc}
-` as unknown as DocumentNode<TagPetition_tagsQuery, TagPetition_tagsQueryVariables>;
+` as unknown as DocumentNode<TagPetition_tagsByNameQuery, TagPetition_tagsByNameQueryVariables>;
 export const TagPetition_createTagDocument = gql`
   mutation TagPetition_createTag($name: String!, $color: String!) {
     createTag(name: $name, color: $color) {
@@ -10580,16 +10604,16 @@ export const TagPetition_tagPetitionDocument = gql`
   TagPetition_tagPetitionMutation,
   TagPetition_tagPetitionMutationVariables
 >;
-export const UntagPetition_tagsDocument = gql`
-  query UntagPetition_tags($search: String) {
-    tags(offset: 0, limit: 1000, search: $search) {
+export const UntagPetition_tagsByNameDocument = gql`
+  query UntagPetition_tagsByName($search: String!) {
+    tagsByName(offset: 0, limit: 1, search: [$search]) {
       items {
         ...Tag
       }
     }
   }
   ${TagFragmentDoc}
-` as unknown as DocumentNode<UntagPetition_tagsQuery, UntagPetition_tagsQueryVariables>;
+` as unknown as DocumentNode<UntagPetition_tagsByNameQuery, UntagPetition_tagsByNameQueryVariables>;
 export const UntagPetition_untagPetitionDocument = gql`
   mutation UntagPetition_untagPetition($petitionId: GID!, $tagId: GID!) {
     untagPetition(petitionId: $petitionId, tagId: $tagId) {
@@ -10844,11 +10868,11 @@ export const GetPermissions_permissionsDocument = gql`
   GetPermissions_permissionsQuery,
   GetPermissions_permissionsQueryVariables
 >;
-export const SharePetition_usersDocument = gql`
-  query SharePetition_users {
+export const SharePetition_usersByEmailDocument = gql`
+  query SharePetition_usersByEmail($emails: [String!]!) {
     me {
       organization {
-        users(limit: 1000, offset: 0) {
+        usersByEmail(limit: 100, offset: 0, emails: $emails) {
           items {
             id
             email
@@ -10857,7 +10881,10 @@ export const SharePetition_usersDocument = gql`
       }
     }
   }
-` as unknown as DocumentNode<SharePetition_usersQuery, SharePetition_usersQueryVariables>;
+` as unknown as DocumentNode<
+  SharePetition_usersByEmailQuery,
+  SharePetition_usersByEmailQueryVariables
+>;
 export const SharePetition_addPetitionPermissionDocument = gql`
   mutation SharePetition_addPetitionPermission(
     $petitionId: GID!

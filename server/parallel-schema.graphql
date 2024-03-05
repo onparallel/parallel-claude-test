@@ -2776,6 +2776,23 @@ type Organization implements Timestamps {
     """
     sortBy: [OrganizationUsers_OrderBy!]
   ): UserPagination!
+
+  """
+  The users in the organization filtered by a list of emails.
+  """
+  usersByEmail(
+    emails: [String!]!
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): UserPagination!
 }
 
 type OrganizationBrandThemeData {
@@ -6328,6 +6345,22 @@ type Query {
     """
     search: String
     tagIds: [GID!]
+  ): TagPagination!
+
+  """
+  Paginated list of tags in the organization where tag name is included in the search argument.
+  """
+  tagsByName(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+    search: [String!]!
   ): TagPagination!
   task(id: GID!): Task!
 

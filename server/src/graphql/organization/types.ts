@@ -19,6 +19,7 @@ import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { ContactLocaleValues } from "../../db/__types";
+import { validEmail } from "../helpers/validators/validEmail";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -207,6 +208,22 @@ export const Organization = objectType({
             const [field, order] = parseSortBy(value);
             return { field: columnMap[field], order };
           }),
+        });
+      },
+    });
+    t.paginationField("usersByEmail", {
+      type: "User",
+      description: "The users in the organization filtered by a list of emails.",
+      authorize: and(isOwnOrgOrSuperAdmin(), contextUserHasPermission("USERS:LIST_USERS")),
+      extendArgs: {
+        emails: nonNull(list(nonNull(stringArg()))),
+      },
+      validateArgs: validEmail((args) => args.emails, "emails", true),
+      resolve: (root, { offset, limit, emails }, ctx) => {
+        return ctx.organizations.getOrganizationUsersFilteredByEmail(root.id, {
+          offset,
+          limit,
+          emails,
         });
       },
     });

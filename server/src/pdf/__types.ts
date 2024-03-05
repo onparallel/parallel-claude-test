@@ -2498,6 +2498,8 @@ export type Organization = Timestamps & {
   usagePeriods: OrganizationUsageLimitPagination;
   /** The users in the organization. */
   users: UserPagination;
+  /** The users in the organization filtered by a list of emails. */
+  usersByEmail: UserPagination;
 };
 
 /** An organization in the system. */
@@ -2554,6 +2556,13 @@ export type OrganizationusersArgs = {
   search?: InputMaybe<Scalars["String"]["input"]>;
   searchByEmailOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
+};
+
+/** An organization in the system. */
+export type OrganizationusersByEmailArgs = {
+  emails: Array<Scalars["String"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type OrganizationBrandThemeData = {
@@ -4581,6 +4590,8 @@ export type Query = {
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
+  /** Paginated list of tags in the organization where tag name is included in the search argument. */
+  tagsByName: TagPagination;
   task: Task;
   /** The available templates */
   templates: PetitionBaseOrFolderPagination;
@@ -4822,6 +4833,12 @@ export type QuerytagsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
+export type QuerytagsByNameArgs = {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search: Array<Scalars["String"]["input"]>;
 };
 
 export type QuerytaskArgs = {

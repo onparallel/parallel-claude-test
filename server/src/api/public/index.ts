@@ -94,7 +94,7 @@ import {
   RemoveUserPermission_removePetitionPermissionDocument,
   ReopenPetition_reopenPetitionDocument,
   SharePetition_addPetitionPermissionDocument,
-  SharePetition_usersDocument,
+  SharePetition_usersByEmailDocument,
   StartSignature_startSignatureRequestDocument,
   StopSharing_removePetitionPermissionDocument,
   SubmitReplies_bulkCreatePetitionRepliesDocument,
@@ -106,7 +106,7 @@ import {
   TagFragmentDoc,
   TagPetition_createTagDocument,
   TagPetition_tagPetitionDocument,
-  TagPetition_tagsDocument,
+  TagPetition_tagsByNameDocument,
   Task_TaskStatusDocument,
   Task_getTaskResultFileDocument,
   TemplateFragment as TemplateFragmentType,
@@ -154,7 +154,6 @@ import {
   buildTagsFilter,
   containsGraphQLError,
   flattenPetitionFields,
-  getTags,
   getTaskResultFileUrl,
   idParam,
   mapPetition,
@@ -615,8 +614,7 @@ api
       let tags: PetitionTagFilter | undefined = undefined;
       if (isDefined(query.tags)) {
         try {
-          const allTags = await getTags(client);
-          tags = buildTagsFilter(allTags, query.tags);
+          tags = await buildTagsFilter(client, query.tags);
         } catch (e) {
           if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
             return Ok({ totalCount: 0, items: [] });
@@ -1029,8 +1027,8 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
   },
   async ({ client, params, body, query }) => {
     const _query = gql`
-      query TagPetition_tags($search: String) {
-        tags(offset: 0, limit: 1000, search: $search) {
+      query TagPetition_tagsByName($search: String!) {
+        tagsByName(offset: 0, limit: 1, search: [$search]) {
           items {
             ...Tag
           }
@@ -1038,9 +1036,9 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
       }
       ${PetitionTagFragment}
     `;
-    const queryResult = await client.request(TagPetition_tagsDocument, { search: body.name });
+    const queryResult = await client.request(TagPetition_tagsByNameDocument, { search: body.name });
     // must have a 100% match on the result
-    let tagId = queryResult.tags.items.find((t) => t.name === body.name)?.id;
+    let tagId = queryResult.tagsByName.items[0]?.id;
 
     if (!isDefined(tagId)) {
       const _mutation = gql`
@@ -1109,8 +1107,8 @@ api
     },
     async ({ client, params }) => {
       const _query = gql`
-        query UntagPetition_tags($search: String) {
-          tags(offset: 0, limit: 1000, search: $search) {
+        query UntagPetition_tagsByName($search: String!) {
+          tagsByName(offset: 0, limit: 1, search: [$search]) {
             items {
               ...Tag
             }
@@ -1118,8 +1116,10 @@ api
         }
         ${PetitionTagFragment}
       `;
-      const queryResult = await client.request(TagPetition_tagsDocument, { search: params.name });
-      const tagId = queryResult.tags.items.find((tag) => tag.name === params.name)?.id;
+      const queryResult = await client.request(TagPetition_tagsByNameDocument, {
+        search: params.name,
+      });
+      const tagId = queryResult.tagsByName.items[0]?.id;
 
       if (!isDefined(tagId)) {
         throw new ResourceNotFoundError(`Label '${params.name}' not found`);
@@ -1135,7 +1135,7 @@ api
 
       await client.request(UntagPetition_untagPetitionDocument, {
         petitionId: params.petitionId,
-        tagId: tagId!,
+        tagId,
       });
 
       return NoContent();
@@ -2325,10 +2325,10 @@ api
     },
     async ({ client, params, body }) => {
       const _usersQuery = gql`
-        query SharePetition_users {
+        query SharePetition_usersByEmail($emails: [String!]!) {
           me {
             organization {
-              users(limit: 1000, offset: 0) {
+              usersByEmail(limit: 100, offset: 0, emails: $emails) {
                 items {
                   id
                   email
@@ -2363,10 +2363,10 @@ api
           throw new BadRequestError("Some of the provided emails are invalid");
         }
 
-        const usersResponse = await client.request(SharePetition_usersDocument);
-        const ids = usersResponse.me.organization.users.items
-          .filter((u) => body.emails!.includes(u.email))
-          .map((u) => u.id);
+        const usersResponse = await client.request(SharePetition_usersByEmailDocument, {
+          emails: body.emails,
+        });
+        const ids = usersResponse.me.organization.usersByEmail.items.map((u) => u.id);
         if (body.emails.length !== ids.length) {
           throw new BadRequestError("Some of the provided emails are invalid");
         }
@@ -2971,8 +2971,7 @@ api.path("/templates").get(
     let tags: PetitionTagFilter | undefined = undefined;
     if (isDefined(query.tags)) {
       try {
-        const allTags = await getTags(client);
-        tags = buildTagsFilter(allTags, query.tags);
+        tags = await buildTagsFilter(client, query.tags);
       } catch (e) {
         if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
           return Ok({ totalCount: 0, items: [] });
