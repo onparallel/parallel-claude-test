@@ -2952,6 +2952,7 @@ export class PetitionRepository extends BaseRepository {
             "last_recipient_activity_at",
             "last_change_at",
             "summary_ai_completion_log_id",
+            "latest_signature_status",
             // avoid copying deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition.is_template
               ? (["deadline"] as const)
