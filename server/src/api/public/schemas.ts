@@ -638,6 +638,51 @@ const _VariablesResult = {
   },
 } as const;
 
+const _SignatureRequest = {
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "environment", "createdAt", "updatedAt", "status", "signers"],
+  properties: {
+    id: {
+      type: "string",
+      description: "The ID of the parallel signature request",
+      example: toGlobalId("PetitionSignatureRequest", 1),
+    },
+    environment: {
+      description:
+        "The environment of the used signature integration. DEMO signatures have no legal validity.",
+      type: "string",
+      enum: ["DEMO", "PRODUCTION"],
+      example: "PRODUCTION",
+    },
+    status: {
+      type: "string",
+      enum: ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLING", "CANCELLED", "COMPLETED"],
+      description: "Current status of the signature request",
+      example: "COMPLETED",
+    },
+    signers: {
+      type: "array",
+      items: _PetitionSigner,
+      description: "The list of signers",
+    },
+    createdAt: {
+      description: "Creation date of the signature request",
+      type: "string",
+      format: "date-time",
+      example: new Date(2021, 1, 15).toISOString(),
+    },
+    updatedAt: {
+      description: "Date and time of the last event on the signature request",
+      type: "string",
+      format: "date-time",
+      example: new Date(2021, 2, 15).toISOString(),
+    },
+  },
+} as const;
+export const ListOfSignatureRequests = ListOf(_SignatureRequest);
+export const SignatureRequest = schema(_SignatureRequest);
+
 const _Petition = {
   title: "Petition",
   type: "object",
@@ -763,6 +808,11 @@ const _Petition = {
       description:
         "If parameter `include` contains `variablesResult`, this will be the list of defined variables of the parallel.",
       ...ListOf(_VariablesResult),
+    },
+    signatures: {
+      description:
+        "If parameter `include` contains `signatures`, this will be the list of ongoing and finished signatures of the parallel.",
+      ...ListOfSignatureRequests,
     },
   },
 } as const;
@@ -2346,50 +2396,6 @@ export const FileUpload = schema({
   },
 } as const);
 
-const _SignatureRequest = {
-  type: "object",
-  additionalProperties: false,
-  required: ["id", "environment", "createdAt", "updatedAt", "status", "signers"],
-  properties: {
-    id: {
-      type: "string",
-      description: "The ID of the parallel signature request",
-      example: toGlobalId("PetitionSignatureRequest", 1),
-    },
-    environment: {
-      description:
-        "The environment of the used signature integration. DEMO signatures have no legal validity.",
-      type: "string",
-      enum: ["DEMO", "PRODUCTION"],
-      example: "PRODUCTION",
-    },
-    status: {
-      type: "string",
-      enum: ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLING", "CANCELLED", "COMPLETED"],
-      description: "Current status of the signature request",
-      example: "COMPLETED",
-    },
-    signers: {
-      type: "array",
-      items: _PetitionSigner,
-      description: "The list of signers",
-    },
-    createdAt: {
-      description: "Creation date of the signature request",
-      type: "string",
-      format: "date-time",
-      example: new Date(2021, 1, 15).toISOString(),
-    },
-    updatedAt: {
-      description: "Date and time of the last event on the signature request",
-      type: "string",
-      format: "date-time",
-      example: new Date(2021, 2, 15).toISOString(),
-    },
-  },
-} as const;
-export const ListOfSignatureRequests = ListOf(_SignatureRequest);
-export const SignatureRequest = schema(_SignatureRequest);
 export const SignatureRequestInput = schema({
   title: "SignatureRequestInput",
   type: "object",

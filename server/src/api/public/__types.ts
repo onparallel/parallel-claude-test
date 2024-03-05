@@ -5657,6 +5657,17 @@ export type PetitionFieldWithRepliesFragment = {
 
 export type TagFragment = { id: string; name: string };
 
+export type PetitionSignatureRequestFragment = {
+  id: string;
+  status: PetitionSignatureRequestStatus;
+  environment: SignatureOrgIntegrationEnvironment;
+  createdAt: string;
+  updatedAt: string;
+  signatureConfig: {
+    signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+  };
+};
+
 export type PetitionFragment = {
   id: string;
   name: string | null;
@@ -5760,6 +5771,16 @@ export type PetitionFragment = {
     internal: { approved: number; replied: number; optional: number; total: number };
   };
   variablesResult?: Array<{ name: string; value: number | null }>;
+  signatures: Array<{
+    id: string;
+    status: PetitionSignatureRequestStatus;
+    environment: SignatureOrgIntegrationEnvironment;
+    createdAt: string;
+    updatedAt: string;
+    signatureConfig: {
+      signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+    };
+  }>;
 };
 
 export type TemplateFragment = {
@@ -5937,17 +5958,6 @@ export type ProfileFragment = {
   }>;
 };
 
-export type PetitionSignatureRequestFragment = {
-  id: string;
-  status: PetitionSignatureRequestStatus;
-  environment: SignatureOrgIntegrationEnvironment;
-  createdAt: string;
-  updatedAt: string;
-  signatureConfig: {
-    signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-  };
-};
-
 export type getTags_tagsQueryVariables = Exact<{
   offset: Scalars["Int"]["input"];
   limit: Scalars["Int"]["input"];
@@ -6018,6 +6028,7 @@ export type GetTags_tagsQuery = {
 export type GetPetitions_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"]["input"];
   limit: Scalars["Int"]["input"];
+  search?: InputMaybe<Scalars["String"]["input"]>;
   status?: InputMaybe<Array<PetitionStatus> | PetitionStatus>;
   tags?: InputMaybe<PetitionTagFilter>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
@@ -6029,6 +6040,7 @@ export type GetPetitions_petitionsQueryVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
@@ -6139,6 +6151,16 @@ export type GetPetitions_petitionsQuery = {
             internal: { approved: number; replied: number; optional: number; total: number };
           };
           variablesResult?: Array<{ name: string; value: number | null }>;
+          signatures: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+            };
+          }>;
         }
       | {}
     >;
@@ -6156,6 +6178,7 @@ export type CreatePetition_petitionMutationVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
 }>;
 
 export type CreatePetition_petitionMutation = {
@@ -6263,6 +6286,16 @@ export type CreatePetition_petitionMutation = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
+        }>;
       }
     | {};
 };
@@ -6277,6 +6310,7 @@ export type GetPetition_petitionQueryVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
 }>;
 
 export type GetPetition_petitionQuery = {
@@ -6384,6 +6418,16 @@ export type GetPetition_petitionQuery = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
+        }>;
       }
     | {}
     | null;
@@ -6433,6 +6477,7 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
 }>;
 
 export type UpdatePetition_updatePetitionMutation = {
@@ -6540,6 +6585,16 @@ export type UpdatePetition_updatePetitionMutation = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
+        }>;
       }
     | {};
 };
@@ -6561,6 +6616,7 @@ export type ClosePetition_closePetitionMutationVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
 }>;
 
 export type ClosePetition_closePetitionMutation = {
@@ -6667,6 +6723,16 @@ export type ClosePetition_closePetitionMutation = {
       internal: { approved: number; replied: number; optional: number; total: number };
     };
     variablesResult?: Array<{ name: string; value: number | null }>;
+    signatures: Array<{
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+      createdAt: string;
+      updatedAt: string;
+      signatureConfig: {
+        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+      };
+    }>;
   };
 };
 
@@ -6680,6 +6746,7 @@ export type ReopenPetition_reopenPetitionMutationVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
 }>;
 
 export type ReopenPetition_reopenPetitionMutation = {
@@ -6786,6 +6853,16 @@ export type ReopenPetition_reopenPetitionMutation = {
       internal: { approved: number; replied: number; optional: number; total: number };
     };
     variablesResult?: Array<{ name: string; value: number | null }>;
+    signatures: Array<{
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+      createdAt: string;
+      updatedAt: string;
+      signatureConfig: {
+        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+      };
+    }>;
   };
 };
 
@@ -6813,6 +6890,7 @@ export type TagPetition_tagPetitionMutationVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
 }>;
 
 export type TagPetition_tagPetitionMutation = {
@@ -6920,6 +6998,16 @@ export type TagPetition_tagPetitionMutation = {
           internal: { approved: number; replied: number; optional: number; total: number };
         };
         variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
+        }>;
       }
     | {};
 };
@@ -6999,6 +7087,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
   senderId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
@@ -7108,6 +7197,16 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
         internal: { approved: number; replied: number; optional: number; total: number };
       };
       variablesResult?: Array<{ name: string; value: number | null }>;
+      signatures: Array<{
+        id: string;
+        status: PetitionSignatureRequestStatus;
+        environment: SignatureOrgIntegrationEnvironment;
+        createdAt: string;
+        updatedAt: string;
+        signatureConfig: {
+          signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+        };
+      }>;
     } | null;
   }>;
 };
@@ -9379,6 +9478,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
   includeProgress: Scalars["Boolean"]["input"];
   includeSigners: Scalars["Boolean"]["input"];
   includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
 }>;
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
@@ -9485,6 +9585,16 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
       internal: { approved: number; replied: number; optional: number; total: number };
     };
     variablesResult?: Array<{ name: string; value: number | null }>;
+    signatures: Array<{
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+      createdAt: string;
+      updatedAt: string;
+      signatureConfig: {
+        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+      };
+    }>;
   };
 };
 
@@ -9672,6 +9782,22 @@ export const TagFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<TagFragment, unknown>;
+export const PetitionSignatureRequestFragmentDoc = gql`
+  fragment PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    environment
+    signatureConfig {
+      signers {
+        email
+        firstName
+        lastName
+      }
+    }
+    createdAt
+    updatedAt
+  }
+` as unknown as DocumentNode<PetitionSignatureRequestFragment, unknown>;
 export const PetitionFragmentDoc = gql`
   fragment Petition on Petition {
     id
@@ -9743,10 +9869,14 @@ export const PetitionFragmentDoc = gql`
       name
       value
     }
+    signatures: signatureRequests @include(if: $includeSignatureRequests) {
+      ...PetitionSignatureRequest
+    }
   }
   ${PetitionAccessFragmentDoc}
   ${PetitionFieldWithRepliesFragmentDoc}
   ${TagFragmentDoc}
+  ${PetitionSignatureRequestFragmentDoc}
 ` as unknown as DocumentNode<PetitionFragment, unknown>;
 export const TemplateFragmentDoc = gql`
   fragment Template on PetitionTemplate {
@@ -9886,22 +10016,6 @@ export const ProfileFragmentDoc = gql`
   ${ProfileFieldPropertyFragmentDoc}
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<ProfileFragment, unknown>;
-export const PetitionSignatureRequestFragmentDoc = gql`
-  fragment PetitionSignatureRequest on PetitionSignatureRequest {
-    id
-    status
-    environment
-    signatureConfig {
-      signers {
-        email
-        firstName
-        lastName
-      }
-    }
-    createdAt
-    updatedAt
-  }
-` as unknown as DocumentNode<PetitionSignatureRequestFragment, unknown>;
 export const getTags_tagsDocument = gql`
   query getTags_tags($offset: Int!, $limit: Int!) {
     tags(offset: $offset, limit: $limit) {
@@ -9990,6 +10104,7 @@ export const GetPetitions_petitionsDocument = gql`
   query GetPetitions_petitions(
     $offset: Int!
     $limit: Int!
+    $search: String
     $status: [PetitionStatus!]
     $tags: PetitionTagFilter
     $sortBy: [QueryPetitions_OrderBy!]
@@ -10001,12 +10116,14 @@ export const GetPetitions_petitionsDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
     $fromTemplateId: [GID!]
   ) {
     petitions(
       offset: $offset
       limit: $limit
       sortBy: $sortBy
+      search: $search
       filters: { status: $status, type: PETITION, tags: $tags, fromTemplateId: $fromTemplateId }
     ) {
       items {
@@ -10029,6 +10146,7 @@ export const CreatePetition_petitionDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     createPetition(name: $name, petitionId: $templateId) {
       ...Petition
@@ -10050,6 +10168,7 @@ export const GetPetition_petitionDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     petition(id: $petitionId) {
       ...Petition
@@ -10087,6 +10206,7 @@ export const UpdatePetition_updatePetitionDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...Petition
@@ -10116,6 +10236,7 @@ export const ClosePetition_closePetitionDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     closePetition(petitionId: $petitionId) {
       ...Petition
@@ -10137,6 +10258,7 @@ export const ReopenPetition_reopenPetitionDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     reopenPetition(petitionId: $petitionId) {
       ...Petition
@@ -10177,6 +10299,7 @@ export const TagPetition_tagPetitionDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     tagPetition(petitionId: $petitionId, tagId: $tagId) {
       ...Petition
@@ -10273,6 +10396,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
     $senderId: GID
   ) {
     sendPetition(
@@ -11309,6 +11433,7 @@ export const SubmitReplies_bulkCreatePetitionRepliesDocument = gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
       ...Petition

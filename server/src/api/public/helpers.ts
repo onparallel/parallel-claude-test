@@ -341,7 +341,7 @@ function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "sign
 export function mapPetition<
   T extends Pick<
     PetitionFragment,
-    "fromTemplate" | "tags" | "fields" | "replies" | "signatureConfig"
+    "fromTemplate" | "tags" | "fields" | "replies" | "signatureConfig" | "signatures"
   >,
 >(petition: T) {
   return pipe(
@@ -350,11 +350,19 @@ export function mapPetition<
     mapPetitionFieldRepliesContent,
     mapPetitionTags,
     mapPetitionReplies,
+    mapPetitionSignatures,
   );
 }
 
 export function mapTemplate<T extends Pick<TemplateFragment, "tags" | "fields">>(petition: T) {
   return pipe(petition, mapTemplateFields, mapPetitionTags);
+}
+
+function mapPetitionSignatures<T extends Pick<PetitionFragment, "signatures">>(petition: T) {
+  return {
+    ...petition,
+    signatures: petition.signatures?.map((s) => mapSignatureRequest(s)),
+  };
 }
 
 export function mapSignatureRequest<T extends PetitionSignatureRequestFragment>(signature: T) {

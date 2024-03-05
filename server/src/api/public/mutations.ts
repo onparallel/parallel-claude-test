@@ -127,6 +127,7 @@ gql`
     $includeProgress: Boolean!
     $includeSigners: Boolean!
     $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
   ) {
     bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
       ...Petition

@@ -372,6 +372,7 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
         - \`replies\`: An object with the replies by alias. Only fields with an alias defined will be shown.
         - \`progress\`: An object describing the progress of the parallel.
         - \`signers\`: List of the signers configured to sign this parallel, if any.
+        - \`signatures\`: List of ongoing and completed signatures, if any.
         ${
           includeRecipientUrl
             ? `- \`recipients.recipientUrl\`: Include the recipient URL in when using \`recipients\`. **A special permission is required as there are security implications**.`
@@ -388,6 +389,7 @@ function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: b
         "replies",
         "progress",
         "signers",
+        "signatures",
         ...(includeRecipientUrl ? ["recipients.recipientUrl" as const] : []),
         "variablesResult",
       ],
@@ -410,6 +412,7 @@ function getPetitionIncludesFromQuery<
     includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
     includeProgress: query.include?.includes("progress") ?? false,
     includeSigners: query.include?.includes("signers") ?? false,
+    includeSignatureRequests: query.include?.includes("signatures") ?? false,
     includeVariablesResult: query.include?.includes("variablesResult") ?? false,
   };
 }
@@ -570,11 +573,14 @@ api
       query: {
         ...paginationParams(),
         ...sortByParam(["createdAt", "name"]),
-        // for some reason types are doing weird things here
-        status: enumParam<"DRAFT" | "PENDING" | "COMPLETED" | "CLOSED", false>({
+        search: stringParam({
+          description: "Search criteria to find relevant parallels",
+          required: false,
+        }),
+        status: enumParam({
           description: "Optionally filter parallels by their status",
           required: false,
-          values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
+          values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] as const,
         }),
         tags: stringParam({
           description: "List of tags to filter by",
@@ -613,6 +619,7 @@ api
         query GetPetitions_petitions(
           $offset: Int!
           $limit: Int!
+          $search: String
           $status: [PetitionStatus!]
           $tags: PetitionTagFilter
           $sortBy: [QueryPetitions_OrderBy!]
@@ -624,12 +631,14 @@ api
           $includeProgress: Boolean!
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
           $fromTemplateId: [GID!]
         ) {
           petitions(
             offset: $offset
             limit: $limit
             sortBy: $sortBy
+            search: $search
             filters: {
               status: $status
               type: PETITION
@@ -647,7 +656,7 @@ api
       `;
       try {
         const result = await client.request(GetPetitions_petitionsDocument, {
-          ...pick(query, ["offset", "limit", "status", "fromTemplateId", "sortBy"]),
+          ...pick(query, ["offset", "limit", "search", "status", "fromTemplateId", "sortBy"]),
           tags,
           ...getPetitionIncludesFromQuery(query),
         });
@@ -689,6 +698,7 @@ api
           $includeProgress: Boolean!
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
         ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
@@ -732,6 +742,7 @@ api
           $includeProgress: Boolean!
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
         ) {
           petition(id: $petitionId) {
             ...Petition
@@ -799,6 +810,7 @@ api
           $includeProgress: Boolean!
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
         ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
@@ -921,6 +933,7 @@ api.path("/petitions/:petitionId/close", { params: { petitionId } }).post(
         $includeProgress: Boolean!
         $includeSigners: Boolean!
         $includeVariablesResult: Boolean!
+        $includeSignatureRequests: Boolean!
       ) {
         closePetition(petitionId: $petitionId) {
           ...Petition
@@ -966,6 +979,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
         $includeProgress: Boolean!
         $includeSigners: Boolean!
         $includeVariablesResult: Boolean!
+        $includeSignatureRequests: Boolean!
       ) {
         reopenPetition(petitionId: $petitionId) {
           ...Petition
@@ -1049,6 +1063,7 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
         $includeProgress: Boolean!
         $includeSigners: Boolean!
         $includeVariablesResult: Boolean!
+        $includeSignatureRequests: Boolean!
       ) {
         tagPetition(petitionId: $petitionId, tagId: $tagId) {
           ...Petition
@@ -1320,6 +1335,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeProgress: Boolean!
           $includeSigners: Boolean!
           $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
           $senderId: GID
         ) {
           sendPetition(

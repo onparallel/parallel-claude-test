@@ -124,6 +124,23 @@ export const PetitionTagFragment = gql`
   }
 `;
 
+export const PetitionSignatureRequestFragment = gql`
+  fragment PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    environment
+    signatureConfig {
+      signers {
+        email
+        firstName
+        lastName
+      }
+    }
+    createdAt
+    updatedAt
+  }
+`;
+
 export const PetitionFragment = gql`
   fragment Petition on Petition {
     id
@@ -195,10 +212,14 @@ export const PetitionFragment = gql`
       name
       value
     }
+    signatures: signatureRequests @include(if: $includeSignatureRequests) {
+      ...PetitionSignatureRequest
+    }
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}
   ${PetitionTagFragment}
+  ${PetitionSignatureRequestFragment}
 `;
 
 export const TemplateFragment = gql`
@@ -341,21 +362,4 @@ export const ProfileFragment = gql`
   ${ProfileTypeFragment}
   ${ProfileFieldPropertyFragment}
   ${UserFragment}
-`;
-
-export const PetitionSignatureRequestFragment = gql`
-  fragment PetitionSignatureRequest on PetitionSignatureRequest {
-    id
-    status
-    environment
-    signatureConfig {
-      signers {
-        email
-        firstName
-        lastName
-      }
-    }
-    createdAt
-    updatedAt
-  }
 `;
