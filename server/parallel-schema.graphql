@@ -536,6 +536,15 @@ type EffectivePetitionUserPermission {
   user: User!
 }
 
+interface EventSubscription {
+  eventsUrl: String!
+  id: GID!
+  isEnabled: Boolean!
+  isFailing: Boolean!
+  name: String
+  signatureKeys: [EventSubscriptionSignatureKey!]!
+}
+
 type EventSubscriptionSignatureKey {
   id: GID!
   publicKey: String!
@@ -1038,7 +1047,7 @@ type Mutation {
     fromTemplateFieldIds: [GID!]
     fromTemplateId: GID
     name: String
-  ): PetitionEventSubscription!
+  ): PetitionEventSubscription! @deprecated(reason: "Use createPetitionEventSubscription")
 
   """
   Creates a pair of asymmetric keys to be used for signing webhook events
@@ -1136,6 +1145,17 @@ type Mutation {
   ): [PetitionAttachmentUploadData!]!
 
   """
+  Creates an event subscription for the user's petitions
+  """
+  createPetitionEventSubscription(
+    eventTypes: [PetitionEventType!]
+    eventsUrl: String!
+    fromTemplateFieldIds: [GID!]
+    fromTemplateId: GID
+    name: String
+  ): PetitionEventSubscription!
+
+  """
   Creates a petition field
   """
   createPetitionField(
@@ -1224,6 +1244,17 @@ type Mutation {
     """
     subscribe: Boolean
   ): Profile!
+
+  """
+  Creates an event subscription for the user's profiles
+  """
+  createProfileEventSubscription(
+    eventTypes: [ProfileEventType!]
+    eventsUrl: String!
+    fromProfileTypeFieldIds: [GID!]
+    fromProfileTypeId: GID
+    name: String
+  ): ProfileEventSubscription!
   createProfileFieldFileUploadLink(
     data: [FileUploadInput!]!
     expiryDate: Date
@@ -2131,7 +2162,7 @@ type Mutation {
     id: GID!
     isEnabled: Boolean
     name: String
-  ): PetitionEventSubscription!
+  ): PetitionEventSubscription! @deprecated(reason: "Use updatePetitionEventSubscription")
 
   """
   Activate or deactivate a feature flag on a specific user
@@ -2300,6 +2331,19 @@ type Mutation {
   ): PetitionAttachment!
 
   """
+  Updates an existing event subscription for the user's petitions
+  """
+  updatePetitionEventSubscription(
+    eventTypes: [PetitionEventType!]
+    eventsUrl: String
+    fromTemplateFieldIds: [GID!]
+    fromTemplateId: GID
+    id: GID!
+    isEnabled: Boolean
+    name: String
+  ): PetitionEventSubscription!
+
+  """
   Updates a petition field.
   """
   updatePetitionField(
@@ -2426,6 +2470,19 @@ type Mutation {
     name: String!
     petitionId: GID!
   ): Petition!
+
+  """
+  Updates an existing event subscription for the user's profiles
+  """
+  updateProfileEventSubscription(
+    eventTypes: [ProfileEventType!]
+    eventsUrl: String
+    fromProfileTypeFieldIds: [GID!]
+    fromProfileTypeId: GID
+    id: GID!
+    isEnabled: Boolean
+    name: String
+  ): ProfileEventSubscription!
   updateProfileFieldValue(fields: [UpdateProfileFieldValueInput!]!, profileId: GID!): Profile!
   updateProfileType(
     name: LocalizableUserText
@@ -3225,6 +3282,7 @@ type PetitionAnonymizedEvent implements PetitionEvent {
 
 type PetitionAssociatedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -3533,6 +3591,7 @@ type PetitionDeletedEvent implements PetitionEvent {
 
 type PetitionDisassociatedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -3559,7 +3618,7 @@ type PetitionEventPagination {
   totalCount: Int!
 }
 
-type PetitionEventSubscription {
+type PetitionEventSubscription implements EventSubscription {
   eventTypes: [PetitionEventType!]
   eventsUrl: String!
   fromTemplate: PetitionBaseMini
@@ -4982,6 +5041,7 @@ type Profile implements Timestamps {
 
 type ProfileAnonymizedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -4999,6 +5059,7 @@ type ProfileAssociatedEvent implements PetitionEvent {
 
 type ProfileClosedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5007,6 +5068,7 @@ type ProfileClosedEvent implements ProfileEvent {
 
 type ProfileCreatedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5025,6 +5087,7 @@ type ProfileDisassociatedEvent implements PetitionEvent {
 
 interface ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5040,6 +5103,18 @@ type ProfileEventPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type ProfileEventSubscription implements EventSubscription {
+  eventTypes: [ProfileEventType!]
+  eventsUrl: String!
+  fromProfileType: ProfileType
+  fromProfileTypeFields: [ProfileTypeField]
+  id: GID!
+  isEnabled: Boolean!
+  isFailing: Boolean!
+  name: String
+  signatureKeys: [EventSubscriptionSignatureKey!]!
 }
 
 enum ProfileEventType {
@@ -5058,6 +5133,7 @@ enum ProfileEventType {
 
 type ProfileFieldExpiryUpdatedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5095,6 +5171,7 @@ type ProfileFieldFile implements ProfileFieldResponse {
 
 type ProfileFieldFileAddedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5103,6 +5180,7 @@ type ProfileFieldFileAddedEvent implements ProfileEvent {
 
 type ProfileFieldFileRemovedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5196,6 +5274,7 @@ type ProfileFieldValue implements ProfileFieldResponse {
 
 type ProfileFieldValueUpdatedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5227,6 +5306,7 @@ input ProfilePropertyFilter {
 
 type ProfileReopenedEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -5235,6 +5315,7 @@ type ProfileReopenedEvent implements ProfileEvent {
 
 type ProfileScheduledForDeletionEvent implements ProfileEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   profile: Profile
   type: ProfileEventType!
@@ -6135,6 +6216,13 @@ type Query {
   ): PetitionBaseOrFolderPagination!
   petitionsById(folders: FoldersInput, ids: [GID!]): [PetitionBase]!
   profile(profileId: GID!): Profile!
+  profileEvents(
+    """
+    Filter events that happened before the specified event id
+    """
+    before: GID
+    eventTypes: [ProfileEventType!]
+  ): [ProfileEvent!]!
   profileType(profileTypeId: GID!): ProfileType!
   profileTypes(
     filter: ProfileTypeFilter
@@ -6219,7 +6307,7 @@ type Query {
     includeInactive: Boolean
     search: String!
   ): [UserOrUserGroup!]!
-  subscriptions: [PetitionEventSubscription!]!
+  subscriptions: [EventSubscription!]!
 
   """
   Paginated list of tags in the organization

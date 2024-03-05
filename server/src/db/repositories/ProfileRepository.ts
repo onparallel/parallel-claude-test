@@ -13,10 +13,12 @@ import {
   uniq,
 } from "remeda";
 import { LocalizableUserText } from "../../graphql";
+import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { LazyPromise } from "../../util/promises/LazyPromise";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { Maybe, MaybeArray, Replace } from "../../util/types";
 import {
   CreateProfile,
@@ -27,6 +29,7 @@ import {
   Organization,
   Profile,
   ProfileEvent,
+  ProfileEventType,
   ProfileFieldFile,
   ProfileFieldValue,
   ProfileStatus,
@@ -46,11 +49,13 @@ import {
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
 import { SortBy, escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { pMapChunk } from "../../util/promises/pMapChunk";
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex) {
+  constructor(
+    @inject(KNEX) knex: Knex,
+    @inject(QUEUES_SERVICE) private queues: IQueuesService,
+  ) {
     super(knex);
   }
 
@@ -1042,10 +1047,13 @@ export class ProfileRepository extends BaseRepository {
   }
 
   async createEvent(events: MaybeArray<CreateProfileEvent>, t?: Knex.Transaction) {
-    if (Array.isArray(events) && events.length === 0) {
+    const eventsArray = unMaybeArray(events);
+    if (eventsArray.length === 0) {
       return [];
     }
-    return await this.insert("profile_event", events, t);
+    const profileEvents = await this.insert("profile_event", eventsArray, t);
+    await this.queues.enqueueEvents(profileEvents, "profile_event", undefined, t);
+    return profileEvents;
   }
 
   getPaginatedExpirableProfileFieldProperties(
@@ -1760,5 +1768,41 @@ export class ProfileRepository extends BaseRepository {
         );
       }
     });
+  }
+
+  async getProfileEventsForUser(
+    userId: number,
+    options: {
+      eventTypes?: Maybe<ProfileEventType[]>;
+      before?: Maybe<number>;
+      limit: number;
+    },
+  ) {
+    return await this.raw<ProfileEvent>(
+      /* sql */ `
+      select pe.* from user_profile_event_log upel
+      join profile_event pe on upel.profile_event_id = pe.id
+      where upel.user_id = ?
+        ${isDefined(options.before) ? /* sql */ `and upel.profile_event_id < ?` : ""}
+        ${isDefined(options.eventTypes) ? /* sql */ `and pe.type in ?` : ""}
+      order by pe.id desc
+      limit ${options.limit};
+    `,
+      [
+        userId,
+        ...(isDefined(options.before) ? [options.before] : []),
+        ...(isDefined(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
+      ],
+    );
+  }
+
+  async attachProfileEventsToUsers(profileEventId: number, userIds: number[]) {
+    await this.insert(
+      "user_profile_event_log",
+      userIds.map((userId) => ({
+        profile_event_id: profileEventId,
+        user_id: userId,
+      })),
+    );
   }
 }

@@ -1,11 +1,20 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+import { Heading, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { DevelopersLayout } from "@parallel/components/layout/DevelopersLayout";
 import {
+  ProfileEventType,
+  Subscriptions_PetitionEventSubscriptionFragment,
+  Subscriptions_ProfileEventSubscriptionFragment,
+  Subscriptions_createEventSubscriptionSignatureKeyDocument,
+  Subscriptions_createPetitionEventSubscriptionDocument,
+  Subscriptions_createProfileEventSubscriptionDocument,
+  Subscriptions_deleteEventSubscriptionsDocument,
   Subscriptions_subscriptionsDocument,
+  Subscriptions_updatePetitionEventSubscriptionDocument,
+  Subscriptions_updateProfileEventSubscriptionDocument,
   Subscriptions_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -29,6 +38,7 @@ import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Link } from "@parallel/components/common/Link";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -36,18 +46,18 @@ import { Table, TableColumn } from "@parallel/components/common/Table";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { useConfirmDeactivateEventSubscriptionDialog } from "@parallel/components/settings/dialogs/ConfirmDeactivateEventSubscriptionDialog";
 import {
-  CreateOrUpdateEventSubscriptionDialog,
-  useCreateOrUpdateEventSubscriptionDialog,
-} from "@parallel/components/settings/dialogs/CreateOrUpdateEventSubscriptionDialog";
+  CreateOrUpdatePetitionEventSubscriptionDialog,
+  useCreateOrUpdatePetitionEventSubscriptionDialog,
+} from "@parallel/components/settings/dialogs/CreateOrUpdatePetitionEventSubscriptionDialog";
+import {
+  CreateOrUpdateProfileEventSubscriptionDialog,
+  useCreateOrUpdateProfileEventSubscriptionDialog,
+} from "@parallel/components/settings/dialogs/CreateOrUpdateProfileEventSubscriptionDialog";
 import {
   PetitionEventType,
-  Subscriptions_PetitionEventSubscriptionFragment,
-  Subscriptions_createEventSubscriptionDocument,
-  Subscriptions_createEventSubscriptionSignatureKeyDocument,
   Subscriptions_deleteEventSubscriptionSignatureKeysDocument,
-  Subscriptions_deleteEventSubscriptionsDocument,
-  Subscriptions_updateEventSubscriptionDocument,
 } from "@parallel/graphql/__types";
+import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { Maybe } from "@parallel/utils/types";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -64,21 +74,35 @@ function Subscriptions() {
     refetch: refetchSubscriptions,
   } = useAssertQuery(Subscriptions_subscriptionsDocument);
 
-  const [selectedSubscriptions, setSelectedSubscriptions] = useState<string[]>([]);
-
-  const [updateEventSubscription] = useMutation(Subscriptions_updateEventSubscriptionDocument);
-  const [deleteEventSubscriptions] = useMutation(Subscriptions_deleteEventSubscriptionsDocument);
-  const [createEventSubscription] = useMutation(Subscriptions_createEventSubscriptionDocument);
-
-  const [createEventSubscriptionSignatureKey] = useMutation(
-    Subscriptions_createEventSubscriptionSignatureKeyDocument,
+  const templateSubscriptions = subscriptions.filter(
+    (s) => s.__typename === "PetitionEventSubscription",
   );
+  assertTypenameArray(templateSubscriptions, "PetitionEventSubscription");
+
+  const profileSubscriptions = subscriptions.filter(
+    (s) => s.__typename === "ProfileEventSubscription",
+  );
+  assertTypenameArray(profileSubscriptions, "ProfileEventSubscription");
+
+  const [selectedTemplateSubscriptions, setSelectedTemplateSubscriptions] = useState<string[]>([]);
+  const [selectedProfileSubscriptions, setSelectedProfileSubscriptions] = useState<string[]>([]);
 
   const [deleteEventSubscriptionSignatureKeys] = useMutation(
     Subscriptions_deleteEventSubscriptionSignatureKeysDocument,
   );
+  const [deleteEventSubscriptions] = useMutation(Subscriptions_deleteEventSubscriptionsDocument);
+  const [createEventSubscriptionSignatureKey] = useMutation(
+    Subscriptions_createEventSubscriptionSignatureKeyDocument,
+  );
 
-  const createOrUpdateSubscriptionHandlers = {
+  // Petition Events Mutations
+  const [updatePetitionEventSubscription] = useMutation(
+    Subscriptions_updatePetitionEventSubscriptionDocument,
+  );
+  const [createPetitionEventSubscription] = useMutation(
+    Subscriptions_createPetitionEventSubscriptionDocument,
+  );
+  const createOrUpdatePetitionSubscriptionHandlers = {
     onSubscriptionSubmit: async (
       id: Maybe<string>,
       data: {
@@ -91,7 +115,7 @@ function Subscriptions() {
     ) => {
       let subscriptionId = id;
       if (isDefined(id)) {
-        await updateEventSubscription({
+        await updatePetitionEventSubscription({
           variables: {
             id,
             name: data.name,
@@ -102,8 +126,8 @@ function Subscriptions() {
           },
         });
       } else {
-        const result = await createEventSubscription({ variables: data });
-        subscriptionId = result.data!.createEventSubscription.id;
+        const result = await createPetitionEventSubscription({ variables: data });
+        subscriptionId = result.data!.createPetitionEventSubscription.id;
       }
 
       await refetchSubscriptions();
@@ -122,82 +146,223 @@ function Subscriptions() {
     },
   };
 
-  const showCreateOrUpdateEventSubscriptionDialog = useCreateOrUpdateEventSubscriptionDialog();
-  const handleCreateEventSubscription = async () => {
-    try {
-      await showCreateOrUpdateEventSubscriptionDialog({
-        ...createOrUpdateSubscriptionHandlers,
+  // Profile Events Mutations
+  const [updateProfileEventSubscription] = useMutation(
+    Subscriptions_updateProfileEventSubscriptionDocument,
+  );
+  const [createProfileEventSubscription] = useMutation(
+    Subscriptions_createProfileEventSubscriptionDocument,
+  );
+
+  const createOrUpdateProfileSubscriptionHandlers = {
+    onSubscriptionSubmit: async (
+      id: Maybe<string>,
+      data: {
+        eventsUrl: string;
+        eventTypes: ProfileEventType[] | null;
+        name: string | null;
+        fromProfileTypeId: string | null;
+        fromProfileTypeFieldIds: string[] | null;
+      },
+    ) => {
+      let subscriptionId = id;
+      if (isDefined(id)) {
+        await updateProfileEventSubscription({
+          variables: {
+            id,
+            name: data.name,
+            eventsUrl: data.eventsUrl,
+            eventTypes: data.eventTypes,
+            fromProfileTypeId: data.fromProfileTypeId,
+            fromProfileTypeFieldIds: data.fromProfileTypeFieldIds,
+          },
+        });
+      } else {
+        const result = await createProfileEventSubscription({ variables: data });
+        subscriptionId = result.data!.createProfileEventSubscription.id;
+      }
+
+      await refetchSubscriptions();
+      return subscriptionId!;
+    },
+    onAddSignatureKey: async (subscriptionId: string) => {
+      const response = await createEventSubscriptionSignatureKey({
+        variables: { subscriptionId },
       });
+      await refetchSubscriptions();
+      return response.data!.createEventSubscriptionSignatureKey;
+    },
+    onDeleteSignatureKey: async (signatureKeyId: string) => {
+      await deleteEventSubscriptionSignatureKeys({ variables: { ids: [signatureKeyId] } });
+      await refetchSubscriptions();
+    },
+  };
+
+  const showCreateOrUpdatePetitionEventSubscriptionDialog =
+    useCreateOrUpdatePetitionEventSubscriptionDialog();
+  const showCreateOrUpdateProfileEventSubscriptionDialog =
+    useCreateOrUpdateProfileEventSubscriptionDialog();
+  const handleCreateEventSubscription = async (type: "TEMPLATE" | "PROFILE") => {
+    try {
+      if (type === "TEMPLATE") {
+        await showCreateOrUpdatePetitionEventSubscriptionDialog({
+          ...createOrUpdatePetitionSubscriptionHandlers,
+        });
+      } else {
+        await showCreateOrUpdateProfileEventSubscriptionDialog({
+          ...createOrUpdateProfileSubscriptionHandlers,
+        });
+      }
     } catch {}
   };
 
   const showDeleteSubscriptionDialog = useConfirmDeleteSubscriptionDialog();
-  const handleDeleteEventSubscriptions = async () => {
+  const handleDeleteEventSubscriptions = async (type: "TEMPLATE" | "PROFILE") => {
     try {
+      const selectedSubscriptions =
+        type === "TEMPLATE" ? selectedTemplateSubscriptions : selectedProfileSubscriptions;
       await showDeleteSubscriptionDialog({ count: selectedSubscriptions.length });
+
       await deleteEventSubscriptions({
         variables: {
           ids: selectedSubscriptions,
         },
       });
+
       await refetchSubscriptions();
-      setSelectedSubscriptions([]);
+      if (type === "TEMPLATE") {
+        setSelectedTemplateSubscriptions([]);
+      } else {
+        setSelectedProfileSubscriptions([]);
+      }
     } catch {}
   };
 
-  const handleEditEventSubscription = async () => {
+  const handleEditEventSubscription = async (type: "TEMPLATE" | "PROFILE") => {
     try {
+      const subscriptions = type === "TEMPLATE" ? templateSubscriptions : profileSubscriptions;
+      const selectedSubscriptions =
+        type === "TEMPLATE" ? selectedTemplateSubscriptions : selectedProfileSubscriptions;
+
       const eventSubscription = subscriptions.find((s) => s.id === selectedSubscriptions[0])!;
-      await showCreateOrUpdateEventSubscriptionDialog({
-        eventSubscription,
-        ...createOrUpdateSubscriptionHandlers,
-      });
+
+      if (type === "TEMPLATE") {
+        if (eventSubscription) {
+          assertTypename(eventSubscription, "PetitionEventSubscription");
+        }
+        await showCreateOrUpdatePetitionEventSubscriptionDialog({
+          eventSubscription,
+          ...createOrUpdatePetitionSubscriptionHandlers,
+        });
+      } else {
+        if (eventSubscription) {
+          assertTypename(eventSubscription, "ProfileEventSubscription");
+        }
+        await showCreateOrUpdateProfileEventSubscriptionDialog({
+          eventSubscription,
+          ...createOrUpdateProfileSubscriptionHandlers,
+        });
+      }
     } catch {}
   };
-  const handleEditSubscriptionSignatureKeys = async (subscriptionId: string) => {
+
+  const handleEditSubscriptionSignatureKeys = async (
+    subscriptionId: string,
+    type: "TEMPLATE" | "PROFILE",
+  ) => {
     try {
+      const subscriptions = type === "TEMPLATE" ? templateSubscriptions : profileSubscriptions;
       const eventSubscription = subscriptions.find((s) => s.id === subscriptionId)!;
-      await showCreateOrUpdateEventSubscriptionDialog({
-        eventSubscription,
-        initialStep: 1,
-        ...createOrUpdateSubscriptionHandlers,
-      });
+
+      if (type === "TEMPLATE") {
+        assertTypename(eventSubscription, "PetitionEventSubscription");
+        await showCreateOrUpdatePetitionEventSubscriptionDialog({
+          eventSubscription,
+          initialStep: 1,
+          ...createOrUpdatePetitionSubscriptionHandlers,
+        });
+      } else {
+        assertTypename(eventSubscription, "ProfileEventSubscription");
+        await showCreateOrUpdateProfileEventSubscriptionDialog({
+          eventSubscription,
+          initialStep: 1,
+          ...createOrUpdateProfileSubscriptionHandlers,
+        });
+      }
     } catch {}
   };
 
   const showConfirmDeactivateEventSubscriptionDialog =
     useConfirmDeactivateEventSubscriptionDialog();
 
-  const subscriptionsTableContext = useMemo<SubscriptionsTableContext>(
+  const templateSubscriptionsTableContext = useMemo<TemplateSubscriptionsTableContext>(
     () => ({
       onToggleEnabled: async (id: string, isEnabled: boolean) => {
-        await updateEventSubscription({
+        await updatePetitionEventSubscription({
           variables: { id, isEnabled },
         });
       },
       showConfirmDeactivateEventSubscriptionDialog,
-      onSignatureKeysClick: handleEditSubscriptionSignatureKeys,
+      onSignatureKeysClick: async (subscriptionId: string) => {
+        handleEditSubscriptionSignatureKeys(subscriptionId, "TEMPLATE");
+      },
     }),
     [
-      updateEventSubscription,
+      updatePetitionEventSubscription,
       showConfirmDeactivateEventSubscriptionDialog,
       handleEditSubscriptionSignatureKeys,
     ],
   );
 
-  const subscriptionsColumns = useSubscriptionsColumns();
-
-  const actions = [
+  const templateSubscriptionsColumns = useTemplateSubscriptionsColumns();
+  const actionsTemplateSubscriptions = [
     {
       key: "edit",
-      onClick: () => handleEditEventSubscription(),
+      onClick: () => handleEditEventSubscription("TEMPLATE"),
       leftIcon: <EditIcon />,
       children: <FormattedMessage id="generic.edit" defaultMessage="Edit" />,
-      isDisabled: selectedSubscriptions.length !== 1,
+      isDisabled: selectedTemplateSubscriptions.length !== 1,
     },
     {
       key: "delete",
-      onClick: () => handleDeleteEventSubscriptions(),
+      onClick: () => handleDeleteEventSubscriptions("TEMPLATE"),
+      leftIcon: <DeleteIcon />,
+      children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+      colorScheme: "red",
+    },
+  ];
+
+  const profileSubscriptionsTableContext = useMemo<ProfileSubscriptionsTableContext>(
+    () => ({
+      onToggleEnabled: async (id: string, isEnabled: boolean) => {
+        await updateProfileEventSubscription({
+          variables: { id, isEnabled },
+        });
+      },
+      showConfirmDeactivateEventSubscriptionDialog,
+      onSignatureKeysClick: async (subscriptionId: string) => {
+        handleEditSubscriptionSignatureKeys(subscriptionId, "PROFILE");
+      },
+    }),
+    [
+      updateProfileEventSubscription,
+      showConfirmDeactivateEventSubscriptionDialog,
+      handleEditSubscriptionSignatureKeys,
+    ],
+  );
+
+  const profileSubscriptionsColumns = useProfileSubscriptionsColumns();
+  const actionsProfileSubscriptions = [
+    {
+      key: "edit",
+      onClick: () => handleEditEventSubscription("PROFILE"),
+      leftIcon: <EditIcon />,
+      children: <FormattedMessage id="generic.edit" defaultMessage="Edit" />,
+      isDisabled: selectedProfileSubscriptions.length !== 1,
+    },
+    {
+      key: "delete",
+      onClick: () => handleDeleteEventSubscriptions("PROFILE"),
       leftIcon: <DeleteIcon />,
       children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
       colorScheme: "red",
@@ -213,59 +378,130 @@ function Subscriptions() {
             defaultMessage="Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
           />
         </Text>
-        <Card display="flex" flexDirection="column" overflow="hidden">
-          <Stack direction="row" padding={2}>
-            <IconButtonWithTooltip
-              onClick={() => refetchSubscriptions()}
-              icon={<RepeatIcon />}
-              placement="bottom"
-              variant="outline"
-              label={intl.formatMessage({
-                id: "generic.reload-data",
-                defaultMessage: "Reload",
-              })}
+        <Stack spacing={4}>
+          <Heading as="h3" size="md">
+            <FormattedMessage
+              id="page.subscriptions.template-subscriptions-title"
+              defaultMessage="Template subscriptions"
             />
-            <Spacer />
-            <Button colorScheme="primary" onClick={handleCreateEventSubscription}>
-              <FormattedMessage
-                id="page.subscriptions.create-subscription"
-                defaultMessage="Create subscription"
+          </Heading>
+
+          <Card display="flex" flexDirection="column" overflow="hidden">
+            <Stack direction="row" padding={2}>
+              <IconButtonWithTooltip
+                onClick={() => refetchSubscriptions()}
+                icon={<RepeatIcon />}
+                placement="bottom"
+                variant="outline"
+                label={intl.formatMessage({
+                  id: "generic.reload-data",
+                  defaultMessage: "Reload",
+                })}
               />
-            </Button>
-          </Stack>
-          <Box overflowX="auto">
-            {subscriptions.length ? (
-              <Table
-                context={subscriptionsTableContext}
-                flex="0 1 auto"
-                minHeight={0}
-                isSelectable
-                isHighlightable
-                columns={subscriptionsColumns}
-                rows={subscriptions}
-                rowKeyProp="id"
-                onSelectionChange={setSelectedSubscriptions}
-                actions={actions}
+              <Spacer />
+              <Button
+                colorScheme="primary"
+                onClick={() => handleCreateEventSubscription("TEMPLATE")}
+              >
+                <FormattedMessage
+                  id="page.subscriptions.create-subscription"
+                  defaultMessage="Create subscription"
+                />
+              </Button>
+            </Stack>
+            <Box overflowX="auto">
+              {templateSubscriptions.length ? (
+                <Table
+                  context={templateSubscriptionsTableContext}
+                  flex="0 1 auto"
+                  minHeight={0}
+                  isSelectable
+                  isHighlightable
+                  columns={templateSubscriptionsColumns}
+                  rows={templateSubscriptions}
+                  rowKeyProp="id"
+                  onSelectionChange={setSelectedTemplateSubscriptions}
+                  actions={actionsTemplateSubscriptions}
+                />
+              ) : (
+                <>
+                  <Divider />
+                  <Center textStyle="hint" minHeight="60px">
+                    <FormattedMessage
+                      id="page.subscriptions.no-subscriptions-message"
+                      defaultMessage="You haven't created any subscriptions yet"
+                    />
+                  </Center>
+                </>
+              )}
+            </Box>
+          </Card>
+        </Stack>
+        <Stack spacing={4}>
+          <Heading as="h3" size="md">
+            <FormattedMessage
+              id="page.subscriptions.profiles-subscriptions-title"
+              defaultMessage="Profile subscriptions"
+            />
+          </Heading>
+
+          <Card display="flex" flexDirection="column" overflow="hidden">
+            <Stack direction="row" padding={2}>
+              <IconButtonWithTooltip
+                onClick={() => refetchSubscriptions()}
+                icon={<RepeatIcon />}
+                placement="bottom"
+                variant="outline"
+                label={intl.formatMessage({
+                  id: "generic.reload-data",
+                  defaultMessage: "Reload",
+                })}
               />
-            ) : (
-              <>
-                <Divider />
-                <Center textStyle="hint" minHeight="60px">
-                  <FormattedMessage
-                    id="page.subscriptions.no-subscriptions-message"
-                    defaultMessage="You haven't created any subscriptions yet"
-                  />
-                </Center>
-              </>
-            )}
-          </Box>
-        </Card>
+              <Spacer />
+              <Button
+                colorScheme="primary"
+                onClick={() => handleCreateEventSubscription("PROFILE")}
+              >
+                <FormattedMessage
+                  id="page.subscriptions.create-subscription"
+                  defaultMessage="Create subscription"
+                />
+              </Button>
+            </Stack>
+            <Box overflowX="auto">
+              {profileSubscriptions.length ? (
+                <Table
+                  context={profileSubscriptionsTableContext}
+                  flex="0 1 auto"
+                  minHeight={0}
+                  isSelectable
+                  isHighlightable
+                  columns={profileSubscriptionsColumns}
+                  rows={profileSubscriptions}
+                  rowKeyProp="id"
+                  onSelectionChange={setSelectedProfileSubscriptions}
+                  actions={actionsProfileSubscriptions}
+                />
+              ) : (
+                <>
+                  <Divider />
+                  <Center textStyle="hint" minHeight="60px">
+                    <FormattedMessage
+                      id="page.subscriptions.no-subscriptions-message"
+                      defaultMessage="You haven't created any subscriptions yet"
+                    />
+                  </Center>
+                </>
+              )}
+            </Box>
+          </Card>
+        </Stack>
       </Stack>
     </DevelopersLayout>
   );
 }
 
-interface SubscriptionsTableContext {
+interface TemplateSubscriptionsTableContext {
   onToggleEnabled: (id: string, isEnabled: boolean) => void;
   showConfirmDeactivateEventSubscriptionDialog: ReturnType<
     typeof useConfirmDeactivateEventSubscriptionDialog
@@ -273,9 +509,9 @@ interface SubscriptionsTableContext {
   onSignatureKeysClick: (subscriptionId: string) => Promise<void>;
 }
 
-function useSubscriptionsColumns(): TableColumn<
+function useTemplateSubscriptionsColumns(): TableColumn<
   Subscriptions_PetitionEventSubscriptionFragment,
-  SubscriptionsTableContext
+  TemplateSubscriptionsTableContext
 >[] {
   const intl = useIntl();
   return useMemo(
@@ -342,6 +578,7 @@ function useSubscriptionsColumns(): TableColumn<
           maxWidth: 0,
         },
         CellContent: ({ row }) => {
+          assertTypename(row, "PetitionEventSubscription");
           return (
             <OverflownText>
               {row.fromTemplate ? (
@@ -376,6 +613,7 @@ function useSubscriptionsColumns(): TableColumn<
         align: "center",
         cellProps: { minWidth: "170px", width: "10%", whiteSpace: "nowrap" },
         CellContent: ({ row }) => {
+          assertTypename(row, "PetitionEventSubscription");
           return !isDefined(row.eventTypes) ? (
             <Text fontSize="sm">
               <FormattedMessage id="generic.all-event-types" defaultMessage="All events" />
@@ -401,6 +639,209 @@ function useSubscriptionsColumns(): TableColumn<
                   id="page.subscriptions.n-events"
                   defaultMessage="{count} events"
                   values={{ count: row.eventTypes.length }}
+                />
+              </Text>
+            </SmallPopover>
+          );
+        },
+      },
+      {
+        key: "signatureKeys",
+        label: intl.formatMessage({
+          id: "page.subscriptions.column-header-signature-keys",
+          defaultMessage: "Keys",
+        }),
+        align: "center",
+        cellProps: { minWidth: "100px", width: "5%" },
+        CellContent: ({ row, context: { onSignatureKeysClick } }) => {
+          return (
+            <Button
+              size="xs"
+              variant="ghost"
+              color="primary.500"
+              fontSize="sm"
+              onClick={() => onSignatureKeysClick(row.id)}
+            >
+              <FormattedMessage
+                id="page.subscriptions.n-keys"
+                defaultMessage="{count, plural, =1{# key} other {# keys}}"
+                values={{ count: row.signatureKeys.length }}
+              />
+            </Button>
+          );
+        },
+      },
+      {
+        key: "isEnabled",
+        label: intl.formatMessage({
+          id: "page.subscriptions.column-header-is-enabled",
+          defaultMessage: "Enabled",
+        }),
+        align: "center",
+        cellProps: { minWidth: "100px", width: "5%" },
+        CellContent: ({
+          row,
+          context: { onToggleEnabled, showConfirmDeactivateEventSubscriptionDialog },
+        }) => {
+          async function handleToggleChange(e: any) {
+            try {
+              if (!e.target.checked) {
+                await showConfirmDeactivateEventSubscriptionDialog();
+                onToggleEnabled(row.id, false);
+              } else {
+                onToggleEnabled(row.id, true);
+              }
+            } catch {}
+          }
+          return <Switch isChecked={row.isEnabled} onChange={handleToggleChange} />;
+        },
+      },
+    ],
+    [intl.locale],
+  );
+}
+
+interface ProfileSubscriptionsTableContext {
+  onToggleEnabled: (id: string, isEnabled: boolean) => void;
+  showConfirmDeactivateEventSubscriptionDialog: ReturnType<
+    typeof useConfirmDeactivateEventSubscriptionDialog
+  >;
+  onSignatureKeysClick: (subscriptionId: string) => Promise<void>;
+}
+
+function useProfileSubscriptionsColumns(): TableColumn<
+  Subscriptions_ProfileEventSubscriptionFragment,
+  ProfileSubscriptionsTableContext
+>[] {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        key: "name",
+        label: intl.formatMessage({
+          id: "page.subscriptions.column-header-name",
+          defaultMessage: "Name",
+        }),
+        cellProps: {
+          width: "20%",
+        },
+        CellContent: ({ row }) => (
+          <HStack>
+            {row.isFailing ? (
+              <Tooltip
+                label={intl.formatMessage({
+                  id: "page.subscriptions.webhook-is-failing",
+                  defaultMessage:
+                    "The events could not be sent to the URL, if the error persists check the webhook",
+                })}
+              >
+                <AlertCircleFilledIcon color="red.500" />
+              </Tooltip>
+            ) : null}
+            <Text textStyle={row.name ? undefined : "hint"}>
+              {row.name ?? (
+                <FormattedMessage
+                  id="page.subscriptions.unnamed-subscription"
+                  defaultMessage="Unnamed subscription"
+                />
+              )}
+            </Text>
+          </HStack>
+        ),
+      },
+      {
+        key: "eventsUrl",
+        label: intl.formatMessage({
+          id: "page.subscriptions.column-header-events-url",
+          defaultMessage: "Events URL",
+        }),
+        cellProps: {
+          width: "30%",
+          minWidth: "200px",
+          fontSize: "sm",
+          maxWidth: 0,
+        },
+        CellContent: ({ row }) => {
+          return <OverflownText>{row.eventsUrl}</OverflownText>;
+        },
+      },
+      {
+        key: "fromProfileType",
+        label: intl.formatMessage({
+          id: "page.subscriptions.column-header-from-profile-type",
+          defaultMessage: "From profile type",
+        }),
+        cellProps: {
+          width: "30%",
+          minWidth: "200px",
+          fontSize: "sm",
+          maxWidth: 0,
+        },
+        CellContent: ({ row }) => {
+          if (!isDefined(row.fromProfileType)) {
+            return (
+              <Text textStyle="hint">
+                <FormattedMessage
+                  id="page.subscriptions.column-header-from-any-profile"
+                  defaultMessage="Any profile"
+                />
+              </Text>
+            );
+          }
+          return (
+            <OverflownText>
+              <Link href={`/app/organization/profiles/types/${row.fromProfileType.id}`}>
+                <LocalizableUserTextRender
+                  value={row.fromProfileType.name}
+                  default={
+                    <Text as="span" fontStyle="italic">
+                      <FormattedMessage
+                        id="generic.unnamed-profile-type"
+                        defaultMessage="Unnamed profile type"
+                      />
+                    </Text>
+                  }
+                />
+              </Link>
+            </OverflownText>
+          );
+        },
+      },
+      {
+        key: "profileEventTypes",
+        label: intl.formatMessage({
+          id: "page.subscriptions.column-header-event-types",
+          defaultMessage: "Event types",
+        }),
+        align: "center",
+        cellProps: { minWidth: "170px", width: "10%", whiteSpace: "nowrap" },
+        CellContent: ({ row }) => {
+          assertTypename(row, "ProfileEventSubscription");
+          return !isDefined(row.profileEventTypes) ? (
+            <Text fontSize="sm">
+              <FormattedMessage id="generic.all-event-types" defaultMessage="All events" />
+            </Text>
+          ) : row.profileEventTypes.length === 1 ? (
+            <Badge>{row.profileEventTypes[0]}</Badge>
+          ) : (
+            <SmallPopover
+              width="min-content"
+              placement="bottom-end"
+              content={
+                <Stack as={List} alignItems="flex-start">
+                  {row.profileEventTypes!.map((type) => (
+                    <Badge as={ListItem} key={type}>
+                      {type}
+                    </Badge>
+                  ))}
+                </Stack>
+              }
+            >
+              <Text color="primary.500" fontSize="sm">
+                <FormattedMessage
+                  id="page.subscriptions.n-events"
+                  defaultMessage="{count} events"
+                  values={{ count: row.profileEventTypes.length }}
                 />
               </Text>
             </SmallPopover>
@@ -500,34 +941,59 @@ const _fragments = {
   PetitionEventSubscription: gql`
     fragment Subscriptions_PetitionEventSubscription on PetitionEventSubscription {
       id
-      eventsUrl
-      eventTypes
       isEnabled
-      isFailing
-      name
+      eventTypes
       fromTemplate {
         id
         name
       }
+      ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
+    }
+    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionEventSubscription}
+  `,
+  ProfileEventSubscription: gql`
+    fragment Subscriptions_ProfileEventSubscription on ProfileEventSubscription {
+      id
+      isEnabled
+      profileEventTypes: eventTypes
+      fromProfileType {
+        id
+        name
+      }
+      ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
+    }
+    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileEventSubscription}
+  `,
+  EventSubscription: gql`
+    fragment Subscriptions_EventSubscription on EventSubscription {
+      id
+      eventsUrl
+      isEnabled
+      isFailing
+      name
       signatureKeys {
         id
       }
-      ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
+      ... on PetitionEventSubscription {
+        ...Subscriptions_PetitionEventSubscription
+      }
+      ... on ProfileEventSubscription {
+        ...Subscriptions_ProfileEventSubscription
+      }
     }
-    ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionEventSubscription}
   `,
 };
 
 const _mutations = [
   gql`
-    mutation Subscriptions_createEventSubscription(
+    mutation Subscriptions_createPetitionEventSubscription(
       $eventsUrl: String!
       $eventTypes: [PetitionEventType!]
       $name: String
       $fromTemplateId: GID
       $fromTemplateFieldIds: [GID!]
     ) {
-      createEventSubscription(
+      createPetitionEventSubscription(
         eventsUrl: $eventsUrl
         eventTypes: $eventTypes
         name: $name
@@ -540,7 +1006,7 @@ const _mutations = [
     ${_fragments.PetitionEventSubscription}
   `,
   gql`
-    mutation Subscriptions_updateEventSubscription(
+    mutation Subscriptions_updatePetitionEventSubscription(
       $id: GID!
       $isEnabled: Boolean
       $eventsUrl: String
@@ -549,7 +1015,7 @@ const _mutations = [
       $fromTemplateId: GID
       $fromTemplateFieldIds: [GID!]
     ) {
-      updateEventSubscription(
+      updatePetitionEventSubscription(
         id: $id
         isEnabled: $isEnabled
         eventsUrl: $eventsUrl
@@ -559,11 +1025,57 @@ const _mutations = [
         fromTemplateFieldIds: $fromTemplateFieldIds
       ) {
         ...Subscriptions_PetitionEventSubscription
-        ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
+        ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
       }
     }
     ${_fragments.PetitionEventSubscription}
-    ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionEventSubscription}
+    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionEventSubscription}
+  `,
+  gql`
+    mutation Subscriptions_createProfileEventSubscription(
+      $eventsUrl: String!
+      $eventTypes: [ProfileEventType!]
+      $name: String
+      $fromProfileTypeId: GID
+      $fromProfileTypeFieldIds: [GID!]
+    ) {
+      createProfileEventSubscription(
+        eventsUrl: $eventsUrl
+        eventTypes: $eventTypes
+        name: $name
+        fromProfileTypeId: $fromProfileTypeId
+        fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+      ) {
+        ...Subscriptions_ProfileEventSubscription
+      }
+    }
+    ${_fragments.ProfileEventSubscription}
+  `,
+  gql`
+    mutation Subscriptions_updateProfileEventSubscription(
+      $id: GID!
+      $isEnabled: Boolean
+      $eventsUrl: String
+      $eventTypes: [ProfileEventType!]
+      $name: String
+      $fromProfileTypeId: GID
+      $fromProfileTypeFieldIds: [GID!]
+    ) {
+      updateProfileEventSubscription(
+        id: $id
+        isEnabled: $isEnabled
+        eventsUrl: $eventsUrl
+        eventTypes: $eventTypes
+        name: $name
+        fromProfileTypeId: $fromProfileTypeId
+        fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+      ) {
+        ...Subscriptions_ProfileEventSubscription
+        ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
+      }
+    }
+    ${_fragments.ProfileEventSubscription}
+    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileEventSubscription}
   `,
   gql`
     mutation Subscriptions_deleteEventSubscriptions($ids: [GID!]!) {
@@ -573,10 +1085,12 @@ const _mutations = [
   gql`
     mutation Subscriptions_createEventSubscriptionSignatureKey($subscriptionId: GID!) {
       createEventSubscriptionSignatureKey(subscriptionId: $subscriptionId) {
-        id
-        publicKey
+        ...CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey
+        ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
       }
     }
+    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.EventSubscriptionSignatureKey}
+    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.EventSubscriptionSignatureKey}
   `,
   gql`
     mutation Subscriptions_deleteEventSubscriptionSignatureKeys($ids: [GID!]!) {
@@ -589,10 +1103,10 @@ const _queries = [
   gql`
     query Subscriptions_subscriptions {
       subscriptions {
-        ...Subscriptions_PetitionEventSubscription
+        ...Subscriptions_EventSubscription
       }
     }
-    ${_fragments.PetitionEventSubscription}
+    ${_fragments.EventSubscription}
   `,
   gql`
     query Subscriptions_user {

@@ -1,7 +1,7 @@
 import { core, enumType, interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
 import { PetitionEventTypeValues } from "../../../db/__types";
-import { mapEventPayload } from "../../../util/eventMapper";
+import { mapPetitionEventPayload } from "../../../util/eventMapper";
 import { userOrPetitionAccessResolver } from "../../helpers/userOrPetitionAccessResolver";
 
 export const PetitionEvent = interfaceType({
@@ -21,7 +21,7 @@ export const PetitionEvent = interfaceType({
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
     });
-    t.jsonObject("data", { resolve: (o) => mapEventPayload(o) });
+    t.jsonObject("data", { resolve: (o) => mapPetitionEventPayload(o) });
   },
   resolveType: (p) => {
     switch (p.type) {

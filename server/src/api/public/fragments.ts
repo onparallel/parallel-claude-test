@@ -260,15 +260,42 @@ export const PermissionFragment = gql`
   ${UserGroupFragment}
 `;
 
-export const SubscriptionFragment = gql`
-  fragment Subscription on PetitionEventSubscription {
+export const PetitionEventSubscriptionFragment = gql`
+  fragment PetitionEventSubscription on PetitionEventSubscription {
     id
     name
     eventsUrl
     isEnabled
-    eventTypes
+    petitionEventTypes: eventTypes
     fromTemplate {
       id
+    }
+    __typename
+  }
+`;
+
+export const ProfileEventSubscriptionFragment = gql`
+  fragment ProfileEventSubscription on ProfileEventSubscription {
+    id
+    name
+    eventsUrl
+    isEnabled
+    profileEventTypes: eventTypes
+    fromProfileType {
+      id
+    }
+    __typename
+  }
+`;
+
+export const EventSubscriptionFragment = gql`
+  fragment EventSubscription on EventSubscription {
+    id
+    ... on PetitionEventSubscription {
+      ...PetitionEventSubscription
+    }
+    ... on ProfileEventSubscription {
+      ...ProfileEventSubscription
     }
   }
 `;

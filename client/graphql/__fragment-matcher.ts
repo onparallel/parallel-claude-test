@@ -27,6 +27,7 @@ const result: PossibleTypesResultData = {
       "DowJonesKycEntitySearchResultEntity",
       "DowJonesKycEntitySearchResultPerson",
     ],
+    EventSubscription: ["PetitionEventSubscription", "ProfileEventSubscription"],
     IOrgIntegration: ["OrgIntegration", "SignatureOrgIntegration"],
     PetitionBase: ["Petition", "PetitionTemplate"],
     PetitionBaseOrFolder: ["Petition", "PetitionFolder", "PetitionTemplate"],

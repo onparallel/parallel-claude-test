@@ -1,10 +1,13 @@
+import { isAfter } from "date-fns";
 import FormData from "form-data";
 import { createReadStream } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
+import pMap from "p-map";
 import { performance } from "perf_hooks";
 import { isDefined, omit, pick, pipe, uniq, zip } from "remeda";
 import { promisify } from "util";
+import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor } from "../../util/promises/waitFor";
@@ -26,6 +29,7 @@ import {
   CreatePetitionRecipients_contactDocument,
   CreatePetitionRecipients_createContactDocument,
   CreatePetitionRecipients_updateContactDocument,
+  EventSubscriptionFragment,
   getTags_tagsDocument,
   getTaskResultFileUrl_getTaskResultFileDocument,
   PetitionFieldFragment,
@@ -35,15 +39,12 @@ import {
   PetitionSignatureRequestFragment,
   PetitionTagFilter,
   ProfileFragment,
-  SubscriptionFragment,
   TagFragmentDoc,
   TaskFragment as TaskType,
   TemplateFragment,
   waitForTask_TaskDocument,
 } from "./__types";
 import { TaskFragment } from "./fragments";
-import pMap from "p-map";
-import { isAfter } from "date-fns";
 
 export function paginationParams() {
   return {
@@ -89,21 +90,23 @@ export function idParam<
 ): RestParameter<GeneratedParameterType<string, TRequired, TArray>> {
   // ignore defaultValue
   delete options.defaultValue;
-  const { type } = options;
+  const prefixes = unMaybeArray(options.type);
+
   return {
     parse: buildParse(options, (value) => {
       try {
-        if (fromGlobalId(value).type !== type) {
+        const parsed = fromGlobalId(value);
+        if (!prefixes.includes(parsed.type)) {
           throw new Error();
         }
+        return value;
       } catch {
         throw new ParseError(value, `Value is not a valid ID`);
       }
-      return value;
     }),
     spec: buildDefinition(options, {
       type: "string",
-      example: toGlobalId(type, 42),
+      example: toGlobalId(prefixes[0], 42),
     } as any),
   };
 }
@@ -457,11 +460,22 @@ export function mapReplyResponse(reply: PetitionFieldReplyFragment) {
   };
 }
 
-export function mapSubscription(subscription: SubscriptionFragment) {
-  return {
-    ...omit(subscription, ["fromTemplate"]),
-    fromTemplateId: subscription.fromTemplate?.id,
-  };
+export function mapSubscription(subscription: EventSubscriptionFragment) {
+  if (subscription.__typename === "PetitionEventSubscription") {
+    return {
+      ...omit(subscription, ["fromTemplate", "petitionEventTypes", "__typename"]),
+      type: "PETITION" as const,
+      eventTypes: subscription.petitionEventTypes,
+      fromTemplateId: subscription.fromTemplate?.id ?? null,
+    };
+  } else {
+    return {
+      ...omit(subscription, ["fromProfileType", "profileEventTypes", "__typename"]),
+      type: "PROFILE" as const,
+      eventTypes: subscription.profileEventTypes,
+      fromProfileTypeId: subscription.fromProfileType?.id ?? null,
+    };
+  }
 }
 
 export function buildTagsFilter(

@@ -6,33 +6,35 @@ import { fullName } from "../../util/fullName";
 
 export async function developerWebhookFailed(
   payload: {
-    petition_event_subscription_id: number;
-    petition_id: number;
+    event_subscription_id: number;
     error_message: string;
     post_body: any;
   },
   context: WorkerContext,
 ) {
-  const [petition, subscription] = await Promise.all([
-    context.petitions.loadPetition(payload.petition_id),
-    context.subscriptions.loadSubscription(payload.petition_event_subscription_id),
-  ]);
-  if (!petition) {
-    return; // if the petition was deleted, return without throwing error
-  }
+  const subscription = await context.subscriptions.loadEventSubscription(
+    payload.event_subscription_id,
+  );
+
   if (!subscription) {
-    throw new Error(
-      `PetitionEventSubscription not found for payload.petition_event_subscription_id ${payload.petition_event_subscription_id}`,
-    );
+    throw new Error(`EventSubscription:${payload.event_subscription_id} not found`);
   }
+  const user = await context.users.loadUser(subscription.user_id);
+  if (!user) {
+    throw new Error(`User:${subscription.user_id} not found`);
+  }
+  if (user.status !== "ACTIVE") {
+    return;
+  }
+
   const subscribedUserData = await context.users.loadUserDataByUserId(subscription.user_id);
   if (!subscribedUserData) {
     throw new Error(
-      `UserData not found for User:${subscription.user_id} on PetitionEventSubscription:${payload.petition_event_subscription_id}`,
+      `UserData not found for User:${subscription.user_id} on EventSubscription:${payload.event_subscription_id}`,
     );
   }
 
-  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(user.org_id);
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {
@@ -49,6 +51,6 @@ export async function developerWebhookFailed(
     subject,
     text,
     html,
-    created_from: `PetitionEventSubscription:${payload.petition_event_subscription_id}`,
+    created_from: `EventSubscription:${payload.event_subscription_id}`,
   });
 }

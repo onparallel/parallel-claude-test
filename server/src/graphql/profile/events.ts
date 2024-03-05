@@ -1,5 +1,6 @@
 import { core, enumType, interfaceType, objectType } from "nexus";
 import { ProfileEventTypeValues } from "../../db/__types";
+import { mapProfileEventPayload } from "../../util/eventMapper";
 
 export const ProfileEvent = interfaceType({
   name: "ProfileEvent",
@@ -18,6 +19,7 @@ export const ProfileEvent = interfaceType({
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
     });
+    t.jsonObject("data", { resolve: (o) => mapProfileEventPayload(o) });
   },
   resolveType: (p) => {
     switch (p.type) {

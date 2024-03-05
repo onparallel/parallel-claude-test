@@ -1,8 +1,9 @@
 import { isDefined } from "remeda";
 import { PetitionEvent } from "../db/events/PetitionEvent";
 import { toGlobalId } from "./globalId";
+import { ProfileEvent } from "../db/events/ProfileEvent";
 
-export function mapEventPayload(event: PetitionEvent) {
+export function mapPetitionEventPayload(event: PetitionEvent) {
   switch (event.type) {
     case "ACCESS_ACTIVATED": {
       return {
@@ -358,12 +359,91 @@ export function mapEventPayload(event: PetitionEvent) {
   }
 }
 
-export function mapEvent(event: PetitionEvent) {
+export function mapPetitionEvent(event: PetitionEvent) {
   return {
     id: toGlobalId("PetitionEvent", event.id),
     petitionId: toGlobalId("Petition", event.petition_id),
     type: event.type,
-    data: mapEventPayload(event),
+    data: mapPetitionEventPayload(event),
+    createdAt: event.created_at,
+  };
+}
+
+export function mapProfileEventPayload(event: ProfileEvent) {
+  switch (event.type) {
+    case "PETITION_ASSOCIATED": {
+      return {
+        petitionId: toGlobalId("Petition", event.data.petition_id),
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "PETITION_DISASSOCIATED": {
+      return {
+        petitionId: toGlobalId("Petition", event.data.petition_id),
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "PROFILE_ANONYMIZED": {
+      return {};
+    }
+    case "PROFILE_CLOSED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "PROFILE_CREATED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "PROFILE_FIELD_EXPIRY_UPDATED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
+        expiryDate: event.data.expiry_date,
+      };
+    }
+    case "PROFILE_FIELD_FILE_ADDED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
+        profileFieldFileId: toGlobalId("ProfileFieldFile", event.data.profile_field_file_id),
+      };
+    }
+    case "PROFILE_FIELD_FILE_REMOVED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
+        profileFieldFileId: toGlobalId("ProfileFieldFile", event.data.profile_field_file_id),
+      };
+    }
+    case "PROFILE_FIELD_VALUE_UPDATED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
+      };
+    }
+    case "PROFILE_REOPENED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "PROFILE_SCHEDULED_FOR_DELETION": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    default:
+      return {};
+  }
+}
+
+export function mapProfileEvent(event: ProfileEvent) {
+  return {
+    id: toGlobalId("ProfileEvent", event.id),
+    profileId: toGlobalId("Profile", event.profile_id),
+    type: event.type,
+    data: mapProfileEventPayload(event),
     createdAt: event.created_at,
   };
 }

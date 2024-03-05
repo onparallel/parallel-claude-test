@@ -4,6 +4,7 @@ import { unlink } from "fs/promises";
 import { GraphQLClient, gql } from "graphql-request";
 import { outdent } from "outdent";
 import { isDefined, omit, pick, uniq, zip } from "remeda";
+import { PetitionEventTypeValues, ProfileEventTypeValues } from "../../db/__types";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -56,7 +57,8 @@ import {
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
   DownloadSignedDocument_downloadAuditTrailDocument,
   DownloadSignedDocument_downloadSignedDocDocument,
-  EventSubscriptions_createSubscriptionDocument,
+  EventSubscriptions_createPetitionEventSubscriptionDocument,
+  EventSubscriptions_createProfileEventSubscriptionDocument,
   EventSubscriptions_deleteSubscriptionDocument,
   EventSubscriptions_getSubscriptionsDocument,
   ExportPetitionReplies_createExportRepliesTaskDocument,
@@ -72,6 +74,7 @@ import {
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetition_petitionDocument,
   GetPetitions_petitionsDocument,
+  GetProfileEvents_ProfileEventsDocument,
   GetProfileFields_profileDocument,
   GetProfileSubscribers_profileDocument,
   GetProfile_profileDocument,
@@ -130,15 +133,17 @@ import {
 import { description } from "./description";
 import {
   ContactFragment,
+  EventSubscriptionFragment,
   PermissionFragment,
   PetitionAccessFragment,
+  PetitionEventSubscriptionFragment,
   PetitionFieldFragment,
   PetitionFieldWithRepliesFragment,
   PetitionFragment,
   PetitionSignatureRequestFragment,
   PetitionTagFragment,
+  ProfileEventSubscriptionFragment,
   ProfileFragment,
-  SubscriptionFragment,
   TaskFragment,
   TemplateFragment,
   UserFragment,
@@ -171,16 +176,18 @@ import {
   AssociatePetitionToProfileInput,
   Contact,
   CreateContact,
+  CreateEventSubscription,
   CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
   CreateProfile,
   CreateProfileFieldValue,
-  CreateSubscription,
+  EventSubscription,
   FileDownload,
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfPetitionEvents,
   ListOfPetitionFieldsWithReplies,
+  ListOfProfileEvents,
   ListOfProfileProperties,
   ListOfProfileSubscriptions,
   ListOfProfiles,
@@ -195,7 +202,6 @@ import {
   Petition,
   PetitionAccess,
   PetitionCustomProperties,
-  PetitionEvent,
   PetitionField,
   PetitionFieldReply,
   Profile,
@@ -209,7 +215,6 @@ import {
   SubmitPetitionReplies,
   SubmitPetitionRepliesResponse,
   SubmitReply,
-  Subscription,
   TagPetition,
   Template,
   UpdateFileReply,
@@ -218,8 +223,8 @@ import {
   UpdateProfileFieldValueFormDataBody,
   UpdateReply,
   UserWithOrg,
-  petitionEventTypes,
-} from "./schemas";
+} from "./schemas/core";
+import { PetitionEvent, ProfileEvent } from "./schemas/events";
 
 function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
@@ -319,10 +324,14 @@ export const api = new RestApi({
     {
       name: "Subscriptions",
       description: outdent`
-        Subscribe to our events to get real time updates on your parallels.
+        Subscribe to our events to get real time updates on your parallels and profiles.
 
         Here's a list of all possible events:
+        ## Parallel Events
         ${PetitionEvent.description}
+
+        ## Profile Events
+        ${ProfileEvent.description}
       `,
     },
     {
@@ -474,7 +483,7 @@ const templateId = idParam({
   description: "The ID of the template",
 });
 const subscriptionId = idParam({
-  type: "PetitionEventSubscription",
+  type: ["PetitionEventSubscription", "ProfileEventSubscription"],
   description: "The ID of the subscription",
 });
 const signatureId = idParam({
@@ -3247,10 +3256,10 @@ api
       const _query = gql`
         query EventSubscriptions_getSubscriptions {
           subscriptions {
-            ...Subscription
+            ...EventSubscription
           }
         }
-        ${SubscriptionFragment}
+        ${EventSubscriptionFragment}
       `;
       const result = await client.request(EventSubscriptions_getSubscriptionsDocument);
       return Ok(result.subscriptions.map(mapSubscription));
@@ -3260,10 +3269,10 @@ api
     {
       operationId: "CreateSubscription",
       summary: "Create subscription",
-      description: outdent`Creates a new subscription.`,
-      body: JsonBody(CreateSubscription),
+      description: outdent`Creates a new event subscription on any of your parallels of profiles.`,
+      body: JsonBody(CreateEventSubscription),
       responses: {
-        201: SuccessResponse(Subscription),
+        201: SuccessResponse(EventSubscription),
         400: ErrorResponse({ description: "Invalid request" }),
       },
       callbacks: {
@@ -3292,37 +3301,97 @@ api
             },
           },
         },
+        ProfileEventCreated: {
+          "{$request.body#/eventsUrl}": {
+            post: {
+              operationId: "ProfileEventCreated",
+              summary: "New Profile Event",
+              description: outdent`
+                A new event was triggered on one of your subscribed profiles.
+                
+                A POST request will be sent to the provided events URL containing the event information.
+                
+                Additionally, if you created one or more signature keys, special headers will be sent with the request, containing the event signatures. You can read more about signature verification in [this help center article](https://help.onparallel.com/en/articles/7035199-event-subscriptions-and-signature-keys).
+              `,
+              requestBody: {
+                required: true,
+                content: { "application/json": { schema: ProfileEvent as any } },
+              },
+              responses: {
+                "200": {
+                  description:
+                    "Your server implementation should return this HTTP status code\nif the data was received successfully\n",
+                },
+              },
+            },
+          },
+        },
       },
       tags: ["Subscriptions"],
     },
     async ({ client, body }) => {
-      try {
-        const _mutation = gql`
-          mutation EventSubscriptions_createSubscription(
-            $eventsUrl: String!
-            $eventTypes: [PetitionEventType!]
-            $name: String
-            $fromTemplateId: GID
+      const _petitionMutation = gql`
+        mutation EventSubscriptions_createPetitionEventSubscription(
+          $eventsUrl: String!
+          $eventTypes: [PetitionEventType!]
+          $name: String
+          $fromTemplateId: GID
+        ) {
+          createPetitionEventSubscription(
+            eventsUrl: $eventsUrl
+            eventTypes: $eventTypes
+            name: $name
+            fromTemplateId: $fromTemplateId
           ) {
-            createEventSubscription(
-              eventsUrl: $eventsUrl
-              eventTypes: $eventTypes
-              name: $name
-              fromTemplateId: $fromTemplateId
-            ) {
-              ...Subscription
-            }
+            ...PetitionEventSubscription
           }
-          ${SubscriptionFragment}
-        `;
-        const result = await client.request(EventSubscriptions_createSubscriptionDocument, {
-          eventsUrl: body.eventsUrl,
-          eventTypes: body.eventTypes,
-          name: body.name,
-          fromTemplateId: body.fromTemplateId,
-        });
+        }
+        ${PetitionEventSubscriptionFragment}
+      `;
+      const _profileMutation = gql`
+        mutation EventSubscriptions_createProfileEventSubscription(
+          $eventsUrl: String!
+          $eventTypes: [ProfileEventType!]
+          $name: String
+          $fromProfileTypeId: GID
+        ) {
+          createProfileEventSubscription(
+            eventsUrl: $eventsUrl
+            eventTypes: $eventTypes
+            name: $name
+            fromProfileTypeId: $fromProfileTypeId
+          ) {
+            ...ProfileEventSubscription
+          }
+        }
+        ${ProfileEventSubscriptionFragment}
+      `;
+      try {
+        if (body.type === "PETITION") {
+          const result = await client.request(
+            EventSubscriptions_createPetitionEventSubscriptionDocument,
+            {
+              eventsUrl: body.eventsUrl,
+              eventTypes: body.eventTypes,
+              name: body.name,
+              fromTemplateId: body.fromTemplateId,
+            },
+          );
 
-        return Created(mapSubscription(result.createEventSubscription));
+          return Created(mapSubscription(result.createPetitionEventSubscription));
+        } else {
+          const result = await client.request(
+            EventSubscriptions_createProfileEventSubscriptionDocument,
+            {
+              eventsUrl: body.eventsUrl,
+              eventTypes: body.eventTypes,
+              name: body.name,
+              fromProfileTypeId: body.fromProfileTypeId,
+            },
+          );
+
+          return Created(mapSubscription(result.createProfileEventSubscription));
+        }
       } catch (error) {
         if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
           throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
@@ -3370,7 +3439,7 @@ api.path("/petition-events").get(
         required: false,
       }),
       eventTypes: enumParam({
-        values: petitionEventTypes,
+        values: PetitionEventTypeValues,
         description: "Filter events by types",
         required: false,
         array: true,
@@ -3404,6 +3473,61 @@ api.path("/petition-events").get(
         .map((e) => ({
           id: e.id,
           petitionId: e.petition!.id,
+          type: e.type,
+          data: e.data,
+          createdAt: e.createdAt,
+        })),
+    );
+  },
+);
+
+api.path("/profile-events").get(
+  {
+    operationId: "GetProfileEvents",
+    summary: "Get your latest profile events",
+    excludeFromSpec: true,
+    description: "Returns a list with your latest profile events",
+    query: {
+      before: idParam({
+        type: "ProfileEvent",
+        description: "Fetch events that ocurred before this ID",
+        required: false,
+      }),
+      eventTypes: enumParam({
+        values: ProfileEventTypeValues,
+        description: "Filter events by types",
+        required: false,
+        array: true,
+      }),
+    },
+    responses: { 200: SuccessResponse(ListOfProfileEvents) },
+  },
+  async ({ client, query }) => {
+    const _query = gql`
+      query GetProfileEvents_ProfileEvents($before: GID, $eventTypes: [ProfileEventType!]) {
+        profileEvents(before: $before, eventTypes: $eventTypes) {
+          id
+          data
+          profile {
+            id
+          }
+          type
+          createdAt
+        }
+      }
+    `;
+
+    const result = await client.request(GetProfileEvents_ProfileEventsDocument, {
+      before: query.before,
+      eventTypes: query.eventTypes,
+    });
+
+    return Ok(
+      result.profileEvents
+        .filter((e) => isDefined(e.profile))
+        .map((e) => ({
+          id: e.id,
+          profileId: e.profile!.id,
           type: e.type,
           data: e.data,
           createdAt: e.createdAt,

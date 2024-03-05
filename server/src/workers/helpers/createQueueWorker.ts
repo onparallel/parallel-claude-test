@@ -12,13 +12,13 @@ import { ILogger, LOGGER } from "../../services/Logger";
 import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
+import { MaybePromise } from "../../util/types";
 import { DelayQueuePayload } from "../delay-queue";
 import { EmailEventsWorkerPayload } from "../email-events";
 import { EmailSenderWorkerPayload } from "../email-sender";
-import { EventProcessorPayload } from "../event-processor";
 import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
-import { MaybePromise } from "../../util/types";
+import { EventProcessorPayload } from "./EventProcessor";
 
 export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;

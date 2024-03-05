@@ -20,6 +20,11 @@ import { BANKFLIP_SERVICE, BankflipService, IBankflipService } from "./BankflipS
 import { DOW_JONES_CLIENT, DowJonesClient, IDowJonesClient } from "./DowJonesClient";
 import { EMAILS, EmailsService, IEmailsService } from "./EmailsService";
 import { ENCRYPTION_SERVICE, EncryptionService, IEncryptionService } from "./EncryptionService";
+import {
+  EVENT_SUBSCRIPTION_SERVICE,
+  EventSubscriptionService,
+  IEventSubscriptionService,
+} from "./EventSubscriptionService";
 import { FETCH_SERVICE, FetchService, IFetchService } from "./FetchService";
 import { I18N_SERVICE, I18nService, II18nService } from "./I18nService";
 import { IImageService, IMAGE_SERVICE, ImageService } from "./ImageService";
@@ -95,4 +100,5 @@ export const servicesModule = new ContainerModule((bind) => {
   );
   bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
   bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE).to(BackgroundCheckService);
+  bind<IEventSubscriptionService>(EVENT_SUBSCRIPTION_SERVICE).to(EventSubscriptionService);
 });

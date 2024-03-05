@@ -11,7 +11,7 @@ export function userHasAccessToEventSubscription<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const subscriptionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-    const subscriptions = await ctx.subscriptions.loadSubscription(subscriptionIds);
+    const subscriptions = await ctx.subscriptions.loadEventSubscription(subscriptionIds);
     return subscriptions.every((s) => s?.user_id === ctx.user!.id);
   };
 }
@@ -41,7 +41,7 @@ export function userHasAccessToEventSubscriptionSignatureKeys<
       return false;
     }
     const subscriptionIds = uniq(keys.map((k) => k!.event_subscription_id));
-    const subscriptions = await ctx.subscriptions.loadSubscription(subscriptionIds);
+    const subscriptions = await ctx.subscriptions.loadEventSubscription(subscriptionIds);
     return subscriptions.every((s) => s?.user_id === ctx.user!.id);
   };
 }

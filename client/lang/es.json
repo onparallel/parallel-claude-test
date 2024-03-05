@@ -1650,22 +1650,7 @@
     "context": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
   },
   {
-    "term": "component.create-event-subscription-dialog.confirm-delete-body",
-    "definition": "¿Estás seguro que quieres eliminar la clave seleccionada?",
-    "context": "Are you sure you want to delete the selected key?"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.confirm-delete-header",
-    "definition": "Eliminar clave de firma",
-    "context": "Delete signature key"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.confirm-delete-warning",
-    "definition": "Antes de continuar, asegúrate de no estar usando esta clave para verificar eventos recibidos, ya que no será más válida.",
-    "context": "Before you proceed, make sure you are not using this key to verify received events, as it will not be valid anymore."
-  },
-  {
-    "term": "component.create-event-subscription-dialog.event-select.placeholder",
+    "term": "component.create-event-subscription-dialog.event-select-placeholder",
     "definition": "Buscar eventos...",
     "context": "Search events..."
   },
@@ -1685,24 +1670,14 @@
     "context": "Your URL does not seem to accept POST requests."
   },
   {
-    "term": "component.create-event-subscription-dialog.filter-fields",
-    "definition": "Filtra eventos provenientes de campos específicos de la plantilla. Deja en blanco para recibir todos los eventos.",
-    "context": "Filter for events coming from specific fields of the template. Leave blank to receive all events."
+    "term": "component.create-event-subscription-dialog.header-step-1",
+    "definition": "Suscripción de eventos",
+    "context": "Event subscription"
   },
   {
-    "term": "component.create-event-subscription-dialog.filter-fields-placeholder",
-    "definition": "Selecciona campos para filtrar eventos...",
-    "context": "Select fields to filter events..."
-  },
-  {
-    "term": "component.create-event-subscription-dialog.from-template-label",
-    "definition": "Filtrar eventos provinientes de parallels creados a partir de una plantilla específica (Opcional).",
-    "context": "Filter events from parallels created from a specific template (Optional)."
-  },
-  {
-    "term": "component.create-event-subscription-dialog.from-template-placeholder",
-    "definition": "Buscar plantillas...",
-    "context": "Search for templates..."
+    "term": "component.create-event-subscription-dialog.header-step-2",
+    "definition": "Claves de firma",
+    "context": "Signature keys"
   },
   {
     "term": "component.create-event-subscription-dialog.invalid-event-types",
@@ -1728,16 +1703,6 @@
     "term": "component.create-event-subscription-dialog.specific-events",
     "definition": "Eventos específicos",
     "context": "Specific events"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.title.step-1",
-    "definition": "Suscripción de eventos",
-    "context": "Event subscription"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.title.step-2",
-    "definition": "Claves de firma",
-    "context": "Signature keys"
   },
   {
     "term": "component.create-folder-dialog.create-folder",
@@ -1990,6 +1955,26 @@
     "context": "Organization status"
   },
   {
+    "term": "component.create-petition-event-subscription-dialog.filter-fields",
+    "definition": "Filtra eventos provenientes de campos específicos de la plantilla. Deja en blanco para recibir todos los eventos.",
+    "context": "Filter for events coming from specific fields of the template. Leave blank to receive all events."
+  },
+  {
+    "term": "component.create-petition-event-subscription-dialog.filter-fields-placeholder",
+    "definition": "Selecciona campos para filtrar eventos...",
+    "context": "Select fields to filter events..."
+  },
+  {
+    "term": "component.create-petition-event-subscription-dialog.from-template-label",
+    "definition": "Filtrar eventos provinientes de parallels creados a partir de una plantilla específica (Opcional).",
+    "context": "Filter events from parallels created from a specific template (Optional)."
+  },
+  {
+    "term": "component.create-petition-event-subscription-dialog.from-template-placeholder",
+    "definition": "Buscar plantillas...",
+    "context": "Search for templates..."
+  },
+  {
     "term": "component.create-profile-dialog.new-profile",
     "definition": "Nuevo perfil",
     "context": "New profile"
@@ -1998,6 +1983,21 @@
     "term": "component.create-profile-dialog.profile-type",
     "definition": "Tipo de perfil",
     "context": "Profile type"
+  },
+  {
+    "term": "component.create-profile-event-subscription-dialog.filter-fields",
+    "definition": "Filtra los eventos procedentes de propiedades específicas del perfil. Deja en blanco para recibir todos los eventos.",
+    "context": "Filter for events coming from specific properties of the profile. Leave blank to receive all events."
+  },
+  {
+    "term": "component.create-profile-event-subscription-dialog.filter-fields-placeholder",
+    "definition": "Selecciona propiedades para filtrar eventos...",
+    "context": "Select properties to filter events..."
+  },
+  {
+    "term": "component.create-profile-event-subscription-dialog.from-profiles-label",
+    "definition": "Filtrar eventos de perfiles creados a partir de un tipo de perfil específico (Opcional).",
+    "context": "Filter events from profiles created from a specific profile type (Optional)."
   },
   {
     "term": "component.create-profile-type-dialog.edit-profile-type-name",
@@ -2148,6 +2148,21 @@
     "term": "component.delete-signature-error-confirmation.title",
     "definition": "Firmas pendientes",
     "context": "Pending signatures"
+  },
+  {
+    "term": "component.delete-webhook-signature-keys-dialog.confirm-delete-body",
+    "definition": "¿Estás seguro que quieres eliminar la clave seleccionada?",
+    "context": "Are you sure you want to delete the selected key?"
+  },
+  {
+    "term": "component.delete-webhook-signature-keys-dialog.confirm-delete-header",
+    "definition": "Eliminar clave de firma",
+    "context": "Delete signature key"
+  },
+  {
+    "term": "component.delete-webhook-signature-keys-dialog.confirm-delete-warning",
+    "definition": "Antes de continuar, asegúrate de no estar usando esta clave para verificar eventos recibidos, ya que no será más válida.",
+    "context": "Before you proceed, make sure you are not using this key to verify received events, as it will not be valid anymore."
   },
   {
     "term": "component.developers-layout.subscriptions",
@@ -6585,6 +6600,21 @@
     "context": "Can write"
   },
   {
+    "term": "component.profile-type-field-select.create-property",
+    "definition": "Crear propiedad: <b>{label}</b>",
+    "context": "Create property: <b>{label}</b>"
+  },
+  {
+    "term": "component.profile-type-field-select.placeholder",
+    "definition": "Selecciona una propiedad",
+    "context": "Select a property"
+  },
+  {
+    "term": "component.profile-type-field-select.suggested-property",
+    "definition": "Propiedad sugerida: <b>{label}</b>",
+    "context": "Suggested property: <b>{label}</b>"
+  },
+  {
     "term": "component.profile-type-header.clone-label",
     "definition": "Duplicar tipo de perfil",
     "context": "Clone profile type"
@@ -10240,11 +10270,6 @@
     "context": "Your account uses SSO. To reset your password, please contact your team admin."
   },
   {
-    "term": "generic.forms.url-placeholder",
-    "definition": "https://www.ejemplo.com",
-    "context": "https://www.example.com"
-  },
-  {
     "term": "generic.forms.valid-password-error",
     "definition": "Por favor, introduce una contraseña válida",
     "context": "Please, enter a valid password"
@@ -11168,6 +11193,11 @@
     "term": "generic.upgrade-to-enable",
     "definition": "Actualiza tu plan para activar esta funcionalidad.",
     "context": "Upgrade to enable this feature."
+  },
+  {
+    "term": "generic.url-placeholder",
+    "definition": "https://www.ejemplo.com",
+    "context": "https://www.example.com"
   },
   {
     "term": "generic.user-status-active",
@@ -13270,6 +13300,16 @@
     "context": "Any parallel"
   },
   {
+    "term": "page.subscriptions.column-header-from-any-profile",
+    "definition": "Cualquier perfil",
+    "context": "Any profile"
+  },
+  {
+    "term": "page.subscriptions.column-header-from-profile-type",
+    "definition": "Desde el tipo de perfil",
+    "context": "From profile type"
+  },
+  {
     "term": "page.subscriptions.column-header-from-template",
     "definition": "Desde la plantilla",
     "context": "From template"
@@ -13325,9 +13365,19 @@
     "context": "You haven't created any subscriptions yet"
   },
   {
+    "term": "page.subscriptions.profiles-subscriptions-title",
+    "definition": "Suscripciones a perfiles",
+    "context": "Profile subscriptions"
+  },
+  {
     "term": "page.subscriptions.subscriptions-explanation",
     "definition": "Aquí puedes registrar webhooks para ser notificado cuando ocurra cualquier cosa en uno de tus parallels (por ejemplo, cuando un destinatario envía un comentario o cuando se completa el parallel)",
     "context": "Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
+  },
+  {
+    "term": "page.subscriptions.template-subscriptions-title",
+    "definition": "Suscripciones a plantillas",
+    "context": "Template subscriptions"
   },
   {
     "term": "page.subscriptions.unnamed-subscription",

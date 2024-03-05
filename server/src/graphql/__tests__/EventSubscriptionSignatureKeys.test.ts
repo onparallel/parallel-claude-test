@@ -1,7 +1,7 @@
 import assert from "assert";
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { EventSubscriptionSignatureKey, PetitionEventSubscription, User } from "../../db/__types";
+import { EventSubscription, EventSubscriptionSignatureKey, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "../../services/EncryptionService";
@@ -13,7 +13,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
   let mocks: Mocks;
   let user: User;
 
-  let subscription: PetitionEventSubscription;
+  let subscription: EventSubscription;
   let signatureKeys: EventSubscriptionSignatureKey[];
 
   let encryptionService: IEncryptionService;
@@ -28,6 +28,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
     ({ user } = await mocks.createSessionUserAndOrganization());
 
     [subscription] = await mocks.createEventSubscription({
+      type: "PETITION",
       name: "my subscription",
       user_id: user.id,
       endpoint: "https://my.website.com/webhook",

@@ -25,6 +25,10 @@ export type ContactLocale = "en" | "es" | "ca" | "it" | "pt";
 
 export const ContactLocaleValues = ["en", "es", "ca", "it", "pt"] as ContactLocale[];
 
+export type EventSubscriptionType = "PETITION" | "PROFILE";
+
+export const EventSubscriptionTypeValues = ["PETITION", "PROFILE"] as EventSubscriptionType[];
+
 export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
@@ -563,6 +567,7 @@ export interface TableTypes {
   email_attachment: EmailAttachment;
   email_event: EmailEvent;
   email_log: EmailLog;
+  event_subscription: EventSubscription;
   event_subscription_signature_key: EventSubscriptionSignatureKey;
   feature_flag: FeatureFlag;
   feature_flag_override: FeatureFlagOverride;
@@ -614,6 +619,7 @@ export interface TableTypes {
   user_group_member: UserGroupMember;
   user_group_permission: UserGroupPermission;
   user_petition_event_log: UserPetitionEventLog;
+  user_profile_event_log: UserProfileEventLog;
 }
 
 export interface TableCreateTypes {
@@ -624,6 +630,7 @@ export interface TableCreateTypes {
   email_attachment: CreateEmailAttachment;
   email_event: CreateEmailEvent;
   email_log: CreateEmailLog;
+  event_subscription: CreateEventSubscription;
   event_subscription_signature_key: CreateEventSubscriptionSignatureKey;
   feature_flag: CreateFeatureFlag;
   feature_flag_override: CreateFeatureFlagOverride;
@@ -675,6 +682,7 @@ export interface TableCreateTypes {
   user_group_member: CreateUserGroupMember;
   user_group_permission: CreateUserGroupPermission;
   user_petition_event_log: CreateUserPetitionEventLog;
+  user_profile_event_log: CreateUserProfileEventLog;
 }
 
 export interface TablePrimaryKeys {
@@ -685,6 +693,7 @@ export interface TablePrimaryKeys {
   email_attachment: "id";
   email_event: "id";
   email_log: "id";
+  event_subscription: "id";
   event_subscription_signature_key: "id";
   feature_flag: "id";
   feature_flag_override: "id";
@@ -736,6 +745,7 @@ export interface TablePrimaryKeys {
   user_group_member: "id";
   user_group_permission: "id";
   user_petition_event_log: "id";
+  user_profile_event_log: "id";
 }
 
 export interface AiCompletionLog {
@@ -889,6 +899,47 @@ export type CreateEmailLog = PartialProps<
   | "anonymized_at"
   | "processed_at"
   | "processed_by"
+>;
+
+export interface EventSubscription {
+  id: number; // int4
+  type: EventSubscriptionType; // event_subscription_type
+  user_id: number; // int4
+  name: Maybe<string>; // varchar
+  endpoint: string; // varchar
+  event_types: Maybe<any>; // jsonb
+  is_enabled: boolean; // bool
+  is_failing: boolean; // bool
+  from_template_id: Maybe<number>; // int4
+  from_template_field_ids: Maybe<number[]>; // int4[]
+  from_profile_type_id: Maybe<number>; // int4
+  from_profile_type_field_ids: Maybe<number[]>; // int4[]
+  error_log: any; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateEventSubscription = PartialProps<
+  Omit<EventSubscription, "id">,
+  | "name"
+  | "event_types"
+  | "is_enabled"
+  | "is_failing"
+  | "from_template_id"
+  | "from_template_field_ids"
+  | "from_profile_type_id"
+  | "from_profile_type_field_ids"
+  | "error_log"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface EventSubscriptionSignatureKey {
@@ -1683,11 +1734,12 @@ export interface ProfileEvent {
   data: any; // jsonb
   created_at: Date; // timestamptz
   processed_at: Maybe<Date>; // timestamptz
+  processed_by: Maybe<string>; // varchar
 }
 
 export type CreateProfileEvent = PartialProps<
   Omit<ProfileEvent, "id">,
-  "data" | "created_at" | "processed_at"
+  "data" | "created_at" | "processed_at" | "processed_by"
 >;
 
 export interface ProfileFieldFile {
@@ -2193,4 +2245,15 @@ export interface UserPetitionEventLog {
 export type CreateUserPetitionEventLog = PartialProps<
   Omit<UserPetitionEventLog, "id">,
   "user_id" | "petition_event_id"
+>;
+
+export interface UserProfileEventLog {
+  id: string; // int8
+  user_id: Maybe<number>; // int4
+  profile_event_id: Maybe<number>; // int4
+}
+
+export type CreateUserProfileEventLog = PartialProps<
+  Omit<UserProfileEventLog, "id">,
+  "user_id" | "profile_event_id"
 >;

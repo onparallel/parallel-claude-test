@@ -913,7 +913,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
     totalCount: number; // Int!
   };
-  PetitionEventSubscription: db.PetitionEventSubscription;
+  PetitionEventSubscription: db.EventSubscription;
   PetitionField: db.PetitionField;
   PetitionFieldAttachment: db.PetitionFieldAttachment;
   PetitionFieldAttachmentUploadData: {
@@ -1046,6 +1046,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["ProfileEvent"][]; // [ProfileEvent!]!
     totalCount: number; // Int!
   };
+  ProfileEventSubscription: db.EventSubscription;
   ProfileFieldExpiryUpdatedEvent: profileEvents.ProfileFieldExpiryUpdatedEvent;
   ProfileFieldFile: db.ProfileFieldFile;
   ProfileFieldFileAddedEvent: profileEvents.ProfileFieldFileAddedEvent;
@@ -1266,6 +1267,7 @@ export interface NexusGenInterfaces {
   DowJonesKycEntitySearchResult:
     | NexusGenRootTypes["DowJonesKycEntitySearchResultEntity"]
     | NexusGenRootTypes["DowJonesKycEntitySearchResultPerson"];
+  EventSubscription: db.EventSubscription;
   IOrgIntegration:
     | NexusGenRootTypes["OrgIntegration"]
     | NexusGenRootTypes["SignatureOrgIntegration"];
@@ -1823,6 +1825,7 @@ export interface NexusGenFieldTypes {
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"][]; // [PetitionAttachmentUploadData!]!
+    createPetitionEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -1832,6 +1835,7 @@ export interface NexusGenFieldTypes {
     createPetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createProfile: NexusGenRootTypes["Profile"]; // Profile!
+    createProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     createProfileFieldFileUploadLink: NexusGenRootTypes["ProfileFieldPropertyAndFileWithUploadData"]; // ProfileFieldPropertyAndFileWithUploadData!
     createProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -1969,6 +1973,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationUserLimit: NexusGenRootTypes["Organization"]; // Organization!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionAttachmentType: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
+    updatePetitionEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldAutoSearchConfig: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -1981,6 +1986,7 @@ export interface NexusGenFieldTypes {
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
     updatePetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
+    updateProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     updateProfileFieldValue: NexusGenRootTypes["Profile"]; // Profile!
     updateProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -2183,6 +2189,7 @@ export interface NexusGenFieldTypes {
   PetitionAssociatedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2289,6 +2296,7 @@ export interface NexusGenFieldTypes {
   PetitionDisassociatedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2707,6 +2715,7 @@ export interface NexusGenFieldTypes {
   ProfileAnonymizedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2724,6 +2733,7 @@ export interface NexusGenFieldTypes {
   ProfileClosedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2732,6 +2742,7 @@ export interface NexusGenFieldTypes {
   ProfileCreatedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2752,9 +2763,22 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["ProfileEvent"][]; // [ProfileEvent!]!
     totalCount: number; // Int!
   };
+  ProfileEventSubscription: {
+    // field return type
+    eventTypes: NexusGenEnums["ProfileEventType"][] | null; // [ProfileEventType!]
+    eventsUrl: string; // String!
+    fromProfileType: NexusGenRootTypes["ProfileType"] | null; // ProfileType
+    fromProfileTypeFields: Array<NexusGenRootTypes["ProfileTypeField"] | null> | null; // [ProfileTypeField]
+    id: NexusGenScalars["GID"]; // GID!
+    isEnabled: boolean; // Boolean!
+    isFailing: boolean; // Boolean!
+    name: string | null; // String
+    signatureKeys: NexusGenRootTypes["EventSubscriptionSignatureKey"][]; // [EventSubscriptionSignatureKey!]!
+  };
   ProfileFieldExpiryUpdatedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2777,6 +2801,7 @@ export interface NexusGenFieldTypes {
   ProfileFieldFileAddedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2785,6 +2810,7 @@ export interface NexusGenFieldTypes {
   ProfileFieldFileRemovedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2829,6 +2855,7 @@ export interface NexusGenFieldTypes {
   ProfileFieldValueUpdatedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2842,6 +2869,7 @@ export interface NexusGenFieldTypes {
   ProfileReopenedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -2850,6 +2878,7 @@ export interface NexusGenFieldTypes {
   ProfileScheduledForDeletionEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -3130,6 +3159,7 @@ export interface NexusGenFieldTypes {
     petitions: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     profile: NexusGenRootTypes["Profile"]; // Profile!
+    profileEvents: NexusGenRootTypes["ProfileEvent"][]; // [ProfileEvent!]!
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     profileTypes: NexusGenRootTypes["ProfileTypePagination"]; // ProfileTypePagination!
     profiles: NexusGenRootTypes["ProfilePagination"]; // ProfilePagination!
@@ -3143,7 +3173,7 @@ export interface NexusGenFieldTypes {
     remindersOptOut: NexusGenRootTypes["PublicRemindersOptOut"] | null; // PublicRemindersOptOut
     searchUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
-    subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
+    subscriptions: NexusGenRootTypes["EventSubscription"][]; // [EventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     task: NexusGenRootTypes["Task"]; // Task!
     templates: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
@@ -3577,6 +3607,15 @@ export interface NexusGenFieldTypes {
     title: string; // String!
     type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
+  EventSubscription: {
+    // field return type
+    eventsUrl: string; // String!
+    id: NexusGenScalars["GID"]; // GID!
+    isEnabled: boolean; // Boolean!
+    isFailing: boolean; // Boolean!
+    name: string | null; // String
+    signatureKeys: NexusGenRootTypes["EventSubscriptionSignatureKey"][]; // [EventSubscriptionSignatureKey!]!
+  };
   IOrgIntegration: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
@@ -3659,6 +3698,7 @@ export interface NexusGenFieldTypes {
   ProfileEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
@@ -4209,6 +4249,7 @@ export interface NexusGenFieldTypeNames {
     createPetition: "PetitionBase";
     createPetitionAccess: "PetitionAccess";
     createPetitionAttachmentUploadLink: "PetitionAttachmentUploadData";
+    createPetitionEventSubscription: "PetitionEventSubscription";
     createPetitionField: "PetitionField";
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
     createPetitionFieldComment: "PetitionFieldComment";
@@ -4218,6 +4259,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionVariable: "Petition";
     createPrintPdfTask: "Task";
     createProfile: "Profile";
+    createProfileEventSubscription: "ProfileEventSubscription";
     createProfileFieldFileUploadLink: "ProfileFieldPropertyAndFileWithUploadData";
     createProfileType: "ProfileType";
     createProfileTypeField: "ProfileTypeField";
@@ -4355,6 +4397,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationUserLimit: "Organization";
     updatePetition: "PetitionBase";
     updatePetitionAttachmentType: "PetitionAttachment";
+    updatePetitionEventSubscription: "PetitionEventSubscription";
     updatePetitionField: "PetitionField";
     updatePetitionFieldAutoSearchConfig: "PetitionField";
     updatePetitionFieldComment: "PetitionFieldComment";
@@ -4367,6 +4410,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionRestriction: "PetitionBase";
     updatePetitionUserNotificationReadStatus: "PetitionUserNotification";
     updatePetitionVariable: "Petition";
+    updateProfileEventSubscription: "ProfileEventSubscription";
     updateProfileFieldValue: "Profile";
     updateProfileType: "ProfileType";
     updateProfileTypeField: "ProfileTypeField";
@@ -4569,6 +4613,7 @@ export interface NexusGenFieldTypeNames {
   PetitionAssociatedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -4675,6 +4720,7 @@ export interface NexusGenFieldTypeNames {
   PetitionDisassociatedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5093,6 +5139,7 @@ export interface NexusGenFieldTypeNames {
   ProfileAnonymizedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5110,6 +5157,7 @@ export interface NexusGenFieldTypeNames {
   ProfileClosedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5118,6 +5166,7 @@ export interface NexusGenFieldTypeNames {
   ProfileCreatedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5138,9 +5187,22 @@ export interface NexusGenFieldTypeNames {
     items: "ProfileEvent";
     totalCount: "Int";
   };
+  ProfileEventSubscription: {
+    // field return type name
+    eventTypes: "ProfileEventType";
+    eventsUrl: "String";
+    fromProfileType: "ProfileType";
+    fromProfileTypeFields: "ProfileTypeField";
+    id: "GID";
+    isEnabled: "Boolean";
+    isFailing: "Boolean";
+    name: "String";
+    signatureKeys: "EventSubscriptionSignatureKey";
+  };
   ProfileFieldExpiryUpdatedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5163,6 +5225,7 @@ export interface NexusGenFieldTypeNames {
   ProfileFieldFileAddedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5171,6 +5234,7 @@ export interface NexusGenFieldTypeNames {
   ProfileFieldFileRemovedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5215,6 +5279,7 @@ export interface NexusGenFieldTypeNames {
   ProfileFieldValueUpdatedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5228,6 +5293,7 @@ export interface NexusGenFieldTypeNames {
   ProfileReopenedEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5236,6 +5302,7 @@ export interface NexusGenFieldTypeNames {
   ProfileScheduledForDeletionEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -5516,6 +5583,7 @@ export interface NexusGenFieldTypeNames {
     petitions: "PetitionBaseOrFolderPagination";
     petitionsById: "PetitionBase";
     profile: "Profile";
+    profileEvents: "ProfileEvent";
     profileType: "ProfileType";
     profileTypes: "ProfileTypePagination";
     profiles: "ProfilePagination";
@@ -5529,7 +5597,7 @@ export interface NexusGenFieldTypeNames {
     remindersOptOut: "PublicRemindersOptOut";
     searchUserGroups: "UserGroup";
     searchUsers: "UserOrUserGroup";
-    subscriptions: "PetitionEventSubscription";
+    subscriptions: "EventSubscription";
     tags: "TagPagination";
     task: "Task";
     templates: "PetitionBaseOrFolderPagination";
@@ -5963,6 +6031,15 @@ export interface NexusGenFieldTypeNames {
     title: "String";
     type: "DowJonesKycEntityType";
   };
+  EventSubscription: {
+    // field return type name
+    eventsUrl: "String";
+    id: "GID";
+    isEnabled: "Boolean";
+    isFailing: "Boolean";
+    name: "String";
+    signatureKeys: "EventSubscriptionSignatureKey";
+  };
   IOrgIntegration: {
     // field return type name
     id: "GID";
@@ -6045,6 +6122,7 @@ export interface NexusGenFieldTypeNames {
   ProfileEvent: {
     // field return type name
     createdAt: "DateTime";
+    data: "JSONObject";
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
@@ -6317,6 +6395,14 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
     };
+    createPetitionEventSubscription: {
+      // args
+      eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
+      eventsUrl: string; // String!
+      fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      fromTemplateId?: NexusGenScalars["GID"] | null; // GID
+      name?: string | null; // String
+    };
     createPetitionField: {
       // args
       parentFieldId?: NexusGenScalars["GID"] | null; // GID
@@ -6371,6 +6457,14 @@ export interface NexusGenArgTypes {
       // args
       profileTypeId: NexusGenScalars["GID"]; // GID!
       subscribe?: boolean | null; // Boolean
+    };
+    createProfileEventSubscription: {
+      // args
+      eventTypes?: NexusGenEnums["ProfileEventType"][] | null; // [ProfileEventType!]
+      eventsUrl: string; // String!
+      fromProfileTypeFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      fromProfileTypeId?: NexusGenScalars["GID"] | null; // GID
+      name?: string | null; // String
     };
     createProfileFieldFileUploadLink: {
       // args
@@ -7139,6 +7233,16 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
     };
+    updatePetitionEventSubscription: {
+      // args
+      eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
+      eventsUrl?: string | null; // String
+      fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      fromTemplateId?: NexusGenScalars["GID"] | null; // GID
+      id: NexusGenScalars["GID"]; // GID!
+      isEnabled?: boolean | null; // Boolean
+      name?: string | null; // String
+    };
     updatePetitionField: {
       // args
       data: NexusGenInputs["UpdatePetitionFieldInput"]; // UpdatePetitionFieldInput!
@@ -7216,6 +7320,16 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["UpdatePetitionVariableInput"]; // UpdatePetitionVariableInput!
       name: string; // String!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfileEventSubscription: {
+      // args
+      eventTypes?: NexusGenEnums["ProfileEventType"][] | null; // [ProfileEventType!]
+      eventsUrl?: string | null; // String
+      fromProfileTypeFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      fromProfileTypeId?: NexusGenScalars["GID"] | null; // GID
+      id: NexusGenScalars["GID"]; // GID!
+      isEnabled?: boolean | null; // Boolean
+      name?: string | null; // String
     };
     updateProfileFieldValue: {
       // args
@@ -7571,6 +7685,11 @@ export interface NexusGenArgTypes {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
     };
+    profileEvents: {
+      // args
+      before?: NexusGenScalars["GID"] | null; // GID
+      eventTypes?: NexusGenEnums["ProfileEventType"][] | null; // [ProfileEventType!]
+    };
     profileType: {
       // args
       profileTypeId: NexusGenScalars["GID"]; // GID!
@@ -7711,6 +7830,7 @@ export interface NexusGenAbstractTypeMembers {
   DowJonesKycEntitySearchResult:
     | "DowJonesKycEntitySearchResultEntity"
     | "DowJonesKycEntitySearchResultPerson";
+  EventSubscription: "PetitionEventSubscription" | "ProfileEventSubscription";
   IOrgIntegration: "OrgIntegration" | "SignatureOrgIntegration";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionEvent:
@@ -7845,6 +7965,7 @@ export interface NexusGenTypeInterfaces {
   PetitionCreatedEvent: "PetitionEvent";
   PetitionDeletedEvent: "PetitionEvent";
   PetitionDisassociatedEvent: "ProfileEvent";
+  PetitionEventSubscription: "EventSubscription";
   PetitionFieldAttachment: "CreatedAt";
   PetitionFieldReply: "Timestamps";
   PetitionMessage: "CreatedAt";
@@ -7865,6 +7986,7 @@ export interface NexusGenTypeInterfaces {
   ProfileClosedEvent: "ProfileEvent";
   ProfileCreatedEvent: "ProfileEvent";
   ProfileDisassociatedEvent: "PetitionEvent";
+  ProfileEventSubscription: "EventSubscription";
   ProfileFieldExpiryUpdatedEvent: "ProfileEvent";
   ProfileFieldFile: "ProfileFieldResponse";
   ProfileFieldFileAddedEvent: "ProfileEvent";
@@ -7927,6 +8049,7 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "CreatedAt"
   | "DowJonesKycEntityProfileResult"
   | "DowJonesKycEntitySearchResult"
+  | "EventSubscription"
   | "IOrgIntegration"
   | "PetitionBase"
   | "PetitionBaseOrFolder"

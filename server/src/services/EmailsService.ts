@@ -62,8 +62,7 @@ export interface IEmailsService {
     messageBody: any,
   ): Promise<void>;
   sendDeveloperWebhookFailedEmail(
-    petitionEventSubscriptionId: number,
-    petitionId: number,
+    eventSubscriptionId: number,
     errorMessage: string,
     postBody: any,
   ): Promise<void>;
@@ -256,15 +255,13 @@ export class EmailsService implements IEmailsService {
   }
 
   async sendDeveloperWebhookFailedEmail(
-    petitionEventSubscriptionId: number,
-    petitionId: number,
+    eventSubscriptionId: number,
     errorMessage: string,
     postBody: any,
   ) {
     return await this.enqueueEmail("developer-webhook-failed", {
-      id: this.buildQueueId("DeveloperWebhookFailed", petitionEventSubscriptionId),
-      petition_event_subscription_id: petitionEventSubscriptionId,
-      petition_id: petitionId,
+      id: this.buildQueueId("DeveloperWebhookFailed", eventSubscriptionId),
+      event_subscription_id: eventSubscriptionId,
       error_message: errorMessage,
       post_body: postBody,
     });

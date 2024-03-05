@@ -522,6 +522,15 @@ export interface EffectivePetitionUserPermission {
   user: User;
 }
 
+export interface EventSubscription {
+  eventsUrl: Scalars["String"]["output"];
+  id: Scalars["GID"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  isFailing: Scalars["Boolean"]["output"];
+  name?: Maybe<Scalars["String"]["output"]>;
+  signatureKeys: Array<EventSubscriptionSignatureKey>;
+}
+
 export interface EventSubscriptionSignatureKey {
   __typename?: "EventSubscriptionSignatureKey";
   id: Scalars["GID"]["output"];
@@ -848,7 +857,10 @@ export interface Mutation {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
-  /** Creates an event subscription for the user's petitions */
+  /**
+   * Creates an event subscription for the user's petitions
+   * @deprecated Use createPetitionEventSubscription
+   */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a pair of asymmetric keys to be used for signing webhook events */
   createEventSubscriptionSignatureKey: EventSubscriptionSignatureKey;
@@ -870,6 +882,8 @@ export interface Mutation {
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
+  /** Creates an event subscription for the user's petitions */
+  createPetitionEventSubscription: PetitionEventSubscription;
   /** Creates a petition field */
   createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
@@ -887,6 +901,8 @@ export interface Mutation {
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   createProfile: Profile;
+  /** Creates an event subscription for the user's profiles */
+  createProfileEventSubscription: ProfileEventSubscription;
   createProfileFieldFileUploadLink: ProfileFieldPropertyAndFileWithUploadData;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
@@ -1111,7 +1127,10 @@ export interface Mutation {
   updateBackgroundCheckEntity: Success;
   /** Updates a contact. */
   updateContact: Contact;
-  /** Updates an existing event subscription for the user's petitions */
+  /**
+   * Updates an existing event subscription for the user's petitions
+   * @deprecated Use updatePetitionEventSubscription
+   */
   updateEventSubscription: PetitionEventSubscription;
   /** Activate or deactivate a feature flag on a specific user */
   updateFeatureFlag: SupportMethodResponse;
@@ -1145,6 +1164,8 @@ export interface Mutation {
   updatePetition: PetitionBase;
   /** Updates the type of a petition attachment and sets it in the final position */
   updatePetitionAttachmentType: PetitionAttachment;
+  /** Updates an existing event subscription for the user's petitions */
+  updatePetitionEventSubscription: PetitionEventSubscription;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
   /** Updates the auto search config of a BACKGROUND_CHECK petition field. */
@@ -1175,6 +1196,8 @@ export interface Mutation {
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   /** Updates a variable on the petition. */
   updatePetitionVariable: Petition;
+  /** Updates an existing event subscription for the user's profiles */
+  updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
@@ -1427,6 +1450,14 @@ export interface MutationcreatePetitionAttachmentUploadLinkArgs {
   type: PetitionAttachmentType;
 }
 
+export interface MutationcreatePetitionEventSubscriptionArgs {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl: Scalars["String"]["input"];
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+}
+
 export interface MutationcreatePetitionFieldArgs {
   parentFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1480,6 +1511,14 @@ export interface MutationcreatePrintPdfTaskArgs {
 export interface MutationcreateProfileArgs {
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+}
+
+export interface MutationcreateProfileEventSubscriptionArgs {
+  eventTypes?: InputMaybe<Array<ProfileEventType>>;
+  eventsUrl: Scalars["String"]["input"];
+  fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 export interface MutationcreateProfileFieldFileUploadLinkArgs {
@@ -2249,6 +2288,16 @@ export interface MutationupdatePetitionAttachmentTypeArgs {
   type: PetitionAttachmentType;
 }
 
+export interface MutationupdatePetitionEventSubscriptionArgs {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  id: Scalars["GID"]["input"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+}
+
 export interface MutationupdatePetitionFieldArgs {
   data: UpdatePetitionFieldInput;
   fieldId: Scalars["GID"]["input"];
@@ -2325,6 +2374,16 @@ export interface MutationupdatePetitionVariableArgs {
   data: UpdatePetitionVariableInput;
   name: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateProfileEventSubscriptionArgs {
+  eventTypes?: InputMaybe<Array<ProfileEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
+  fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  id: Scalars["GID"]["input"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 export interface MutationupdateProfileFieldValueArgs {
@@ -3095,7 +3154,7 @@ export interface PetitionEventPagination {
   totalCount: Scalars["Int"]["output"];
 }
 
-export interface PetitionEventSubscription {
+export interface PetitionEventSubscription extends EventSubscription {
   __typename?: "PetitionEventSubscription";
   eventTypes?: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"]["output"];
@@ -4039,6 +4098,19 @@ export interface ProfileEventPagination {
   totalCount: Scalars["Int"]["output"];
 }
 
+export interface ProfileEventSubscription extends EventSubscription {
+  __typename?: "ProfileEventSubscription";
+  eventTypes?: Maybe<Array<ProfileEventType>>;
+  eventsUrl: Scalars["String"]["output"];
+  fromProfileType?: Maybe<ProfileType>;
+  fromProfileTypeFields?: Maybe<Array<Maybe<ProfileTypeField>>>;
+  id: Scalars["GID"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  isFailing: Scalars["Boolean"]["output"];
+  name?: Maybe<Scalars["String"]["output"]>;
+  signatureKeys: Array<EventSubscriptionSignatureKey>;
+}
+
 export type ProfileEventType =
   | "PETITION_ASSOCIATED"
   | "PETITION_DISASSOCIATED"
@@ -4650,6 +4722,7 @@ export interface Query {
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   profile: Profile;
+  profileEvents: Array<ProfileEvent>;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
@@ -4667,7 +4740,7 @@ export interface Query {
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
-  subscriptions: Array<PetitionEventSubscription>;
+  subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
   task: Task;
@@ -4836,6 +4909,11 @@ export interface QuerypetitionsByIdArgs {
 
 export interface QueryprofileArgs {
   profileId: Scalars["GID"]["input"];
+}
+
+export interface QueryprofileEventsArgs {
+  before?: InputMaybe<Scalars["GID"]["input"]>;
+  eventTypes?: InputMaybe<Array<ProfileEventType>>;
 }
 
 export interface QueryprofileTypeArgs {
@@ -6386,6 +6464,13 @@ export type ProfileSelect_profileQuery = {
       name: { [locale in UserLocale]?: string };
     };
   };
+};
+
+export type ProfileTypeFieldSelect_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  type: ProfileTypeFieldType;
 };
 
 export type ProfileTypeSelect_ProfileTypeFragment = {
@@ -23743,14 +23828,14 @@ export type AccountDelegates_UserFragment = {
 
 export type AccountLocaleChange_UserFragment = { __typename?: "User"; preferredLocale: UserLocale };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment = {
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragment = {
   __typename?: "PetitionEventSubscription";
   id: string;
+  name?: string | null;
   eventsUrl: string;
-  eventTypes?: Array<PetitionEventType> | null;
   isEnabled: boolean;
   isFailing: boolean;
-  name?: string | null;
+  eventTypes?: Array<PetitionEventType> | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   signatureKeys: Array<{
@@ -23760,29 +23845,29 @@ export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragm
   }>;
 };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionBase_Petition_Fragment = {
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   name?: string | null;
 };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment = {
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
 };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment =
-  | CreateOrUpdateEventSubscriptionDialog_PetitionBase_Petition_Fragment
-  | CreateOrUpdateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment;
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragment =
+  | CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase_Petition_Fragment
+  | CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment;
 
-export type CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment = {
+export type CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment = {
   __typename?: "EventSubscriptionSignatureKey";
   id: string;
   publicKey: string;
 };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment = {
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   isReadOnly: boolean;
   id: string;
@@ -23800,29 +23885,30 @@ export type CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment = {
   parent?: { __typename?: "PetitionField"; id: string } | null;
 };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_Petition_Fragment = {
-  __typename?: "Petition";
-  id: string;
-  fields: Array<{
-    __typename?: "PetitionField";
-    isReadOnly: boolean;
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields_Petition_Fragment =
+  {
+    __typename?: "Petition";
     id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-    options: { [key: string]: any };
-    children?: Array<{
+    fields: Array<{
       __typename?: "PetitionField";
+      isReadOnly: boolean;
       id: string;
       type: PetitionFieldType;
       title?: string | null;
       options: { [key: string]: any };
+      children?: Array<{
+        __typename?: "PetitionField";
+        id: string;
+        type: PetitionFieldType;
+        title?: string | null;
+        options: { [key: string]: any };
+        parent?: { __typename?: "PetitionField"; id: string } | null;
+      }> | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
-    }> | null;
-    parent?: { __typename?: "PetitionField"; id: string } | null;
-  }>;
-};
+    }>;
+  };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_PetitionTemplate_Fragment =
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields_PetitionTemplate_Fragment =
   {
     __typename?: "PetitionTemplate";
     id: string;
@@ -23845,11 +23931,11 @@ export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_Petitio
     }>;
   };
 
-export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragment =
-  | CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_Petition_Fragment
-  | CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_PetitionTemplate_Fragment;
+export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFieldsFragment =
+  | CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields_Petition_Fragment
+  | CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields_PetitionTemplate_Fragment;
 
-export type CreateOrUpdateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
+export type CreateOrUpdatePetitionEventSubscriptionDialog_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"]["input"];
   limit: Scalars["Int"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
@@ -23857,7 +23943,7 @@ export type CreateOrUpdateEventSubscriptionDialog_petitionsQueryVariables = Exac
   filters?: InputMaybe<PetitionFilter>;
 }>;
 
-export type CreateOrUpdateEventSubscriptionDialog_petitionsQuery = {
+export type CreateOrUpdatePetitionEventSubscriptionDialog_petitionsQuery = {
   petitions: {
     __typename?: "PetitionBaseOrFolderPagination";
     items: Array<
@@ -23868,11 +23954,11 @@ export type CreateOrUpdateEventSubscriptionDialog_petitionsQuery = {
   };
 };
 
-export type CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQueryVariables = Exact<{
+export type CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
 
-export type CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQuery = {
+export type CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsQuery = {
   petition?:
     | {
         __typename?: "Petition";
@@ -23917,6 +24003,70 @@ export type CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQuery = {
         }>;
       }
     | null;
+};
+
+export type CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment = {
+  __typename?: "ProfileEventSubscription";
+  id: string;
+  name?: string | null;
+  eventsUrl: string;
+  isEnabled: boolean;
+  isFailing: boolean;
+  profileEventTypes?: Array<ProfileEventType> | null;
+  signatureKeys: Array<{
+    __typename?: "EventSubscriptionSignatureKey";
+    id: string;
+    publicKey: string;
+  }>;
+  fromProfileType?: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  } | null;
+  fromProfileTypeFields?: Array<{ __typename?: "ProfileTypeField"; id: string } | null> | null;
+};
+
+export type CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment = {
+  __typename?: "EventSubscriptionSignatureKey";
+  id: string;
+  publicKey: string;
+};
+
+export type CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  type: ProfileTypeFieldType;
+};
+
+export type CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    type: ProfileTypeFieldType;
+  }>;
+};
+
+export type CreateOrUpdateProfileEventSubscriptionDialog_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type CreateOrUpdateProfileEventSubscriptionDialog_profileTypeQuery = {
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      type: ProfileTypeFieldType;
+    }>;
+  };
 };
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
@@ -41505,21 +41655,84 @@ export type Account_userQuery = {
 export type Subscriptions_PetitionEventSubscriptionFragment = {
   __typename?: "PetitionEventSubscription";
   id: string;
-  eventsUrl: string;
-  eventTypes?: Array<PetitionEventType> | null;
   isEnabled: boolean;
-  isFailing: boolean;
+  eventTypes?: Array<PetitionEventType> | null;
   name?: string | null;
+  eventsUrl: string;
+  isFailing: boolean;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+  fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   signatureKeys: Array<{
     __typename?: "EventSubscriptionSignatureKey";
     id: string;
     publicKey: string;
   }>;
+};
+
+export type Subscriptions_ProfileEventSubscriptionFragment = {
+  __typename?: "ProfileEventSubscription";
+  id: string;
+  isEnabled: boolean;
+  name?: string | null;
+  eventsUrl: string;
+  isFailing: boolean;
+  profileEventTypes?: Array<ProfileEventType> | null;
+  fromProfileType?: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  } | null;
+  signatureKeys: Array<{
+    __typename?: "EventSubscriptionSignatureKey";
+    id: string;
+    publicKey: string;
+  }>;
+  fromProfileTypeFields?: Array<{ __typename?: "ProfileTypeField"; id: string } | null> | null;
+};
+
+export type Subscriptions_EventSubscription_PetitionEventSubscription_Fragment = {
+  __typename?: "PetitionEventSubscription";
+  id: string;
+  eventsUrl: string;
+  isEnabled: boolean;
+  isFailing: boolean;
+  name?: string | null;
+  eventTypes?: Array<PetitionEventType> | null;
+  signatureKeys: Array<{
+    __typename?: "EventSubscriptionSignatureKey";
+    id: string;
+    publicKey: string;
+  }>;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
 };
 
-export type Subscriptions_createEventSubscriptionMutationVariables = Exact<{
+export type Subscriptions_EventSubscription_ProfileEventSubscription_Fragment = {
+  __typename?: "ProfileEventSubscription";
+  id: string;
+  eventsUrl: string;
+  isEnabled: boolean;
+  isFailing: boolean;
+  name?: string | null;
+  profileEventTypes?: Array<ProfileEventType> | null;
+  signatureKeys: Array<{
+    __typename?: "EventSubscriptionSignatureKey";
+    id: string;
+    publicKey: string;
+  }>;
+  fromProfileType?: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  } | null;
+  fromProfileTypeFields?: Array<{ __typename?: "ProfileTypeField"; id: string } | null> | null;
+};
+
+export type Subscriptions_EventSubscriptionFragment =
+  | Subscriptions_EventSubscription_PetitionEventSubscription_Fragment
+  | Subscriptions_EventSubscription_ProfileEventSubscription_Fragment;
+
+export type Subscriptions_createPetitionEventSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"]["input"];
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   name?: InputMaybe<Scalars["String"]["input"]>;
@@ -41527,26 +41740,26 @@ export type Subscriptions_createEventSubscriptionMutationVariables = Exact<{
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
-export type Subscriptions_createEventSubscriptionMutation = {
-  createEventSubscription: {
+export type Subscriptions_createPetitionEventSubscriptionMutation = {
+  createPetitionEventSubscription: {
     __typename?: "PetitionEventSubscription";
     id: string;
-    eventsUrl: string;
-    eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
-    isFailing: boolean;
+    eventTypes?: Array<PetitionEventType> | null;
     name?: string | null;
+    eventsUrl: string;
+    isFailing: boolean;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
     signatureKeys: Array<{
       __typename?: "EventSubscriptionSignatureKey";
       id: string;
       publicKey: string;
     }>;
-    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   };
 };
 
-export type Subscriptions_updateEventSubscriptionMutationVariables = Exact<{
+export type Subscriptions_updatePetitionEventSubscriptionMutationVariables = Exact<{
   id: Scalars["GID"]["input"];
   isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
@@ -41556,22 +41769,86 @@ export type Subscriptions_updateEventSubscriptionMutationVariables = Exact<{
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
-export type Subscriptions_updateEventSubscriptionMutation = {
-  updateEventSubscription: {
+export type Subscriptions_updatePetitionEventSubscriptionMutation = {
+  updatePetitionEventSubscription: {
     __typename?: "PetitionEventSubscription";
     id: string;
-    eventsUrl: string;
-    eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
-    isFailing: boolean;
+    eventTypes?: Array<PetitionEventType> | null;
     name?: string | null;
+    eventsUrl: string;
+    isFailing: boolean;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
     signatureKeys: Array<{
       __typename?: "EventSubscriptionSignatureKey";
       id: string;
       publicKey: string;
     }>;
-    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
+  };
+};
+
+export type Subscriptions_createProfileEventSubscriptionMutationVariables = Exact<{
+  eventsUrl: Scalars["String"]["input"];
+  eventTypes?: InputMaybe<Array<ProfileEventType> | ProfileEventType>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+}>;
+
+export type Subscriptions_createProfileEventSubscriptionMutation = {
+  createProfileEventSubscription: {
+    __typename?: "ProfileEventSubscription";
+    id: string;
+    isEnabled: boolean;
+    name?: string | null;
+    eventsUrl: string;
+    isFailing: boolean;
+    profileEventTypes?: Array<ProfileEventType> | null;
+    fromProfileType?: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    } | null;
+    signatureKeys: Array<{
+      __typename?: "EventSubscriptionSignatureKey";
+      id: string;
+      publicKey: string;
+    }>;
+    fromProfileTypeFields?: Array<{ __typename?: "ProfileTypeField"; id: string } | null> | null;
+  };
+};
+
+export type Subscriptions_updateProfileEventSubscriptionMutationVariables = Exact<{
+  id: Scalars["GID"]["input"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
+  eventTypes?: InputMaybe<Array<ProfileEventType> | ProfileEventType>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+}>;
+
+export type Subscriptions_updateProfileEventSubscriptionMutation = {
+  updateProfileEventSubscription: {
+    __typename?: "ProfileEventSubscription";
+    id: string;
+    isEnabled: boolean;
+    name?: string | null;
+    eventsUrl: string;
+    isFailing: boolean;
+    profileEventTypes?: Array<ProfileEventType> | null;
+    fromProfileType?: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    } | null;
+    signatureKeys: Array<{
+      __typename?: "EventSubscriptionSignatureKey";
+      id: string;
+      publicKey: string;
+    }>;
+    fromProfileTypeFields?: Array<{ __typename?: "ProfileTypeField"; id: string } | null> | null;
   };
 };
 
@@ -41604,22 +41881,47 @@ export type Subscriptions_deleteEventSubscriptionSignatureKeysMutation = {
 export type Subscriptions_subscriptionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Subscriptions_subscriptionsQuery = {
-  subscriptions: Array<{
-    __typename?: "PetitionEventSubscription";
-    id: string;
-    eventsUrl: string;
-    eventTypes?: Array<PetitionEventType> | null;
-    isEnabled: boolean;
-    isFailing: boolean;
-    name?: string | null;
-    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
-    signatureKeys: Array<{
-      __typename?: "EventSubscriptionSignatureKey";
-      id: string;
-      publicKey: string;
-    }>;
-    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
-  }>;
+  subscriptions: Array<
+    | {
+        __typename?: "PetitionEventSubscription";
+        id: string;
+        eventsUrl: string;
+        isEnabled: boolean;
+        isFailing: boolean;
+        name?: string | null;
+        eventTypes?: Array<PetitionEventType> | null;
+        signatureKeys: Array<{
+          __typename?: "EventSubscriptionSignatureKey";
+          id: string;
+          publicKey: string;
+        }>;
+        fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+        fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
+      }
+    | {
+        __typename?: "ProfileEventSubscription";
+        id: string;
+        eventsUrl: string;
+        isEnabled: boolean;
+        isFailing: boolean;
+        name?: string | null;
+        profileEventTypes?: Array<ProfileEventType> | null;
+        signatureKeys: Array<{
+          __typename?: "EventSubscriptionSignatureKey";
+          id: string;
+          publicKey: string;
+        }>;
+        fromProfileType?: {
+          __typename?: "ProfileType";
+          id: string;
+          name: { [locale in UserLocale]?: string };
+        } | null;
+        fromProfileTypeFields?: Array<{
+          __typename?: "ProfileTypeField";
+          id: string;
+        } | null> | null;
+      }
+  >;
 };
 
 export type Subscriptions_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -48314,29 +48616,65 @@ export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetiti
     RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
     unknown
   >;
-export const CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql`
-  fragment CreateOrUpdateEventSubscriptionDialog_PetitionBase on PetitionBase {
+export const CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragmentDoc = gql`
+  fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase on PetitionBase {
     id
     name
   }
-` as unknown as DocumentNode<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
-export const CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragmentDoc = gql`
-  fragment CreateOrUpdateEventSubscriptionDialog_PetitionField on PetitionField {
+` as unknown as DocumentNode<
+  CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragment,
+  unknown
+>;
+export const CreateOrUpdatePetitionEventSubscriptionDialog_PetitionFieldFragmentDoc = gql`
+  fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField on PetitionField {
     ...PetitionFieldSelect_PetitionField
     isReadOnly
   }
   ${PetitionFieldSelect_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment, unknown>;
-export const CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragmentDoc = gql`
-  fragment CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
+` as unknown as DocumentNode<
+  CreateOrUpdatePetitionEventSubscriptionDialog_PetitionFieldFragment,
+  unknown
+>;
+export const CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFieldsFragmentDoc = gql`
+  fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
     id
     fields {
-      ...CreateOrUpdateEventSubscriptionDialog_PetitionField
+      ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField
     }
   }
-  ${CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragmentDoc}
+  ${CreateOrUpdatePetitionEventSubscriptionDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragment,
+  CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFieldsFragment,
+  unknown
+>;
+export const ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileTypeFieldSelect_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+  }
+` as unknown as DocumentNode<ProfileTypeFieldSelect_ProfileTypeFieldFragment, unknown>;
+export const CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField on ProfileTypeField {
+    id
+    ...ProfileTypeFieldSelect_ProfileTypeField
+  }
+  ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFieldFragment,
+  unknown
+>;
+export const CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFragmentDoc = gql`
+  fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileType on ProfileType {
+    id
+    name
+    fields {
+      ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField
+    }
+  }
+  ${CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFragment,
   unknown
 >;
 export const AdminOrganizationsFeatures_OrganizationFragmentDoc = gql`
@@ -53206,58 +53544,121 @@ export const Account_QueryFragmentDoc = gql`
   ${AccountLocaleChange_UserFragmentDoc}
   ${AccountDelegates_UserFragmentDoc}
 ` as unknown as DocumentNode<Account_QueryFragment, unknown>;
-export const CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc = gql`
-  fragment CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
-    id
-    publicKey
-  }
-` as unknown as DocumentNode<
-  CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
-  unknown
->;
-export const CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc = gql`
-  fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
-    id
-    eventsUrl
-    eventTypes
-    isEnabled
-    isFailing
-    name
-    fromTemplate {
+export const CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc =
+  gql`
+    fragment CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+      id
+      publicKey
+    }
+  ` as unknown as DocumentNode<
+    CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
+    unknown
+  >;
+export const CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc =
+  gql`
+    fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
       id
       name
+      eventsUrl
+      isEnabled
+      isFailing
+      eventTypes
+      fromTemplate {
+        id
+        name
+      }
+      fromTemplateFields {
+        id
+      }
+      signatureKeys {
+        ...CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey
+      }
     }
-    fromTemplateFields {
-      id
-    }
-    signatureKeys {
-      ...CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey
-    }
-  }
-  ${CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc}
-` as unknown as DocumentNode<
-  CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
-  unknown
->;
+    ${CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc}
+  ` as unknown as DocumentNode<
+    CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragment,
+    unknown
+  >;
 export const Subscriptions_PetitionEventSubscriptionFragmentDoc = gql`
   fragment Subscriptions_PetitionEventSubscription on PetitionEventSubscription {
     id
-    eventsUrl
-    eventTypes
     isEnabled
-    isFailing
-    name
+    eventTypes
     fromTemplate {
       id
       name
     }
+    ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
+  }
+  ${CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<Subscriptions_PetitionEventSubscriptionFragment, unknown>;
+export const CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc =
+  gql`
+    fragment CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+      id
+      publicKey
+    }
+  ` as unknown as DocumentNode<
+    CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
+    unknown
+  >;
+export const CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragmentDoc = gql`
+  fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription on ProfileEventSubscription {
+    id
+    name
+    eventsUrl
+    isEnabled
+    isFailing
+    signatureKeys {
+      ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
+    }
+    profileEventTypes: eventTypes
+    fromProfileType {
+      id
+      name
+    }
+    fromProfileTypeFields {
+      id
+    }
+  }
+  ${CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc}
+` as unknown as DocumentNode<
+  CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment,
+  unknown
+>;
+export const Subscriptions_ProfileEventSubscriptionFragmentDoc = gql`
+  fragment Subscriptions_ProfileEventSubscription on ProfileEventSubscription {
+    id
+    isEnabled
+    profileEventTypes: eventTypes
+    fromProfileType {
+      id
+      name
+    }
+    ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
+  }
+  ${CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<Subscriptions_ProfileEventSubscriptionFragment, unknown>;
+export const Subscriptions_EventSubscriptionFragmentDoc = gql`
+  fragment Subscriptions_EventSubscription on EventSubscription {
+    id
+    eventsUrl
+    isEnabled
+    isFailing
+    name
     signatureKeys {
       id
     }
-    ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
+    ... on PetitionEventSubscription {
+      ...Subscriptions_PetitionEventSubscription
+    }
+    ... on ProfileEventSubscription {
+      ...Subscriptions_ProfileEventSubscription
+    }
   }
-  ${CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
-` as unknown as DocumentNode<Subscriptions_PetitionEventSubscriptionFragment, unknown>;
+  ${Subscriptions_PetitionEventSubscriptionFragmentDoc}
+  ${Subscriptions_ProfileEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<Subscriptions_EventSubscriptionFragment, unknown>;
 export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
   fragment Tokens_UserAuthenticationToken on UserAuthenticationToken {
     id
@@ -56876,8 +57277,8 @@ export const RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyD
   RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutation,
   RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutationVariables
 >;
-export const CreateOrUpdateEventSubscriptionDialog_petitionsDocument = gql`
-  query CreateOrUpdateEventSubscriptionDialog_petitions(
+export const CreateOrUpdatePetitionEventSubscriptionDialog_petitionsDocument = gql`
+  query CreateOrUpdatePetitionEventSubscriptionDialog_petitions(
     $offset: Int!
     $limit: Int!
     $search: String
@@ -56886,25 +57287,36 @@ export const CreateOrUpdateEventSubscriptionDialog_petitionsDocument = gql`
   ) {
     petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
       items {
-        ...CreateOrUpdateEventSubscriptionDialog_PetitionBase
+        ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase
       }
     }
   }
-  ${CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragmentDoc}
+  ${CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
-  CreateOrUpdateEventSubscriptionDialog_petitionsQuery,
-  CreateOrUpdateEventSubscriptionDialog_petitionsQueryVariables
+  CreateOrUpdatePetitionEventSubscriptionDialog_petitionsQuery,
+  CreateOrUpdatePetitionEventSubscriptionDialog_petitionsQueryVariables
 >;
-export const CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsDocument = gql`
-  query CreateOrUpdateEventSubscriptionDialog_petitionWithFields($petitionId: GID!) {
+export const CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsDocument = gql`
+  query CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFields($petitionId: GID!) {
     petition(id: $petitionId) {
-      ...CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields
+      ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields
     }
   }
-  ${CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragmentDoc}
+  ${CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFieldsFragmentDoc}
 ` as unknown as DocumentNode<
-  CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQuery,
-  CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQueryVariables
+  CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsQuery,
+  CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsQueryVariables
+>;
+export const CreateOrUpdateProfileEventSubscriptionDialog_profileTypeDocument = gql`
+  query CreateOrUpdateProfileEventSubscriptionDialog_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileType
+    }
+  }
+  ${CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  CreateOrUpdateProfileEventSubscriptionDialog_profileTypeQuery,
+  CreateOrUpdateProfileEventSubscriptionDialog_profileTypeQueryVariables
 >;
 export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
   mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {
@@ -59117,15 +59529,15 @@ export const Account_userDocument = gql`
   }
   ${Account_QueryFragmentDoc}
 ` as unknown as DocumentNode<Account_userQuery, Account_userQueryVariables>;
-export const Subscriptions_createEventSubscriptionDocument = gql`
-  mutation Subscriptions_createEventSubscription(
+export const Subscriptions_createPetitionEventSubscriptionDocument = gql`
+  mutation Subscriptions_createPetitionEventSubscription(
     $eventsUrl: String!
     $eventTypes: [PetitionEventType!]
     $name: String
     $fromTemplateId: GID
     $fromTemplateFieldIds: [GID!]
   ) {
-    createEventSubscription(
+    createPetitionEventSubscription(
       eventsUrl: $eventsUrl
       eventTypes: $eventTypes
       name: $name
@@ -59137,11 +59549,11 @@ export const Subscriptions_createEventSubscriptionDocument = gql`
   }
   ${Subscriptions_PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
-  Subscriptions_createEventSubscriptionMutation,
-  Subscriptions_createEventSubscriptionMutationVariables
+  Subscriptions_createPetitionEventSubscriptionMutation,
+  Subscriptions_createPetitionEventSubscriptionMutationVariables
 >;
-export const Subscriptions_updateEventSubscriptionDocument = gql`
-  mutation Subscriptions_updateEventSubscription(
+export const Subscriptions_updatePetitionEventSubscriptionDocument = gql`
+  mutation Subscriptions_updatePetitionEventSubscription(
     $id: GID!
     $isEnabled: Boolean
     $eventsUrl: String
@@ -59150,7 +59562,7 @@ export const Subscriptions_updateEventSubscriptionDocument = gql`
     $fromTemplateId: GID
     $fromTemplateFieldIds: [GID!]
   ) {
-    updateEventSubscription(
+    updatePetitionEventSubscription(
       id: $id
       isEnabled: $isEnabled
       eventsUrl: $eventsUrl
@@ -59160,14 +59572,66 @@ export const Subscriptions_updateEventSubscriptionDocument = gql`
       fromTemplateFieldIds: $fromTemplateFieldIds
     ) {
       ...Subscriptions_PetitionEventSubscription
-      ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
+      ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
     }
   }
   ${Subscriptions_PetitionEventSubscriptionFragmentDoc}
-  ${CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
+  ${CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
-  Subscriptions_updateEventSubscriptionMutation,
-  Subscriptions_updateEventSubscriptionMutationVariables
+  Subscriptions_updatePetitionEventSubscriptionMutation,
+  Subscriptions_updatePetitionEventSubscriptionMutationVariables
+>;
+export const Subscriptions_createProfileEventSubscriptionDocument = gql`
+  mutation Subscriptions_createProfileEventSubscription(
+    $eventsUrl: String!
+    $eventTypes: [ProfileEventType!]
+    $name: String
+    $fromProfileTypeId: GID
+    $fromProfileTypeFieldIds: [GID!]
+  ) {
+    createProfileEventSubscription(
+      eventsUrl: $eventsUrl
+      eventTypes: $eventTypes
+      name: $name
+      fromProfileTypeId: $fromProfileTypeId
+      fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+    ) {
+      ...Subscriptions_ProfileEventSubscription
+    }
+  }
+  ${Subscriptions_ProfileEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<
+  Subscriptions_createProfileEventSubscriptionMutation,
+  Subscriptions_createProfileEventSubscriptionMutationVariables
+>;
+export const Subscriptions_updateProfileEventSubscriptionDocument = gql`
+  mutation Subscriptions_updateProfileEventSubscription(
+    $id: GID!
+    $isEnabled: Boolean
+    $eventsUrl: String
+    $eventTypes: [ProfileEventType!]
+    $name: String
+    $fromProfileTypeId: GID
+    $fromProfileTypeFieldIds: [GID!]
+  ) {
+    updateProfileEventSubscription(
+      id: $id
+      isEnabled: $isEnabled
+      eventsUrl: $eventsUrl
+      eventTypes: $eventTypes
+      name: $name
+      fromProfileTypeId: $fromProfileTypeId
+      fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+    ) {
+      ...Subscriptions_ProfileEventSubscription
+      ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
+    }
+  }
+  ${Subscriptions_ProfileEventSubscriptionFragmentDoc}
+  ${CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<
+  Subscriptions_updateProfileEventSubscriptionMutation,
+  Subscriptions_updateProfileEventSubscriptionMutationVariables
 >;
 export const Subscriptions_deleteEventSubscriptionsDocument = gql`
   mutation Subscriptions_deleteEventSubscriptions($ids: [GID!]!) {
@@ -59180,10 +59644,12 @@ export const Subscriptions_deleteEventSubscriptionsDocument = gql`
 export const Subscriptions_createEventSubscriptionSignatureKeyDocument = gql`
   mutation Subscriptions_createEventSubscriptionSignatureKey($subscriptionId: GID!) {
     createEventSubscriptionSignatureKey(subscriptionId: $subscriptionId) {
-      id
-      publicKey
+      ...CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey
+      ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
     }
   }
+  ${CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc}
+  ${CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc}
 ` as unknown as DocumentNode<
   Subscriptions_createEventSubscriptionSignatureKeyMutation,
   Subscriptions_createEventSubscriptionSignatureKeyMutationVariables
@@ -59199,10 +59665,10 @@ export const Subscriptions_deleteEventSubscriptionSignatureKeysDocument = gql`
 export const Subscriptions_subscriptionsDocument = gql`
   query Subscriptions_subscriptions {
     subscriptions {
-      ...Subscriptions_PetitionEventSubscription
+      ...Subscriptions_EventSubscription
     }
   }
-  ${Subscriptions_PetitionEventSubscriptionFragmentDoc}
+  ${Subscriptions_EventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
   Subscriptions_subscriptionsQuery,
   Subscriptions_subscriptionsQueryVariables

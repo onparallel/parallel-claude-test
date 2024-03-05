@@ -20,6 +20,7 @@ import {
   ContactLocale,
   ContactLocaleValues,
   CreateContact,
+  CreateEventSubscription,
   CreateFeatureFlag,
   CreateFeatureFlagOverride,
   CreateFileUpload,
@@ -29,7 +30,6 @@ import {
   CreatePetition,
   CreatePetitionAccess,
   CreatePetitionAttachment,
-  CreatePetitionEventSubscription,
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreateTag,
@@ -39,6 +39,7 @@ import {
   CreateUserGroup,
   CreateUserGroupPermission,
   EmailLog,
+  EventSubscription,
   EventSubscriptionSignatureKey,
   FeatureFlagName,
   FileUpload,
@@ -52,7 +53,6 @@ import {
   PetitionAttachment,
   PetitionAttachmentType,
   PetitionEvent,
-  PetitionEventSubscription,
   PetitionEventType,
   PetitionEventTypeValues,
   PetitionField,
@@ -68,6 +68,9 @@ import {
   PetitionStatus,
   PetitionUserNotification,
   Profile,
+  ProfileEvent,
+  ProfileEventType,
+  ProfileEventTypeValues,
   ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
@@ -86,6 +89,7 @@ import {
   UserLocale,
   UserLocaleValues,
   UserPetitionEventLog,
+  UserProfileEventLog,
 } from "../../__types";
 import { Task } from "../TaskRepository";
 
@@ -1138,12 +1142,12 @@ export class Mocks {
     return await this.knex<OrgIntegration>("org_integration").insert(dataArr, "*");
   }
 
-  async createEventSubscription(data: MaybeArray<CreatePetitionEventSubscription>) {
+  async createEventSubscription(data: MaybeArray<CreateEventSubscription>) {
     const dataArr = unMaybeArray(data);
     if (dataArr.length === 0) {
       return [];
     }
-    return await this.knex<PetitionEventSubscription>("petition_event_subscription").insert(
+    return await this.knex<EventSubscription>("event_subscription").insert(
       dataArr.map((d) => ({
         ...d,
         event_types: d.event_types ? this.knex.raw(`?::json`, JSON.stringify(d.event_types)) : null,
@@ -1205,6 +1209,37 @@ export class Mocks {
       .returning("*");
 
     return petitionEvents;
+  }
+
+  async createRandomProfileEvents(
+    orgId: number,
+    userId: number,
+    profileId: number,
+    amount: number,
+    types?: ProfileEventType[],
+  ) {
+    const eventTypes = types ?? ProfileEventTypeValues;
+    const profileEvents = await this.knex<ProfileEvent>("profile_event")
+      .insert(
+        range(0, amount || 1).map(() => ({
+          org_id: orgId,
+          type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
+          data: {},
+          profile_id: profileId,
+        })),
+      )
+      .returning("*");
+
+    await this.knex<UserProfileEventLog>("user_profile_event_log")
+      .insert(
+        profileEvents.map((e) => ({
+          profile_event_id: e.id,
+          user_id: userId,
+        })),
+      )
+      .returning("*");
+
+    return profileEvents;
   }
 
   async createRandomPetitionSignatureRequest(

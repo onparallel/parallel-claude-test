@@ -482,6 +482,15 @@ export type EffectivePetitionUserPermission = {
   user: User;
 };
 
+export type EventSubscription = {
+  eventsUrl: Scalars["String"]["output"];
+  id: Scalars["GID"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  isFailing: Scalars["Boolean"]["output"];
+  name: Maybe<Scalars["String"]["output"]>;
+  signatureKeys: Array<EventSubscriptionSignatureKey>;
+};
+
 export type EventSubscriptionSignatureKey = {
   id: Scalars["GID"]["output"];
   publicKey: Scalars["String"]["output"];
@@ -789,7 +798,10 @@ export type Mutation = {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
-  /** Creates an event subscription for the user's petitions */
+  /**
+   * Creates an event subscription for the user's petitions
+   * @deprecated Use createPetitionEventSubscription
+   */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a pair of asymmetric keys to be used for signing webhook events */
   createEventSubscriptionSignatureKey: EventSubscriptionSignatureKey;
@@ -811,6 +823,8 @@ export type Mutation = {
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
+  /** Creates an event subscription for the user's petitions */
+  createPetitionEventSubscription: PetitionEventSubscription;
   /** Creates a petition field */
   createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
@@ -828,6 +842,8 @@ export type Mutation = {
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   createProfile: Profile;
+  /** Creates an event subscription for the user's profiles */
+  createProfileEventSubscription: ProfileEventSubscription;
   createProfileFieldFileUploadLink: ProfileFieldPropertyAndFileWithUploadData;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
@@ -1052,7 +1068,10 @@ export type Mutation = {
   updateBackgroundCheckEntity: Success;
   /** Updates a contact. */
   updateContact: Contact;
-  /** Updates an existing event subscription for the user's petitions */
+  /**
+   * Updates an existing event subscription for the user's petitions
+   * @deprecated Use updatePetitionEventSubscription
+   */
   updateEventSubscription: PetitionEventSubscription;
   /** Activate or deactivate a feature flag on a specific user */
   updateFeatureFlag: SupportMethodResponse;
@@ -1086,6 +1105,8 @@ export type Mutation = {
   updatePetition: PetitionBase;
   /** Updates the type of a petition attachment and sets it in the final position */
   updatePetitionAttachmentType: PetitionAttachment;
+  /** Updates an existing event subscription for the user's petitions */
+  updatePetitionEventSubscription: PetitionEventSubscription;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
   /** Updates the auto search config of a BACKGROUND_CHECK petition field. */
@@ -1116,6 +1137,8 @@ export type Mutation = {
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   /** Updates a variable on the petition. */
   updatePetitionVariable: Petition;
+  /** Updates an existing event subscription for the user's profiles */
+  updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
@@ -1368,6 +1391,14 @@ export type MutationcreatePetitionAttachmentUploadLinkArgs = {
   type: PetitionAttachmentType;
 };
 
+export type MutationcreatePetitionEventSubscriptionArgs = {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl: Scalars["String"]["input"];
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type MutationcreatePetitionFieldArgs = {
   parentFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1421,6 +1452,14 @@ export type MutationcreatePrintPdfTaskArgs = {
 export type MutationcreateProfileArgs = {
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type MutationcreateProfileEventSubscriptionArgs = {
+  eventTypes?: InputMaybe<Array<ProfileEventType>>;
+  eventsUrl: Scalars["String"]["input"];
+  fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationcreateProfileFieldFileUploadLinkArgs = {
@@ -2190,6 +2229,16 @@ export type MutationupdatePetitionAttachmentTypeArgs = {
   type: PetitionAttachmentType;
 };
 
+export type MutationupdatePetitionEventSubscriptionArgs = {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  id: Scalars["GID"]["input"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type MutationupdatePetitionFieldArgs = {
   data: UpdatePetitionFieldInput;
   fieldId: Scalars["GID"]["input"];
@@ -2266,6 +2315,16 @@ export type MutationupdatePetitionVariableArgs = {
   data: UpdatePetitionVariableInput;
   name: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfileEventSubscriptionArgs = {
+  eventTypes?: InputMaybe<Array<ProfileEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
+  fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  id: Scalars["GID"]["input"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationupdateProfileFieldValueArgs = {
@@ -2784,6 +2843,7 @@ export type PetitionAnonymizedEvent = PetitionEvent & {
 
 export type PetitionAssociatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -2985,6 +3045,7 @@ export type PetitionDeletedEvent = PetitionEvent & {
 
 export type PetitionDisassociatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -3006,7 +3067,7 @@ export type PetitionEventPagination = {
   totalCount: Scalars["Int"]["output"];
 };
 
-export type PetitionEventSubscription = {
+export type PetitionEventSubscription = EventSubscription & {
   eventTypes: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"]["output"];
   fromTemplate: Maybe<PetitionBaseMini>;
@@ -3850,6 +3911,7 @@ export type ProfilepetitionsArgs = {
 
 export type ProfileAnonymizedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -3867,6 +3929,7 @@ export type ProfileAssociatedEvent = PetitionEvent & {
 
 export type ProfileClosedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -3875,6 +3938,7 @@ export type ProfileClosedEvent = ProfileEvent & {
 
 export type ProfileCreatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -3893,6 +3957,7 @@ export type ProfileDisassociatedEvent = PetitionEvent & {
 
 export type ProfileEvent = {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -3903,6 +3968,18 @@ export type ProfileEventPagination = {
   items: Array<ProfileEvent>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
+};
+
+export type ProfileEventSubscription = EventSubscription & {
+  eventTypes: Maybe<Array<ProfileEventType>>;
+  eventsUrl: Scalars["String"]["output"];
+  fromProfileType: Maybe<ProfileType>;
+  fromProfileTypeFields: Maybe<Array<Maybe<ProfileTypeField>>>;
+  id: Scalars["GID"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  isFailing: Scalars["Boolean"]["output"];
+  name: Maybe<Scalars["String"]["output"]>;
+  signatureKeys: Array<EventSubscriptionSignatureKey>;
 };
 
 export type ProfileEventType =
@@ -3920,6 +3997,7 @@ export type ProfileEventType =
 
 export type ProfileFieldExpiryUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -3946,6 +4024,7 @@ export type ProfileFieldFile = ProfileFieldResponse & {
 
 export type ProfileFieldFileAddedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -3954,6 +4033,7 @@ export type ProfileFieldFileAddedEvent = ProfileEvent & {
 
 export type ProfileFieldFileRemovedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -4020,6 +4100,7 @@ export type ProfileFieldValue = ProfileFieldResponse & {
 
 export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -4046,6 +4127,7 @@ export type ProfilePropertyFilter = {
 
 export type ProfileReopenedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -4054,6 +4136,7 @@ export type ProfileReopenedEvent = ProfileEvent & {
 
 export type ProfileScheduledForDeletionEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
@@ -4477,6 +4560,7 @@ export type Query = {
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   profile: Profile;
+  profileEvents: Array<ProfileEvent>;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
@@ -4494,7 +4578,7 @@ export type Query = {
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
-  subscriptions: Array<PetitionEventSubscription>;
+  subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
   task: Task;
@@ -4663,6 +4747,11 @@ export type QuerypetitionsByIdArgs = {
 
 export type QueryprofileArgs = {
   profileId: Scalars["GID"]["input"];
+};
+
+export type QueryprofileEventsArgs = {
+  before?: InputMaybe<Scalars["GID"]["input"]>;
+  eventTypes?: InputMaybe<Array<ProfileEventType>>;
 };
 
 export type QueryprofileTypeArgs = {
@@ -5837,14 +5926,49 @@ export type PermissionFragment =
   | Permission_PetitionUserGroupPermission_Fragment
   | Permission_PetitionUserPermission_Fragment;
 
-export type SubscriptionFragment = {
+export type PetitionEventSubscriptionFragment = {
+  __typename: "PetitionEventSubscription";
   id: string;
   name: string | null;
   eventsUrl: string;
   isEnabled: boolean;
-  eventTypes: Array<PetitionEventType> | null;
+  petitionEventTypes: Array<PetitionEventType> | null;
   fromTemplate: { id: string } | null;
 };
+
+export type ProfileEventSubscriptionFragment = {
+  __typename: "ProfileEventSubscription";
+  id: string;
+  name: string | null;
+  eventsUrl: string;
+  isEnabled: boolean;
+  profileEventTypes: Array<ProfileEventType> | null;
+  fromProfileType: { id: string } | null;
+};
+
+export type EventSubscription_PetitionEventSubscription_Fragment = {
+  __typename: "PetitionEventSubscription";
+  id: string;
+  name: string | null;
+  eventsUrl: string;
+  isEnabled: boolean;
+  petitionEventTypes: Array<PetitionEventType> | null;
+  fromTemplate: { id: string } | null;
+};
+
+export type EventSubscription_ProfileEventSubscription_Fragment = {
+  __typename: "ProfileEventSubscription";
+  id: string;
+  name: string | null;
+  eventsUrl: string;
+  isEnabled: boolean;
+  profileEventTypes: Array<ProfileEventType> | null;
+  fromProfileType: { id: string } | null;
+};
+
+export type EventSubscriptionFragment =
+  | EventSubscription_PetitionEventSubscription_Fragment
+  | EventSubscription_ProfileEventSubscription_Fragment;
 
 export type TaskFragment = {
   id: string;
@@ -8110,31 +8234,63 @@ export type GetOrganizationUsers_usersQuery = {
 export type EventSubscriptions_getSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type EventSubscriptions_getSubscriptionsQuery = {
-  subscriptions: Array<{
-    id: string;
-    name: string | null;
-    eventsUrl: string;
-    isEnabled: boolean;
-    eventTypes: Array<PetitionEventType> | null;
-    fromTemplate: { id: string } | null;
-  }>;
+  subscriptions: Array<
+    | {
+        __typename: "PetitionEventSubscription";
+        id: string;
+        name: string | null;
+        eventsUrl: string;
+        isEnabled: boolean;
+        petitionEventTypes: Array<PetitionEventType> | null;
+        fromTemplate: { id: string } | null;
+      }
+    | {
+        __typename: "ProfileEventSubscription";
+        id: string;
+        name: string | null;
+        eventsUrl: string;
+        isEnabled: boolean;
+        profileEventTypes: Array<ProfileEventType> | null;
+        fromProfileType: { id: string } | null;
+      }
+  >;
 };
 
-export type EventSubscriptions_createSubscriptionMutationVariables = Exact<{
+export type EventSubscriptions_createPetitionEventSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"]["input"];
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
-export type EventSubscriptions_createSubscriptionMutation = {
-  createEventSubscription: {
+export type EventSubscriptions_createPetitionEventSubscriptionMutation = {
+  createPetitionEventSubscription: {
+    __typename: "PetitionEventSubscription";
     id: string;
     name: string | null;
     eventsUrl: string;
     isEnabled: boolean;
-    eventTypes: Array<PetitionEventType> | null;
+    petitionEventTypes: Array<PetitionEventType> | null;
     fromTemplate: { id: string } | null;
+  };
+};
+
+export type EventSubscriptions_createProfileEventSubscriptionMutationVariables = Exact<{
+  eventsUrl: Scalars["String"]["input"];
+  eventTypes?: InputMaybe<Array<ProfileEventType> | ProfileEventType>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+}>;
+
+export type EventSubscriptions_createProfileEventSubscriptionMutation = {
+  createProfileEventSubscription: {
+    __typename: "ProfileEventSubscription";
+    id: string;
+    name: string | null;
+    eventsUrl: string;
+    isEnabled: boolean;
+    profileEventTypes: Array<ProfileEventType> | null;
+    fromProfileType: { id: string } | null;
   };
 };
 
@@ -8465,6 +8621,93 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: { id: string } | null;
+      }
+  >;
+};
+
+export type GetProfileEvents_ProfileEventsQueryVariables = Exact<{
+  before?: InputMaybe<Scalars["GID"]["input"]>;
+  eventTypes?: InputMaybe<Array<ProfileEventType> | ProfileEventType>;
+}>;
+
+export type GetProfileEvents_ProfileEventsQuery = {
+  profileEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
       }
   >;
 };
@@ -9920,18 +10163,45 @@ export const PermissionFragmentDoc = gql`
   ${UserFragmentDoc}
   ${UserGroupFragmentDoc}
 ` as unknown as DocumentNode<PermissionFragment, unknown>;
-export const SubscriptionFragmentDoc = gql`
-  fragment Subscription on PetitionEventSubscription {
+export const PetitionEventSubscriptionFragmentDoc = gql`
+  fragment PetitionEventSubscription on PetitionEventSubscription {
     id
     name
     eventsUrl
     isEnabled
-    eventTypes
+    petitionEventTypes: eventTypes
     fromTemplate {
       id
     }
+    __typename
   }
-` as unknown as DocumentNode<SubscriptionFragment, unknown>;
+` as unknown as DocumentNode<PetitionEventSubscriptionFragment, unknown>;
+export const ProfileEventSubscriptionFragmentDoc = gql`
+  fragment ProfileEventSubscription on ProfileEventSubscription {
+    id
+    name
+    eventsUrl
+    isEnabled
+    profileEventTypes: eventTypes
+    fromProfileType {
+      id
+    }
+    __typename
+  }
+` as unknown as DocumentNode<ProfileEventSubscriptionFragment, unknown>;
+export const EventSubscriptionFragmentDoc = gql`
+  fragment EventSubscription on EventSubscription {
+    id
+    ... on PetitionEventSubscription {
+      ...PetitionEventSubscription
+    }
+    ... on ProfileEventSubscription {
+      ...ProfileEventSubscription
+    }
+  }
+  ${PetitionEventSubscriptionFragmentDoc}
+  ${ProfileEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<EventSubscriptionFragment, unknown>;
 export const TaskFragmentDoc = gql`
   fragment Task on Task {
     id
@@ -10864,34 +11134,55 @@ export const GetOrganizationUsers_usersDocument = gql`
 export const EventSubscriptions_getSubscriptionsDocument = gql`
   query EventSubscriptions_getSubscriptions {
     subscriptions {
-      ...Subscription
+      ...EventSubscription
     }
   }
-  ${SubscriptionFragmentDoc}
+  ${EventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
   EventSubscriptions_getSubscriptionsQuery,
   EventSubscriptions_getSubscriptionsQueryVariables
 >;
-export const EventSubscriptions_createSubscriptionDocument = gql`
-  mutation EventSubscriptions_createSubscription(
+export const EventSubscriptions_createPetitionEventSubscriptionDocument = gql`
+  mutation EventSubscriptions_createPetitionEventSubscription(
     $eventsUrl: String!
     $eventTypes: [PetitionEventType!]
     $name: String
     $fromTemplateId: GID
   ) {
-    createEventSubscription(
+    createPetitionEventSubscription(
       eventsUrl: $eventsUrl
       eventTypes: $eventTypes
       name: $name
       fromTemplateId: $fromTemplateId
     ) {
-      ...Subscription
+      ...PetitionEventSubscription
     }
   }
-  ${SubscriptionFragmentDoc}
+  ${PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
-  EventSubscriptions_createSubscriptionMutation,
-  EventSubscriptions_createSubscriptionMutationVariables
+  EventSubscriptions_createPetitionEventSubscriptionMutation,
+  EventSubscriptions_createPetitionEventSubscriptionMutationVariables
+>;
+export const EventSubscriptions_createProfileEventSubscriptionDocument = gql`
+  mutation EventSubscriptions_createProfileEventSubscription(
+    $eventsUrl: String!
+    $eventTypes: [ProfileEventType!]
+    $name: String
+    $fromProfileTypeId: GID
+  ) {
+    createProfileEventSubscription(
+      eventsUrl: $eventsUrl
+      eventTypes: $eventTypes
+      name: $name
+      fromProfileTypeId: $fromProfileTypeId
+    ) {
+      ...ProfileEventSubscription
+    }
+  }
+  ${ProfileEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<
+  EventSubscriptions_createProfileEventSubscriptionMutation,
+  EventSubscriptions_createProfileEventSubscriptionMutationVariables
 >;
 export const EventSubscriptions_deleteSubscriptionDocument = gql`
   mutation EventSubscriptions_deleteSubscription($ids: [GID!]!) {
@@ -10916,6 +11207,22 @@ export const GetPetitionEvents_PetitionEventsDocument = gql`
 ` as unknown as DocumentNode<
   GetPetitionEvents_PetitionEventsQuery,
   GetPetitionEvents_PetitionEventsQueryVariables
+>;
+export const GetProfileEvents_ProfileEventsDocument = gql`
+  query GetProfileEvents_ProfileEvents($before: GID, $eventTypes: [ProfileEventType!]) {
+    profileEvents(before: $before, eventTypes: $eventTypes) {
+      id
+      data
+      profile {
+        id
+      }
+      type
+      createdAt
+    }
+  }
+` as unknown as DocumentNode<
+  GetProfileEvents_ProfileEventsQuery,
+  GetProfileEvents_ProfileEventsQueryVariables
 >;
 export const GetProfiles_profilesDocument = gql`
   query GetProfiles_profiles(

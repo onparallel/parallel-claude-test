@@ -1650,22 +1650,7 @@
     "context": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
   },
   {
-    "term": "component.create-event-subscription-dialog.confirm-delete-body",
-    "definition": "Are you sure you want to delete the selected key?",
-    "context": "Are you sure you want to delete the selected key?"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.confirm-delete-header",
-    "definition": "Delete signature key",
-    "context": "Delete signature key"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.confirm-delete-warning",
-    "definition": "Before you proceed, make sure you are not using this key to verify received events, as it will not be valid anymore.",
-    "context": "Before you proceed, make sure you are not using this key to verify received events, as it will not be valid anymore."
-  },
-  {
-    "term": "component.create-event-subscription-dialog.event-select.placeholder",
+    "term": "component.create-event-subscription-dialog.event-select-placeholder",
     "definition": "Search events...",
     "context": "Search events..."
   },
@@ -1685,24 +1670,14 @@
     "context": "Your URL does not seem to accept POST requests."
   },
   {
-    "term": "component.create-event-subscription-dialog.filter-fields",
-    "definition": "Filter for events coming from specific fields of the template. Leave blank to receive all events.",
-    "context": "Filter for events coming from specific fields of the template. Leave blank to receive all events."
+    "term": "component.create-event-subscription-dialog.header-step-1",
+    "definition": "Event subscription",
+    "context": "Event subscription"
   },
   {
-    "term": "component.create-event-subscription-dialog.filter-fields-placeholder",
-    "definition": "Select fields to filter events...",
-    "context": "Select fields to filter events..."
-  },
-  {
-    "term": "component.create-event-subscription-dialog.from-template-label",
-    "definition": "Filter events from parallels created from a specific template (Optional).",
-    "context": "Filter events from parallels created from a specific template (Optional)."
-  },
-  {
-    "term": "component.create-event-subscription-dialog.from-template-placeholder",
-    "definition": "Search for templates...",
-    "context": "Search for templates..."
+    "term": "component.create-event-subscription-dialog.header-step-2",
+    "definition": "Signature keys",
+    "context": "Signature keys"
   },
   {
     "term": "component.create-event-subscription-dialog.invalid-event-types",
@@ -1728,16 +1703,6 @@
     "term": "component.create-event-subscription-dialog.specific-events",
     "definition": "Specific events",
     "context": "Specific events"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.title.step-1",
-    "definition": "Event subscription",
-    "context": "Event subscription"
-  },
-  {
-    "term": "component.create-event-subscription-dialog.title.step-2",
-    "definition": "Signature keys",
-    "context": "Signature keys"
   },
   {
     "term": "component.create-folder-dialog.create-folder",
@@ -1990,6 +1955,26 @@
     "context": "Organization status"
   },
   {
+    "term": "component.create-petition-event-subscription-dialog.filter-fields",
+    "definition": "Filter for events coming from specific fields of the template. Leave blank to receive all events.",
+    "context": "Filter for events coming from specific fields of the template. Leave blank to receive all events."
+  },
+  {
+    "term": "component.create-petition-event-subscription-dialog.filter-fields-placeholder",
+    "definition": "Select fields to filter events...",
+    "context": "Select fields to filter events..."
+  },
+  {
+    "term": "component.create-petition-event-subscription-dialog.from-template-label",
+    "definition": "Filter events from parallels created from a specific template (Optional).",
+    "context": "Filter events from parallels created from a specific template (Optional)."
+  },
+  {
+    "term": "component.create-petition-event-subscription-dialog.from-template-placeholder",
+    "definition": "Search for templates...",
+    "context": "Search for templates..."
+  },
+  {
     "term": "component.create-profile-dialog.new-profile",
     "definition": "New profile",
     "context": "New profile"
@@ -1998,6 +1983,21 @@
     "term": "component.create-profile-dialog.profile-type",
     "definition": "Profile type",
     "context": "Profile type"
+  },
+  {
+    "term": "component.create-profile-event-subscription-dialog.filter-fields",
+    "definition": "Filter for events coming from specific properties of the profile. Leave blank to receive all events.",
+    "context": "Filter for events coming from specific properties of the profile. Leave blank to receive all events."
+  },
+  {
+    "term": "component.create-profile-event-subscription-dialog.filter-fields-placeholder",
+    "definition": "Select properties to filter events...",
+    "context": "Select properties to filter events..."
+  },
+  {
+    "term": "component.create-profile-event-subscription-dialog.from-profiles-label",
+    "definition": "Filter events from profiles created from a specific profile type (Optional).",
+    "context": "Filter events from profiles created from a specific profile type (Optional)."
   },
   {
     "term": "component.create-profile-type-dialog.edit-profile-type-name",
@@ -2148,6 +2148,21 @@
     "term": "component.delete-signature-error-confirmation.title",
     "definition": "Pending signatures",
     "context": "Pending signatures"
+  },
+  {
+    "term": "component.delete-webhook-signature-keys-dialog.confirm-delete-body",
+    "definition": "Are you sure you want to delete the selected key?",
+    "context": "Are you sure you want to delete the selected key?"
+  },
+  {
+    "term": "component.delete-webhook-signature-keys-dialog.confirm-delete-header",
+    "definition": "Delete signature key",
+    "context": "Delete signature key"
+  },
+  {
+    "term": "component.delete-webhook-signature-keys-dialog.confirm-delete-warning",
+    "definition": "Before you proceed, make sure you are not using this key to verify received events, as it will not be valid anymore.",
+    "context": "Before you proceed, make sure you are not using this key to verify received events, as it will not be valid anymore."
   },
   {
     "term": "component.developers-layout.subscriptions",
@@ -6585,6 +6600,21 @@
     "context": "Can write"
   },
   {
+    "term": "component.profile-type-field-select.create-property",
+    "definition": "Create property: <b>{label}</b>",
+    "context": "Create property: <b>{label}</b>"
+  },
+  {
+    "term": "component.profile-type-field-select.placeholder",
+    "definition": "Select a property",
+    "context": "Select a property"
+  },
+  {
+    "term": "component.profile-type-field-select.suggested-property",
+    "definition": "Suggested property: <b>{label}</b>",
+    "context": "Suggested property: <b>{label}</b>"
+  },
+  {
     "term": "component.profile-type-header.clone-label",
     "definition": "Clone profile type",
     "context": "Clone profile type"
@@ -10240,11 +10270,6 @@
     "context": "Your account uses SSO. To reset your password, please contact your team admin."
   },
   {
-    "term": "generic.forms.url-placeholder",
-    "definition": "https://www.example.com",
-    "context": "https://www.example.com"
-  },
-  {
     "term": "generic.forms.valid-password-error",
     "definition": "Please, enter a valid password",
     "context": "Please, enter a valid password"
@@ -11168,6 +11193,11 @@
     "term": "generic.upgrade-to-enable",
     "definition": "Upgrade to enable this feature.",
     "context": "Upgrade to enable this feature."
+  },
+  {
+    "term": "generic.url-placeholder",
+    "definition": "https://www.example.com",
+    "context": "https://www.example.com"
   },
   {
     "term": "generic.user-status-active",
@@ -13270,6 +13300,16 @@
     "context": "Any parallel"
   },
   {
+    "term": "page.subscriptions.column-header-from-any-profile",
+    "definition": "Any profile",
+    "context": "Any profile"
+  },
+  {
+    "term": "page.subscriptions.column-header-from-profile-type",
+    "definition": "From profile type",
+    "context": "From profile type"
+  },
+  {
     "term": "page.subscriptions.column-header-from-template",
     "definition": "From template",
     "context": "From template"
@@ -13325,9 +13365,19 @@
     "context": "You haven't created any subscriptions yet"
   },
   {
+    "term": "page.subscriptions.profiles-subscriptions-title",
+    "definition": "Profile subscriptions",
+    "context": "Profile subscriptions"
+  },
+  {
     "term": "page.subscriptions.subscriptions-explanation",
     "definition": "Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)",
     "context": "Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
+  },
+  {
+    "term": "page.subscriptions.template-subscriptions-title",
+    "definition": "Template subscriptions",
+    "context": "Template subscriptions"
   },
   {
     "term": "page.subscriptions.unnamed-subscription",

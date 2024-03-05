@@ -273,7 +273,7 @@ export type IdParameterOptions<
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
 > = ParameterOptions<string, TRequired, TArray, undefined> & {
-  type: string;
+  type: string | string[];
 };
 
 export function booleanParam<

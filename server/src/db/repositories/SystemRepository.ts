@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { QUEUES_SERVICE, IQueuesService } from "../../services/QueuesService";
+import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { CreateSystemEvent } from "../events/SystemEvent";
@@ -31,12 +31,5 @@ export class SystemRepository extends BaseRepository {
       .where({ type: "USER_LOGGED_IN" })
       .whereRaw(/* sql */ `(("data" ->> 'user_id')::int) = ?`, [userId])
       .select("*");
-  }
-
-  async markEventAsProcessed(id: number, processedBy: string) {
-    await this.from("system_event").where("id", id).update({
-      processed_by: processedBy,
-      processed_at: this.now(),
-    });
   }
 }

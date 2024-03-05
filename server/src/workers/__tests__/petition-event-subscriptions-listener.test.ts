@@ -4,15 +4,15 @@ import { createTestContainer } from "../../../test/testContainer";
 import { WorkerContext } from "../../context";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, PetitionEventSubscription, User } from "../../db/__types";
+import { Organization, Petition, EventSubscription, User } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { FetchOptions, FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { IEncryptionService, ENCRYPTION_SERVICE } from "../../services/EncryptionService";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
-import { eventSubscriptionsListener } from "../event-listeners/event-subscriptions-listener";
+import { petitionEventSubscriptionsListener } from "../event-listeners/petition-event-subscriptions-listener";
 
-describe("Worker - Event Subscriptions Listener", () => {
+describe("Worker - Petition Event Subscriptions Listener", () => {
   let ctx: WorkerContext;
   let knex: Knex;
   let mocks: Mocks;
@@ -22,7 +22,7 @@ describe("Worker - Event Subscriptions Listener", () => {
   let template: Petition;
   let petitionFromTemplate: Petition;
   let petition: Petition;
-  let subscriptions: PetitionEventSubscription[];
+  let subscriptions: EventSubscription[];
 
   let fetchSpy: jest.SpyInstance;
   let emailSpy: jest.SpyInstance;
@@ -37,6 +37,14 @@ describe("Worker - Event Subscriptions Listener", () => {
 
     [organization] = await mocks.createRandomOrganizations(1);
     users = await mocks.createRandomUsers(organization.id, 5);
+
+    emailSpy = jest.spyOn(container.get<IEmailsService>(EMAILS), "sendDeveloperWebhookFailedEmail");
+    fetchSpy = jest.spyOn(container.get<IFetchService>(FETCH_SERVICE), "fetch");
+
+    encryptionService = container.get<IEncryptionService>(ENCRYPTION_SERVICE);
+  });
+
+  beforeEach(async () => {
     [template] = await mocks.createRandomTemplates(organization.id, users[0].id, 1);
     [petitionFromTemplate, petition] = await mocks.createRandomPetitions(
       organization.id,
@@ -59,6 +67,7 @@ describe("Worker - Event Subscriptions Listener", () => {
     await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[4].id, "WRITE");
     subscriptions = await mocks.createEventSubscription([
       {
+        type: "PETITION",
         user_id: users[0].id,
         event_types: null,
         endpoint: "https://users.0.com/events",
@@ -66,6 +75,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         name: "users.0.webhook",
       },
       {
+        type: "PETITION",
         user_id: users[1].id,
         event_types: ["PETITION_CREATED"],
         endpoint: "https://users.1.com/events",
@@ -73,6 +83,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         name: "users.1.webhook",
       },
       {
+        type: "PETITION",
         user_id: users[2].id,
         event_types: ["PETITION_CREATED", "PETITION_COMPLETED"],
         endpoint: "https://users.2.com/events",
@@ -81,6 +92,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         from_template_id: template.id,
       },
       {
+        type: "PETITION",
         user_id: users[3].id,
         event_types: null,
         endpoint: "https://users.3.com/events",
@@ -88,18 +100,16 @@ describe("Worker - Event Subscriptions Listener", () => {
         name: "users.3.webhook",
       },
     ]);
-
-    emailSpy = jest.spyOn(container.get<IEmailsService>(EMAILS), "sendDeveloperWebhookFailedEmail");
-    fetchSpy = jest.spyOn(container.get<IFetchService>(FETCH_SERVICE), "fetch");
-
-    encryptionService = container.get<IEncryptionService>(ENCRYPTION_SERVICE);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     fetchSpy.mockClear();
     emailSpy.mockClear();
     ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId.dataloader.clearAll();
-    ctx.subscriptions.loadSubscriptionsByUserId.dataloader.clearAll();
+    ctx.subscriptions.loadPetitionEventSubscriptionsByUserId.dataloader.clearAll();
+    await mocks.knex.from("event_subscription_signature_key").delete();
+    await mocks.knex.from("event_subscription").delete();
+    await mocks.knex.from("petition_permission").delete();
   });
 
   afterAll(async () => {
@@ -114,7 +124,7 @@ describe("Worker - Event Subscriptions Listener", () => {
       1,
       ["PETITION_CREATED"],
     );
-    await eventSubscriptionsListener.handle(
+    await petitionEventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,
@@ -186,7 +196,7 @@ describe("Worker - Event Subscriptions Listener", () => {
     const [event] = await mocks.createRandomPetitionEvents(users[0].id, petition.id, 1, [
       "PETITION_COMPLETED",
     ]);
-    await eventSubscriptionsListener.handle(
+    await petitionEventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,
@@ -239,7 +249,7 @@ describe("Worker - Event Subscriptions Listener", () => {
       "PETITION_CREATED",
     ]);
 
-    await eventSubscriptionsListener.handle(
+    await petitionEventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,
@@ -324,7 +334,7 @@ describe("Worker - Event Subscriptions Listener", () => {
     const [event] = await mocks.createRandomPetitionEvents(users[0].id, petition.id, 1, [
       "PETITION_CREATED",
     ]);
-    await eventSubscriptionsListener.handle(
+    await petitionEventSubscriptionsListener.handle(
       {
         id: event.id,
         petition_id: event.petition_id,
@@ -343,7 +353,6 @@ describe("Worker - Event Subscriptions Listener", () => {
     const user0Subscription = subscriptions.find((s) => s.user_id === users[0].id)!;
     expect(emailSpy).toHaveBeenLastCalledWith(
       user0Subscription.id,
-      event.petition_id,
       "Error 111: Mocked error for POST https://users.0.com/events",
       {
         id: toGlobalId("PetitionEvent", event.id),
@@ -357,7 +366,7 @@ describe("Worker - Event Subscriptions Listener", () => {
     );
 
     const [failingSubscription] = await mocks.knex
-      .from("petition_event_subscription")
+      .from("event_subscription")
       .where("id", user0Subscription.id)
       .select("*");
 

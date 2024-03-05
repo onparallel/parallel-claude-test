@@ -3,6 +3,7 @@ import { Knex } from "knex";
 import { createKnex, KNEX } from "./knex";
 import { ContactRepository } from "./repositories/ContactRepository";
 import { EmailLogRepository } from "./repositories/EmailLogRepository";
+import { EventRepository } from "./repositories/EventRepository";
 import { FeatureFlagRepository } from "./repositories/FeatureFlagRepository";
 import { FileRepository } from "./repositories/FileRepository";
 import { IntegrationRepository } from "./repositories/IntegrationRepository";
@@ -47,4 +48,5 @@ export const dbModule = new ContainerModule((bind) => {
   bind<LicenseCodeRepository>(LicenseCodeRepository).toSelf();
   bind<PetitionViewRepository>(PetitionViewRepository).toSelf();
   bind<ProfileRepository>(ProfileRepository).toSelf();
+  bind<EventRepository>(EventRepository).toSelf();
 });

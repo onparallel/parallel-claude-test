@@ -1,34 +1,45 @@
 import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
-import { PetitionEventType, PetitionEventTypeValues, SystemEventType } from "../../db/__types";
+import { PetitionEventType, ProfileEventType, SystemEventType } from "../../db/__types";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
+import { ProfileEvent } from "../../db/events/ProfileEvent";
 import { SystemEvent } from "../../db/events/SystemEvent";
-import { EventProcessorPayload, EventType } from "../event-processor";
 import { Prettify } from "../../util/types";
 
-type EventListener<T extends PetitionEventType | SystemEventType> = (
+export type EventType = PetitionEventType | SystemEventType | ProfileEventType;
+
+export interface EventProcessorPayload {
+  id: number;
+  type: EventType;
+  created_at: Date; // this helps with content-based deduplication and is used to check if the event should be processed or not
+  table_name: "petition_event" | "system_event" | "profile_event";
+}
+
+type EventListener<T extends EventType> = (
   payload: Prettify<
-    T extends PetitionEventType ? PetitionEvent & { type: T } : SystemEvent & { type: T }
+    T extends PetitionEventType
+      ? PetitionEvent & { type: T }
+      : T extends SystemEventType
+        ? SystemEvent & { type: T }
+        : ProfileEvent & { type: T }
   >,
   ctx: WorkerContext,
 ) => Promise<void>;
 
 interface Listener {
-  types: (PetitionEventType | SystemEventType)[] | "*";
-  handle: EventListener<PetitionEventType | SystemEventType>;
+  types: EventType[];
+  handle: EventListener<EventType>;
 }
 
-export function listener<
-  T extends PetitionEventType | SystemEventType = PetitionEventType | SystemEventType,
->(types: T[] | "*", handle: EventListener<T>) {
-  return { types, handle } as Listener;
+export function listener<T extends EventType>(types: T[], handle: EventListener<T>) {
+  return { types, handle } as unknown as Listener;
 }
 
 export class EventProcessor {
   private listeners = new Map<EventType, EventListener<any>[]>();
 
   register({ types, handle }: Listener) {
-    for (const type of types === "*" ? PetitionEventTypeValues : types) {
+    for (const type of types) {
       if (this.listeners.has(type)) {
         this.listeners.get(type)!.push(handle);
       } else {
@@ -41,7 +52,7 @@ export class EventProcessor {
   listen(): (payload: EventProcessorPayload, ctx: WorkerContext) => Promise<void> {
     return async (payload, ctx) => {
       if (this.listeners.has(payload.type)) {
-        const event = await ctx.petitions.pickEventToProcess(
+        const event = await ctx.events.pickEventToProcess(
           payload.id,
           payload.table_name,
           payload.created_at,
@@ -51,14 +62,18 @@ export class EventProcessor {
           for (const listener of this.listeners.get(event.type)!) {
             try {
               await listener(event, ctx);
-              if (payload.table_name === "petition_event") {
-                await ctx.petitions.markEventAsProcessed(event.id, ctx.config.instanceName);
-              } else if (payload.table_name === "system_event") {
-                await ctx.system.markEventAsProcessed(event.id, ctx.config.instanceName);
-              }
-            } catch (error: any) {
+              await ctx.events.markEventAsProcessed(
+                event.id,
+                payload.table_name,
+                ctx.config.instanceName,
+              );
+            } catch (error) {
               // log error and continue to other listeners
-              ctx.logger.error(error.message, { stack: error.stack });
+              if (error instanceof Error) {
+                ctx.logger.error(error.message, { stack: error.stack });
+              } else {
+                ctx.logger.error(error);
+              }
             }
           }
         }

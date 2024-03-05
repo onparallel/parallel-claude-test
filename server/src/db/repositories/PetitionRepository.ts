@@ -6937,35 +6937,6 @@ export class PetitionRepository extends BaseRepository {
   }
 
   /**
-   * retrieves an unprocessed petition or system event for the event-processor.
-   *
-   * created_at Date of the event must match with param createdAt.
-   * This will ensure to only pick the most up-to-date event for processing, as some events can be updated in DB before the event-processor processes them
-   */
-  async pickEventToProcess<TName extends "petition_event" | "system_event">(
-    id: number,
-    tableName: TName,
-    createdAt: Date,
-  ): Promise<TableTypes[TName] | undefined> {
-    const [event] = await this.from(tableName)
-      .update("processed_at", this.now())
-      .whereRaw(
-        /* sql */ `id = ? and processed_at is null and date_trunc('milliseconds', created_at) = ?::timestamptz`,
-        [id, createdAt],
-      )
-      .returning("*");
-
-    return event as unknown as TableTypes[TName] | undefined;
-  }
-
-  async markEventAsProcessed(id: number, processedBy: string) {
-    await this.from("petition_event").where("id", id).update({
-      processed_at: this.now(),
-      processed_by: processedBy,
-    });
-  }
-
-  /**
    * creates the required accesses and messages to send a petition to a single contact group
    */
   async createAccessesAndMessages(

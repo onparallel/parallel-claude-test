@@ -78,16 +78,15 @@ type _UnwrapIfNull<T> = If<IsNullable<T>, number | null, number>;
 type IsArray<T> = any[] extends T ? true : false;
 type IsNullable<T> = null extends T ? true : false;
 
+type GlobalIdArgOpts = Omit<core.NexusArgConfig<"ID">, "type"> & { allowedPrefixes?: string[] };
+
+export function globalIdArg(prefixName: string, opts?: GlobalIdArgOpts): core.NexusArgDef<any>;
+export function globalIdArg(opts?: GlobalIdArgOpts): core.NexusArgDef<any>;
 export function globalIdArg(
-  prefixName: string,
-  opts?: Omit<core.NexusArgConfig<"ID">, "type">,
-): core.NexusArgDef<any>;
-export function globalIdArg(opts?: Omit<core.NexusArgConfig<"ID">, "type">): core.NexusArgDef<any>;
-export function globalIdArg(
-  prefixNameOrOpts?: string | Omit<core.NexusArgConfig<"ID">, "type">,
-  opts?: Omit<core.NexusArgConfig<"ID">, "type">,
+  prefixNameOrOpts?: string | GlobalIdArgOpts,
+  opts?: GlobalIdArgOpts,
 ): core.NexusArgDef<any> {
-  const { extensions, ...config } =
+  const { extensions, allowedPrefixes, ...config } =
     typeof prefixNameOrOpts === "string" ? opts ?? {} : prefixNameOrOpts ?? {};
   const prefixName = typeof prefixNameOrOpts === "string" ? prefixNameOrOpts : null;
   return core.arg({
@@ -96,28 +95,43 @@ export function globalIdArg(
     extensions: {
       ...extensions,
       PREFIX_NAME: prefixName,
+      ALLOWED_PREFIXES: allowedPrefixes,
     },
   });
 }
 
-function mapGlobalIds(type: GraphQLInputType, value: any, prefixName?: string): any {
+function mapGlobalIds(
+  type: GraphQLInputType,
+  value: any,
+  prefixName?: string,
+  allowedPrefixes?: string[],
+): any {
   if (isDefined(value)) {
     if (isScalarType(type) && type.name === "GID") {
       try {
-        return fromGlobalId(value, prefixName).id;
+        const decoded = fromGlobalId(value, prefixName);
+        if (isDefined(allowedPrefixes) && !allowedPrefixes.includes(decoded.type)) {
+          throw new Error();
+        }
+        return decoded.id;
       } catch {
         throw new ForbiddenError("Invalid ID");
       }
     } else if (isNonNullType(type)) {
-      return mapGlobalIds(type.ofType, value, prefixName);
+      return mapGlobalIds(type.ofType, value, prefixName, allowedPrefixes);
     } else if (isListType(type)) {
-      return (value as any[]).map((item) => mapGlobalIds(type.ofType, item, prefixName));
+      return (value as any[]).map((item) =>
+        mapGlobalIds(type.ofType, item, prefixName, allowedPrefixes),
+      );
     } else if (isInputObjectType(type)) {
       const result: any = {};
       for (const [name, field] of Object.entries(type.getFields())) {
         if (name in value) {
           const prefixName = (field.extensions as any)["PREFIX_NAME"] as string | undefined;
-          result[name] = mapGlobalIds(field.type, value[name], prefixName);
+          const allowedPrefixes = (field.extensions as any)["ALLOWED_PREFIXES"] as
+            | string[]
+            | undefined;
+          result[name] = mapGlobalIds(field.type, value[name], prefixName, allowedPrefixes);
         }
       }
       return result;
@@ -146,7 +160,10 @@ export function globalIdPlugin() {
         const _args = mapValues(args ?? {}, (argValue, argName) => {
           const argConfig = fieldConfig.args![argName as string];
           const prefixName = (argConfig.extensions as any)["PREFIX_NAME"] as string | undefined;
-          return mapGlobalIds(argConfig.type, argValue, prefixName);
+          const allowedPrefixes = (argConfig.extensions as any)["ALLOWED_PREFIXES"] as
+            | string[]
+            | undefined;
+          return mapGlobalIds(argConfig.type, argValue, prefixName, allowedPrefixes);
         });
         const result = await next(root, _args, ctx, info);
         if (config.type === "GID") {

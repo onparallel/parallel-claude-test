@@ -1,4 +1,4 @@
-import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
+import { ApolloError, gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -19,131 +19,86 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
-import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
-import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
+import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Steps } from "@parallel/components/common/Steps";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
-  CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment,
-  CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
-  CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment,
-  CreateOrUpdateEventSubscriptionDialog_petitionsDocument,
-  CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsDocument,
-  PetitionEventType,
+  CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
+  CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment,
+  CreateOrUpdateProfileEventSubscriptionDialog_profileTypeDocument,
+  ProfileEventType,
 } from "@parallel/graphql/__types";
-import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe } from "@parallel/utils/types";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components, OptionProps, SingleValueProps } from "react-select";
-import Select from "react-select/async";
 import { isDefined } from "remeda";
-
-interface CreateOrUpdateEventSubscriptionDialogProps {
-  eventSubscription?: CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment;
+import { useDeleteWebhookSignatureKeysDialog } from "./ConfirmDeleteWebhookSignatureKeysDialog";
+import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
+interface CreateOrUpdateProfileEventSubscriptionDialogProps {
+  eventSubscription?: CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment;
   initialStep?: number;
   onSubscriptionSubmit: (
     subscriptionId: string | null,
     data: {
       eventsUrl: string;
-      eventTypes: PetitionEventType[] | null;
+      eventTypes: ProfileEventType[] | null;
       name: string | null;
-      fromTemplateId: string | null;
-      fromTemplateFieldIds: string[] | null;
+      fromProfileTypeId: string | null;
+      fromProfileTypeFieldIds: string[] | null;
     },
   ) => Promise<string>;
   onAddSignatureKey: (
     subscriptionId: string,
-  ) => Promise<CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment>;
+  ) => Promise<CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment>;
   onDeleteSignatureKey: (signatureKeyId: string) => Promise<void>;
 }
 
-interface CreateOrUpdateEventSubscriptionDialogFormData {
+interface CreateOrUpdateProfileEventSubscriptionDialogFormData {
   name: Maybe<string>;
   eventsUrl: string;
   eventsMode: "ALL" | "SPECIFIC";
-  eventTypes: PetitionEventType[];
-  fromTemplate: Maybe<
-    Omit<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment, "__typename">
-  >;
-  fromTemplateFields: CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment[];
+  eventTypes: ProfileEventType[];
+  fromProfileTypeId: Maybe<string>;
+  fromProfileTypeFieldIds: string[];
 }
 
-const EVENT_TYPES: PetitionEventType[] = [
-  "ACCESS_ACTIVATED",
-  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
-  "ACCESS_DEACTIVATED",
-  "ACCESS_DELEGATED",
-  "ACCESS_OPENED",
-  "COMMENT_DELETED",
-  "COMMENT_PUBLISHED",
-  "GROUP_PERMISSION_ADDED",
-  "GROUP_PERMISSION_EDITED",
-  "GROUP_PERMISSION_REMOVED",
-  "MESSAGE_CANCELLED",
-  "MESSAGE_SCHEDULED",
-  "MESSAGE_SENT",
-  "OWNERSHIP_TRANSFERRED",
-  "PETITION_CLONED",
-  "PETITION_CLOSED",
-  "PETITION_CLOSED_NOTIFIED",
-  "PETITION_COMPLETED",
-  "PETITION_CREATED",
-  "PETITION_MESSAGE_BOUNCED",
-  "PETITION_REMINDER_BOUNCED",
-  "PETITION_REOPENED",
-  "PETITION_DELETED",
-  "RECIPIENT_SIGNED",
-  "REMINDER_SENT",
-  "REPLY_CREATED",
-  "REPLY_DELETED",
-  "REPLY_UPDATED",
-  "SIGNATURE_OPENED",
-  "SIGNATURE_CANCELLED",
-  "SIGNATURE_COMPLETED",
-  "SIGNATURE_REMINDER",
-  "SIGNATURE_STARTED",
-  "TEMPLATE_USED",
-  "USER_PERMISSION_ADDED",
-  "USER_PERMISSION_EDITED",
-  "USER_PERMISSION_REMOVED",
-  "REMINDERS_OPT_OUT",
-  "PETITION_ANONYMIZED",
-  "REPLY_STATUS_CHANGED",
-  "PROFILE_ASSOCIATED",
-  "PROFILE_DISASSOCIATED",
-  "PETITION_TAGGED",
-  "PETITION_UNTAGGED",
+const PROFILE_EVENT_TYPES: ProfileEventType[] = [
+  "PETITION_ASSOCIATED",
+  "PETITION_DISASSOCIATED",
+  "PROFILE_ANONYMIZED",
+  "PROFILE_CLOSED",
+  "PROFILE_CREATED",
+  "PROFILE_FIELD_EXPIRY_UPDATED",
+  "PROFILE_FIELD_FILE_ADDED",
+  "PROFILE_FIELD_FILE_REMOVED",
+  "PROFILE_FIELD_VALUE_UPDATED",
+  "PROFILE_REOPENED",
+  "PROFILE_SCHEDULED_FOR_DELETION",
 ];
 
-const FIELD_EVENTS: PetitionEventType[] = [
-  "COMMENT_DELETED",
-  "COMMENT_PUBLISHED",
-  "REPLY_CREATED",
-  "REPLY_DELETED",
-  "REPLY_STATUS_CHANGED",
-  "REPLY_UPDATED",
+const FIELD_EVENTS: ProfileEventType[] = [
+  "PROFILE_FIELD_EXPIRY_UPDATED",
+  "PROFILE_FIELD_FILE_ADDED",
+  "PROFILE_FIELD_FILE_REMOVED",
+  "PROFILE_FIELD_VALUE_UPDATED",
 ];
 
-export function CreateOrUpdateEventSubscriptionDialog({
+export function CreateOrUpdateProfileEventSubscriptionDialog({
   eventSubscription,
   initialStep,
   onSubscriptionSubmit,
   onAddSignatureKey,
   onDeleteSignatureKey,
   ...props
-}: DialogProps<CreateOrUpdateEventSubscriptionDialogProps>) {
+}: DialogProps<CreateOrUpdateProfileEventSubscriptionDialogProps>) {
   const intl = useIntl();
 
   const {
@@ -161,47 +116,36 @@ export function CreateOrUpdateEventSubscriptionDialog({
     register,
     control,
     watch,
-    setValue,
     formState: { errors, isSubmitting },
-    resetField,
+    setValue,
     setError,
     clearErrors,
-  } = useForm<CreateOrUpdateEventSubscriptionDialogFormData>({
+  } = useForm<CreateOrUpdateProfileEventSubscriptionDialogFormData>({
     defaultValues: {
       name: eventSubscription?.name ?? "",
       eventsUrl: eventSubscription?.eventsUrl ?? "",
-      eventsMode: isDefined(eventSubscription?.eventTypes) ? "SPECIFIC" : "ALL",
-      eventTypes: eventSubscription?.eventTypes ?? [],
-      fromTemplate: eventSubscription?.fromTemplate,
-      fromTemplateFields: [],
+      eventsMode: isDefined(eventSubscription?.profileEventTypes) ? "SPECIFIC" : "ALL",
+      eventTypes: eventSubscription?.profileEventTypes ?? [],
+      fromProfileTypeId: eventSubscription?.fromProfileType?.id ?? null,
+      fromProfileTypeFieldIds: eventSubscription?.fromProfileTypeFields?.map((f) => f?.id) ?? [],
     },
   });
   const eventsMode = watch("eventsMode");
   const eventTypes = watch("eventTypes");
+  const fromProfileTypeId = watch("fromProfileTypeId");
 
-  const apollo = useApolloClient();
+  useEffectSkipFirst(() => {
+    // reset fields when profile type changes
+    setValue("fromProfileTypeFieldIds", []);
+  }, [fromProfileTypeId]);
 
-  const loadTemplates = useDebouncedAsync(
-    async (search: string | null | undefined) => {
-      const result = await apollo.query({
-        query: CreateOrUpdateEventSubscriptionDialog_petitionsDocument,
-        variables: {
-          offset: 0,
-          limit: 100,
-          filters: {
-            type: "TEMPLATE",
-          },
-          search,
-          sortBy: "lastUsedAt_DESC",
-        },
-        fetchPolicy: "no-cache",
-      });
-      assertTypenameArray(result.data.petitions.items, "PetitionTemplate");
-      return result.data.petitions.items;
-    },
-    300,
-    [],
-  );
+  const { data } = useQuery(CreateOrUpdateProfileEventSubscriptionDialog_profileTypeDocument, {
+    variables: fromProfileTypeId ? { profileTypeId: fromProfileTypeId } : undefined,
+    skip: !isDefined(fromProfileTypeId),
+    fetchPolicy: "no-cache",
+  });
+
+  const fields = data?.profileType?.fields ?? [];
 
   const eventsUrlInputRef = useRef<HTMLInputElement>(null);
   const eventsUrlInputProps = useRegisterWithRef(eventsUrlInputRef, register, "eventsUrl", {
@@ -215,13 +159,9 @@ export function CreateOrUpdateEventSubscriptionDialog({
       }
     },
   });
-  const reactSelectProps = useReactSelectProps<
-    CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment,
-    false
-  >({ components: { Option, SingleValue } as any });
 
-  const options = useSimpleSelectOptions(
-    () => EVENT_TYPES.map((event) => ({ label: event, value: event })),
+  const profileEventOptions = useSimpleSelectOptions(
+    () => PROFILE_EVENT_TYPES.map((event) => ({ label: event, value: event })),
     [],
   );
 
@@ -234,7 +174,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
   }
 
   const [signatureKeys, setSignatureKeys] = useState<
-    CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment[]
+    CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment[]
   >(eventSubscription?.signatureKeys ?? []);
 
   async function handleAddNewSignatureKey(subscriptionId: string) {
@@ -253,41 +193,6 @@ export function CreateOrUpdateEventSubscriptionDialog({
     } catch {}
   }
 
-  const fromTemplate = watch("fromTemplate");
-
-  const { data } = useQuery(CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsDocument, {
-    variables: fromTemplate ? { petitionId: fromTemplate.id } : undefined,
-    skip: !isDefined(fromTemplate),
-    fetchPolicy: "no-cache",
-  });
-
-  const fields = data?.petition?.fields ?? [];
-
-  useEffectSkipFirst(() => {
-    // reset fields when template changes
-    setValue("fromTemplateFields", []);
-  }, [fromTemplate?.id]);
-
-  const initialFieldsSetRef = useRef(false);
-  useEffect(() => {
-    // set initial fields
-    setTimeout(() => {
-      if (
-        isDefined(eventSubscription) &&
-        isDefined(eventSubscription.fromTemplateFields) &&
-        fields.length > 0 &&
-        !initialFieldsSetRef.current
-      ) {
-        resetField("fromTemplateFields", {
-          defaultValue: fields.filter((field) =>
-            eventSubscription.fromTemplateFields?.some((f) => field.id === f.id),
-          ),
-        });
-        initialFieldsSetRef.current = true;
-      }
-    });
-  }, [eventSubscription?.fromTemplateFields, fields]);
-
   return (
     <ConfirmDialog
       size="xl"
@@ -305,10 +210,10 @@ export function CreateOrUpdateEventSubscriptionDialog({
                   name: data.name?.trim() || null,
                   eventsUrl: data.eventsUrl,
                   eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes,
-                  fromTemplateId: data.fromTemplate?.id ?? null,
-                  fromTemplateFieldIds:
-                    isDefined(data.fromTemplate) && data.fromTemplateFields.length > 0
-                      ? data.fromTemplateFields.map((f) => f.id)
+                  fromProfileTypeId: data.fromProfileTypeId,
+                  fromProfileTypeFieldIds:
+                    isDefined(data.fromProfileTypeId) && data.fromProfileTypeFieldIds.length > 0
+                      ? data.fromProfileTypeFieldIds
                       : null,
                 }),
               );
@@ -332,12 +237,12 @@ export function CreateOrUpdateEventSubscriptionDialog({
         <Flex alignItems="baseline">
           {currentStep === 0 ? (
             <FormattedMessage
-              id="component.create-event-subscription-dialog.title.step-1"
+              id="component.create-event-subscription-dialog.header-step-1"
               defaultMessage="Event subscription"
             />
           ) : (
             <FormattedMessage
-              id="component.create-event-subscription-dialog.title.step-2"
+              id="component.create-event-subscription-dialog.header-step-2"
               defaultMessage="Signature keys"
             />
           )}
@@ -368,7 +273,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
               <Input
                 {...eventsUrlInputProps}
                 placeholder={intl.formatMessage({
-                  id: "generic.forms.url-placeholder",
+                  id: "generic.url-placeholder",
                   defaultMessage: "https://www.example.com",
                 })}
               />
@@ -392,39 +297,28 @@ export function CreateOrUpdateEventSubscriptionDialog({
                 defaultMessage="When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
               />
             </Text>
-            <FormControl id="from-template-id">
+
+            <FormControl>
               <FormLabel>
                 <FormattedMessage
-                  id="component.create-event-subscription-dialog.from-template-label"
-                  defaultMessage="Filter events from parallels created from a specific template (Optional)."
+                  id="component.create-profile-event-subscription-dialog.from-profiles-label"
+                  defaultMessage="Filter events from profiles created from a specific profile type (Optional)."
                 />
               </FormLabel>
               <Controller
-                name="fromTemplate"
+                name="fromProfileTypeId"
                 control={control}
-                rules={{
-                  required: false,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Select<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment, false>
-                    {...reactSelectProps}
-                    value={value}
-                    inputId="from-template-id"
-                    onChange={onChange}
+                render={({ field: { value, onChange } }) => (
+                  <ProfileTypeSelect
                     defaultOptions
-                    loadOptions={loadTemplates}
-                    isSearchable
+                    value={value}
+                    onChange={(v) => onChange(v?.id ?? "")}
                     isClearable
-                    placeholder={intl.formatMessage({
-                      id: "component.create-event-subscription-dialog.from-template-placeholder",
-                      defaultMessage: "Search for templates...",
-                    })}
-                    getOptionValue={(o) => o.id}
-                    getOptionLabel={(o) => o.name ?? ""}
                   />
                 )}
               />
             </FormControl>
+
             <FormControl>
               <Controller
                 name="eventsMode"
@@ -459,7 +353,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
                     values={{
                       a: (chunks: any) => (
                         <Link
-                          href="https://www.onparallel.com/developers/api#tag/Parallel-Event"
+                          href="https://www.onparallel.com/developers/api#tag/Subscriptions/Profile-Events"
                           isExternal
                         >
                           {chunks}
@@ -482,9 +376,9 @@ export function CreateOrUpdateEventSubscriptionDialog({
                           value={value}
                           onChange={onChange}
                           isMulti
-                          options={options}
+                          options={profileEventOptions}
                           placeholder={intl.formatMessage({
-                            id: "component.create-event-subscription-dialog.event-select.placeholder",
+                            id: "component.create-event-subscription-dialog.event-select-placeholder",
                             defaultMessage: "Search events...",
                           })}
                         />
@@ -502,7 +396,6 @@ export function CreateOrUpdateEventSubscriptionDialog({
             </PaddedCollapse>
             <PaddedCollapse
               in={
-                isDefined(fromTemplate) &&
                 eventsMode === "SPECIFIC" &&
                 eventTypes.length > 0 &&
                 eventTypes.every((e) => FIELD_EVENTS.includes(e))
@@ -511,24 +404,25 @@ export function CreateOrUpdateEventSubscriptionDialog({
               <Stack paddingLeft={6}>
                 <Text fontSize="sm">
                   <FormattedMessage
-                    id="component.create-event-subscription-dialog.filter-fields"
-                    defaultMessage="Filter for events coming from specific fields of the template. Leave blank to receive all events."
+                    id="component.create-profile-event-subscription-dialog.filter-fields"
+                    defaultMessage="Filter for events coming from specific properties of the profile. Leave blank to receive all events."
                   />
                 </Text>
                 <FormControl>
                   <Controller
-                    name="fromTemplateFields"
+                    name="fromProfileTypeFieldIds"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                      <PetitionFieldSelect
+                      <ProfileTypeFieldSelect
                         isMulti
-                        value={value}
+                        value={fields.filter((f) => value.includes(f.id))}
                         fields={fields}
-                        onChange={onChange}
+                        onChange={(values) => onChange(values.map((v) => v.id))}
                         placeholder={intl.formatMessage({
-                          id: "component.create-event-subscription-dialog.filter-fields-placeholder",
-                          defaultMessage: "Select fields to filter events...",
+                          id: "component.create-profile-event-subscription-dialog.filter-fields-placeholder",
+                          defaultMessage: "Select properties to filter events...",
                         })}
+                        fontSize="sm"
                       />
                     )}
                   />
@@ -615,157 +509,67 @@ export function CreateOrUpdateEventSubscriptionDialog({
   );
 }
 
-function Option(props: OptionProps<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment>) {
-  return (
-    <components.Option {...props}>
-      {props.data.name ?? (
-        <Text as="span" textStyle="hint">
-          <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
-        </Text>
-      )}
-    </components.Option>
-  );
-}
-
-function SingleValue(
-  props: SingleValueProps<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment>,
-) {
-  return (
-    <components.SingleValue {...props}>
-      {props.data.name ?? (
-        <Text as="span" textStyle="hint">
-          <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
-        </Text>
-      )}
-    </components.SingleValue>
-  );
-}
-
-CreateOrUpdateEventSubscriptionDialog.fragments = {
-  get PetitionEventSubscription() {
+CreateOrUpdateProfileEventSubscriptionDialog.fragments = {
+  get ProfileEventSubscription() {
     return gql`
-      fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
+      fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription on ProfileEventSubscription {
         id
+        name
         eventsUrl
-        eventTypes
         isEnabled
         isFailing
-        name
-        fromTemplate {
+        signatureKeys {
+          ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
+        }
+        profileEventTypes: eventTypes
+        fromProfileType {
           id
           name
         }
-        fromTemplateFields {
+        fromProfileTypeFields {
           id
-        }
-        signatureKeys {
-          ...CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey
         }
       }
       ${this.EventSubscriptionSignatureKey}
     `;
   },
-  get PetitionBase() {
-    return gql`
-      fragment CreateOrUpdateEventSubscriptionDialog_PetitionBase on PetitionBase {
-        id
-        name
-      }
-    `;
-  },
   get EventSubscriptionSignatureKey() {
     return gql`
-      fragment CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+      fragment CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
         id
         publicKey
       }
     `;
   },
-  get PetitionField() {
-    return gql`
-      fragment CreateOrUpdateEventSubscriptionDialog_PetitionField on PetitionField {
-        ...PetitionFieldSelect_PetitionField
-        isReadOnly
+  ProfileTypeField: gql`
+    fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField on ProfileTypeField {
+      id
+      ...ProfileTypeFieldSelect_ProfileTypeField
+    }
+    ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
+  `,
+  ProfileType: gql`
+    fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileType on ProfileType {
+      id
+      name
+      fields {
+        ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField
       }
-      ${PetitionFieldSelect.fragments.PetitionField}
-    `;
-  },
-  get PetitionBaseWithFields() {
-    return gql`
-      fragment CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
-        id
-        fields {
-          ...CreateOrUpdateEventSubscriptionDialog_PetitionField
-        }
-      }
-      ${this.PetitionField}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
   gql`
-    query CreateOrUpdateEventSubscriptionDialog_petitions(
-      $offset: Int!
-      $limit: Int!
-      $search: String
-      $sortBy: [QueryPetitions_OrderBy!]
-      $filters: PetitionFilter
-    ) {
-      petitions(
-        offset: $offset
-        limit: $limit
-        search: $search
-        sortBy: $sortBy
-        filters: $filters
-      ) {
-        items {
-          ...CreateOrUpdateEventSubscriptionDialog_PetitionBase
-        }
+    query CreateOrUpdateProfileEventSubscriptionDialog_profileType($profileTypeId: GID!) {
+      profileType(profileTypeId: $profileTypeId) {
+        ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileType
       }
     }
-    ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionBase}
-  `,
-  gql`
-    query CreateOrUpdateEventSubscriptionDialog_petitionWithFields($petitionId: GID!) {
-      petition(id: $petitionId) {
-        ...CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields
-      }
-    }
-    ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionBaseWithFields}
+    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileType}
   `,
 ];
 
-export function useCreateOrUpdateEventSubscriptionDialog() {
-  return useDialog(CreateOrUpdateEventSubscriptionDialog);
-}
-
-function useDeleteWebhookSignatureKeysDialog() {
-  const showDialog = useConfirmDeleteDialog();
-  return useCallback(async () => {
-    return await showDialog({
-      header: (
-        <FormattedMessage
-          id="component.create-event-subscription-dialog.confirm-delete-header"
-          defaultMessage="Delete signature key"
-        />
-      ),
-      description: (
-        <Stack>
-          <Text>
-            <FormattedMessage
-              id="component.create-event-subscription-dialog.confirm-delete-body"
-              defaultMessage="Are you sure you want to delete the selected key?"
-            />
-          </Text>
-          <Text>
-            <FormattedMessage
-              id="component.create-event-subscription-dialog.confirm-delete-warning"
-              defaultMessage="Before you proceed, make sure you are not using this key to verify received events, as it will not be valid anymore."
-            />
-          </Text>
-        </Stack>
-      ),
-    });
-  }, []);
+export function useCreateOrUpdateProfileEventSubscriptionDialog() {
+  return useDialog(CreateOrUpdateProfileEventSubscriptionDialog);
 }

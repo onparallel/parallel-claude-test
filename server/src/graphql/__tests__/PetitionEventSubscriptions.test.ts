@@ -1,12 +1,12 @@
 import { addDays } from "date-fns";
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { EventSubscription, Organization, PetitionEvent, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, PetitionEvent, PetitionEventSubscription, User } from "../../db/__types";
 import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/PetitionEventSubscription", () => {
   let testClient: TestClient;
@@ -16,7 +16,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
 
   let organization: Organization;
 
-  let subscriptions: PetitionEventSubscription[];
+  let subscriptions: EventSubscription[];
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -32,9 +32,15 @@ describe("GraphQL/PetitionEventSubscription", () => {
     }));
 
     subscriptions = await mocks.createEventSubscription([
-      { user_id: otherUser.id, endpoint: "https://www.endpoint-1.com" },
-      { user_id: sessionUser.id, endpoint: "https://www.endpoint-2.com", created_at: new Date() },
+      { type: "PETITION", user_id: otherUser.id, endpoint: "https://www.endpoint-1.com" },
       {
+        type: "PETITION",
+        user_id: sessionUser.id,
+        endpoint: "https://www.endpoint-2.com",
+        created_at: new Date(),
+      },
+      {
+        type: "PETITION",
         user_id: sessionUser.id,
         endpoint: "https://www.endpoint-3.com",
         is_enabled: false,
@@ -51,7 +57,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
     afterAll(async () => {
       // delete session user's subscriptions so we will able to create new ones in the next tests
       await mocks.knex
-        .from("petition_event_subscription")
+        .from("event_subscription")
         .where({ user_id: sessionUser.id })
         .update({ deleted_at: new Date() });
     });
@@ -128,14 +134,14 @@ describe("GraphQL/PetitionEventSubscription", () => {
   });
 
   let subscriptionId: string;
-  describe("createEventSubscription", () => {
+  describe("createPetitionEventSubscription", () => {
     it("creates and returns a new subscription for the user's petitions", async () => {
       const fetch = testClient.container.get<IFetchService>(FETCH_SERVICE);
       const spy = jest.spyOn(fetch, "fetch");
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($eventsUrl: String!, $name: String) {
-            createEventSubscription(eventsUrl: $eventsUrl, name: $name) {
+            createPetitionEventSubscription(eventsUrl: $eventsUrl, name: $name) {
               id
               name
               eventsUrl
@@ -149,12 +155,12 @@ describe("GraphQL/PetitionEventSubscription", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data?.createEventSubscription).toMatchObject({
+      expect(data?.createPetitionEventSubscription).toMatchObject({
         isEnabled: true,
         name: "example",
         eventsUrl: "https://www.example.com/api",
       });
-      subscriptionId = data!.createEventSubscription.id;
+      subscriptionId = data!.createPetitionEventSubscription.id;
       expect(spy).toHaveBeenCalledWith("https://www.example.com/api", expect.anything());
     });
 
@@ -163,7 +169,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($eventsUrl: String!, $name: String, $fromTemplateId: GID) {
-            createEventSubscription(
+            createPetitionEventSubscription(
               eventsUrl: $eventsUrl
               name: $name
               fromTemplateId: $fromTemplateId
@@ -185,7 +191,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data?.createEventSubscription).toMatchObject({
+      expect(data?.createPetitionEventSubscription).toMatchObject({
         isEnabled: true,
         name: "example",
         eventsUrl: "https://www.example.com/api",
@@ -200,7 +206,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($eventsUrl: String!, $name: String, $fromTemplateId: GID) {
-            createEventSubscription(
+            createPetitionEventSubscription(
               eventsUrl: $eventsUrl
               name: $name
               fromTemplateId: $fromTemplateId
@@ -226,12 +232,12 @@ describe("GraphQL/PetitionEventSubscription", () => {
     });
   });
 
-  describe("updateEventSubscription", () => {
+  describe("updatePetitionEventSubscription", () => {
     it("disables a subscription for the user's petitions", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($id: GID!, $isEnabled: Boolean!) {
-            updateEventSubscription(id: $id, isEnabled: $isEnabled) {
+            updatePetitionEventSubscription(id: $id, isEnabled: $isEnabled) {
               id
               eventsUrl
               isEnabled
@@ -245,7 +251,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.updateEventSubscription).toEqual({
+      expect(data?.updatePetitionEventSubscription).toEqual({
         id: subscriptionId,
         eventsUrl: "https://www.example.com/api",
         isEnabled: false,
@@ -256,7 +262,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($id: GID!, $isEnabled: Boolean!) {
-            updateEventSubscription(id: $id, isEnabled: $isEnabled) {
+            updatePetitionEventSubscription(id: $id, isEnabled: $isEnabled) {
               id
             }
           }

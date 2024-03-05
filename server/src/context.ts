@@ -5,6 +5,7 @@ import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { readOnly } from "./db/knex";
 import { ContactRepository } from "./db/repositories/ContactRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
+import { EventRepository } from "./db/repositories/EventRepository";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { FileRepository } from "./db/repositories/FileRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
@@ -65,6 +66,10 @@ import { IRedis, REDIS } from "./services/Redis";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
+import {
+  EVENT_SUBSCRIPTION_SERVICE,
+  EventSubscriptionService,
+} from "./services/EventSubscriptionService";
 
 @injectable()
 export class ApiContext {
@@ -102,6 +107,7 @@ export class ApiContext {
     public readonly petitionMessageContext: PetitionMessageContextService,
     @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
     @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: BackgroundCheckService,
+    @inject(EVENT_SUBSCRIPTION_SERVICE) public readonly eventSubscription: EventSubscriptionService,
 
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
@@ -159,6 +165,7 @@ export class WorkerContext {
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: AiCompletionService,
     @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: BackgroundCheckService,
+    @inject(EVENT_SUBSCRIPTION_SERVICE) public readonly eventSubscription: EventSubscriptionService,
     @inject(REDIS) public readonly redis: IRedis,
 
     // Repositories
@@ -175,6 +182,7 @@ export class WorkerContext {
     public readonly subscriptions: SubscriptionRepository,
     public readonly tasks: TaskRepository,
     public readonly profiles: ProfileRepository,
+    public readonly events: EventRepository,
 
     @readOnly public readonly readonlyContacts: ContactRepository,
     @readOnly public readonly readonlyPetitions: PetitionRepository,

@@ -104,7 +104,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
           setState("IDLE");
           done();
         } else {
-          setRepliesBefore(field.replies.map((value: any) => pick(value, ["id", "updatedAt"])));
+          setRepliesBefore(field.replies.map((r) => pick(r, ["id", "updatedAt"])));
           onRefreshField();
         }
       } else {

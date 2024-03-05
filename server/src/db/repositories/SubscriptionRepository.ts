@@ -2,13 +2,9 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
+import { CreateEventSubscription, CreateEventSubscriptionSignatureKey } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import {
-  CreateEventSubscriptionSignatureKey,
-  CreatePetitionEventSubscription,
-  PetitionEventSubscription,
-} from "../__types";
 
 @injectable()
 export class SubscriptionRepository extends BaseRepository {
@@ -16,14 +12,26 @@ export class SubscriptionRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadSubscription = this.buildLoadBy("petition_event_subscription", "id", (q) =>
+  readonly loadEventSubscription = this.buildLoadBy("event_subscription", "id", (q) =>
     q.whereNull("deleted_at"),
   );
 
-  readonly loadSubscriptionsByUserId = this.buildLoadMultipleBy(
-    "petition_event_subscription",
+  readonly loadEventSubscriptionsByUserId = this.buildLoadMultipleBy(
+    "event_subscription",
     "user_id",
     (q) => q.whereNull("deleted_at").orderBy("created_at", "desc"),
+  );
+
+  readonly loadPetitionEventSubscriptionsByUserId = this.buildLoadMultipleBy(
+    "event_subscription",
+    "user_id",
+    (q) => q.whereNull("deleted_at").where("type", "PETITION").orderBy("created_at", "desc"),
+  );
+
+  readonly loadProfileEventSubscriptionsByUserId = this.buildLoadMultipleBy(
+    "event_subscription",
+    "user_id",
+    (q) => q.whereNull("deleted_at").where("type", "PROFILE").orderBy("created_at", "desc"),
   );
 
   readonly loadEventSubscriptionSignatureKey = this.buildLoadBy(
@@ -38,31 +46,28 @@ export class SubscriptionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("created_at", "asc"),
   );
 
-  async createSubscription(
-    { event_types: eventTypes, ...data }: CreatePetitionEventSubscription,
-    createdBy: string,
-  ) {
-    const [row] = await this.insert("petition_event_subscription", {
+  async createEventSubscription(data: CreateEventSubscription, createdBy: string) {
+    const [row] = await this.insert("event_subscription", {
       ...data,
-      event_types: eventTypes && JSON.stringify(eventTypes),
+      event_types: data.event_types && JSON.stringify(data.event_types),
       created_by: createdBy,
     });
 
     return row;
   }
 
-  async updateSubscription(
+  async updateEventSubscription(
     id: number,
-    { event_types: eventTypes, ...data }: Partial<PetitionEventSubscription>,
+    data: Partial<Omit<CreateEventSubscription, "type">>,
     updatedBy: string,
   ) {
-    const [row] = await this.from("petition_event_subscription")
+    const [row] = await this.from("event_subscription")
       .where({ id, deleted_at: null })
       .update(
         {
           ...data,
-          ...(eventTypes !== undefined
-            ? { event_types: eventTypes && JSON.stringify(eventTypes) }
+          ...(data.event_types !== undefined
+            ? { event_types: data.event_types && JSON.stringify(data.event_types) }
             : {}),
           updated_by: updatedBy,
           updated_at: this.now(),
@@ -74,7 +79,7 @@ export class SubscriptionRepository extends BaseRepository {
   }
 
   async appendErrorLog(id: number, errorLog: any, updatedBy: string) {
-    await this.from("petition_event_subscription")
+    await this.from("event_subscription")
       .where({ id: id, deleted_at: null })
       .update({
         is_failing: true,
@@ -87,8 +92,8 @@ export class SubscriptionRepository extends BaseRepository {
       });
   }
 
-  async deleteSubscriptions(ids: MaybeArray<number>, deletedBy: string) {
-    await this.from("petition_event_subscription")
+  async deleteEventSubscriptions(ids: MaybeArray<number>, deletedBy: string) {
+    await this.from("event_subscription")
       .whereIn("id", unMaybeArray(ids))
       .whereNull("deleted_at")
       .update({
