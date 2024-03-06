@@ -5,7 +5,7 @@ import { paginatedRequest, request } from "./helpers";
  * This script closes all petitions coming from the same template
  */
 
-const TEMPLATE_IDS = ["zas25KHxAByKXKSsb6Q"];
+const TEMPLATE_IDS = ["zas25KHxAByKXb63HwM"];
 
 async function main() {
   for await (const { item: petition, totalCount, index } of paginatedRequest<{ id: string }>(

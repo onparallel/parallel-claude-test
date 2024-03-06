@@ -1,6 +1,6 @@
 import { Button, Stack } from "@chakra-ui/react";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
 import { gql } from "@apollo/client";
 import {
@@ -16,7 +16,7 @@ import {
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { ImportOptionsSettingsRow_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { generateValueLabelExcel } from "@parallel/utils/generateValueLabelExcel";
+import { generateExcel } from "@parallel/utils/generateExcel";
 import { parseValueLabelFromExcel } from "@parallel/utils/parseValueLabelFromExcel";
 import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
 import { useState } from "react";
@@ -25,6 +25,7 @@ import { Dropzone } from "../../../common/Dropzone";
 import { FileSize } from "../../../common/FileSize";
 import { BaseDialog } from "../../../common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "../../../common/dialogs/DialogProvider";
+import { times, zip } from "remeda";
 
 export function ImportOptionsSettingsRow({
   field,
@@ -265,4 +266,47 @@ export function ImportSelectOptionsDialog({
       </ModalContent>
     </BaseDialog>
   );
+}
+
+async function generateValueLabelExcel(
+  intl: IntlShape,
+  {
+    fileName,
+    values,
+    labels,
+  }: {
+    fileName: string;
+    values: string[];
+    labels: string[] | null;
+  },
+) {
+  return await generateExcel({
+    fileName,
+    columns: [
+      {
+        key: "value",
+        cell: {
+          value: intl.formatMessage({
+            id: "component.import-select-options-dialog.excel-header-value",
+            defaultMessage: "Internal value",
+          }),
+          fontWeight: "bold",
+        },
+      },
+      {
+        key: "label",
+        cell: {
+          value: intl.formatMessage({
+            id: "component.import-select-options-dialog.excel-header-label",
+            defaultMessage: "Label (optional)",
+          }),
+          fontWeight: "bold",
+        },
+      },
+    ],
+    rows: zip(values, labels ?? times(values.length, () => null)).map(([value, label]) => ({
+      value,
+      label,
+    })),
+  });
 }

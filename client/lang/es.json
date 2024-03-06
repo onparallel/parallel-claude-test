@@ -15090,12 +15090,12 @@
     "context": "This team contains all users from the organization."
   },
   {
-    "term": "util.generate-value-label-excel.label",
+    "term": "component.import-select-options-dialog.excel-header-label",
     "definition": "Descripción (opcional)",
     "context": "Label (optional)"
   },
   {
-    "term": "util.generate-value-label-excel.value",
+    "term": "component.import-select-options-dialog.excel-header-value",
     "definition": "Valor interno",
     "context": "Internal value"
   },
