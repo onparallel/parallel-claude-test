@@ -1,24 +1,17 @@
 import { Knex, knex } from "knex";
+import { escapeLike } from "./utils";
+import ASCIIFolder from "fold-to-ascii";
 
-(knex as any).QueryBuilder.extend("whereEscapedLike", likeClause("like"));
-(knex as any).QueryBuilder.extend("whereEscapedILike", likeClause("ilike"));
-(knex as any).QueryBuilder.extend("whereEscapedNotLike", likeClause("not like"));
-(knex as any).QueryBuilder.extend("whereNotIlike", likeClause("not ilike"));
-
-function likeClause<TRecord extends {} = any, TResult = unknown>(operator: string) {
-  return function (
-    this: Knex.QueryBuilder<TRecord, TResult>,
-    columnName: string,
-    pattern: string,
-    escape?: string,
-  ) {
-    if (escape) {
-      return this.whereRaw(`?? ${operator} ? escape ?`, [columnName, pattern, escape]);
-    } else {
-      return this.whereRaw(`?? ${operator} ?`, [columnName, pattern]);
-    }
-  };
-}
+(knex as any).QueryBuilder.extend("whereSearch", function <
+  TRecord extends {} = any,
+  TResult = unknown,
+>(this: Knex.QueryBuilder<TRecord, TResult>, columnName: string, search: string) {
+  return this.whereRaw(`unaccent(??) ilike ? escape ?`, [
+    columnName,
+    `%${escapeLike(ASCIIFolder.foldMaintaining(search), "\\")}%`,
+    "\\",
+  ]);
+});
 
 (knex as any).QueryBuilder.extend("mmodify", function mmodify<
   TRecord extends {},

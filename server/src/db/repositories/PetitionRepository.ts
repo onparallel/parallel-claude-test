@@ -110,7 +110,7 @@ import {
   TableTypes,
 } from "../helpers/BaseRepository";
 import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
-import { SortBy, escapeLike } from "../helpers/utils";
+import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   CommentCreatedUserNotification,
@@ -502,43 +502,36 @@ export class PetitionRepository extends BaseRepository {
     if (search) {
       builders.push((q) => {
         if (opts.searchByNameOnly) {
-          q.whereRaw(/* sql */ `p.name ilike :search escape '\\'`, {
-            search: `%${escapeLike(search, "\\")}%`,
-          });
-        } else if (type === "PETITION") {
-          q.joinRaw(/* sql */ `left join petition_access pa on p.id = pa.petition_id `)
-            .joinRaw(
-              /* sql */ `left join contact c on pa.contact_id = c.id and c.deleted_at is null`,
-            )
-            .whereRaw(
-              /* sql */ ` 
-              (
-                p.name ilike :search escape '\\'
-                or (p.path != '/' and exists (
-                  select from unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part where part ilike :search escape '\\'
-                ))
-                or (
-                  c.deleted_at is null and (
-                    concat(c.first_name, ' ', c.last_name) ilike :search escape '\\'
-                    or c.email ilike :search escape '\\'
-                  )
-                )
-              )
-            `,
-              { search: `%${escapeLike(search, "\\")}%` },
-            );
+          q.whereSearch("p.name", search);
         } else {
-          q.whereRaw(
-            /* sql */ `
-            (
-              p.name ilike :search escape '\\'
-              or (p.path != '/' and exists (
-                select from unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part where part ilike :search escape '\\'
-              ))
-              or p.template_description ilike :search escape '\\'
-            )`,
-            { search: `%${escapeLike(search, "\\")}%` },
-          );
+          if (type === "PETITION") {
+            q.joinRaw(/* sql */ `left join petition_access pa on p.id = pa.petition_id `).joinRaw(
+              /* sql */ `left join contact c on pa.contact_id = c.id and c.deleted_at is null`,
+            );
+          }
+          q.where((q) => {
+            q.whereSearch("p.name", search)
+              .orWhere((q) => {
+                q.where("p.path", "<>", "/").and.whereExists((q) =>
+                  q
+                    .fromRaw(
+                      /* sql */ `unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part`,
+                    )
+                    .whereSearch("part", search),
+                );
+              })
+              .orWhere((q) => {
+                if (type === "PETITION") {
+                  q.whereNull("c.deleted_at").andWhere((q) =>
+                    q
+                      .whereSearch(this.knex.raw(`concat(c.first_name, ' ', c.last_name)`), search)
+                      .or.whereSearch("c.email", search),
+                  );
+                } else {
+                  q.whereSearch("p.template_description", search);
+                }
+              });
+          });
         }
       });
     }
@@ -5471,13 +5464,8 @@ export class PetitionRepository extends BaseRepository {
             q.where("recipient_locale", locale);
           }
           if (search) {
-            const escapedSearch = `%${escapeLike(search, "\\")}%`;
             q.andWhere((q2) => {
-              q2.whereEscapedILike("name", escapedSearch, "\\").or.whereEscapedILike(
-                "template_description",
-                escapedSearch,
-                "\\",
-              );
+              q2.whereSearch("name", search).or.whereSearch("template_description", search);
             });
           }
           if (categories) {

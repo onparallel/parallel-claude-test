@@ -2,10 +2,7 @@ import "knex";
 declare module "knex" {
   namespace Knex {
     interface QueryBuilder<TRecord extends {} = any, TResult = any> {
-      whereEscapedLike: WhereLike<TRecord, TResult>;
-      whereEscapedILike: WhereLike<TRecord, TResult>;
-      whereEscapedNotLike: WhereLike<TRecord, TResult>;
-      whereNotIlike: WhereLike<TRecord, TResult>;
+      whereSearch: WhereSearch<TRecord, TResult>;
       /**
        * Same as .modify but without any change in types. Use only chainable
        * methods that don't change the QueryBuilder generics.
@@ -22,6 +19,10 @@ declare module "knex" {
         escape?: string,
       ): QueryBuilder<TRecord, TResult>;
       (columnName: string, pattern: string, escape?: string): QueryBuilder<TRecord, TResult>;
+    }
+
+    interface WhereSearch<TRecord = any, TResult = unknown[]> {
+      (columnName: keyof TRecord | Raw | string, search: string): QueryBuilder<TRecord, TResult>;
     }
   }
 }

@@ -22,7 +22,7 @@ import {
   UserStatus,
 } from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { SortBy, escapeLike } from "../helpers/utils";
+import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { SystemRepository } from "./SystemRepository";
 
@@ -98,11 +98,10 @@ export class OrganizationRepository extends BaseRepository {
               if (opts.searchByEmailOnly) {
                 q2.where("user_data.email", search);
               } else {
-                q2.whereEscapedILike(
+                q2.whereSearch(
                   this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
-                  `%${escapeLike(search, "\\")}%`,
-                  "\\",
-                ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
+                  search,
+                ).or.whereSearch("user_data.email", search);
               }
             });
           }
@@ -254,7 +253,7 @@ export class OrganizationRepository extends BaseRepository {
         .mmodify((q) => {
           const { search, status, sortBy } = opts;
           if (search) {
-            q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\");
+            q.whereSearch("name", search);
             if (search.match(/^\d+$/)) {
               q.or.where("id", parseInt(search, 10));
             } else if (isGlobalId(search, "Organization")) {

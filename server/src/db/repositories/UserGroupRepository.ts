@@ -12,7 +12,7 @@ import {
   UserGroupType,
 } from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { SortBy, escapeLike } from "../helpers/utils";
+import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
 @injectable()
@@ -34,15 +34,11 @@ export class UserGroupRepository extends BaseRepository {
         .mmodify((q) => {
           if (opts.search) {
             q.where((q2) => {
-              q2.whereEscapedILike(
-                "name",
-                `%${escapeLike(opts.search!, "\\")}%`,
-                "\\",
-              ).or.whereExists((q3) =>
+              q2.whereSearch("name", opts.search!).or.whereExists((q3) =>
                 q3
                   .select(this.knex.raw("1"))
                   .fromRaw(`jsonb_each_text(localizable_name) AS t(key, value)`)
-                  .whereEscapedILike("value", `%${escapeLike(opts.search!, "\\")}%`),
+                  .whereSearch("value", opts.search!),
               );
             });
           }
@@ -320,11 +316,11 @@ export class UserGroupRepository extends BaseRepository {
         }
       })
       .where((q) => {
-        q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\").or.whereExists((q2) =>
+        q.whereSearch("name", search).or.whereExists((q2) =>
           q2
             .select(this.knex.raw("1"))
             .fromRaw(`jsonb_each_text(localizable_name) AS t(key, value)`)
-            .whereEscapedILike("value", `%${escapeLike(search, "\\")}%`),
+            .whereSearch("value", search),
         );
       })
       .select("*");

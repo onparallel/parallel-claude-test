@@ -6,9 +6,6 @@ import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { hash, random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike, SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
 import {
   Contact,
   ContactAuthentication,
@@ -19,6 +16,9 @@ import {
   PetitionStatus,
   User,
 } from "../__types";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { SortBy } from "../helpers/utils";
+import { KNEX } from "../knex";
 
 @injectable()
 export class ContactRepository extends BaseRepository {
@@ -159,11 +159,10 @@ export class ContactRepository extends BaseRepository {
           const { search, excludeIds } = opts;
           if (search) {
             q.andWhere((q2) => {
-              q2.whereEscapedILike(
+              q2.whereSearch(
                 this.knex.raw(`concat("first_name", ' ', "last_name")`),
-                `%${escapeLike(search, "\\")}%`,
-                "\\",
-              ).or.whereEscapedILike("email", `%${escapeLike(search, "\\")}%`, "\\");
+                search,
+              ).or.whereSearch("email", search);
             });
           }
           if (excludeIds) {
@@ -224,7 +223,7 @@ export class ContactRepository extends BaseRepository {
                 q.whereIn("p.status", opts.status);
               }
               if (opts.search) {
-                q.whereEscapedILike("pm.email_subject", `%${escapeLike(opts.search, "\\")}%`, "\\");
+                q.whereSearch("pm.email_subject", opts.search);
               }
             })
             .where("pa.contact_id", contactId)

@@ -47,7 +47,7 @@ import {
   ProfileFieldValueUpdatedEvent,
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
-import { SortBy, escapeLike } from "../helpers/utils";
+import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
 @injectable()
@@ -118,7 +118,7 @@ export class ProfileRepository extends BaseRepository {
               q
                 .select(this.knex.raw("1"))
                 .fromRaw(`jsonb_each_text(name) AS t(key, value)`)
-                .whereEscapedILike("value", `%${escapeLike(search, "\\")}%`),
+                .whereSearch("value", search),
             );
           }
           if (sortBy) {
@@ -564,7 +564,7 @@ export class ProfileRepository extends BaseRepository {
         .mmodify((q) => {
           const { search, sortBy, filter } = opts;
           if (search) {
-            q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`);
+            q.whereSearch("name", search);
           }
           if (isDefined(filter?.profileId)) {
             q.whereIn("id", filter!.profileId);
@@ -1079,7 +1079,7 @@ export class ProfileRepository extends BaseRepository {
   }> {
     const filter = (q: Knex.QueryBuilder) => {
       if (isDefined(opts.search)) {
-        q.whereEscapedILike("p.name", `%${escapeLike(opts.search, "\\")}%`, "\\");
+        q.whereSearch("p.name", opts.search);
       }
       if (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0) {
         q.whereIn("p.profile_type_id", opts.filter!.profileTypeId);

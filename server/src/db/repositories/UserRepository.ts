@@ -7,7 +7,6 @@ import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray } from "../../util/types";
 import { CreateUser, CreateUserData, User, UserData, UserGroupPermissionName } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
-import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { SystemRepository } from "./SystemRepository";
 
@@ -403,11 +402,10 @@ export class UserRepository extends BaseRepository {
           q.whereNotIn("user.id", opts.excludeUsers);
         }
         q.andWhere((q) => {
-          q.whereEscapedILike(
-            this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
-            `%${escapeLike(search, "\\")}%`,
-            "\\",
-          ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
+          q.whereSearch(
+            this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`),
+            search,
+          ).or.whereSearch("user_data.email", search);
         });
       })
       .select<User[]>("user.*");
