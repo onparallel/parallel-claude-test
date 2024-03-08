@@ -424,6 +424,14 @@ export const ProfileTypeFieldTypeValues = [
   "SELECT",
 ] as ProfileTypeFieldType[];
 
+export type ProfileTypeStandardType = "INDIVIDUAL" | "LEGAL_ENTITY" | "CONTRACT";
+
+export const ProfileTypeStandardTypeValues = [
+  "INDIVIDUAL",
+  "LEGAL_ENTITY",
+  "CONTRACT",
+] as ProfileTypeStandardType[];
+
 export type SystemEventType =
   | "USER_CREATED"
   | "USER_LOGGED_IN"
@@ -1826,6 +1834,7 @@ export interface ProfileType {
   deleted_by: Maybe<string>; // varchar
   archived_by_user_id: Maybe<number>; // int4
   archived_at: Maybe<Date>; // timestamptz
+  standard_type: Maybe<ProfileTypeStandardType>; // profile_type_standard_type
 }
 
 export type CreateProfileType = PartialProps<
@@ -1840,6 +1849,7 @@ export type CreateProfileType = PartialProps<
   | "deleted_by"
   | "archived_by_user_id"
   | "archived_at"
+  | "standard_type"
 >;
 
 export interface ProfileTypeField {
