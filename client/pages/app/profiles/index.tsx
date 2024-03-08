@@ -137,7 +137,7 @@ function Profiles() {
   const { data: _profileTypesData } = useQueryOrPreviousData(Profiles_profileTypesDocument, {
     variables: {
       offset: 0,
-      limit: 999,
+      limit: 100,
       locale: intl.locale as UserLocale,
     },
     fetchPolicy: "cache-and-network",
