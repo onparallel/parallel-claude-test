@@ -96,11 +96,13 @@ import {
 import {
   CreatePetitionEvent,
   GenericPetitionEvent,
+  GroupPermissionAddedEvent,
   PetitionEvent,
   ReplyCreatedEvent,
   ReplyDeletedEvent,
   ReplyStatusChangedEvent,
   ReplyUpdatedEvent,
+  UserPermissionAddedEvent,
 } from "../events/PetitionEvent";
 import {
   BaseRepository,
@@ -4806,116 +4808,131 @@ export class PetitionRepository extends BaseRepository {
 
       const newUserPermissions =
         newUsers.length > 0
-          ? await this.raw<PetitionPermission>(
-              /* sql */ `
-         ? on conflict (petition_id, user_id)
-         where deleted_at is null and from_user_group_id is null and user_group_id is null 
-            do update set
-            type = ?,
-            updated_by = ?,
-            updated_at = ?,
-            deleted_by = null,
-            deleted_at = null where petition_permission.type > ?
-          returning *;
-        `,
-              [
-                // directly-assigned user permissions
-                this.from("petition_permission").insert(
-                  petitionIds.flatMap((petitionId) =>
-                    newUsers.map((user) => ({
-                      petition_id: petitionId,
-                      user_id: user.id,
-                      is_subscribed: user.isSubscribed,
-                      type: user.permissionType,
-                      created_by: createdBy,
-                      updated_by: createdBy,
-                    })),
-                  ),
+          ? await pMapChunk(
+              petitionIds.flatMap((petitionId) =>
+                newUsers.map((user) => ({
+                  petition_id: petitionId,
+                  user_id: user.id,
+                  is_subscribed: user.isSubscribed,
+                  type: user.permissionType,
+                  created_by: createdBy,
+                  updated_by: createdBy,
+                })),
+              ),
+              async (chunk) =>
+                await this.raw<PetitionPermission>(
+                  /* sql */ `
+                    ? on conflict (petition_id, user_id)
+                    where deleted_at is null and from_user_group_id is null and user_group_id is null 
+                      do update set
+                      type = ?,
+                      updated_by = ?,
+                      updated_at = ?,
+                      deleted_by = null,
+                      deleted_at = null where petition_permission.type > ?
+                    returning *;
+                  `,
+                  [
+                    // directly-assigned user permissions
+                    this.from("petition_permission").insert(chunk),
+                    permissionType,
+                    createdBy,
+                    this.now(),
+                    permissionType,
+                  ],
+                  t,
                 ),
-                permissionType,
-                createdBy,
-                this.now(),
-                permissionType,
-              ],
-              t,
+              {
+                chunkSize: 100,
+                concurrency: 1,
+              },
             )
           : [];
 
       const newGroupPermissions =
         newUserGroups.length > 0
-          ? await this.raw<PetitionPermission>(
-              /* sql */ `
-              ? on conflict (petition_id, user_group_id)
-              where deleted_at is null and user_group_id is not null
-                do update set
-                type = ?,
-                updated_by = ?,
-                updated_at = ?,
-                deleted_by = null,
-                deleted_at = null  where petition_permission.type > ?
-              returning *;
-            `,
-              [
-                // group permissions
-                this.from("petition_permission").insert(
-                  petitionIds.flatMap((petitionId) =>
-                    newUserGroups.map((userGroup) => ({
-                      petition_id: petitionId,
-                      user_group_id: userGroup.id,
-                      is_subscribed: userGroup.isSubscribed,
-                      type: userGroup.permissionType,
-                      created_by: createdBy,
-                      updated_by: createdBy,
-                    })),
-                  ),
+          ? await pMapChunk(
+              petitionIds.flatMap((petitionId) =>
+                newUserGroups.map((userGroup) => ({
+                  petition_id: petitionId,
+                  user_group_id: userGroup.id,
+                  is_subscribed: userGroup.isSubscribed,
+                  type: userGroup.permissionType,
+                  created_by: createdBy,
+                  updated_by: createdBy,
+                })),
+              ),
+              async (chunk) =>
+                await this.raw<PetitionPermission>(
+                  /* sql */ `
+                    ? on conflict (petition_id, user_group_id)
+                    where deleted_at is null and user_group_id is not null
+                      do update set
+                      type = ?,
+                      updated_by = ?,
+                      updated_at = ?,
+                      deleted_by = null,
+                      deleted_at = null  where petition_permission.type > ?
+                    returning *;
+                  `,
+                  [
+                    // group permissions
+                    this.from("petition_permission").insert(chunk),
+                    permissionType,
+                    createdBy,
+                    this.now(),
+                    permissionType,
+                  ],
+                  t,
                 ),
-                permissionType,
-                createdBy,
-                this.now(),
-                permissionType,
-              ],
-              t,
+              { chunkSize: 100, concurrency: 1 },
             )
           : [];
 
       // user permissions through a user group
       const groupAssignedNewUserPermissions =
         newUserGroups.length > 0
-          ? await this.raw<PetitionPermission>(
-              /* sql */ `
-              with gm as (
-                select ugm.user_id, ugm.user_group_id, ugm_info.is_subscribed, ugm_info.permission_type
-                from user_group_member ugm
-                -- each user group may have different is_subscribed and permission_type values assigned
-                join (
-                  select * from (?) as t(user_group_id, is_subscribed, permission_type)
-                ) as ugm_info on ugm_info.user_group_id = ugm.user_group_id
-                where ugm.deleted_at is null and ugm.user_group_id in ?
-              ),
-              p as (
-                select petition_id from (?) as t(petition_id))
-              insert into petition_permission(petition_id, user_id, from_user_group_id, is_subscribed, type, created_by, updated_by)
-              select p.petition_id, gm.user_id, gm.user_group_id, gm.is_subscribed, gm.permission_type, ?, ? 
-              from gm cross join p
-              on conflict do nothing returning *;
-            `,
-              [
-                this.sqlValues(
-                  newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
-                  ["int", "bool", "petition_permission_type"],
+          ? await pMapChunk(
+              newUserGroups,
+              async (chunk) =>
+                await this.raw<PetitionPermission>(
+                  /* sql */ `
+                    with gm as (
+                      select ugm.user_id, ugm.user_group_id, ugm_info.is_subscribed, ugm_info.permission_type
+                      from user_group_member ugm
+                      -- each user group may have different is_subscribed and permission_type values assigned
+                      join (
+                        select * from (?) as t(user_group_id, is_subscribed, permission_type)
+                      ) as ugm_info on ugm_info.user_group_id = ugm.user_group_id
+                      where ugm.deleted_at is null and ugm.user_group_id in ?
+                    ),
+                    p as (
+                      select petition_id from (?) as t(petition_id)
+                    )
+                    insert into petition_permission(petition_id, user_id, from_user_group_id, is_subscribed, type, created_by, updated_by)
+                    select p.petition_id, gm.user_id, gm.user_group_id, gm.is_subscribed, gm.permission_type, ?, ? 
+                    from gm cross join p
+                    on conflict do nothing returning *;
+                  `,
+                  [
+                    this.sqlValues(
+                      chunk.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
+                      ["int", "bool", "petition_permission_type"],
+                    ),
+                    this.sqlIn(
+                      chunk.map((ug) => ug.id),
+                      "int",
+                    ),
+                    this.sqlValues(
+                      petitionIds.map((id) => [id]),
+                      ["int"],
+                    ),
+                    createdBy,
+                    createdBy,
+                  ],
+                  t,
                 ),
-                this.sqlIn(
-                  newUserGroups.map((ug) => ug.id),
-                  "int",
-                ),
-                this.sqlValues(
-                  petitionIds.map((id) => [id]),
-                  ["int"],
-                ),
-                createdBy,
-                createdBy,
-              ],
-              t,
+              { chunkSize: 100, concurrency: 1 },
             )
           : [];
 
@@ -4924,28 +4941,35 @@ export class PetitionRepository extends BaseRepository {
       }
 
       if (createEvents && creator === "User") {
-        await this.createEvent(
+        await pMapChunk(
           [
-            ...newUserPermissions.map((p) => ({
-              petition_id: p.petition_id,
-              type: "USER_PERMISSION_ADDED" as const,
-              data: {
-                user_id: creatorId,
-                permission_type: p.type,
-                permission_user_id: p.user_id!,
-              },
-            })),
-            ...newGroupPermissions.map((p) => ({
-              petition_id: p.petition_id,
-              type: "GROUP_PERMISSION_ADDED" as const,
-              data: {
-                user_id: creatorId,
-                permission_type: p.type,
-                user_group_id: p.user_group_id!,
-              },
-            })),
+            ...newUserPermissions.map(
+              (p) =>
+                ({
+                  petition_id: p.petition_id,
+                  type: "USER_PERMISSION_ADDED",
+                  data: {
+                    user_id: creatorId,
+                    permission_type: p.type,
+                    permission_user_id: p.user_id!,
+                  },
+                }) satisfies UserPermissionAddedEvent<true>,
+            ),
+            ...newGroupPermissions.map(
+              (p) =>
+                ({
+                  petition_id: p.petition_id,
+                  type: "GROUP_PERMISSION_ADDED",
+                  data: {
+                    user_id: creatorId,
+                    permission_type: p.type,
+                    user_group_id: p.user_group_id!,
+                  },
+                }) satisfies GroupPermissionAddedEvent<true>,
+            ),
           ],
-          t,
+          async (chunk) => await this.createEvent(chunk, t),
+          { chunkSize: 100, concurrency: 1 },
         );
       }
 
