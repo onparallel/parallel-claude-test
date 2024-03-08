@@ -29,17 +29,7 @@ export function CopyOrDownloadReplyButton({
   const intl = useIntl();
   return (
     <Stack spacing={1}>
-      {reply.field!.type === "NUMBER" ? (
-        <CopyToClipboardButton
-          size="xs"
-          fontSize="md"
-          isDisabled={reply.isAnonymized}
-          text={intl.formatNumber(content, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 20,
-          })}
-        />
-      ) : reply.field!.type === "BACKGROUND_CHECK" ? (
+      {reply.field!.type === "BACKGROUND_CHECK" ? (
         <IconButtonWithTooltip
           isDisabled={reply.isAnonymized}
           onClick={() => onAction(isDefined(content?.entity) ? "VIEW_DETAILS" : "VIEW_RESULTS")}
