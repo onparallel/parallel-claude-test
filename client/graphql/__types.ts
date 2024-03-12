@@ -2560,6 +2560,8 @@ export interface Organization extends Timestamps {
   usagePeriods: OrganizationUsageLimitPagination;
   /** The users in the organization. */
   users: UserPagination;
+  /** The users in the organization filtered by a list of emails. */
+  usersByEmail: UserPagination;
 }
 
 /** An organization in the system. */
@@ -2616,6 +2618,13 @@ export interface OrganizationusersArgs {
   search?: InputMaybe<Scalars["String"]["input"]>;
   searchByEmailOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
+}
+
+/** An organization in the system. */
+export interface OrganizationusersByEmailArgs {
+  emails: Array<Scalars["String"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 }
 
 export interface OrganizationBrandThemeData {
@@ -2916,6 +2925,7 @@ export interface PetitionAnonymizedEvent extends PetitionEvent {
 export interface PetitionAssociatedEvent extends ProfileEvent {
   __typename?: "PetitionAssociatedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -3132,6 +3142,7 @@ export interface PetitionDeletedEvent extends PetitionEvent {
 export interface PetitionDisassociatedEvent extends ProfileEvent {
   __typename?: "PetitionDisassociatedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4038,6 +4049,7 @@ export interface ProfilepetitionsArgs {
 export interface ProfileAnonymizedEvent extends ProfileEvent {
   __typename?: "ProfileAnonymizedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4057,6 +4069,7 @@ export interface ProfileAssociatedEvent extends PetitionEvent {
 export interface ProfileClosedEvent extends ProfileEvent {
   __typename?: "ProfileClosedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4066,6 +4079,7 @@ export interface ProfileClosedEvent extends ProfileEvent {
 export interface ProfileCreatedEvent extends ProfileEvent {
   __typename?: "ProfileCreatedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4085,6 +4099,7 @@ export interface ProfileDisassociatedEvent extends PetitionEvent {
 
 export interface ProfileEvent {
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4127,6 +4142,7 @@ export type ProfileEventType =
 export interface ProfileFieldExpiryUpdatedEvent extends ProfileEvent {
   __typename?: "ProfileFieldExpiryUpdatedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4155,6 +4171,7 @@ export interface ProfileFieldFile extends ProfileFieldResponse {
 export interface ProfileFieldFileAddedEvent extends ProfileEvent {
   __typename?: "ProfileFieldFileAddedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4164,6 +4181,7 @@ export interface ProfileFieldFileAddedEvent extends ProfileEvent {
 export interface ProfileFieldFileRemovedEvent extends ProfileEvent {
   __typename?: "ProfileFieldFileRemovedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4236,6 +4254,7 @@ export interface ProfileFieldValue extends ProfileFieldResponse {
 export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
   __typename?: "ProfileFieldValueUpdatedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4264,6 +4283,7 @@ export interface ProfilePropertyFilter {
 export interface ProfileReopenedEvent extends ProfileEvent {
   __typename?: "ProfileReopenedEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4273,6 +4293,7 @@ export interface ProfileReopenedEvent extends ProfileEvent {
 export interface ProfileScheduledForDeletionEvent extends ProfileEvent {
   __typename?: "ProfileScheduledForDeletionEvent";
   createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   profile?: Maybe<Profile>;
   type: ProfileEventType;
@@ -4743,6 +4764,8 @@ export interface Query {
   subscriptions: Array<EventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
+  /** Paginated list of tags in the organization where tag name is included in the search argument. */
+  tagsByName: TagPagination;
   task: Task;
   /** The available templates */
   templates: PetitionBaseOrFolderPagination;
@@ -4984,6 +5007,12 @@ export interface QuerytagsArgs {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+}
+
+export interface QuerytagsByNameArgs {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search: Array<Scalars["String"]["input"]>;
 }
 
 export interface QuerytaskArgs {
@@ -41399,24 +41428,6 @@ export type ReportsReplies_PetitionTemplateFragment = {
   name?: string | null;
 };
 
-export type ReportsReplies_templatesQueryVariables = Exact<{
-  offset: Scalars["Int"]["input"];
-  limit: Scalars["Int"]["input"];
-  isPublic: Scalars["Boolean"]["input"];
-}>;
-
-export type ReportsReplies_templatesQuery = {
-  templates: {
-    __typename?: "PetitionBaseOrFolderPagination";
-    totalCount: number;
-    items: Array<
-      | { __typename?: "Petition" }
-      | { __typename?: "PetitionFolder" }
-      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
-    >;
-  };
-};
-
 export type ReportsReplies_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ReportsReplies_userQuery = {
@@ -41463,24 +41474,6 @@ export type ReportsTemplates_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-};
-
-export type ReportsTemplates_templatesQueryVariables = Exact<{
-  offset: Scalars["Int"]["input"];
-  limit: Scalars["Int"]["input"];
-  isPublic: Scalars["Boolean"]["input"];
-}>;
-
-export type ReportsTemplates_templatesQuery = {
-  templates: {
-    __typename?: "PetitionBaseOrFolderPagination";
-    totalCount: number;
-    items: Array<
-      | { __typename?: "Petition" }
-      | { __typename?: "PetitionFolder" }
-      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
-    >;
-  };
 };
 
 export type ReportsTemplates_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -59451,37 +59444,12 @@ export const Overview_userDocument = gql`
   }
   ${ReportsSidebarLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Overview_userQuery, Overview_userQueryVariables>;
-export const ReportsReplies_templatesDocument = gql`
-  query ReportsReplies_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
-    templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
-      items {
-        ...ReportsReplies_PetitionTemplate
-      }
-      totalCount
-    }
-  }
-  ${ReportsReplies_PetitionTemplateFragmentDoc}
-` as unknown as DocumentNode<ReportsReplies_templatesQuery, ReportsReplies_templatesQueryVariables>;
 export const ReportsReplies_userDocument = gql`
   query ReportsReplies_user {
     ...ReportsSidebarLayout_Query
   }
   ${ReportsSidebarLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ReportsReplies_userQuery, ReportsReplies_userQueryVariables>;
-export const ReportsTemplates_templatesDocument = gql`
-  query ReportsTemplates_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
-    templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
-      items {
-        ...ReportsTemplates_PetitionTemplate
-      }
-      totalCount
-    }
-  }
-  ${ReportsTemplates_PetitionTemplateFragmentDoc}
-` as unknown as DocumentNode<
-  ReportsTemplates_templatesQuery,
-  ReportsTemplates_templatesQueryVariables
->;
 export const ReportsTemplates_userDocument = gql`
   query ReportsTemplates_user {
     ...ReportsSidebarLayout_Query

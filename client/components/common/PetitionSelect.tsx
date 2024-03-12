@@ -12,7 +12,7 @@ import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
   OptionProps,
@@ -27,6 +27,7 @@ import { OverflownText } from "./OverflownText";
 import { PetitionSelectOption } from "./PetitionSelectOption";
 import { indexBy, isDefined, zip } from "remeda";
 import pMap from "p-map";
+import { Center, Text } from "@chakra-ui/react";
 
 export type PetitionSelectSelection = PetitionSelect_PetitionBaseFragment;
 
@@ -108,7 +109,6 @@ export const PetitionSelect = Object.assign(
       options,
       isMulti,
       placeholder: _placeholder,
-      type = "PETITION",
       excludePetitions,
       permissionTypes,
       ...props
@@ -119,6 +119,7 @@ export const PetitionSelect = Object.assign(
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
 
     const apollo = useApolloClient();
+    const type = props.type ?? "PETITION";
 
     const loadPetitions = useDebouncedAsync(
       async (search: string | null | undefined) => {
@@ -202,6 +203,7 @@ export const PetitionSelect = Object.assign(
     const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
       ...props,
       components: {
+        NoOptionsMessage,
         SingleValue,
         MultiValueLabel,
         Option,
@@ -322,6 +324,38 @@ function MultiValueLabel({ children, ...props }: MultiValueGenericProps<Petition
 
 interface ReactSelectExtraProps {
   noOfLines?: number;
+  type?: "PETITION" | "TEMPLATE";
+}
+
+function NoOptionsMessage(
+  props: OptionProps<PetitionSelectSelection> & { selectProps: ReactSelectExtraProps },
+) {
+  const {
+    selectProps: { inputValue: search, type },
+  } = props;
+  return (
+    <Center alignItems="center" textAlign="center" padding={4}>
+      {search ? (
+        <Text textStyle="hint">
+          <FormattedMessage id="generic.no-results" defaultMessage="No results" />
+        </Text>
+      ) : (
+        <Text color="gray.400">
+          {type === "TEMPLATE" ? (
+            <FormattedMessage
+              id="component.petition-select.search-hint-template"
+              defaultMessage="Type to search among the existing templates"
+            />
+          ) : (
+            <FormattedMessage
+              id="component.petition-select.search-hint-petition"
+              defaultMessage="Type to search among the existing parallels"
+            />
+          )}
+        </Text>
+      )}
+    </Center>
+  );
 }
 
 function Option({

@@ -3290,6 +3290,16 @@
     "context": "Download existing options"
   },
   {
+    "term": "component.import-select-options-dialog.excel-header-label",
+    "definition": "Descripción (opcional)",
+    "context": "Label (optional)"
+  },
+  {
+    "term": "component.import-select-options-dialog.excel-header-value",
+    "definition": "Valor interno",
+    "context": "Internal value"
+  },
+  {
     "term": "component.import-select-options-dialog.header",
     "definition": "Importar opciones de Excel",
     "context": "Import options from Excel"
@@ -5708,6 +5718,16 @@
     "term": "component.petition-select.placeholder-petition-template",
     "definition": "Selecciona {isMulti, select, true{plantillas} other {una plantilla}}",
     "context": "Select {isMulti, select, true{templates} other {a template}}"
+  },
+  {
+    "term": "component.petition-select.search-hint-petition",
+    "definition": "Escribe para buscar entre los parallels existentes",
+    "context": "Type to search among the existing parallels"
+  },
+  {
+    "term": "component.petition-select.search-hint-template",
+    "definition": "Escribe para buscar entre las plantillas existentes",
+    "context": "Type to search among the existing templates"
   },
   {
     "term": "component.petition-settings.automatic-reminders",
@@ -15088,16 +15108,6 @@
     "term": "user-group.all-members.description",
     "definition": "Este equipo contiene a todos los usuarios de la organización.",
     "context": "This team contains all users from the organization."
-  },
-  {
-    "term": "component.import-select-options-dialog.excel-header-label",
-    "definition": "Descripción (opcional)",
-    "context": "Label (optional)"
-  },
-  {
-    "term": "component.import-select-options-dialog.excel-header-value",
-    "definition": "Valor interno",
-    "context": "Internal value"
   },
   {
     "term": "util.get-open-sanctions-relationship.board-member",

@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
-import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
@@ -13,15 +13,8 @@ import { ReportsReadyMessage } from "@parallel/components/reports/common/Reports
 import { ReportsStatisticsAverage } from "@parallel/components/reports/statistics/ReportsStatisticsAverage";
 import { ReportsStatisticsConversion } from "@parallel/components/reports/statistics/ReportsStatisticsConversion";
 import { ReportsStatisticsTime } from "@parallel/components/reports/statistics/ReportsStatisticsTime";
-import {
-  ReportsTemplates_templatesDocument,
-  ReportsTemplates_userDocument,
-} from "@parallel/graphql/__types";
-import { assertTypenameArray } from "@parallel/utils/apollo/typename";
-import {
-  useAssertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/useAssertQuery";
+import { ReportsTemplates_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { stallFor } from "@parallel/utils/promises/stallFor";
 import { date, string, useQueryState } from "@parallel/utils/queryState";
@@ -76,6 +69,7 @@ interface TimeStatistic {
 const QUERY_STATE = {
   range: date().list({ maxItems: 2 }),
   template: string(),
+  name: string(),
 };
 
 export interface ActiveReportData {
@@ -92,32 +86,21 @@ export function ReportsTemplates() {
     data: { me, realMe },
   } = useAssertQuery(ReportsTemplates_userDocument);
 
-  const [{ status, activeTemplateId, report, activeRange }, setState] = useState<{
+  const [{ status, activeTemplateId, templateName, report, activeRange }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
     activeTemplateId: string | null;
     report: ReportTypeStatistics | null;
     activeRange: Date[] | null;
+    templateName: string | null;
   }>({
     status: "IDLE",
     activeTemplateId: null,
     report: null,
     activeRange: null,
+    templateName: null,
   });
 
   const taskAbortController = useRef<AbortController | null>(null);
-
-  const {
-    data: {
-      templates: { items: templates },
-    },
-  } = useAssertQueryOrPreviousData(ReportsTemplates_templatesDocument, {
-    variables: {
-      offset: 0,
-      limit: 1999,
-      isPublic: false,
-    },
-  });
-  assertTypenameArray(templates, "PetitionTemplate");
 
   const handleDateRangeChange = (range: [Date, Date] | null) => {
     setState((state) => ({ ...state, status: "IDLE" }));
@@ -154,6 +137,7 @@ export function ReportsTemplates() {
           status: "LOADED",
           activeRange: queryState.range,
           activeTemplateId: queryState.template,
+          templateName: queryState.name,
         }));
       }
     } catch (e: any) {
@@ -164,8 +148,6 @@ export function ReportsTemplates() {
       }
     }
   };
-
-  const templateName = templates.find((template) => template.id === activeTemplateId)?.name;
 
   return (
     <ReportsSidebarLayout
@@ -203,26 +185,21 @@ export function ReportsTemplates() {
             maxWidth={{ base: "100%", lg: "500px" }}
           >
             <Box flex="1" minWidth="0">
-              <SimpleSelect
-                options={templates.map((t) => ({
-                  label:
-                    t.name ??
-                    intl.formatMessage({
-                      id: "generic.unnamed-template",
-                      defaultMessage: "Unnamed template",
-                    }),
-                  value: t.id,
-                }))}
+              <PetitionSelect
+                type="TEMPLATE"
+                value={queryState.template}
+                onChange={(template) => {
+                  setQueryState((state) => ({
+                    ...state,
+                    template: template?.id ?? null,
+                    name: template?.name ?? null,
+                  }));
+                  setState((state) => ({ ...state, status: "IDLE" }));
+                }}
                 placeholder={intl.formatMessage({
                   id: "page.reports.select-a-template",
                   defaultMessage: "Select a template...",
                 })}
-                isSearchable={true}
-                value={queryState.template}
-                onChange={(template) => {
-                  setQueryState((state) => ({ ...state, template }));
-                  setState((state) => ({ ...state, status: "IDLE" }));
-                }}
                 isDisabled={status === "LOADING"}
               />
             </Box>
@@ -295,17 +272,6 @@ ReportsTemplates.fragments = {
 
 ReportsTemplates.queries = [
   gql`
-    query ReportsTemplates_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
-      templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
-        items {
-          ...ReportsTemplates_PetitionTemplate
-        }
-        totalCount
-      }
-    }
-    ${ReportsTemplates.fragments.PetitionTemplate}
-  `,
-  gql`
     query ReportsTemplates_user {
       ...ReportsSidebarLayout_Query
     }
@@ -314,16 +280,7 @@ ReportsTemplates.queries = [
 ];
 
 ReportsTemplates.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery(ReportsTemplates_templatesDocument, {
-      variables: {
-        offset: 0,
-        limit: 1999,
-        isPublic: false,
-      },
-    }),
-    fetchQuery(ReportsTemplates_userDocument),
-  ]);
+  await fetchQuery(ReportsTemplates_userDocument);
 };
 
 export default compose(

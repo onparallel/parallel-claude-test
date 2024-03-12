@@ -4,22 +4,15 @@ import { CheckIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { OverflownText } from "@parallel/components/common/OverflownText";
-import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
-import {
-  ReportsReplies_templatesDocument,
-  ReportsReplies_userDocument,
-} from "@parallel/graphql/__types";
-import { assertTypenameArray } from "@parallel/utils/apollo/typename";
-import {
-  useAssertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/useAssertQuery";
+import { ReportsReplies_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { date, string, useQueryState } from "@parallel/utils/queryState";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
@@ -49,19 +42,6 @@ export function ReportsReplies() {
     activeRange: null,
     showDownload: false,
   });
-
-  const {
-    data: {
-      templates: { items: templates },
-    },
-  } = useAssertQueryOrPreviousData(ReportsReplies_templatesDocument, {
-    variables: {
-      offset: 0,
-      limit: 1999,
-      isPublic: false,
-    },
-  });
-  assertTypenameArray(templates, "PetitionTemplate");
 
   const handleGenerateReportClick = () => {
     setState((state) => ({ ...state, status: "LOADING" }));
@@ -116,26 +96,18 @@ export function ReportsReplies() {
             maxWidth={{ base: "100%", lg: "500px" }}
           >
             <Box flex="1" minWidth="0">
-              <SimpleSelect
-                options={templates.map((t) => ({
-                  label:
-                    t.name ??
-                    intl.formatMessage({
-                      id: "generic.unnamed-template",
-                      defaultMessage: "Unnamed template",
-                    }),
-                  value: t.id,
-                }))}
+              <PetitionSelect
+                type="TEMPLATE"
+                value={queryState.template}
+                onChange={(template) => {
+                  setQueryState((state) => ({ ...state, template: template?.id ?? null }));
+                  setState((state) => ({ ...state, showDownload: false }));
+                }}
                 placeholder={intl.formatMessage({
                   id: "page.reports.select-a-template",
                   defaultMessage: "Select a template...",
                 })}
-                isSearchable={true}
-                value={queryState.template}
-                onChange={(template) => {
-                  setQueryState((state) => ({ ...state, template }));
-                  setState((state) => ({ ...state, showDownload: false }));
-                }}
+                isDisabled={status === "LOADING"}
               />
             </Box>
           </HStack>
@@ -220,17 +192,6 @@ ReportsReplies.fragments = {
 
 ReportsReplies.queries = [
   gql`
-    query ReportsReplies_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
-      templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
-        items {
-          ...ReportsReplies_PetitionTemplate
-        }
-        totalCount
-      }
-    }
-    ${ReportsReplies.fragments.PetitionTemplate}
-  `,
-  gql`
     query ReportsReplies_user {
       ...ReportsSidebarLayout_Query
     }
@@ -239,16 +200,7 @@ ReportsReplies.queries = [
 ];
 
 ReportsReplies.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery(ReportsReplies_templatesDocument, {
-      variables: {
-        offset: 0,
-        limit: 1999,
-        isPublic: false,
-      },
-    }),
-    fetchQuery(ReportsReplies_userDocument),
-  ]);
+  await fetchQuery(ReportsReplies_userDocument);
 };
 
 export default compose(
