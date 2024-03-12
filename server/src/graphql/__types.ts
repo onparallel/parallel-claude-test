@@ -1088,6 +1088,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     totalCount: number; // Int!
   };
+  ProfileUpdatedEvent: profileEvents.ProfileUpdatedEvent;
   PublicAccessVerification: {
     // root type
     cookieName?: string | null; // String
@@ -2927,6 +2928,15 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     totalCount: number; // Int!
+  };
+  ProfileUpdatedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    profile: NexusGenRootTypes["Profile"] | null; // Profile
+    type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PublicAccessVerification: {
     // field return type
@@ -5353,6 +5363,15 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "ProfileType";
     totalCount: "Int";
+  };
+  ProfileUpdatedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    profile: "Profile";
+    type: "ProfileEventType";
+    user: "User";
   };
   PublicAccessVerification: {
     // field return type name
@@ -7917,7 +7936,8 @@ export interface NexusGenAbstractTypeMembers {
     | "ProfileFieldFileRemovedEvent"
     | "ProfileFieldValueUpdatedEvent"
     | "ProfileReopenedEvent"
-    | "ProfileScheduledForDeletionEvent";
+    | "ProfileScheduledForDeletionEvent"
+    | "ProfileUpdatedEvent";
   ProfileFieldResponse: "ProfileFieldFile" | "ProfileFieldValue";
   TemplateDefaultPermission: "TemplateDefaultUserGroupPermission" | "TemplateDefaultUserPermission";
   Timestamps:
@@ -8012,6 +8032,7 @@ export interface NexusGenTypeInterfaces {
   ProfileReopenedEvent: "ProfileEvent";
   ProfileScheduledForDeletionEvent: "ProfileEvent";
   ProfileType: "Timestamps";
+  ProfileUpdatedEvent: "ProfileEvent";
   PublicPetition: "Timestamps";
   PublicPetitionFieldReply: "Timestamps";
   RecipientSignedEvent: "PetitionEvent";

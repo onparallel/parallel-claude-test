@@ -11,6 +11,7 @@ import {
   Profile,
   ProfileType,
   ProfileTypeField,
+  ProfileTypeFieldType,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -388,6 +389,11 @@ describe("GraphQL/Profiles", () => {
                       id
                     }
                   }
+                  ... on ProfileUpdatedEvent {
+                    user {
+                      id
+                    }
+                  }
                   ... on ProfileFieldValueUpdatedEvent {
                     user {
                       id
@@ -518,6 +524,13 @@ describe("GraphQL/Profiles", () => {
         events: {
           items: [
             {
+              type: "PROFILE_UPDATED",
+              profile: { id: profile.id },
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
+            {
               type: "PROFILE_FIELD_EXPIRY_UPDATED",
               profile: { id: profile.id },
               user: {
@@ -567,7 +580,7 @@ describe("GraphQL/Profiles", () => {
               },
             },
           ],
-          totalCount: 7,
+          totalCount: 8,
         },
       });
     });
@@ -2139,18 +2152,24 @@ describe("GraphQL/Profiles", () => {
   describe("updateProfileTypeField", () => {
     let profileTypeField: ProfileTypeField;
     let profileTypeField2: ProfileTypeField;
+    let profileTypeField3: ProfileTypeField;
     beforeEach(async () => {
-      [profileTypeField, profileTypeField2] = await mocks.createRandomProfileTypeFields(
-        organization.id,
-        profileTypes[1].id,
-        2,
-        (i) => ({
+      [profileTypeField, profileTypeField2, profileTypeField3] =
+        await mocks.createRandomProfileTypeFields(organization.id, profileTypes[1].id, 3, (i) => ({
           is_expirable: true,
           expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
           alias: i === 0 ? "alias" : null,
-          type: "TEXT",
-        }),
-      );
+          type: ["TEXT", "TEXT", "SELECT"][i] as ProfileTypeFieldType,
+          options:
+            i === 2
+              ? {
+                  values: [
+                    { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
+                    { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
+                  ],
+                }
+              : {},
+        }));
     });
 
     it("updates the information of the profile type field", async () => {
@@ -2405,6 +2424,10 @@ describe("GraphQL/Profiles", () => {
             field: { id: toGlobalId("ProfileTypeField", profileTypeField2.id) },
             value: null,
           },
+          {
+            field: { id: toGlobalId("ProfileTypeField", profileTypeField3.id) },
+            value: null,
+          },
         ],
       });
     });
@@ -2444,6 +2467,189 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toContainGraphQLError("REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("sends error when removing a SELECT option that is being used in a profile_field_value", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          content: { value: "option_2" },
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          data: {
+            options: {
+              values: [{ value: "option_1", label: { es: "Opción 1", en: "Option 1" } }],
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends profile_field_value_updated event when updating select field options with null substitutions", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          content: { value: "option_2" },
+        },
+      ]);
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          data: {
+            options: {
+              values: [{ value: "option_1", label: { es: "Opción 1", en: "Option 1" } }],
+            },
+            substitutions: [{ old: "option_2", new: null }],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { data, errors: queryErrors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              events(limit: 100, offset: 0) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: profile.id,
+        events: {
+          totalCount: 4,
+          items: [
+            { type: "PROFILE_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_CREATED" },
+          ],
+        },
+      });
+    });
+
+    it("sends profile_field_value_updated event when updating select field options with non-null substitutions", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          content: { value: "option_2" },
+        },
+      ]);
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          data: {
+            options: {
+              values: [{ value: "option_1", label: { es: "Opción 1", en: "Option 1" } }],
+            },
+            substitutions: [{ old: "option_2", new: "new_option" }],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { data, errors: queryErrors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              events(limit: 100, offset: 0) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: profile.id,
+        events: {
+          totalCount: 4,
+          items: [
+            { type: "PROFILE_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_CREATED" },
+          ],
+        },
+      });
     });
   });
 
@@ -3391,6 +3597,11 @@ describe("GraphQL/Profiles", () => {
                           id
                         }
                       }
+                      ... on ProfileUpdatedEvent {
+                        user {
+                          id
+                        }
+                      }
                       ... on ProfileFieldFileAddedEvent {
                         user {
                           id
@@ -3467,8 +3678,12 @@ describe("GraphQL/Profiles", () => {
           profile: {
             id: profile.id,
             events: {
-              totalCount: 3,
+              totalCount: 4,
               items: [
+                {
+                  type: "PROFILE_UPDATED",
+                  user: { id: toGlobalId("User", sessionUser.id) },
+                },
                 {
                   type: "PROFILE_FIELD_EXPIRY_UPDATED",
                   user: { id: toGlobalId("User", sessionUser.id) },
@@ -4002,6 +4217,11 @@ describe("GraphQL/Profiles", () => {
                         id
                       }
                     }
+                    ... on ProfileUpdatedEvent {
+                      user {
+                        id
+                      }
+                    }
                     ... on ProfileFieldFileRemovedEvent {
                       user {
                         id
@@ -4020,8 +4240,14 @@ describe("GraphQL/Profiles", () => {
       expect(profileEventsQueryErrors).toBeUndefined();
       expect(profileEventsQueryData.profile).toEqual({
         events: {
-          totalCount: 2,
+          totalCount: 3,
           items: [
+            {
+              type: "PROFILE_UPDATED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
             {
               type: "PROFILE_FIELD_FILE_REMOVED",
               user: {
@@ -4119,6 +4345,11 @@ describe("GraphQL/Profiles", () => {
                         id
                       }
                     }
+                    ... on ProfileUpdatedEvent {
+                      user {
+                        id
+                      }
+                    }
                     ... on ProfileFieldFileRemovedEvent {
                       user {
                         id
@@ -4138,8 +4369,14 @@ describe("GraphQL/Profiles", () => {
       expect(profileEventsQueryData.profile).toEqual({
         properties: [{ files: null }, { files: null }, { files: null }, { files: null }],
         events: {
-          totalCount: 4,
+          totalCount: 5,
           items: [
+            {
+              type: "PROFILE_UPDATED",
+              user: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+            },
             {
               type: "PROFILE_FIELD_FILE_REMOVED",
               user: {

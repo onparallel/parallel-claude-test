@@ -45,6 +45,8 @@ export const ProfileEvent = interfaceType({
         return "ProfileReopenedEvent";
       case "PROFILE_ANONYMIZED":
         return "ProfileAnonymizedEvent";
+      case "PROFILE_UPDATED":
+        return "ProfileUpdatedEvent";
     }
   },
   sourceType: "profileEvents.ProfileEvent",
@@ -162,3 +164,14 @@ export const ProfileReopenedEvent = createProfileEvent("ProfileReopenedEvent", (
 });
 
 export const ProfileAnonymizedEvent = createProfileEvent("ProfileAnonymizedEvent", () => {});
+
+export const ProfileUpdatedEvent = createProfileEvent("ProfileUpdatedEvent", (t) => {
+  t.nullable.field("user", {
+    type: "User",
+    resolve: async (root, _, ctx) => {
+      if (!root.data.user_id) return null;
+
+      return await ctx.users.loadUser(root.data.user_id);
+    },
+  });
+});

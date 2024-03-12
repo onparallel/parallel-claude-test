@@ -377,7 +377,8 @@ export type ProfileEventType =
   | "PROFILE_CLOSED"
   | "PROFILE_SCHEDULED_FOR_DELETION"
   | "PROFILE_REOPENED"
-  | "PROFILE_ANONYMIZED";
+  | "PROFILE_ANONYMIZED"
+  | "PROFILE_UPDATED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
@@ -391,6 +392,7 @@ export const ProfileEventTypeValues = [
   "PROFILE_SCHEDULED_FOR_DELETION",
   "PROFILE_REOPENED",
   "PROFILE_ANONYMIZED",
+  "PROFILE_UPDATED",
 ] as ProfileEventType[];
 
 export type ProfileStatus = "OPEN" | "CLOSED" | "DELETION_SCHEDULED";

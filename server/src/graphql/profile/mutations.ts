@@ -18,8 +18,14 @@ import {
   FileUpload,
   Profile,
   ProfileFieldFile,
+  ProfileFieldValue,
   ProfileTypeField,
 } from "../../db/__types";
+import {
+  ProfileFieldExpiryUpdatedEvent,
+  ProfileFieldFileAddedEvent,
+  ProfileFieldValueUpdatedEvent,
+} from "../../db/events/ProfileEvent";
 import {
   ProfileTypeFieldOptions,
   defaultProfileTypeFieldOptions,
@@ -376,11 +382,42 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             }
           }
           if (isDefined(args.data.substitutions) && args.data.substitutions.length > 0) {
-            await ctx.profiles.updateProfileFieldValueContentByProfileFieldTypeId(
-              profileTypeField.id,
-              args.data.substitutions,
-              ctx.user!.id,
-            );
+            const { currentValues, previousValues } =
+              await ctx.profiles.updateProfileFieldValueContentByProfileFieldTypeId(
+                profileTypeField.id,
+                args.data.substitutions,
+                ctx.user!.id,
+              );
+
+            const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
+            const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
+
+            if (previousValues.length > 0) {
+              await ctx.profiles.createProfileUpdatedEvents(
+                previousValues[0].profile_id,
+                previousValues.map((f) => {
+                  const current = currentByPtfId[f.profile_type_field_id] as ProfileFieldValue;
+                  const previous = previousByPtfId[f.profile_type_field_id] as ProfileFieldValue;
+
+                  return {
+                    org_id: ctx.user!.org_id,
+                    profile_id: f.profile_id,
+                    type: "PROFILE_FIELD_VALUE_UPDATED",
+                    data: {
+                      user_id: ctx.user!.id,
+                      profile_type_field_id: f.profile_type_field_id,
+                      current_profile_field_value_id: current?.id ?? null,
+                      previous_profile_field_value_id: previous?.id ?? null,
+                      alias:
+                        updateData.alias !== undefined
+                          ? updateData.alias
+                          : profileTypeField.alias ?? null,
+                    },
+                  };
+                }),
+                ctx.user!,
+              );
+            }
           }
         }
 
@@ -732,6 +769,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       return {
         ...field,
         type: profileTypeField.type,
+        alias: profileTypeField.alias,
         expiryDate: field.expiryDate
           ? // priorize expiryDate argument if set
             field.expiryDate
@@ -744,11 +782,60 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       };
     });
 
-    return (await ctx.profiles.updateProfileFieldValue(
-      profileId,
-      fieldsWithZonedExpires,
-      ctx.user!.id,
-    ))!;
+    const {
+      profile: updatedProfile,
+      currentValues,
+      previousValues,
+    } = await ctx.profiles.updateProfileFieldValue(profileId, fieldsWithZonedExpires, ctx.user!.id);
+
+    const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
+    const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
+
+    const newEventsData = fieldsWithZonedExpires.flatMap((f) => {
+      const current = currentByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
+      const previous = previousByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
+      const expiryChanged =
+        f.expiryDate !== undefined &&
+        (previous?.expiry_date?.valueOf() ?? null) !== (f.expiryDate?.valueOf() ?? null);
+      return [
+        ...(isDefined(current) || isDefined(previous)
+          ? [
+              {
+                org_id: ctx.user!.org_id,
+                profile_id: profileId,
+                type: "PROFILE_FIELD_VALUE_UPDATED",
+                data: {
+                  user_id: ctx.user!.id,
+                  profile_type_field_id: f.profileTypeFieldId,
+                  current_profile_field_value_id: current?.id ?? null,
+                  previous_profile_field_value_id: previous?.id ?? null,
+                  alias: f.alias,
+                },
+              } satisfies ProfileFieldValueUpdatedEvent<true>,
+            ]
+          : []),
+        ...(expiryChanged
+          ? [
+              {
+                org_id: ctx.user!.org_id,
+                profile_id: profileId,
+                type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                data: {
+                  user_id: ctx.user!.id,
+                  profile_type_field_id: f.profileTypeFieldId,
+                  expiry_date: current?.expiry_date ?? null,
+                  alias: f.alias,
+                },
+              } satisfies ProfileFieldExpiryUpdatedEvent<true>,
+            ]
+          : []),
+      ];
+    });
+    if (newEventsData.length > 0) {
+      await ctx.profiles.createProfileUpdatedEvents(profileId, newEventsData, ctx.user!);
+    }
+
+    return updatedProfile!;
   },
 });
 
@@ -782,6 +869,8 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     let presignedPostDatas: PresignedPost[] = [];
     let files: ProfileFieldFile[] = [];
 
+    const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
+
     if (data.length > 0) {
       fileUploads = await ctx.files.createFileUpload(
         data.map((data) => ({
@@ -811,6 +900,42 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
         expiryDate,
         ctx.user!.id,
       );
+
+      await ctx.profiles.createProfileUpdatedEvents(
+        profileId,
+        [
+          ...files.map(
+            (pff) =>
+              ({
+                org_id: ctx.user!.org_id,
+                profile_id: pff.profile_id,
+                type: "PROFILE_FIELD_FILE_ADDED",
+                data: {
+                  user_id: ctx.user!.id,
+                  profile_type_field_id: profileTypeFieldId,
+                  profile_field_file_id: pff.id,
+                  alias: profileTypeField?.alias ?? null,
+                },
+              }) satisfies ProfileFieldFileAddedEvent<true>,
+          ),
+          ...(expiryDate !== undefined
+            ? [
+                {
+                  org_id: ctx.user!.org_id,
+                  profile_id: profileId,
+                  type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    profile_type_field_id: profileTypeFieldId,
+                    expiry_date: expiryDate ?? null,
+                    alias: profileTypeField?.alias ?? null,
+                  },
+                } satisfies ProfileFieldExpiryUpdatedEvent<true>,
+              ]
+            : []),
+        ],
+        ctx.user!,
+      );
     } else {
       // no new files, update expiryDate on all uploaded files
       await ctx.profiles.updateProfileFieldFilesExpiryDate(
@@ -819,16 +944,21 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
         expiryDate ?? null,
       );
 
-      await ctx.profiles.createEvent({
-        type: "PROFILE_FIELD_EXPIRY_UPDATED",
-        org_id: ctx.user!.org_id,
-        profile_id: profileId,
-        data: {
-          user_id: ctx.user!.id,
-          expiry_date: expiryDate ?? null,
-          profile_type_field_id: profileTypeFieldId,
+      await ctx.profiles.createProfileUpdatedEvents(
+        profileId,
+        {
+          type: "PROFILE_FIELD_EXPIRY_UPDATED",
+          org_id: ctx.user!.org_id,
+          profile_id: profileId,
+          data: {
+            user_id: ctx.user!.id,
+            expiry_date: expiryDate ?? null,
+            profile_type_field_id: profileTypeFieldId,
+            alias: profileTypeField?.alias ?? null,
+          },
         },
-      });
+        ctx.user!,
+      );
     }
 
     ctx.profiles.loadProfileFieldFiles.dataloader.clear({ profileId, profileTypeFieldId });
@@ -924,19 +1054,25 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
           ctx.user!.id,
         );
       }
+      const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
 
-      await ctx.profiles.createEvent(
-        deletedProfileFieldFiles.map((f) => ({
-          type: "PROFILE_FIELD_FILE_REMOVED",
-          profile_id: profileId,
-          org_id: ctx.user!.org_id,
-          data: {
-            user_id: ctx.user!.id,
-            profile_type_field_id: profileTypeFieldId,
-            profile_field_file_id: f.id,
-          },
-        })),
-      );
+      if (deletedProfileFieldFiles.length > 0) {
+        await ctx.profiles.createProfileUpdatedEvents(
+          profileId,
+          deletedProfileFieldFiles.map((f) => ({
+            type: "PROFILE_FIELD_FILE_REMOVED",
+            profile_id: profileId,
+            org_id: ctx.user!.org_id,
+            data: {
+              user_id: ctx.user!.id,
+              profile_type_field_id: profileTypeFieldId,
+              profile_field_file_id: f.id,
+              alias: profileTypeField?.alias ?? null,
+            },
+          })),
+          ctx.user!,
+        );
+      }
 
       return RESULT.SUCCESS;
     } catch {
@@ -977,13 +1113,53 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
 
     const clonedFiles = await ctx.files.cloneFileUpload(fileUploadIds);
 
-    return await ctx.profiles.createProfileFieldFiles(
+    const files = await ctx.profiles.createProfileFieldFiles(
       profileId,
       profileTypeFieldId,
       clonedFiles.map((f) => f.id),
       expiryDate,
       ctx.user!.id,
     );
+
+    const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
+
+    await ctx.profiles.createProfileUpdatedEvents(
+      profileId,
+      [
+        ...files.map(
+          (pff) =>
+            ({
+              org_id: ctx.user!.org_id,
+              profile_id: pff.profile_id,
+              type: "PROFILE_FIELD_FILE_ADDED",
+              data: {
+                user_id: ctx.user!.id,
+                profile_type_field_id: profileTypeFieldId,
+                profile_field_file_id: pff.id,
+                alias: profileTypeField?.alias ?? null,
+              },
+            }) satisfies ProfileFieldFileAddedEvent<true>,
+        ),
+        ...(expiryDate !== undefined
+          ? [
+              {
+                org_id: ctx.user!.org_id,
+                profile_id: profileId,
+                type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                data: {
+                  user_id: ctx.user!.id,
+                  profile_type_field_id: profileTypeFieldId,
+                  expiry_date: expiryDate ?? null,
+                  alias: profileTypeField?.alias ?? null,
+                },
+              } satisfies ProfileFieldExpiryUpdatedEvent<true>,
+            ]
+          : []),
+      ],
+      ctx.user!,
+    );
+
+    return files;
   },
 });
 

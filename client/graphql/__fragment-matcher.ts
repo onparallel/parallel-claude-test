@@ -106,6 +106,7 @@ const result: PossibleTypesResultData = {
       "ProfileFieldValueUpdatedEvent",
       "ProfileReopenedEvent",
       "ProfileScheduledForDeletionEvent",
+      "ProfileUpdatedEvent",
     ],
     ProfileFieldResponse: ["ProfileFieldFile", "ProfileFieldValue"],
     PublicUserOrContact: ["PublicContact", "PublicUser"],

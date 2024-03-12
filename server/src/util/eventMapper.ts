@@ -401,6 +401,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
         userId: toGlobalId("User", event.data.user_id),
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         expiryDate: event.data.expiry_date,
+        alias: event.data.alias,
       };
     }
     case "PROFILE_FIELD_FILE_ADDED": {
@@ -408,6 +409,7 @@ export function mapProfileEventPayload(event: ProfileEvent) {
         userId: toGlobalId("User", event.data.user_id),
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         profileFieldFileId: toGlobalId("ProfileFieldFile", event.data.profile_field_file_id),
+        alias: event.data.alias,
       };
     }
     case "PROFILE_FIELD_FILE_REMOVED": {
@@ -415,12 +417,14 @@ export function mapProfileEventPayload(event: ProfileEvent) {
         userId: toGlobalId("User", event.data.user_id),
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         profileFieldFileId: toGlobalId("ProfileFieldFile", event.data.profile_field_file_id),
+        alias: event.data.alias,
       };
     }
     case "PROFILE_FIELD_VALUE_UPDATED": {
       return {
         userId: toGlobalId("User", event.data.user_id),
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
+        alias: event.data.alias,
       };
     }
     case "PROFILE_REOPENED": {
@@ -431,6 +435,11 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     case "PROFILE_SCHEDULED_FOR_DELETION": {
       return {
         userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "PROFILE_UPDATED": {
+      return {
+        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
       };
     }
     default:

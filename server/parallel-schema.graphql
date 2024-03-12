@@ -5146,6 +5146,7 @@ enum ProfileEventType {
   PROFILE_FIELD_VALUE_UPDATED
   PROFILE_REOPENED
   PROFILE_SCHEDULED_FOR_DELETION
+  PROFILE_UPDATED
 }
 
 type ProfileFieldExpiryUpdatedEvent implements ProfileEvent {
@@ -5424,6 +5425,15 @@ type ProfileTypePagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type ProfileUpdatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
 }
 
 type PublicAccessVerification {

@@ -4002,7 +4002,8 @@ export type ProfileEventType =
   | "PROFILE_FIELD_FILE_REMOVED"
   | "PROFILE_FIELD_VALUE_UPDATED"
   | "PROFILE_REOPENED"
-  | "PROFILE_SCHEDULED_FOR_DELETION";
+  | "PROFILE_SCHEDULED_FOR_DELETION"
+  | "PROFILE_UPDATED";
 
 export type ProfileFieldExpiryUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
@@ -4215,6 +4216,15 @@ export type ProfileTypePagination = {
   items: Array<ProfileType>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"]["output"];
+};
+
+export type ProfileUpdatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
 };
 
 export type PublicAccessVerification = {

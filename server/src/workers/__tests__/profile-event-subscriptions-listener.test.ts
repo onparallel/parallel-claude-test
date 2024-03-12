@@ -301,6 +301,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           profile_type_field_id: profileTypeFields[1].id,
           current_profile_field_value_id: null,
           previous_profile_field_value_id: null,
+          alias: null,
         },
       },
       ctx,
@@ -313,6 +314,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       data: {
         userId: toGlobalId("User", users[0].id),
         profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+        alias: null,
       },
       createdAt: event.created_at,
     });
@@ -401,6 +403,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           user_id: users[4].id,
           profile_type_field_id: profileTypeFields[1].id,
           profile_field_file_id: 0,
+          alias: null,
         },
       },
       ctx,
@@ -414,6 +417,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
         userId: toGlobalId("User", users[4].id),
         profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
         profileFieldFileId: toGlobalId("ProfileFieldFile", 0),
+        alias: null,
       },
       createdAt: event.created_at,
     });

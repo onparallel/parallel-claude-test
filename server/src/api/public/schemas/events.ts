@@ -936,6 +936,11 @@ const ProfileEventSchemas = {
         format: "date",
         example: new Date(2020, 2, 15).toISOString(),
       },
+      alias: {
+        description: "The alias of the profile field",
+        type: "string",
+        example: "passport",
+      },
     },
   },
   PROFILE_FIELD_FILE_ADDED: {
@@ -955,6 +960,11 @@ const ProfileEventSchemas = {
         description: "The ID of the file",
         type: "string",
         example: toGlobalId("ProfileFieldFile", 1),
+      },
+      alias: {
+        description: "The alias of the profile field",
+        type: "string",
+        example: "passport",
       },
     },
   },
@@ -976,6 +986,11 @@ const ProfileEventSchemas = {
         type: "string",
         example: toGlobalId("ProfileFieldFile", 1),
       },
+      alias: {
+        description: "The alias of the profile field",
+        type: "string",
+        example: "passport",
+      },
     },
   },
   PROFILE_FIELD_VALUE_UPDATED: {
@@ -990,6 +1005,11 @@ const ProfileEventSchemas = {
         description: "The ID of the profile field",
         type: "string",
         example: toGlobalId("ProfileTypeField", 1),
+      },
+      alias: {
+        description: "The alias of the profile field",
+        type: "string",
+        example: "passport_number",
       },
     },
   },
@@ -1009,6 +1029,18 @@ const ProfileEventSchemas = {
       userId: {
         description: "The ID of the user that scheduled the profile for deletion",
         type: "string",
+        example: toGlobalId("User", 1),
+      },
+    },
+  },
+  PROFILE_UPDATED: {
+    description:
+      "A property on the profile has been updated. This event will arrive after `PROFILE_FIELD_EXPIRY_UPDATED`, `PROFILE_FIELD_FILE_ADDED`, `PROFILE_FIELD_FILE_REMOVED` and `PROFILE_FIELD_VALUE_UPDATED`, providing a single event for all of those updates.",
+    properties: {
+      userId: {
+        type: ["string", "null"],
+        description:
+          "The ID of the user that updated the property. Null means the property was updated by monitoring rules.",
         example: toGlobalId("User", 1),
       },
     },
