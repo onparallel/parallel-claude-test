@@ -136,7 +136,9 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
           date,
         },
       );
-    } else if (["zas25KHxAByKXKRCYU4", "zas25KHxAByKXKUbz48"].includes(templateId)) {
+    } else if (
+      ["zas25KHxAByKXKRCYU4", "zas25KHxAByKXKUbz48", "6Y8DSH92uxPaJ4B9sFhHo"].includes(templateId)
+    ) {
       signers.push({
         fullName: "Juan Francisco Sahuquillo Cebrián",
         signatureImageUrl:
