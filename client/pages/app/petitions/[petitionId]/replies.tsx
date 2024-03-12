@@ -5,8 +5,6 @@ import {
   Flex,
   HStack,
   Heading,
-  MenuItem,
-  MenuList,
   Stack,
   Tab,
   TabList,
@@ -27,12 +25,12 @@ import {
   SparklesIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
-import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
 import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -540,8 +538,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           {displayPetitionLimitReachedAlert ? (
             <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
           ) : null}
-          <Stack direction="row" paddingX={4} paddingY={2}>
+          <HStack paddingX={4} paddingY={2}>
             <IconButtonWithTooltip
+              display={{ base: "none", md: "inline" }}
               onClick={() => refetch()}
               icon={<RepeatIcon />}
               placement="bottom"
@@ -590,11 +589,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             {me.hasProfilesAccess &&
             ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
               petition.profiles.length > 0) ? (
-              <Button
+              <ResponsiveButtonIcon
                 data-action="associate-profile"
                 colorScheme="primary"
-                leftIcon={<ProfilesIcon />}
-                isDisabled={petition.isAnonymized}
+                icon={<ProfilesIcon />}
                 onClick={() =>
                   petition.profiles.length
                     ? setQueryState({
@@ -603,58 +601,42 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       })
                     : handleAssociateProfile()
                 }
-              >
-                <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-                  {petition.profiles.length ? (
-                    <FormattedMessage
-                      id="page.replies.open-profile-button"
-                      defaultMessage="Open profile"
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="page.replies.associate-profile-button"
-                      defaultMessage="Associate profile"
-                    />
-                  )}
-                </Text>
-              </Button>
+                label={
+                  petition.profiles.length
+                    ? intl.formatMessage({
+                        id: "page.replies.open-profile-button",
+                        defaultMessage: "Open profile",
+                      })
+                    : intl.formatMessage({
+                        id: "page.replies.associate-profile-button",
+                        defaultMessage: "Associate profile",
+                      })
+                }
+              />
             ) : null}
             {showDownloadAll && !petition.isAnonymized ? (
-              petition.isDocumentGenerationEnabled ? (
-                <ButtonWithMoreOptions
-                  leftIcon={<FilePdfIcon boxSize={5} />}
-                  onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
-                  options={
-                    <MenuList minWidth="0">
-                      <MenuItem onClick={handleDownloadAllClick}>
-                        <Text>
-                          <FormattedMessage
-                            id="page.replies.export-replies"
-                            defaultMessage="Export replies"
-                          />
-                        </Text>
-                      </MenuItem>
-                    </MenuList>
-                  }
-                >
-                  <FormattedMessage
-                    id="page.petition-replies.export-pdf"
-                    defaultMessage="Export to PDF"
-                  />
-                </ButtonWithMoreOptions>
-              ) : (
-                <Button
-                  leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+              <>
+                <ResponsiveButtonIcon
+                  icon={<DownloadIcon fontSize="lg" display="block" />}
                   onClick={handleDownloadAllClick}
-                >
-                  <FormattedMessage
-                    id="page.replies.export-replies"
-                    defaultMessage="Export replies"
+                  label={intl.formatMessage({
+                    id: "page.replies.export-replies",
+                    defaultMessage: "Export replies",
+                  })}
+                />
+                {petition.isDocumentGenerationEnabled ? (
+                  <ResponsiveButtonIcon
+                    icon={<FilePdfIcon fontSize="lg" display="block" />}
+                    onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
+                    label={intl.formatMessage({
+                      id: "page.petition-replies.export-pdf",
+                      defaultMessage: "Export to PDF",
+                    })}
                   />
-                </Button>
-              )
+                ) : null}
+              </>
             ) : null}
-          </Stack>
+          </HStack>
           <Divider />
         </>
       }
