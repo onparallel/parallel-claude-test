@@ -1036,6 +1036,7 @@ export class ProfileRepository extends BaseRepository {
       and type = 'PROFILE_UPDATED'
       `,
       [profileId],
+      t,
     );
 
     await this.createEvent(events, t);
