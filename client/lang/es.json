@@ -6640,6 +6640,11 @@
     "context": "Suggested property: <b>{label}</b>"
   },
   {
+    "term": "component.profile-type-header.archive-label",
+    "definition": "Archivar tipo de perfil",
+    "context": "Archive profile type"
+  },
+  {
     "term": "component.profile-type-header.clone-label",
     "definition": "Duplicar tipo de perfil",
     "context": "Clone profile type"
@@ -6648,6 +6653,11 @@
     "term": "component.profile-type-header.delete-label",
     "definition": "Eliminar tipo de perfil",
     "context": "Delete profile type"
+  },
+  {
+    "term": "component.profile-type-header.unarchive-label",
+    "definition": "Recuperar tipo de perfil",
+    "context": "Unarchive profile type"
   },
   {
     "term": "component.profile-type-select.placeholder",
@@ -9046,7 +9056,7 @@
   },
   {
     "term": "component.unarchive-profile-type-dialog.title",
-    "definition": "Recuperar tipo de perfil ",
+    "definition": "Recuperar tipo de perfil",
     "context": "Unarchive profile type"
   },
   {
@@ -12163,6 +12173,11 @@
     "term": "page.organization-profile-type.add-profile-type-field",
     "definition": "Añadir propiedad",
     "context": "Add property"
+  },
+  {
+    "term": "page.organization-profile-type.archived-profile-type-alert-description",
+    "definition": "Este tipo de perfil está archivado y no podrá utilizarse para crear nuevos perfiles. Si quieres, puedes <a>recuperarlo</a> para seguir utilizándolo.",
+    "context": "This profile type is archived and cannot be used to create new profiles. If you want, you can <a>retrieve</a> it to continue using it."
   },
   {
     "term": "page.organization-profile-type.changes-saved",

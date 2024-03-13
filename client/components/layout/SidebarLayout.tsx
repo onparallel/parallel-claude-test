@@ -17,6 +17,7 @@ export interface SidebarLayoutProps extends SidebarLayout_QueryFragment {
   isBase?: boolean;
   showBackButton?: boolean;
   header?: ReactNode;
+  subHeader?: ReactNode;
   children?: ReactNode;
 }
 
@@ -30,6 +31,7 @@ export function SidebarLayout({
   isBase,
   showBackButton,
   header,
+  subHeader,
   children,
 }: SidebarLayoutProps) {
   const intl = useIntl();
@@ -115,6 +117,7 @@ export function SidebarLayout({
               </NakedLink>
               {header}
             </Flex>
+            {subHeader ? <Box>{subHeader}</Box> : null}
             <Flex
               direction="column"
               flex="1"

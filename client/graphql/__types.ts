@@ -26780,6 +26780,7 @@ export type OrganizationProfileType_ProfileTypeFragment = {
   name: { [locale in UserLocale]?: string };
   profileNamePattern: string;
   createdAt: string;
+  archivedAt?: string | null;
   fields: Array<{
     __typename?: "ProfileTypeField";
     id: string;
@@ -26829,6 +26830,7 @@ export type OrganizationProfileType_profileTypeQuery = {
     name: { [locale in UserLocale]?: string };
     profileNamePattern: string;
     createdAt: string;
+    archivedAt?: string | null;
     fields: Array<{
       __typename?: "ProfileTypeField";
       id: string;
@@ -26963,6 +26965,7 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
     name: { [locale in UserLocale]?: string };
     profileNamePattern: string;
     createdAt: string;
+    archivedAt?: string | null;
     fields: Array<{
       __typename?: "ProfileTypeField";
       id: string;
@@ -27014,6 +27017,7 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
     name: { [locale in UserLocale]?: string };
     profileNamePattern: string;
     createdAt: string;
+    archivedAt?: string | null;
     fields: Array<{
       __typename?: "ProfileTypeField";
       id: string;
@@ -27065,6 +27069,7 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
     name: { [locale in UserLocale]?: string };
     profileNamePattern: string;
     createdAt: string;
+    archivedAt?: string | null;
     fields: Array<{
       __typename?: "ProfileTypeField";
       id: string;
@@ -27163,6 +27168,7 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
     name: { [locale in UserLocale]?: string };
     profileNamePattern: string;
     createdAt: string;
+    archivedAt?: string | null;
     fields: Array<{
       __typename?: "ProfileTypeField";
       id: string;
@@ -27313,6 +27319,7 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
     name: { [locale in UserLocale]?: string };
     profileNamePattern: string;
     createdAt: string;
+    archivedAt?: string | null;
     fields: Array<{
       __typename?: "ProfileTypeField";
       id: string;
@@ -49302,6 +49309,18 @@ export const ProfileTypeSettings_ProfileTypeFragmentDoc = gql`
   }
   ${ProfileTypeSettings_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileTypeSettings_ProfileTypeFragment, unknown>;
+export const useArchiveProfileType_ProfileTypeFragmentDoc = gql`
+  fragment useArchiveProfileType_ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<useArchiveProfileType_ProfileTypeFragment, unknown>;
+export const useUnarchiveProfileType_ProfileTypeFragmentDoc = gql`
+  fragment useUnarchiveProfileType_ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<useUnarchiveProfileType_ProfileTypeFragment, unknown>;
 export const OrganizationProfileType_ProfileTypeFragmentDoc = gql`
   fragment OrganizationProfileType_ProfileType on ProfileType {
     id
@@ -49311,10 +49330,15 @@ export const OrganizationProfileType_ProfileTypeFragmentDoc = gql`
     }
     profileNamePattern
     createdAt
+    archivedAt
     ...ProfileTypeSettings_ProfileType
+    ...useArchiveProfileType_ProfileType
+    ...useUnarchiveProfileType_ProfileType
   }
   ${OrganizationProfileType_ProfileTypeFieldFragmentDoc}
   ${ProfileTypeSettings_ProfileTypeFragmentDoc}
+  ${useArchiveProfileType_ProfileTypeFragmentDoc}
+  ${useUnarchiveProfileType_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileType_ProfileTypeFragment, unknown>;
 export const useDeleteProfileType_ProfileTypeFragmentDoc = gql`
   fragment useDeleteProfileType_ProfileType on ProfileType {
@@ -49322,12 +49346,6 @@ export const useDeleteProfileType_ProfileTypeFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<useDeleteProfileType_ProfileTypeFragment, unknown>;
-export const useArchiveProfileType_ProfileTypeFragmentDoc = gql`
-  fragment useArchiveProfileType_ProfileType on ProfileType {
-    id
-    name
-  }
-` as unknown as DocumentNode<useArchiveProfileType_ProfileTypeFragment, unknown>;
 export const OrganizationProfileTypes_ProfileTypeFragmentDoc = gql`
   fragment OrganizationProfileTypes_ProfileType on ProfileType {
     id
@@ -54506,12 +54524,6 @@ export const usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc = gql`
   }
   ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<usePetitionCommentsMutations_PetitionFieldCommentFragment, unknown>;
-export const useUnarchiveProfileType_ProfileTypeFragmentDoc = gql`
-  fragment useUnarchiveProfileType_ProfileType on ProfileType {
-    id
-    name
-  }
-` as unknown as DocumentNode<useUnarchiveProfileType_ProfileTypeFragment, unknown>;
 export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
   fragment useUpdateIsReadNotification_PetitionFieldComment on PetitionFieldComment {
     id

@@ -141,6 +141,7 @@ export const cloneProfileType = mutationField("cloneProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    not(profileTypeIsArchived("profileTypeId")),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),

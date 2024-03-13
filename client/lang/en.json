@@ -6640,6 +6640,11 @@
     "context": "Suggested property: <b>{label}</b>"
   },
   {
+    "term": "component.profile-type-header.archive-label",
+    "definition": "Archive profile type",
+    "context": "Archive profile type"
+  },
+  {
     "term": "component.profile-type-header.clone-label",
     "definition": "Clone profile type",
     "context": "Clone profile type"
@@ -6648,6 +6653,11 @@
     "term": "component.profile-type-header.delete-label",
     "definition": "Delete profile type",
     "context": "Delete profile type"
+  },
+  {
+    "term": "component.profile-type-header.unarchive-label",
+    "definition": "Unarchive profile type",
+    "context": "Unarchive profile type"
   },
   {
     "term": "component.profile-type-select.placeholder",
@@ -12163,6 +12173,11 @@
     "term": "page.organization-profile-type.add-profile-type-field",
     "definition": "Add property",
     "context": "Add property"
+  },
+  {
+    "term": "page.organization-profile-type.archived-profile-type-alert-description",
+    "definition": "This profile type is archived and cannot be used to create new profiles. If you want, you can <a>retrieve</a> it to continue using it.",
+    "context": "This profile type is archived and cannot be used to create new profiles. If you want, you can <a>retrieve</a> it to continue using it."
   },
   {
     "term": "page.organization-profile-type.changes-saved",

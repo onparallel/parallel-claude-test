@@ -1,5 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   ButtonProps,
   Flex,
   Heading,
@@ -9,7 +12,7 @@ import {
   MenuList,
   useToast,
 } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon, EditSimpleIcon, EyeIcon } from "@parallel/chakra/icons";
+import { ArchiveIcon, CopyIcon, DeleteIcon, EditSimpleIcon, EyeIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -69,6 +72,8 @@ import {
 } from "react";
 import { identity, noop } from "remeda";
 import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
+import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
+import { useUnarchiveProfileType } from "@parallel/utils/mutations/useUnarchiveProfileType";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -171,6 +176,22 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       if (res === "SUCCESS") {
         router.push("/app/organization/profiles/types/");
       }
+    } catch {}
+  };
+
+  const archiveProfileType = useArchiveProfileType();
+  const handleArchiveProfileType = async () => {
+    try {
+      await archiveProfileType({ profileTypes: [profileType] });
+      await refetch();
+    } catch {}
+  };
+
+  const unarchiveProfileType = useUnarchiveProfileType();
+  const handleUnarchiveProfileType = async () => {
+    try {
+      await unarchiveProfileType({ profileTypes: [profileType] });
+      await refetch();
     } catch {}
   };
 
@@ -357,31 +378,80 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
               variant="outline"
               options={
                 <MenuList>
-                  <MenuItem
-                    onClick={handleCloneProfileType}
-                    icon={<CopyIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="component.profile-type-header.clone-label"
-                      defaultMessage="Clone profile type"
-                    />
-                  </MenuItem>
+                  {profileType.archivedAt ? (
+                    <MenuItem
+                      onClick={handleUnarchiveProfileType}
+                      icon={<ArchiveIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.profile-type-header.unarchive-label"
+                        defaultMessage="Unarchive profile type"
+                      />
+                    </MenuItem>
+                  ) : (
+                    <MenuItem
+                      onClick={handleCloneProfileType}
+                      icon={<CopyIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.profile-type-header.clone-label"
+                        defaultMessage="Clone profile type"
+                      />
+                    </MenuItem>
+                  )}
                   <MenuDivider />
-                  <MenuItem
-                    color="red.500"
-                    onClick={handleDeleteProfileType}
-                    icon={<DeleteIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="component.profile-type-header.delete-label"
-                      defaultMessage="Delete profile type"
-                    />
-                  </MenuItem>
+                  {profileType.archivedAt ? (
+                    <MenuItem
+                      color="red.500"
+                      onClick={handleDeleteProfileType}
+                      icon={<DeleteIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.profile-type-header.delete-label"
+                        defaultMessage="Delete profile type"
+                      />
+                    </MenuItem>
+                  ) : (
+                    <MenuItem
+                      color="red.500"
+                      onClick={handleArchiveProfileType}
+                      icon={<ArchiveIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.profile-type-header.archive-label"
+                        defaultMessage="Archive profile type"
+                      />
+                    </MenuItem>
+                  )}
                 </MenuList>
               }
             />
           </WhenPermission>
         </Flex>
+      }
+      subHeader={
+        profileType.archivedAt ? (
+          <Alert status="info">
+            <AlertIcon />
+            <AlertDescription>
+              <FormattedMessage
+                id="page.organization-profile-type.archived-profile-type-alert-description"
+                defaultMessage="This profile type is archived and cannot be used to create new profiles. If you want, you can <a>retrieve</a> it to continue using it."
+                values={{
+                  a: (chunks: ReactNode) => (
+                    <Button
+                      variant="link"
+                      colorScheme="primary"
+                      onClick={handleUnarchiveProfileType}
+                    >
+                      {chunks}
+                    </Button>
+                  ),
+                }}
+              />
+            </AlertDescription>
+          </Alert>
+        ) : null
       }
       showBackButton={true}
     >
@@ -783,10 +853,15 @@ const _fragments = {
         }
         profileNamePattern
         createdAt
+        archivedAt
         ...ProfileTypeSettings_ProfileType
+        ...useArchiveProfileType_ProfileType
+        ...useUnarchiveProfileType_ProfileType
       }
       ${this.ProfileTypeField}
       ${ProfileTypeSettings.fragments.ProfileType}
+      ${useArchiveProfileType.fragments.ProfileType}
+      ${useUnarchiveProfileType.fragments.ProfileType}
     `;
   },
 };
