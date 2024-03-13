@@ -137,7 +137,12 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
         },
       );
     } else if (
-      ["zas25KHxAByKXKRCYU4", "zas25KHxAByKXKUbz48", "6Y8DSH92uxPaJ4B9sFhHo"].includes(templateId)
+      [
+        "zas25KHxAByKXKRCYU4",
+        "zas25KHxAByKXKUbz48",
+        "6Y8DSH92uxPaJ4B9sFhHo",
+        "6Y8DSH92uxPaJ4B9sFhSu",
+      ].includes(templateId)
     ) {
       signers.push({
         fullName: "Juan Francisco Sahuquillo Cebrián",
