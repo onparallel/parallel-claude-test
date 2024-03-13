@@ -218,20 +218,20 @@ function PublicPetitionLink({
               {step === "REMINDER_SENT" ? (
                 <PublicPetitionReminder
                   organizationName={organization.name}
-                  logoUrl={organization.logoUrl}
+                  logoUrl={organization.logoUrl340x160}
                   email={submittedData?.email ?? ""}
                 />
               ) : step === "EMAIL_SENT" ? (
                 <PublicPetitionEmailSent
                   organizationName={organization.name}
-                  logoUrl={organization.logoUrl}
+                  logoUrl={organization.logoUrl340x160}
                   email={submittedData?.email ?? ""}
                 />
               ) : step === "EMAIL_EXISTS" ? (
                 publicPetitionLink.allowMultiplePetitions ? (
                   <PublicPetitionEmailExists
                     organizationName={organization.name}
-                    logoUrl={organization.logoUrl}
+                    logoUrl={organization.logoUrl340x160}
                     onContinue={handleContinueExisting}
                     onNewPetition={handleNewPublicPetition}
                     isNewRequestLoading={loading}
@@ -240,7 +240,7 @@ function PublicPetitionLink({
                 ) : (
                   <PublicPetitionEmailSent
                     organizationName={organization.name}
-                    logoUrl={organization.logoUrl}
+                    logoUrl={organization.logoUrl340x160}
                     email={submittedData?.email ?? ""}
                     hasExistingProcess={true}
                   />
@@ -248,7 +248,7 @@ function PublicPetitionLink({
               ) : (
                 <PublicPetitionInitialForm
                   organizationName={organization.name}
-                  logoUrl={organization.logoUrl}
+                  logoUrl={organization.logoUrl340x160}
                   title={title}
                   description={description}
                   onSubmit={onSubmit}
@@ -303,7 +303,7 @@ PublicPetitionLink.fragments = {
         email
         organization {
           name
-          logoUrl
+          logoUrl340x160: logoUrl(options: { resize: { width: 340, height: 160, fit: inside } })
           hasRemoveParallelBranding
           brandTheme {
             fontFamily

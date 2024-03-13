@@ -87,13 +87,16 @@ export function PublicPetitionInitialForm({
         alignItems="flex-start"
       >
         {logoUrl ? (
-          <Img
-            src={logoUrl}
-            aria-label={organizationName}
-            width="auto"
-            height="40px"
-            objectFit="contain"
-          />
+          <Box maxWidth="170px">
+            <Img
+              src={logoUrl}
+              aria-label={organizationName}
+              width="auto"
+              height="auto"
+              maxHeight="80px"
+              objectFit="contain"
+            />
+          </Box>
         ) : (
           <Logo width="152px" height="40px" />
         )}

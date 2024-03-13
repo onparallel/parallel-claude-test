@@ -22029,7 +22029,7 @@ export type RecipientViewContactlessForm_PublicOrganizationFragment = {
   __typename?: "PublicOrganization";
   name: string;
   hasRemoveParallelBranding: boolean;
-  logoUrl340?: string | null;
+  logoUrl340x160?: string | null;
 };
 
 export type RecipientViewContactlessForm_publicSendVerificationCodeMutationVariables = Exact<{
@@ -22373,7 +22373,7 @@ export type RecipientViewNewDevice_PublicOrganizationFragment = {
   __typename?: "PublicOrganization";
   name: string;
   hasRemoveParallelBranding: boolean;
-  logoUrl340?: string | null;
+  logoUrl340x160?: string | null;
 };
 
 export type RecipientViewNewDevice_publicSendVerificationCodeMutationVariables = Exact<{
@@ -43240,7 +43240,7 @@ export type RecipientViewVerify_PublicAccessVerificationFragment = {
     id: string;
     hasRemoveParallelBranding: boolean;
     name: string;
-    logoUrl340?: string | null;
+    logoUrl340x160?: string | null;
     brandTheme: {
       __typename?: "OrganizationBrandThemeData";
       preferredTone: Tone;
@@ -43271,7 +43271,7 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
       id: string;
       hasRemoveParallelBranding: boolean;
       name: string;
-      logoUrl340?: string | null;
+      logoUrl340x160?: string | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         preferredTone: Tone;
@@ -43322,8 +43322,8 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
     organization: {
       __typename?: "PublicOrganization";
       name: string;
-      logoUrl?: string | null;
       hasRemoveParallelBranding: boolean;
+      logoUrl340x160?: string | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         fontFamily?: string | null;
@@ -43373,8 +43373,8 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
       organization: {
         __typename?: "PublicOrganization";
         name: string;
-        logoUrl?: string | null;
         hasRemoveParallelBranding: boolean;
+        logoUrl340x160?: string | null;
         brandTheme: {
           __typename?: "OrganizationBrandThemeData";
           fontFamily?: string | null;
@@ -43582,7 +43582,7 @@ export type ThanksForSigning_PublicOrganizationFragment = {
   __typename?: "PublicOrganization";
   name: string;
   hasRemoveParallelBranding: boolean;
-  logoUrl340?: string | null;
+  logoUrl400?: string | null;
   brandTheme: {
     __typename?: "OrganizationBrandThemeData";
     color: string;
@@ -43599,7 +43599,7 @@ export type Thanks_publicOrganizationQuery = {
     __typename?: "PublicOrganization";
     name: string;
     hasRemoveParallelBranding: boolean;
-    logoUrl340?: string | null;
+    logoUrl400?: string | null;
     brandTheme: {
       __typename?: "OrganizationBrandThemeData";
       color: string;
@@ -54381,14 +54381,14 @@ export const RecipientPortal_PublicPetitionAccessFragmentDoc = gql`
 export const RecipientViewContactlessForm_PublicOrganizationFragmentDoc = gql`
   fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
     name
-    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    logoUrl340x160: logoUrl(options: { resize: { width: 340, height: 160, fit: inside } })
     hasRemoveParallelBranding
   }
 ` as unknown as DocumentNode<RecipientViewContactlessForm_PublicOrganizationFragment, unknown>;
 export const RecipientViewNewDevice_PublicOrganizationFragmentDoc = gql`
   fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
     name
-    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    logoUrl340x160: logoUrl(options: { resize: { width: 340, height: 160, fit: inside } })
     hasRemoveParallelBranding
   }
 ` as unknown as DocumentNode<RecipientViewNewDevice_PublicOrganizationFragment, unknown>;
@@ -54431,7 +54431,7 @@ export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
       email
       organization {
         name
-        logoUrl
+        logoUrl340x160: logoUrl(options: { resize: { width: 340, height: 160, fit: inside } })
         hasRemoveParallelBranding
         brandTheme {
           fontFamily
@@ -54481,7 +54481,7 @@ export const LandintTemplatesCategory_LandingTemplateCategorySampleFragmentDoc =
 export const ThanksForSigning_PublicOrganizationFragmentDoc = gql`
   fragment ThanksForSigning_PublicOrganization on PublicOrganization {
     name
-    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    logoUrl400: logoUrl(options: { resize: { width: 400, height: 400, fit: inside } })
     hasRemoveParallelBranding
     brandTheme {
       ...OverrideWithOrganizationTheme_OrganizationBrandThemeData

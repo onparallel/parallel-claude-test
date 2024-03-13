@@ -48,8 +48,8 @@ function ThanksForSigning() {
           justifyContent="center"
         >
           <Center>
-            {isDefined(organization.logoUrl340) ? (
-              <Image src={organization.logoUrl340} width="200px" />
+            {isDefined(organization.logoUrl400) ? (
+              <Image src={organization.logoUrl400} maxWidth="200px" maxHeight="200px" />
             ) : (
               <Logo width="200px" />
             )}
@@ -144,7 +144,7 @@ ThanksForSigning.fragments = {
   PublicOrganization: gql`
     fragment ThanksForSigning_PublicOrganization on PublicOrganization {
       name
-      logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+      logoUrl400: logoUrl(options: { resize: { width: 400, height: 400, fit: inside } })
       hasRemoveParallelBranding
       brandTheme {
         ...OverrideWithOrganizationTheme_OrganizationBrandThemeData

@@ -271,14 +271,15 @@ export function RecipientViewContactlessForm({
       position="relative"
     >
       <Stack spacing={8}>
-        <Box>
-          {organization.logoUrl340 ? (
+        <Box maxWidth="170px">
+          {organization.logoUrl340x160 ? (
             <Image
               alt={organization.name}
-              src={organization.logoUrl340}
+              src={organization.logoUrl340x160}
               objectFit="contain"
-              width="170px"
-              height="60px"
+              width="auto"
+              height="auto"
+              maxHeight="80px"
             />
           ) : (
             <Logo width="170px" />
@@ -518,7 +519,7 @@ RecipientViewContactlessForm.fragments = {
   PublicOrganization: gql`
     fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
       name
-      logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+      logoUrl340x160: logoUrl(options: { resize: { width: 340, height: 160, fit: inside } })
       hasRemoveParallelBranding
     }
   `,

@@ -32,7 +32,9 @@ export function PublicPetitionEmailExists({
           src={logoUrl}
           aria-label={organizationName}
           width="auto"
-          height="40px"
+          maxWidth="170px"
+          height="auto"
+          maxHeight="80px"
           objectFit="contain"
         />
       ) : (
