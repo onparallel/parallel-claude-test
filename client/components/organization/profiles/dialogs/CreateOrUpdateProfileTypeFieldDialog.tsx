@@ -57,10 +57,14 @@ import { Reorder, useDragControls } from "framer-motion";
 import { nanoid } from "nanoid";
 import { KeyboardEvent, useCallback } from "react";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit, pick } from "remeda";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { isDefined, omit, pick, times, zip } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
 import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
+import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
+import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
+import { generateExcel } from "@parallel/utils/generateExcel";
+import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
 
 interface CreateOrUpdateProfileTypeFieldDialogProps {
   profileTypeId: string;
@@ -505,14 +509,14 @@ function CreateOrUpdateProfileTypeFieldDialog({
 function ProfileFieldSelectSettings() {
   const intl = useIntl();
 
-  const { control, register, watch, setFocus } =
+  const { control, register, watch, setFocus, getValues } =
     useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
 
-  const { fields, append, remove, reorder } = useFieldArrayReorder({
+  const { fields, append, remove, reorder, replace } = useFieldArrayReorder({
     name: "options.values",
     keyName: "key",
     control,
-    rules: { required: true, minLength: 1 },
+    rules: { required: true, minLength: 1, maxLength: 1000 },
     shouldUnregister: true,
   });
 
@@ -521,6 +525,64 @@ function ProfileFieldSelectSettings() {
   }, []);
 
   const showOptionsWithColors = watch("options.showOptionsWithColors");
+  const name = watch("name");
+
+  const showImportSelectOptionsDialog = useImportSelectOptionsDialog();
+  const handleImportOptions = async () => {
+    try {
+      const values = getValues("options.values");
+      await showImportSelectOptionsDialog({
+        hasOptions: values ? values.length > 0 : false,
+        onDownloadEmptyOptions: async () => {
+          await generateValueLabelExcel(intl, {
+            fileName: sanitizeFilenameWithSuffix(
+              intl.formatMessage({
+                id: "component.import-options-settings-row.default-file-name",
+                defaultMessage: "options",
+              }),
+              ".xlsx",
+            ),
+            values: [],
+            labels: [],
+          });
+        },
+        onDownloadExistingOptions: async () => {
+          const values = getValues("options.values");
+          await generateValueLabelExcel(intl, {
+            fileName: sanitizeFilenameWithSuffix(
+              localizableUserTextRender({
+                value: name,
+                intl,
+                default: intl.formatMessage({
+                  id: "component.import-options-settings-row.default-file-name",
+                  defaultMessage: "options",
+                }),
+              }),
+              ".xlsx",
+            ),
+            values: values?.map((field) => field.value) ?? [],
+            labels: values?.map((field) => field.label) ?? [],
+          });
+        },
+        onExcelDrop: async (file) => {
+          const options = await parseProfileSelectOptionsFromExcel(file);
+          if (options.length > 0) {
+            replace(
+              options.map(({ label, value }) => ({
+                id: nanoid(),
+                label,
+                value,
+                color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
+              })),
+            );
+          } else {
+            // show empty inputs when uploaded file is empty
+            replace([{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }]);
+          }
+        },
+      });
+    } catch {}
+  };
 
   return (
     <Stack spacing={4}>
@@ -588,10 +650,11 @@ function ProfileFieldSelectSettings() {
           })}
         </Reorder.Group>
       </Table>
-      <Box>
+      <HStack>
         <Button
           leftIcon={<PlusCircleIcon />}
           variant="outline"
+          isDisabled={fields.length >= 1000}
           onClick={() => {
             append({
               id: nanoid(),
@@ -607,7 +670,13 @@ function ProfileFieldSelectSettings() {
             defaultMessage="Add option"
           />
         </Button>
-      </Box>
+        <Button variant="outline" onClick={handleImportOptions}>
+          <FormattedMessage
+            id="component.create-or-update-property-dialog.import-options-button"
+            defaultMessage="Import options..."
+          />
+        </Button>
+      </HStack>
     </Stack>
   );
 }
@@ -803,7 +872,8 @@ function ProfileFieldSelectOption({
           ) : (
             <FormattedMessage
               id="component.create-or-update-property-dialog.options-alias-error"
-              defaultMessage="The field is required and only accepts letters, numbers or _"
+              defaultMessage="The field is required and only accepts up to {max} letters, numbers or _"
+              values={{ max: 50 }}
             />
           )}
         </FormErrorMessage>
@@ -891,3 +961,57 @@ const _mutations = [
     ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
   `,
 ];
+
+async function generateValueLabelExcel(
+  intl: IntlShape,
+  {
+    fileName,
+    values,
+    labels,
+  }: {
+    fileName: string;
+    values: SelectOptionValue["value"][];
+    labels: SelectOptionValue["label"][];
+  },
+) {
+  return await generateExcel({
+    fileName,
+    columns: [
+      {
+        key: "value",
+        cell: {
+          value: intl.formatMessage({
+            id: "util.generate-value-label-excel.header-value",
+            defaultMessage: "Internal value",
+          }),
+          fontWeight: "bold",
+        },
+      },
+      {
+        key: "label_en",
+        cell: {
+          value: intl.formatMessage({
+            id: "util.generate-value-label-excel.header-label-english",
+            defaultMessage: "Label (English)",
+          }),
+          fontWeight: "bold",
+        },
+      },
+      {
+        key: "label_es",
+        cell: {
+          value: intl.formatMessage({
+            id: "util.generate-value-label-excel.header-label-spanish",
+            defaultMessage: "Label (Spanish)",
+          }),
+          fontWeight: "bold",
+        },
+      },
+    ],
+    rows: zip(values, labels ?? times(values.length, () => null)).map(([value, label]) => ({
+      value,
+      label_es: label?.es ?? null,
+      label_en: label?.en ?? null,
+    })),
+  });
+}

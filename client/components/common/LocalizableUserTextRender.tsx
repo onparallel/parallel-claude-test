@@ -49,6 +49,6 @@ export function localizableUserTextRender({
   return isDefined(locale) ? value[locale]?.trim() || _default : _default;
 }
 
-export function isValidLocalizableUserText(label: { [key: string]: string }) {
-  return Object.values(label).some((value) => value!.trim().length > 0);
+export function isValidLocalizableUserText(label: { [key: string]: string | null }) {
+  return Object.values(label).some((value) => (value ?? "").trim().length > 0);
 }

@@ -1865,6 +1865,11 @@
     "context": "Remind on:"
   },
   {
+    "term": "component.create-or-update-property-dialog.import-options-button",
+    "definition": "Importar opciones...",
+    "context": "Import options..."
+  },
+  {
     "term": "component.create-or-update-property-dialog.new-property",
     "definition": "Nueva propiedad",
     "context": "New property"
@@ -1876,8 +1881,8 @@
   },
   {
     "term": "component.create-or-update-property-dialog.options-alias-error",
-    "definition": "El campo es obligatorio y sólo acepta letras, números o _.",
-    "context": "The field is required and only accepts letters, numbers or _"
+    "definition": "El campo es obligatorio y sólo acepta hasta {max} letras, números o _.",
+    "context": "The field is required and only accepts up to {max} letters, numbers or _"
   },
   {
     "term": "component.create-or-update-property-dialog.options-label",
@@ -3275,7 +3280,7 @@
     "context": "Upload a .xlsx file like the provided model. If you want to keep the existing options, download them to include them in the import."
   },
   {
-    "term": "component.import-select-options-dialog.default-file-name",
+    "term": "component.import-options-settings-row.default-file-name",
     "definition": "opciones",
     "context": "options"
   },
@@ -15108,6 +15113,21 @@
     "term": "user-group.all-members.description",
     "definition": "Este equipo contiene a todos los usuarios de la organización.",
     "context": "This team contains all users from the organization."
+  },
+  {
+    "term": "util.generate-value-label-excel.header-label-english",
+    "definition": "Descripción (inglés)",
+    "context": "Label (English)"
+  },
+  {
+    "term": "util.generate-value-label-excel.header-label-spanish",
+    "definition": "Descripción (español)",
+    "context": "Label (Spanish)"
+  },
+  {
+    "term": "util.generate-value-label-excel.header-value",
+    "definition": "Valor interno",
+    "context": "Internal value"
   },
   {
     "term": "util.get-open-sanctions-relationship.board-member",

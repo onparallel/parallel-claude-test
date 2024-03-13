@@ -1,9 +1,7 @@
+import { parseExcel } from "./parseExcel";
+
 export async function parseValueLabelFromExcel(file: File) {
-  const readXlsxFile = (await import("read-excel-file")).default;
-  const rows = await readXlsxFile(file);
-  const options = rows
-    .slice(1)
-    .map((row) => ({ value: row[0]?.toString(), label: row[1]?.toString() }));
+  const options = await parseExcel(file, { columns: ["value", "label"] });
   // max of 1000 options
   if (options.length > 1000) {
     throw new Error("A maximum of 1000 options is allowed");

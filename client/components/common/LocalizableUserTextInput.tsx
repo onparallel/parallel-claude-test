@@ -51,9 +51,9 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
           asSupportedUserLocale(intl.locale),
           "en" as UserLocale,
           Object.keys(value)[0] as UserLocale,
-        ].find((locale) => isDefined(value[locale]))!,
+        ].find((locale) => isDefined(value[locale])) || (intl.locale as UserLocale),
     );
-    const [inputValue, setInputValue] = useState(() => value[selectedLocale]);
+    const [inputValue, setInputValue] = useState(() => value[selectedLocale] ?? "");
     function handleChangeLocale(locale: UserLocale) {
       setSelectedLocale(locale);
       setInputValue(value[locale] ?? "");
@@ -65,7 +65,7 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
     }
 
     useEffectSkipFirst(() => {
-      setInputValue(value[selectedLocale]);
+      setInputValue(value[selectedLocale] ?? "");
     }, [value]);
     return (
       <InputGroup ref={ref} {...props}>

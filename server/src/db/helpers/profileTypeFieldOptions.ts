@@ -51,12 +51,13 @@ const SCHEMAS = {
       values: {
         type: "array",
         minItems: 1,
+        maxItems: 1000,
         items: {
           type: "object",
           required: ["label", "value"],
           properties: {
             label: LOCALIZABLE_USER_TEXT_SCHEMA,
-            value: { type: "string" },
+            value: { type: "string", maxLength: 50 },
             color: { type: "string" },
           },
         },
