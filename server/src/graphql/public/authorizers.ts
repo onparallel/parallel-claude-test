@@ -342,11 +342,26 @@ export function validPetitionFieldCommentContent<
             additionalProperties: false,
             required: ["text"],
           },
+          link: {
+            type: "object",
+            properties: {
+              type: { const: "link" },
+              url: { type: "string" },
+              children: {
+                type: "array",
+                items: {
+                  type: "object",
+                  anyOf: [{ $ref: "#/definitions/text" }],
+                },
+              },
+            },
+          },
           leaf: {
             type: "object",
             anyOf: [
               ...(allowMentions ? [{ $ref: "#/definitions/mention" }] : []),
               { $ref: "#/definitions/text" },
+              { $ref: "#/definitions/link" },
             ],
           },
           root: { type: "array", items: { $ref: "#/definitions/paragraph" } },

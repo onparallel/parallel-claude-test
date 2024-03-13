@@ -33,9 +33,11 @@ import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { useIntl } from "react-intl";
 import { UserLocale } from "@parallel/graphql/__types";
+import { ELEMENT_LINK, createLinkPlugin } from "@udecode/plate-link";
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
+  [ELEMENT_LINK]: RenderLink,
 } as Record<string, PlatePluginComponent>;
 
 export type CommentEditorValue = CommentEditorBlock[];
@@ -67,7 +69,7 @@ export function removeMentionInputElements(content: CommentEditorValue) {
     const children: (CommentEditorText | MentionElement)[] = [currentText];
     for (let i = 1; i < block.children.length; ++i) {
       const element = block.children[i];
-      if (element.type === MENTION_TYPE) {
+      if (element.type === MENTION_TYPE || element.type === "link") {
         children.push(element);
         currentText = null;
       } else {
@@ -129,6 +131,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
             createHistoryPlugin(),
             createParagraphPlugin(),
             createComboboxPlugin(),
+            createLinkPlugin(),
             ...(isDefined(onSearchMentionables)
               ? [createMentionPlugin<CommentEditorValue, CommentPEditor>(intl.locale as UserLocale)]
               : []),
@@ -137,6 +140,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
             components,
             overrideByKey: {
               [ELEMENT_PARAGRAPH]: { type: "paragraph" },
+              [ELEMENT_LINK]: { type: "link" },
             },
           },
         ),
@@ -237,4 +241,19 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
 
 function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
   return <Text {...attributes} {...props} />;
+}
+
+function RenderLink({ attributes, nodeProps, styles, element, editor, ...props }: any) {
+  return (
+    <Text
+      as="a"
+      cursor="text"
+      target="_blank"
+      href={element.url}
+      color="primary.600"
+      rel="noopener noreferrer"
+      {...attributes}
+      {...props}
+    />
+  );
 }

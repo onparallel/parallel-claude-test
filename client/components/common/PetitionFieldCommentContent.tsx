@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+import { Box, Link } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldCommentContent_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
-import parse, { Element, HTMLReactParserOptions } from "html-react-parser";
+import parse, { Element, HTMLReactParserOptions, domToReact } from "html-react-parser";
 import { useMemo } from "react";
 import { Mention } from "./Mention";
 
@@ -23,6 +23,12 @@ export const PetitionFieldCommentContent = Object.assign(
             (m) => m.mentionedId === domNode.attribs["data-mention-id"],
           )!;
           return <Mention mention={mention} />;
+        } else if (domNode instanceof Element && domNode.name === "a") {
+          return (
+            <Link href={domNode.attribs.href} isExternal>
+              {domToReact(domNode.children as any, options)}
+            </Link>
+          );
         }
       },
     };
@@ -30,7 +36,7 @@ export const PetitionFieldCommentContent = Object.assign(
       return comment.contentHtml
         ? parse(
             sanitizeHtml(comment.contentHtml, {
-              ADD_TAGS: ["mention"],
+              ADD_TAGS: ["mention", "a"],
               ADD_ATTR: ["data-mention-id"],
             }),
             options,
