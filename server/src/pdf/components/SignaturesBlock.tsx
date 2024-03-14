@@ -107,7 +107,9 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
           "https://static.onparallel.com/static/images/signatures/jorge-arturo-caceres-rive.png",
         date,
       });
-    } else if (["zas25KHxAByKWmKNDXb", "zas25KHxAByKWmKRZgb"].includes(templateId)) {
+    } else if (
+      ["zas25KHxAByKWmKNDXb", "zas25KHxAByKWmKRZgb", "zas25KHxAByKX3mKDNQ"].includes(templateId)
+    ) {
       signers.push({
         fullName: "Dña Ana Ortiz Canela",
         signatureImageUrl:
