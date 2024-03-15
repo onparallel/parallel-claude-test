@@ -3,9 +3,10 @@ import { ProfilesIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
+import { SupportButton } from "../SupportButton";
 
 function ProfilesContactUsDialog({ ...props }: DialogProps<{}>) {
-  const { locale } = useIntl();
+  const intl = useIntl();
   return (
     <ConfirmDialog
       {...props}
@@ -46,7 +47,7 @@ function ProfilesContactUsDialog({ ...props }: DialogProps<{}>) {
         <Button
           variant="link"
           as="a"
-          href={`https://www.onparallel.com/${locale}/profiles`}
+          href={`https://www.onparallel.com/${intl.locale}/profiles`}
           rel="noopener"
           target="_blank"
         >
@@ -58,18 +59,19 @@ function ProfilesContactUsDialog({ ...props }: DialogProps<{}>) {
       }
       cancel={<></>}
       confirm={
-        <Button
+        <SupportButton
           colorScheme="primary"
-          as="a"
-          href={`https://meetings.hubspot.com/alex-romera/parallel-profiles`}
-          rel="noopener"
-          target="_blank"
+          message={intl.formatMessage({
+            id: "component.profiles-contact-us-dialog.upgrade-plan-support-message",
+            defaultMessage:
+              "Hi, I would like more information about upgrading my plan to access Profiles and Alerts",
+          })}
         >
           <FormattedMessage
             id="component.profiles-contact-us-dialog.contact-us"
             defaultMessage="Contact us"
           />
-        </Button>
+        </SupportButton>
       }
     />
   );
