@@ -615,26 +615,24 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               />
             ) : null}
             {showDownloadAll && !petition.isAnonymized ? (
-              <>
-                <ResponsiveButtonIcon
-                  icon={<DownloadIcon fontSize="lg" display="block" />}
-                  onClick={handleDownloadAllClick}
-                  label={intl.formatMessage({
-                    id: "page.replies.export-replies",
-                    defaultMessage: "Export replies",
-                  })}
-                />
-                {petition.isDocumentGenerationEnabled ? (
-                  <ResponsiveButtonIcon
-                    icon={<FilePdfIcon fontSize="lg" display="block" />}
-                    onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
-                    label={intl.formatMessage({
-                      id: "page.petition-replies.export-pdf",
-                      defaultMessage: "Export to PDF",
-                    })}
-                  />
-                ) : null}
-              </>
+              <ResponsiveButtonIcon
+                icon={<DownloadIcon fontSize="lg" display="block" />}
+                onClick={handleDownloadAllClick}
+                label={intl.formatMessage({
+                  id: "page.replies.export-replies",
+                  defaultMessage: "Export replies",
+                })}
+              />
+            ) : null}
+            {petition.isDocumentGenerationEnabled && !petition.isAnonymized ? (
+              <ResponsiveButtonIcon
+                icon={<FilePdfIcon fontSize="lg" display="block" />}
+                onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
+                label={intl.formatMessage({
+                  id: "page.petition-replies.export-pdf",
+                  defaultMessage: "Export to PDF",
+                })}
+              />
             ) : null}
           </HStack>
           <Divider />

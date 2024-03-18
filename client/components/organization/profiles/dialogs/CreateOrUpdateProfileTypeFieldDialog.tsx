@@ -600,56 +600,58 @@ function ProfileFieldSelectSettings() {
           />
         </HelpPopover>
       </FormControl>
-      <Table variant="unstyled">
-        <Thead>
-          <Tr>
-            <Th paddingInlineEnd={1} paddingBlock={2} width="50%">
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.options-label"
-                defaultMessage="Label"
-              />
-            </Th>
-            <Th paddingInline={1} paddingBlock={2} width="50%">
-              <FormattedMessage
-                id="component.create-or-update-property-dialog.options-value-label"
-                defaultMessage="Internal value"
-              />
-              <HelpPopover position="relative" top="-1px">
-                <Text>
-                  <FormattedMessage
-                    id="component.create-or-update-property-dialog.options-value-label-help"
-                    defaultMessage="This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
-                  />
-                </Text>
-              </HelpPopover>
-            </Th>
-            {showOptionsWithColors ? (
-              <Th paddingInline={1} paddingBlock={2} minWidth="158px">
+      <Box maxHeight="360px" overflowY="auto">
+        <Table variant="unstyled">
+          <Thead>
+            <Tr>
+              <Th paddingInlineEnd={1} paddingBlock={2} width="50%">
                 <FormattedMessage
-                  id="component.manage-tags-dialog.color-label"
-                  defaultMessage="Color"
+                  id="component.create-or-update-property-dialog.options-label"
+                  defaultMessage="Label"
                 />
               </Th>
-            ) : null}
-            <Th paddingInline={1} paddingBlock={2}></Th>
-          </Tr>
-        </Thead>
-        <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
-          {fields.map((field, index) => {
-            return (
-              <ProfileFieldSelectOption
-                key={field.id}
-                index={index}
-                field={field}
-                fields={fields}
-                onRemove={handleRemoveOption}
-                canRemoveOption={fields.length > 1}
-                showOptionsWithColors={showOptionsWithColors ?? false}
-              />
-            );
-          })}
-        </Reorder.Group>
-      </Table>
+              <Th paddingInline={1} paddingBlock={2} width="50%">
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.options-value-label"
+                  defaultMessage="Internal value"
+                />
+                <HelpPopover position="relative" top="-1px">
+                  <Text>
+                    <FormattedMessage
+                      id="component.create-or-update-property-dialog.options-value-label-help"
+                      defaultMessage="This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
+                    />
+                  </Text>
+                </HelpPopover>
+              </Th>
+              {showOptionsWithColors ? (
+                <Th paddingInline={1} paddingBlock={2} minWidth="158px">
+                  <FormattedMessage
+                    id="component.manage-tags-dialog.color-label"
+                    defaultMessage="Color"
+                  />
+                </Th>
+              ) : null}
+              <Th paddingInline={1} paddingBlock={2}></Th>
+            </Tr>
+          </Thead>
+          <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
+            {fields.map((field, index) => {
+              return (
+                <ProfileFieldSelectOption
+                  key={field.id}
+                  index={index}
+                  field={field}
+                  fields={fields}
+                  onRemove={handleRemoveOption}
+                  canRemoveOption={fields.length > 1}
+                  showOptionsWithColors={showOptionsWithColors ?? false}
+                />
+              );
+            })}
+          </Reorder.Group>
+        </Table>
+      </Box>
       <HStack>
         <Button
           leftIcon={<PlusCircleIcon />}
