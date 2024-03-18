@@ -56,17 +56,13 @@ export class EventProcessor {
           payload.id,
           payload.table_name,
           payload.created_at,
+          ctx.config.instanceName,
         );
 
         if (isDefined(event)) {
           for (const listener of this.listeners.get(event.type)!) {
             try {
               await listener(event, ctx);
-              await ctx.events.markEventAsProcessed(
-                event.id,
-                payload.table_name,
-                ctx.config.instanceName,
-              );
             } catch (error) {
               // log error and continue to other listeners
               if (error instanceof Error) {
@@ -76,6 +72,8 @@ export class EventProcessor {
               }
             }
           }
+
+          await ctx.events.markEventAsProcessed(event.id, payload.table_name);
         }
       }
     };

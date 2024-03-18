@@ -18,11 +18,12 @@ export class EventRepository extends BaseRepository {
     id: number,
     tableName: TName,
     createdAt: Date,
+    pickedBy: string,
   ): Promise<TableTypes[TName] | undefined> {
     const [event] = await this.from(tableName)
-      .update("processed_at", this.now())
+      .update("processed_by", pickedBy)
       .whereRaw(
-        /* sql */ `id = ? and processed_at is null and date_trunc('milliseconds', created_at) = ?::timestamptz`,
+        /* sql */ `id = ? and processed_by is null and date_trunc('milliseconds', created_at) = ?::timestamptz`,
         [id, createdAt],
       )
       .returning("*");
@@ -33,11 +34,7 @@ export class EventRepository extends BaseRepository {
   async markEventAsProcessed<TName extends "petition_event" | "system_event" | "profile_event">(
     id: number,
     tableName: TName,
-    processedBy: string,
   ) {
-    await this.from(tableName)
-      .where("id", id)
-      .update("processed_at", this.now())
-      .update("processed_by", processedBy);
+    await this.from(tableName).where("id", id).update("processed_at", this.now());
   }
 }
