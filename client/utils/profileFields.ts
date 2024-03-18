@@ -18,7 +18,12 @@ export interface ProfileTypeFieldOptions {
     useReplyAsExpiryDate?: Maybe<boolean>;
   };
   SELECT: {
-    values: { label: LocalizableUserText; value: string; color?: string }[];
+    values: {
+      label: LocalizableUserText;
+      value: string;
+      color?: string;
+      isStandard?: boolean;
+    }[];
     showOptionsWithColors?: Maybe<boolean>;
   };
 }

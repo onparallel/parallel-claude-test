@@ -5,6 +5,7 @@ import {
   Profile,
   ProfileStatus,
   ProfileType,
+  ProfileTypeField,
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
 } from "../../db/__types";
@@ -47,9 +48,34 @@ function createProfileAuthorizer<TRest extends any[] = []>(
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
 
+function createProfileTypeFieldAuthorizer<TRest extends any[] = []>(
+  predicate: (profileTypeField: ProfileTypeField, ...rest: TRest) => boolean,
+) {
+  return ((argName, ...rest: TRest) => {
+    return async (_, args, ctx) => {
+      const profileTypeFieldIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      if (profileTypeFieldIds.length === 0) {
+        return true;
+      }
+      const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
+      return profileTypeFields.every(
+        (profileTypeField) => isDefined(profileTypeField) && predicate(profileTypeField, ...rest),
+      );
+    };
+  }) as ArgAuthorizer<MaybeArray<number>, TRest>;
+}
+
 export const profileTypeIsArchived = createProfileTypeAuthorizer((p) => isDefined(p.archived_at));
 
 export const profileIsNotAnonymized = createProfileAuthorizer((p) => !isDefined(p.anonymized_at));
+
+export const profileTypeIsNotStandard = createProfileTypeAuthorizer(
+  (p) => p.standard_type === null,
+);
+
+export const profileTypeFieldIsNotStandard = createProfileTypeFieldAuthorizer(
+  (p) => !p.alias?.startsWith("p_"),
+);
 
 export function profileIsAssociatedToPetition<
   TypeName extends string,

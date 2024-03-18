@@ -59,6 +59,7 @@ const SCHEMAS = {
             label: LOCALIZABLE_USER_TEXT_SCHEMA,
             value: { type: "string", maxLength: 50 },
             color: { type: "string" },
+            isStandard: { type: "boolean" },
           },
         },
       },

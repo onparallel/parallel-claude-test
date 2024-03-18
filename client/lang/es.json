@@ -1910,9 +1910,19 @@
     "context": "Property name"
   },
   {
+    "term": "component.create-or-update-property-dialog.property-standard-alert-description",
+    "definition": "Esta propiedad la proporciona Parallel, y solo algunas de las opciones se pueden modificar.",
+    "context": "This property is provided by Parallel, and only some of the options can be modified."
+  },
+  {
     "term": "component.create-or-update-property-dialog.remove-option-button",
     "definition": "Quitar opción",
     "context": "Remove option"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.reserved-alias-error",
+    "definition": "Este identificador está reservado y no puede ser usado",
+    "context": "This identifier is reserved and can't be used"
   },
   {
     "term": "component.create-or-update-property-dialog.type-of-property",
@@ -6605,11 +6615,6 @@
     "context": "Who can see this property"
   },
   {
-    "term": "component.profile-type-field-permission-dialog.hidden",
-    "definition": "Oculto",
-    "context": "Hidden"
-  },
-  {
     "term": "component.profile-type-field-permission-dialog.permissions-conflict-popover",
     "definition": "Hay un permiso superior para todos en la organización que sobreescribe este.",
     "context": "There is a higher-level permission for everyone in the organization that overrides this one."
@@ -6618,6 +6623,11 @@
     "term": "component.profile-type-field-permission-dialog.read",
     "definition": "Lectura",
     "context": "Can read"
+  },
+  {
+    "term": "component.profile-type-field-permission-dialog.restricted",
+    "definition": "Restringido",
+    "context": "Restricted"
   },
   {
     "term": "component.profile-type-field-permission-dialog.used-in-profile-name-warning",
@@ -6693,6 +6703,11 @@
     "term": "component.profile-type-settings.settings",
     "definition": "Ajustes",
     "context": "Settings"
+  },
+  {
+    "term": "component.profile-types-list-actions.archive-restricted",
+    "definition": "Alguno de los tipos de perfil seleccionados es proporcionado por Parallel y no se puede archivar.",
+    "context": "Some of the selected profile types are provided by Parallel and cannot be archived."
   },
   {
     "term": "component.profile-types-table.active",
@@ -12200,6 +12215,11 @@
     "context": "The \"Name of each profile\" changes have been saved."
   },
   {
+    "term": "page.organization-profile-type.standard-profile-type-alert-description",
+    "definition": "Este tipo de perfil es proporcionado por Parallel, y sólo algunas de las opciones pueden ser modificadas.",
+    "context": "This profile type is provided by Parallel, and only some of the options can be modified."
+  },
+  {
     "term": "page.organization-users.invalid-email-toast-description",
     "definition": "El email proporcionado no es válido.",
     "context": "The provided email is invalid."
@@ -12730,11 +12750,6 @@
     "context": "Signature sent"
   },
   {
-    "term": "page.profile-details.hidden-properties",
-    "definition": "Propiedades ocultas",
-    "context": "Hidden properties"
-  },
-  {
     "term": "page.profile-details.hidden-properties-description",
     "definition": "Solicita permiso para ver estas propiedades.",
     "context": "Request permission to see these properties."
@@ -12743,6 +12758,11 @@
     "term": "page.profile-details.n-fields-edited",
     "definition": "{count, plural, =1 {# propiedad editada} other{# propiedades editadas}}",
     "context": "{count, plural, =1 {# property} other{# properties}} changed"
+  },
+  {
+    "term": "page.profile-details.restricted-properties",
+    "definition": "Propiedades restringidas",
+    "context": "Restricted properties"
   },
   {
     "term": "page.profile-details.saving-changes",

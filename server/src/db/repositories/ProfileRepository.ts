@@ -213,6 +213,8 @@ export class ProfileRepository extends BaseRepository {
                   "created_at",
                   "updated_at",
                 ]),
+                // when cloning a standard profile_type, set alias to null so cloned fields are not considered standard
+                alias: sourceProfileType.standard_type ? null : field.alias,
                 profile_type_id: profileType.id,
                 expiry_alert_ahead_time:
                   field.is_expirable && field.expiry_alert_ahead_time

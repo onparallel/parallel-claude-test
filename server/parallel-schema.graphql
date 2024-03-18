@@ -5364,6 +5364,7 @@ type ProfileType implements Timestamps {
   createdAt: DateTime!
   fields: [ProfileTypeField!]!
   id: GID!
+  isStandard: Boolean!
   name: LocalizableUserText!
   profileNamePattern: String!
 
@@ -5379,6 +5380,7 @@ type ProfileTypeField {
   expiryAlertAheadTime: Duration
   id: GID!
   isExpirable: Boolean!
+  isStandard: Boolean!
   isUsedInProfileName: Boolean!
   myPermission: ProfileTypeFieldPermissionType!
   name: LocalizableUserText!

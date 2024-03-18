@@ -49,12 +49,15 @@ import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/Conf
 import { WhenPermission } from "@parallel/components/common/WhenPermission";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { useCreateOrUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
 import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldsInPatternDialog";
 import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
 import { ProfileTypeFieldTypeIndicator } from "@parallel/components/organization/profiles/ProfileTypeFieldTypeIndicator";
 import { ProfileTypeSettings } from "@parallel/components/organization/profiles/ProfileTypeSettings";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { getKey, KeyProp } from "@parallel/utils/keyProp";
+import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
+import { useUnarchiveProfileType } from "@parallel/utils/mutations/useUnarchiveProfileType";
 import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSelection, useSelectionState } from "@parallel/utils/useSelectionState";
@@ -71,9 +74,6 @@ import {
   useState,
 } from "react";
 import { identity, noop } from "remeda";
-import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
-import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
-import { useUnarchiveProfileType } from "@parallel/utils/mutations/useUnarchiveProfileType";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -96,7 +96,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     },
   });
 
-  const { selectedIds, onChangeSelectedIds } = useSelection(profileType.fields, "id");
+  const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(profileType.fields, "id");
 
   const showError = useGenericErrorToast();
   const [updateProfileType] = useMutation(OrganizationProfileType_updateProfileTypeDocument);
@@ -335,6 +335,8 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     onEditClick: () =>
       handleEditProperty(profileType.fields.filter((f) => selectedIds.includes(f.id))),
     visibilityIsDisabled: selectedIds.length !== 1,
+    hideDeleteButton: selectedRows.every((row) => row.isStandard),
+    disableDeleteButton: selectedRows.some((row) => row.isStandard),
   });
 
   return (
@@ -350,6 +352,40 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       basePath="/app/organization/profiles/types"
       me={me}
       realMe={realMe}
+      subHeader={
+        profileType.isStandard ? (
+          <Alert status="info">
+            <AlertIcon />
+            <AlertDescription>
+              <FormattedMessage
+                id="page.organization-profile-type.standard-profile-type-alert-description"
+                defaultMessage="This profile type is provided by Parallel, and only some of the options can be modified."
+              />
+            </AlertDescription>
+          </Alert>
+        ) : profileType.archivedAt ? (
+          <Alert status="info">
+            <AlertIcon />
+            <AlertDescription>
+              <FormattedMessage
+                id="page.organization-profile-type.archived-profile-type-alert-description"
+                defaultMessage="This profile type is archived and cannot be used to create new profiles. If you want, you can <a>retrieve</a> it to continue using it."
+                values={{
+                  a: (chunks: ReactNode) => (
+                    <Button
+                      variant="link"
+                      colorScheme="primary"
+                      onClick={handleUnarchiveProfileType}
+                    >
+                      {chunks}
+                    </Button>
+                  ),
+                }}
+              />
+            </AlertDescription>
+          </Alert>
+        ) : null
+      }
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <HStack paddingRight={2}>
@@ -362,16 +398,18 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                 })}
               />
             </Heading>
-            <IconButtonWithTooltip
-              label={intl.formatMessage({
-                id: "generic.edit-name",
-                defaultMessage: "Edit name",
-              })}
-              size="sm"
-              variant="ghost"
-              icon={<EditSimpleIcon />}
-              onClick={handleChangeProfileTypeName}
-            />
+            {profileType.isStandard ? null : (
+              <IconButtonWithTooltip
+                label={intl.formatMessage({
+                  id: "generic.edit-name",
+                  defaultMessage: "Edit name",
+                })}
+                size="sm"
+                variant="ghost"
+                icon={<EditSimpleIcon />}
+                onClick={handleChangeProfileTypeName}
+              />
+            )}
           </HStack>
           <WhenPermission permission="PROFILE_TYPES:CRUD_PROFILE_TYPES">
             <MoreOptionsMenuButton
@@ -399,59 +437,39 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                       />
                     </MenuItem>
                   )}
-                  <MenuDivider />
-                  {profileType.archivedAt ? (
-                    <MenuItem
-                      color="red.500"
-                      onClick={handleDeleteProfileType}
-                      icon={<DeleteIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.profile-type-header.delete-label"
-                        defaultMessage="Delete profile type"
-                      />
-                    </MenuItem>
-                  ) : (
-                    <MenuItem
-                      color="red.500"
-                      onClick={handleArchiveProfileType}
-                      icon={<ArchiveIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.profile-type-header.archive-label"
-                        defaultMessage="Archive profile type"
-                      />
-                    </MenuItem>
-                  )}
+                  {!profileType.isStandard ? (
+                    <>
+                      <MenuDivider />
+                      {profileType.archivedAt ? (
+                        <MenuItem
+                          color="red.500"
+                          onClick={handleDeleteProfileType}
+                          icon={<DeleteIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="component.profile-type-header.delete-label"
+                            defaultMessage="Delete profile type"
+                          />
+                        </MenuItem>
+                      ) : (
+                        <MenuItem
+                          color="red.500"
+                          onClick={handleArchiveProfileType}
+                          icon={<ArchiveIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="component.profile-type-header.archive-label"
+                            defaultMessage="Archive profile type"
+                          />
+                        </MenuItem>
+                      )}
+                    </>
+                  ) : null}
                 </MenuList>
               }
             />
           </WhenPermission>
         </Flex>
-      }
-      subHeader={
-        profileType.archivedAt ? (
-          <Alert status="info">
-            <AlertIcon />
-            <AlertDescription>
-              <FormattedMessage
-                id="page.organization-profile-type.archived-profile-type-alert-description"
-                defaultMessage="This profile type is archived and cannot be used to create new profiles. If you want, you can <a>retrieve</a> it to continue using it."
-                values={{
-                  a: (chunks: ReactNode) => (
-                    <Button
-                      variant="link"
-                      colorScheme="primary"
-                      onClick={handleUnarchiveProfileType}
-                    >
-                      {chunks}
-                    </Button>
-                  ),
-                }}
-              />
-            </AlertDescription>
-          </Alert>
-        ) : null
       }
       showBackButton={true}
     >
@@ -724,17 +742,21 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
                     defaultMessage="Configure visibility"
                   />
                 </MenuItem>
-                <MenuDivider />
-                <MenuItem
-                  icon={<DeleteIcon display="block" boxSize={4} />}
-                  onClick={onDelete}
-                  color="red.500"
-                >
-                  <FormattedMessage
-                    id="component.draggable-list.delete-property"
-                    defaultMessage="Delete property"
-                  />
-                </MenuItem>
+                {item.isStandard ? null : (
+                  <>
+                    <MenuDivider />
+                    <MenuItem
+                      icon={<DeleteIcon display="block" boxSize={4} />}
+                      onClick={onDelete}
+                      color="red.500"
+                    >
+                      <FormattedMessage
+                        id="component.draggable-list.delete-property"
+                        defaultMessage="Delete property"
+                      />
+                    </MenuItem>
+                  </>
+                )}
               </MenuList>
             }
           />
@@ -749,11 +771,15 @@ function useProfileTypeFieldsActions({
   onConfigureVisibilityClick,
   onDeleteClick,
   visibilityIsDisabled,
+  hideDeleteButton,
+  disableDeleteButton,
 }: {
   onEditClick: () => void;
   onConfigureVisibilityClick: () => void;
   onDeleteClick: () => void;
   visibilityIsDisabled: boolean;
+  hideDeleteButton: boolean;
+  disableDeleteButton: boolean;
 }) {
   return [
     {
@@ -776,13 +802,18 @@ function useProfileTypeFieldsActions({
       ),
       isDisabled: visibilityIsDisabled,
     },
-    {
-      key: "delete",
-      onClick: onDeleteClick,
-      leftIcon: <DeleteIcon />,
-      children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
-      colorScheme: "red",
-    },
+    ...(hideDeleteButton
+      ? []
+      : [
+          {
+            key: "delete",
+            onClick: onDeleteClick,
+            leftIcon: <DeleteIcon />,
+            children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+            colorScheme: "red",
+            isDisabled: disableDeleteButton,
+          },
+        ]),
   ];
 }
 
@@ -832,6 +863,7 @@ const _fragments = {
         id
         name
         type
+        isStandard
         ...useProfileTypeFieldPermissionDialog_ProfileTypeField
         ...useUpdateProfileTypeFieldDialog_ProfileTypeField
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
@@ -848,6 +880,7 @@ const _fragments = {
       fragment OrganizationProfileType_ProfileType on ProfileType {
         id
         name
+        isStandard
         fields {
           ...OrganizationProfileType_ProfileTypeField
         }

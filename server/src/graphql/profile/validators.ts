@@ -5,14 +5,14 @@ import { TableTypes } from "../../db/helpers/BaseRepository";
 import { validateProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { discriminator } from "../../util/discriminator";
 import { fromGlobalId } from "../../util/globalId";
+import { isAtLeast } from "../../util/profileTypeFieldPermission";
+import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { isValidDate } from "../../util/time";
 import { Maybe } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
-import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
-import { isAtLeast } from "../../util/profileTypeFieldPermission";
 
 export function validProfileNamePattern<
   TypeName extends string,
@@ -148,4 +148,28 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
     case "FILE":
       throw new Error("Can't validate file field");
   }
+}
+
+export function validProfileTypeFieldSubstitution<
+  TypeName extends string,
+  FieldName extends string,
+  TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdateProfileTypeFieldInput"]>,
+>(dataArg: TDataArg, argName: string) {
+  return ((_, args, ctx, info) => {
+    const data = args[dataArg] as unknown as NexusGenInputs["UpdateProfileTypeFieldInput"];
+
+    if (isDefined(data.substitutions) && isDefined(data.options?.values)) {
+      if (
+        !data.substitutions.every(
+          (s) => !isDefined(s.new) || data.options?.values.some((v: any) => v.value === s.new),
+        )
+      ) {
+        throw new ArgValidationError(
+          info,
+          argName,
+          "Every new substitution needs to be a valid option",
+        );
+      }
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

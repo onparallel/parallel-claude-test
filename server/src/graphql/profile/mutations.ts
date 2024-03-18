@@ -68,8 +68,10 @@ import {
   profileIsAssociatedToPetition,
   profileIsNotAnonymized,
   profileTypeFieldBelongsToProfileType,
+  profileTypeFieldIsNotStandard,
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
+  profileTypeIsNotStandard,
   userHasAccessToProfile,
   userHasAccessToProfileType,
   userHasPermissionOnProfileTypeField,
@@ -77,6 +79,7 @@ import {
 import {
   validProfileNamePattern,
   validProfileTypeFieldOptions,
+  validProfileTypeFieldSubstitution,
   validateProfileFieldValue,
 } from "./validators";
 
@@ -104,6 +107,7 @@ export const updateProfileType = mutationField("updateProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    profileTypeIsNotStandard("profileTypeId"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -167,6 +171,7 @@ export const deleteProfileType = mutationField("deleteProfileType", {
     userHasAccessToProfileType("profileTypeIds"),
     profileTypeIsArchived("profileTypeIds"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    profileTypeIsNotStandard("profileTypeIds"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -191,6 +196,7 @@ export const archiveProfileType = mutationField("archiveProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    profileTypeIsNotStandard("profileTypeIds"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -206,6 +212,7 @@ export const unarchiveProfileType = mutationField("unarchiveProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
+    profileTypeIsNotStandard("profileTypeIds"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -226,7 +233,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
     notEmptyObject((args) => args.data, "data"),
     validLocalizableUserText((args) => args.data.name, "data.name", { maxLength: 200 }),
     maxLength((args) => args.data.alias, "data.alias", 100),
-    validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/),
+    validateRegex((args) => args.data.alias, "data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
     validProfileTypeFieldOptions("data", "data"),
   ),
   args: {
@@ -285,6 +292,10 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
+    ifArgDefined(
+      (args) => args.data.name || args.data.alias,
+      profileTypeFieldIsNotStandard("profileTypeFieldId"),
+    ),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -322,7 +333,8 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     maxLength((args) => args.data.name?.en, "data.name.en", 500),
     maxLength((args) => args.data.name?.es, "data.name.es", 500),
     maxLength((args) => args.data.alias, "data.alias", 100),
-    validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/),
+    validateRegex((args) => args.data.alias, "data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
+    validProfileTypeFieldSubstitution("data", "data.substitutions"),
   ),
   resolve: async (_, args, ctx, info) => {
     const updateData: Partial<CreateProfileTypeField> = {};
@@ -342,96 +354,115 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     }
 
     if (isDefined(args.data.options)) {
+      const options = { ...profileTypeField.options, ...args.data.options };
       try {
-        const options = { ...profileTypeField.options, ...args.data.options };
         validateProfileTypeFieldOptions(profileTypeField.type, options);
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new ArgValidationError(info, "data.options", error.message);
+        }
+        throw error;
+      }
 
-        if (profileTypeField.type === "SELECT") {
-          /* 
+      if (profileTypeField.type === "SELECT") {
+        const fieldOptions = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
+
+        const removedOptions = pipe(
+          fieldOptions.values,
+          differenceWith(
+            args.data.options.values as { value: string }[],
+            (a, b) => a.value === b.value,
+          ),
+        );
+
+        // make sure we are not removing standard options
+        if (removedOptions.some((o) => o.isStandard)) {
+          throw new ArgValidationError(
+            info,
+            "data.options",
+            "Can't remove standard options from a SELECT field.",
+          );
+        }
+
+        // append the isStandard flag to the new options
+        for (const value of (options as ProfileTypeFieldOptions["SELECT"]).values) {
+          if (fieldOptions.values.some((v) => v.value === value.value && v.isStandard)) {
+            value.isStandard = true;
+          }
+        }
+
+        /* 
             when removing options from a SELECT field, we need to make sure that
             every profile_field_value using those options are updated to use the substitution.
 
             If the removed option is being used and does not have any substitution, throw an error
             so the user can choose a substitution for the option and try again.
           */
-          const removedOptionsWithoutSubstitutions = pipe(
-            profileTypeField.options.values as { value: string }[],
-            differenceWith(
-              args.data.options.values as { value: string }[],
-              (a, b) => a.value === b.value,
-            ),
-            differenceWith(args.data.substitutions ?? [], (a, b) => a.value === b.old),
+        const removedOptionsWithoutSubstitutions = pipe(
+          removedOptions,
+          differenceWith(args.data.substitutions ?? [], (a, b) => a.value === b.old),
+        );
+
+        if (removedOptionsWithoutSubstitutions.length > 0) {
+          const usedProfileFieldValues = await ctx.profiles.getProfileFieldValueCountWithContent(
+            profileTypeField.id,
+            removedOptionsWithoutSubstitutions.map((o) => o.value),
           );
+          if (Object.keys(usedProfileFieldValues).length > 0) {
+            const removedOptions = (
+              profileTypeField.options as ProfileTypeFieldOptions["SELECT"]
+            ).values
+              .filter((value) => usedProfileFieldValues[value.value])
+              .map((value) => ({ ...value, count: usedProfileFieldValues[value.value] }));
 
-          if (removedOptionsWithoutSubstitutions.length > 0) {
-            const usedProfileFieldValues = await ctx.profiles.getProfileFieldValueCountWithContent(
-              profileTypeField.id,
-              removedOptionsWithoutSubstitutions.map((o) => o.value),
+            throw new ApolloError(
+              "Cannot remove options that have values associated with them.",
+              "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR",
+              { options: removedOptions },
             );
-            if (Object.keys(usedProfileFieldValues).length > 0) {
-              const removedOptions = (
-                profileTypeField.options as ProfileTypeFieldOptions["SELECT"]
-              ).values
-                .filter((value) => usedProfileFieldValues[value.value])
-                .map((value) => ({ ...value, count: usedProfileFieldValues[value.value] }));
-
-              throw new ApolloError(
-                "Cannot remove options that have values associated with them.",
-                "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR",
-                { options: removedOptions },
-              );
-            }
-          }
-          if (isDefined(args.data.substitutions) && args.data.substitutions.length > 0) {
-            const { currentValues, previousValues } =
-              await ctx.profiles.updateProfileFieldValueContentByProfileFieldTypeId(
-                profileTypeField.id,
-                args.data.substitutions,
-                ctx.user!.id,
-              );
-
-            const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
-            const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
-
-            if (previousValues.length > 0) {
-              await ctx.profiles.createProfileUpdatedEvents(
-                previousValues[0].profile_id,
-                previousValues.map((f) => {
-                  const current = currentByPtfId[f.profile_type_field_id] as ProfileFieldValue;
-                  const previous = previousByPtfId[f.profile_type_field_id] as ProfileFieldValue;
-
-                  return {
-                    org_id: ctx.user!.org_id,
-                    profile_id: f.profile_id,
-                    type: "PROFILE_FIELD_VALUE_UPDATED",
-                    data: {
-                      user_id: ctx.user!.id,
-                      profile_type_field_id: f.profile_type_field_id,
-                      current_profile_field_value_id: current?.id ?? null,
-                      previous_profile_field_value_id: previous?.id ?? null,
-                      alias:
-                        updateData.alias !== undefined
-                          ? updateData.alias
-                          : profileTypeField.alias ?? null,
-                    },
-                  };
-                }),
-                ctx.user!,
-              );
-            }
           }
         }
+        if (isDefined(args.data.substitutions) && args.data.substitutions.length > 0) {
+          const { currentValues, previousValues } =
+            await ctx.profiles.updateProfileFieldValueContentByProfileFieldTypeId(
+              profileTypeField.id,
+              args.data.substitutions,
+              ctx.user!.id,
+            );
 
-        updateData.options = options;
-      } catch (e) {
-        if (e instanceof ApolloError) {
-          throw e;
+          const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
+          const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
+
+          if (previousValues.length > 0) {
+            await ctx.profiles.createProfileUpdatedEvents(
+              previousValues[0].profile_id,
+              previousValues.map((f) => {
+                const current = currentByPtfId[f.profile_type_field_id] as ProfileFieldValue;
+                const previous = previousByPtfId[f.profile_type_field_id] as ProfileFieldValue;
+
+                return {
+                  org_id: ctx.user!.org_id,
+                  profile_id: f.profile_id,
+                  type: "PROFILE_FIELD_VALUE_UPDATED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    profile_type_field_id: f.profile_type_field_id,
+                    current_profile_field_value_id: current?.id ?? null,
+                    previous_profile_field_value_id: previous?.id ?? null,
+                    alias:
+                      updateData.alias !== undefined
+                        ? updateData.alias
+                        : profileTypeField.alias ?? null,
+                  },
+                };
+              }),
+              ctx.user!,
+            );
+          }
         }
-        if (e instanceof Error) {
-          throw new ArgValidationError(info, "data.options", e.message);
-        }
-        throw e;
       }
+
+      updateData.options = options;
     }
 
     try {
@@ -548,6 +579,7 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
+    profileTypeFieldIsNotStandard("profileTypeFieldIds"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),

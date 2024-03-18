@@ -1,5 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Center,
@@ -98,6 +101,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const intl = useIntl();
 
   const isUpdating = isDefined(profileTypeField);
+  const isStandard = profileTypeField?.isStandard ?? false;
 
   const initialOptionValues = useConstant(() => {
     if (profileTypeField?.type === "SELECT") {
@@ -132,7 +136,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
   });
   const {
     control,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     register,
     handleSubmit,
     watch,
@@ -220,6 +224,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
         as: "form",
         onSubmit: handleSubmit(async (data) => {
           try {
+            const dirtyFieldsKeys = Object.keys(
+              dirtyFields,
+            ) as (keyof CreateOrUpdateProfileTypeFieldDialogData)[];
+            const dirtyData = pick(data, dirtyFieldsKeys);
+
             const expiryAlertAheadTime =
               data.isExpirable && data.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
                 ? expirationToDuration(data.expiryAlertAheadTime)
@@ -227,19 +236,21 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
             if (isUpdating) {
               if (data.type === "SELECT") {
-                const options = {
-                  ...pick(data.options, ["showOptionsWithColors"]),
-                  values: data.options.values!.map(omit(["id", "existing"])),
-                };
+                const options = isDefined(dirtyData.options)
+                  ? {
+                      ...pick(dirtyData.options, ["showOptionsWithColors"]),
+                      values: dirtyData.options.values!.map(omit(["id", "existing"])),
+                    }
+                  : undefined;
                 try {
                   await updateProfileTypeField({
                     variables: {
                       profileTypeId,
                       profileTypeFieldId: profileTypeField.id,
                       data: {
-                        ...omit(data, ["expiryAlertAheadTime", "type", "alias"]),
-                        alias: data.alias || null,
+                        ...(isStandard ? {} : dirtyData),
                         options,
+                        isExpirable: data.isExpirable,
                         expiryAlertAheadTime,
                       },
                     },
@@ -251,9 +262,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
                     const optionValuesToUpdate =
                       await showConfirmRemovedSelectOptionsReplacementDialog({
-                        currentOptions: data.options.values!,
+                        currentOptions: dirtyData.options.values!,
                         removedOptions: removedOptions,
-                        showOptionsWithColors: data.options.showOptionsWithColors ?? false,
+                        showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
                       });
 
                     await updateProfileTypeField({
@@ -261,9 +272,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
                         profileTypeId,
                         profileTypeFieldId: profileTypeField.id,
                         data: {
-                          ...omit(data, ["expiryAlertAheadTime", "type", "alias"]),
-                          alias: data.alias || null,
+                          ...(isStandard ? {} : dirtyData),
                           options,
+                          isExpirable: data.isExpirable,
                           expiryAlertAheadTime,
                           substitutions: optionValuesToUpdate,
                         },
@@ -279,10 +290,10 @@ function CreateOrUpdateProfileTypeFieldDialog({
                     profileTypeId,
                     profileTypeFieldId: profileTypeField.id,
                     data: {
-                      ...omit(data, ["expiryAlertAheadTime", "type", "alias"]),
-                      alias: data.alias || null,
+                      ...dirtyData,
                       options:
                         data.type === "DATE" ? pick(data.options, ["useReplyAsExpiryDate"]) : {},
+                      isExpirable: data.isExpirable,
                       expiryAlertAheadTime,
                     },
                   },
@@ -334,7 +345,18 @@ function CreateOrUpdateProfileTypeFieldDialog({
       }
       body={
         <Stack spacing={4}>
-          <FormControl isInvalid={!!errors.name}>
+          {isStandard ? (
+            <Alert status="info" rounded="md">
+              <AlertIcon />
+              <AlertDescription>
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.property-standard-alert-description"
+                  defaultMessage="This property is provided by Parallel, and only some of the options can be modified."
+                />
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <FormControl isInvalid={!!errors.name} isDisabled={isStandard}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.property-name"
@@ -399,7 +421,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={!!errors.alias}>
+          <FormControl isInvalid={!!errors.alias} isDisabled={isStandard}>
             <FormLabel display="flex" alignItems="center" fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.unique-identifier"
@@ -416,8 +438,13 @@ function CreateOrUpdateProfileTypeFieldDialog({
             </FormLabel>
             <Input
               {...register("alias", {
-                validate: (value) => {
-                  return value ? REFERENCE_REGEX.test(value) : true;
+                validate: {
+                  isAliasReservedError: (value) => {
+                    return value && !isStandard ? /^(?!p_).*$/.test(value) : true;
+                  },
+                  isInvalidReferenceError: (value) => {
+                    return value && !isStandard ? REFERENCE_REGEX.test(value) : true;
+                  },
                 },
               })}
               maxLength={50}
@@ -427,6 +454,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 <FormattedMessage
                   id="component.create-or-update-property-dialog.unique-identifier-alredy-exists"
                   defaultMessage="This identifier is already in use"
+                />
+              ) : errors.alias?.type === "isAliasReservedError" ? (
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.reserved-alias-error"
+                  defaultMessage="This identifier is reserved and can't be used"
                 />
               ) : (
                 <FormattedMessage
@@ -700,7 +732,7 @@ function ProfileFieldSelectOption({
 }) {
   const intl = useIntl();
   const isUpdating = field.existing ?? false;
-
+  const isDisabled = field.isStandard ?? false;
   const {
     control,
     formState: { errors, touchedFields },
@@ -776,6 +808,7 @@ function ProfileFieldSelectOption({
         paddingBlock={2}
         width="50%"
         isInvalid={!!errors.options?.values?.[index]?.label}
+        isDisabled={isDisabled}
       >
         <Box
           className="drag-handle"
@@ -849,7 +882,7 @@ function ProfileFieldSelectOption({
         paddingBlock={2}
         width="50%"
         isInvalid={!!errors.options?.values?.[index]?.value}
-        isDisabled={isUpdating}
+        isDisabled={isUpdating || isDisabled}
       >
         <Input
           {...register(`options.values.${index}.value` as const, {
@@ -887,6 +920,7 @@ function ProfileFieldSelectOption({
           paddingInline={1}
           paddingBlock={2}
           minWidth="158px"
+          isDisabled={isDisabled}
         >
           <Controller
             name={`options.values.${index}.color` as const}
@@ -899,7 +933,7 @@ function ProfileFieldSelectOption({
       ) : null}
       <Td verticalAlign="top" paddingInline={1} paddingBlock={2}>
         <IconButtonWithTooltip
-          isDisabled={!canRemoveOption}
+          isDisabled={!canRemoveOption || isDisabled}
           onClick={() => onRemove(index)}
           icon={<DeleteIcon />}
           variant="outline"
@@ -928,6 +962,7 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
       isExpirable
       expiryAlertAheadTime
       options
+      isStandard
     }
   `,
 };

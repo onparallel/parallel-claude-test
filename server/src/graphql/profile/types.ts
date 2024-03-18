@@ -40,6 +40,9 @@ export const ProfileType = objectType({
       resolve: async (o, _, ctx) =>
         o.archived_by_user_id ? await ctx.users.loadUser(o.archived_by_user_id) : null,
     });
+    t.nonNull.boolean("isStandard", {
+      resolve: (o) => o.standard_type !== null,
+    });
   },
 });
 
@@ -91,6 +94,9 @@ export const ProfileTypeField = objectType({
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });
     t.nullable.duration("expiryAlertAheadTime", { resolve: (o) => o.expiry_alert_ahead_time });
+    t.nonNull.boolean("isStandard", {
+      resolve: (o) => o.alias?.startsWith("p_") ?? false,
+    });
   },
 });
 

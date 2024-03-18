@@ -4318,6 +4318,7 @@ export interface ProfileType extends Timestamps {
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
   id: Scalars["GID"]["output"];
+  isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
   /** Time when the resource was last updated. */
@@ -4331,6 +4332,7 @@ export interface ProfileTypeField {
   expiryAlertAheadTime?: Maybe<Scalars["Duration"]["output"]>;
   id: Scalars["GID"]["output"];
   isExpirable: Scalars["Boolean"]["output"];
+  isStandard: Scalars["Boolean"]["output"];
   isUsedInProfileName: Scalars["Boolean"]["output"];
   myPermission: ProfileTypeFieldPermissionType;
   name: Scalars["LocalizableUserText"]["output"];
@@ -8624,6 +8626,7 @@ export type ProfileTypeSettings_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
+  isStandard: boolean;
   profileNamePattern: string;
   fields: Array<{
     __typename?: "ProfileTypeField";
@@ -8643,6 +8646,7 @@ export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   options: { [key: string]: any };
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
+  isStandard: boolean;
 };
 
 export type useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldMutationVariables =
@@ -8661,6 +8665,7 @@ export type useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldMutati
     options: { [key: string]: any };
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
+    isStandard: boolean;
   };
 };
 
@@ -8682,6 +8687,7 @@ export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutati
     options: { [key: string]: any };
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
+    isStandard: boolean;
   };
 };
 
@@ -26742,6 +26748,7 @@ export type OrganizationProfileType_ProfileTypeFieldFragment = {
   id: string;
   name: { [locale in UserLocale]?: string };
   type: ProfileTypeFieldType;
+  isStandard: boolean;
   myPermission: ProfileTypeFieldPermissionType;
   defaultPermission: ProfileTypeFieldPermissionType;
   isUsedInProfileName: boolean;
@@ -26778,6 +26785,7 @@ export type OrganizationProfileType_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   name: { [locale in UserLocale]?: string };
+  isStandard: boolean;
   profileNamePattern: string;
   createdAt: string;
   archivedAt?: string | null;
@@ -26786,6 +26794,7 @@ export type OrganizationProfileType_ProfileTypeFragment = {
     id: string;
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
+    isStandard: boolean;
     defaultPermission: ProfileTypeFieldPermissionType;
     myPermission: ProfileTypeFieldPermissionType;
     isUsedInProfileName: boolean;
@@ -26828,6 +26837,7 @@ export type OrganizationProfileType_profileTypeQuery = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    isStandard: boolean;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -26836,6 +26846,7 @@ export type OrganizationProfileType_profileTypeQuery = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
+      isStandard: boolean;
       defaultPermission: ProfileTypeFieldPermissionType;
       myPermission: ProfileTypeFieldPermissionType;
       isUsedInProfileName: boolean;
@@ -26963,6 +26974,7 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    isStandard: boolean;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -26971,6 +26983,7 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
+      isStandard: boolean;
       defaultPermission: ProfileTypeFieldPermissionType;
       myPermission: ProfileTypeFieldPermissionType;
       isUsedInProfileName: boolean;
@@ -27015,6 +27028,7 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    isStandard: boolean;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -27023,6 +27037,7 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
+      isStandard: boolean;
       defaultPermission: ProfileTypeFieldPermissionType;
       myPermission: ProfileTypeFieldPermissionType;
       isUsedInProfileName: boolean;
@@ -27067,6 +27082,7 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    isStandard: boolean;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -27075,6 +27091,7 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
+      isStandard: boolean;
       defaultPermission: ProfileTypeFieldPermissionType;
       myPermission: ProfileTypeFieldPermissionType;
       isUsedInProfileName: boolean;
@@ -27122,6 +27139,7 @@ export type OrganizationProfileType_updateProfileTypeFieldMutation = {
     id: string;
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
+    isStandard: boolean;
     myPermission: ProfileTypeFieldPermissionType;
     defaultPermission: ProfileTypeFieldPermissionType;
     isUsedInProfileName: boolean;
@@ -27166,6 +27184,7 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    isStandard: boolean;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -27174,6 +27193,7 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
+      isStandard: boolean;
       defaultPermission: ProfileTypeFieldPermissionType;
       myPermission: ProfileTypeFieldPermissionType;
       isUsedInProfileName: boolean;
@@ -27214,6 +27234,7 @@ export type OrganizationProfileTypes_ProfileTypeFragment = {
   name: { [locale in UserLocale]?: string };
   createdAt: string;
   archivedAt?: string | null;
+  isStandard: boolean;
 };
 
 export type OrganizationProfileTypes_ProfileTypePaginationFragment = {
@@ -27225,6 +27246,7 @@ export type OrganizationProfileTypes_ProfileTypePaginationFragment = {
     name: { [locale in UserLocale]?: string };
     createdAt: string;
     archivedAt?: string | null;
+    isStandard: boolean;
   }>;
 };
 
@@ -27247,6 +27269,7 @@ export type OrganizationProfileTypes_profileTypesQuery = {
       name: { [locale in UserLocale]?: string };
       createdAt: string;
       archivedAt?: string | null;
+      isStandard: boolean;
     }>;
   };
 };
@@ -27304,6 +27327,7 @@ export type OrganizationProfileTypes_createProfileTypeMutation = {
     name: { [locale in UserLocale]?: string };
     createdAt: string;
     archivedAt?: string | null;
+    isStandard: boolean;
   };
 };
 
@@ -27317,6 +27341,7 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
     __typename?: "ProfileType";
     id: string;
     name: { [locale in UserLocale]?: string };
+    isStandard: boolean;
     profileNamePattern: string;
     createdAt: string;
     archivedAt?: string | null;
@@ -27325,6 +27350,7 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
+      isStandard: boolean;
       defaultPermission: ProfileTypeFieldPermissionType;
       myPermission: ProfileTypeFieldPermissionType;
       isUsedInProfileName: boolean;
@@ -49270,6 +49296,7 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc
     isExpirable
     expiryAlertAheadTime
     options
+    isStandard
   }
 ` as unknown as DocumentNode<
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
@@ -49288,6 +49315,7 @@ export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
     id
     name
     type
+    isStandard
     ...useProfileTypeFieldPermissionDialog_ProfileTypeField
     ...useUpdateProfileTypeFieldDialog_ProfileTypeField
     ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
@@ -49305,6 +49333,7 @@ export const ProfileTypeSettings_ProfileTypeFragmentDoc = gql`
     fields {
       ...ProfileTypeSettings_ProfileTypeField
     }
+    isStandard
     profileNamePattern
   }
   ${ProfileTypeSettings_ProfileTypeFieldFragmentDoc}
@@ -49325,6 +49354,7 @@ export const OrganizationProfileType_ProfileTypeFragmentDoc = gql`
   fragment OrganizationProfileType_ProfileType on ProfileType {
     id
     name
+    isStandard
     fields {
       ...OrganizationProfileType_ProfileTypeField
     }
@@ -49352,6 +49382,7 @@ export const OrganizationProfileTypes_ProfileTypeFragmentDoc = gql`
     name
     createdAt
     archivedAt
+    isStandard
     ...useDeleteProfileType_ProfileType
     ...useArchiveProfileType_ProfileType
   }

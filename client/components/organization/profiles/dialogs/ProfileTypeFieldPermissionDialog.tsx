@@ -172,7 +172,7 @@ export function ProfileTypeFieldPermissionDialog({
       body={
         <Stack>
           {isUsedInProfileName ? (
-            <Alert status="info" marginBottom={2}>
+            <Alert status="info" marginBottom={2} borderRadius="md">
               <AlertIcon />
               <AlertDescription>
                 <FormattedMessage
@@ -478,8 +478,8 @@ const ProfileTypeFieldPermissionTypeText = chakraForwardRef<
     <Text ref={ref as any} as="span" {...props}>
       {type === "HIDDEN" ? (
         <FormattedMessage
-          id="component.profile-type-field-permission-dialog.hidden"
-          defaultMessage="Hidden"
+          id="component.profile-type-field-permission-dialog.restricted"
+          defaultMessage="Restricted"
         />
       ) : type === "WRITE" ? (
         <FormattedMessage

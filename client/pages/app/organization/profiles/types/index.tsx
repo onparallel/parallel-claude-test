@@ -3,6 +3,7 @@ import { Flex, Text } from "@chakra-ui/react";
 import { ArchiveIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -41,7 +42,7 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
+import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["name", "createdAt"] as const;
@@ -170,6 +171,7 @@ function OrganizationProfileTypes() {
     onCloneClick: handleCloneClick,
     onUnarchiveClick: handleUnarchiveClick,
     onArchiveClick: handleArchiveClick,
+    hasStandardProfileTypeSelected: selectedRows.some((row) => row.isStandard),
   });
 
   const context = useMemo<OrganizationProfileTypesContext>(
@@ -345,6 +347,7 @@ function useProfileTypesListActions({
   onDeleteClick,
   onArchiveClick,
   onUnarchiveClick,
+  hasStandardProfileTypeSelected,
 }: {
   showArchived: boolean | null;
   selectedCount: number;
@@ -352,6 +355,7 @@ function useProfileTypesListActions({
   onDeleteClick: () => void;
   onArchiveClick: () => void;
   onUnarchiveClick: () => void;
+  hasStandardProfileTypeSelected: boolean;
 }) {
   return showArchived
     ? [
@@ -385,6 +389,20 @@ function useProfileTypesListActions({
             <FormattedMessage id="component.profile-types-table.archive" defaultMessage="Archive" />
           ),
           colorScheme: "red",
+          isDisabled: hasStandardProfileTypeSelected,
+          wrap: (button: ReactNode) => (
+            <RestrictedFeaturePopover
+              isRestricted={hasStandardProfileTypeSelected}
+              content={
+                <FormattedMessage
+                  id="component.profile-types-list-actions.archive-restricted"
+                  defaultMessage="Some of the selected profile types are provided by Parallel and cannot be archived."
+                />
+              }
+            >
+              {button}
+            </RestrictedFeaturePopover>
+          ),
         },
       ];
 }
@@ -397,6 +415,7 @@ OrganizationProfileTypes.fragments = {
         name
         createdAt
         archivedAt
+        isStandard
         ...useDeleteProfileType_ProfileType
         ...useArchiveProfileType_ProfileType
       }

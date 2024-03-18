@@ -1768,6 +1768,72 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("INVALID_PROFILE_NAME_PATTERN");
       expect(data).toBeNull();
     });
+
+    it("fails when trying to update name of a standard profile type", async () => {
+      const [standardProfileType] = await mocks.createRandomProfileTypes(
+        organization.id,
+        1,
+        () => ({
+          name: json({ en: "Standard", es: "Standard" }),
+          standard_type: "CONTRACT",
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $name: LocalizableUserText!) {
+            updateProfileType(profileTypeId: $profileTypeId, name: $name) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", standardProfileType.id),
+          name: { en: "Updated name" },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("fails when trying to update profile name pattern of a standard profile type", async () => {
+      const [standardProfileType] = await mocks.createRandomProfileTypes(
+        organization.id,
+        1,
+        () => ({
+          name: json({ en: "Standard", es: "Standard" }),
+          standard_type: "CONTRACT",
+        }),
+      );
+
+      const [profileTypeField] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        standardProfileType.id,
+        1,
+        () => ({ type: "SHORT_TEXT" }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileNamePattern: String!) {
+            updateProfileType(
+              profileTypeId: $profileTypeId
+              profileNamePattern: $profileNamePattern
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", standardProfileType.id),
+          profileNamePattern: `Hello {{${toGlobalId("ProfileTypeField", profileTypeField.id)}}}`,
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("cloneProfileType", () => {
@@ -1808,6 +1874,48 @@ describe("GraphQL/Profiles", () => {
         `{{ ${data.cloneProfileType.fields[0].id} }} {{ ${data.cloneProfileType.fields[1].id} }}`,
       );
     });
+
+    it("cloning a standard profile type makes it mutable", async () => {
+      const [standardProfileType] = await mocks.createRandomProfileTypes(
+        organization.id,
+        1,
+        () => ({
+          name: json({ en: "Standard", es: "Standard" }),
+          standard_type: "CONTRACT",
+        }),
+      );
+
+      await mocks.createRandomProfileTypeFields(
+        organization.id,
+        standardProfileType.id,
+        3,
+        (i) => ({
+          alias: `p_${i}`,
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            cloneProfileType(profileTypeId: $profileTypeId) {
+              isStandard
+              fields {
+                isStandard
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", standardProfileType.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.cloneProfileType).toEqual({
+        isStandard: false,
+        fields: [{ isStandard: false }, { isStandard: false }, { isStandard: false }],
+      });
+    });
   });
 
   describe("archiveProfileType", () => {
@@ -1845,6 +1953,33 @@ describe("GraphQL/Profiles", () => {
           archivedBy: { id: toGlobalId("User", sessionUser.id) },
         },
       ]);
+    });
+
+    it("sends error when trying to archive a standard profile type", async () => {
+      const [standardProfileType] = await mocks.createRandomProfileTypes(
+        organization.id,
+        1,
+        () => ({
+          name: json({ en: "Standard", es: "Standard" }),
+          standard_type: "CONTRACT",
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            archiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", standardProfileType.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 
@@ -1893,6 +2028,35 @@ describe("GraphQL/Profiles", () => {
         { id: toGlobalId("ProfileType", profileTypes[1].id) },
         { id: toGlobalId("ProfileType", profileTypes[2].id) },
       ]);
+    });
+
+    it("sends error when trying to unarchive a standard profile type", async () => {
+      const [standardProfileType] = await mocks.createRandomProfileTypes(
+        organization.id,
+        1,
+        () => ({
+          name: json({ en: "Standard", es: "Standard" }),
+          standard_type: "CONTRACT",
+          archived_at: new Date(),
+          archived_by_user_id: sessionUser.id,
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            unarchiveProfileType(profileTypeIds: $profileTypeIds) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", standardProfileType.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 
@@ -2022,6 +2186,33 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to delete a standard profile type", async () => {
+      const [standardProfileType] = await mocks.createRandomProfileTypes(
+        organization.id,
+        1,
+        () => ({
+          name: json({ en: "Standard", es: "Standard" }),
+          standard_type: "CONTRACT",
+          archived_at: new Date(),
+          archived_by_user_id: sessionUser.id,
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds)
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", standardProfileType.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createProfileTypeField", () => {
@@ -2147,12 +2338,37 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("fails when creating a field with alias starting with p_", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            alias: "p_firstname",
+            name: { en: "First Name" },
+            type: "TEXT",
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updateProfileTypeField", () => {
     let profileTypeField: ProfileTypeField;
     let profileTypeField2: ProfileTypeField;
     let profileTypeField3: ProfileTypeField;
+    let selectWithStandardOptions: ProfileTypeField;
+
     beforeEach(async () => {
       [profileTypeField, profileTypeField2, profileTypeField3] =
         await mocks.createRandomProfileTypeFields(organization.id, profileTypes[1].id, 3, (i) => ({
@@ -2170,6 +2386,23 @@ describe("GraphQL/Profiles", () => {
                 }
               : {},
         }));
+
+      [selectWithStandardOptions] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileTypes[1].id,
+        1,
+        () => ({
+          type: "SELECT",
+          alias: "p_standard",
+          options: {
+            values: [
+              { value: "option_1", label: { es: "Opción 1", en: "Option 1" }, isStandard: true },
+              { value: "option_2", label: { es: "Opción 2", en: "Option 2" }, isStandard: true },
+              { value: "A", label: { es: "A", en: "A" } },
+            ],
+          },
+        }),
+      );
     });
 
     it("updates the information of the profile type field", async () => {
@@ -2428,6 +2661,10 @@ describe("GraphQL/Profiles", () => {
             field: { id: toGlobalId("ProfileTypeField", profileTypeField3.id) },
             value: null,
           },
+          {
+            field: { id: toGlobalId("ProfileTypeField", selectWithStandardOptions.id) },
+            value: null,
+          },
         ],
       });
     });
@@ -2609,7 +2846,10 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
           data: {
             options: {
-              values: [{ value: "option_1", label: { es: "Opción 1", en: "Option 1" } }],
+              values: [
+                { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
+                { value: "new_option", label: { es: "Nueva Opción" } },
+              ],
             },
             substitutions: [{ old: "option_2", new: "new_option" }],
           },
@@ -2650,6 +2890,341 @@ describe("GraphQL/Profiles", () => {
           ],
         },
       });
+    });
+
+    it("fails when updating field alias to start with p_", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          data: { alias: "p_alias" },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when tying to update standard SELECT options of field", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          data: {
+            options: {
+              values: [
+                { value: "option_1_updated", label: { es: "Opción 1", en: "Option 1" } },
+                { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
+              ],
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails when trying to delete standard SELECT options of field", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          data: {
+            options: {
+              values: [{ value: "option_2", label: { es: "Opción 2", en: "Option 2" } }],
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("allows to add new SELECT options to standard field", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          data: {
+            options: {
+              values: [
+                { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
+                { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
+                { value: "option_3", label: { es: "Opción 3", en: "Option 3" } },
+              ],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+        options: {
+          values: [
+            { value: "option_1", label: { es: "Opción 1", en: "Option 1" }, isStandard: true },
+            { value: "option_2", label: { es: "Opción 2", en: "Option 2" }, isStandard: true },
+            { value: "option_3", label: { es: "Opción 3", en: "Option 3" } },
+          ],
+        },
+      });
+    });
+
+    it("fails when updating name or alias of a standard field", async () => {
+      for (const updateData of [{ name: { en: "new name" } }, { alias: "new_alias" }]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation (
+              $profileTypeId: GID!
+              $profileTypeFieldId: GID!
+              $data: UpdateProfileTypeFieldInput!
+            ) {
+              updateProfileTypeField(
+                profileTypeId: $profileTypeId
+                profileTypeFieldId: $profileTypeFieldId
+                data: $data
+              ) {
+                id
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+            profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+            data: updateData,
+          },
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      }
+    });
+
+    it("allows to update isExpirable and expiryAlertAheadTime of a standard field", async () => {
+      for (const updateData of [{ isExpirable: true }, { expiryAlertAheadTime: { months: 1 } }]) {
+        const { errors } = await testClient.execute(
+          gql`
+            mutation (
+              $profileTypeId: GID!
+              $profileTypeFieldId: GID!
+              $data: UpdateProfileTypeFieldInput!
+            ) {
+              updateProfileTypeField(
+                profileTypeId: $profileTypeId
+                profileTypeFieldId: $profileTypeFieldId
+                data: $data
+              ) {
+                id
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+            profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+            data: updateData,
+          },
+        );
+
+        expect(errors).toBeUndefined();
+      }
+    });
+
+    it("fails if trying to remove SELECT option used in a profile field value", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          content: { value: "A" },
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeFieldId: GID!
+            $profileTypeId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeFieldId: $profileTypeFieldId
+              profileTypeId: $profileTypeId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            options: {
+              values: [
+                { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
+                { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
+              ],
+            },
+          },
+        },
+      );
+      expect(errors).toContainGraphQLError("REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("does not fail if offering substitution when removing SELECT option used in a profile field value", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          content: { value: "A" },
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeFieldId: GID!
+            $profileTypeId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeFieldId: $profileTypeFieldId
+              profileTypeId: $profileTypeId
+              data: $data
+            ) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            options: {
+              values: [
+                { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
+                { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
+              ],
+            },
+            substitutions: [{ old: "A", new: "option_1" }],
+          },
+        },
+      );
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+        options: {
+          values: [
+            { value: "option_1", label: { es: "Opción 1", en: "Option 1" }, isStandard: true },
+            { value: "option_2", label: { es: "Opción 2", en: "Option 2" }, isStandard: true },
+          ],
+        },
+      });
+    });
+
+    it("fails when offering unknown substitution", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          content: { value: "A" },
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeFieldId: GID!
+            $profileTypeId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeFieldId: $profileTypeFieldId
+              profileTypeId: $profileTypeId
+              data: $data
+            ) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectWithStandardOptions.id),
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            options: {
+              values: [
+                { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
+                { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
+              ],
+            },
+            substitutions: [{ old: "A", new: "unknown" }],
+          },
+        },
+      );
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
     });
   });
 
@@ -2837,6 +3412,38 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[0].id)],
         },
       );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("fails when deleting a standard field", async () => {
+      const [standardField] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileTypes[1].id,
+        1,
+        () => ({
+          alias: "p_name",
+          type: "TEXT",
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", standardField.id)],
+        },
+      );
+
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });

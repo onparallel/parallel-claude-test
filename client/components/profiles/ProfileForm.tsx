@@ -451,8 +451,8 @@ export const ProfileForm = Object.assign(
                 <LockClosedIcon />
                 <Heading as="h3" size="sm" fontWeight={600}>
                   <FormattedMessage
-                    id="page.profile-details.hidden-properties"
-                    defaultMessage="Hidden properties"
+                    id="page.profile-details.restricted-properties"
+                    defaultMessage="Restricted properties"
                   />
                 </Heading>
                 <HelpPopover>

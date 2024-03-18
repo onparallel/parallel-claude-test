@@ -2898,6 +2898,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     fields: NexusGenRootTypes["ProfileTypeField"][]; // [ProfileTypeField!]!
     id: NexusGenScalars["GID"]; // GID!
+    isStandard: boolean; // Boolean!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     profileNamePattern: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2909,6 +2910,7 @@ export interface NexusGenFieldTypes {
     expiryAlertAheadTime: NexusGenScalars["Duration"] | null; // Duration
     id: NexusGenScalars["GID"]; // GID!
     isExpirable: boolean; // Boolean!
+    isStandard: boolean; // Boolean!
     isUsedInProfileName: boolean; // Boolean!
     myPermission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
@@ -5333,6 +5335,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     fields: "ProfileTypeField";
     id: "GID";
+    isStandard: "Boolean";
     name: "LocalizableUserText";
     profileNamePattern: "String";
     updatedAt: "DateTime";
@@ -5344,6 +5347,7 @@ export interface NexusGenFieldTypeNames {
     expiryAlertAheadTime: "Duration";
     id: "GID";
     isExpirable: "Boolean";
+    isStandard: "Boolean";
     isUsedInProfileName: "Boolean";
     myPermission: "ProfileTypeFieldPermissionType";
     name: "LocalizableUserText";

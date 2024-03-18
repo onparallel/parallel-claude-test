@@ -4168,6 +4168,7 @@ export type ProfileType = Timestamps & {
   createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
   id: Scalars["GID"]["output"];
+  isStandard: Scalars["Boolean"]["output"];
   name: Scalars["LocalizableUserText"]["output"];
   profileNamePattern: Scalars["String"]["output"];
   /** Time when the resource was last updated. */
@@ -4180,6 +4181,7 @@ export type ProfileTypeField = {
   expiryAlertAheadTime: Maybe<Scalars["Duration"]["output"]>;
   id: Scalars["GID"]["output"];
   isExpirable: Scalars["Boolean"]["output"];
+  isStandard: Scalars["Boolean"]["output"];
   isUsedInProfileName: Scalars["Boolean"]["output"];
   myPermission: ProfileTypeFieldPermissionType;
   name: Scalars["LocalizableUserText"]["output"];
