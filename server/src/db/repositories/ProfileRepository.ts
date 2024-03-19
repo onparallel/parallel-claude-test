@@ -1,3 +1,4 @@
+import { addSeconds, differenceInSeconds } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import {
@@ -41,9 +42,6 @@ import {
   User,
   UserLocale,
 } from "../__types";
-import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
-import { SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
 import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
@@ -51,7 +49,9 @@ import {
   ProfileFieldValueUpdatedEvent,
   ProfileUpdatedEvent,
 } from "../events/ProfileEvent";
-import { differenceInSeconds } from "date-fns";
+import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
+import { SortBy } from "../helpers/utils";
+import { KNEX } from "../knex";
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
@@ -1051,7 +1051,8 @@ export class ProfileRepository extends BaseRepository {
     ) {
       await this.updateEvent(
         profileUpdatedEvent.id,
-        { created_at: new Date() },
+        // make sure this created_at is greater than inserted events (equal created_at will move this event to 2nd position in event list)
+        { created_at: addSeconds(new Date(), 1) },
         this.PROFILE_UPDATED_EVENT_DELAY_SECONDS,
         t,
       );
