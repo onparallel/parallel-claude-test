@@ -39,6 +39,7 @@ import {
   PetitionSignatureRequestFragment,
   PetitionTagFilter,
   ProfileFragment,
+  ProfileTypeFieldFragment,
   TagFragmentDoc,
   TaskFragment as TaskType,
   TemplateFragment,
@@ -527,14 +528,28 @@ export function bodyMessageToRTE(message?: Maybe<{ format: "PLAIN_TEXT"; content
     : null;
 }
 
+function mapProfilePropertyOptions(field: Pick<ProfileTypeFieldFragment, "type" | "options">) {
+  if (field.type === "SELECT") {
+    return pick(field.options, ["values"]);
+  }
+
+  return {};
+}
+
 function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "propertiesByAlias">>(
   profile: T,
 ) {
   return {
     ...omit(profile, ["properties", "propertiesByAlias"]),
-    fields: profile.properties?.map((prop) =>
-      pick(prop, ["field", prop.field.type === "FILE" ? "files" : "value"]),
-    ),
+    fields: profile.properties?.map((prop) => {
+      return {
+        field: {
+          ...prop.field,
+          options: mapProfilePropertyOptions(prop.field),
+        },
+        ...(prop.field.type === "FILE" ? { files: prop.files } : { value: prop.value }),
+      };
+    }),
     fieldsByAlias: isDefined(profile.propertiesByAlias)
       ? fillPropertiesByAlias(profile.propertiesByAlias)
       : undefined,

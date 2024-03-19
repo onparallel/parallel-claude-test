@@ -49,6 +49,7 @@ export interface FieldOptions {
     values: string[];
     labels?: Maybe<string[]>;
     placeholder?: Maybe<string>;
+    standardList?: Maybe<string>;
   };
   DYNAMIC_SELECT: {
     values: DynamicSelectOption[];

@@ -1,8 +1,10 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { isDefined } from "remeda";
+import { FromSchema } from "json-schema-to-ts";
+import { isDefined, pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
-import { CreatePetitionField, PetitionField, PetitionFieldType } from "../__types";
+import { Maybe } from "../../util/types";
+import { ContactLocale, CreatePetitionField, PetitionField, PetitionFieldType } from "../__types";
 
 const SCHEMAS = {
   NUMBER: {
@@ -140,6 +142,9 @@ const SCHEMAS = {
         },
       },
       placeholder: {
+        type: ["string", "null"],
+      },
+      standardList: {
         type: ["string", "null"],
       },
     },
@@ -305,6 +310,10 @@ const SCHEMAS = {
       },
     },
   },
+} as const;
+
+export type PetitionFieldOptions = {
+  [K in keyof typeof SCHEMAS]: FromSchema<(typeof SCHEMAS)[K]>;
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -498,21 +507,54 @@ function hasPlaceholder(type: PetitionFieldType) {
   return ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "PHONE"].includes(type);
 }
 
-export function mapFieldOptions(options: any) {
-  return {
-    ...options,
-    ...(options.autoSearchConfig
-      ? {
-          autoSearchConfig: {
-            type: options.autoSearchConfig.type,
-            name: options.autoSearchConfig.name.map((id: number) =>
-              toGlobalId("PetitionField", id),
-            ),
-            date: isDefined(options.autoSearchConfig.date)
-              ? toGlobalId("PetitionField", options.autoSearchConfig.date)
-              : null,
-          },
-        }
-      : {}),
-  };
+export async function selectOptionsValuesAndLabels(
+  options: PetitionFieldOptions["SELECT"],
+  locale: ContactLocale = "en",
+): Promise<{ values: string[]; labels?: Maybe<string[]> }> {
+  switch (options.standardList) {
+    case "COUNTRIES":
+      const countries = (await import(`./countries/countries_${locale}.json`)).default;
+      const countryCodes = Object.keys(countries);
+      return {
+        values: countryCodes,
+        labels: countryCodes.map((code) => {
+          const label = countries[code];
+          return Array.isArray(label) ? label[0] : label;
+        }),
+      };
+    default:
+      return pick(options, ["values", "labels"]);
+  }
+}
+
+export async function mapFieldOptions(
+  type: PetitionFieldType,
+  options: any,
+  locale?: ContactLocale,
+) {
+  if (type === "BACKGROUND_CHECK") {
+    return {
+      ...options,
+      ...(options.autoSearchConfig
+        ? {
+            autoSearchConfig: {
+              type: options.autoSearchConfig.type,
+              name: options.autoSearchConfig.name.map((id: number) =>
+                toGlobalId("PetitionField", id),
+              ),
+              date: isDefined(options.autoSearchConfig.date)
+                ? toGlobalId("PetitionField", options.autoSearchConfig.date)
+                : null,
+            },
+          }
+        : {}),
+    };
+  } else if (type === "SELECT") {
+    return {
+      ...options,
+      ...(await selectOptionsValuesAndLabels(options, locale)),
+    };
+  }
+
+  return options;
 }

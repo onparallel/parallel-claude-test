@@ -2,6 +2,7 @@ import Ajv from "ajv";
 import { core } from "nexus";
 import { isDefined } from "remeda";
 import { PetitionField } from "../../../db/__types";
+import { selectOptionsValuesAndLabels } from "../../../db/helpers/fieldOptions";
 import { PetitionVariable } from "../../../db/repositories/PetitionRepository";
 import {
   PetitionFieldLogic,
@@ -211,7 +212,7 @@ export function validateReferencingFieldsPositions<
   assert(referencedFieldPosition <= fieldPosition, "Can't reference fields that come next");
 }
 
-export function validateFieldLogic<
+export async function validateFieldLogic<
   TField extends Pick<
     PetitionField,
     | "id"
@@ -224,121 +225,123 @@ export function validateFieldLogic<
     | "parent_petition_field_id"
   >,
 >(field: TField, allFields: TField[], variables: PetitionVariable[]) {
-  function validateLogicCondition(opts?: { allowSelfReference: boolean }) {
-    return (c: PetitionFieldLogicCondition, index: number) => {
-      if ("fieldId" in c) {
-        const referencedField = allFields.find((f) => f.id === c.fieldId);
+  async function validateLogicCondition(
+    c: PetitionFieldLogicCondition,
+    index: number,
+    opts?: { allowSelfReference: boolean },
+  ) {
+    if ("fieldId" in c) {
+      const referencedField = allFields.find((f) => f.id === c.fieldId);
 
-        assert(
-          referencedField !== undefined,
-          `Can't find PetitionField:${c.fieldId} referenced in PetitionField:${field.id}, condition ${index}`,
-        );
+      assert(
+        referencedField !== undefined,
+        `Can't find PetitionField:${c.fieldId} referenced in PetitionField:${field.id}, condition ${index}`,
+      );
 
-        if (!opts?.allowSelfReference) {
-          assert(field.id !== referencedField.id, "Can't add a reference to field itself");
-        }
+      if (!opts?.allowSelfReference) {
+        assert(field.id !== referencedField.id, "Can't add a reference to field itself");
+      }
 
-        validateReferencingFieldsPositions(field, referencedField, allFields);
+      validateReferencingFieldsPositions(field, referencedField, allFields);
 
-        assert(referencedField.type !== "HEADING", `Conditions can't reference HEADING fields`);
-        assert(
-          referencedField.petition_id === field.petition_id,
-          `Field with id ${referencedField.id} is not linked to petition with id ${field.petition_id}`,
-        );
+      assert(referencedField.type !== "HEADING", `Conditions can't reference HEADING fields`);
+      assert(
+        referencedField.petition_id === field.petition_id,
+        `Field with id ${referencedField.id} is not linked to petition with id ${field.petition_id}`,
+      );
 
-        assert(
-          referencedField.type === "FIELD_GROUP" ? c.modifier === "NUMBER_OF_REPLIES" : true,
-          "FIELD_GROUP can only be referenced with NUMBER_OF_REPLIES",
-        );
+      assert(
+        referencedField.type === "FIELD_GROUP" ? c.modifier === "NUMBER_OF_REPLIES" : true,
+        "FIELD_GROUP can only be referenced with NUMBER_OF_REPLIES",
+      );
 
-        // check operator/modifier compatibility
-        if (c.modifier === "NUMBER_OF_REPLIES") {
-          assertOneOf(
-            c.operator,
-            [
-              "EQUAL",
-              "NOT_EQUAL",
-              "LESS_THAN",
-              "LESS_THAN_OR_EQUAL",
-              "GREATER_THAN",
-              "GREATER_THAN_OR_EQUAL",
-            ],
-            `Invalid operator ${c.operator} for modifier ${c.modifier}`,
-          );
-          assert(
-            c.value === null || typeof c.value === "number",
-            `Invalid value type ${typeof c.value} for modifier ${c.modifier}`,
-          );
-        } else {
-          if (referencedField.type === "TEXT" || referencedField.type === "SHORT_TEXT") {
-            assertOneOf(
-              c.operator,
-              ["EQUAL", "NOT_EQUAL", "START_WITH", "END_WITH", "CONTAIN", "NOT_CONTAIN"],
-              `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
-            );
-
-            assert(
-              c.value === null || typeof c.value === "string",
-              `Invalid value type ${typeof c.value} for field of type ${referencedField.type}`,
-            );
-          } else if (isFileTypeField(referencedField.type)) {
-            throw new Error(
-              `Invalid modifier ${c.modifier} for field of type ${referencedField.type}`,
-            );
-          } else if (
-            referencedField.type === "SELECT" ||
-            (referencedField.type === "DYNAMIC_SELECT" && c.column !== undefined)
-          ) {
-            const options =
-              referencedField.type === "SELECT"
-                ? referencedField.options.values
-                : getDynamicSelectValues(referencedField.options.values, c.column!);
-            assertOneOf(
-              c.operator,
-              ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF", "IS_IN_LIST", "NOT_IS_IN_LIST"],
-              `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
-            );
-            assert(
-              c.value === null ||
-                (["EQUAL", "NOT_EQUAL"].includes(c.operator) &&
-                  typeof c.value === "string" &&
-                  options.includes(c.value)) ||
-                (["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(c.operator) &&
-                  Array.isArray(c.value) &&
-                  c.value.every((v) => options.includes(v))) ||
-                (["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(c.operator) &&
-                  typeof c.value === "string"),
-              `Invalid value ${c.value} for field of type ${
-                referencedField.type
-              }. Should be one of: ${options.join(", ")}`,
-            );
-          }
-        }
-      } else {
-        assert(
-          typeof c.value === "number",
-          `Invalid value type ${typeof c.value} for variable condition ${index}`,
-        );
-
+      // check operator/modifier compatibility
+      if (c.modifier === "NUMBER_OF_REPLIES") {
         assertOneOf(
           c.operator,
           [
             "EQUAL",
             "NOT_EQUAL",
-            "GREATER_THAN",
-            "GREATER_THAN_OR_EQUAL",
             "LESS_THAN",
             "LESS_THAN_OR_EQUAL",
+            "GREATER_THAN",
+            "GREATER_THAN_OR_EQUAL",
           ],
-          `Invalid operator ${c.operator} for variable condition ${index}`,
+          `Invalid operator ${c.operator} for modifier ${c.modifier}`,
         );
-
         assert(
-          !!variables.find((v) => v.name === c.variableName),
-          `Can't find variable ${c.variableName} referenced in condition ${index}`,
+          c.value === null || typeof c.value === "number",
+          `Invalid value type ${typeof c.value} for modifier ${c.modifier}`,
         );
+      } else {
+        if (referencedField.type === "TEXT" || referencedField.type === "SHORT_TEXT") {
+          assertOneOf(
+            c.operator,
+            ["EQUAL", "NOT_EQUAL", "START_WITH", "END_WITH", "CONTAIN", "NOT_CONTAIN"],
+            `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
+          );
+
+          assert(
+            c.value === null || typeof c.value === "string",
+            `Invalid value type ${typeof c.value} for field of type ${referencedField.type}`,
+          );
+        } else if (isFileTypeField(referencedField.type)) {
+          throw new Error(
+            `Invalid modifier ${c.modifier} for field of type ${referencedField.type}`,
+          );
+        } else if (
+          referencedField.type === "SELECT" ||
+          (referencedField.type === "DYNAMIC_SELECT" && c.column !== undefined)
+        ) {
+          const options =
+            referencedField.type === "SELECT"
+              ? (await selectOptionsValuesAndLabels(referencedField.options)).values
+              : getDynamicSelectValues(referencedField.options.values, c.column!);
+          assertOneOf(
+            c.operator,
+            ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF", "IS_IN_LIST", "NOT_IS_IN_LIST"],
+            `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
+          );
+          assert(
+            c.value === null ||
+              (["EQUAL", "NOT_EQUAL"].includes(c.operator) &&
+                typeof c.value === "string" &&
+                options.includes(c.value)) ||
+              (["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(c.operator) &&
+                Array.isArray(c.value) &&
+                c.value.every((v) => options.includes(v))) ||
+              (["IS_IN_LIST", "NOT_IS_IN_LIST"].includes(c.operator) &&
+                typeof c.value === "string"),
+            `Invalid value ${c.value} for field of type ${
+              referencedField.type
+            }. Should be one of: ${options.join(", ")}`,
+          );
+        }
       }
-    };
+    } else {
+      assert(
+        typeof c.value === "number",
+        `Invalid value type ${typeof c.value} for variable condition ${index}`,
+      );
+
+      assertOneOf(
+        c.operator,
+        [
+          "EQUAL",
+          "NOT_EQUAL",
+          "GREATER_THAN",
+          "GREATER_THAN_OR_EQUAL",
+          "LESS_THAN",
+          "LESS_THAN_OR_EQUAL",
+        ],
+        `Invalid operator ${c.operator} for variable condition ${index}`,
+      );
+
+      assert(
+        !!variables.find((v) => v.name === c.variableName),
+        `Can't find variable ${c.variableName} referenced in condition ${index}`,
+      );
+    }
   }
 
   function validateMathOperation(op: PetitionFieldMathOperation, index: number) {
@@ -385,11 +388,19 @@ export function validateFieldLogic<
   const visibility = field.visibility as PetitionFieldVisibility | null;
   const math = field.math as PetitionFieldMath[] | null;
 
-  visibility?.conditions.forEach(validateLogicCondition());
-  math?.forEach((m) => {
-    m.conditions.forEach(validateLogicCondition({ allowSelfReference: true }));
-    m.operations.forEach(validateMathOperation);
-  });
+  for (const c of visibility?.conditions ?? []) {
+    const index = visibility!.conditions.indexOf(c);
+    await validateLogicCondition(c, index);
+  }
+
+  for (const m of math ?? []) {
+    for (const c of m.conditions) {
+      await validateLogicCondition(c, m.conditions.indexOf(c), { allowSelfReference: true });
+    }
+    for (const op of m.operations) {
+      validateMathOperation(op, m.operations.indexOf(op));
+    }
+  }
 }
 
 export function validFieldVisibility<TypeName extends string, FieldName extends string>(
@@ -424,7 +435,7 @@ export function validFieldVisibility<TypeName extends string, FieldName extends 
           }
         : null;
 
-      validateFieldLogic({ ...field!, visibility }, allFields, petition!.variables ?? []);
+      await validateFieldLogic({ ...field!, visibility }, allFields, petition!.variables ?? []);
     } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);
     }
@@ -464,7 +475,7 @@ export function validFieldMath<TypeName extends string, FieldName extends string
           }))
         : null;
 
-      validateFieldLogic({ ...field!, math }, allFields, petition!.variables ?? []);
+      await validateFieldLogic({ ...field!, math }, allFields, petition!.variables ?? []);
     } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);
     }

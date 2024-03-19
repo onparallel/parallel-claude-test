@@ -2361,6 +2361,29 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("creates a SELECT field with standard countries list", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              options
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            name: { en: "Country" },
+            type: "SELECT",
+            options: { values: [], standardList: "COUNTRIES" },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileTypeField.options.values).toBeArrayOfSize(250);
+    });
   });
 
   describe("updateProfileTypeField", () => {
@@ -2380,8 +2403,8 @@ describe("GraphQL/Profiles", () => {
             i === 2
               ? {
                   values: [
-                    { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
-                    { value: "option_2", label: { es: "Opción 2", en: "Option 2" } },
+                    { value: "AR", label: { es: "Argentina", en: "Argentina" } },
+                    { value: "ES", label: { es: "España", en: "Spain" } },
                   ],
                 }
               : {},
@@ -2710,7 +2733,7 @@ describe("GraphQL/Profiles", () => {
       await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
-          content: { value: "option_2" },
+          content: { value: "ES" },
         },
       ]);
 
@@ -2735,7 +2758,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
           data: {
             options: {
-              values: [{ value: "option_1", label: { es: "Opción 1", en: "Option 1" } }],
+              values: [{ value: "AR", label: { es: "Argentina", en: "Argentina" } }],
             },
           },
         },
@@ -2749,7 +2772,7 @@ describe("GraphQL/Profiles", () => {
       const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
-          content: { value: "option_2" },
+          content: { value: "ES" },
         },
       ]);
 
@@ -2774,9 +2797,9 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
           data: {
             options: {
-              values: [{ value: "option_1", label: { es: "Opción 1", en: "Option 1" } }],
+              values: [{ value: "AR", label: { es: "Argentina", en: "Argentina" } }],
             },
-            substitutions: [{ old: "option_2", new: null }],
+            substitutions: [{ old: "ES", new: null }],
           },
         },
       );
@@ -2821,7 +2844,7 @@ describe("GraphQL/Profiles", () => {
       const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
-          content: { value: "option_2" },
+          content: { value: "ES" },
         },
       ]);
 
@@ -2847,11 +2870,11 @@ describe("GraphQL/Profiles", () => {
           data: {
             options: {
               values: [
-                { value: "option_1", label: { es: "Opción 1", en: "Option 1" } },
-                { value: "new_option", label: { es: "Nueva Opción" } },
+                { value: "AR", label: { es: "Argentina", en: "Argentina" } },
+                { value: "FR", label: { es: "Francia", en: "France" } },
               ],
             },
-            substitutions: [{ old: "option_2", new: "new_option" }],
+            substitutions: [{ old: "ES", new: "FR" }],
           },
         },
       );
@@ -3031,6 +3054,47 @@ describe("GraphQL/Profiles", () => {
           ],
         },
       });
+    });
+
+    it("allows to update to standard list if every used value is already in the standard list", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          content: { value: "AR" },
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          data: {
+            options: {
+              values: [],
+              standardList: "COUNTRIES",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField.options.values).toBeArrayOfSize(250);
     });
 
     it("fails when updating name or alias of a standard field", async () => {

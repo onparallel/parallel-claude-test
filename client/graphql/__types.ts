@@ -15059,6 +15059,7 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
 export type ImportOptionsSettingsRow_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  type: PetitionFieldType;
   title?: string | null;
   options: { [key: string]: any };
 };
@@ -46262,6 +46263,7 @@ export const useEditPetitionFieldCalculationsDialog_PetitionBaseFragmentDoc = gq
 export const ImportOptionsSettingsRow_PetitionFieldFragmentDoc = gql`
   fragment ImportOptionsSettingsRow_PetitionField on PetitionField {
     id
+    type
     title
     options
   }

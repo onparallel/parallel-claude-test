@@ -3,6 +3,7 @@ import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { difference, isDefined } from "remeda";
 import { validCIF, validDNI, validNIE } from "spain-id";
 import { PetitionField } from "../db/__types";
+import { selectOptionsValuesAndLabels } from "../db/helpers/fieldOptions";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { isGlobalId } from "./globalId";
@@ -46,8 +47,8 @@ export async function validateReplyContent(
       if (!("value" in content) || typeof content.value !== "string") {
         throw new ValidateReplyContentError("INVALID_TYPE_ERROR", "Reply must be of type string.");
       }
-      const options = field.options.values as Maybe<string[]>;
-      if (!options?.includes(content.value)) {
+      const options = (await selectOptionsValuesAndLabels(field.options)).values;
+      if (!options.includes(content.value)) {
         throw new ValidateReplyContentError(
           "UNKNOWN_OPTION_ERROR",
           `Reply must be one of [${(options ?? []).map((opt) => `'${opt}'`).join(", ")}].`,

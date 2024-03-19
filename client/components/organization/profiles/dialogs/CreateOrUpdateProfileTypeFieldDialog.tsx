@@ -13,6 +13,8 @@ import {
   FormLabel,
   HStack,
   Input,
+  Radio,
+  RadioGroup,
   Stack,
   Switch,
   Table,
@@ -32,10 +34,12 @@ import {
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
 import { TagColorSelect } from "@parallel/components/common/TagColorSelect";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
 import {
   CreateProfileTypeFieldInput,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
@@ -43,9 +47,12 @@ import {
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { generateExcel } from "@parallel/utils/generateExcel";
+import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useFieldArrayReorder } from "@parallel/utils/react-form-hook/useFieldArrayReorder";
 import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
+import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";
 import {
@@ -64,10 +71,6 @@ import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isDefined, omit, pick, times, zip } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
 import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
-import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
-import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
-import { generateExcel } from "@parallel/utils/generateExcel";
-import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
 
 interface CreateOrUpdateProfileTypeFieldDialogProps {
   profileTypeId: string;
@@ -88,6 +91,8 @@ interface CreateOrUpdateProfileTypeFieldDialogData
     useReplyAsExpiryDate?: boolean;
     showOptionsWithColors?: boolean;
     values?: SelectOptionValueData[];
+    standardList?: string | null;
+    listingType?: "CUSTOM" | "STANDARD";
   };
 }
 
@@ -103,17 +108,25 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const isUpdating = isDefined(profileTypeField);
   const isStandard = profileTypeField?.isStandard ?? false;
 
-  const initialOptionValues = useConstant(() => {
+  const initialSelectOptions = useConstant(() => {
     if (profileTypeField?.type === "SELECT") {
-      return (profileTypeField.options as ProfileTypeFieldOptions["SELECT"]).values.map(
-        (option) => ({
-          ...option,
-          id: nanoid(),
-          existing: true,
-        }),
-      );
+      const options = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
+
+      return {
+        ...options,
+        showOptionsWithColors: options.showOptionsWithColors ?? false,
+        listingType: options.standardList ? "STANDARD" : "CUSTOM",
+        values:
+          options.values?.length && !options.standardList
+            ? options.values.map((option) => ({
+                ...option,
+                id: nanoid(),
+                existing: true,
+              }))
+            : [{ id: nanoid(), label: { [intl.locale]: "" }, value: "" }],
+      };
     }
-  });
+  }) as CreateOrUpdateProfileTypeFieldDialogData["options"];
 
   const form = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
     mode: "onSubmit",
@@ -122,10 +135,10 @@ function CreateOrUpdateProfileTypeFieldDialog({
       type: profileTypeField?.type ?? "SHORT_TEXT",
       alias: profileTypeField?.alias ?? "",
       isExpirable: profileTypeField?.isExpirable ?? false,
-      options: {
-        ...(profileTypeField?.options ?? {}),
-        ...(profileTypeField?.type === "SELECT" ? { values: initialOptionValues } : {}),
-      },
+      options:
+        profileTypeField?.type === "SELECT"
+          ? initialSelectOptions
+          : profileTypeField?.options ?? {},
       expiryAlertAheadTime:
         isDefined(profileTypeField) &&
         profileTypeField.isExpirable &&
@@ -147,6 +160,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
   const isExpirable = watch("isExpirable");
   const selectedType = watch("type");
+  const values = watch("options.values");
 
   const showConfirmRemovedSelectOptionsReplacementDialog =
     useConfirmRemovedSelectOptionsReplacementDialog();
@@ -225,7 +239,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
         onSubmit: handleSubmit(async (data) => {
           try {
             const dirtyFieldsKeys = Object.keys(
-              dirtyFields,
+              omit(dirtyFields, ["type"]),
             ) as (keyof CreateOrUpdateProfileTypeFieldDialogData)[];
             const dirtyData = pick(data, dirtyFieldsKeys);
 
@@ -236,10 +250,16 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
             if (isUpdating) {
               if (data.type === "SELECT") {
+                const hasStandardList =
+                  data.options.listingType === "STANDARD" && data.options.standardList;
+
                 const options = isDefined(dirtyData.options)
                   ? {
-                      ...pick(dirtyData.options, ["showOptionsWithColors"]),
-                      values: dirtyData.options.values!.map(omit(["id", "existing"])),
+                      showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
+                      standardList: hasStandardList ? dirtyData.options.standardList : null,
+                      values: hasStandardList
+                        ? []
+                        : dirtyData.options.values!.map(omit(["id", "existing"])),
                     }
                   : undefined;
                 try {
@@ -258,12 +278,15 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 } catch (error) {
                   if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
                     const removedOptions = error.graphQLErrors[0].extensions
-                      ?.options as (SelectOptionValue & { count: number })[];
+                      ?.removedOptions as (SelectOptionValue & { count: number })[];
+
+                    const currentOptions = error.graphQLErrors[0].extensions
+                      ?.currentOptions as SelectOptionValue[];
 
                     const optionValuesToUpdate =
                       await showConfirmRemovedSelectOptionsReplacementDialog({
-                        currentOptions: dirtyData.options.values!,
-                        removedOptions: removedOptions,
+                        currentOptions,
+                        removedOptions,
                         showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
                       });
 
@@ -300,11 +323,16 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 });
               }
             } else {
+              const hasStandardList =
+                data.options.listingType === "STANDARD" && data.options.standardList;
               const options =
                 data.type === "SELECT"
                   ? {
-                      ...pick(data.options, ["showOptionsWithColors"]),
-                      values: data.options.values!.map(omit(["id", "existing"])),
+                      showOptionsWithColors: data.options.showOptionsWithColors ?? false,
+                      standardList: hasStandardList ? data.options.standardList : null,
+                      values: hasStandardList
+                        ? []
+                        : data.options.values!.map(omit(["id", "existing"])),
                     }
                   : data.type === "DATE"
                     ? pick(data.options, ["useReplyAsExpiryDate"])
@@ -470,7 +498,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
           </FormControl>
 
           <FormProvider {...form}>
-            {selectedType === "SELECT" ? <ProfileFieldSelectSettings /> : null}
+            {selectedType === "SELECT" ? (
+              <ProfileFieldSelectSettings
+                isDisabled={isStandard || values?.some((v) => v.isStandard)}
+              />
+            ) : null}
           </FormProvider>
           <Stack spacing={2}>
             <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
@@ -538,11 +570,17 @@ function CreateOrUpdateProfileTypeFieldDialog({
   );
 }
 
-function ProfileFieldSelectSettings() {
+function ProfileFieldSelectSettings({ isDisabled }: { isDisabled?: boolean }) {
   const intl = useIntl();
 
-  const { control, register, watch, setFocus, getValues } =
-    useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
+  const {
+    control,
+    register,
+    watch,
+    setFocus,
+    getValues,
+    formState: { errors },
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
 
   const { fields, append, remove, reorder, replace } = useFieldArrayReorder({
     name: "options.values",
@@ -557,6 +595,7 @@ function ProfileFieldSelectSettings() {
   }, []);
 
   const showOptionsWithColors = watch("options.showOptionsWithColors");
+  const listingType = watch("options.listingType");
   const name = watch("name");
 
   const showImportSelectOptionsDialog = useImportSelectOptionsDialog();
@@ -618,99 +657,153 @@ function ProfileFieldSelectSettings() {
 
   return (
     <Stack spacing={4}>
-      <FormControl as={HStack} spacing={0}>
-        <Checkbox {...register("options.showOptionsWithColors")}>
+      <FormControl>
+        <FormLabel fontWeight={400}>
           <FormattedMessage
-            id="component.create-or-update-property-dialog.enable-colored-options"
-            defaultMessage="Enable colored options"
+            id="component.create-or-update-property-dialog.type-of-options"
+            defaultMessage="Options:"
           />
-        </Checkbox>
-        <HelpPopover>
-          <FormattedMessage
-            id="component.create-or-update-property-dialog.enable-colored-options-help"
-            defaultMessage="This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification."
-          />
-        </HelpPopover>
+        </FormLabel>
+        <Controller
+          name="options.listingType"
+          defaultValue="CUSTOM"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup
+              onChange={(value) => onChange(value)}
+              value={value}
+              as={HStack}
+              spacing={2}
+              isDisabled={isDisabled}
+            >
+              <Radio value="CUSTOM">
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.custom-list"
+                  defaultMessage="Custom list"
+                />
+              </Radio>
+              <Radio value="STANDARD">
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.standard-list"
+                  defaultMessage="Standard list"
+                />
+              </Radio>
+            </RadioGroup>
+          )}
+        />
       </FormControl>
-      <Box maxHeight="360px" overflowY="auto">
-        <Table variant="unstyled">
-          <Thead>
-            <Tr>
-              <Th paddingInlineEnd={1} paddingBlock={2} width="50%">
-                <FormattedMessage
-                  id="component.create-or-update-property-dialog.options-label"
-                  defaultMessage="Label"
-                />
-              </Th>
-              <Th paddingInline={1} paddingBlock={2} width="50%">
-                <FormattedMessage
-                  id="component.create-or-update-property-dialog.options-value-label"
-                  defaultMessage="Internal value"
-                />
-                <HelpPopover position="relative" top="-1px">
-                  <Text>
+      {listingType === "STANDARD" ? (
+        <FormControl isInvalid={!!errors.options?.standardList} isDisabled={isDisabled}>
+          <Controller
+            name="options.standardList"
+            rules={{
+              required: true,
+            }}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Box>
+                <StandardListSelect onChange={(value) => onChange(value)} value={value ?? null} />
+              </Box>
+            )}
+          />
+        </FormControl>
+      ) : (
+        <>
+          <FormControl as={HStack} spacing={0}>
+            <Checkbox {...register("options.showOptionsWithColors")}>
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.enable-colored-options"
+                defaultMessage="Enable colored options"
+              />
+            </Checkbox>
+            <HelpPopover>
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.enable-colored-options-help"
+                defaultMessage="This setting allows you to assign colors to each option, enhancing visual distinction and aiding in quick identification."
+              />
+            </HelpPopover>
+          </FormControl>
+          <Box maxHeight="360px" overflowY="auto">
+            <Table variant="unstyled">
+              <Thead>
+                <Tr>
+                  <Th paddingInlineEnd={1} paddingBlock={2} width="50%">
                     <FormattedMessage
-                      id="component.create-or-update-property-dialog.options-value-label-help"
-                      defaultMessage="This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
+                      id="component.create-or-update-property-dialog.options-label"
+                      defaultMessage="Label"
                     />
-                  </Text>
-                </HelpPopover>
-              </Th>
-              {showOptionsWithColors ? (
-                <Th paddingInline={1} paddingBlock={2} minWidth="158px">
-                  <FormattedMessage
-                    id="component.manage-tags-dialog.color-label"
-                    defaultMessage="Color"
-                  />
-                </Th>
-              ) : null}
-              <Th paddingInline={1} paddingBlock={2}></Th>
-            </Tr>
-          </Thead>
-          <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
-            {fields.map((field, index) => {
-              return (
-                <ProfileFieldSelectOption
-                  key={field.id}
-                  index={index}
-                  field={field}
-                  fields={fields}
-                  onRemove={handleRemoveOption}
-                  canRemoveOption={fields.length > 1}
-                  showOptionsWithColors={showOptionsWithColors ?? false}
-                />
-              );
-            })}
-          </Reorder.Group>
-        </Table>
-      </Box>
-      <HStack>
-        <Button
-          leftIcon={<PlusCircleIcon />}
-          variant="outline"
-          isDisabled={fields.length >= 1000}
-          onClick={() => {
-            append({
-              id: nanoid(),
-              label: { [intl.locale]: "" },
-              value: "",
-              color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
-            });
-            setTimeout(() => setFocus(`options.values.${fields.length}.label`));
-          }}
-        >
-          <FormattedMessage
-            id="component.create-or-update-property-dialog.add-option-button"
-            defaultMessage="Add option"
-          />
-        </Button>
-        <Button variant="outline" onClick={handleImportOptions}>
-          <FormattedMessage
-            id="component.create-or-update-property-dialog.import-options-button"
-            defaultMessage="Import options..."
-          />
-        </Button>
-      </HStack>
+                  </Th>
+                  <Th paddingInline={1} paddingBlock={2} width="50%">
+                    <FormattedMessage
+                      id="component.create-or-update-property-dialog.options-value-label"
+                      defaultMessage="Internal value"
+                    />
+                    <HelpPopover position="relative" top="-1px">
+                      <Text>
+                        <FormattedMessage
+                          id="component.create-or-update-property-dialog.options-value-label-help"
+                          defaultMessage="This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
+                        />
+                      </Text>
+                    </HelpPopover>
+                  </Th>
+                  {showOptionsWithColors ? (
+                    <Th paddingInline={1} paddingBlock={2} minWidth="158px">
+                      <FormattedMessage
+                        id="component.manage-tags-dialog.color-label"
+                        defaultMessage="Color"
+                      />
+                    </Th>
+                  ) : null}
+                  <Th paddingInline={1} paddingBlock={2}></Th>
+                </Tr>
+              </Thead>
+              <Reorder.Group as={Tbody as any} axis="y" values={fields} onReorder={reorder}>
+                {fields.map((field, index) => {
+                  return (
+                    <ProfileFieldSelectOption
+                      key={field.id}
+                      index={index}
+                      field={field}
+                      fields={fields}
+                      onRemove={handleRemoveOption}
+                      canRemoveOption={fields.length > 1}
+                      showOptionsWithColors={showOptionsWithColors ?? false}
+                    />
+                  );
+                })}
+              </Reorder.Group>
+            </Table>
+          </Box>
+          <HStack>
+            <Button
+              leftIcon={<PlusCircleIcon />}
+              variant="outline"
+              isDisabled={fields.length >= 1000}
+              onClick={() => {
+                append({
+                  id: nanoid(),
+                  label: { [intl.locale]: "" },
+                  value: "",
+                  color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined,
+                });
+                setTimeout(() => setFocus(`options.values.${fields.length}.label`));
+              }}
+            >
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.add-option-button"
+                defaultMessage="Add option"
+              />
+            </Button>
+            <Button variant="outline" onClick={handleImportOptions}>
+              <FormattedMessage
+                id="component.create-or-update-property-dialog.import-options-button"
+                defaultMessage="Import options..."
+              />
+            </Button>
+          </HStack>
+        </>
+      )}
     </Stack>
   );
 }
@@ -851,6 +944,7 @@ function ProfileFieldSelectOption({
               }}
               onChange={(value) => {
                 onChange(value);
+
                 if (!isUpdating && !touchedFields.options?.values?.[index]?.value) {
                   const alias = localizableUserTextRender({
                     value,
@@ -889,6 +983,7 @@ function ProfileFieldSelectOption({
             required: true,
             pattern: REFERENCE_REGEX,
             maxLength: 50,
+
             validate: {
               isAvailable: (value, { options }) => {
                 return !options.values?.some(({ value: v }, i) => v === value && i < index);
@@ -920,7 +1015,6 @@ function ProfileFieldSelectOption({
           paddingInline={1}
           paddingBlock={2}
           minWidth="158px"
-          isDisabled={isDisabled}
         >
           <Controller
             name={`options.values.${index}.color` as const}

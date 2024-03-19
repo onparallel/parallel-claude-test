@@ -46,6 +46,7 @@ function getReplyValue(
     case "DATE_TIME":
       return new DateTimeLiquidValue(intl, content);
     case "SELECT":
+      // in case of standard SELECT lists, this options will already have it correctly filled, as it comes from a graphql query
       const options = field.options as { labels?: string[]; values: string[] };
       if (isDefined(options.labels)) {
         const label =

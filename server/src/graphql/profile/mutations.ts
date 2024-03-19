@@ -29,6 +29,7 @@ import {
 import {
   ProfileTypeFieldOptions,
   defaultProfileTypeFieldOptions,
+  profileTypeFieldSelectValues,
   validateProfileTypeFieldOptions,
 } from "../../db/helpers/profileTypeFieldOptions";
 import { toBytes } from "../../util/fileSize";
@@ -398,8 +399,14 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             If the removed option is being used and does not have any substitution, throw an error
             so the user can choose a substitution for the option and try again.
           */
+
+        const currentValues = await profileTypeFieldSelectValues(profileTypeField.options);
+        const newValues = await profileTypeFieldSelectValues(
+          args.data.options as ProfileTypeFieldOptions["SELECT"],
+        );
         const removedOptionsWithoutSubstitutions = pipe(
-          removedOptions,
+          currentValues,
+          differenceWith(newValues, (a, b) => a.value === b.value),
           differenceWith(args.data.substitutions ?? [], (a, b) => a.value === b.old),
         );
 
@@ -408,17 +415,19 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             profileTypeField.id,
             removedOptionsWithoutSubstitutions.map((o) => o.value),
           );
+
           if (Object.keys(usedProfileFieldValues).length > 0) {
-            const removedOptions = (
-              profileTypeField.options as ProfileTypeFieldOptions["SELECT"]
-            ).values
+            const removedOptions = currentValues
               .filter((value) => usedProfileFieldValues[value.value])
               .map((value) => ({ ...value, count: usedProfileFieldValues[value.value] }));
 
             throw new ApolloError(
               "Cannot remove options that have values associated with them.",
               "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR",
-              { options: removedOptions },
+              {
+                removedOptions,
+                currentOptions: newValues,
+              },
             );
           }
         }
@@ -461,7 +470,6 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           }
         }
       }
-
       updateData.options = options;
     }
 
@@ -764,56 +772,63 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
     const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
 
-    const fieldsWithZonedExpires = fields.map((field) => {
-      const profileTypeField = profileTypeFieldsById[field.profileTypeFieldId];
+    const fieldsWithZonedExpires = await pMap(
+      fields,
+      async (field) => {
+        const profileTypeField = profileTypeFieldsById[field.profileTypeFieldId];
 
-      if (isDefined(field.content)) {
-        try {
-          validateProfileFieldValue(profileTypeField, field.content);
-        } catch (e) {
-          if (e instanceof Error) {
-            throw new ApolloError(
-              `Invalid profile field value: ${e.message}`,
-              "INVALID_PROFILE_FIELD_VALUE",
-            );
+        if (isDefined(field.content)) {
+          try {
+            await validateProfileFieldValue(profileTypeField, field.content);
+          } catch (e) {
+            if (e instanceof Error) {
+              throw new ApolloError(
+                `Invalid profile field value: ${e.message}`,
+                "INVALID_PROFILE_FIELD_VALUE",
+              );
+            }
           }
         }
-      }
-      if (field.expiryDate !== undefined && !profileTypeField.is_expirable) {
-        throw new ApolloError(
-          `Can't set expiry on a non expirable field`,
-          "EXPIRY_ON_NON_EXPIRABLE_FIELD",
-        );
-      }
-      if (field.expiryDate !== undefined && field.content === null) {
-        throw new ApolloError(`Can't set expiry when removing a field`, "EXPIRY_ON_REMOVED_FIELD");
-      }
-      if (
-        field.expiryDate !== undefined &&
-        field.content === undefined &&
-        !isDefined(valuesByPtfId[field.profileTypeFieldId])
-      ) {
-        throw new ApolloError(
-          `Can't set expiry on a field with no value`,
-          "EXPIRY_ON_NONEXISTING_VALUE",
-        );
-      }
+        if (field.expiryDate !== undefined && !profileTypeField.is_expirable) {
+          throw new ApolloError(
+            `Can't set expiry on a non expirable field`,
+            "EXPIRY_ON_NON_EXPIRABLE_FIELD",
+          );
+        }
+        if (field.expiryDate !== undefined && field.content === null) {
+          throw new ApolloError(
+            `Can't set expiry when removing a field`,
+            "EXPIRY_ON_REMOVED_FIELD",
+          );
+        }
+        if (
+          field.expiryDate !== undefined &&
+          field.content === undefined &&
+          !isDefined(valuesByPtfId[field.profileTypeFieldId])
+        ) {
+          throw new ApolloError(
+            `Can't set expiry on a field with no value`,
+            "EXPIRY_ON_NONEXISTING_VALUE",
+          );
+        }
 
-      return {
-        ...field,
-        type: profileTypeField.type,
-        alias: profileTypeField.alias,
-        expiryDate: field.expiryDate
-          ? // priorize expiryDate argument if set
-            field.expiryDate
-          : // else, check option useReplyAsExpiryDate for DATE replies
-            profileTypeField.type === "DATE" &&
-              profileTypeField.options.useReplyAsExpiryDate &&
-              isDefined(field.content?.value)
-            ? (field.content!.value as string)
-            : null,
-      };
-    });
+        return {
+          ...field,
+          type: profileTypeField.type,
+          alias: profileTypeField.alias,
+          expiryDate: field.expiryDate
+            ? // priorize expiryDate argument if set
+              field.expiryDate
+            : // else, check option useReplyAsExpiryDate for DATE replies
+              profileTypeField.type === "DATE" &&
+                profileTypeField.options.useReplyAsExpiryDate &&
+                isDefined(field.content?.value)
+              ? (field.content!.value as string)
+              : null,
+        };
+      },
+      { concurrency: 1 },
+    );
 
     const {
       profile: updatedProfile,

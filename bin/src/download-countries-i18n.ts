@@ -23,7 +23,14 @@ async function main() {
       `https://raw.githubusercontent.com/michaelwittig/node-i18n-iso-countries/master/langs/${locale}.json`,
     );
     const json = await res.json();
-    await writeJson(path.join(output, `countries_${locale}.json`), json.countries);
+    await writeJson(
+      path.join(output, `countries_${locale}.json`),
+      Object.fromEntries(
+        Object.entries<string | string[]>(json.countries).sort(([, a], [, b]) =>
+          (Array.isArray(a) ? a[0] : a).localeCompare(Array.isArray(b) ? b[0] : b),
+        ),
+      ),
+    );
   }
 }
 

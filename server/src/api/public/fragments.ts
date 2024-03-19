@@ -316,6 +316,7 @@ export const ProfileTypeFieldFragment = gql`
     alias
     type
     isExpirable
+    options
   }
 `;
 

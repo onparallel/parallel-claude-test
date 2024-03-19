@@ -19,7 +19,6 @@ export function SettingsRowPlaceholder({
     setPlaceholder(value);
     debouncedOnUpdate(field.id, {
       options: {
-        ...field.options,
         placeholder: value || null,
       },
     });

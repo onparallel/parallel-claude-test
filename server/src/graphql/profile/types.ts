@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { enumType, interfaceType, nonNull, objectType } from "nexus";
 import { sortBy } from "remeda";
@@ -6,8 +7,8 @@ import {
   ProfileTypeFieldPermissionTypeValues,
   ProfileTypeFieldTypeValues,
 } from "../../db/__types";
+import { mapProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { toGlobalId } from "../../util/globalId";
-import { addDays } from "date-fns";
 
 export const ProfileType = objectType({
   name: "ProfileType",
@@ -90,7 +91,9 @@ export const ProfileTypeField = objectType({
         return await ctx.profiles.loadProfileTypeFieldPermissionsByProfileTypeFieldId(o.id);
       },
     });
-    t.jsonObject("options", { resolve: (o) => o.options });
+    t.jsonObject("options", {
+      resolve: async (o) => await mapProfileTypeFieldOptions(o.type, o.options),
+    });
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });
     t.nullable.duration("expiryAlertAheadTime", { resolve: (o) => o.expiry_alert_ahead_time });

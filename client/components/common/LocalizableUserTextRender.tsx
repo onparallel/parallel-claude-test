@@ -24,7 +24,13 @@ export function LocalizableUserTextRender({
     "en" as UserLocale,
     Object.keys(value)[0] as UserLocale,
   ].find((l) => isDefined(l) && isDefined(value[l]));
-  return <>{isDefined(locale) ? value[locale]?.trim() || _default : _default}</>;
+
+  const val = isDefined(locale)
+    ? Array.isArray(value[locale])
+      ? value[locale]?.[0]
+      : value[locale]
+    : null;
+  return <>{isDefined(locale) ? val?.trim() || _default : _default}</>;
 }
 
 interface LocalizableUserTextRenderOptions {

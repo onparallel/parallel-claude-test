@@ -4,7 +4,10 @@ import { LocalizableUserTextRender } from "@parallel/components/common/Localizab
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileFieldSelectOptionItem } from "@parallel/components/profiles/fields/ProfileFieldSelect";
-import { UpdateProfileTypeFieldSelectOptionsSubstitution } from "@parallel/graphql/__types";
+import {
+  UpdateProfileTypeFieldSelectOptionsSubstitution,
+  UserLocale,
+} from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
@@ -49,6 +52,12 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
       Option,
     },
   });
+
+  const getOptionLabel = (option: SelectOptionValue) => {
+    return option.label[intl.locale as UserLocale] ?? "";
+  };
+
+  const getOptionValue = (option: SelectOptionValue) => option.value;
 
   return (
     <ConfirmDialog
@@ -110,6 +119,8 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
                         ref={ref}
                         options={currentOptions}
                         isClearable
+                        getOptionLabel={getOptionLabel}
+                        getOptionValue={getOptionValue}
                         isMulti={false}
                         value={currentOptions?.find((v) => v.value === value) ?? null}
                         onChange={(o: SelectOptionValue) => onChange([option, o?.value ?? null])}

@@ -1,5 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { UserLocale } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
@@ -43,6 +44,12 @@ export function ProfileFieldSelect({
     showOptionsWithColors,
   };
 
+  const getOptionLabel = (option: SelectOptionValue) => {
+    return option.label[intl.locale as UserLocale] ?? "";
+  };
+
+  const getOptionValue = (option: SelectOptionValue) => option.value;
+
   return (
     <ProfileFieldInputGroup
       {...props}
@@ -58,6 +65,8 @@ export function ProfileFieldSelect({
             return (
               <Select
                 options={values}
+                getOptionLabel={getOptionLabel}
+                getOptionValue={getOptionValue}
                 isClearable
                 isMulti={false}
                 value={values?.find((v) => v.value === value) ?? null}
@@ -155,7 +164,7 @@ export function ProfileFieldSelectOptionItem({
           {children}
         </Box>
       ) : (
-        <Box as="span" color="gray.800">
+        <Box as="span" color="inherit">
           {children}
         </Box>
       )}

@@ -1,8 +1,9 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { ProfileTypeFieldType } from "../__types";
-import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
 import { FromSchema } from "json-schema-to-ts";
+import pMap from "p-map";
+import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
+import { ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
 
 const SCHEMAS = {
   TEXT: {
@@ -50,7 +51,6 @@ const SCHEMAS = {
     properties: {
       values: {
         type: "array",
-        minItems: 1,
         maxItems: 1000,
         items: {
           type: "object",
@@ -64,6 +64,7 @@ const SCHEMAS = {
         },
       },
       showOptionsWithColors: { type: ["boolean", "null"] },
+      standardList: { type: ["string", "null"] },
     },
   },
 } as const;
@@ -87,4 +88,43 @@ export function defaultProfileTypeFieldOptions(type: ProfileTypeFieldType) {
     return { useReplyAsExpiryDate: false };
   }
   return {};
+}
+
+export async function profileTypeFieldSelectValues(
+  options: ProfileTypeFieldOptions["SELECT"],
+): Promise<ProfileTypeFieldOptions["SELECT"]["values"]> {
+  if (options.standardList === "COUNTRIES") {
+    const countriesByUserLocale = Object.fromEntries(
+      await pMap(UserLocaleValues, async (locale) => [
+        locale,
+        (await import(`./countries/countries_${locale}.json`)).default,
+      ]),
+    );
+
+    const countryCodes = Object.keys(countriesByUserLocale["en"]);
+
+    return countryCodes.map((code) => ({
+      value: code,
+      label: Object.fromEntries(
+        UserLocaleValues.map((locale) => {
+          const label =
+            countriesByUserLocale[locale][code as keyof (typeof countriesByUserLocale)["en"]];
+          return [locale, Array.isArray(label) ? label[0] : label];
+        }),
+      ) as Record<UserLocale, string>,
+      isStandard: true,
+    }));
+  }
+
+  return options.values;
+}
+
+export async function mapProfileTypeFieldOptions(type: ProfileTypeFieldType, options: any) {
+  if (type === "SELECT") {
+    return {
+      ...options,
+      values: await profileTypeFieldSelectValues(options),
+    };
+  }
+  return options;
 }

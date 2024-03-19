@@ -25,6 +25,7 @@ export interface ProfileTypeFieldOptions {
       isStandard?: boolean;
     }[];
     showOptionsWithColors?: Maybe<boolean>;
+    standardList?: Maybe<string>;
   };
 }
 

@@ -88,9 +88,6 @@ export function AddAliasToFieldDialog({
         onSubmit: handleSubmit(async (data) => {
           try {
             await updateField(field.id, {
-              options: {
-                ...field.options,
-              },
               alias: data.alias,
             });
             props.onResolve(data.alias);

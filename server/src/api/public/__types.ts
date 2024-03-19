@@ -6012,6 +6012,7 @@ export type ProfileTypeFieldFragment = {
   alias: string | null;
   type: ProfileTypeFieldType;
   isExpirable: boolean;
+  options: { [key: string]: any };
 };
 
 export type ProfileFieldValueFragment = {
@@ -6037,6 +6038,7 @@ export type ProfileFieldPropertyFragment = {
     alias: string | null;
     type: ProfileTypeFieldType;
     isExpirable: boolean;
+    options: { [key: string]: any };
   };
   value: {
     id: string;
@@ -6065,6 +6067,7 @@ export type ProfileFragment = {
       alias: string | null;
       type: ProfileTypeFieldType;
       isExpirable: boolean;
+      options: { [key: string]: any };
     };
     value: {
       id: string;
@@ -6086,6 +6089,7 @@ export type ProfileFragment = {
       alias: string | null;
       type: ProfileTypeFieldType;
       isExpirable: boolean;
+      options: { [key: string]: any };
     };
     value: {
       id: string;
@@ -7961,6 +7965,7 @@ export type GetPetitionProfiles_petitionQuery = {
               alias: string | null;
               type: ProfileTypeFieldType;
               isExpirable: boolean;
+              options: { [key: string]: any };
             };
             value: {
               id: string;
@@ -7982,6 +7987,7 @@ export type GetPetitionProfiles_petitionQuery = {
               alias: string | null;
               type: ProfileTypeFieldType;
               isExpirable: boolean;
+              options: { [key: string]: any };
             };
             value: {
               id: string;
@@ -8034,6 +8040,7 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
           alias: string | null;
           type: ProfileTypeFieldType;
           isExpirable: boolean;
+          options: { [key: string]: any };
         };
         value: {
           id: string;
@@ -8055,6 +8062,7 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
           alias: string | null;
           type: ProfileTypeFieldType;
           isExpirable: boolean;
+          options: { [key: string]: any };
         };
         value: {
           id: string;
@@ -8783,6 +8791,7 @@ export type GetProfiles_profilesQuery = {
           alias: string | null;
           type: ProfileTypeFieldType;
           isExpirable: boolean;
+          options: { [key: string]: any };
         };
         value: {
           id: string;
@@ -8804,6 +8813,7 @@ export type GetProfiles_profilesQuery = {
           alias: string | null;
           type: ProfileTypeFieldType;
           isExpirable: boolean;
+          options: { [key: string]: any };
         };
         value: {
           id: string;
@@ -8853,6 +8863,7 @@ export type CreateProfile_createProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -8874,6 +8885,7 @@ export type CreateProfile_createProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -8922,6 +8934,7 @@ export type CreateProfile_updateProfileFieldValueMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -8943,6 +8956,7 @@ export type CreateProfile_updateProfileFieldValueMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -8990,6 +9004,7 @@ export type GetProfile_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9011,6 +9026,7 @@ export type GetProfile_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9058,6 +9074,7 @@ export type GetProfileFields_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9079,6 +9096,7 @@ export type GetProfileFields_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9126,6 +9144,7 @@ export type CreateProfileFieldValue_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9147,6 +9166,7 @@ export type CreateProfileFieldValue_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9254,6 +9274,7 @@ export type UpdateProfileFieldValue_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9275,6 +9296,7 @@ export type UpdateProfileFieldValue_profileQuery = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9376,6 +9398,7 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9397,6 +9420,7 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9445,6 +9469,7 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -9466,6 +9491,7 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
         alias: string | null;
         type: ProfileTypeFieldType;
         isExpirable: boolean;
+        options: { [key: string]: any };
       };
       value: {
         id: string;
@@ -10266,6 +10292,7 @@ export const ProfileTypeFieldFragmentDoc = gql`
     alias
     type
     isExpirable
+    options
   }
 ` as unknown as DocumentNode<ProfileTypeFieldFragment, unknown>;
 export const ProfileFieldValueFragmentDoc = gql`

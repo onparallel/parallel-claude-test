@@ -9,7 +9,7 @@ import { fileSize } from "../../../util/fileSize";
 import { formatNumberWithPrefix } from "../../../util/formatNumberWithPrefix";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { titleize } from "../../../util/strings";
-import { UnwrapArray } from "../../../util/types";
+import { MaybeArray, UnwrapArray } from "../../../util/types";
 import {
   PetitionExport_PetitionBaseFragment,
   PetitionExport_PetitionFieldFragment,
@@ -298,6 +298,19 @@ function PetitionExportField({
     ? sortBy(replies, (r) => isDefined(r.content.error))
     : replies;
 
+  function optionsFieldLabel(
+    options: { values: string[]; labels?: MaybeArray<string>[] },
+    value: string,
+  ) {
+    if (isDefined(options.labels)) {
+      const index = options.values.indexOf(value);
+      const label = options.labels[index];
+      return index >= 0 ? label : value;
+    } else {
+      return value;
+    }
+  }
+
   return (
     <View>
       {field.type === "HEADING" ? (
@@ -409,7 +422,7 @@ function PetitionExportField({
                   <View>
                     {(reply.content.value as [string]).map((value, i) => (
                       <Text style={[styles.text]} key={i}>
-                        {value}
+                        {optionsFieldLabel(field.options as any, value)}
                       </Text>
                     ))}
                   </View>
@@ -460,6 +473,10 @@ function PetitionExportField({
                       </LiquidPetitionVariableProvider>
                     ))}
                   </View>
+                ) : field.type === "SELECT" ? (
+                  <Text style={[styles.text]}>
+                    {optionsFieldLabel(field.options as any, reply.content.value)}
+                  </Text>
                 ) : (
                   <Text style={[styles.text]}>{reply.content.value}</Text>
                 )}

@@ -24,7 +24,7 @@ async function main() {
     for (const locale of locales) {
         const res = await (0, node_fetch_1.default)(`https://raw.githubusercontent.com/michaelwittig/node-i18n-iso-countries/master/langs/${locale}.json`);
         const json = await res.json();
-        await (0, json_1.writeJson)(path_1.default.join(output, `countries_${locale}.json`), json.countries);
+        await (0, json_1.writeJson)(path_1.default.join(output, `countries_${locale}.json`), Object.fromEntries(Object.entries(json.countries).sort(([, a], [, b]) => (Array.isArray(a) ? a[0] : a).localeCompare(Array.isArray(b) ? b[0] : b))));
     }
 }
 (0, run_1.run)(main);

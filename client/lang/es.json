@@ -1250,6 +1250,21 @@
     "context": "Add field to group"
   },
   {
+    "term": "component.confirm-overwrite-options-dialog.body",
+    "definition": "Este campo tiene opciones añadidas. Si continúas, se sobreescribirán por las del listado proporcionado.",
+    "context": "This field has options added. If you continue, they will be overwritten with the ones from the provided list."
+  },
+  {
+    "term": "component.confirm-overwrite-options-dialog.confirm",
+    "definition": "¿Estás seguro que quieres continuar?",
+    "context": "Are you sure you want to continue?"
+  },
+  {
+    "term": "component.confirm-overwrite-options-dialog.header",
+    "definition": "Sobreescribir opciones",
+    "context": "Overwrite options"
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.allow-additional-signers-help",
     "definition": "Si esta opción está desactivada, solo podrán firmar el documento las personas indicadas.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
@@ -1840,6 +1855,11 @@
     "context": "Add option"
   },
   {
+    "term": "component.create-or-update-property-dialog.custom-list",
+    "definition": "Listado personalizado",
+    "context": "Custom list"
+  },
+  {
     "term": "component.create-or-update-property-dialog.edit-profile-type-field",
     "definition": "Editar propiedad",
     "context": "Edit property"
@@ -1923,6 +1943,16 @@
     "term": "component.create-or-update-property-dialog.reserved-alias-error",
     "definition": "Este identificador está reservado y no puede ser usado",
     "context": "This identifier is reserved and can't be used"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.standard-list",
+    "definition": "Listado estándar",
+    "context": "Standard list"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.type-of-options",
+    "definition": "Opciones:",
+    "context": "Options:"
   },
   {
     "term": "component.create-or-update-property-dialog.type-of-property",
@@ -4815,6 +4845,21 @@
     "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
+    "term": "component.petition-compose-select-settings.list-of-options-description-1",
+    "definition": "Utiliza nuestros listados de opciones existentes para ahorrar tiempo.",
+    "context": "Use our existing option lists to save time."
+  },
+  {
+    "term": "component.petition-compose-select-settings.list-of-options-description-2",
+    "definition": "Estas opciones serán fijas y no editables.",
+    "context": "These options will be fixed and not editable."
+  },
+  {
+    "term": "component.petition-compose-select-settings.list-of-options-label",
+    "definition": "Listados de opciones",
+    "context": "List of options"
+  },
+  {
     "term": "component.petition-compose-text-settings.format",
     "definition": "Formato:",
     "context": "Format:"
@@ -4963,6 +5008,11 @@
     "term": "component.petition-field-options-list-editor.settings-imported-options-description",
     "definition": "Opciones importadas con valores internos. Para editarlas, importa un archivo Excel desde los ajustes de campo.",
     "context": "Options imported with internal values. To edit, import an Excel file from field settings."
+  },
+  {
+    "term": "component.petition-field-options-list-editor.settings-standard-options-description",
+    "definition": "Opciones estándar de <b>\"{standardList}\"</b>. Puedes editarlo desde los ajustes del campo.",
+    "context": "Standard options from <b>\"{standardList}\"</b>. Edit from the field settings."
   },
   {
     "term": "component.petition-field-select.placeholder",
@@ -8658,6 +8708,16 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "¿Qué quieres hacer con ellas?",
     "context": "What would you like to do with them?"
+  },
+  {
+    "term": "component.standard-list-select.countries-iso",
+    "definition": "Listado de paises",
+    "context": "List of countries"
+  },
+  {
+    "term": "component.standard-list-select.no-list",
+    "definition": "Ningún listado",
+    "context": "No list"
   },
   {
     "term": "component.subscribed-notifications-icon.label",

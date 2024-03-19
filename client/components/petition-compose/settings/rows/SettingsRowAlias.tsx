@@ -62,9 +62,6 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
     if (!value || REFERENCE_REGEX.test(value)) {
       setAliasError(null);
       debouncedOnUpdate(field.id, {
-        options: {
-          ...field.options,
-        },
         alias: value || null,
       });
     } else {

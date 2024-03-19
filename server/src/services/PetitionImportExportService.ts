@@ -298,10 +298,10 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
     this.validateJsonVariablesAndAliases(variables, fieldAliases);
 
-    allJsonFields.forEach((field) => {
+    for (const field of allJsonFields) {
       validateFieldOptions(field.type, field.options);
-      validateFieldLogic(field, allJsonFields, variables);
-    });
+      await validateFieldLogic(field, allJsonFields, variables);
+    }
 
     return await this.petitions.withTransaction(async (t) => {
       const petition = await this.petitions.createPetition(

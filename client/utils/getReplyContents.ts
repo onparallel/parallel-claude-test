@@ -50,7 +50,8 @@ export function getReplyContents({
     assertType<FieldOptions["SELECT"]>(options);
     if (isDefined(options.labels)) {
       const index = options.values.indexOf(reply.content.value);
-      return [index >= 0 ? options.labels[index] : reply.content.value];
+      const label = options.labels[index];
+      return [index >= 0 ? label : reply.content.value];
     } else {
       return [reply.content.value];
     }

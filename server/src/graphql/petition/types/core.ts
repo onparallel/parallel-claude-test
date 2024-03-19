@@ -419,7 +419,14 @@ export const PetitionFieldMini = objectType({
     });
     t.jsonObject("options", {
       description: "The options of the petition field.",
-      resolve: (o) => mapFieldOptions(o.options),
+      resolve: async (o, _, ctx) => {
+        if (o.type === "SELECT") {
+          const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
+          return await mapFieldOptions(o.type, o.options, petition.recipient_locale);
+        }
+
+        return await mapFieldOptions(o.type, o.options);
+      },
     });
   },
 });
@@ -647,7 +654,14 @@ export const PetitionField = objectType({
     });
     t.jsonObject("options", {
       description: "The options of the petition field.",
-      resolve: (o) => mapFieldOptions(o.options),
+      resolve: async (o, _, ctx) => {
+        if (o.type === "SELECT") {
+          const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
+          return await mapFieldOptions(o.type, o.options, petition.recipient_locale);
+        }
+
+        return await mapFieldOptions(o.type, o.options);
+      },
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",

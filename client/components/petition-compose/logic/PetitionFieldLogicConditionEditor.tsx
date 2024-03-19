@@ -961,18 +961,28 @@ function ConditionPredicateValueSelect({
   const referencedField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)![0];
 
   const options = useMemo(() => {
-    const values =
-      referencedField.type === "SELECT"
-        ? (referencedField.options as FieldOptions["SELECT"]).values
-        : referencedField.type === "CHECKBOX"
-          ? (referencedField.options as FieldOptions["CHECKBOX"]).values
-          : getDynamicSelectValues(
-              (referencedField.options as FieldOptions["DYNAMIC_SELECT"]).values,
-              condition.column!,
-            );
-    return uniq(values)
-      .sort((a, b) => a.localeCompare(b))
-      .map((value) => toSimpleSelectOption(value)!);
+    if (["SELECT", "CHECKBOX"].includes(referencedField.type)) {
+      const values = (referencedField.options as FieldOptions["SELECT"] | FieldOptions["CHECKBOX"])
+        .values;
+
+      return uniq(values)
+        .map((value, index) => {
+          let label = (referencedField.options as FieldOptions["SELECT"] | FieldOptions["CHECKBOX"])
+            .labels?.[index];
+          label = `${value}${isDefined(label) ? `: ${label}` : ""}`;
+
+          return { label, value } as SimpleOption<string>;
+        })
+        .sort((a, b) => a.label.localeCompare(b.label));
+    } else {
+      const values = getDynamicSelectValues(
+        (referencedField.options as FieldOptions["DYNAMIC_SELECT"]).values,
+        condition.column!,
+      );
+      return uniq(values)
+        .sort((a, b) => a.localeCompare(b))
+        .map((value) => toSimpleSelectOption(value)!);
+    }
   }, [referencedField.type, referencedField.options.values, condition.column]);
 
   const isMultiCondition =
@@ -1019,7 +1029,7 @@ function ConditionPredicateValueSelect({
         valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }),
         option: (styles) => ({
           ...styles,
-          "-webkit-line-clamp": "3",
+          WebkitLineClamp: "3",
           padding: "4px 8px",
         }),
       }}

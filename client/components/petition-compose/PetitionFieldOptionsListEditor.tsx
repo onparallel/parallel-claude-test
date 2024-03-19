@@ -20,7 +20,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pipe } from "remeda";
 import { shallowEqualArrays } from "shallow-equal";
 import { Editor, Point, Transforms, createEditor } from "slate";
@@ -34,6 +34,7 @@ import {
   withReact,
 } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
+import { getStandardListLabel } from "../common/StandardListSelect";
 
 type PetitionFieldOptionsListEditorValue = PetitionFieldOptionsListEditorBlock[];
 
@@ -65,6 +66,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       { field, showError, onFieldEdit, onFocusNextField, onFocusDescription, isReadOnly, ...props },
       ref,
     ) {
+      const intl = useIntl();
       const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
       const editorRef = useUpdatingRef(editor);
       const [value, onChange] = useState(valuesToSlateNodes(field.options.values ?? []));
@@ -169,7 +171,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
               },
             });
           } else {
-            onFieldEdit({ options: { ...field.options, values } });
+            onFieldEdit({ options: { values } });
           }
           currentValues.current = values;
         }
@@ -179,9 +181,23 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       const isInvalid =
         field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
 
-      return isReadOnly || hasLabels ? (
+      const standardList =
+        field.type === "SELECT" && field.options.standardList ? field.options.standardList : null;
+
+      return isReadOnly || hasLabels || standardList ? (
         <>
-          {hasLabels ? (
+          {standardList ? (
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="component.petition-field-options-list-editor.settings-standard-options-description"
+                defaultMessage='Standard options from <b>"{standardList}"</b>. Edit from the field settings.'
+                values={{ standardList: getStandardListLabel(standardList, intl) }}
+              />
+              <Text as="span" marginLeft={1} position="relative" top="-1px">
+                (<SettingsIcon />)
+              </Text>
+            </Text>
+          ) : hasLabels ? (
             <Text fontSize="sm">
               <FormattedMessage
                 id="component.petition-field-options-list-editor.settings-imported-options-description"

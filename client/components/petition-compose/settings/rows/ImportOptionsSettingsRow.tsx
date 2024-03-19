@@ -1,17 +1,15 @@
 import { gql } from "@apollo/client";
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
+import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { SettingsRow } from "./SettingsRow";
 
 import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
-import {
-  ImportOptionsSettingsRow_PetitionFieldFragment,
-  UpdatePetitionFieldInput,
-} from "@parallel/graphql/__types";
+import { ImportOptionsSettingsRow_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { generateExcel } from "@parallel/utils/generateExcel";
 import { parseValueLabelFromExcel } from "@parallel/utils/parseValueLabelFromExcel";
 import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
-import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { times, zip } from "remeda";
-import { SettingsRow } from "./SettingsRow";
 
 export function ImportOptionsSettingsRow({
   field,
@@ -57,8 +55,13 @@ export function ImportOptionsSettingsRow({
         },
         onExcelDrop: async (file) => {
           const { values, labels } = await parseValueLabelFromExcel(file);
-          onChange({
-            options: { ...field.options, values, labels },
+          await onChange({
+            options: {
+              ...field.options,
+              values,
+              labels,
+              ...(field.type === "SELECT" ? { standardList: null } : {}),
+            },
           });
         },
       });
@@ -73,26 +76,24 @@ export function ImportOptionsSettingsRow({
         />
       }
       description={
-        <Stack>
-          <Text>
-            <FormattedMessage
-              id="component.import-options-settings-row.description-1"
-              defaultMessage="Upload an <b>.xlsx file</b> to load the list of options."
-            />
-          </Text>
-        </Stack>
+        <FormattedMessage
+          id="component.import-options-settings-row.description-1"
+          defaultMessage="Upload an <b>.xlsx file</b> to load the list of options."
+        />
       }
       controlId="import-options-excel"
     >
-      <Button
-        size="sm"
-        fontWeight="normal"
-        fontSize="16px"
-        isDisabled={isDisabled}
-        onClick={handleImportOptions}
-      >
-        <FormattedMessage id="generic.import" defaultMessage="Import" />
-      </Button>
+      <Box>
+        <Button
+          size="sm"
+          fontWeight="normal"
+          fontSize="16px"
+          isDisabled={isDisabled}
+          onClick={handleImportOptions}
+        >
+          <FormattedMessage id="generic.import" defaultMessage="Import" />
+        </Button>
+      </Box>
     </SettingsRow>
   );
 }
@@ -101,6 +102,7 @@ ImportOptionsSettingsRow.fragments = {
   PetitionField: gql`
     fragment ImportOptionsSettingsRow_PetitionField on PetitionField {
       id
+      type
       title
       options
     }

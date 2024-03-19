@@ -1982,6 +1982,37 @@ const _ProfileTypeField = {
       description: "Whether the profile type field is expirable",
       example: false,
     },
+    options: {
+      type: "object",
+      description: "For fields of type `SELECT`, contains the list of possible values",
+      oneOf: [
+        {
+          title: "SELECT",
+          type: "object",
+          required: ["values"],
+          additionalProperties: false,
+          properties: {
+            values: {
+              type: "array",
+              maxItems: 1000,
+              items: {
+                type: "object",
+                required: ["label", "value"],
+                properties: {
+                  label: _LocalizableUserText,
+                  value: { type: "string", maxLength: 50 },
+                  color: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        {
+          type: "object",
+          properties: {},
+        },
+      ],
+    },
   },
 } as const;
 

@@ -67,8 +67,8 @@ describe("validateFieldLogic", () => {
 
   describe("field visibility", () => {
     describe("simple fields", () => {
-      it("simple reply count condition", () => {
-        expect(() =>
+      it("simple reply count condition", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -88,11 +88,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("simple text match condition", () => {
-        expect(() =>
+      it("simple text match condition", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -112,11 +112,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("simple condition on SELECT field replies", () => {
-        expect(() =>
+      it("simple condition on SELECT field replies", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...headingField,
@@ -136,11 +136,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("simple condition on FILE_UPLOAD field replies", () => {
-        expect(() =>
+      it("simple condition on FILE_UPLOAD field replies", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -160,11 +160,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("multiple visibility conditions", () => {
-        expect(() =>
+      it("multiple visibility conditions", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -196,11 +196,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("should have at least 1 condition", () => {
-        expect(() =>
+      it("should have at least 1 condition", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...textField,
@@ -213,11 +213,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError();
+        ).rejects.toThrow();
       });
 
-      it("should allow null values on conditions", () => {
-        expect(() =>
+      it("should allow null values on conditions", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -237,11 +237,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("should NOT allow null fieldIds on conditions", () => {
-        expect(() =>
+      it("should NOT allow null fieldIds on conditions", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...textField,
@@ -261,11 +261,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError();
+        ).rejects.toThrow();
       });
 
-      it("should not allow conditions referencing HEADING fields", () => {
-        expect(() =>
+      it("should not allow conditions referencing HEADING fields", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...shortTextField,
@@ -285,11 +285,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Conditions can't reference HEADING fields");
+        ).rejects.toThrow("Conditions can't reference HEADING fields");
       });
 
-      it("value for NUMBER_OF_REPLIES modifier should be a number", () => {
-        expect(() =>
+      it("value for NUMBER_OF_REPLIES modifier should be a number", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -309,11 +309,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Invalid value type string for modifier NUMBER_OF_REPLIES");
+        ).rejects.toThrow("Invalid value type string for modifier NUMBER_OF_REPLIES");
       });
 
-      it("value for text match modifier should be a string", () => {
-        expect(() =>
+      it("value for text match modifier should be a string", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...fileUploadField,
@@ -333,11 +333,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Invalid value type number for field of type TEXT");
+        ).rejects.toThrow("Invalid value type number for field of type TEXT");
       });
 
-      it("operator for NUMBER_OF_REPLIES should be of numeric comparator", () => {
-        expect(() =>
+      it("operator for NUMBER_OF_REPLIES should be of numeric comparator", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -357,11 +357,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Invalid operator START_WITH for modifier NUMBER_OF_REPLIES");
+        ).rejects.toThrow("Invalid operator START_WITH for modifier NUMBER_OF_REPLIES");
       });
 
-      it("operator for text match modifiers should be of text comparator", () => {
-        expect(() =>
+      it("operator for text match modifiers should be of text comparator", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -381,11 +381,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Invalid operator LESS_THAN for field of type TEXT");
+        ).rejects.toThrow("Invalid operator LESS_THAN for field of type TEXT");
       });
 
-      it("conditions on SELECT field replies should not allow substring comparisons", () => {
-        expect(() =>
+      it("conditions on SELECT field replies should not allow substring comparisons", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...shortTextField,
@@ -405,11 +405,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Invalid operator START_WITH for field of type SELECT");
+        ).rejects.toThrow("Invalid operator START_WITH for field of type SELECT");
       });
 
-      it("value on SELECT field replies should be one of the selector options", () => {
-        expect(() =>
+      it("value on SELECT field replies should be one of the selector options", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...shortTextField,
@@ -429,13 +429,13 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError(
+        ).rejects.toThrow(
           "Invalid value Unknown option for field of type SELECT. Should be one of: Option 1, Option 2, Option 3",
         );
       });
 
-      it("modifier for FILE_UPLOAD field should be NUMBER_OF_REPLIES", () => {
-        expect(() =>
+      it("modifier for FILE_UPLOAD field should be NUMBER_OF_REPLIES", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -455,11 +455,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Invalid modifier NONE for field of type FILE_UPLOAD");
+        ).rejects.toThrow("Invalid modifier NONE for field of type FILE_UPLOAD");
       });
 
-      it("fieldId value for conditions should be a PetitionField GID", () => {
-        expect(() =>
+      it("fieldId value for conditions should be a PetitionField GID", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...textField,
@@ -479,11 +479,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError();
+        ).rejects.toThrow();
       });
 
-      it("referenced fields on conditions should exist and be valid", () => {
-        expect(() =>
+      it("referenced fields on conditions should exist and be valid", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...textField,
@@ -503,13 +503,13 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError(
+        ).rejects.toThrow(
           `Can't find PetitionField:1101010 referenced in PetitionField:${textField.id}, condition 0`,
         );
       });
 
-      it("referenced fields on conditions should not be deleted", () => {
-        expect(() =>
+      it("referenced fields on conditions should not be deleted", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...shortTextField,
@@ -535,13 +535,13 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError(
+        ).rejects.toThrow(
           `Can't find PetitionField:${deletedField.id} referenced in PetitionField:${shortTextField.id}, condition 1`,
         );
       });
 
-      it("referenced fields on conditions should all belong to the same petition", () => {
-        expect(() =>
+      it("referenced fields on conditions should all belong to the same petition", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...shortTextField,
@@ -573,13 +573,13 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError(
+        ).rejects.toThrow(
           `Can't find PetitionField:${fieldOnAnotherPetition.id} referenced in PetitionField:${shortTextField.id}, condition 2`,
         );
       });
 
-      it("can't set a condition based on itself", () => {
-        expect(() =>
+      it("can't set a condition based on itself", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...textField,
@@ -599,11 +599,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Can't add a reference to field itself");
+        ).rejects.toThrow("Can't add a reference to field itself");
       });
 
-      it("can't set a condition on a field that comes next", () => {
-        expect(() =>
+      it("can't set a condition on a field that comes next", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...textField,
@@ -623,11 +623,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Can't reference fields that come next");
+        ).rejects.toThrow("Can't reference fields that come next");
       });
 
-      it("should have up to 15 conditions", () => {
-        expect(() =>
+      it("should have up to 15 conditions", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -645,11 +645,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError();
+        ).rejects.toThrow();
       });
 
-      it("uses a petition variable on a visibility condition", () => {
-        expect(() =>
+      it("uses a petition variable on a visibility condition", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -668,11 +668,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [{ name: "PETITION_VARIABLE", default_value: 0 }],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("variable conditions should use numeric values", () => {
-        expect(() =>
+      it("variable conditions should use numeric values", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -691,10 +691,10 @@ describe("validateFieldLogic", () => {
             allFields,
             [{ name: "PETITION_VARIABLE", default_value: 0 }],
           ),
-        ).toThrowError("Invalid value type string for variable condition 0");
+        ).rejects.toThrow("Invalid value type string for variable condition 0");
       });
 
-      it("variable conditions should use numeric operators", () => {
+      it("variable conditions should use numeric operators", async () => {
         const invalidOperators = [
           "START_WITH",
           "END_WITH",
@@ -706,7 +706,7 @@ describe("validateFieldLogic", () => {
         ];
 
         for (const operator of invalidOperators) {
-          expect(() =>
+          await expect(() =>
             validateFieldLogic(
               {
                 ...selectField,
@@ -725,12 +725,12 @@ describe("validateFieldLogic", () => {
               allFields,
               [{ name: "PETITION_VARIABLE", default_value: 0 }],
             ),
-          ).toThrowError(`Invalid operator ${operator} for variable condition 0`);
+          ).rejects.toThrow(`Invalid operator ${operator} for variable condition 0`);
         }
       });
 
-      it("sends error if variable is not defined", () => {
-        expect(() =>
+      it("sends error if variable is not defined", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -749,7 +749,7 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError(`Can't find variable PETITION_VARIABLE referenced in condition 0`);
+        ).rejects.toThrow(`Can't find variable PETITION_VARIABLE referenced in condition 0`);
       });
     });
 
@@ -792,8 +792,8 @@ describe("validateFieldLogic", () => {
         ];
       });
 
-      it("a child field can reference previous fields", () => {
-        expect(() =>
+      it("a child field can reference previous fields", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...fieldGroup1Children[0],
@@ -813,11 +813,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("a child field can have a condition on its parent only with NUMBER_OF_REPLIES modifier", () => {
-        expect(() =>
+      it("a child field can have a condition on its parent only with NUMBER_OF_REPLIES modifier", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...fieldGroup1Children[0],
@@ -837,11 +837,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("a child field can reference previous siblings", () => {
-        expect(() =>
+      it("a child field can reference previous siblings", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...fieldGroup1Children[1],
@@ -861,11 +861,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("a child field can't reference later siblings", () => {
-        expect(() =>
+      it("a child field can't reference later siblings", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...fieldGroup1Children[0],
@@ -885,11 +885,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Can't reference fields that come next");
+        ).rejects.toThrow("Can't reference fields that come next");
       });
 
-      it("a child field can reference children on previous fields", () => {
-        expect(() =>
+      it("a child field can reference children on previous fields", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...fieldGroup2Children[0],
@@ -909,11 +909,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("a child field can't reference children on later fields", () => {
-        expect(() =>
+      it("a child field can't reference children on later fields", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...fieldGroup1Children[0],
@@ -933,11 +933,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Can't reference fields that come next");
+        ).rejects.toThrow("Can't reference fields that come next");
       });
 
-      it("a normal field can reference another previous field's children", () => {
-        expect(() =>
+      it("a normal field can reference another previous field's children", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...dateField,
@@ -957,11 +957,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
 
-      it("a normal field can't reference another later field's children", () => {
-        expect(() =>
+      it("a normal field can't reference another later field's children", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...textField,
@@ -981,11 +981,11 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).toThrowError("Can't reference fields that come next");
+        ).rejects.toThrow("Can't reference fields that come next");
       });
 
-      it("a normal field can reference a FIELD_GROUP field only with NUMBER_OF_REPLIES modifier", () => {
-        expect(() =>
+      it("a normal field can reference a FIELD_GROUP field only with NUMBER_OF_REPLIES modifier", async () => {
+        await expect(
           validateFieldLogic(
             {
               ...dateField,
@@ -1005,14 +1005,14 @@ describe("validateFieldLogic", () => {
             allFields,
             [],
           ),
-        ).not.toThrowError();
+        ).resolves.not.toThrow();
       });
     });
   });
 
   describe("field math", () => {
-    it("simple math addition with NUMBER operand", () => {
-      expect(() =>
+    it("simple math addition with NUMBER operand", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1043,11 +1043,11 @@ describe("validateFieldLogic", () => {
           allFields,
           [{ name: "score", default_value: 0 }],
         ),
-      ).not.toThrowError();
+      ).resolves.not.toThrow();
     });
 
-    it("simple math addition with FIELD operand", () => {
-      expect(() =>
+    it("simple math addition with FIELD operand", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1078,11 +1078,11 @@ describe("validateFieldLogic", () => {
           allFields,
           [{ name: "score", default_value: 0 }],
         ),
-      ).not.toThrowError();
+      ).resolves.not.toThrow();
     });
 
-    it("simple math addition with VARIABLE operand", () => {
-      expect(() =>
+    it("simple math addition with VARIABLE operand", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1116,11 +1116,11 @@ describe("validateFieldLogic", () => {
             { name: "source", default_value: 100 },
           ],
         ),
-      ).not.toThrowError();
+      ).resolves.not.toThrow();
     });
 
-    it("NUMBER operand must have a numeric value", () => {
-      expect(() =>
+    it("NUMBER operand must have a numeric value", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1151,11 +1151,11 @@ describe("validateFieldLogic", () => {
           allFields,
           [{ name: "score", default_value: 0 }],
         ),
-      ).toThrowError();
+      ).rejects.toThrow();
     });
 
-    it("FIELD operand must refer to a NUMBER type field", () => {
-      expect(() =>
+    it("FIELD operand must refer to a NUMBER type field", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1186,11 +1186,11 @@ describe("validateFieldLogic", () => {
           allFields,
           [{ name: "score", default_value: 0 }],
         ),
-      ).toThrowError();
+      ).rejects.toThrow();
     });
 
-    it("VARIABLE operand must refer to a defined petition variable", () => {
-      expect(() =>
+    it("VARIABLE operand must refer to a defined petition variable", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1224,11 +1224,11 @@ describe("validateFieldLogic", () => {
             { name: "source", default_value: 100 },
           ],
         ),
-      ).toThrowError();
+      ).rejects.toThrow();
     });
 
-    it("variable in operation must be defined in petition variables", () => {
-      expect(() =>
+    it("variable in operation must be defined in petition variables", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1262,10 +1262,10 @@ describe("validateFieldLogic", () => {
             { name: "source", default_value: 100 },
           ],
         ),
-      ).toThrowError();
+      ).rejects.toThrow();
     });
 
-    it("should have between 1 and 10 conditions", () => {
+    it("should have between 1 and 10 conditions", async () => {
       const conditionsArr = [
         [],
         range(0, 11).map(() => ({
@@ -1277,7 +1277,7 @@ describe("validateFieldLogic", () => {
       ];
 
       for (const conditions of conditionsArr) {
-        expect(() =>
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -1304,11 +1304,11 @@ describe("validateFieldLogic", () => {
               { name: "source", default_value: 100 },
             ],
           ),
-        ).toThrowError();
+        ).rejects.toThrow();
       }
     });
 
-    it("should have between 1 and 10 operations", () => {
+    it("should have between 1 and 10 operations", async () => {
       const operationsArr = [
         [],
         range(0, 11).map(() => ({
@@ -1322,7 +1322,7 @@ describe("validateFieldLogic", () => {
       ];
 
       for (const operations of operationsArr) {
-        expect(() =>
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -1347,11 +1347,11 @@ describe("validateFieldLogic", () => {
               { name: "source", default_value: 100 },
             ],
           ),
-        ).toThrowError();
+        ).rejects.toThrow();
       }
     });
 
-    it("should have between 1 and 10 math groups", () => {
+    it("should have between 1 and 10 math groups", async () => {
       const mathsArr = [
         [],
         range(0, 11).map(() => ({
@@ -1378,7 +1378,7 @@ describe("validateFieldLogic", () => {
       ];
 
       for (const math of mathsArr) {
-        expect(() =>
+        await expect(
           validateFieldLogic(
             {
               ...selectField,
@@ -1390,12 +1390,12 @@ describe("validateFieldLogic", () => {
               { name: "source", default_value: 100 },
             ],
           ),
-        ).toThrowError();
+        ).rejects.toThrow();
       }
     });
 
-    it("should allow to set a condition based on itself", () => {
-      expect(() =>
+    it("should allow to set a condition based on itself", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...textField,
@@ -1426,11 +1426,11 @@ describe("validateFieldLogic", () => {
           allFields,
           [{ name: "score", default_value: 0 }],
         ),
-      ).not.toThrowError();
+      ).resolves.not.toThrow();
     });
 
-    it("complex math", () => {
-      expect(() =>
+    it("complex math", async () => {
+      await expect(
         validateFieldLogic(
           {
             ...selectField,
@@ -1486,7 +1486,7 @@ describe("validateFieldLogic", () => {
             { name: "price_multiplier", default_value: 1 },
           ],
         ),
-      ).not.toThrowError();
+      ).resolves.not.toThrow();
     });
   });
 });
