@@ -647,6 +647,7 @@ const _queries = [
   gql`
     query PetitionActivity_events($id: GID!, $offset: Int!, $limit: Int!) {
       petition(id: $id) {
+        id
         ... on Petition {
           events(offset: $offset, limit: $limit) {
             items {

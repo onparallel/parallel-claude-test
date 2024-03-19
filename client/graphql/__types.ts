@@ -28025,6 +28025,7 @@ export type PetitionActivity_eventsQuery = {
   petition?:
     | {
         __typename?: "Petition";
+        id: string;
         events: {
           __typename?: "PetitionEventPagination";
           totalCount: number;
@@ -28927,7 +28928,7 @@ export type PetitionActivity_eventsQuery = {
           >;
         };
       }
-    | { __typename?: "PetitionTemplate" }
+    | { __typename?: "PetitionTemplate"; id: string }
     | null;
 };
 
@@ -56719,6 +56720,7 @@ export const PetitionActivity_disassociateProfileFromPetitionDocument = gql`
 export const PetitionActivity_eventsDocument = gql`
   query PetitionActivity_events($id: GID!, $offset: Int!, $limit: Int!) {
     petition(id: $id) {
+      id
       ... on Petition {
         events(offset: $offset, limit: $limit) {
           items {
