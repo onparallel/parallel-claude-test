@@ -80,9 +80,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   } = useAssertQuery(PetitionActivity_userDocument);
   const { data: petitionData, refetch: petitionRefetch } = useAssertQuery(
     PetitionActivity_petitionDocument,
-    {
-      variables: { id: petitionId, offset: 0, limit: PAGE_SIZE },
-    },
+    { variables: { id: petitionId } },
   );
   const {
     data: eventsData,
@@ -91,7 +89,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   } = useAssertQuery(PetitionActivity_eventsDocument, {
     variables: { id: petitionId, offset: 0, limit: PAGE_SIZE },
   });
-
   const refetch = useCallback(
     () => Promise.all([petitionRefetch(), eventsRefetch()]),
     [petitionRefetch, eventsRefetch],
