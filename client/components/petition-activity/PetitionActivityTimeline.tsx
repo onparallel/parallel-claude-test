@@ -24,6 +24,8 @@ import { TimelinePetitionCreatedEvent } from "./timeline/events/TimelinePetition
 import { TimelinePetitionMessageBouncedEvent } from "./timeline/events/TimelinePetitionMessageBouncedEvent";
 import { TimelinePetitionReminderBouncedEvent } from "./timeline/events/TimelinePetitionReminderBouncedEvent";
 import { TimelinePetitionReopenedEvent } from "./timeline/events/TimelinePetitionReopenedEvent";
+import { TimelinePetitionTaggedEvent } from "./timeline/events/TimelinePetitionTaggedEvent";
+import { TimelinePetitionUntaggedEvent } from "./timeline/events/TimelinePetitionUntaggedEvent";
 import { TimelineProfileAssociatedEvent } from "./timeline/events/TimelineProfileAssociatedEvent";
 import { TimelineProfileDisassociatedEvent } from "./timeline/events/TimelineProfileDisassociatedEvent";
 import { TimelineRecipientSignedEvent } from "./timeline/events/TimelineRecipientSignedEvent";
@@ -42,8 +44,6 @@ import { TimelineSignatureStartedEvent } from "./timeline/events/TimelineSignatu
 import { TimelineUserPermissionAddedEvent } from "./timeline/events/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/events/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/events/TimelineUserPermissionRemovedEvent";
-import { TimelinePetitionTaggedEvent } from "./timeline/events/TimelinePetitionTaggedEvent";
-import { TimelinePetitionUntaggedEvent } from "./timeline/events/TimelinePetitionUntaggedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -56,113 +56,104 @@ export function PetitionActivityTimeline({
   ...props
 }: PetitionActivityTimelineProps) {
   return (
-    <Box {...props}>
-      <Box as="ol">
-        {events.map((event) => (
-          <Box as="li" key={event.id} listStyleType="none">
-            {event.__typename === "PetitionCreatedEvent" ? (
-              <TimelinePetitionCreatedEvent event={event} userId={userId} />
-            ) : event.__typename === "PetitionCompletedEvent" ? (
-              <TimelinePetitionCompletedEvent event={event} userId={userId} />
-            ) : event.__typename === "AccessActivatedEvent" ? (
-              <TimelineAccessActivatedEvent event={event} userId={userId} />
-            ) : event.__typename === "AccessDeactivatedEvent" ? (
-              <TimelineAccessDeactivatedEvent event={event} userId={userId} />
-            ) : event.__typename === "AccessOpenedEvent" ? (
-              <TimelineAccessOpenedEvent event={event} />
-            ) : event.__typename === "MessageScheduledEvent" ? (
-              <TimelineMessageScheduledEvent event={event} userId={userId} />
-            ) : event.__typename === "MessageCancelledEvent" ? (
-              <TimelineMessageCancelledEvent event={event} userId={userId} />
-            ) : event.__typename === "MessageSentEvent" ? (
-              <TimelineMessageSentEvent event={event} userId={userId} />
-            ) : event.__typename === "ReminderSentEvent" ? (
-              <TimelineReminderSentEvent event={event} userId={userId} />
-            ) : event.__typename === "ReplyCreatedEvent" ? (
-              <TimelineReplyCreatedEvent event={event} userId={userId} />
-            ) : event.__typename === "ReplyUpdatedEvent" ? (
-              <TimelineReplyUpdatedEvent event={event} userId={userId} />
-            ) : event.__typename === "ReplyDeletedEvent" ? (
-              <TimelineReplyDeletedEvent event={event} userId={userId} />
-            ) : event.__typename === "CommentPublishedEvent" ? (
-              <TimelineCommentPublishedEvent event={event} userId={userId} />
-            ) : event.__typename === "CommentDeletedEvent" ? (
-              <TimelineCommentDeletedEvent event={event} userId={userId} />
-            ) : event.__typename === "UserPermissionAddedEvent" ? (
-              <TimelineUserPermissionAddedEvent event={event} userId={userId} />
-            ) : event.__typename === "UserPermissionRemovedEvent" ? (
-              <TimelineUserPermissionRemovedEvent event={event} userId={userId} />
-            ) : event.__typename === "UserPermissionEditedEvent" ? (
-              <TimelineUserPermissionEditedEvent event={event} userId={userId} />
-            ) : event.__typename === "OwnershipTransferredEvent" ? (
-              <TimelineOwnershipTransferredEvent event={event} userId={userId} />
-            ) : event.__typename === "PetitionClosedEvent" ? (
-              <TimelinePetitionClosedEvent event={event} userId={userId} />
-            ) : event.__typename === "PetitionClosedNotifiedEvent" ? (
-              <TimelinePetitionClosedNotifiedEvent event={event} userId={userId} />
-            ) : event.__typename === "PetitionReopenedEvent" ? (
-              <TimelinePetitionReopenedEvent event={event} userId={userId} />
-            ) : event.__typename === "SignatureDeliveredEvent" ? (
-              <TimelineSignatureDeliveredEvent event={event} />
-            ) : event.__typename === "SignatureOpenedEvent" ? (
-              <TimelineSignatureOpenedEvent event={event} />
-            ) : event.__typename === "SignatureStartedEvent" ? (
-              <TimelineSignatureStartedEvent event={event} />
-            ) : event.__typename === "SignatureCompletedEvent" ? (
-              <TimelineSignatureCompletedEvent event={event} />
-            ) : event.__typename === "SignatureCancelledEvent" ? (
-              <TimelineSignatureCancelledEvent event={event} userId={userId} />
-            ) : event.__typename === "SignatureReminderEvent" ? (
-              <TimelineSignatureReminderEvent event={event} userId={userId} />
-            ) : event.__typename === "AccessDelegatedEvent" ? (
-              <TimelineAccessDelegatedEvent event={event} />
-            ) : event.__typename === "GroupPermissionAddedEvent" ? (
-              <TimelineGroupPermissionAddedEvent event={event} userId={userId} />
-            ) : event.__typename === "GroupPermissionEditedEvent" ? (
-              <TimelineGroupPermissionEditedEvent event={event} userId={userId} />
-            ) : event.__typename === "GroupPermissionRemovedEvent" ? (
-              <TimelineGroupPermissionRemovedEvent event={event} userId={userId} />
-            ) : event.__typename === "PetitionClonedEvent" ? (
-              <TimelinePetitionClonedEvent event={event} userId={userId} />
-            ) : event.__typename === "RemindersOptOutEvent" ? (
-              <TimelineRemindersOptOutEvent event={event} />
-            ) : event.__typename === "AccessActivatedFromPublicPetitionLinkEvent" ? (
-              <TimelineAccessActivatedFromLinkEvent event={event} />
-            ) : event.__typename === "RecipientSignedEvent" ? (
-              <TimelineRecipientSignedEvent event={event} />
-            ) : event.__typename === "PetitionMessageBouncedEvent" ? (
-              <TimelinePetitionMessageBouncedEvent event={event} />
-            ) : event.__typename === "PetitionReminderBouncedEvent" ? (
-              <TimelinePetitionReminderBouncedEvent event={event} />
-            ) : event.__typename === "PetitionAnonymizedEvent" ? (
-              <TimelinePetitionAnonymizedEvent event={event} />
-            ) : event.__typename === "ReplyStatusChangedEvent" ? (
-              <TimelineReplyStatusChangedEvent event={event} userId={userId} />
-            ) : event.__typename === "ProfileAssociatedEvent" ? (
-              <TimelineProfileAssociatedEvent event={event} />
-            ) : event.__typename === "ProfileDisassociatedEvent" ? (
-              <TimelineProfileDisassociatedEvent event={event} />
-            ) : event.__typename === "PetitionTaggedEvent" ? (
-              <TimelinePetitionTaggedEvent event={event} userId={userId} />
-            ) : event.__typename === "PetitionUntaggedEvent" ? (
-              <TimelinePetitionUntaggedEvent event={event} userId={userId} />
-            ) : null}
-          </Box>
-        ))}
-      </Box>
+    <Box as="ol" {...props}>
+      {events.map((event) => (
+        <Box as="li" key={event.id} listStyleType="none">
+          {event.__typename === "PetitionCreatedEvent" ? (
+            <TimelinePetitionCreatedEvent event={event} userId={userId} />
+          ) : event.__typename === "PetitionCompletedEvent" ? (
+            <TimelinePetitionCompletedEvent event={event} userId={userId} />
+          ) : event.__typename === "AccessActivatedEvent" ? (
+            <TimelineAccessActivatedEvent event={event} userId={userId} />
+          ) : event.__typename === "AccessDeactivatedEvent" ? (
+            <TimelineAccessDeactivatedEvent event={event} userId={userId} />
+          ) : event.__typename === "AccessOpenedEvent" ? (
+            <TimelineAccessOpenedEvent event={event} />
+          ) : event.__typename === "MessageScheduledEvent" ? (
+            <TimelineMessageScheduledEvent event={event} userId={userId} />
+          ) : event.__typename === "MessageCancelledEvent" ? (
+            <TimelineMessageCancelledEvent event={event} userId={userId} />
+          ) : event.__typename === "MessageSentEvent" ? (
+            <TimelineMessageSentEvent event={event} userId={userId} />
+          ) : event.__typename === "ReminderSentEvent" ? (
+            <TimelineReminderSentEvent event={event} userId={userId} />
+          ) : event.__typename === "ReplyCreatedEvent" ? (
+            <TimelineReplyCreatedEvent event={event} userId={userId} />
+          ) : event.__typename === "ReplyUpdatedEvent" ? (
+            <TimelineReplyUpdatedEvent event={event} userId={userId} />
+          ) : event.__typename === "ReplyDeletedEvent" ? (
+            <TimelineReplyDeletedEvent event={event} userId={userId} />
+          ) : event.__typename === "CommentPublishedEvent" ? (
+            <TimelineCommentPublishedEvent event={event} userId={userId} />
+          ) : event.__typename === "CommentDeletedEvent" ? (
+            <TimelineCommentDeletedEvent event={event} userId={userId} />
+          ) : event.__typename === "UserPermissionAddedEvent" ? (
+            <TimelineUserPermissionAddedEvent event={event} userId={userId} />
+          ) : event.__typename === "UserPermissionRemovedEvent" ? (
+            <TimelineUserPermissionRemovedEvent event={event} userId={userId} />
+          ) : event.__typename === "UserPermissionEditedEvent" ? (
+            <TimelineUserPermissionEditedEvent event={event} userId={userId} />
+          ) : event.__typename === "OwnershipTransferredEvent" ? (
+            <TimelineOwnershipTransferredEvent event={event} userId={userId} />
+          ) : event.__typename === "PetitionClosedEvent" ? (
+            <TimelinePetitionClosedEvent event={event} userId={userId} />
+          ) : event.__typename === "PetitionClosedNotifiedEvent" ? (
+            <TimelinePetitionClosedNotifiedEvent event={event} userId={userId} />
+          ) : event.__typename === "PetitionReopenedEvent" ? (
+            <TimelinePetitionReopenedEvent event={event} userId={userId} />
+          ) : event.__typename === "SignatureDeliveredEvent" ? (
+            <TimelineSignatureDeliveredEvent event={event} />
+          ) : event.__typename === "SignatureOpenedEvent" ? (
+            <TimelineSignatureOpenedEvent event={event} />
+          ) : event.__typename === "SignatureStartedEvent" ? (
+            <TimelineSignatureStartedEvent event={event} />
+          ) : event.__typename === "SignatureCompletedEvent" ? (
+            <TimelineSignatureCompletedEvent event={event} />
+          ) : event.__typename === "SignatureCancelledEvent" ? (
+            <TimelineSignatureCancelledEvent event={event} userId={userId} />
+          ) : event.__typename === "SignatureReminderEvent" ? (
+            <TimelineSignatureReminderEvent event={event} userId={userId} />
+          ) : event.__typename === "AccessDelegatedEvent" ? (
+            <TimelineAccessDelegatedEvent event={event} />
+          ) : event.__typename === "GroupPermissionAddedEvent" ? (
+            <TimelineGroupPermissionAddedEvent event={event} userId={userId} />
+          ) : event.__typename === "GroupPermissionEditedEvent" ? (
+            <TimelineGroupPermissionEditedEvent event={event} userId={userId} />
+          ) : event.__typename === "GroupPermissionRemovedEvent" ? (
+            <TimelineGroupPermissionRemovedEvent event={event} userId={userId} />
+          ) : event.__typename === "PetitionClonedEvent" ? (
+            <TimelinePetitionClonedEvent event={event} userId={userId} />
+          ) : event.__typename === "RemindersOptOutEvent" ? (
+            <TimelineRemindersOptOutEvent event={event} />
+          ) : event.__typename === "AccessActivatedFromPublicPetitionLinkEvent" ? (
+            <TimelineAccessActivatedFromLinkEvent event={event} />
+          ) : event.__typename === "RecipientSignedEvent" ? (
+            <TimelineRecipientSignedEvent event={event} />
+          ) : event.__typename === "PetitionMessageBouncedEvent" ? (
+            <TimelinePetitionMessageBouncedEvent event={event} />
+          ) : event.__typename === "PetitionReminderBouncedEvent" ? (
+            <TimelinePetitionReminderBouncedEvent event={event} />
+          ) : event.__typename === "PetitionAnonymizedEvent" ? (
+            <TimelinePetitionAnonymizedEvent event={event} />
+          ) : event.__typename === "ReplyStatusChangedEvent" ? (
+            <TimelineReplyStatusChangedEvent event={event} userId={userId} />
+          ) : event.__typename === "ProfileAssociatedEvent" ? (
+            <TimelineProfileAssociatedEvent event={event} />
+          ) : event.__typename === "ProfileDisassociatedEvent" ? (
+            <TimelineProfileDisassociatedEvent event={event} />
+          ) : event.__typename === "PetitionTaggedEvent" ? (
+            <TimelinePetitionTaggedEvent event={event} userId={userId} />
+          ) : event.__typename === "PetitionUntaggedEvent" ? (
+            <TimelinePetitionUntaggedEvent event={event} userId={userId} />
+          ) : null}
+        </Box>
+      ))}
     </Box>
   );
 }
 
 PetitionActivityTimeline.fragments = {
-  Petition: gql`
-    fragment PetitionActivityTimeline_Petition on Petition {
-      events(limit: 1000) {
-        items {
-          ...PetitionActivityTimeline_PetitionEvent
-        }
-      }
-    }
+  PetitionEvent: gql`
     fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
       id
       ... on PetitionCreatedEvent {

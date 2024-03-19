@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, useToast } from "@chakra-ui/react";
+import { Box, Center, Spinner, useToast } from "@chakra-ui/react";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -35,10 +35,10 @@ import { useSendPetitionHandler } from "@parallel/components/petition-common/use
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import {
   PetitionAccessTable_PetitionAccessFragment,
-  PetitionActivity_PetitionFragment,
   PetitionActivity_associateProfileToPetitionDocument,
   PetitionActivity_deactivateAccessesDocument,
   PetitionActivity_disassociateProfileFromPetitionDocument,
+  PetitionActivity_eventsDocument,
   PetitionActivity_petitionDocument,
   PetitionActivity_reactivateAccessesDocument,
   PetitionActivity_sendRemindersDocument,
@@ -48,6 +48,7 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { assertTypename } from "@parallel/utils/apollo/typename";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
@@ -58,8 +59,12 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
+import { assert } from "ts-essentials";
+
+const PAGE_SIZE = 100;
 
 type PetitionActivityProps = UnwrapPromise<ReturnType<typeof PetitionActivity.getInitialProps>>;
 
@@ -73,16 +78,37 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionActivity_userDocument);
-  const { data, refetch } = useAssertQuery(PetitionActivity_petitionDocument, {
-    variables: { id: petitionId },
+  const { data: petitionData, refetch: petitionRefetch } = useAssertQuery(
+    PetitionActivity_petitionDocument,
+    {
+      variables: { id: petitionId, offset: 0, limit: PAGE_SIZE },
+    },
+  );
+  const {
+    data: eventsData,
+    refetch: eventsRefetch,
+    fetchMore: eventsFetchMore,
+  } = useAssertQuery(PetitionActivity_eventsDocument, {
+    variables: { id: petitionId, offset: 0, limit: PAGE_SIZE },
   });
+
+  const refetch = useCallback(
+    () => Promise.all([petitionRefetch(), eventsRefetch()]),
+    [petitionRefetch, eventsRefetch],
+  );
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
     updateIsReadNotification({ isRead: true, filter: "OTHER", petitionIds: [petitionId] });
   }, []);
 
-  const petition = data!.petition as PetitionActivity_PetitionFragment;
+  assert(isDefined(petitionData.petition));
+  assertTypename(petitionData.petition, "Petition");
+  const petition = petitionData.petition;
+
+  assert(isDefined(eventsData.petition));
+  assertTypename(eventsData.petition, "Petition");
+  const events = eventsData.petition.events;
 
   const wrapper = usePetitionStateWrapper();
 
@@ -401,6 +427,12 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     } catch {}
   };
 
+  const handleLoadMore = useCallback(async () => {
+    await eventsFetchMore({
+      variables: { id: petitionId, offset: events.items.length, limit: PAGE_SIZE },
+    });
+  }, [petitionId, eventsFetchMore, events.items.length]);
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -445,11 +477,29 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         </Box>
       ) : null}
       <Box margin={4}>
-        <PetitionActivityTimeline
-          id="petition-activity-timeline"
-          userId={me.id}
-          events={petition.events.items}
-        />
+        <InfiniteScroll
+          dataLength={events.items.length}
+          next={handleLoadMore}
+          hasMore={events.items.length < events.totalCount}
+          loader={
+            <Center height="100px" width="100%" zIndex="1">
+              <Spinner
+                thickness="2px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="gray.600"
+                size="xl"
+              />
+            </Center>
+          }
+          scrollableTarget="petition-layout-body"
+        >
+          <PetitionActivityTimeline
+            id="petition-activity-timeline"
+            userId={me.id}
+            events={events.items}
+          />
+        </InfiniteScroll>
       </Box>
     </PetitionLayout>
   );
@@ -468,7 +518,6 @@ const _fragments = {
       }
       ...PetitionLayout_PetitionBase
       ...PetitionAccessTable_Petition
-      ...PetitionActivityTimeline_Petition
       ...ShareButton_PetitionBase
       ...AddPetitionAccessDialog_Petition
       ...useSendPetitionHandler_Petition
@@ -490,7 +539,6 @@ const _fragments = {
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
     ${PetitionProfilesTable.fragments.Petition}
-    ${PetitionActivityTimeline.fragments.Petition}
     ${ShareButton.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
@@ -501,6 +549,12 @@ const _fragments = {
     ${ConfirmDeactivateAccessDialog.fragments.PetitionAccess}
     ${ConfirmReactivateAccessDialog.fragments.PetitionAccess}
     ${useConfirmSendReminderDialog.fragments.Petition}
+  `,
+  PetitionEvent: gql`
+    fragment PetitionActivity_PetitionEvent on PetitionEvent {
+      ...PetitionActivityTimeline_PetitionEvent
+    }
+    ${PetitionActivityTimeline.fragments.PetitionEvent}
   `,
   Query: gql`
     fragment PetitionActivity_Query on Query {
@@ -594,6 +648,21 @@ PetitionActivity.mutations = [
 
 const _queries = [
   gql`
+    query PetitionActivity_events($id: GID!, $offset: Int!, $limit: Int!) {
+      petition(id: $id) {
+        ... on Petition {
+          events(offset: $offset, limit: $limit) {
+            items {
+              ...PetitionActivity_PetitionEvent
+            }
+            totalCount
+          }
+        }
+      }
+    }
+    ${_fragments.Petition}
+  `,
+  gql`
     query PetitionActivity_petition($id: GID!) {
       petition(id: $id) {
         ...PetitionActivity_Petition
@@ -615,6 +684,9 @@ const _queries = [
 PetitionActivity.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
   await Promise.all([
+    fetchQuery(PetitionActivity_eventsDocument, {
+      variables: { id: petitionId, offset: 0, limit: PAGE_SIZE },
+    }),
     fetchQuery(PetitionActivity_petitionDocument, {
       variables: { id: petitionId },
     }),

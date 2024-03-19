@@ -8859,854 +8859,6 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   } | null;
 };
 
-export type PetitionActivityTimeline_PetitionFragment = {
-  __typename?: "Petition";
-  events: {
-    __typename?: "PetitionEventPagination";
-    items: Array<
-      | {
-          __typename?: "AccessActivatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          access: {
-            __typename?: "PetitionAccess";
-            isContactless: boolean;
-            delegateGranter?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            } | null;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessDeactivatedEvent";
-          id: string;
-          reason: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          access: {
-            __typename?: "PetitionAccess";
-            isContactless: boolean;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessDelegatedEvent";
-          id: string;
-          createdAt: string;
-          originalAccess: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-          newAccess: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessOpenedEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "CommentDeletedEvent";
-          id: string;
-          isInternal: boolean;
-          createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-          deletedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-        }
-      | {
-          __typename?: "CommentPublishedEvent";
-          id: string;
-          isInternal: boolean;
-          createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-          comment?: {
-            __typename?: "PetitionFieldComment";
-            isEdited: boolean;
-            isAnonymized: boolean;
-            contentHtml?: string | null;
-            author?:
-              | {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-              | null;
-            mentions: Array<
-              | {
-                  __typename?: "PetitionFieldCommentUserGroupMention";
-                  mentionedId: string;
-                  userGroup?: {
-                    __typename?: "UserGroup";
-                    id: string;
-                    imMember: boolean;
-                    name: string;
-                    localizableName: { [locale in UserLocale]?: string };
-                    type: UserGroupType;
-                  } | null;
-                }
-              | {
-                  __typename?: "PetitionFieldCommentUserMention";
-                  mentionedId: string;
-                  user?: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                    isMe: boolean;
-                  } | null;
-                }
-            >;
-          } | null;
-        }
-      | {
-          __typename?: "GroupPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionGroup?: {
-            __typename?: "UserGroup";
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "GroupPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionGroup?: {
-            __typename?: "UserGroup";
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "GroupPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionGroup?: {
-            __typename?: "UserGroup";
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "MessageCancelledEvent";
-          id: string;
-          reason: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            status: PetitionMessageStatus;
-            scheduledAt?: string | null;
-            emailSubject?: any | null;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "MessageScheduledEvent";
-          id: string;
-          createdAt: string;
-          petition?: { __typename?: "Petition"; id: string } | null;
-          message: {
-            __typename?: "PetitionMessage";
-            id: string;
-            status: PetitionMessageStatus;
-            scheduledAt?: string | null;
-            emailSubject?: any | null;
-            emailBody?: string | null;
-            sentAt?: string | null;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            };
-            access: {
-              __typename?: "PetitionAccess";
-              delegateGranter?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-              } | null;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "MessageSentEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            emailSubject?: any | null;
-            scheduledAt?: string | null;
-            isAnonymized: boolean;
-            openedAt?: string | null;
-            deliveredAt?: string | null;
-            bouncedAt?: string | null;
-            emailBody?: string | null;
-            sentAt?: string | null;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            };
-            access: {
-              __typename?: "PetitionAccess";
-              delegateGranter?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-              } | null;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "OwnershipTransferredEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          owner?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          previousOwner?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | { __typename?: "PetitionAnonymizedEvent"; id: string; createdAt: string }
-      | {
-          __typename?: "PetitionClonedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionClosedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionClosedNotifiedEvent";
-          id: string;
-          emailBody?: string | null;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          access: {
-            __typename?: "PetitionAccess";
-            delegateGranter?: { __typename?: "User"; id: string } | null;
-            granter?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            } | null;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "PetitionCompletedEvent";
-          id: string;
-          createdAt: string;
-          completedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-        }
-      | {
-          __typename?: "PetitionCreatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | { __typename?: "PetitionDeletedEvent"; id: string }
-      | {
-          __typename?: "PetitionMessageBouncedEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReminderBouncedEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReopenedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionTaggedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-        }
-      | {
-          __typename?: "PetitionUntaggedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-        }
-      | {
-          __typename?: "ProfileAssociatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          profile?: {
-            __typename?: "Profile";
-            id: string;
-            name: string;
-            status: ProfileStatus;
-          } | null;
-        }
-      | {
-          __typename?: "ProfileDisassociatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          profile?: {
-            __typename?: "Profile";
-            id: string;
-            name: string;
-            status: ProfileStatus;
-          } | null;
-        }
-      | {
-          __typename?: "RecipientSignedEvent";
-          id: string;
-          createdAt: string;
-          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | {
-          __typename?: "ReminderSentEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            type: PetitionReminderType;
-            createdAt: string;
-            emailBody?: string | null;
-            sender?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            } | null;
-            access: {
-              __typename?: "PetitionAccess";
-              delegateGranter?: { __typename?: "User"; id: string } | null;
-              granter?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-              } | null;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "RemindersOptOutEvent";
-          id: string;
-          createdAt: string;
-          reason: string;
-          other?: string | null;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "ReplyCreatedEvent";
-          id: string;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            }>;
-          } | null;
-          createdBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          reply?: {
-            __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
-            id: string;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          } | null;
-        }
-      | {
-          __typename?: "ReplyDeletedEvent";
-          id: string;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            type: PetitionFieldType;
-            id: string;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-          } | null;
-          deletedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-        }
-      | {
-          __typename?: "ReplyStatusChangedEvent";
-          id: string;
-          status: PetitionFieldReplyStatus;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            id: string;
-            multiple: boolean;
-            title?: string | null;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            }>;
-          } | null;
-          updatedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          reply?: {
-            __typename?: "PetitionFieldReply";
-            id: string;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          } | null;
-        }
-      | {
-          __typename?: "ReplyUpdatedEvent";
-          id: string;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            type: PetitionFieldType;
-            id: string;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            }>;
-          } | null;
-          updatedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          reply?: {
-            __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
-            id: string;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          } | null;
-        }
-      | {
-          __typename?: "SignatureCancelledEvent";
-          id: string;
-          cancelType: PetitionSignatureCancelReason;
-          errorCode?: string | null;
-          errorMessage?: string | null;
-          cancellerReason?: string | null;
-          createdAt: string;
-          extraErrorData?: any | null;
-          cancelledBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
-      | {
-          __typename?: "SignatureDeliveredEvent";
-          id: string;
-          createdAt: string;
-          openedAt?: string | null;
-          deliveredAt?: string | null;
-          bouncedAt?: string | null;
-          signature: {
-            __typename?: "PetitionSignatureRequest";
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              integration?: {
-                __typename?: "SignatureOrgIntegration";
-                provider: SignatureOrgIntegrationProvider;
-              } | null;
-            };
-          };
-          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | {
-          __typename?: "SignatureOpenedEvent";
-          id: string;
-          createdAt: string;
-          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | {
-          __typename?: "SignatureReminderEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "SignatureStartedEvent";
-          id: string;
-          createdAt: string;
-          signature: {
-            __typename?: "PetitionSignatureRequest";
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              signingMode: SignatureConfigSigningMode;
-              message?: string | null;
-            };
-          };
-        }
-      | { __typename?: "TemplateUsedEvent"; id: string }
-      | {
-          __typename?: "UserPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionUser?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "UserPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionUser?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "UserPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionUser?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-    >;
-  };
-};
-
 export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment = {
   __typename?: "AccessActivatedEvent";
   id: string;
@@ -27724,850 +26876,6 @@ export type PetitionActivity_PetitionFragment = {
     isSubscribed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
-  events: {
-    __typename?: "PetitionEventPagination";
-    items: Array<
-      | {
-          __typename?: "AccessActivatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          access: {
-            __typename?: "PetitionAccess";
-            isContactless: boolean;
-            delegateGranter?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            } | null;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessDeactivatedEvent";
-          id: string;
-          reason: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          access: {
-            __typename?: "PetitionAccess";
-            isContactless: boolean;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessDelegatedEvent";
-          id: string;
-          createdAt: string;
-          originalAccess: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-          newAccess: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "AccessOpenedEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "CommentDeletedEvent";
-          id: string;
-          isInternal: boolean;
-          createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-          deletedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-        }
-      | {
-          __typename?: "CommentPublishedEvent";
-          id: string;
-          isInternal: boolean;
-          createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-          comment?: {
-            __typename?: "PetitionFieldComment";
-            isEdited: boolean;
-            isAnonymized: boolean;
-            contentHtml?: string | null;
-            author?:
-              | {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-              | null;
-            mentions: Array<
-              | {
-                  __typename?: "PetitionFieldCommentUserGroupMention";
-                  mentionedId: string;
-                  userGroup?: {
-                    __typename?: "UserGroup";
-                    id: string;
-                    imMember: boolean;
-                    name: string;
-                    localizableName: { [locale in UserLocale]?: string };
-                    type: UserGroupType;
-                  } | null;
-                }
-              | {
-                  __typename?: "PetitionFieldCommentUserMention";
-                  mentionedId: string;
-                  user?: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                    isMe: boolean;
-                  } | null;
-                }
-            >;
-          } | null;
-        }
-      | {
-          __typename?: "GroupPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionGroup?: {
-            __typename?: "UserGroup";
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "GroupPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionGroup?: {
-            __typename?: "UserGroup";
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "GroupPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionGroup?: {
-            __typename?: "UserGroup";
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "MessageCancelledEvent";
-          id: string;
-          reason: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            status: PetitionMessageStatus;
-            scheduledAt?: string | null;
-            emailSubject?: any | null;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "MessageScheduledEvent";
-          id: string;
-          createdAt: string;
-          petition?: { __typename?: "Petition"; id: string } | null;
-          message: {
-            __typename?: "PetitionMessage";
-            id: string;
-            status: PetitionMessageStatus;
-            scheduledAt?: string | null;
-            emailSubject?: any | null;
-            emailBody?: string | null;
-            sentAt?: string | null;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            };
-            access: {
-              __typename?: "PetitionAccess";
-              delegateGranter?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-              } | null;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "MessageSentEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            emailSubject?: any | null;
-            scheduledAt?: string | null;
-            isAnonymized: boolean;
-            openedAt?: string | null;
-            deliveredAt?: string | null;
-            bouncedAt?: string | null;
-            emailBody?: string | null;
-            sentAt?: string | null;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            };
-            access: {
-              __typename?: "PetitionAccess";
-              delegateGranter?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-              } | null;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "OwnershipTransferredEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          owner?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          previousOwner?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | { __typename?: "PetitionAnonymizedEvent"; id: string; createdAt: string }
-      | {
-          __typename?: "PetitionClonedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionClosedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionClosedNotifiedEvent";
-          id: string;
-          emailBody?: string | null;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          access: {
-            __typename?: "PetitionAccess";
-            delegateGranter?: { __typename?: "User"; id: string } | null;
-            granter?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            } | null;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "PetitionCompletedEvent";
-          id: string;
-          createdAt: string;
-          completedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-        }
-      | {
-          __typename?: "PetitionCreatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | { __typename?: "PetitionDeletedEvent"; id: string }
-      | {
-          __typename?: "PetitionMessageBouncedEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReminderBouncedEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReopenedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionTaggedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-        }
-      | {
-          __typename?: "PetitionUntaggedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-        }
-      | {
-          __typename?: "ProfileAssociatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          profile?: {
-            __typename?: "Profile";
-            id: string;
-            name: string;
-            status: ProfileStatus;
-          } | null;
-        }
-      | {
-          __typename?: "ProfileDisassociatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          profile?: {
-            __typename?: "Profile";
-            id: string;
-            name: string;
-            status: ProfileStatus;
-          } | null;
-        }
-      | {
-          __typename?: "RecipientSignedEvent";
-          id: string;
-          createdAt: string;
-          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | {
-          __typename?: "ReminderSentEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            type: PetitionReminderType;
-            createdAt: string;
-            emailBody?: string | null;
-            sender?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              status: UserStatus;
-            } | null;
-            access: {
-              __typename?: "PetitionAccess";
-              delegateGranter?: { __typename?: "User"; id: string } | null;
-              granter?: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                status: UserStatus;
-              } | null;
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName: string;
-                email: string;
-              } | null;
-            };
-          };
-        }
-      | {
-          __typename?: "RemindersOptOutEvent";
-          id: string;
-          createdAt: string;
-          reason: string;
-          other?: string | null;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName: string;
-              email: string;
-            } | null;
-          };
-        }
-      | {
-          __typename?: "ReplyCreatedEvent";
-          id: string;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            }>;
-          } | null;
-          createdBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          reply?: {
-            __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
-            id: string;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          } | null;
-        }
-      | {
-          __typename?: "ReplyDeletedEvent";
-          id: string;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            type: PetitionFieldType;
-            id: string;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-          } | null;
-          deletedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-        }
-      | {
-          __typename?: "ReplyStatusChangedEvent";
-          id: string;
-          status: PetitionFieldReplyStatus;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            id: string;
-            multiple: boolean;
-            title?: string | null;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            }>;
-          } | null;
-          updatedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          reply?: {
-            __typename?: "PetitionFieldReply";
-            id: string;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          } | null;
-        }
-      | {
-          __typename?: "ReplyUpdatedEvent";
-          id: string;
-          createdAt: string;
-          field?: {
-            __typename?: "PetitionField";
-            type: PetitionFieldType;
-            id: string;
-            title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            }>;
-          } | null;
-          updatedBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          reply?: {
-            __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
-            id: string;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          } | null;
-        }
-      | {
-          __typename?: "SignatureCancelledEvent";
-          id: string;
-          cancelType: PetitionSignatureCancelReason;
-          errorCode?: string | null;
-          errorMessage?: string | null;
-          cancellerReason?: string | null;
-          createdAt: string;
-          extraErrorData?: any | null;
-          cancelledBy?:
-            | {
-                __typename?: "PetitionAccess";
-                contact?: {
-                  __typename?: "Contact";
-                  id: string;
-                  fullName: string;
-                  email: string;
-                } | null;
-              }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-            | null;
-          canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
-      | {
-          __typename?: "SignatureDeliveredEvent";
-          id: string;
-          createdAt: string;
-          openedAt?: string | null;
-          deliveredAt?: string | null;
-          bouncedAt?: string | null;
-          signature: {
-            __typename?: "PetitionSignatureRequest";
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              integration?: {
-                __typename?: "SignatureOrgIntegration";
-                provider: SignatureOrgIntegrationProvider;
-              } | null;
-            };
-          };
-          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | {
-          __typename?: "SignatureOpenedEvent";
-          id: string;
-          createdAt: string;
-          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-        }
-      | {
-          __typename?: "SignatureReminderEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "SignatureStartedEvent";
-          id: string;
-          createdAt: string;
-          signature: {
-            __typename?: "PetitionSignatureRequest";
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              signingMode: SignatureConfigSigningMode;
-              message?: string | null;
-            };
-          };
-        }
-      | { __typename?: "TemplateUsedEvent"; id: string }
-      | {
-          __typename?: "UserPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionUser?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "UserPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionUser?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-      | {
-          __typename?: "UserPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-          permissionUser?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
-    >;
-  };
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -28680,6 +26988,716 @@ export type PetitionActivity_PetitionFragment = {
     };
   }>;
 };
+
+export type PetitionActivity_PetitionEvent_AccessActivatedEvent_Fragment = {
+  __typename?: "AccessActivatedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  access: {
+    __typename?: "PetitionAccess";
+    isContactless: boolean;
+    delegateGranter?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+};
+
+export type PetitionActivity_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment = {
+  __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+  id: string;
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+};
+
+export type PetitionActivity_PetitionEvent_AccessDeactivatedEvent_Fragment = {
+  __typename?: "AccessDeactivatedEvent";
+  id: string;
+  reason: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  access: {
+    __typename?: "PetitionAccess";
+    isContactless: boolean;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+};
+
+export type PetitionActivity_PetitionEvent_AccessDelegatedEvent_Fragment = {
+  __typename?: "AccessDelegatedEvent";
+  id: string;
+  createdAt: string;
+  originalAccess: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+  newAccess: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+};
+
+export type PetitionActivity_PetitionEvent_AccessOpenedEvent_Fragment = {
+  __typename?: "AccessOpenedEvent";
+  id: string;
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+};
+
+export type PetitionActivity_PetitionEvent_CommentDeletedEvent_Fragment = {
+  __typename?: "CommentDeletedEvent";
+  id: string;
+  isInternal: boolean;
+  createdAt: string;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+  deletedBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+};
+
+export type PetitionActivity_PetitionEvent_CommentPublishedEvent_Fragment = {
+  __typename?: "CommentPublishedEvent";
+  id: string;
+  isInternal: boolean;
+  createdAt: string;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+  comment?: {
+    __typename?: "PetitionFieldComment";
+    isEdited: boolean;
+    isAnonymized: boolean;
+    contentHtml?: string | null;
+    author?:
+      | {
+          __typename?: "PetitionAccess";
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+        }
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | null;
+    mentions: Array<
+      | {
+          __typename?: "PetitionFieldCommentUserGroupMention";
+          mentionedId: string;
+          userGroup?: {
+            __typename?: "UserGroup";
+            id: string;
+            imMember: boolean;
+            name: string;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          } | null;
+        }
+      | {
+          __typename?: "PetitionFieldCommentUserMention";
+          mentionedId: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+            isMe: boolean;
+          } | null;
+        }
+    >;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_GroupPermissionAddedEvent_Fragment = {
+  __typename?: "GroupPermissionAddedEvent";
+  id: string;
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_GroupPermissionEditedEvent_Fragment = {
+  __typename?: "GroupPermissionEditedEvent";
+  id: string;
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_GroupPermissionRemovedEvent_Fragment = {
+  __typename?: "GroupPermissionRemovedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  permissionGroup?: {
+    __typename?: "UserGroup";
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_MessageCancelledEvent_Fragment = {
+  __typename?: "MessageCancelledEvent";
+  id: string;
+  reason: string;
+  createdAt: string;
+  message: {
+    __typename?: "PetitionMessage";
+    status: PetitionMessageStatus;
+    scheduledAt?: string | null;
+    emailSubject?: any | null;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    };
+  };
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_MessageScheduledEvent_Fragment = {
+  __typename?: "MessageScheduledEvent";
+  id: string;
+  createdAt: string;
+  petition?: { __typename?: "Petition"; id: string } | null;
+  message: {
+    __typename?: "PetitionMessage";
+    id: string;
+    status: PetitionMessageStatus;
+    scheduledAt?: string | null;
+    emailSubject?: any | null;
+    emailBody?: string | null;
+    sentAt?: string | null;
+    sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+    access: {
+      __typename?: "PetitionAccess";
+      delegateGranter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    };
+  };
+};
+
+export type PetitionActivity_PetitionEvent_MessageSentEvent_Fragment = {
+  __typename?: "MessageSentEvent";
+  id: string;
+  createdAt: string;
+  message: {
+    __typename?: "PetitionMessage";
+    emailSubject?: any | null;
+    scheduledAt?: string | null;
+    isAnonymized: boolean;
+    openedAt?: string | null;
+    deliveredAt?: string | null;
+    bouncedAt?: string | null;
+    emailBody?: string | null;
+    sentAt?: string | null;
+    sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+    access: {
+      __typename?: "PetitionAccess";
+      delegateGranter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    };
+  };
+};
+
+export type PetitionActivity_PetitionEvent_OwnershipTransferredEvent_Fragment = {
+  __typename?: "OwnershipTransferredEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  owner?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  previousOwner?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionAnonymizedEvent_Fragment = {
+  __typename?: "PetitionAnonymizedEvent";
+  id: string;
+  createdAt: string;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionClonedEvent_Fragment = {
+  __typename?: "PetitionClonedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionClosedEvent_Fragment = {
+  __typename?: "PetitionClosedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
+  __typename?: "PetitionClosedNotifiedEvent";
+  id: string;
+  emailBody?: string | null;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  access: {
+    __typename?: "PetitionAccess";
+    delegateGranter?: { __typename?: "User"; id: string } | null;
+    granter?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+};
+
+export type PetitionActivity_PetitionEvent_PetitionCompletedEvent_Fragment = {
+  __typename?: "PetitionCompletedEvent";
+  id: string;
+  createdAt: string;
+  completedBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionCreatedEvent_Fragment = {
+  __typename?: "PetitionCreatedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionDeletedEvent_Fragment = {
+  __typename?: "PetitionDeletedEvent";
+  id: string;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionMessageBouncedEvent_Fragment = {
+  __typename?: "PetitionMessageBouncedEvent";
+  id: string;
+  createdAt: string;
+  message: {
+    __typename?: "PetitionMessage";
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    };
+  };
+};
+
+export type PetitionActivity_PetitionEvent_PetitionReminderBouncedEvent_Fragment = {
+  __typename?: "PetitionReminderBouncedEvent";
+  id: string;
+  createdAt: string;
+  reminder: {
+    __typename?: "PetitionReminder";
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    };
+  };
+};
+
+export type PetitionActivity_PetitionEvent_PetitionReopenedEvent_Fragment = {
+  __typename?: "PetitionReopenedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionTaggedEvent_Fragment = {
+  __typename?: "PetitionTaggedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+};
+
+export type PetitionActivity_PetitionEvent_PetitionUntaggedEvent_Fragment = {
+  __typename?: "PetitionUntaggedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
+};
+
+export type PetitionActivity_PetitionEvent_ProfileAssociatedEvent_Fragment = {
+  __typename?: "ProfileAssociatedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_ProfileDisassociatedEvent_Fragment = {
+  __typename?: "ProfileDisassociatedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  profile?: { __typename?: "Profile"; id: string; name: string; status: ProfileStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_RecipientSignedEvent_Fragment = {
+  __typename?: "RecipientSignedEvent";
+  id: string;
+  createdAt: string;
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
+export type PetitionActivity_PetitionEvent_ReminderSentEvent_Fragment = {
+  __typename?: "ReminderSentEvent";
+  id: string;
+  createdAt: string;
+  reminder: {
+    __typename?: "PetitionReminder";
+    type: PetitionReminderType;
+    createdAt: string;
+    emailBody?: string | null;
+    sender?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
+    access: {
+      __typename?: "PetitionAccess";
+      delegateGranter?: { __typename?: "User"; id: string } | null;
+      granter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    };
+  };
+};
+
+export type PetitionActivity_PetitionEvent_RemindersOptOutEvent_Fragment = {
+  __typename?: "RemindersOptOutEvent";
+  id: string;
+  createdAt: string;
+  reason: string;
+  other?: string | null;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  };
+};
+
+export type PetitionActivity_PetitionEvent_ReplyCreatedEvent_Fragment = {
+  __typename?: "ReplyCreatedEvent";
+  id: string;
+  createdAt: string;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    title?: string | null;
+    parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    }>;
+  } | null;
+  createdBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+  reply?: {
+    __typename?: "PetitionFieldReply";
+    content: { [key: string]: any };
+    id: string;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_ReplyDeletedEvent_Fragment = {
+  __typename?: "ReplyDeletedEvent";
+  id: string;
+  createdAt: string;
+  field?: {
+    __typename?: "PetitionField";
+    type: PetitionFieldType;
+    id: string;
+    title?: string | null;
+    parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+  } | null;
+  deletedBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+};
+
+export type PetitionActivity_PetitionEvent_ReplyStatusChangedEvent_Fragment = {
+  __typename?: "ReplyStatusChangedEvent";
+  id: string;
+  status: PetitionFieldReplyStatus;
+  createdAt: string;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    multiple: boolean;
+    title?: string | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    }>;
+  } | null;
+  updatedBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+  reply?: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_ReplyUpdatedEvent_Fragment = {
+  __typename?: "ReplyUpdatedEvent";
+  id: string;
+  createdAt: string;
+  field?: {
+    __typename?: "PetitionField";
+    type: PetitionFieldType;
+    id: string;
+    title?: string | null;
+    parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    }>;
+  } | null;
+  updatedBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+  reply?: {
+    __typename?: "PetitionFieldReply";
+    content: { [key: string]: any };
+    id: string;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_SignatureCancelledEvent_Fragment = {
+  __typename?: "SignatureCancelledEvent";
+  id: string;
+  cancelType: PetitionSignatureCancelReason;
+  errorCode?: string | null;
+  errorMessage?: string | null;
+  cancellerReason?: string | null;
+  createdAt: string;
+  extraErrorData?: any | null;
+  cancelledBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+  canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
+export type PetitionActivity_PetitionEvent_SignatureCompletedEvent_Fragment = {
+  __typename?: "SignatureCompletedEvent";
+  id: string;
+  createdAt: string;
+};
+
+export type PetitionActivity_PetitionEvent_SignatureDeliveredEvent_Fragment = {
+  __typename?: "SignatureDeliveredEvent";
+  id: string;
+  createdAt: string;
+  openedAt?: string | null;
+  deliveredAt?: string | null;
+  bouncedAt?: string | null;
+  signature: {
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
+  };
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
+export type PetitionActivity_PetitionEvent_SignatureOpenedEvent_Fragment = {
+  __typename?: "SignatureOpenedEvent";
+  id: string;
+  createdAt: string;
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
+export type PetitionActivity_PetitionEvent_SignatureReminderEvent_Fragment = {
+  __typename?: "SignatureReminderEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
+export type PetitionActivity_PetitionEvent_SignatureStartedEvent_Fragment = {
+  __typename?: "SignatureStartedEvent";
+  id: string;
+  createdAt: string;
+  signature: {
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      message?: string | null;
+    };
+  };
+};
+
+export type PetitionActivity_PetitionEvent_TemplateUsedEvent_Fragment = {
+  __typename?: "TemplateUsedEvent";
+  id: string;
+};
+
+export type PetitionActivity_PetitionEvent_UserPermissionAddedEvent_Fragment = {
+  __typename?: "UserPermissionAddedEvent";
+  id: string;
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  permissionUser?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_UserPermissionEditedEvent_Fragment = {
+  __typename?: "UserPermissionEditedEvent";
+  id: string;
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  permissionUser?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEvent_UserPermissionRemovedEvent_Fragment = {
+  __typename?: "UserPermissionRemovedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  permissionUser?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+  } | null;
+};
+
+export type PetitionActivity_PetitionEventFragment =
+  | PetitionActivity_PetitionEvent_AccessActivatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment
+  | PetitionActivity_PetitionEvent_AccessDeactivatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_AccessDelegatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_AccessOpenedEvent_Fragment
+  | PetitionActivity_PetitionEvent_CommentDeletedEvent_Fragment
+  | PetitionActivity_PetitionEvent_CommentPublishedEvent_Fragment
+  | PetitionActivity_PetitionEvent_GroupPermissionAddedEvent_Fragment
+  | PetitionActivity_PetitionEvent_GroupPermissionEditedEvent_Fragment
+  | PetitionActivity_PetitionEvent_GroupPermissionRemovedEvent_Fragment
+  | PetitionActivity_PetitionEvent_MessageCancelledEvent_Fragment
+  | PetitionActivity_PetitionEvent_MessageScheduledEvent_Fragment
+  | PetitionActivity_PetitionEvent_MessageSentEvent_Fragment
+  | PetitionActivity_PetitionEvent_OwnershipTransferredEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionAnonymizedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionClonedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionClosedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionClosedNotifiedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionCompletedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionCreatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionDeletedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionMessageBouncedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionReminderBouncedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionReopenedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionTaggedEvent_Fragment
+  | PetitionActivity_PetitionEvent_PetitionUntaggedEvent_Fragment
+  | PetitionActivity_PetitionEvent_ProfileAssociatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_ProfileDisassociatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_RecipientSignedEvent_Fragment
+  | PetitionActivity_PetitionEvent_ReminderSentEvent_Fragment
+  | PetitionActivity_PetitionEvent_RemindersOptOutEvent_Fragment
+  | PetitionActivity_PetitionEvent_ReplyCreatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_ReplyDeletedEvent_Fragment
+  | PetitionActivity_PetitionEvent_ReplyStatusChangedEvent_Fragment
+  | PetitionActivity_PetitionEvent_ReplyUpdatedEvent_Fragment
+  | PetitionActivity_PetitionEvent_SignatureCancelledEvent_Fragment
+  | PetitionActivity_PetitionEvent_SignatureCompletedEvent_Fragment
+  | PetitionActivity_PetitionEvent_SignatureDeliveredEvent_Fragment
+  | PetitionActivity_PetitionEvent_SignatureOpenedEvent_Fragment
+  | PetitionActivity_PetitionEvent_SignatureReminderEvent_Fragment
+  | PetitionActivity_PetitionEvent_SignatureStartedEvent_Fragment
+  | PetitionActivity_PetitionEvent_TemplateUsedEvent_Fragment
+  | PetitionActivity_PetitionEvent_UserPermissionAddedEvent_Fragment
+  | PetitionActivity_PetitionEvent_UserPermissionEditedEvent_Fragment
+  | PetitionActivity_PetitionEvent_UserPermissionRemovedEvent_Fragment;
 
 export type PetitionActivity_QueryFragment = {
   me: {
@@ -28801,906 +27819,6 @@ export type PetitionActivity_updatePetitionMutation = {
           isSubscribed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
-        events: {
-          __typename?: "PetitionEventPagination";
-          items: Array<
-            | {
-                __typename?: "AccessActivatedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                access: {
-                  __typename?: "PetitionAccess";
-                  isContactless: boolean;
-                  delegateGranter?: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                  } | null;
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-              }
-            | {
-                __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-              }
-            | {
-                __typename?: "AccessDeactivatedEvent";
-                id: string;
-                reason: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                access: {
-                  __typename?: "PetitionAccess";
-                  isContactless: boolean;
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-              }
-            | {
-                __typename?: "AccessDelegatedEvent";
-                id: string;
-                createdAt: string;
-                originalAccess: {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-                newAccess: {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-              }
-            | {
-                __typename?: "AccessOpenedEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-              }
-            | {
-                __typename?: "CommentDeletedEvent";
-                id: string;
-                isInternal: boolean;
-                createdAt: string;
-                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-                deletedBy?:
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: {
-                        __typename?: "Contact";
-                        id: string;
-                        fullName: string;
-                        email: string;
-                      } | null;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    }
-                  | null;
-              }
-            | {
-                __typename?: "CommentPublishedEvent";
-                id: string;
-                isInternal: boolean;
-                createdAt: string;
-                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-                comment?: {
-                  __typename?: "PetitionFieldComment";
-                  isEdited: boolean;
-                  isAnonymized: boolean;
-                  contentHtml?: string | null;
-                  author?:
-                    | {
-                        __typename?: "PetitionAccess";
-                        contact?: {
-                          __typename?: "Contact";
-                          id: string;
-                          fullName: string;
-                          email: string;
-                        } | null;
-                      }
-                    | {
-                        __typename?: "User";
-                        id: string;
-                        fullName?: string | null;
-                        status: UserStatus;
-                      }
-                    | null;
-                  mentions: Array<
-                    | {
-                        __typename?: "PetitionFieldCommentUserGroupMention";
-                        mentionedId: string;
-                        userGroup?: {
-                          __typename?: "UserGroup";
-                          id: string;
-                          imMember: boolean;
-                          name: string;
-                          localizableName: { [locale in UserLocale]?: string };
-                          type: UserGroupType;
-                        } | null;
-                      }
-                    | {
-                        __typename?: "PetitionFieldCommentUserMention";
-                        mentionedId: string;
-                        user?: {
-                          __typename?: "User";
-                          id: string;
-                          fullName?: string | null;
-                          status: UserStatus;
-                          isMe: boolean;
-                        } | null;
-                      }
-                  >;
-                } | null;
-              }
-            | {
-                __typename?: "GroupPermissionAddedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                permissionGroup?: {
-                  __typename?: "UserGroup";
-                  name: string;
-                  localizableName: { [locale in UserLocale]?: string };
-                  type: UserGroupType;
-                } | null;
-              }
-            | {
-                __typename?: "GroupPermissionEditedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                permissionGroup?: {
-                  __typename?: "UserGroup";
-                  name: string;
-                  localizableName: { [locale in UserLocale]?: string };
-                  type: UserGroupType;
-                } | null;
-              }
-            | {
-                __typename?: "GroupPermissionRemovedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                permissionGroup?: {
-                  __typename?: "UserGroup";
-                  name: string;
-                  localizableName: { [locale in UserLocale]?: string };
-                  type: UserGroupType;
-                } | null;
-              }
-            | {
-                __typename?: "MessageCancelledEvent";
-                id: string;
-                reason: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  status: PetitionMessageStatus;
-                  scheduledAt?: string | null;
-                  emailSubject?: any | null;
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: {
-                      __typename?: "Contact";
-                      id: string;
-                      fullName: string;
-                      email: string;
-                    } | null;
-                  };
-                };
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | {
-                __typename?: "MessageScheduledEvent";
-                id: string;
-                createdAt: string;
-                petition?: { __typename?: "Petition"; id: string } | null;
-                message: {
-                  __typename?: "PetitionMessage";
-                  id: string;
-                  status: PetitionMessageStatus;
-                  scheduledAt?: string | null;
-                  emailSubject?: any | null;
-                  emailBody?: string | null;
-                  sentAt?: string | null;
-                  sender: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                  };
-                  access: {
-                    __typename?: "PetitionAccess";
-                    delegateGranter?: {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    } | null;
-                    contact?: {
-                      __typename?: "Contact";
-                      id: string;
-                      fullName: string;
-                      email: string;
-                    } | null;
-                  };
-                };
-              }
-            | {
-                __typename?: "MessageSentEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  emailSubject?: any | null;
-                  scheduledAt?: string | null;
-                  isAnonymized: boolean;
-                  openedAt?: string | null;
-                  deliveredAt?: string | null;
-                  bouncedAt?: string | null;
-                  emailBody?: string | null;
-                  sentAt?: string | null;
-                  sender: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                  };
-                  access: {
-                    __typename?: "PetitionAccess";
-                    delegateGranter?: {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    } | null;
-                    contact?: {
-                      __typename?: "Contact";
-                      id: string;
-                      fullName: string;
-                      email: string;
-                    } | null;
-                  };
-                };
-              }
-            | {
-                __typename?: "OwnershipTransferredEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                owner?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                previousOwner?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | { __typename?: "PetitionAnonymizedEvent"; id: string; createdAt: string }
-            | {
-                __typename?: "PetitionClonedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | {
-                __typename?: "PetitionClosedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | {
-                __typename?: "PetitionClosedNotifiedEvent";
-                id: string;
-                emailBody?: string | null;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                access: {
-                  __typename?: "PetitionAccess";
-                  delegateGranter?: { __typename?: "User"; id: string } | null;
-                  granter?: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                  } | null;
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-              }
-            | {
-                __typename?: "PetitionCompletedEvent";
-                id: string;
-                createdAt: string;
-                completedBy?:
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: {
-                        __typename?: "Contact";
-                        id: string;
-                        fullName: string;
-                        email: string;
-                      } | null;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    }
-                  | null;
-              }
-            | {
-                __typename?: "PetitionCreatedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | { __typename?: "PetitionDeletedEvent"; id: string }
-            | {
-                __typename?: "PetitionMessageBouncedEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: {
-                      __typename?: "Contact";
-                      id: string;
-                      fullName: string;
-                      email: string;
-                    } | null;
-                  };
-                };
-              }
-            | {
-                __typename?: "PetitionReminderBouncedEvent";
-                id: string;
-                createdAt: string;
-                reminder: {
-                  __typename?: "PetitionReminder";
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: {
-                      __typename?: "Contact";
-                      id: string;
-                      fullName: string;
-                      email: string;
-                    } | null;
-                  };
-                };
-              }
-            | {
-                __typename?: "PetitionReopenedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | {
-                __typename?: "PetitionTaggedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-              }
-            | {
-                __typename?: "PetitionUntaggedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-              }
-            | {
-                __typename?: "ProfileAssociatedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                profile?: {
-                  __typename?: "Profile";
-                  id: string;
-                  name: string;
-                  status: ProfileStatus;
-                } | null;
-              }
-            | {
-                __typename?: "ProfileDisassociatedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                profile?: {
-                  __typename?: "Profile";
-                  id: string;
-                  name: string;
-                  status: ProfileStatus;
-                } | null;
-              }
-            | {
-                __typename?: "RecipientSignedEvent";
-                id: string;
-                createdAt: string;
-                signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-              }
-            | {
-                __typename?: "ReminderSentEvent";
-                id: string;
-                createdAt: string;
-                reminder: {
-                  __typename?: "PetitionReminder";
-                  type: PetitionReminderType;
-                  createdAt: string;
-                  emailBody?: string | null;
-                  sender?: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: string | null;
-                    status: UserStatus;
-                  } | null;
-                  access: {
-                    __typename?: "PetitionAccess";
-                    delegateGranter?: { __typename?: "User"; id: string } | null;
-                    granter?: {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    } | null;
-                    contact?: {
-                      __typename?: "Contact";
-                      id: string;
-                      fullName: string;
-                      email: string;
-                    } | null;
-                  };
-                };
-              }
-            | {
-                __typename?: "RemindersOptOutEvent";
-                id: string;
-                createdAt: string;
-                reason: string;
-                other?: string | null;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName: string;
-                    email: string;
-                  } | null;
-                };
-              }
-            | {
-                __typename?: "ReplyCreatedEvent";
-                id: string;
-                createdAt: string;
-                field?: {
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  options: { [key: string]: any };
-                  title?: string | null;
-                  parent?: {
-                    __typename?: "PetitionField";
-                    id: string;
-                    title?: string | null;
-                  } | null;
-                  replies: Array<{
-                    __typename?: "PetitionFieldReply";
-                    id: string;
-                    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                  }>;
-                } | null;
-                createdBy?:
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: {
-                        __typename?: "Contact";
-                        id: string;
-                        fullName: string;
-                        email: string;
-                      } | null;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    }
-                  | null;
-                reply?: {
-                  __typename?: "PetitionFieldReply";
-                  content: { [key: string]: any };
-                  id: string;
-                  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                } | null;
-              }
-            | {
-                __typename?: "ReplyDeletedEvent";
-                id: string;
-                createdAt: string;
-                field?: {
-                  __typename?: "PetitionField";
-                  type: PetitionFieldType;
-                  id: string;
-                  title?: string | null;
-                  parent?: {
-                    __typename?: "PetitionField";
-                    id: string;
-                    title?: string | null;
-                  } | null;
-                } | null;
-                deletedBy?:
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: {
-                        __typename?: "Contact";
-                        id: string;
-                        fullName: string;
-                        email: string;
-                      } | null;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    }
-                  | null;
-              }
-            | {
-                __typename?: "ReplyStatusChangedEvent";
-                id: string;
-                status: PetitionFieldReplyStatus;
-                createdAt: string;
-                field?: {
-                  __typename?: "PetitionField";
-                  id: string;
-                  multiple: boolean;
-                  title?: string | null;
-                  replies: Array<{
-                    __typename?: "PetitionFieldReply";
-                    id: string;
-                    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                  }>;
-                } | null;
-                updatedBy?:
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: {
-                        __typename?: "Contact";
-                        id: string;
-                        fullName: string;
-                        email: string;
-                      } | null;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    }
-                  | null;
-                reply?: {
-                  __typename?: "PetitionFieldReply";
-                  id: string;
-                  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                } | null;
-              }
-            | {
-                __typename?: "ReplyUpdatedEvent";
-                id: string;
-                createdAt: string;
-                field?: {
-                  __typename?: "PetitionField";
-                  type: PetitionFieldType;
-                  id: string;
-                  title?: string | null;
-                  parent?: {
-                    __typename?: "PetitionField";
-                    id: string;
-                    title?: string | null;
-                  } | null;
-                  replies: Array<{
-                    __typename?: "PetitionFieldReply";
-                    id: string;
-                    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                  }>;
-                } | null;
-                updatedBy?:
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: {
-                        __typename?: "Contact";
-                        id: string;
-                        fullName: string;
-                        email: string;
-                      } | null;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    }
-                  | null;
-                reply?: {
-                  __typename?: "PetitionFieldReply";
-                  content: { [key: string]: any };
-                  id: string;
-                  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                } | null;
-              }
-            | {
-                __typename?: "SignatureCancelledEvent";
-                id: string;
-                cancelType: PetitionSignatureCancelReason;
-                errorCode?: string | null;
-                errorMessage?: string | null;
-                cancellerReason?: string | null;
-                createdAt: string;
-                extraErrorData?: any | null;
-                cancelledBy?:
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: {
-                        __typename?: "Contact";
-                        id: string;
-                        fullName: string;
-                        email: string;
-                      } | null;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: string | null;
-                      status: UserStatus;
-                    }
-                  | null;
-                canceller?: {
-                  __typename?: "PetitionSigner";
-                  email: string;
-                  fullName: string;
-                } | null;
-              }
-            | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
-            | {
-                __typename?: "SignatureDeliveredEvent";
-                id: string;
-                createdAt: string;
-                openedAt?: string | null;
-                deliveredAt?: string | null;
-                bouncedAt?: string | null;
-                signature: {
-                  __typename?: "PetitionSignatureRequest";
-                  signatureConfig: {
-                    __typename?: "SignatureConfig";
-                    integration?: {
-                      __typename?: "SignatureOrgIntegration";
-                      provider: SignatureOrgIntegrationProvider;
-                    } | null;
-                  };
-                };
-                signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-              }
-            | {
-                __typename?: "SignatureOpenedEvent";
-                id: string;
-                createdAt: string;
-                signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
-              }
-            | {
-                __typename?: "SignatureReminderEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | {
-                __typename?: "SignatureStartedEvent";
-                id: string;
-                createdAt: string;
-                signature: {
-                  __typename?: "PetitionSignatureRequest";
-                  signatureConfig: {
-                    __typename?: "SignatureConfig";
-                    signingMode: SignatureConfigSigningMode;
-                    message?: string | null;
-                  };
-                };
-              }
-            | { __typename?: "TemplateUsedEvent"; id: string }
-            | {
-                __typename?: "UserPermissionAddedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                permissionUser?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | {
-                __typename?: "UserPermissionEditedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                permissionUser?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-            | {
-                __typename?: "UserPermissionRemovedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-                permissionUser?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
-          >;
-        };
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -29897,83 +28015,19 @@ export type PetitionActivity_disassociateProfileFromPetitionMutation = {
   disassociateProfileFromPetition: Success;
 };
 
-export type PetitionActivity_petitionQueryVariables = Exact<{
+export type PetitionActivity_eventsQueryVariables = Exact<{
   id: Scalars["GID"]["input"];
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
 }>;
 
-export type PetitionActivity_petitionQuery = {
+export type PetitionActivity_eventsQuery = {
   petition?:
     | {
         __typename?: "Petition";
-        id: string;
-        isInteractionWithRecipientsEnabled: boolean;
-        name?: string | null;
-        status: PetitionStatus;
-        isAnonymized: boolean;
-        emailSubject?: string | null;
-        emailBody?: any | null;
-        isDocumentGenerationEnabled: boolean;
-        path: string;
-        locale: PetitionLocale;
-        deadline?: string | null;
-        isRestricted: boolean;
-        lastChangeAt: string;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          status: PetitionAccessStatus;
-          isContactless: boolean;
-          recipientUrl?: string | null;
-          remindersOptOut: boolean;
-          nextReminderAt?: string | null;
-          remindersLeft: number;
-          reminderCount: number;
-          remindersActive: boolean;
-          createdAt: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            email: string;
-            firstName: string;
-            lastName?: string | null;
-            fullName: string;
-          } | null;
-          remindersConfig?: {
-            __typename?: "RemindersConfig";
-            offset: number;
-            limit: number;
-            time: string;
-            timezone: string;
-            weekdaysOnly: boolean;
-          } | null;
-        }>;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          isInternal: boolean;
-          isReadOnly: boolean;
-          title?: string | null;
-          options: { [key: string]: any };
-          alias?: string | null;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            title?: string | null;
-            type: PetitionFieldType;
-            isReadOnly: boolean;
-            options: { [key: string]: any };
-            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
-          }> | null;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        }>;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          permissionType: PetitionPermissionType;
-        } | null;
         events: {
           __typename?: "PetitionEventPagination";
+          totalCount: number;
           items: Array<
             | {
                 __typename?: "AccessActivatedEvent";
@@ -30872,6 +28926,86 @@ export type PetitionActivity_petitionQuery = {
               }
           >;
         };
+      }
+    | { __typename?: "PetitionTemplate" }
+    | null;
+};
+
+export type PetitionActivity_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type PetitionActivity_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        isInteractionWithRecipientsEnabled: boolean;
+        name?: string | null;
+        status: PetitionStatus;
+        isAnonymized: boolean;
+        emailSubject?: string | null;
+        emailBody?: any | null;
+        isDocumentGenerationEnabled: boolean;
+        path: string;
+        locale: PetitionLocale;
+        deadline?: string | null;
+        isRestricted: boolean;
+        lastChangeAt: string;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+          isContactless: boolean;
+          recipientUrl?: string | null;
+          remindersOptOut: boolean;
+          nextReminderAt?: string | null;
+          remindersLeft: number;
+          reminderCount: number;
+          remindersActive: boolean;
+          createdAt: string;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+            fullName: string;
+          } | null;
+          remindersConfig?: {
+            __typename?: "RemindersConfig";
+            offset: number;
+            limit: number;
+            time: string;
+            timezone: string;
+            weekdaysOnly: boolean;
+          } | null;
+        }>;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          isInternal: boolean;
+          isReadOnly: boolean;
+          title?: string | null;
+          options: { [key: string]: any };
+          alias?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            title?: string | null;
+            type: PetitionFieldType;
+            isReadOnly: boolean;
+            options: { [key: string]: any };
+            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+          }> | null;
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        }>;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+          permissionType: PetitionPermissionType;
+        } | null;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -49627,6 +47761,320 @@ export const PetitionAccessTable_PetitionFragmentDoc = gql`
   }
   ${PetitionAccessTable_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<PetitionAccessTable_PetitionFragment, unknown>;
+export const ShareButton_PetitionBaseFragmentDoc = gql`
+  fragment ShareButton_PetitionBase on PetitionBase {
+    permissions {
+      permissionType
+      ... on PetitionUserPermission {
+        user {
+          id
+          fullName
+          ...UserReference_User
+        }
+      }
+      ... on PetitionUserGroupPermission {
+        group {
+          id
+          ...UserGroupReference_UserGroup
+        }
+      }
+    }
+  }
+  ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<ShareButton_PetitionBaseFragment, unknown>;
+export const SelectedSignerRow_PetitionSignerFragmentDoc = gql`
+  fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
+    firstName
+    lastName
+    email
+  }
+` as unknown as DocumentNode<SelectedSignerRow_PetitionSignerFragment, unknown>;
+export const SuggestedSigners_PetitionSignerFragmentDoc = gql`
+  fragment SuggestedSigners_PetitionSigner on PetitionSigner {
+    firstName
+    lastName
+    email
+  }
+` as unknown as DocumentNode<SuggestedSigners_PetitionSignerFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+    contactId
+    email
+    firstName
+    lastName
+    isPreset
+    ...SelectedSignerRow_PetitionSigner
+    ...SuggestedSigners_PetitionSigner
+  }
+  ${SelectedSignerRow_PetitionSignerFragmentDoc}
+  ${SuggestedSigners_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_Petition on Petition {
+    id
+    isInteractionWithRecipientsEnabled
+    accesses {
+      id
+      status
+      contact {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+    signatureRequests {
+      signatureConfig {
+        signers {
+          ...ConfirmPetitionSignersDialog_PetitionSigner
+        }
+      }
+    }
+  }
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionFragment, unknown>;
+export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
+  fragment CopySignatureConfigDialog_PetitionSigner on PetitionSigner {
+    email
+    fullName
+  }
+` as unknown as DocumentNode<CopySignatureConfigDialog_PetitionSignerFragment, unknown>;
+export const ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
+    signingMode
+    minSigners
+    instructions
+    allowAdditionalSigners
+    signers {
+      ...ConfirmPetitionSignersDialog_PetitionSigner
+    }
+  }
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_SignatureConfigFragment, unknown>;
+export const AddPetitionAccessDialog_SignatureConfigFragmentDoc = gql`
+  fragment AddPetitionAccessDialog_SignatureConfig on SignatureConfig {
+    review
+    timezone
+    title
+    allowAdditionalSigners
+    minSigners
+    integration {
+      id
+    }
+    signers {
+      ...CopySignatureConfigDialog_PetitionSigner
+    }
+    ...ConfirmPetitionSignersDialog_SignatureConfig
+  }
+  ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
+` as unknown as DocumentNode<AddPetitionAccessDialog_SignatureConfigFragment, unknown>;
+export const AddPetitionAccessDialog_DelegateUserFragmentDoc = gql`
+  fragment AddPetitionAccessDialog_DelegateUser on User {
+    id
+    fullName
+    ...UserSelect_User
+  }
+  ${UserSelect_UserFragmentDoc}
+` as unknown as DocumentNode<AddPetitionAccessDialog_DelegateUserFragment, unknown>;
+export const MessageEmailSubjectFormControl_PetitionBaseFragmentDoc = gql`
+  fragment MessageEmailSubjectFormControl_PetitionBase on PetitionBase {
+    ...usePetitionMessagePlaceholderOptions_PetitionBase
+  }
+  ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<MessageEmailSubjectFormControl_PetitionBaseFragment, unknown>;
+export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
+  fragment AddPetitionAccessDialog_Petition on Petition {
+    id
+    emailSubject
+    emailBody
+    myEffectivePermission {
+      permissionType
+    }
+    effectivePermissions {
+      isSubscribed
+      user {
+        id
+      }
+    }
+    ...ConfirmPetitionSignersDialog_Petition
+    signatureConfig {
+      timezone
+      ...AddPetitionAccessDialog_SignatureConfig
+      ...ConfirmPetitionSignersDialog_SignatureConfig
+    }
+    remindersConfig {
+      ...PetitionRemindersConfig_RemindersConfig
+    }
+    organization {
+      id
+      petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+        id
+        limit
+        used
+      }
+    }
+    accesses {
+      id
+      isContactless
+      recipientUrl
+    }
+    defaultOnBehalf {
+      ...AddPetitionAccessDialog_DelegateUser
+    }
+    ...MessageEmailSubjectFormControl_PetitionBase
+  }
+  ${ConfirmPetitionSignersDialog_PetitionFragmentDoc}
+  ${AddPetitionAccessDialog_SignatureConfigFragmentDoc}
+  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
+  ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
+  ${AddPetitionAccessDialog_DelegateUserFragmentDoc}
+  ${MessageEmailSubjectFormControl_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionFragment, unknown>;
+export const useSendPetitionHandler_PetitionFragmentDoc = gql`
+  fragment useSendPetitionHandler_Petition on Petition {
+    id
+    accesses {
+      id
+      contact {
+        id
+      }
+    }
+    signatureConfig {
+      integration {
+        id
+        environment
+        name
+      }
+    }
+    ...AddPetitionAccessDialog_Petition
+  }
+  ${AddPetitionAccessDialog_PetitionFragmentDoc}
+` as unknown as DocumentNode<useSendPetitionHandler_PetitionFragment, unknown>;
+export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
+  fragment validatePetitionFields_PetitionField on PetitionField {
+    id
+    title
+    type
+    isReadOnly
+    options
+    children {
+      id
+    }
+  }
+` as unknown as DocumentNode<validatePetitionFields_PetitionFieldFragment, unknown>;
+export const useConfirmSendReminderDialog_PetitionFragmentDoc = gql`
+  fragment useConfirmSendReminderDialog_Petition on Petition {
+    status
+    accesses {
+      id
+      remindersOptOut
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    ...usePetitionMessagePlaceholderOptions_PetitionBase
+  }
+  ${ContactReference_ContactFragmentDoc}
+  ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<useConfirmSendReminderDialog_PetitionFragment, unknown>;
+export const ProfileLink_ProfileFragmentDoc = gql`
+  fragment ProfileLink_Profile on Profile {
+    id
+    name
+    status
+  }
+` as unknown as DocumentNode<ProfileLink_ProfileFragment, unknown>;
+export const PetitionProfilesTable_ProfileFragmentDoc = gql`
+  fragment PetitionProfilesTable_Profile on Profile {
+    id
+    name
+    status
+    profileType {
+      id
+      name
+    }
+    subscribers {
+      id
+      user {
+        ...UserAvatarList_User
+      }
+    }
+    createdAt
+    ...ProfileLink_Profile
+  }
+  ${UserAvatarList_UserFragmentDoc}
+  ${ProfileLink_ProfileFragmentDoc}
+` as unknown as DocumentNode<PetitionProfilesTable_ProfileFragment, unknown>;
+export const PetitionProfilesTable_PetitionFragmentDoc = gql`
+  fragment PetitionProfilesTable_Petition on Petition {
+    id
+    isAnonymized
+    myEffectivePermission {
+      permissionType
+    }
+    profiles {
+      ...PetitionProfilesTable_Profile
+    }
+  }
+  ${PetitionProfilesTable_ProfileFragmentDoc}
+` as unknown as DocumentNode<PetitionProfilesTable_PetitionFragment, unknown>;
+export const validatePetitionFields_PetitionBaseFragmentDoc = gql`
+  fragment validatePetitionFields_PetitionBase on PetitionBase {
+    id
+    organization {
+      features {
+        name
+        value
+      }
+    }
+  }
+` as unknown as DocumentNode<validatePetitionFields_PetitionBaseFragment, unknown>;
+export const PetitionActivity_PetitionFragmentDoc = gql`
+  fragment PetitionActivity_Petition on Petition {
+    id
+    isInteractionWithRecipientsEnabled
+    accesses {
+      id
+      status
+      ...ConfirmDeactivateAccessDialog_PetitionAccess
+      ...ConfirmReactivateAccessDialog_PetitionAccess
+    }
+    ...PetitionLayout_PetitionBase
+    ...PetitionAccessTable_Petition
+    ...ShareButton_PetitionBase
+    ...AddPetitionAccessDialog_Petition
+    ...useSendPetitionHandler_Petition
+    fields {
+      id
+      ...useAllFieldsWithIndices_PetitionField
+      ...validatePetitionFields_PetitionField
+      ...FieldErrorDialog_PetitionField
+      children {
+        id
+        ...validatePetitionFields_PetitionField
+        ...FieldErrorDialog_PetitionField
+      }
+    }
+    ...useConfirmSendReminderDialog_Petition
+    ...PetitionProfilesTable_Petition
+    ...validatePetitionFields_PetitionBase
+  }
+  ${ConfirmDeactivateAccessDialog_PetitionAccessFragmentDoc}
+  ${ConfirmReactivateAccessDialog_PetitionAccessFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
+  ${PetitionAccessTable_PetitionFragmentDoc}
+  ${ShareButton_PetitionBaseFragmentDoc}
+  ${AddPetitionAccessDialog_PetitionFragmentDoc}
+  ${useSendPetitionHandler_PetitionFragmentDoc}
+  ${useAllFieldsWithIndices_PetitionFieldFragmentDoc}
+  ${validatePetitionFields_PetitionFieldFragmentDoc}
+  ${FieldErrorDialog_PetitionFieldFragmentDoc}
+  ${useConfirmSendReminderDialog_PetitionFragmentDoc}
+  ${PetitionProfilesTable_PetitionFragmentDoc}
+  ${validatePetitionFields_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<PetitionActivity_PetitionFragment, unknown>;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
   fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
     user {
@@ -50371,13 +48819,6 @@ export const TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc 
   TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment,
   unknown
 >;
-export const ProfileLink_ProfileFragmentDoc = gql`
-  fragment ProfileLink_Profile on Profile {
-    id
-    name
-    status
-  }
-` as unknown as DocumentNode<ProfileLink_ProfileFragment, unknown>;
 export const TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc = gql`
   fragment TimelineProfileAssociatedEvent_ProfileAssociatedEvent on ProfileAssociatedEvent {
     user {
@@ -50619,325 +49060,12 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc}
   ${TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
-export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
-  fragment PetitionActivityTimeline_Petition on Petition {
-    events(limit: 1000) {
-      items {
-        ...PetitionActivityTimeline_PetitionEvent
-      }
-    }
+export const PetitionActivity_PetitionEventFragmentDoc = gql`
+  fragment PetitionActivity_PetitionEvent on PetitionEvent {
+    ...PetitionActivityTimeline_PetitionEvent
   }
   ${PetitionActivityTimeline_PetitionEventFragmentDoc}
-` as unknown as DocumentNode<PetitionActivityTimeline_PetitionFragment, unknown>;
-export const ShareButton_PetitionBaseFragmentDoc = gql`
-  fragment ShareButton_PetitionBase on PetitionBase {
-    permissions {
-      permissionType
-      ... on PetitionUserPermission {
-        user {
-          id
-          fullName
-          ...UserReference_User
-        }
-      }
-      ... on PetitionUserGroupPermission {
-        group {
-          id
-          ...UserGroupReference_UserGroup
-        }
-      }
-    }
-  }
-  ${UserReference_UserFragmentDoc}
-  ${UserGroupReference_UserGroupFragmentDoc}
-` as unknown as DocumentNode<ShareButton_PetitionBaseFragment, unknown>;
-export const SelectedSignerRow_PetitionSignerFragmentDoc = gql`
-  fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<SelectedSignerRow_PetitionSignerFragment, unknown>;
-export const SuggestedSigners_PetitionSignerFragmentDoc = gql`
-  fragment SuggestedSigners_PetitionSigner on PetitionSigner {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<SuggestedSigners_PetitionSignerFragment, unknown>;
-export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-    contactId
-    email
-    firstName
-    lastName
-    isPreset
-    ...SelectedSignerRow_PetitionSigner
-    ...SuggestedSigners_PetitionSigner
-  }
-  ${SelectedSignerRow_PetitionSignerFragmentDoc}
-  ${SuggestedSigners_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
-export const ConfirmPetitionSignersDialog_PetitionFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_Petition on Petition {
-    id
-    isInteractionWithRecipientsEnabled
-    accesses {
-      id
-      status
-      contact {
-        id
-        email
-        firstName
-        lastName
-      }
-    }
-    signatureRequests {
-      signatureConfig {
-        signers {
-          ...ConfirmPetitionSignersDialog_PetitionSigner
-        }
-      }
-    }
-  }
-  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionFragment, unknown>;
-export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
-  fragment CopySignatureConfigDialog_PetitionSigner on PetitionSigner {
-    email
-    fullName
-  }
-` as unknown as DocumentNode<CopySignatureConfigDialog_PetitionSignerFragment, unknown>;
-export const ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
-    signingMode
-    minSigners
-    instructions
-    allowAdditionalSigners
-    signers {
-      ...ConfirmPetitionSignersDialog_PetitionSigner
-    }
-  }
-  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_SignatureConfigFragment, unknown>;
-export const AddPetitionAccessDialog_SignatureConfigFragmentDoc = gql`
-  fragment AddPetitionAccessDialog_SignatureConfig on SignatureConfig {
-    review
-    timezone
-    title
-    allowAdditionalSigners
-    minSigners
-    integration {
-      id
-    }
-    signers {
-      ...CopySignatureConfigDialog_PetitionSigner
-    }
-    ...ConfirmPetitionSignersDialog_SignatureConfig
-  }
-  ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
-  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
-` as unknown as DocumentNode<AddPetitionAccessDialog_SignatureConfigFragment, unknown>;
-export const AddPetitionAccessDialog_DelegateUserFragmentDoc = gql`
-  fragment AddPetitionAccessDialog_DelegateUser on User {
-    id
-    fullName
-    ...UserSelect_User
-  }
-  ${UserSelect_UserFragmentDoc}
-` as unknown as DocumentNode<AddPetitionAccessDialog_DelegateUserFragment, unknown>;
-export const MessageEmailSubjectFormControl_PetitionBaseFragmentDoc = gql`
-  fragment MessageEmailSubjectFormControl_PetitionBase on PetitionBase {
-    ...usePetitionMessagePlaceholderOptions_PetitionBase
-  }
-  ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<MessageEmailSubjectFormControl_PetitionBaseFragment, unknown>;
-export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
-  fragment AddPetitionAccessDialog_Petition on Petition {
-    id
-    emailSubject
-    emailBody
-    myEffectivePermission {
-      permissionType
-    }
-    effectivePermissions {
-      isSubscribed
-      user {
-        id
-      }
-    }
-    ...ConfirmPetitionSignersDialog_Petition
-    signatureConfig {
-      timezone
-      ...AddPetitionAccessDialog_SignatureConfig
-      ...ConfirmPetitionSignersDialog_SignatureConfig
-    }
-    remindersConfig {
-      ...PetitionRemindersConfig_RemindersConfig
-    }
-    organization {
-      id
-      petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
-        id
-        limit
-        used
-      }
-    }
-    accesses {
-      id
-      isContactless
-      recipientUrl
-    }
-    defaultOnBehalf {
-      ...AddPetitionAccessDialog_DelegateUser
-    }
-    ...MessageEmailSubjectFormControl_PetitionBase
-  }
-  ${ConfirmPetitionSignersDialog_PetitionFragmentDoc}
-  ${AddPetitionAccessDialog_SignatureConfigFragmentDoc}
-  ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
-  ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
-  ${AddPetitionAccessDialog_DelegateUserFragmentDoc}
-  ${MessageEmailSubjectFormControl_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionFragment, unknown>;
-export const useSendPetitionHandler_PetitionFragmentDoc = gql`
-  fragment useSendPetitionHandler_Petition on Petition {
-    id
-    accesses {
-      id
-      contact {
-        id
-      }
-    }
-    signatureConfig {
-      integration {
-        id
-        environment
-        name
-      }
-    }
-    ...AddPetitionAccessDialog_Petition
-  }
-  ${AddPetitionAccessDialog_PetitionFragmentDoc}
-` as unknown as DocumentNode<useSendPetitionHandler_PetitionFragment, unknown>;
-export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
-  fragment validatePetitionFields_PetitionField on PetitionField {
-    id
-    title
-    type
-    isReadOnly
-    options
-    children {
-      id
-    }
-  }
-` as unknown as DocumentNode<validatePetitionFields_PetitionFieldFragment, unknown>;
-export const useConfirmSendReminderDialog_PetitionFragmentDoc = gql`
-  fragment useConfirmSendReminderDialog_Petition on Petition {
-    status
-    accesses {
-      id
-      remindersOptOut
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    ...usePetitionMessagePlaceholderOptions_PetitionBase
-  }
-  ${ContactReference_ContactFragmentDoc}
-  ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<useConfirmSendReminderDialog_PetitionFragment, unknown>;
-export const PetitionProfilesTable_ProfileFragmentDoc = gql`
-  fragment PetitionProfilesTable_Profile on Profile {
-    id
-    name
-    status
-    profileType {
-      id
-      name
-    }
-    subscribers {
-      id
-      user {
-        ...UserAvatarList_User
-      }
-    }
-    createdAt
-    ...ProfileLink_Profile
-  }
-  ${UserAvatarList_UserFragmentDoc}
-  ${ProfileLink_ProfileFragmentDoc}
-` as unknown as DocumentNode<PetitionProfilesTable_ProfileFragment, unknown>;
-export const PetitionProfilesTable_PetitionFragmentDoc = gql`
-  fragment PetitionProfilesTable_Petition on Petition {
-    id
-    isAnonymized
-    myEffectivePermission {
-      permissionType
-    }
-    profiles {
-      ...PetitionProfilesTable_Profile
-    }
-  }
-  ${PetitionProfilesTable_ProfileFragmentDoc}
-` as unknown as DocumentNode<PetitionProfilesTable_PetitionFragment, unknown>;
-export const validatePetitionFields_PetitionBaseFragmentDoc = gql`
-  fragment validatePetitionFields_PetitionBase on PetitionBase {
-    id
-    organization {
-      features {
-        name
-        value
-      }
-    }
-  }
-` as unknown as DocumentNode<validatePetitionFields_PetitionBaseFragment, unknown>;
-export const PetitionActivity_PetitionFragmentDoc = gql`
-  fragment PetitionActivity_Petition on Petition {
-    id
-    isInteractionWithRecipientsEnabled
-    accesses {
-      id
-      status
-      ...ConfirmDeactivateAccessDialog_PetitionAccess
-      ...ConfirmReactivateAccessDialog_PetitionAccess
-    }
-    ...PetitionLayout_PetitionBase
-    ...PetitionAccessTable_Petition
-    ...PetitionActivityTimeline_Petition
-    ...ShareButton_PetitionBase
-    ...AddPetitionAccessDialog_Petition
-    ...useSendPetitionHandler_Petition
-    fields {
-      id
-      ...useAllFieldsWithIndices_PetitionField
-      ...validatePetitionFields_PetitionField
-      ...FieldErrorDialog_PetitionField
-      children {
-        id
-        ...validatePetitionFields_PetitionField
-        ...FieldErrorDialog_PetitionField
-      }
-    }
-    ...useConfirmSendReminderDialog_Petition
-    ...PetitionProfilesTable_Petition
-    ...validatePetitionFields_PetitionBase
-  }
-  ${ConfirmDeactivateAccessDialog_PetitionAccessFragmentDoc}
-  ${ConfirmReactivateAccessDialog_PetitionAccessFragmentDoc}
-  ${PetitionLayout_PetitionBaseFragmentDoc}
-  ${PetitionAccessTable_PetitionFragmentDoc}
-  ${PetitionActivityTimeline_PetitionFragmentDoc}
-  ${ShareButton_PetitionBaseFragmentDoc}
-  ${AddPetitionAccessDialog_PetitionFragmentDoc}
-  ${useSendPetitionHandler_PetitionFragmentDoc}
-  ${useAllFieldsWithIndices_PetitionFieldFragmentDoc}
-  ${validatePetitionFields_PetitionFieldFragmentDoc}
-  ${FieldErrorDialog_PetitionFieldFragmentDoc}
-  ${useConfirmSendReminderDialog_PetitionFragmentDoc}
-  ${PetitionProfilesTable_PetitionFragmentDoc}
-  ${validatePetitionFields_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<PetitionActivity_PetitionFragment, unknown>;
+` as unknown as DocumentNode<PetitionActivity_PetitionEventFragment, unknown>;
 export const PetitionHeader_QueryFragmentDoc = gql`
   fragment PetitionHeader_Query on Query {
     me {
@@ -58588,6 +56716,21 @@ export const PetitionActivity_disassociateProfileFromPetitionDocument = gql`
   PetitionActivity_disassociateProfileFromPetitionMutation,
   PetitionActivity_disassociateProfileFromPetitionMutationVariables
 >;
+export const PetitionActivity_eventsDocument = gql`
+  query PetitionActivity_events($id: GID!, $offset: Int!, $limit: Int!) {
+    petition(id: $id) {
+      ... on Petition {
+        events(offset: $offset, limit: $limit) {
+          items {
+            ...PetitionActivity_PetitionEvent
+          }
+          totalCount
+        }
+      }
+    }
+  }
+  ${PetitionActivity_PetitionEventFragmentDoc}
+` as unknown as DocumentNode<PetitionActivity_eventsQuery, PetitionActivity_eventsQueryVariables>;
 export const PetitionActivity_petitionDocument = gql`
   query PetitionActivity_petition($id: GID!) {
     petition(id: $id) {

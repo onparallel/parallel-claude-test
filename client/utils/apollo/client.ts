@@ -230,6 +230,24 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             accesses: { merge: mergeArraysBy(["id"]) },
             emailBody: { merge: false },
             signatureConfig: { merge: true },
+            events: {
+              keyArgs: ["id"],
+              merge(existing, incoming, { readField, variables }) {
+                if (existing === undefined || variables?.offset === 0) {
+                  return incoming;
+                } else {
+                  return variables?.offset
+                    ? {
+                        items: uniqBy(
+                          [...(existing.items ?? []), ...(incoming.items ?? [])],
+                          (obj) => readField("id", obj),
+                        ),
+                        totalCount: incoming.totalCount,
+                      }
+                    : incoming;
+                }
+              },
+            },
           },
         },
         PetitionField: {
