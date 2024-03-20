@@ -1000,6 +1000,7 @@ export interface NexusGenObjects {
   PetitionReminderBouncedEvent: petitionEvents.PetitionReminderBouncedEvent;
   PetitionReopenedEvent: petitionEvents.PetitionReopenedEvent;
   PetitionSharedUserNotification: notifications.PetitionSharedUserNotification;
+  PetitionSharingInfo: number[];
   PetitionSignatureRequest: db.PetitionSignatureRequest;
   PetitionSignatureRequestSignerStatus: {
     firstName: string;
@@ -1808,6 +1809,7 @@ export interface NexusGenFieldTypes {
     closeProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
+    createAddPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
@@ -1815,6 +1817,7 @@ export interface NexusGenFieldTypes {
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
+    createEditPetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createEventSubscriptionSignatureKey: NexusGenRootTypes["EventSubscriptionSignatureKey"]; // EventSubscriptionSignatureKey!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
@@ -1842,6 +1845,7 @@ export interface NexusGenFieldTypes {
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createPublicPetitionLinkPrefillData: string; // String!
+    createRemovePetitionPermissionTask: NexusGenRootTypes["Task"]; // Task!
     createSignaturitIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesCsvExportTask: NexusGenRootTypes["Task"]; // Task!
@@ -2556,6 +2560,15 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     sharedWith: NexusGenRootTypes["UserOrUserGroup"] | null; // UserOrUserGroup
   };
+  PetitionSharingInfo: {
+    // field return type
+    firstPetitionEffectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
+    firstPetitionPermissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
+    ownedCount: number; // Int!
+    ownedOrWriteIds: NexusGenScalars["GID"][]; // [GID!]!
+    readPetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    totalCount: number; // Int!
+  };
   PetitionSignatureRequest: {
     // field return type
     auditTrailFilename: string | null; // String
@@ -3171,6 +3184,7 @@ export interface NexusGenFieldTypes {
     petitionInformation: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     petitions: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
+    petitionsSharingInfo: NexusGenRootTypes["PetitionSharingInfo"]; // PetitionSharingInfo!
     profile: NexusGenRootTypes["Profile"]; // Profile!
     profileEvents: NexusGenRootTypes["ProfileEvent"][]; // [ProfileEvent!]!
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
@@ -4245,6 +4259,7 @@ export interface NexusGenFieldTypeNames {
     closeProfile: "Profile";
     completePetition: "Petition";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
+    createAddPetitionPermissionTask: "Task";
     createAzureOpenAiIntegration: "SupportMethodResponse";
     createBackgroundCheckProfilePdfTask: "Task";
     createBulkPetitionSendTask: "Task";
@@ -4252,6 +4267,7 @@ export interface NexusGenFieldTypeNames {
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
+    createEditPetitionPermissionTask: "Task";
     createEventSubscription: "PetitionEventSubscription";
     createEventSubscriptionSignatureKey: "EventSubscriptionSignatureKey";
     createExportExcelTask: "Task";
@@ -4279,6 +4295,7 @@ export interface NexusGenFieldTypeNames {
     createProfileTypeField: "ProfileTypeField";
     createPublicPetitionLink: "PublicPetitionLink";
     createPublicPetitionLinkPrefillData: "String";
+    createRemovePetitionPermissionTask: "Task";
     createSignaturitIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
     createTemplateRepliesCsvExportTask: "Task";
@@ -4993,6 +5010,15 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     sharedWith: "UserOrUserGroup";
   };
+  PetitionSharingInfo: {
+    // field return type name
+    firstPetitionEffectivePermissions: "EffectivePetitionUserPermission";
+    firstPetitionPermissions: "PetitionPermission";
+    ownedCount: "Int";
+    ownedOrWriteIds: "GID";
+    readPetitions: "PetitionBase";
+    totalCount: "Int";
+  };
   PetitionSignatureRequest: {
     // field return type name
     auditTrailFilename: "String";
@@ -5608,6 +5634,7 @@ export interface NexusGenFieldTypeNames {
     petitionInformation: "SupportMethodResponse";
     petitions: "PetitionBaseOrFolderPagination";
     petitionsById: "PetitionBase";
+    petitionsSharingInfo: "PetitionSharingInfo";
     profile: "Profile";
     profileEvents: "ProfileEvent";
     profileType: "ProfileType";
@@ -6319,6 +6346,17 @@ export interface NexusGenArgTypes {
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
+    createAddPetitionPermissionTask: {
+      // args
+      folders?: NexusGenInputs["FoldersInput"] | null; // FoldersInput
+      message?: string | null; // String
+      notify?: boolean | null; // Boolean
+      permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
+      petitionIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      subscribe: boolean | null; // Boolean
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
     createAzureOpenAiIntegration: {
       // args
       apiKey: string; // String!
@@ -6356,6 +6394,13 @@ export interface NexusGenArgTypes {
     createDowJonesProfileDownloadTask: {
       // args
       profileId: string; // ID!
+    };
+    createEditPetitionPermissionTask: {
+      // args
+      permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     createEventSubscription: {
       // args
@@ -6524,6 +6569,13 @@ export interface NexusGenArgTypes {
       data: NexusGenScalars["JSONObject"]; // JSONObject!
       path?: string | null; // String
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
+    };
+    createRemovePetitionPermissionTask: {
+      // args
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      removeAll?: boolean | null; // Boolean
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     createSignaturitIntegration: {
       // args
@@ -7710,6 +7762,11 @@ export interface NexusGenArgTypes {
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
     };
     petitionsById: {
+      // args
+      folders?: NexusGenInputs["FoldersInput"] | null; // FoldersInput
+      ids?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
+    petitionsSharingInfo: {
       // args
       folders?: NexusGenInputs["FoldersInput"] | null; // FoldersInput
       ids?: NexusGenScalars["GID"][] | null; // [GID!]

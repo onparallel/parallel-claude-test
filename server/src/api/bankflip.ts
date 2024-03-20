@@ -29,14 +29,17 @@ export const bankflip = Router().post(
       const retry = typeof req.query.retry === "string" && req.query.retry === "true";
 
       if (body.name === "SESSION_COMPLETED") {
-        await req.context.tasks.createTask({
-          name: "BANKFLIP_SESSION_COMPLETED",
-          input: {
-            bankflip_session_id: body.payload.sessionId,
-            org_id: fromGlobalId(req.params.orgId, "Organization").id,
-            update_errors: retry,
+        await req.context.tasks.createTask(
+          {
+            name: "BANKFLIP_SESSION_COMPLETED",
+            input: {
+              bankflip_session_id: body.payload.sessionId,
+              org_id: fromGlobalId(req.params.orgId, "Organization").id,
+              update_errors: retry,
+            },
           },
-        });
+          req.context.config.instanceName,
+        );
       }
 
       res.sendStatus(200).end();

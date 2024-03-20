@@ -6,10 +6,11 @@ import {
   list,
   nonNull,
   nullable,
+  objectType,
   queryField,
   stringArg,
 } from "nexus";
-import { isDefined, sort, uniq } from "remeda";
+import { countBy, isDefined, sort, uniq } from "remeda";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import {
@@ -174,6 +175,99 @@ export const petitionsByIdQuery = queryField("petitionsById", {
       return [];
     }
     return await ctx.petitions.loadPetition(petitionIds);
+  },
+});
+
+export const petitionsSharingInfoQuery = queryField("petitionsSharingInfo", {
+  type: objectType({
+    name: "PetitionSharingInfo",
+    definition(t) {
+      t.nonNull.int("totalCount", {
+        resolve: (ids) => ids.length,
+      });
+      t.nonNull.int("ownedCount", {
+        resolve: async (ids, _, ctx) => {
+          const permissions = (
+            await ctx.petitions.loadEffectivePermissions(ids as number[])
+          ).flat();
+          return countBy(permissions, (p) => p.user_id === ctx.user!.id && p.type === "OWNER");
+        },
+      });
+      t.nonNull.list.nonNull.globalId("ownedOrWriteIds", {
+        prefixName: "Petition",
+        resolve: async (ids, _, ctx) => {
+          const permissions = (
+            await ctx.petitions.loadEffectivePermissions(ids as number[])
+          ).flat();
+          return permissions
+            .filter((p) => p.user_id === ctx.user!.id && ["OWNER", "WRITE"].includes(p.type))
+            .map((p) => p.petition_id);
+        },
+      });
+      t.nonNull.list.nonNull.field("readPetitions", {
+        type: "PetitionBase",
+        resolve: async (ids, _, ctx) => {
+          const permissions = (
+            await ctx.petitions.loadEffectivePermissions(ids as number[])
+          ).flat();
+          const petitionIds = permissions
+            .filter((p) => p.user_id === ctx.user!.id && p.type === "READ")
+            .map((p) => p.petition_id);
+
+          return await ctx.petitions.loadPetition(petitionIds);
+        },
+      });
+      t.nonNull.list.nonNull.field("firstPetitionPermissions", {
+        type: "PetitionPermission",
+        resolve: async ([id], _, ctx) => {
+          return await ctx.petitions.loadUserAndUserGroupPermissionsByPetitionId(id);
+        },
+      });
+      t.nonNull.list.nonNull.field("firstPetitionEffectivePermissions", {
+        type: "EffectivePetitionUserPermission",
+        description: "The effective permissions on the petition",
+        resolve: async ([id], _, ctx) => {
+          return await ctx.petitions.loadEffectivePermissions(id);
+        },
+      });
+    },
+    sourceType: "number[]",
+  }),
+  args: {
+    ids: list(nonNull(globalIdArg("Petition"))),
+    folders: "FoldersInput",
+  },
+  authorize: authenticateAnd(
+    ifArgDefined(
+      (args) => args.ids,
+      or(
+        userHasAccessToPetitions("ids" as never),
+        and(
+          petitionsArePublicTemplates("ids" as never),
+          contextUserHasPermission("PETITIONS:LIST_PUBLIC_TEMPLATES"),
+        ),
+      ),
+    ),
+  ),
+  validateArgs: validateAnd(
+    validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
+    notEmptyArray(
+      (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
+      "ids or folders",
+    ),
+  ),
+  resolve: async (_, args, ctx) => {
+    const petitionIds = args.ids ?? [];
+    if (isDefined(args.folders)) {
+      const folderIds = fromGlobalIds(args.folders.folderIds, "PetitionFolder", true).ids;
+      const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
+        folderIds,
+        args.folders.type === "TEMPLATE",
+        ctx.user!,
+      );
+      petitionIds.push(...folderPetitions.map((p) => p.id));
+    }
+    return uniq(petitionIds);
   },
 });
 

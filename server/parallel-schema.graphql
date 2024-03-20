@@ -875,7 +875,7 @@ type Mutation {
     subscribe: Boolean = true
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): [PetitionBase!]!
+  ): [PetitionBase!]! @deprecated(reason: "Use createAddPetitionPermissionTask instead")
 
   """
   Add users to a user group
@@ -983,6 +983,26 @@ type Mutation {
     profileTypeFieldId: GID!
   ): [ProfileFieldFile!]!
 
+  "\n    Adds permissions to users and groups on given petitions and folders.\n    If the total amount of permission to add exceeds 100, a task will be created for async completion.\n    If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.\n  "
+  createAddPetitionPermissionTask(
+    folders: FoldersInput
+    message: String
+
+    """
+    Wether to notify the user via email or not.
+    """
+    notify: Boolean = false
+    permissionType: PetitionPermissionTypeRW!
+    petitionIds: [GID!]
+
+    """
+    Subscribe to notifications.
+    """
+    subscribe: Boolean = true
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): Task!
+
   """
   Creates a new Azure OpenAI integration on the provided organization
   """
@@ -1037,6 +1057,14 @@ type Mutation {
   Creates a task for downloading a PDF file with the profile of an entity in DowJones
   """
   createDowJonesProfileDownloadTask(profileId: ID!): Task!
+
+  "\n    Edits permissions to users and groups on given petitions.\n    If the total amount of permissions to edit exceeds 100, a task will be created for async completion.\n  "
+  createEditPetitionPermissionTask(
+    permissionType: PetitionPermissionTypeRW!
+    petitionIds: [GID!]!
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): Task!
 
   """
   Creates an event subscription for the user's petitions
@@ -1286,6 +1314,18 @@ type Mutation {
     publicPetitionLinkId: GID!
   ): String!
 
+  "\n      Removes permissions to users and groups on given petitions.\n      If the total amount of permission to add exceeds 100, a task will be created for async completion.\n    "
+  createRemovePetitionPermissionTask(
+    petitionIds: [GID!]!
+
+    """
+    Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds
+    """
+    removeAll: Boolean
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): Task!
+
   """
   Creates a new Signaturit integration on the user's organization
   """
@@ -1498,7 +1538,7 @@ type Mutation {
     petitionIds: [GID!]!
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): [PetitionBase!]!
+  ): [PetitionBase!]! @deprecated(reason: "Use createEditPetitionPermissionTask instead")
 
   """
   Generates a download link for a file reply.
@@ -1896,7 +1936,7 @@ type Mutation {
     removeAll: Boolean
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): [PetitionBase]!
+  ): [PetitionBase]! @deprecated(reason: "Use createRemovePetitionPermissionTask instead")
 
   """
   Removes users from a user group
@@ -4530,6 +4570,18 @@ input PetitionSharedWithFilterLine {
   value: ID!
 }
 
+type PetitionSharingInfo {
+  """
+  The effective permissions on the petition
+  """
+  firstPetitionEffectivePermissions: [EffectivePetitionUserPermission!]!
+  firstPetitionPermissions: [PetitionPermission!]!
+  ownedCount: Int!
+  ownedOrWriteIds: [GID!]!
+  readPetitions: [PetitionBase!]!
+  totalCount: Int!
+}
+
 enum PetitionSignatureCancelReason {
   CANCELLED_BY_USER
   DECLINED_BY_SIGNER
@@ -6244,6 +6296,7 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBaseOrFolderPagination!
   petitionsById(folders: FoldersInput, ids: [GID!]): [PetitionBase]!
+  petitionsSharingInfo(folders: FoldersInput, ids: [GID!]): PetitionSharingInfo!
   profile(profileId: GID!): Profile!
   profileEvents(
     """
@@ -6947,6 +7000,7 @@ enum TaskName {
   DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES
+  PETITION_SHARING
   PETITION_SUMMARY
   PRINT_PDF
   TEMPLATES_OVERVIEW_REPORT

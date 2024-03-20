@@ -8,14 +8,14 @@ import {
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   UpdatePetitionInput,
-  useSendPetitionHandler_addPetitionPermissionDocument,
   useSendPetitionHandler_PetitionFragment,
-  useSendPetitionHandler_sendPetitionDocument,
   useSendPetitionHandler_UserFragment,
+  useSendPetitionHandler_sendPetitionDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
+import { usePetitionSharingBackgroundTask } from "@parallel/utils/tasks/usePetitionSharingTask";
 import { MaybePromise } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
@@ -37,7 +37,7 @@ export function useSendPetitionHandler(
   const toast = useToast();
 
   const [sendPetition] = useMutation(useSendPetitionHandler_sendPetitionDocument);
-  const [addPetitionPermission] = useMutation(useSendPetitionHandler_addPetitionPermissionDocument);
+  const { addPetitionPermission } = usePetitionSharingBackgroundTask();
 
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
   const showLongBulkSendDialog = useBlockingDialog();
@@ -130,15 +130,13 @@ export function useSendPetitionHandler(
       }
       if (senderId) {
         await addPetitionPermission({
-          variables: {
-            petitionIds: data.sendPetition.map((res) => res.petition!.id),
-            userIds: [senderId],
-            userGroupIds: null,
-            permissionType: "WRITE",
-            notify: false,
-            subscribe: subscribeSender,
-            message: null,
-          },
+          petitionIds: data.sendPetition.map((res) => res.petition!.id),
+          userIds: [senderId],
+          userGroupIds: null,
+          permissionType: "WRITE",
+          notify: false,
+          subscribe: subscribeSender,
+          message: null,
         });
       }
       if (scheduledAt) {
@@ -263,29 +261,5 @@ useSendPetitionHandler.mutations = [
         }
       }
     }
-  `,
-  gql`
-    mutation useSendPetitionHandler_addPetitionPermission(
-      $petitionIds: [GID!]!
-      $userIds: [GID!]
-      $userGroupIds: [GID!]
-      $permissionType: PetitionPermissionTypeRW!
-      $notify: Boolean
-      $subscribe: Boolean
-      $message: String
-    ) {
-      addPetitionPermission(
-        petitionIds: $petitionIds
-        userIds: $userIds
-        userGroupIds: $userGroupIds
-        permissionType: $permissionType
-        notify: $notify
-        subscribe: $subscribe
-        message: $message
-      ) {
-        ...useSendPetitionHandler_Petition
-      }
-    }
-    ${useSendPetitionHandler.fragments.Petition}
   `,
 ];

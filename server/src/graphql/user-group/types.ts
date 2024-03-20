@@ -44,7 +44,7 @@ export const UserGroup = objectType({
     });
     t.int("memberCount", {
       resolve: async (root, _, ctx) => {
-        return await ctx.userGroups.loadUserGroupCount(root.id);
+        return await ctx.userGroups.loadUserGroupMemberCount(root.id);
       },
     });
     t.field("type", {

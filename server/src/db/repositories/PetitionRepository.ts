@@ -33,7 +33,7 @@ import {
   evaluateFieldLogic,
 } from "../../util/fieldLogic";
 import { fieldReplyContent } from "../../util/fieldReplyContent";
-import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
+import { fromGlobalId, fromGlobalIds, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { isValueCompatible } from "../../util/isValueCompatible";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -3665,7 +3665,12 @@ export class PetitionRepository extends BaseRepository {
       return [];
     }
 
-    const petitionEvents = await this.insert("petition_event", events, t);
+    const petitionEvents = await pMapChunk(
+      unMaybeArray(events),
+      async (chunk) => await this.insert("petition_event", chunk, t),
+      { chunkSize: 100, concurrency: 1 },
+    );
+
     await this.queues.enqueueEvents(petitionEvents, "petition_event", undefined, t);
 
     return petitionEvents;
@@ -3681,7 +3686,12 @@ export class PetitionRepository extends BaseRepository {
       return [];
     }
 
-    const petitionEvents = await this.insert("petition_event", eventsArray, t);
+    const petitionEvents = await pMapChunk(
+      unMaybeArray(events),
+      async (chunk) => await this.insert("petition_event", chunk, t),
+      { chunkSize: 100, concurrency: 1 },
+    );
+
     await this.queues.enqueueEvents(petitionEvents, "petition_event", notifyAfter, t);
 
     return petitionEvents;
@@ -4671,6 +4681,40 @@ export class PetitionRepository extends BaseRepository {
     },
   );
 
+  async getPetitionIdsWithUserPermissions(
+    petitionIds: number[],
+    folders: string[],
+    isTemplate: boolean,
+    user: User,
+    permissions: PetitionPermissionType[],
+  ) {
+    const ids: number[] = petitionIds;
+    if (folders.length > 0) {
+      const folderIds = fromGlobalIds(folders, "PetitionFolder", true).ids;
+      const folderPetitions = await this.getUserPetitionsInsideFolders(folderIds, isTemplate, user);
+      ids.push(...folderPetitions.map((p) => p.id));
+    }
+
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const rows = await this.raw<{ petition_id: number }>(
+      /* sql */ `
+        select distinct(petition_id)
+        from petition_permission 
+          where deleted_at is null 
+          and user_group_id is null
+          and petition_id in ? 
+          and user_id = ?
+          and "type" in ?
+      `,
+      [this.sqlIn(uniq(ids)), user.id, this.sqlIn(permissions)],
+    );
+
+    return rows.map((r) => r.petition_id);
+  }
+
   readonly loadEffectiveTemplateDefaultPermissions = this.buildLoader<
     number,
     EffectivePetitionPermission[]
@@ -4997,38 +5041,94 @@ export class PetitionRepository extends BaseRepository {
     newPermissionType: PetitionPermissionType,
     user: User,
   ) {
-    return this.withTransaction(async (t) => {
-      const updatedPermissions = await this.from("petition_permission", t)
-        .whereIn("petition_id", petitionIds)
-        .whereNull("deleted_at")
-        .andWhere((q) =>
-          q
-            .orWhere((q) =>
-              q
-                .whereIn("user_id", userIds)
-                .whereNull("from_user_group_id")
-                .whereNull("user_group_id"),
+    await this.withTransaction(async (t) => {
+      const updateUserData = petitionIds.flatMap((petitionId) =>
+        userIds.map((userId) => ({ petitionId, userId })),
+      );
+
+      const updatedUserPermissions = await pMapChunk(
+        updateUserData,
+        async (data) =>
+          await this.from("petition_permission", t)
+            .whereIn(
+              "petition_id",
+              data.map((d) => d.petitionId),
             )
-            .orWhere((q) => q.whereIn("user_group_id", userGroupIds).whereNotNull("user_group_id"))
-            .orWhere((q) =>
-              q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id"),
+            .whereNull("deleted_at")
+            .whereIn(
+              "user_id",
+              data.map((d) => d.userId),
+            )
+            .whereNull("from_user_group_id")
+            .whereNull("user_group_id")
+            .update(
+              {
+                updated_at: this.now(),
+                updated_by: `User:${user.id}`,
+                type: newPermissionType,
+              },
+              "*",
             ),
-        )
-        .update(
-          {
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`,
-            type: newPermissionType,
-          },
-          "*",
-        );
+        {
+          chunkSize: 100,
+          concurrency: 1,
+        },
+      );
+
+      const updateGroupData = petitionIds.flatMap((petitionId) =>
+        userGroupIds.map((userGroupId) => ({ petitionId, userGroupId })),
+      );
+
+      const updatedGroupPermissions = await pMapChunk(
+        updateGroupData,
+        async (data) =>
+          await this.from("petition_permission", t)
+            .whereIn(
+              "petition_id",
+              data.map((d) => d.petitionId),
+            )
+            .whereNull("deleted_at")
+            .andWhere((q) =>
+              q
+                .orWhere((q) =>
+                  q
+                    .whereIn(
+                      "user_group_id",
+                      data.map((d) => d.userGroupId),
+                    )
+                    .whereNotNull("user_group_id"),
+                )
+                .orWhere((q) =>
+                  q
+                    .whereIn(
+                      "from_user_group_id",
+                      data.map((d) => d.userGroupId),
+                    )
+                    .whereNotNull("from_user_group_id"),
+                ),
+            )
+            .update(
+              {
+                updated_at: this.now(),
+                updated_by: `User:${user.id}`,
+                type: newPermissionType,
+              },
+              "*",
+            ),
+        {
+          chunkSize: 100,
+          concurrency: 1,
+        },
+      );
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissionsByPetitionId.dataloader.clear(petitionId);
       }
 
       const [directlyAssigned, groupAssigned] = partition(
-        updatedPermissions.filter((p) => p.from_user_group_id === null),
+        [...updatedUserPermissions, ...updatedGroupPermissions].filter(
+          (p) => p.from_user_group_id === null,
+        ),
         (p) => p.user_group_id === null,
       );
 
@@ -5055,11 +5155,6 @@ export class PetitionRepository extends BaseRepository {
         ],
         t,
       );
-
-      return await this.from("petition", t)
-        .whereNull("deleted_at")
-        .whereIn("id", petitionIds)
-        .returning("*");
     });
   }
 
@@ -5071,44 +5166,103 @@ export class PetitionRepository extends BaseRepository {
     user: User,
     t?: Knex.Transaction,
   ) {
-    return this.withTransaction(async (t) => {
-      const removedPermissions = await this.from("petition_permission", t)
-        .whereIn("petition_id", petitionIds)
-        .whereNull("deleted_at")
-        .whereNot((q) => q.where("user_id", user.id).andWhere("type", "OWNER"))
-        .mmodify((q) => {
-          if (!removeAll) {
-            q.andWhere((q) =>
-              q
-                .orWhere((q) =>
+    return await this.withTransaction(async (t) => {
+      const removeUserData: { petitionId: number; userId: number | null }[] = removeAll
+        ? petitionIds.map((petitionId) => ({ petitionId, userId: null }))
+        : petitionIds.flatMap((petitionId) => userIds.map((userId) => ({ petitionId, userId })));
+
+      const removedUserPermissions = await pMapChunk(
+        removeUserData,
+        async (data) =>
+          await this.from("petition_permission", t)
+            .whereIn(
+              "petition_id",
+              data.map((d) => d.petitionId),
+            )
+            .whereNull("deleted_at")
+            .whereNot((q) => q.where("user_id", user.id).andWhere("type", "OWNER"))
+            .mmodify((q) => {
+              if (!removeAll) {
+                q.andWhere((q) =>
+                  q.orWhere((q) =>
+                    q
+                      .whereIn(
+                        "user_id",
+                        data.map((d) => d.userId!),
+                      )
+                      .whereNull("from_user_group_id")
+                      .whereNull("user_group_id"),
+                  ),
+                );
+              }
+            })
+            .update(
+              {
+                deleted_at: this.now(),
+                deleted_by: `User:${user.id}`,
+              },
+              "*",
+            ),
+        { chunkSize: 100, concurrency: 1 },
+      );
+
+      const removedGroupData: { petitionId: number; userGroupId: number | null }[] = removeAll
+        ? petitionIds.map((petitionId) => ({ petitionId, userGroupId: null }))
+        : petitionIds.flatMap((petitionId) =>
+            userGroupIds.map((userGroupId) => ({ petitionId, userGroupId })),
+          );
+
+      const removedGroupPermissions = await pMapChunk(
+        removedGroupData,
+        async (data) =>
+          await this.from("petition_permission", t)
+            .whereIn(
+              "petition_id",
+              data.map((d) => d.petitionId),
+            )
+            .whereNull("deleted_at")
+            .whereNot((q) => q.where("user_id", user.id).andWhere("type", "OWNER"))
+            .mmodify((q) => {
+              if (!removeAll) {
+                q.andWhere((q) =>
                   q
-                    .whereIn("user_id", userIds)
-                    .whereNull("from_user_group_id")
-                    .whereNull("user_group_id"),
-                )
-                .orWhere((q) =>
-                  q.whereIn("user_group_id", userGroupIds).whereNotNull("user_group_id"),
-                )
-                .orWhere((q) =>
-                  q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id"),
-                ),
-            );
-          }
-        })
-        .update(
-          {
-            deleted_at: this.now(),
-            deleted_by: `User:${user.id}`,
-          },
-          "*",
-        );
+                    .orWhere((q) =>
+                      q
+                        .whereIn(
+                          "user_group_id",
+                          data.map((d) => d.userGroupId!),
+                        )
+                        .whereNotNull("user_group_id"),
+                    )
+                    .orWhere((q) =>
+                      q
+                        .whereIn(
+                          "from_user_group_id",
+                          data.map((d) => d.userGroupId!),
+                        )
+                        .whereNotNull("from_user_group_id"),
+                    ),
+                );
+              }
+            })
+            .update(
+              {
+                deleted_at: this.now(),
+                deleted_by: `User:${user.id}`,
+              },
+              "*",
+            ),
+        { chunkSize: 100, concurrency: 1 },
+      );
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissionsByPetitionId.dataloader.clear(petitionId);
       }
 
       const [directlyAssigned, groupAssigned] = partition(
-        removedPermissions.filter((p) => p.from_user_group_id === null),
+        [...removedUserPermissions, ...removedGroupPermissions].filter(
+          (p) => p.from_user_group_id === null,
+        ),
         (p) => p.user_group_id === null,
       );
 
@@ -5133,7 +5287,7 @@ export class PetitionRepository extends BaseRepository {
         ],
         t,
       );
-      return removedPermissions;
+      return [...removedUserPermissions, ...removedGroupPermissions];
     }, t);
   }
 
@@ -5143,15 +5297,20 @@ export class PetitionRepository extends BaseRepository {
     t?: Knex.Transaction,
   ) {
     return this.withTransaction(async (t) => {
-      const removedPermissions = await this.from("petition_permission", t)
-        .whereIn("id", petitionUserPermissionIds)
-        .update(
-          {
-            deleted_at: this.now(),
-            deleted_by: `User:${user.id}`,
-          },
-          "*",
-        );
+      const removedPermissions = await pMapChunk(
+        petitionUserPermissionIds,
+        async (ids) =>
+          await this.from("petition_permission", t)
+            .whereIn("id", ids)
+            .update(
+              {
+                deleted_at: this.now(),
+                deleted_by: `User:${user.id}`,
+              },
+              "*",
+            ),
+        { chunkSize: 100, concurrency: 1 },
+      );
 
       const [directlyAssigned, groupAssigned] = partition(
         removedPermissions.filter((p) => p.from_user_group_id === null),
@@ -5231,18 +5390,23 @@ export class PetitionRepository extends BaseRepository {
   ) {
     return await this.withTransaction(async (t) => {
       // change permission of original owner to WRITE
-      const previousOwnerPermissions = await this.from("petition_permission", t)
-        .whereIn("petition_id", petitionIds)
-        .where({
-          deleted_at: null,
-          type: "OWNER",
-        })
-        .update({
-          type: "WRITE",
-          updated_at: this.now(),
-          updated_by: `User:${updatedBy.id}`,
-        })
-        .returning("*");
+      const previousOwnerPermissions = await pMapChunk(
+        petitionIds,
+        async (petitionIdsChunk) =>
+          await this.from("petition_permission", t)
+            .whereIn("petition_id", petitionIdsChunk)
+            .where({
+              deleted_at: null,
+              type: "OWNER",
+            })
+            .update({
+              type: "WRITE",
+              updated_at: this.now(),
+              updated_by: `User:${updatedBy.id}`,
+            })
+            .returning("*"),
+        { chunkSize: 100, concurrency: 1 },
+      );
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissionsByPetitionId.dataloader.clear(petitionId);
@@ -5251,32 +5415,37 @@ export class PetitionRepository extends BaseRepository {
       // UPSERT for new petition owner. Try to insert a new OWNER permission.
       // If conflict, the new owner already has READ or WRITE access to the petition,
       // so we have to update the conflicting row to have OWNER permission
-      await t.raw<{ rows: PetitionPermission[] }>(
-        /* sql */ `
-        ? on conflict (petition_id, user_id) 
-        where deleted_at is null and from_user_group_id is null and user_group_id is null
-          do update set
-          type = ?,
-          updated_by = ?,
-          updated_at = ?,
-          deleted_by = null,
-          deleted_at = null
-        returning *;`,
-        [
-          this.from("petition_permission").insert(
-            petitionIds.map((petitionId) => ({
-              created_by: `User:${updatedBy.id}`,
-              updated_by: `User:${updatedBy.id}`,
-              updated_at: this.now(),
-              type: "OWNER",
-              user_id: toUserId,
-              petition_id: petitionId,
-            })),
+      await pMapChunk(
+        petitionIds,
+        async (petitionIdsChunk) =>
+          await t.raw(
+            /* sql */ `
+            ? on conflict (petition_id, user_id) 
+            where deleted_at is null and from_user_group_id is null and user_group_id is null
+              do update set
+              type = ?,
+              updated_by = ?,
+              updated_at = ?,
+              deleted_by = null,
+              deleted_at = null
+            returning *;`,
+            [
+              this.from("petition_permission").insert(
+                petitionIdsChunk.map((petitionId) => ({
+                  created_by: `User:${updatedBy.id}`,
+                  updated_by: `User:${updatedBy.id}`,
+                  updated_at: this.now(),
+                  type: "OWNER",
+                  user_id: toUserId,
+                  petition_id: petitionId,
+                })),
+              ),
+              "OWNER",
+              `User:${updatedBy.id}`,
+              this.now(),
+            ],
           ),
-          "OWNER",
-          `User:${updatedBy.id}`,
-          this.now(),
-        ],
+        { chunkSize: 100, concurrency: 1 },
       );
 
       await this.createEvent(

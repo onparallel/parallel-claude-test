@@ -2,10 +2,11 @@ import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } fr
 import pMap from "p-map";
 import { DatabaseError } from "pg";
 import { differenceWith, filter, groupBy, isDefined, pipe, uniq, uniqBy, zip } from "remeda";
-import { and, authenticate, authenticateAnd, chain } from "../../helpers/authorize";
+import { authenticate, authenticateAnd, chain } from "../../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../../helpers/validateArgs";
+import { inRange } from "../../helpers/validators/inRange";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
@@ -17,10 +18,11 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
   description:
     "Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.",
   type: list(nonNull("PetitionBase")),
-  authorize: chain(
-    authenticate(),
-    and(userHasAccessToPetitions("petitionIds", ["OWNER"]), userHasAccessToUsers("userId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionIds", ["OWNER"]),
+    userHasAccessToUsers("userId"),
   ),
+
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
     userId: nonNull(globalIdArg("User")),
@@ -31,7 +33,9 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
   },
 });
 
+/** @deprecated */
 export const addPetitionPermission = mutationField("addPetitionPermission", {
+  deprecation: "Use createAddPetitionPermissionTask instead",
   description: "Adds permissions on given parallel and users",
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
@@ -120,7 +124,9 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
   },
 });
 
+/** @deprecated */
 export const editPetitionPermission = mutationField("editPetitionPermission", {
+  deprecation: "Use createEditPetitionPermissionTask instead",
   description: "Edits permissions on given parallel and users",
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
@@ -135,6 +141,14 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
     permissionType: nonNull(arg({ type: "PetitionPermissionType" })),
   },
   validateArgs: validateAnd(
+    /**
+     * the following 3 validators ensure this mutation is not used with evil intentions,
+     * as in UI we edit permissions 1 by 1 but this accepts arrays of any size
+     */
+    inRange((args) => args.petitionIds.length, "petitionIds", 0, 10),
+    inRange((args) => args.userIds?.length ?? 0, "userIds", 0, 10),
+    inRange((args) => args.userGroupIds?.length ?? 0, "userGroupIds", 0, 10),
+    /** */
     notEmptyArray((args) => args.petitionIds, "petitionIds"),
     notEmptyArray((args) => args.userIds, "userIds"),
     notEmptyArray((args) => args.userGroupIds, "userGroupId"),
@@ -155,13 +169,15 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   ),
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.petitions.editPetitionPermissions(
+      await ctx.petitions.editPetitionPermissions(
         args.petitionIds,
         args.userIds ?? [],
         args.userGroupIds ?? [],
         args.permissionType,
         ctx.user!,
       );
+
+      return (await ctx.petitions.loadPetition.raw(args.petitionIds)).filter(isDefined);
     } catch (e) {
       if (e instanceof DatabaseError && e.constraint === "petition_permission__owner") {
         throw new ApolloError(
@@ -175,7 +191,9 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   },
 });
 
+/** @deprecated */
 export const removePetitionPermission = mutationField("removePetitionPermission", {
+  deprecation: "Use createRemovePetitionPermissionTask instead",
   description: "Removes permissions on given parallel and users",
   type: nonNull(list(nullable("PetitionBase"))),
   authorize: authenticateAnd(
@@ -193,6 +211,14 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
     }),
   },
   validateArgs: validateAnd(
+    /**
+     * the following 3 validators ensure this mutation is not used with evil intentions,
+     * as in UI we remove permissions 1 by 1 but this accepts arrays of any size
+     */
+    inRange((args) => args.petitionIds.length, "petitionIds", 0, 10),
+    inRange((args) => args.userIds?.length ?? 0, "userIds", 0, 10),
+    inRange((args) => args.userGroupIds?.length ?? 0, "userGroupIds", 0, 10),
+    /** */
     notEmptyArray((args) => args.petitionIds, "petitionIds"),
     notEmptyArray((args) => args.userIds, "userIds"),
     validateIf(

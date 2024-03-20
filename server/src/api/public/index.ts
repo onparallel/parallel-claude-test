@@ -90,13 +90,14 @@ import {
   ProfileStatus,
   ReadPetitionCustomPropertiesDocument,
   RemindPetitionRecipient_sendRemindersDocument,
-  RemoveUserGroupPermission_removePetitionPermissionDocument,
-  RemoveUserPermission_removePetitionPermissionDocument,
+  RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
+  RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
   ReopenPetition_reopenPetitionDocument,
-  SharePetition_addPetitionPermissionDocument,
+  SharePetition_createAddPetitionPermissionTaskDocument,
+  SharePetition_petitionDocument,
   SharePetition_usersByEmailDocument,
   StartSignature_startSignatureRequestDocument,
-  StopSharing_removePetitionPermissionDocument,
+  StopSharing_createRemovePetitionPermissionTaskDocument,
   SubmitReplies_bulkCreatePetitionRepliesDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
   SubmitReply_createFileUploadReplyDocument,
@@ -2339,17 +2340,26 @@ api
         }
       `;
       const _mutation = gql`
-        mutation SharePetition_addPetitionPermission(
+        mutation SharePetition_createAddPetitionPermissionTask(
           $petitionId: GID!
           $userIds: [GID!]
           $userGroupIds: [GID!]
         ) {
-          addPetitionPermission(
+          createAddPetitionPermissionTask(
             petitionIds: [$petitionId]
             userIds: $userIds
             userGroupIds: $userGroupIds
             permissionType: WRITE
           ) {
+            ...Task
+          }
+        }
+        ${TaskFragment}
+      `;
+
+      const _petitionQuery = gql`
+        query SharePetition_petition($id: GID!) {
+          petition(id: $id) {
             permissions {
               ...Permission
             }
@@ -2379,13 +2389,19 @@ api
         throw new BadRequestError("You must provide at least one user or user group");
       }
 
-      const result = await client.request(SharePetition_addPetitionPermissionDocument, {
+      const task = await client.request(SharePetition_createAddPetitionPermissionTaskDocument, {
         petitionId: params.petitionId,
         userIds: userIds.length > 0 ? uniq(userIds) : undefined,
         userGroupIds: userGroupIds.length > 0 ? uniq(userGroupIds) : undefined,
       });
 
-      return Ok(result.addPetitionPermission[0].permissions);
+      await waitForTask(client, task.createAddPetitionPermissionTask);
+
+      const result = await client.request(SharePetition_petitionDocument, {
+        id: params.petitionId,
+      });
+
+      return Ok(result.petition!.permissions);
     },
   )
   .delete(
@@ -2400,15 +2416,19 @@ api
     },
     async ({ client, params }) => {
       const _mutation = gql`
-        mutation StopSharing_removePetitionPermission($petitionId: GID!) {
-          removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
-            id
+        mutation StopSharing_createRemovePetitionPermissionTask($petitionId: GID!) {
+          createRemovePetitionPermissionTask(petitionIds: [$petitionId], removeAll: true) {
+            ...Task
           }
         }
+        ${TaskFragment}
       `;
-      await client.request(StopSharing_removePetitionPermissionDocument, {
+      const task = await client.request(StopSharing_createRemovePetitionPermissionTaskDocument, {
         petitionId: params.petitionId,
       });
+
+      await waitForTask(client, task.createRemovePetitionPermissionTask);
+
       return NoContent();
     },
   );
@@ -2429,16 +2449,26 @@ api
     },
     async ({ client, params }) => {
       const _mutation = gql`
-        mutation RemoveUserPermission_removePetitionPermission($petitionId: GID!, $userId: GID!) {
-          removePetitionPermission(petitionIds: [$petitionId], userIds: [$userId]) {
-            id
+        mutation RemoveUserPermission_createRemovePetitionPermissionTask(
+          $petitionId: GID!
+          $userId: GID!
+        ) {
+          createRemovePetitionPermissionTask(petitionIds: [$petitionId], userIds: [$userId]) {
+            ...Task
           }
         }
+        ${TaskFragment}
       `;
-      await client.request(RemoveUserPermission_removePetitionPermissionDocument, {
-        petitionId: params.petitionId,
-        userId: params.userId,
-      });
+      const task = await client.request(
+        RemoveUserPermission_createRemovePetitionPermissionTaskDocument,
+        {
+          petitionId: params.petitionId,
+          userId: params.userId,
+        },
+      );
+
+      await waitForTask(client, task.createRemovePetitionPermissionTask);
+
       return NoContent();
     },
   );
@@ -2459,19 +2489,29 @@ api
     },
     async ({ client, params }) => {
       const _mutation = gql`
-        mutation RemoveUserGroupPermission_removePetitionPermission(
+        mutation RemoveUserGroupPermission_createRemovePetitionPermissionTask(
           $petitionId: GID!
           $userGroupId: GID!
         ) {
-          removePetitionPermission(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
-            id
+          createRemovePetitionPermissionTask(
+            petitionIds: [$petitionId]
+            userGroupIds: [$userGroupId]
+          ) {
+            ...Task
           }
         }
+        ${TaskFragment}
       `;
-      await client.request(RemoveUserGroupPermission_removePetitionPermissionDocument, {
-        petitionId: params.petitionId,
-        userGroupId: params.userGroupId,
-      });
+      const task = await client.request(
+        RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument,
+        {
+          petitionId: params.petitionId,
+          userGroupId: params.userGroupId,
+        },
+      );
+
+      await waitForTask(client, task.createRemovePetitionPermissionTask);
+
       return NoContent();
     },
   );

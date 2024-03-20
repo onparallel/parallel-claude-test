@@ -60,8 +60,10 @@ export class UserGroupRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("created_at"),
   );
 
-  readonly loadUserGroupCount = this.buildLoadCountBy("user_group_member", "user_group_id", (q) =>
-    q.whereNull("deleted_at"),
+  readonly loadUserGroupMemberCount = this.buildLoadCountBy(
+    "user_group_member",
+    "user_group_id",
+    (q) => q.whereNull("deleted_at"),
   );
 
   readonly loadUserGroupsByUserId = this.buildLoader<number, UserGroup[]>(async (userIds, t) => {

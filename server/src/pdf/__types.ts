@@ -742,7 +742,10 @@ export type MessageSentEvent = PetitionEvent & {
 export type Mutation = {
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
-  /** Adds permissions on given parallel and users */
+  /**
+   * Adds permissions on given parallel and users
+   * @deprecated Use createAddPetitionPermissionTask instead
+   */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
@@ -782,6 +785,14 @@ export type Mutation = {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /**
+   *
+   *     Adds permissions to users and groups on given petitions and folders.
+   *     If the total amount of permission to add exceeds 100, a task will be created for async completion.
+   *     If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
+   *
+   */
+  createAddPetitionPermissionTask: Task;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -798,6 +809,13 @@ export type Mutation = {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
+  /**
+   *
+   *     Edits permissions to users and groups on given petitions.
+   *     If the total amount of permissions to edit exceeds 100, a task will be created for async completion.
+   *
+   */
+  createEditPetitionPermissionTask: Task;
   /**
    * Creates an event subscription for the user's petitions
    * @deprecated Use createPetitionEventSubscription
@@ -851,6 +869,13 @@ export type Mutation = {
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
   createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
+  /**
+   *
+   *       Removes permissions to users and groups on given petitions.
+   *       If the total amount of permission to add exceeds 100, a task will be created for async completion.
+   *
+   */
+  createRemovePetitionPermissionTask: Task;
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -913,7 +938,10 @@ export type Mutation = {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
-  /** Edits permissions on given parallel and users */
+  /**
+   * Edits permissions on given parallel and users
+   * @deprecated Use createEditPetitionPermissionTask instead
+   */
   editPetitionPermission: Array<PetitionBase>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
@@ -1001,7 +1029,10 @@ export type Mutation = {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes the password on a petition or template */
   removePetitionPassword: SupportMethodResponse;
-  /** Removes permissions on given parallel and users */
+  /**
+   * Removes permissions on given parallel and users
+   * @deprecated Use createRemovePetitionPermissionTask instead
+   */
   removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
@@ -1288,6 +1319,17 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateAddPetitionPermissionTaskArgs = {
+  folders?: InputMaybe<FoldersInput>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
 export type MutationcreateAzureOpenAiIntegrationArgs = {
   apiKey: Scalars["String"]["input"];
   endpoint: Scalars["String"]["input"];
@@ -1324,6 +1366,13 @@ export type MutationcreateDowJonesKycReplyArgs = {
 
 export type MutationcreateDowJonesProfileDownloadTaskArgs = {
   profileId: Scalars["ID"]["input"];
+};
+
+export type MutationcreateEditPetitionPermissionTaskArgs = {
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateEventSubscriptionArgs = {
@@ -1492,6 +1541,13 @@ export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
   data: Scalars["JSONObject"]["input"];
   path?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateRemovePetitionPermissionTaskArgs = {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateSignaturitIntegrationArgs = {
@@ -3608,6 +3664,16 @@ export type PetitionSharedWithFilterLine = {
   value: Scalars["ID"]["input"];
 };
 
+export type PetitionSharingInfo = {
+  /** The effective permissions on the petition */
+  firstPetitionEffectivePermissions: Array<EffectivePetitionUserPermission>;
+  firstPetitionPermissions: Array<PetitionPermission>;
+  ownedCount: Scalars["Int"]["output"];
+  ownedOrWriteIds: Array<Scalars["GID"]["output"]>;
+  readPetitions: Array<PetitionBase>;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
@@ -4580,6 +4646,7 @@ export type Query = {
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
   profileType: ProfileType;
@@ -4764,6 +4831,11 @@ export type QuerypetitionsArgs = {
 };
 
 export type QuerypetitionsByIdArgs = {
+  folders?: InputMaybe<FoldersInput>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
+export type QuerypetitionsSharingInfoArgs = {
   folders?: InputMaybe<FoldersInput>;
   ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
@@ -5247,6 +5319,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"

@@ -75,7 +75,39 @@ export type TaskInput<TName extends TaskName> = {
     token: string;
     entity_id: string;
   };
+  PETITION_SHARING:
+    | AddPetitionPermissionsInput
+    | EditPetitionPermissionsInput
+    | RemovePetitionPermissionsInput;
 }[TName];
+
+export interface AddPetitionPermissionsInput {
+  action: "ADD";
+  petition_ids?: Maybe<number[]>;
+  folders?: Maybe<{ folderIds: string[]; type: "PETITION" | "TEMPLATE" }>;
+  user_ids?: Maybe<number[]>;
+  user_group_ids?: Maybe<number[]>;
+  permission_type: "READ" | "WRITE";
+  notify?: Maybe<boolean>;
+  subscribe?: Maybe<boolean>;
+  message?: Maybe<string>;
+}
+
+export interface EditPetitionPermissionsInput {
+  action: "EDIT";
+  petition_ids: number[];
+  user_ids?: Maybe<number[]>;
+  user_group_ids?: Maybe<number[]>;
+  permission_type: "READ" | "WRITE";
+}
+
+export interface RemovePetitionPermissionsInput {
+  action: "REMOVE";
+  petition_ids: number[];
+  user_ids?: Maybe<number[]>;
+  user_group_ids?: Maybe<number[]>;
+  remove_all?: Maybe<boolean>;
+}
 
 export interface PetitionReportStatusCount {
   all: number;
@@ -172,6 +204,10 @@ export type TaskOutput<TName extends TaskName> = {
   BACKGROUND_CHECK_PROFILE_PDF: {
     temporary_file_id: number;
   };
+  PETITION_SHARING: {
+    success: boolean;
+    error?: any;
+  };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<
@@ -229,7 +265,7 @@ export class TaskRepository extends BaseRepository {
     );
   }
 
-  async createTask<TName extends TaskName>(data: Partial<Task<TName>>, createdBy?: string) {
+  async createTask<TName extends TaskName>(data: Partial<Task<TName>>, createdBy: string) {
     const [task] = await this.from("task").insert(
       {
         ...data,
@@ -241,6 +277,26 @@ export class TaskRepository extends BaseRepository {
       groupId: `Task:${task.id}`,
       body: { taskId: task.id },
     });
+
+    return task;
+  }
+
+  async createCompletedTask<TName extends TaskName>(
+    data: Partial<Task<TName>>,
+    createdBy?: string,
+  ) {
+    const [task] = await this.from("task").insert(
+      {
+        ...data,
+        created_by: createdBy,
+        progress: 100,
+        status: "COMPLETED",
+        started_at: new Date(),
+        processed_at: new Date(),
+        processed_by: createdBy,
+      },
+      "*",
+    );
 
     return task;
   }

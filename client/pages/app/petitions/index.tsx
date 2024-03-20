@@ -315,6 +315,7 @@ function Petitions() {
         currentPath: stateRef.current.path,
       });
     } catch {}
+    await refetch();
   };
   const handleRowClick = useCallback(function (
     row: Petitions_PetitionBaseOrFolderFragment,

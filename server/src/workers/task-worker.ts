@@ -4,18 +4,19 @@ import { TaskName } from "../db/__types";
 import { Task } from "../db/repositories/TaskRepository";
 import { TaskRunner } from "./helpers/TaskRunner";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import { BackgroundCheckProfilePdfRunner } from "./tasks/BackgroundCheckProfilePdfRunner";
 import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
 import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
+import { PetitionSharingRunner } from "./tasks/PetitionSharingRunner";
+import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
+import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
-import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
-import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
-import { BackgroundCheckProfilePdfRunner } from "./tasks/BackgroundCheckProfilePdfRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -30,6 +31,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   TEMPLATE_REPLIES_CSV_EXPORT: TemplateRepliesCsvExportRunner,
   PETITION_SUMMARY: PetitionSummaryRunner,
   BACKGROUND_CHECK_PROFILE_PDF: BackgroundCheckProfilePdfRunner,
+  PETITION_SHARING: PetitionSharingRunner,
 };
 
 export interface TaskWorkerPayload {

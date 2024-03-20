@@ -742,7 +742,10 @@ export type MessageSentEvent = PetitionEvent & {
 export type Mutation = {
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
-  /** Adds permissions on given parallel and users */
+  /**
+   * Adds permissions on given parallel and users
+   * @deprecated Use createAddPetitionPermissionTask instead
+   */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
@@ -782,6 +785,14 @@ export type Mutation = {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /**
+   *
+   *     Adds permissions to users and groups on given petitions and folders.
+   *     If the total amount of permission to add exceeds 100, a task will be created for async completion.
+   *     If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
+   *
+   */
+  createAddPetitionPermissionTask: Task;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -798,6 +809,13 @@ export type Mutation = {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
+  /**
+   *
+   *     Edits permissions to users and groups on given petitions.
+   *     If the total amount of permissions to edit exceeds 100, a task will be created for async completion.
+   *
+   */
+  createEditPetitionPermissionTask: Task;
   /**
    * Creates an event subscription for the user's petitions
    * @deprecated Use createPetitionEventSubscription
@@ -851,6 +869,13 @@ export type Mutation = {
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
   createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
+  /**
+   *
+   *       Removes permissions to users and groups on given petitions.
+   *       If the total amount of permission to add exceeds 100, a task will be created for async completion.
+   *
+   */
+  createRemovePetitionPermissionTask: Task;
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -913,7 +938,10 @@ export type Mutation = {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
-  /** Edits permissions on given parallel and users */
+  /**
+   * Edits permissions on given parallel and users
+   * @deprecated Use createEditPetitionPermissionTask instead
+   */
   editPetitionPermission: Array<PetitionBase>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
@@ -1001,7 +1029,10 @@ export type Mutation = {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes the password on a petition or template */
   removePetitionPassword: SupportMethodResponse;
-  /** Removes permissions on given parallel and users */
+  /**
+   * Removes permissions on given parallel and users
+   * @deprecated Use createRemovePetitionPermissionTask instead
+   */
   removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
@@ -1288,6 +1319,17 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcreateAddPetitionPermissionTaskArgs = {
+  folders?: InputMaybe<FoldersInput>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
 export type MutationcreateAzureOpenAiIntegrationArgs = {
   apiKey: Scalars["String"]["input"];
   endpoint: Scalars["String"]["input"];
@@ -1324,6 +1366,13 @@ export type MutationcreateDowJonesKycReplyArgs = {
 
 export type MutationcreateDowJonesProfileDownloadTaskArgs = {
   profileId: Scalars["ID"]["input"];
+};
+
+export type MutationcreateEditPetitionPermissionTaskArgs = {
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateEventSubscriptionArgs = {
@@ -1492,6 +1541,13 @@ export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
   data: Scalars["JSONObject"]["input"];
   path?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateRemovePetitionPermissionTaskArgs = {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateSignaturitIntegrationArgs = {
@@ -3608,6 +3664,16 @@ export type PetitionSharedWithFilterLine = {
   value: Scalars["ID"]["input"];
 };
 
+export type PetitionSharingInfo = {
+  /** The effective permissions on the petition */
+  firstPetitionEffectivePermissions: Array<EffectivePetitionUserPermission>;
+  firstPetitionPermissions: Array<PetitionPermission>;
+  ownedCount: Scalars["Int"]["output"];
+  ownedOrWriteIds: Array<Scalars["GID"]["output"]>;
+  readPetitions: Array<PetitionBase>;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
@@ -4580,6 +4646,7 @@ export type Query = {
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
   profileType: ProfileType;
@@ -4764,6 +4831,11 @@ export type QuerypetitionsArgs = {
 };
 
 export type QuerypetitionsByIdArgs = {
+  folders?: InputMaybe<FoldersInput>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
+export type QuerypetitionsSharingInfoArgs = {
   folders?: InputMaybe<FoldersInput>;
   ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
@@ -5247,6 +5319,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"
@@ -7749,81 +7822,109 @@ export type SharePetition_usersByEmailQuery = {
   me: { organization: { usersByEmail: { items: Array<{ id: string; email: string }> } } };
 };
 
-export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
+export type SharePetition_createAddPetitionPermissionTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
-export type SharePetition_addPetitionPermissionMutation = {
-  addPetitionPermission: Array<
-    | {
-        permissions: Array<
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              group: { id: string; name: string };
-            }
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              user: {
-                id: string;
-                email: string;
-                fullName: string | null;
-                firstName: string | null;
-                lastName: string | null;
-              };
-            }
-        >;
-      }
-    | {
-        permissions: Array<
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              group: { id: string; name: string };
-            }
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              user: {
-                id: string;
-                email: string;
-                fullName: string | null;
-                firstName: string | null;
-                lastName: string | null;
-              };
-            }
-        >;
-      }
-  >;
+export type SharePetition_createAddPetitionPermissionTaskMutation = {
+  createAddPetitionPermissionTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
 };
 
-export type StopSharing_removePetitionPermissionMutationVariables = Exact<{
+export type SharePetition_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type SharePetition_petitionQuery = {
+  petition:
+    | {
+        permissions: Array<
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              group: { id: string; name: string };
+            }
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              user: {
+                id: string;
+                email: string;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+              };
+            }
+        >;
+      }
+    | {
+        permissions: Array<
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              group: { id: string; name: string };
+            }
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              user: {
+                id: string;
+                email: string;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+              };
+            }
+        >;
+      }
+    | null;
+};
+
+export type StopSharing_createRemovePetitionPermissionTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
 
-export type StopSharing_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string } | { id: string } | null>;
+export type StopSharing_createRemovePetitionPermissionTaskMutation = {
+  createRemovePetitionPermissionTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
 };
 
-export type RemoveUserPermission_removePetitionPermissionMutationVariables = Exact<{
+export type RemoveUserPermission_createRemovePetitionPermissionTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   userId: Scalars["GID"]["input"];
 }>;
 
-export type RemoveUserPermission_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string } | { id: string } | null>;
+export type RemoveUserPermission_createRemovePetitionPermissionTaskMutation = {
+  createRemovePetitionPermissionTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
 };
 
-export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables = Exact<{
+export type RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   userGroupId: Scalars["GID"]["input"];
 }>;
 
-export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string } | { id: string } | null>;
+export type RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutation = {
+  createRemovePetitionPermissionTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
 };
 
 export type TransferPetition_searchUserByEmailQueryVariables = Exact<{
@@ -10931,60 +11032,74 @@ export const SharePetition_usersByEmailDocument = gql`
   SharePetition_usersByEmailQuery,
   SharePetition_usersByEmailQueryVariables
 >;
-export const SharePetition_addPetitionPermissionDocument = gql`
-  mutation SharePetition_addPetitionPermission(
+export const SharePetition_createAddPetitionPermissionTaskDocument = gql`
+  mutation SharePetition_createAddPetitionPermissionTask(
     $petitionId: GID!
     $userIds: [GID!]
     $userGroupIds: [GID!]
   ) {
-    addPetitionPermission(
+    createAddPetitionPermissionTask(
       petitionIds: [$petitionId]
       userIds: $userIds
       userGroupIds: $userGroupIds
       permissionType: WRITE
     ) {
+      ...Task
+    }
+  }
+  ${TaskFragmentDoc}
+` as unknown as DocumentNode<
+  SharePetition_createAddPetitionPermissionTaskMutation,
+  SharePetition_createAddPetitionPermissionTaskMutationVariables
+>;
+export const SharePetition_petitionDocument = gql`
+  query SharePetition_petition($id: GID!) {
+    petition(id: $id) {
       permissions {
         ...Permission
       }
     }
   }
   ${PermissionFragmentDoc}
-` as unknown as DocumentNode<
-  SharePetition_addPetitionPermissionMutation,
-  SharePetition_addPetitionPermissionMutationVariables
->;
-export const StopSharing_removePetitionPermissionDocument = gql`
-  mutation StopSharing_removePetitionPermission($petitionId: GID!) {
-    removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
-      id
+` as unknown as DocumentNode<SharePetition_petitionQuery, SharePetition_petitionQueryVariables>;
+export const StopSharing_createRemovePetitionPermissionTaskDocument = gql`
+  mutation StopSharing_createRemovePetitionPermissionTask($petitionId: GID!) {
+    createRemovePetitionPermissionTask(petitionIds: [$petitionId], removeAll: true) {
+      ...Task
     }
   }
+  ${TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  StopSharing_removePetitionPermissionMutation,
-  StopSharing_removePetitionPermissionMutationVariables
+  StopSharing_createRemovePetitionPermissionTaskMutation,
+  StopSharing_createRemovePetitionPermissionTaskMutationVariables
 >;
-export const RemoveUserPermission_removePetitionPermissionDocument = gql`
-  mutation RemoveUserPermission_removePetitionPermission($petitionId: GID!, $userId: GID!) {
-    removePetitionPermission(petitionIds: [$petitionId], userIds: [$userId]) {
-      id
+export const RemoveUserPermission_createRemovePetitionPermissionTaskDocument = gql`
+  mutation RemoveUserPermission_createRemovePetitionPermissionTask(
+    $petitionId: GID!
+    $userId: GID!
+  ) {
+    createRemovePetitionPermissionTask(petitionIds: [$petitionId], userIds: [$userId]) {
+      ...Task
     }
   }
+  ${TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  RemoveUserPermission_removePetitionPermissionMutation,
-  RemoveUserPermission_removePetitionPermissionMutationVariables
+  RemoveUserPermission_createRemovePetitionPermissionTaskMutation,
+  RemoveUserPermission_createRemovePetitionPermissionTaskMutationVariables
 >;
-export const RemoveUserGroupPermission_removePetitionPermissionDocument = gql`
-  mutation RemoveUserGroupPermission_removePetitionPermission(
+export const RemoveUserGroupPermission_createRemovePetitionPermissionTaskDocument = gql`
+  mutation RemoveUserGroupPermission_createRemovePetitionPermissionTask(
     $petitionId: GID!
     $userGroupId: GID!
   ) {
-    removePetitionPermission(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
-      id
+    createRemovePetitionPermissionTask(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
+      ...Task
     }
   }
+  ${TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  RemoveUserGroupPermission_removePetitionPermissionMutation,
-  RemoveUserGroupPermission_removePetitionPermissionMutationVariables
+  RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutation,
+  RemoveUserGroupPermission_createRemovePetitionPermissionTaskMutationVariables
 >;
 export const TransferPetition_searchUserByEmailDocument = gql`
   query TransferPetition_searchUserByEmail($search: String) {

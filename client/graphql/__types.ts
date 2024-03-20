@@ -801,7 +801,10 @@ export interface Mutation {
   __typename?: "Mutation";
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
-  /** Adds permissions on given parallel and users */
+  /**
+   * Adds permissions on given parallel and users
+   * @deprecated Use createAddPetitionPermissionTask instead
+   */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
@@ -841,6 +844,14 @@ export interface Mutation {
    */
   completePetition: Petition;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  /**
+   *
+   *     Adds permissions to users and groups on given petitions and folders.
+   *     If the total amount of permission to add exceeds 100, a task will be created for async completion.
+   *     If user does not have OWNER or WRITE access on some of the provided petitions, those will be ignored.
+   *
+   */
+  createAddPetitionPermissionTask: Task;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -857,6 +868,13 @@ export interface Mutation {
   createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
+  /**
+   *
+   *     Edits permissions to users and groups on given petitions.
+   *     If the total amount of permissions to edit exceeds 100, a task will be created for async completion.
+   *
+   */
+  createEditPetitionPermissionTask: Task;
   /**
    * Creates an event subscription for the user's petitions
    * @deprecated Use createPetitionEventSubscription
@@ -910,6 +928,13 @@ export interface Mutation {
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
   createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
+  /**
+   *
+   *       Removes permissions to users and groups on given petitions.
+   *       If the total amount of permission to add exceeds 100, a task will be created for async completion.
+   *
+   */
+  createRemovePetitionPermissionTask: Task;
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -972,7 +997,10 @@ export interface Mutation {
   disassociateProfileFromPetition: Success;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
-  /** Edits permissions on given parallel and users */
+  /**
+   * Edits permissions on given parallel and users
+   * @deprecated Use createEditPetitionPermissionTask instead
+   */
   editPetitionPermission: Array<PetitionBase>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
@@ -1060,7 +1088,10 @@ export interface Mutation {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes the password on a petition or template */
   removePetitionPassword: SupportMethodResponse;
-  /** Removes permissions on given parallel and users */
+  /**
+   * Removes permissions on given parallel and users
+   * @deprecated Use createRemovePetitionPermissionTask instead
+   */
   removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
@@ -1347,6 +1378,17 @@ export interface MutationcopyFileReplyToProfileFieldFileArgs {
   profileTypeFieldId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreateAddPetitionPermissionTaskArgs {
+  folders?: InputMaybe<FoldersInput>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+}
+
 export interface MutationcreateAzureOpenAiIntegrationArgs {
   apiKey: Scalars["String"]["input"];
   endpoint: Scalars["String"]["input"];
@@ -1383,6 +1425,13 @@ export interface MutationcreateDowJonesKycReplyArgs {
 
 export interface MutationcreateDowJonesProfileDownloadTaskArgs {
   profileId: Scalars["ID"]["input"];
+}
+
+export interface MutationcreateEditPetitionPermissionTaskArgs {
+  permissionType: PetitionPermissionTypeRW;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
 
 export interface MutationcreateEventSubscriptionArgs {
@@ -1551,6 +1600,13 @@ export interface MutationcreatePublicPetitionLinkPrefillDataArgs {
   data: Scalars["JSONObject"]["input"];
   path?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
+}
+
+export interface MutationcreateRemovePetitionPermissionTaskArgs {
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
 
 export interface MutationcreateSignaturitIntegrationArgs {
@@ -3727,6 +3783,17 @@ export interface PetitionSharedWithFilterLine {
   value: Scalars["ID"]["input"];
 }
 
+export interface PetitionSharingInfo {
+  __typename?: "PetitionSharingInfo";
+  /** The effective permissions on the petition */
+  firstPetitionEffectivePermissions: Array<EffectivePetitionUserPermission>;
+  firstPetitionPermissions: Array<PetitionPermission>;
+  ownedCount: Scalars["Int"]["output"];
+  ownedOrWriteIds: Array<Scalars["GID"]["output"]>;
+  readPetitions: Array<PetitionBase>;
+  totalCount: Scalars["Int"]["output"];
+}
+
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
@@ -4755,6 +4822,7 @@ export interface Query {
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  petitionsSharingInfo: PetitionSharingInfo;
   profile: Profile;
   profileEvents: Array<ProfileEvent>;
   profileType: ProfileType;
@@ -4939,6 +5007,11 @@ export interface QuerypetitionsArgs {
 }
 
 export interface QuerypetitionsByIdArgs {
+  folders?: InputMaybe<FoldersInput>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+}
+
+export interface QuerypetitionsSharingInfoArgs {
   folders?: InputMaybe<FoldersInput>;
   ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
@@ -5447,6 +5520,7 @@ export type TaskName =
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
+  | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
   | "TEMPLATES_OVERVIEW_REPORT"
@@ -11259,134 +11333,6 @@ export type ImportRepliesDialog_createPetitionFieldRepliesMutation = {
   }>;
 };
 
-export type PetitionSharingModal_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  id: string;
-  name?: string | null;
-  path: string;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          name: string;
-          initials: string;
-          memberCount: number;
-          imMember: boolean;
-          localizableName: { [locale in UserLocale]?: string };
-          type: UserGroupType;
-        };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        isSubscribed: boolean;
-        user: {
-          __typename?: "User";
-          id: string;
-          email: string;
-          fullName?: string | null;
-          avatarUrl?: string | null;
-          initials?: string | null;
-          status: UserStatus;
-        };
-      }
-  >;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-    isSubscribed: boolean;
-  } | null;
-  effectivePermissions: Array<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-    user: { __typename?: "User"; id: string };
-  }>;
-};
-
-export type PetitionSharingModal_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-  name?: string | null;
-  path: string;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          name: string;
-          initials: string;
-          memberCount: number;
-          imMember: boolean;
-          localizableName: { [locale in UserLocale]?: string };
-          type: UserGroupType;
-        };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        isSubscribed: boolean;
-        user: {
-          __typename?: "User";
-          id: string;
-          email: string;
-          fullName?: string | null;
-          avatarUrl?: string | null;
-          initials?: string | null;
-          status: UserStatus;
-        };
-      }
-  >;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-    isSubscribed: boolean;
-  } | null;
-  effectivePermissions: Array<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-    user: { __typename?: "User"; id: string };
-  }>;
-};
-
-export type PetitionSharingModal_PetitionBaseFragment =
-  | PetitionSharingModal_PetitionBase_Petition_Fragment
-  | PetitionSharingModal_PetitionBase_PetitionTemplate_Fragment;
-
-export type PetitionSharingModal_PetitionUserPermissionFragment = {
-  __typename?: "PetitionUserPermission";
-  permissionType: PetitionPermissionType;
-  isSubscribed: boolean;
-  user: {
-    __typename?: "User";
-    id: string;
-    email: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
-    status: UserStatus;
-  };
-};
-
-export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
-  __typename?: "PetitionUserGroupPermission";
-  permissionType: PetitionPermissionType;
-  group: {
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    initials: string;
-    memberCount: number;
-    imMember: boolean;
-    localizableName: { [locale in UserLocale]?: string };
-    type: UserGroupType;
-  };
-};
-
 export type PetitionSharingModal_UserFragment = {
   __typename?: "User";
   id: string;
@@ -11408,321 +11354,6 @@ export type PetitionSharingModal_UserGroupFragment = {
   type: UserGroupType;
 };
 
-export type PetitionSharingModal_addPetitionPermissionMutationVariables = Exact<{
-  petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  permissionType: PetitionPermissionTypeRW;
-  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
-  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-}>;
-
-export type PetitionSharingModal_addPetitionPermissionMutation = {
-  addPetitionPermission: Array<
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-  >;
-};
-
-export type PetitionSharingModal_removePetitionPermissionMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-}>;
-
-export type PetitionSharingModal_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-    | null
-  >;
-};
-
-export type PetitionSharingModal_editPetitionPermissionMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  permissionType: PetitionPermissionType;
-}>;
-
-export type PetitionSharingModal_editPetitionPermissionMutation = {
-  editPetitionPermission: Array<
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-  >;
-};
-
 export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   userId: Scalars["GID"]["input"];
@@ -11730,202 +11361,63 @@ export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Ex
 
 export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   transferPetitionOwnership: Array<
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
+    { __typename?: "Petition"; id: string } | { __typename?: "PetitionTemplate"; id: string }
   >;
 };
 
-export type PetitionSharingModal_petitionsQueryVariables = Exact<{
+export type PetitionSharingModal_petitionsSharingInfoQueryVariables = Exact<{
   petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   folders?: InputMaybe<FoldersInput>;
 }>;
 
-export type PetitionSharingModal_petitionsQuery = {
-  petitionsById: Array<
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
+export type PetitionSharingModal_petitionsSharingInfoQuery = {
+  petitionsSharingInfo: {
+    __typename?: "PetitionSharingInfo";
+    totalCount: number;
+    ownedCount: number;
+    ownedOrWriteIds: Array<string>;
+    readPetitions: Array<
+      | { __typename?: "Petition"; id: string; name?: string | null; path: string }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null; path: string }
+    >;
+    firstPetitionPermissions: Array<
+      | {
+          __typename?: "PetitionUserGroupPermission";
+          permissionType: PetitionPermissionType;
+          group: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            initials: string;
+            memberCount: number;
+            imMember: boolean;
+            localizableName: { [locale in UserLocale]?: string };
+            type: UserGroupType;
+          };
+          petition: { __typename?: "Petition"; id: string };
+        }
+      | {
+          __typename?: "PetitionUserPermission";
           permissionType: PetitionPermissionType;
           isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: string | null;
-        path: string;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                name: string;
-                initials: string;
-                memberCount: number;
-                imMember: boolean;
-                localizableName: { [locale in UserLocale]?: string };
-                type: UserGroupType;
-              };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              isSubscribed: boolean;
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-                status: UserStatus;
-              };
-            }
-        >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-      }
-    | null
-  >;
+          user: {
+            __typename?: "User";
+            id: string;
+            email: string;
+            fullName?: string | null;
+            avatarUrl?: string | null;
+            initials?: string | null;
+            status: UserStatus;
+          };
+          petition: { __typename?: "Petition"; id: string };
+        }
+    >;
+    firstPetitionEffectivePermissions: Array<{
+      __typename?: "EffectivePetitionUserPermission";
+      isSubscribed: boolean;
+      user: { __typename?: "User"; id: string };
+    }>;
+  };
 };
 
 export type PublicLinkSettingsDialog_getSlugQueryVariables = Exact<{
@@ -12648,125 +12140,6 @@ export type useSendPetitionHandler_sendPetitionMutation = {
     result: Result;
     petition?: { __typename?: "Petition"; id: string; status: PetitionStatus } | null;
   }>;
-};
-
-export type useSendPetitionHandler_addPetitionPermissionMutationVariables = Exact<{
-  petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
-  permissionType: PetitionPermissionTypeRW;
-  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
-  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-}>;
-
-export type useSendPetitionHandler_addPetitionPermissionMutation = {
-  addPetitionPermission: Array<
-    | {
-        __typename?: "Petition";
-        id: string;
-        emailSubject?: string | null;
-        emailBody?: any | null;
-        isInteractionWithRecipientsEnabled: boolean;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          isContactless: boolean;
-          recipientUrl?: string | null;
-          status: PetitionAccessStatus;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            email: string;
-            firstName: string;
-            lastName?: string | null;
-          } | null;
-        }>;
-        signatureConfig?: {
-          __typename?: "SignatureConfig";
-          timezone: string;
-          review: boolean;
-          title?: string | null;
-          allowAdditionalSigners: boolean;
-          minSigners: number;
-          signingMode: SignatureConfigSigningMode;
-          instructions?: string | null;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            environment: SignatureOrgIntegrationEnvironment;
-            name: string;
-          } | null;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            email: string;
-            fullName: string;
-            contactId?: string | null;
-            firstName: string;
-            lastName?: string | null;
-            isPreset: boolean;
-          } | null>;
-        } | null;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        } | null;
-        effectivePermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-        remindersConfig?: {
-          __typename?: "RemindersConfig";
-          offset: number;
-          limit: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        } | null;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          petitionsPeriod?: {
-            __typename?: "OrganizationUsageLimit";
-            id: string;
-            limit: number;
-            used: number;
-          } | null;
-        };
-        defaultOnBehalf?: {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
-        signatureRequests: Array<{
-          __typename?: "PetitionSignatureRequest";
-          signatureConfig: {
-            __typename?: "SignatureConfig";
-            signers: Array<{
-              __typename?: "PetitionSigner";
-              contactId?: string | null;
-              email: string;
-              firstName: string;
-              lastName?: string | null;
-              isPreset: boolean;
-            } | null>;
-          };
-        }>;
-        fields: Array<{
-          __typename?: "PetitionField";
-          type: PetitionFieldType;
-          isInternal: boolean;
-          isReadOnly: boolean;
-          id: string;
-          title?: string | null;
-          alias?: string | null;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        }>;
-      }
-    | { __typename?: "PetitionTemplate" }
-  >;
 };
 
 export type AddFieldPopover_UserFragment = {
@@ -43181,6 +42554,51 @@ export type useExportRepliesTask_getTaskResultFileMutation = {
   getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
 };
 
+export type usePetitionSharingTask_createAddPetitionPermissionTaskMutationVariables = Exact<{
+  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  folders?: InputMaybe<FoldersInput>;
+  permissionType: PetitionPermissionTypeRW;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type usePetitionSharingTask_createAddPetitionPermissionTaskMutation = {
+  createAddPetitionPermissionTask: { __typename?: "Task"; id: string; status: TaskStatus };
+};
+
+export type usePetitionSharingTask_createEditPetitionPermissionTaskMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  permissionType: PetitionPermissionTypeRW;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+}>;
+
+export type usePetitionSharingTask_createEditPetitionPermissionTaskMutation = {
+  createEditPetitionPermissionTask: { __typename?: "Task"; id: string; status: TaskStatus };
+};
+
+export type usePetitionSharingTask_createRemovePetitionPermissionTaskMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type usePetitionSharingTask_createRemovePetitionPermissionTaskMutation = {
+  createRemovePetitionPermissionTask: { __typename?: "Task"; id: string; status: TaskStatus };
+};
+
+export type usePetitionSharingTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type usePetitionSharingTask_taskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus };
+};
+
 export type usePetitionSummaryBackgroundTask_createPetitionSummaryTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -45787,16 +45205,6 @@ export const PetitionSharingModal_UserFragmentDoc = gql`
   ${UserSelect_UserFragmentDoc}
   ${UserReference_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSharingModal_UserFragment, unknown>;
-export const PetitionSharingModal_PetitionUserPermissionFragmentDoc = gql`
-  fragment PetitionSharingModal_PetitionUserPermission on PetitionUserPermission {
-    permissionType
-    user {
-      ...PetitionSharingModal_User
-    }
-    isSubscribed
-  }
-  ${PetitionSharingModal_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionSharingModal_PetitionUserPermissionFragment, unknown>;
 export const PetitionSharingModal_UserGroupFragmentDoc = gql`
   fragment PetitionSharingModal_UserGroup on UserGroup {
     id
@@ -45808,48 +45216,6 @@ export const PetitionSharingModal_UserGroupFragmentDoc = gql`
   }
   ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<PetitionSharingModal_UserGroupFragment, unknown>;
-export const PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc = gql`
-  fragment PetitionSharingModal_PetitionUserGroupPermission on PetitionUserGroupPermission {
-    permissionType
-    group {
-      ...PetitionSharingModal_UserGroup
-    }
-  }
-  ${PetitionSharingModal_UserGroupFragmentDoc}
-` as unknown as DocumentNode<PetitionSharingModal_PetitionUserGroupPermissionFragment, unknown>;
-export const PetitionSharingModal_PetitionBaseFragmentDoc = gql`
-  fragment PetitionSharingModal_PetitionBase on PetitionBase {
-    id
-    name
-    path
-    permissions {
-      ... on PetitionUserPermission {
-        user {
-          id
-        }
-        ...PetitionSharingModal_PetitionUserPermission
-      }
-      ... on PetitionUserGroupPermission {
-        group {
-          id
-        }
-        ...PetitionSharingModal_PetitionUserGroupPermission
-      }
-    }
-    myEffectivePermission {
-      permissionType
-      isSubscribed
-    }
-    effectivePermissions {
-      user {
-        id
-      }
-      isSubscribed
-    }
-  }
-  ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
-  ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
-` as unknown as DocumentNode<PetitionSharingModal_PetitionBaseFragment, unknown>;
 export const TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc = gql`
   fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
     id
@@ -53502,94 +52868,60 @@ export const ImportRepliesDialog_createPetitionFieldRepliesDocument = gql`
   ImportRepliesDialog_createPetitionFieldRepliesMutation,
   ImportRepliesDialog_createPetitionFieldRepliesMutationVariables
 >;
-export const PetitionSharingModal_addPetitionPermissionDocument = gql`
-  mutation PetitionSharingModal_addPetitionPermission(
-    $petitionIds: [GID!]!
-    $userIds: [GID!]
-    $userGroupIds: [GID!]
-    $permissionType: PetitionPermissionTypeRW!
-    $notify: Boolean
-    $subscribe: Boolean
-    $message: String
-  ) {
-    addPetitionPermission(
-      petitionIds: $petitionIds
-      userIds: $userIds
-      userGroupIds: $userGroupIds
-      permissionType: $permissionType
-      notify: $notify
-      subscribe: $subscribe
-      message: $message
-    ) {
-      ...PetitionSharingModal_PetitionBase
-    }
-  }
-  ${PetitionSharingModal_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSharingModal_addPetitionPermissionMutation,
-  PetitionSharingModal_addPetitionPermissionMutationVariables
->;
-export const PetitionSharingModal_removePetitionPermissionDocument = gql`
-  mutation PetitionSharingModal_removePetitionPermission(
-    $petitionId: GID!
-    $userIds: [GID!]
-    $userGroupIds: [GID!]
-  ) {
-    removePetitionPermission(
-      petitionIds: [$petitionId]
-      userIds: $userIds
-      userGroupIds: $userGroupIds
-    ) {
-      ...PetitionSharingModal_PetitionBase
-    }
-  }
-  ${PetitionSharingModal_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSharingModal_removePetitionPermissionMutation,
-  PetitionSharingModal_removePetitionPermissionMutationVariables
->;
-export const PetitionSharingModal_editPetitionPermissionDocument = gql`
-  mutation PetitionSharingModal_editPetitionPermission(
-    $petitionId: GID!
-    $userIds: [GID!]
-    $userGroupIds: [GID!]
-    $permissionType: PetitionPermissionType!
-  ) {
-    editPetitionPermission(
-      petitionIds: [$petitionId]
-      userIds: $userIds
-      userGroupIds: $userGroupIds
-      permissionType: $permissionType
-    ) {
-      ...PetitionSharingModal_PetitionBase
-    }
-  }
-  ${PetitionSharingModal_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSharingModal_editPetitionPermissionMutation,
-  PetitionSharingModal_editPetitionPermissionMutationVariables
->;
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   mutation PetitionSharingModal_transferPetitionOwnership($petitionId: GID!, $userId: GID!) {
     transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
-      ...PetitionSharingModal_PetitionBase
+      id
     }
   }
-  ${PetitionSharingModal_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionSharingModal_transferPetitionOwnershipMutation,
   PetitionSharingModal_transferPetitionOwnershipMutationVariables
 >;
-export const PetitionSharingModal_petitionsDocument = gql`
-  query PetitionSharingModal_petitions($petitionIds: [GID!], $folders: FoldersInput) {
-    petitionsById(ids: $petitionIds, folders: $folders) {
-      ...PetitionSharingModal_PetitionBase
+export const PetitionSharingModal_petitionsSharingInfoDocument = gql`
+  query PetitionSharingModal_petitionsSharingInfo($petitionIds: [GID!], $folders: FoldersInput) {
+    petitionsSharingInfo(ids: $petitionIds, folders: $folders) {
+      totalCount
+      ownedCount
+      ownedOrWriteIds
+      readPetitions {
+        id
+        ...PetitionName_PetitionBase
+      }
+      firstPetitionPermissions {
+        petition {
+          id
+        }
+        ... on PetitionUserPermission {
+          user {
+            id
+            ...PetitionSharingModal_User
+          }
+          permissionType
+          isSubscribed
+        }
+        ... on PetitionUserGroupPermission {
+          group {
+            id
+            ...PetitionSharingModal_UserGroup
+          }
+          permissionType
+        }
+      }
+      firstPetitionEffectivePermissions {
+        user {
+          id
+        }
+        isSubscribed
+      }
     }
   }
-  ${PetitionSharingModal_PetitionBaseFragmentDoc}
+  ${PetitionName_PetitionBaseFragmentDoc}
+  ${PetitionSharingModal_UserFragmentDoc}
+  ${PetitionSharingModal_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<
-  PetitionSharingModal_petitionsQuery,
-  PetitionSharingModal_petitionsQueryVariables
+  PetitionSharingModal_petitionsSharingInfoQuery,
+  PetitionSharingModal_petitionsSharingInfoQueryVariables
 >;
 export const PublicLinkSettingsDialog_getSlugDocument = gql`
   query PublicLinkSettingsDialog_getSlug($petitionName: String) {
@@ -53727,33 +53059,6 @@ export const useSendPetitionHandler_sendPetitionDocument = gql`
 ` as unknown as DocumentNode<
   useSendPetitionHandler_sendPetitionMutation,
   useSendPetitionHandler_sendPetitionMutationVariables
->;
-export const useSendPetitionHandler_addPetitionPermissionDocument = gql`
-  mutation useSendPetitionHandler_addPetitionPermission(
-    $petitionIds: [GID!]!
-    $userIds: [GID!]
-    $userGroupIds: [GID!]
-    $permissionType: PetitionPermissionTypeRW!
-    $notify: Boolean
-    $subscribe: Boolean
-    $message: String
-  ) {
-    addPetitionPermission(
-      petitionIds: $petitionIds
-      userIds: $userIds
-      userGroupIds: $userGroupIds
-      permissionType: $permissionType
-      notify: $notify
-      subscribe: $subscribe
-      message: $message
-    ) {
-      ...useSendPetitionHandler_Petition
-    }
-  }
-  ${useSendPetitionHandler_PetitionFragmentDoc}
-` as unknown as DocumentNode<
-  useSendPetitionHandler_addPetitionPermissionMutation,
-  useSendPetitionHandler_addPetitionPermissionMutationVariables
 >;
 export const PetitionComposeAttachments_reorderPetitionAttachmentsDocument = gql`
   mutation PetitionComposeAttachments_reorderPetitionAttachments(
@@ -58650,6 +57955,88 @@ export const useExportRepliesTask_getTaskResultFileDocument = gql`
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileMutation,
   useExportRepliesTask_getTaskResultFileMutationVariables
+>;
+export const usePetitionSharingTask_createAddPetitionPermissionTaskDocument = gql`
+  mutation usePetitionSharingTask_createAddPetitionPermissionTask(
+    $petitionIds: [GID!]
+    $folders: FoldersInput
+    $permissionType: PetitionPermissionTypeRW!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
+    $subscribe: Boolean
+    $notify: Boolean
+    $message: String
+  ) {
+    createAddPetitionPermissionTask(
+      petitionIds: $petitionIds
+      folders: $folders
+      permissionType: $permissionType
+      userIds: $userIds
+      userGroupIds: $userGroupIds
+      subscribe: $subscribe
+      notify: $notify
+      message: $message
+    ) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  usePetitionSharingTask_createAddPetitionPermissionTaskMutation,
+  usePetitionSharingTask_createAddPetitionPermissionTaskMutationVariables
+>;
+export const usePetitionSharingTask_createEditPetitionPermissionTaskDocument = gql`
+  mutation usePetitionSharingTask_createEditPetitionPermissionTask(
+    $petitionIds: [GID!]!
+    $permissionType: PetitionPermissionTypeRW!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
+  ) {
+    createEditPetitionPermissionTask(
+      petitionIds: $petitionIds
+      permissionType: $permissionType
+      userIds: $userIds
+      userGroupIds: $userGroupIds
+    ) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  usePetitionSharingTask_createEditPetitionPermissionTaskMutation,
+  usePetitionSharingTask_createEditPetitionPermissionTaskMutationVariables
+>;
+export const usePetitionSharingTask_createRemovePetitionPermissionTaskDocument = gql`
+  mutation usePetitionSharingTask_createRemovePetitionPermissionTask(
+    $petitionIds: [GID!]!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
+    $removeAll: Boolean
+  ) {
+    createRemovePetitionPermissionTask(
+      petitionIds: $petitionIds
+      userIds: $userIds
+      userGroupIds: $userGroupIds
+      removeAll: $removeAll
+    ) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  usePetitionSharingTask_createRemovePetitionPermissionTaskMutation,
+  usePetitionSharingTask_createRemovePetitionPermissionTaskMutationVariables
+>;
+export const usePetitionSharingTask_taskDocument = gql`
+  query usePetitionSharingTask_task($id: GID!) {
+    task(id: $id) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  usePetitionSharingTask_taskQuery,
+  usePetitionSharingTask_taskQueryVariables
 >;
 export const usePetitionSummaryBackgroundTask_createPetitionSummaryTaskDocument = gql`
   mutation usePetitionSummaryBackgroundTask_createPetitionSummaryTask($petitionId: GID!) {
