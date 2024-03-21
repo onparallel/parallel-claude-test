@@ -65,7 +65,10 @@ const SCHEMAS = {
         },
       },
       showOptionsWithColors: { type: ["boolean", "null"] },
-      standardList: { type: ["string", "null"] },
+      standardList: {
+        type: ["string", "null"],
+        enum: ["COUNTRIES", null],
+      },
     },
   },
 } as const;

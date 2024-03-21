@@ -147,6 +147,7 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
+        enum: ["COUNTRIES", null],
       },
     },
   },
