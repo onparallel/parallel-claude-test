@@ -177,11 +177,11 @@ export function useShortTextFormatsSelectOptions() {
       return { grouped: [], allFormats: [], loading: true };
     }
     const countries = uniq(formats.filter((f) => isDefined(f.country)).map((f) => f.country!))
-      .map((code) => {
-        const countryName = countryNames.countries![code];
+      .map((countryCode) => {
+        const countryName = countryNames.countries![countryCode];
         return {
-          countryCode: code,
-          countryName: Array.isArray(countryName) ? countryName[0] : countryName,
+          countryCode,
+          countryName,
         };
       })
       .sort((a, b) => a.countryName.localeCompare(b.countryName, intl.locale));

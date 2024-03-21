@@ -126,7 +126,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
       <InputLeftElement pointerEvents="none" color={inputValue ? undefined : "gray.400"}>
         {country ? (
           <Image
-            alt={Array.isArray(countryName) ? countryName[0] : countryName}
+            alt={countryName}
             boxSize={6}
             src={`${
               process.env.NEXT_PUBLIC_ASSETS_URL

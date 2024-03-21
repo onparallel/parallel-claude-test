@@ -18,7 +18,6 @@ import {
   useLoadOpenSanctionsCountryNames,
 } from "@parallel/utils/useLoadOpenSanctionsCountryNames";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
 
 export function BackgroundCheckEntityDetailsPersonBasic({
   hasReply,
@@ -43,8 +42,7 @@ export function BackgroundCheckEntityDetailsPersonBasic({
 
   const { countries } = useLoadOpenSanctionsCountryNames(intl.locale);
   const getCountryName = (code: string) => {
-    const name = countries?.[code] ?? countries?.[code.toUpperCase()];
-    return isDefined(name) ? (Array.isArray(name) ? name[0] : name) : undefined;
+    return countries?.[code] ?? countries?.[code.toUpperCase()];
   };
 
   const {

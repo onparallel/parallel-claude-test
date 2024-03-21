@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "rimraf dist && tsc --project tsconfig.json",
-    "download-countries-i18n": "node dist/download-countries-i18n.js",
+    "download-cldr-data": "node dist/download-cldr-data.js",
     "download-flag-emojis": "node dist/download-flag-emojis.js",
     "download-fonts": "node dist/download-fonts.js",
     "extract-i18n-terms": "node dist/extract-i18n-terms.js",
@@ -52,11 +52,14 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@types/cldr": "^7.1.4",
     "@types/cli-progress": "^3.11.5",
     "@types/node": "^20.11.19",
     "@types/node-fetch": "^2.6.4",
     "@types/rimraf": "^3.0.2",
     "@types/yargs": "^17.0.32",
+    "cldr": "^7.5.0",
+    "country-codes-list": "^1.6.11",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }

@@ -4,9 +4,8 @@ import { useAsyncEffect } from "./useAsyncEffect";
 const PROMISE_CACHE: Record<string, Promise<any> | undefined> = {};
 const DATA_CACHE: Record<string, CountryNameDict | undefined> = {};
 
-type CountryName = string | [name: string, alias: string];
 interface CountryNameDict {
-  [code: string]: CountryName;
+  [code: string]: string;
 }
 
 export function useLoadCountryNames(locale: string) {

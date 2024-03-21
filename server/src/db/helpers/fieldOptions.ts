@@ -1,6 +1,7 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { FromSchema } from "json-schema-to-ts";
+import { join } from "path";
 import { isDefined, pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
@@ -513,14 +514,13 @@ export async function selectOptionsValuesAndLabels(
 ): Promise<{ values: string[]; labels?: Maybe<string[]> }> {
   switch (options.standardList) {
     case "COUNTRIES":
-      const countries = (await import(`./countries/countries_${locale}.json`)).default;
+      const countries = (
+        await import(join(__dirname, `../../../data/countries/countries_${locale}.json`))
+      ).default;
       const countryCodes = Object.keys(countries);
       return {
         values: countryCodes,
-        labels: countryCodes.map((code) => {
-          const label = countries[code];
-          return Array.isArray(label) ? label[0] : label;
-        }),
+        labels: countryCodes.map((code) => countries[code]),
       };
     default:
       return pick(options, ["values", "labels"]);

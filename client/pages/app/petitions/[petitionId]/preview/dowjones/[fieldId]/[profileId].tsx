@@ -4,8 +4,8 @@ import {
   Button,
   Center,
   Flex,
-  Heading,
   HStack,
+  Heading,
   Image,
   Skeleton,
   Spinner,
@@ -23,35 +23,35 @@ import {
   UserIcon,
 } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Table, TableColumn } from "@parallel/components/common/Table";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
 import {
-  DowJonesFieldProfileDetails_createDowJonesKycReplyDocument,
-  DowJonesFieldProfileDetails_deletePetitionFieldReplyDocument,
   DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment,
   DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
   DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment,
   DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment,
+  DowJonesFieldProfileDetails_createDowJonesKycReplyDocument,
+  DowJonesFieldProfileDetails_deletePetitionFieldReplyDocument,
   DowJonesFieldProfileDetails_petitionFieldDocument,
   DowJonesFieldProfileDetails_profileDocument,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { UnwrapPromise } from "@parallel/utils/types";
-import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useDowJonesProfileDownloadTask } from "@parallel/utils/tasks/useDowJonesProfileDownloadTask";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 function DowJonesFieldProfileDetails({
   petitionId,
@@ -363,8 +363,7 @@ function ProfileResultPerson({
 
   const { countries } = useLoadCountryNames(intl.locale);
   const getCountryName = (code: string) => {
-    const name = countries?.[code];
-    return isDefined(name) ? (Array.isArray(name) ? name[0] : name) : undefined;
+    return countries?.[code];
   };
 
   const { placeOfBirth, citizenship, residence, jurisdiction, isDeceased, dateOfBirth } =
@@ -379,7 +378,7 @@ function ProfileResultPerson({
 
   const birthFlag = placeOfBirthCountryCode ? (
     <Image
-      alt={getCountryName(placeOfBirthCountryCode)}
+      alt={countries?.[placeOfBirthCountryCode]}
       boxSize={6}
       src={`${
         process.env.NEXT_PUBLIC_ASSETS_URL

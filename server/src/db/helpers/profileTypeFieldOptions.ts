@@ -2,6 +2,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
+import { join } from "path";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
 import { ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
 
@@ -97,7 +98,7 @@ export async function profileTypeFieldSelectValues(
     const countriesByUserLocale = Object.fromEntries(
       await pMap(UserLocaleValues, async (locale) => [
         locale,
-        (await import(`./countries/countries_${locale}.json`)).default,
+        (await import(join(__dirname, `../../../data/countries/countries_${locale}.json`))).default,
       ]),
     );
 
@@ -109,7 +110,7 @@ export async function profileTypeFieldSelectValues(
         UserLocaleValues.map((locale) => {
           const label =
             countriesByUserLocale[locale][code as keyof (typeof countriesByUserLocale)["en"]];
-          return [locale, Array.isArray(label) ? label[0] : label];
+          return [locale, label];
         }),
       ) as Record<UserLocale, string>,
       isStandard: true,
