@@ -499,12 +499,29 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             t,
           );
         }
-        return await ctx.profiles.updateProfileTypeField(
+        const updatedProfileTypeField = await ctx.profiles.updateProfileTypeField(
           args.profileTypeFieldId,
           updateData,
           `User:${ctx.user!.id}`,
           t,
         );
+
+        // if the profile type field is a SELECT, it is included in profileType name pattern and its options were updated, update all profile names
+        const profileType = await ctx.profiles.loadProfileType.raw(args.profileTypeId, t);
+        if (
+          profileTypeField.type === "SELECT" &&
+          isDefined(updateData.options) &&
+          profileType?.profile_name_pattern.includes(profileTypeField.id)
+        ) {
+          await ctx.profiles.updateProfileTypeProfileNamePattern(
+            profileType.id,
+            profileType.profile_name_pattern,
+            `User:${ctx.user!.id}`,
+            t,
+          );
+        }
+
+        return updatedProfileTypeField;
       });
     } catch (e) {
       if (

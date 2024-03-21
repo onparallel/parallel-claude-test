@@ -208,17 +208,14 @@ describe("GraphQL/Profiles", () => {
             options: {
               values: [
                 {
-                  id: "1",
                   label: { en: "Low", es: "Bajo" },
                   value: "low",
                 },
                 {
-                  id: "2",
                   label: { en: "Medium", es: "Medio" },
                   value: "medium",
                 },
                 {
-                  id: "3",
                   label: { en: "High", es: "Alto" },
                   value: "high",
                 },
@@ -232,7 +229,14 @@ describe("GraphQL/Profiles", () => {
       .from("profile_type")
       .where("id", profileTypes[0].id)
       .update({
-        profile_name_pattern: json([profileType0Fields[0].id, " ", profileType0Fields[1].id]),
+        profile_name_pattern: json([
+          profileType0Fields[0].id,
+          " ",
+          profileType0Fields[1].id,
+          " (",
+          profileType0Fields[6].id,
+          " risk)",
+        ]),
       });
     profileType1Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
@@ -497,17 +501,14 @@ describe("GraphQL/Profiles", () => {
               options: {
                 values: [
                   {
-                    id: "1",
                     label: { en: "Low", es: "Bajo" },
                     value: "low",
                   },
                   {
-                    id: "2",
                     label: { en: "Medium", es: "Medio" },
                     value: "medium",
                   },
                   {
-                    id: "3",
                     label: { en: "High", es: "Alto" },
                     value: "high",
                   },
@@ -515,7 +516,7 @@ describe("GraphQL/Profiles", () => {
                 showOptionsWithColors: true,
               },
               isExpirable: false,
-              isUsedInProfileName: false,
+              isUsedInProfileName: true,
             },
             files: null,
             value: null,
@@ -1513,7 +1514,7 @@ describe("GraphQL/Profiles", () => {
     });
 
     it("updates profile names when changing the profile name pattern", async () => {
-      async function createIndividualProfile(firstName?: string, lastName?: string) {
+      async function createIndividualProfile(firstName?: string, lastName?: string, risk?: string) {
         const { data } = await testClient.execute(
           gql`
             mutation ($profileTypeId: GID!) {
@@ -1545,14 +1546,18 @@ describe("GraphQL/Profiles", () => {
                 profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
                 content: { value: lastName },
               },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+                content: { value: risk },
+              },
             ],
           },
         );
       }
-      await createIndividualProfile("Mickey", "Mouse");
-      await createIndividualProfile("Donald", "Duck");
-      await createIndividualProfile("Trump", "");
-      await createIndividualProfile("", "Obama");
+      await createIndividualProfile("Mickey", "Mouse", "low");
+      await createIndividualProfile("Donald", "Duck", "low");
+      await createIndividualProfile("Trump", "", "high");
+      await createIndividualProfile("", "Obama", "medium");
       await createIndividualProfile();
 
       const { data } = await testClient.execute(
@@ -1577,10 +1582,10 @@ describe("GraphQL/Profiles", () => {
       expect(data.profiles).toEqual({
         totalCount: 5,
         items: [
-          { id: expect.any(String), name: "Trump" },
-          { id: expect.any(String), name: "Obama" },
-          { id: expect.any(String), name: "Mickey Mouse" },
-          { id: expect.any(String), name: "Donald Duck" },
+          { id: expect.any(String), name: "Trump  (High risk)" },
+          { id: expect.any(String), name: "Obama (Medium risk)" },
+          { id: expect.any(String), name: "Mickey Mouse (Low risk)" },
+          { id: expect.any(String), name: "Donald Duck (Low risk)" },
           { id: expect.any(String), name: "" },
         ],
       });
@@ -1871,7 +1876,7 @@ describe("GraphQL/Profiles", () => {
         })),
       });
       expect(data.cloneProfileType.profileNamePattern).toEqual(
-        `{{ ${data.cloneProfileType.fields[0].id} }} {{ ${data.cloneProfileType.fields[1].id} }}`,
+        `{{ ${data.cloneProfileType.fields[0].id} }} {{ ${data.cloneProfileType.fields[1].id} }} ({{ ${data.cloneProfileType.fields[6].id} }} risk)`,
       );
     });
 
@@ -3523,7 +3528,7 @@ describe("GraphQL/Profiles", () => {
           field: {
             id: toGlobalId("ProfileTypeField", f.id),
             isExpirable: f.is_expirable,
-            isUsedInProfileName: i < 2,
+            isUsedInProfileName: i < 2 || i === 6,
           },
           value: null,
         })),
@@ -3539,13 +3544,13 @@ describe("GraphQL/Profiles", () => {
 
       expect(updateProfileFieldInPattern).toEqual({
         id: expect.any(String),
-        name: "John",
+        name: "John  ( risk)",
         status: "OPEN",
         properties: profileType0Fields.map((f, i) => ({
           field: {
             id: toGlobalId("ProfileTypeField", f.id),
             isExpirable: f.is_expirable,
-            isUsedInProfileName: i < 2,
+            isUsedInProfileName: i < 2 || i === 6,
           },
           value:
             f.id === profileType0Fields[0].id
@@ -3559,24 +3564,30 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
           content: { value: "Wick" },
         },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id), // Risk SELECT
+          content: { value: "high" },
+        },
       ]);
 
       expect(updateProfileFieldInPattern2).toEqual({
         id: expect.any(String),
-        name: "John Wick",
+        name: "John Wick (High risk)",
         status: "OPEN",
         properties: profileType0Fields.map((f, i) => ({
           field: {
             id: toGlobalId("ProfileTypeField", f.id),
             isExpirable: f.is_expirable,
-            isUsedInProfileName: i < 2,
+            isUsedInProfileName: i < 2 || i === 6,
           },
           value:
             f.id === profileType0Fields[0].id
               ? { content: { value: "John" }, expiryDate: null }
               : f.id === profileType0Fields[1].id
                 ? { content: { value: "Wick" }, expiryDate: null }
-                : null,
+                : f.id === profileType0Fields[6].id
+                  ? { content: { value: "high" }, expiryDate: null }
+                  : null,
         })),
       });
 
@@ -3588,18 +3599,20 @@ describe("GraphQL/Profiles", () => {
       ]);
       expect(removesOneValue).toEqual({
         id: expect.any(String),
-        name: "John",
+        name: "John  (High risk)",
         status: "OPEN",
         properties: profileType0Fields.map((f, i) => ({
           field: {
             id: toGlobalId("ProfileTypeField", f.id),
             isExpirable: f.is_expirable,
-            isUsedInProfileName: i < 2,
+            isUsedInProfileName: i < 2 || i === 6,
           },
           value:
             f.id === profileType0Fields[0].id
               ? { content: { value: "John" }, expiryDate: null }
-              : null,
+              : f.id === profileType0Fields[6].id
+                ? { content: { value: "high" }, expiryDate: null }
+                : null,
         })),
       });
 
@@ -3608,16 +3621,20 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
           content: null,
         },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          content: null,
+        },
       ]);
       expect(removesAllValuesInNamePattern).toEqual({
         id: expect.any(String),
-        name: "",
+        name: "( risk)",
         status: "OPEN",
         properties: profileType0Fields.map((f, i) => ({
           field: {
             id: toGlobalId("ProfileTypeField", f.id),
             isExpirable: f.is_expirable,
-            isUsedInProfileName: i < 2,
+            isUsedInProfileName: i < 2 || i === 6,
           },
           value: null,
         })),
@@ -3633,7 +3650,7 @@ describe("GraphQL/Profiles", () => {
           field: {
             id: toGlobalId("ProfileTypeField", f.id),
             isExpirable: f.is_expirable,
-            isUsedInProfileName: i < 2,
+            isUsedInProfileName: i < 2 || i === 6,
           },
           value: null,
         })),
@@ -3678,6 +3695,10 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
           content: { value: "Potter" },
         },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          content: { value: "medium" },
+        },
       ]);
 
       const profile2 = await updateProfileValue(profile.id, [
@@ -3690,13 +3711,13 @@ describe("GraphQL/Profiles", () => {
 
       expect(profile2).toEqual({
         id: expect.any(String),
-        name: "Harry Potter",
+        name: "Harry Potter (Medium risk)",
         status: "OPEN",
         properties: profileType0Fields.map((f, i) => ({
           field: {
             id: toGlobalId("ProfileTypeField", f.id),
             isExpirable: f.is_expirable,
-            isUsedInProfileName: i < 2,
+            isUsedInProfileName: i < 2 || i === 6,
           },
           value:
             f.id === profileType0Fields[0].id
@@ -3705,7 +3726,9 @@ describe("GraphQL/Profiles", () => {
                 ? { content: { value: "Potter" }, expiryDate: null }
                 : f.id === profileType0Fields[5].id
                   ? { content: { value: "123456" }, expiryDate: "2030-01-01" }
-                  : null,
+                  : f.id === profileType0Fields[6].id
+                    ? { content: { value: "medium" }, expiryDate: null }
+                    : null,
         })),
       });
     });

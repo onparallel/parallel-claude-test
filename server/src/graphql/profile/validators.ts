@@ -40,7 +40,7 @@ export function validProfileNamePattern<
           (f) =>
             !isDefined(f) ||
             f.profile_type_id !== profileTypeId ||
-            f.type !== "SHORT_TEXT" ||
+            !["SHORT_TEXT", "SELECT"].includes(f.type) ||
             !isAtLeast(f.permission, "READ"),
         )
       ) {

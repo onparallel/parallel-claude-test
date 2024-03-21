@@ -1,13 +1,19 @@
 import { Box } from "@chakra-ui/react";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { UserLocale } from "@parallel/graphql/__types";
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileField_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useMemo } from "react";
 import { Controller } from "react-hook-form";
 import { useIntl } from "react-intl";
-import Select, { OptionProps, SingleValueProps, components } from "react-select";
+import Select, {
+  OptionProps,
+  Props as SelectProps,
+  SingleValueProps,
+  components,
+} from "react-select";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup, ProfileFieldInputGroupProps } from "./ProfileFieldInputGroup";
 
@@ -29,27 +35,6 @@ export function ProfileFieldSelect({
   control,
   ...props
 }: ProfileFieldSelectProps) {
-  const intl = useIntl();
-
-  const { values, showOptionsWithColors } = field.options as ProfileTypeFieldOptions["SELECT"];
-
-  const reactSelectProps = useReactSelectProps({
-    components: {
-      SingleValue,
-      Option,
-    },
-  });
-
-  const extensions = {
-    showOptionsWithColors,
-  };
-
-  const getOptionLabel = (option: SelectOptionValue) => {
-    return option.label[intl.locale as UserLocale] ?? "";
-  };
-
-  const getOptionValue = (option: SelectOptionValue) => option.value;
-
   return (
     <ProfileFieldInputGroup
       {...props}
@@ -63,22 +48,11 @@ export function ProfileFieldSelect({
           control={control}
           render={({ field: { value, onChange, onBlur } }) => {
             return (
-              <Select
-                options={values}
-                getOptionLabel={getOptionLabel}
-                getOptionValue={getOptionValue}
-                isClearable
-                isMulti={false}
-                value={values?.find((v) => v.value === value) ?? null}
-                onChange={(value) => {
-                  const { value: _value = null } = (value as SelectOptionValue) ?? {};
-                  onChange(_value);
-                }}
+              <ProfileFieldSelectInner
+                field={field}
+                value={value}
+                onChange={onChange}
                 onBlur={onBlur}
-                placeholder={intl.formatMessage({
-                  id: "component.profile-field-select.placeholder",
-                  defaultMessage: "Select an option",
-                })}
                 styles={{
                   control: (baseStyles) => ({
                     ...baseStyles,
@@ -99,8 +73,6 @@ export function ProfileFieldSelect({
                     opacity: 0,
                   }),
                 }}
-                {...reactSelectProps}
-                {...(extensions as any)}
               />
             );
           }}
@@ -110,19 +82,80 @@ export function ProfileFieldSelect({
   );
 }
 
+interface ProfileFieldSelectInnerProps
+  extends UseReactSelectProps<SelectOptionValue, false, never>,
+    Omit<SelectProps<SelectOptionValue, false, never>, "value" | "onChange">,
+    ValueProps<string> {
+  field: ProfileField_ProfileTypeFieldFragment;
+}
+
+export function ProfileFieldSelectInner({
+  field,
+  value,
+  onChange,
+  ...props
+}: ProfileFieldSelectInnerProps) {
+  const intl = useIntl();
+
+  const { values, showOptionsWithColors } = field.options as ProfileTypeFieldOptions["SELECT"];
+
+  const rsProps = useReactSelectProps({
+    ...props,
+    components: {
+      SingleValue,
+      Option,
+      ...props.components,
+    },
+  });
+
+  const _value = useMemo(() => {
+    return values?.find((v) => v.value === value) ?? null;
+  }, [props.options, props.isMulti, value]);
+
+  const extensions = {
+    showOptionsWithColors,
+  };
+
+  const getOptionLabel = (option: SelectOptionValue) => {
+    return localizableUserTextRender({ intl, value: option.label, default: "" });
+  };
+
+  const getOptionValue = (option: SelectOptionValue) => option.value;
+
+  return (
+    <Select<SelectOptionValue, false, never>
+      value={_value}
+      options={values}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      isClearable
+      isMulti={false}
+      onChange={(x) => onChange(x ? x.value : null)}
+      placeholder={intl.formatMessage({
+        id: "component.profile-field-select.placeholder",
+        defaultMessage: "Select an option",
+      })}
+      {...props}
+      {...rsProps}
+      {...(extensions as any)}
+    />
+  );
+}
+
 interface ReactSelectExtraProps {
   showOptionsWithColors?: boolean;
 }
 
-function SingleValue(
-  props: SingleValueProps<SelectOptionValue> & { selectProps: ReactSelectExtraProps },
-) {
+function SingleValue({
+  children,
+  ...props
+}: SingleValueProps<SelectOptionValue, false, never> & { selectProps: ReactSelectExtraProps }) {
   return (
     <components.SingleValue {...props}>
       <ProfileFieldSelectOptionItem
         color={props.selectProps.showOptionsWithColors ? props.data.color : undefined}
       >
-        <LocalizableUserTextRender value={props.data.label} default={<></>} />
+        {children}
       </ProfileFieldSelectOptionItem>
     </components.SingleValue>
   );
@@ -131,13 +164,13 @@ function SingleValue(
 function Option({
   children,
   ...props
-}: OptionProps<SelectOptionValue> & { selectProps: ReactSelectExtraProps }) {
+}: OptionProps<SelectOptionValue, false, never> & { selectProps: ReactSelectExtraProps }) {
   return (
     <components.Option {...props}>
       <ProfileFieldSelectOptionItem
         color={props.selectProps.showOptionsWithColors ? props.data.color : undefined}
       >
-        <LocalizableUserTextRender value={props.data.label} default={<></>} />
+        {children}
       </ProfileFieldSelectOptionItem>
     </components.Option>
   );
@@ -146,7 +179,7 @@ function Option({
 export function ProfileFieldSelectOptionItem({
   color,
   children,
-}: PropsWithChildren<{ color: string | undefined }>) {
+}: PropsWithChildren<{ color?: string | undefined }>) {
   return (
     <>
       {color ? (

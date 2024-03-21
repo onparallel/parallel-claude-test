@@ -1,6 +1,7 @@
 import { addSeconds, differenceInSeconds } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import pMap from "p-map";
 import {
   groupBy,
   indexBy,
@@ -50,6 +51,7 @@ import {
   ProfileUpdatedEvent,
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
+import { profileTypeFieldSelectValues } from "../helpers/profileTypeFieldOptions";
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
@@ -675,31 +677,48 @@ export class ProfileRepository extends BaseRepository {
     return count;
   }
 
-  async updateProfileTypeProfileNamePattern(
-    profileTypeId: number,
-    pattern: (string | number)[],
+  async updateProfileNamesWithPattern(
+    pattern: (number | string)[],
+    profileValues: {
+      profileId: number;
+      values: {
+        [profileTypeFieldId: number]: string | null;
+      };
+    }[],
     updatedBy: string,
     t?: Knex.Transaction,
   ) {
-    return await this.withTransaction(async (t) => {
-      await this.raw(
-        /* sql */ `
-        with profile_values as (
-          select 
-            p.id,
-            jsonb_object_agg(
-              coalesce(pfv.profile_type_field_id, 0), 
-              pfv.content->>'value'
-            ) as values
-          from "profile" p
-          left join profile_field_value pfv
-            on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
-            and pfv.deleted_at is null and pfv.removed_at is null
-          where
-            p.profile_type_id = ?
-            and p.deleted_at is null 
-          group by p.id
-        ) update "profile" p set
+    const profileTypeFieldIds = pattern.filter((p) => typeof p === "number") as number[];
+    const profileTypeFields = await this.loadProfileTypeField.raw(profileTypeFieldIds, t);
+    const selectPatternFields = await pMap(
+      profileTypeFields.filter((f) => f?.type === "SELECT"),
+      async (field) => {
+        return {
+          ...field,
+          options: {
+            values: await profileTypeFieldSelectValues(field!.options),
+          },
+        };
+      },
+      { concurrency: 10 },
+    );
+
+    // on SELECT properties, we need to replace the value with the label.
+    // for now, we will always use label in english
+
+    const hydratedProfileValues = profileValues.map((pv) => ({
+      profileId: pv.profileId,
+      values: JSON.parse(JSON.stringify(pv.values), (key, value) => {
+        const profileTypeFieldId = parseInt(key);
+        const selectField = selectPatternFields.find((f) => f?.id === profileTypeFieldId);
+        const selectValue = selectField?.options.values.find((v) => v.value === value);
+        return selectValue?.label["en"] ?? selectValue?.label["es"] ?? value;
+      }),
+    }));
+
+    return await this.raw<Profile>(
+      /* sql */ `
+        update "profile" p set
           "name" = substring(
             trim(both from concat(${times(pattern.length, () => "?::text").join(",")})),
             1,
@@ -707,19 +726,61 @@ export class ProfileRepository extends BaseRepository {
           ),
           updated_by = ?,
           updated_at = NOW()
-        from profile_values pv
-        where pv.id = p.id
+        from (?) as pv(profileId, values)
+        where pv.profileId = p.id
+        returning p.*;
       `,
-        [
-          this.sqlIn(pattern.filter((p) => typeof p === "number")),
-          profileTypeId,
-          ...pattern.map((p) =>
-            typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
-          ),
-          updatedBy,
-        ],
+      [
+        ...pattern.map((p) =>
+          typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
+        ),
+        updatedBy,
+        this.sqlValues(
+          hydratedProfileValues.map((pv) => [pv.profileId, pv.values]),
+          ["int", "jsonb"],
+        ),
+      ],
+      t,
+    );
+  }
+
+  async updateProfileTypeProfileNamePattern(
+    profileTypeId: number,
+    pattern: (string | number)[],
+    updatedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    return await this.withTransaction(async (t) => {
+      const profileValues = await this.raw<{
+        profileId: number;
+        values: {
+          [profileTypeFieldId: number]: string | null;
+        };
+      }>(
+        /* sql */ `
+        select 
+          p.id "profileId",
+          jsonb_object_agg(
+            coalesce(pfv.profile_type_field_id, 0), 
+            pfv.content->>'value'
+          ) as values
+        from "profile" p
+        left join profile_field_value pfv
+          on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
+          and pfv.deleted_at is null and pfv.removed_at is null
+        where
+          p.profile_type_id = ?
+          and p.deleted_at is null 
+          group by p.id;
+      `,
+        [this.sqlIn(pattern.filter((p) => typeof p === "number")), profileTypeId],
         t,
       );
+
+      if (profileValues.length > 0) {
+        await this.updateProfileNamesWithPattern(pattern, profileValues, updatedBy, t);
+      }
+
       return await this.updateProfileType(
         profileTypeId,
         { profile_name_pattern: this.json(pattern) },
@@ -819,45 +880,39 @@ export class ProfileRepository extends BaseRepository {
 
       const pattern = profileType.profile_name_pattern as (string | number)[];
       if (fields.some((f) => pattern.includes(f.profileTypeFieldId))) {
-        const [profile] = await this.raw<Profile>(
+        const profileValues = await this.raw<{
+          profileId: number;
+          values: {
+            [profileTypeFieldId: number]: string | null;
+          };
+        }>(
           /* sql */ `
-          with profile_values as (
-            select
-              p.id,
-              jsonb_object_agg(
-                coalesce(pfv.profile_type_field_id, 0),
-                pfv.content->>'value'
-              ) as values
-            from "profile" p
-            left join profile_field_value pfv
-              on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
-              and pfv.removed_at is null and pfv.deleted_at is null
-            where
-              p.id = ?
-              and p.deleted_at is null
-            group by p.id
-          ) update "profile" p set
-            "name" = substring(
-              trim(both from concat(${times(pattern.length, () => "?::text").join(",")})),
-              1,
-              255
-            ),
-            updated_by = ?,
-            updated_at = NOW()
-          from profile_values pv
-          where pv.id = p.id
-          returning p.*
+          select 
+            p.id "profileId",
+            jsonb_object_agg(
+              coalesce(pfv.profile_type_field_id, 0), 
+              pfv.content->>'value'
+            ) as values
+          from "profile" p
+          left join profile_field_value pfv
+            on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
+            and pfv.removed_at is null and pfv.deleted_at is null
+          where
+            p.id = ?
+            and p.deleted_at is null 
+            group by p.id;
         `,
-          [
-            this.sqlIn(pattern.filter((p) => typeof p === "number")),
-            profileId,
-            ...pattern.map((p) =>
-              typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
-            ),
-            `User:${userId}`,
-          ],
+          [this.sqlIn(pattern.filter((p) => typeof p === "number")), profileId],
           t,
         );
+
+        const [profile] = await this.updateProfileNamesWithPattern(
+          pattern,
+          profileValues,
+          `User:${userId}`,
+          t,
+        );
+
         return { profile, previousValues, currentValues };
       } else {
         return { profile: await this.loadProfile.raw(profileId, t), previousValues, currentValues };

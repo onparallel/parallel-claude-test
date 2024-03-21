@@ -1,9 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   UpdateProfileFieldValueInput,
   useCreateProfileDialog_profileTypeDocument,
@@ -13,6 +13,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { SelectInstance } from "react-select";
 import { isDefined } from "remeda";
+import { ProfileFieldSelectInner } from "../fields/ProfileFieldSelect";
 
 interface CreateProfileDialogResult {
   profileTypeId: string;
@@ -130,18 +131,34 @@ function CreateProfileDialog({
           </FormControl>
           {profileTypeData?.profileType?.fields
             .filter((f) => f.isUsedInProfileName)
-            .map(({ id, name, myPermission }) => {
-              const index = fields.findIndex((f) => f.profileTypeFieldId === id)!;
-
+            .map((field) => {
+              const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
               return (
-                <FormControl key={id}>
+                <FormControl key={field.id}>
                   <FormLabel fontWeight={400}>
-                    <LocalizableUserTextRender value={name} default="" />
+                    <LocalizableUserTextRender value={field.name} default="" />
                   </FormLabel>
-                  <Input
-                    {...register(`fieldValues.${index}.content.value`)}
-                    isDisabled={myPermission !== "WRITE"}
-                  />
+                  {field.type === "SHORT_TEXT" ? (
+                    <Input
+                      {...register(`fieldValues.${index}.content.value`)}
+                      isDisabled={field.myPermission !== "WRITE"}
+                    />
+                  ) : (
+                    <Controller
+                      name={`fieldValues.${index}.content.value`}
+                      control={control}
+                      render={({ field: { value, onChange, onBlur } }) => {
+                        return (
+                          <ProfileFieldSelectInner
+                            field={field}
+                            value={value}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                          />
+                        );
+                      }}
+                    />
+                  )}
                 </FormControl>
               );
             })}
@@ -173,6 +190,8 @@ const _fragments = {
           name
           isUsedInProfileName
           myPermission
+          options
+          isExpirable
         }
       }
     `;

@@ -20321,6 +20321,8 @@ export type useCreateProfileDialog_ProfileTypeFragment = {
     name: { [locale in UserLocale]?: string };
     isUsedInProfileName: boolean;
     myPermission: ProfileTypeFieldPermissionType;
+    options: { [key: string]: any };
+    isExpirable: boolean;
   }>;
 };
 
@@ -20339,6 +20341,8 @@ export type useCreateProfileDialog_ProfileTypePaginationFragment = {
       name: { [locale in UserLocale]?: string };
       isUsedInProfileName: boolean;
       myPermission: ProfileTypeFieldPermissionType;
+      options: { [key: string]: any };
+      isExpirable: boolean;
     }>;
   }>;
 };
@@ -20360,6 +20364,8 @@ export type useCreateProfileDialog_profileTypeQuery = {
       name: { [locale in UserLocale]?: string };
       isUsedInProfileName: boolean;
       myPermission: ProfileTypeFieldPermissionType;
+      options: { [key: string]: any };
+      isExpirable: boolean;
     }>;
   };
 };
@@ -46009,6 +46015,8 @@ export const useCreateProfileDialog_ProfileTypeFragmentDoc = gql`
       name
       isUsedInProfileName
       myPermission
+      options
+      isExpirable
     }
   }
 ` as unknown as DocumentNode<useCreateProfileDialog_ProfileTypeFragment, unknown>;

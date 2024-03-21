@@ -52,13 +52,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
   IsMulti extends boolean = false,
   OptionType extends SimpleOption<T> = SimpleOption<T>,
 >(
-  {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    as,
-    value,
-    onChange,
-    ...props
-  }: SimpleSelectProps<T, IsMulti, OptionType>,
+  { as, value, onChange, ...props }: SimpleSelectProps<T, IsMulti, OptionType>,
   ref: ForwardedRef<SelectInstance<OptionType, IsMulti>>,
 ) {
   const rsProps = useReactSelectProps({
