@@ -5,6 +5,7 @@ import pMap from "p-map";
 import { join } from "path";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../../graphql";
 import { ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../__types";
+import { isDefined } from "remeda";
 
 const SCHEMAS = {
   TEXT: {
@@ -67,7 +68,7 @@ const SCHEMAS = {
       showOptionsWithColors: { type: ["boolean", "null"] },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", null],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", null],
       },
     },
   },
@@ -94,30 +95,76 @@ export function defaultProfileTypeFieldOptions(type: ProfileTypeFieldType) {
   return {};
 }
 
+const EU_COUNTRIES =
+  "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE".split(",");
+
 export async function profileTypeFieldSelectValues(
   options: ProfileTypeFieldOptions["SELECT"],
 ): Promise<ProfileTypeFieldOptions["SELECT"]["values"]> {
-  if (options.standardList === "COUNTRIES") {
-    const countriesByUserLocale = Object.fromEntries(
-      await pMap(UserLocaleValues, async (locale) => [
-        locale,
-        (await import(join(__dirname, `../../../data/countries/countries_${locale}.json`))).default,
-      ]),
-    );
+  if (isDefined(options.standardList)) {
+    switch (options.standardList) {
+      case "COUNTRIES": {
+        const countriesByLocale = Object.fromEntries(
+          await pMap(UserLocaleValues, async (locale) => [
+            locale,
+            (await import(join(__dirname, `../../../data/countries/countries_${locale}.json`)))
+              .default,
+          ]),
+        );
 
-    const countryCodes = Object.keys(countriesByUserLocale["en"]);
+        const countryCodes = Object.keys(countriesByLocale["en"]);
 
-    return countryCodes.map((code) => ({
-      value: code,
-      label: Object.fromEntries(
-        UserLocaleValues.map((locale) => {
-          const label =
-            countriesByUserLocale[locale][code as keyof (typeof countriesByUserLocale)["en"]];
-          return [locale, label];
-        }),
-      ) as Record<UserLocale, string>,
-      isStandard: true,
-    }));
+        return countryCodes.map((code) => ({
+          value: code,
+          label: Object.fromEntries(
+            UserLocaleValues.map((locale) => [locale, countriesByLocale[locale][code]]),
+          ) as Record<UserLocale, string>,
+          isStandard: true,
+        }));
+      }
+      case "EU_COUNTRIES": {
+        const countriesByLocale = Object.fromEntries(
+          await pMap(UserLocaleValues, async (locale) => [
+            locale,
+            (await import(join(__dirname, `../../../data/countries/countries_${locale}.json`)))
+              .default,
+          ]),
+        );
+
+        const countryCodes = Object.keys(countriesByLocale["en"]).filter((c) =>
+          EU_COUNTRIES.includes(c),
+        );
+
+        return countryCodes.map((code) => ({
+          value: code,
+          label: Object.fromEntries(
+            UserLocaleValues.map((locale) => [locale, countriesByLocale[locale][code]]),
+          ) as Record<UserLocale, string>,
+          isStandard: true,
+        }));
+      }
+      case "NON_EU_COUNTRIES": {
+        const countriesByLocale = Object.fromEntries(
+          await pMap(UserLocaleValues, async (locale) => [
+            locale,
+            (await import(join(__dirname, `../../../data/countries/countries_${locale}.json`)))
+              .default,
+          ]),
+        );
+
+        const countryCodes = Object.keys(countriesByLocale["en"]).filter(
+          (c) => !EU_COUNTRIES.includes(c),
+        );
+
+        return countryCodes.map((code) => ({
+          value: code,
+          label: Object.fromEntries(
+            UserLocaleValues.map((locale) => [locale, countriesByLocale[locale][code]]),
+          ) as Record<UserLocale, string>,
+          isStandard: true,
+        }));
+      }
+    }
   }
 
   return options.values;

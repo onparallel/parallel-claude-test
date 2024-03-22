@@ -10,25 +10,37 @@ import {
 
 export type StandardListSelectProps = Omit<SimpleSelectProps<string>, "options">;
 
-export const getStandardListLabel = (value: string, intl: IntlShape) => {
-  const labels = {
-    COUNTRIES: intl.formatMessage({
+const STANDARD_LISTS = {
+  COUNTRIES: (intl) =>
+    intl.formatMessage({
       id: "component.standard-list-select.countries-iso",
       defaultMessage: "List of countries",
     }),
-  } as Record<string, string>;
+  EU_COUNTRIES: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.eu-countries-iso",
+      defaultMessage: "List of EU countries",
+    }),
+  NON_EU_COUNTRIES: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.non-eu-countries-iso",
+      defaultMessage: "List of non-EU countries",
+    }),
+} satisfies Record<string, (intl: IntlShape) => string>;
 
-  return labels[value] || value;
+type StandardListType = keyof typeof STANDARD_LISTS;
+
+export const getStandardListLabel = (value: StandardListType, intl: IntlShape) => {
+  return STANDARD_LISTS[value](intl) || value;
 };
 
 const useStandardListSelectOptions = () => {
   const options = useSimpleSelectOptions(
-    (intl) => [
-      {
-        label: getStandardListLabel("COUNTRIES", intl),
-        value: "COUNTRIES",
-      },
-    ],
+    (intl) =>
+      Object.entries(STANDARD_LISTS).map(([value, label]) => ({
+        value: value as StandardListType,
+        label: label(intl),
+      })),
     [],
   );
   return options;

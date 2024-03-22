@@ -8715,9 +8715,19 @@
     "context": "List of countries"
   },
   {
+    "term": "component.standard-list-select.eu-countries-iso",
+    "definition": "List of EU countries",
+    "context": "List of EU countries"
+  },
+  {
     "term": "component.standard-list-select.no-list",
     "definition": "No list",
     "context": "No list"
+  },
+  {
+    "term": "component.standard-list-select.non-eu-countries-iso",
+    "definition": "List of non-EU countries",
+    "context": "List of non-EU countries"
   },
   {
     "term": "component.subscribed-notifications-icon.label",

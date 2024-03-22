@@ -147,7 +147,7 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
-        enum: ["COUNTRIES", null],
+        enum: ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES", null],
       },
     },
   },
@@ -509,12 +509,15 @@ function hasPlaceholder(type: PetitionFieldType) {
   return ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "PHONE"].includes(type);
 }
 
+const EU_COUNTRIES =
+  "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE".split(",");
+
 export async function selectOptionsValuesAndLabels(
   options: PetitionFieldOptions["SELECT"],
   locale: ContactLocale = "en",
 ): Promise<{ values: string[]; labels?: Maybe<string[]> }> {
   switch (options.standardList) {
-    case "COUNTRIES":
+    case "COUNTRIES": {
       const countries = (
         await import(join(__dirname, `../../../data/countries/countries_${locale}.json`))
       ).default;
@@ -523,6 +526,27 @@ export async function selectOptionsValuesAndLabels(
         values: countryCodes,
         labels: countryCodes.map((code) => countries[code]),
       };
+    }
+    case "EU_COUNTRIES": {
+      const countries = (
+        await import(join(__dirname, `../../../data/countries/countries_${locale}.json`))
+      ).default;
+      const countryCodes = Object.keys(countries).filter((c) => EU_COUNTRIES.includes(c));
+      return {
+        values: countryCodes,
+        labels: countryCodes.map((code) => countries[code]),
+      };
+    }
+    case "NON_EU_COUNTRIES": {
+      const countries = (
+        await import(join(__dirname, `../../../data/countries/countries_${locale}.json`))
+      ).default;
+      const countryCodes = Object.keys(countries).filter((c) => !EU_COUNTRIES.includes(c));
+      return {
+        values: countryCodes,
+        labels: countryCodes.map((code) => countries[code]),
+      };
+    }
     default:
       return pick(options, ["values", "labels"]);
   }

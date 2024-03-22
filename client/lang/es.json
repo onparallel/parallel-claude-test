@@ -8711,13 +8711,23 @@
   },
   {
     "term": "component.standard-list-select.countries-iso",
-    "definition": "Listado de paises",
+    "definition": "Listado de países",
     "context": "List of countries"
+  },
+  {
+    "term": "component.standard-list-select.eu-countries-iso",
+    "definition": "Listado de países de la UE",
+    "context": "List of EU countries"
   },
   {
     "term": "component.standard-list-select.no-list",
     "definition": "Ningún listado",
     "context": "No list"
+  },
+  {
+    "term": "component.standard-list-select.non-eu-countries-iso",
+    "definition": "Listado de países no UE",
+    "context": "List of non-EU countries"
   },
   {
     "term": "component.subscribed-notifications-icon.label",
