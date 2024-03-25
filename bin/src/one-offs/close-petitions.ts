@@ -13,7 +13,7 @@ async function main() {
     {
       query: new URLSearchParams({
         fromTemplateId: TEMPLATE_IDS.join(","),
-        status: "COMPLETED",
+        status: "PENDING,COMPLETED",
         limit: `${100}`,
       }),
     },
