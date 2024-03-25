@@ -1,3 +1,5 @@
+# make sure to copy all files in image/yente
+
 sudo hostnamectl set-hostname yente
 
 sudo yum install nodejs nginx docker httpd-tools -y
@@ -36,8 +38,12 @@ sudo systemctl enable docker
 sudo systemctl enable yente
 sudo systemctl enable nginx
 
-sudo systemctl start start
+sudo systemctl start docker
 sudo systemctl start yente
+
+
+# sudo certbot certonly --webroot -w /usr/share/nginx/html -m santi@onparallel.com --agree-tos -d yente-green.parallel.so
+# sudo certbot certonly --webroot -w /usr/share/nginx/html -m santi@onparallel.com --agree-tos -d yente-blue.parallel.so
+
 sudo systemctl start nginx
 
-# certbot certonly --webroot -w /usr/share/nginx/html -m santi@onparallel.com --agree-tos -d yente.parallel.so

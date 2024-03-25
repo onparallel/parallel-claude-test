@@ -168,7 +168,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
   ) {}
 
   private async apiCall<TResult>(method: string, uri: string, body?: any): Promise<TResult> {
-    const response = await this.fetch.fetch(`https://yente.parallel.so/${uri}`, {
+    const response = await this.fetch.fetch(`${this.config.openSanctions.yenteUrl}/${uri}`, {
       method,
       headers: {
         Authorization: `Basic ${Buffer.from(
