@@ -40,7 +40,6 @@ export function createLogger({ container }: interfaces.Context): ILogger {
               name: "cloudwatch",
               cloudWatchLogs: new CloudWatchLogs({ ...config.aws }),
               level: "info",
-              retentionInDays: 30,
               messageFormatter: ({ level, message, ...rest }) => {
                 return stringify({ level, message, ...rest });
               },
