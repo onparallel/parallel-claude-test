@@ -108,6 +108,7 @@ async function main() {
                                     { Key: "Release", Value: commit },
                                     { Key: "Environment", Value: env },
                                     { Key: "InstanceNumber", Value: `${i + 1}` },
+                                    { Key: "MalwareScan", Value: `${env === "production"}` },
                                 ],
                             },
                         ],
